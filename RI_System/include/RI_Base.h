@@ -3,7 +3,7 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  *  Portions from the official RI.h
  *    See: https://renderman.pixar.com/products/rispec/rispec_3_1/appendix.C.html

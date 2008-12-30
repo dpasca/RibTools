@@ -3,7 +3,7 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/18.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 
@@ -32,10 +32,10 @@ struct Param
 	u_int	type;
 	
 	struct Values {
-		int				intVal;
-		float			floatVal;
-		DStr			stringVal;
-		DVec<int>		intArrayVal;
+		int			intVal;
+		float		floatVal;
+		DStr		stringVal;
+		DVec<int>	intArrayVal;
 		DVec<float>	floatArrayVal;
 	}u;
 

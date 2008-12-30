@@ -3,7 +3,7 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/22.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 
@@ -12,6 +12,8 @@
 
 #include <string.h>
 #include <math.h>
+#include "DVector.h"
+#include "DTypes.h"
 
 //==================================================================
 class Matrix44
@@ -27,7 +29,7 @@ public:
 		if ( setToIdentity )
 			Identity();
 	}
-	
+
 	Matrix44(
 		float m00_, float m01_, float m02_, float m03_,
 		float m10_, float m11_, float m12_, float m13_,
@@ -67,23 +69,37 @@ public:
 	
 	static Matrix44 Rot( float ang, float ax, float ay, float az )
 	{
-			float   xx, yy, zz, xy, yz, zx, xs, ys, zs;
+		float   xx, yy, zz, xy, yz, zx, xs, ys, zs;
 
-			float s = sinf( ang );
-			float c = cosf( ang );
+		float s = sinf( ang );
+		float c = cosf( ang );
 
-			xx = ax * ax;   yy = ay * ay;   zz = az * az;
-			xy = ax * ay;   yz = ay * az;   zx = az * ax;
-			xs = ax * s;    ys = ay * s;    zs = az * s;
-			float one_c = 1 - c;
+		xx = ax * ax;   yy = ay * ay;   zz = az * az;
+		xy = ax * ay;   yz = ay * az;   zx = az * ax;
+		xs = ax * s;    ys = ay * s;    zs = az * s;
+		float one_c = 1 - c;
 
-			return Matrix44(
-					(one_c * xx) + c,	(one_c * xy) + zs,	(one_c * zx) - ys,	0,
-					(one_c * xy) - zs,	(one_c * yy) + c,	(one_c * yz) + xs,	0,
-					(one_c * zx) + ys,	(one_c * yz) - xs,	(one_c * zz) + c,	0,
-					0,					0,					0,					1 );
+		return Matrix44(
+				(one_c * xx) + c,	(one_c * xy) + zs,	(one_c * zx) - ys,	0,
+				(one_c * xy) - zs,	(one_c * yy) + c,	(one_c * yz) + xs,	0,
+				(one_c * zx) + ys,	(one_c * yz) - xs,	(one_c * zz) + c,	0,
+				0,					0,					0,					1 );
 	}
 
+	static Matrix44 Perspective( float fov, float n, float f )
+	{
+		float   ootan2 = tanf( fov * 0.5f );
+		DASSERT( ootan2 != 0 );
+		ootan2 = 1.0f / ootan2;
+
+		DASSERT( f != n );
+
+		return Matrix44(
+				ootan2,	0,		0,			0,
+				0,		ootan2,	0,			0,
+				0,		0,		f/(f-n),	1,
+				0,		0,		n*f/(n-f),	0 );
+	}
 	
 
 	void CopyRowMajor( const float *pSrcMtx )
@@ -110,5 +126,32 @@ inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 	}
 	return tmp;
 }
+
+//==================================================================
+inline Vector4 operator * ( const Vector4 &v, const Matrix44 &a )
+{
+	float	x = v.x, y = v.y, z = v.z, w = v.w;
+
+	return Vector4(
+		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0] * w,
+		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1] * w,
+		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2] * w,
+		a.u.m44[0][3] * x + a.u.m44[1][3] * y + a.u.m44[2][3] * z + a.u.m44[3][3] * w
+	);
+}
+
+//==================================================================
+inline Vector4 operator * ( const Vector3 &v, const Matrix44 &a )
+{
+	float	x = v.x, y = v.y, z = v.z;
+
+	return Vector4(
+		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
+		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
+		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2],
+		a.u.m44[0][3] * x + a.u.m44[1][3] * y + a.u.m44[2][3] * z + a.u.m44[3][3]
+	);
+}
+
 
 #endif

@@ -3,14 +3,16 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/31.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 
-#include "RibRender.h"
-
-#include "RI_Base.h"
+#include <stdio.h>
+#include "RI_Parser.h"
 #include "RI_Machine.h"
+#include "DUtils.h"
+
+#include "RibRender.h"
 
 #include <GLUT/glut.h>
 
@@ -52,42 +54,16 @@ void idle(void)
 {
     glutPostRedisplay();
 }
-/*
-//===============================================================
-static int stricmp( const char *a, const char *b )
-{
-	size_t	len = strlen(a);
-
-	return strncasecmp( a, b, len );
-}
-
-//===============================================================
-static size_t subStrings( char *pBuff, const char *pOutList[32] )
-{
-	size_t	cnt = 0;
-	char	*pTrack = NULL;
-	
-	for (;;)
-	{
-		strtok_r( pBuff, " ¥t/", &pTrack );
-		if ( pTrack == NULL )
-			break;
-
-		if ( cnt >= 32 )
-			throw "Out of bounds !";
-
-		pOutList[cnt++] = pTrack;
-
-		++cnt;
-	}
-	
-	return cnt;
-}
-*/
 
 //===============================================================
 int main(int argc, char** argv)
 {
+	if ( argc != 2 )
+	{
+		printf( "Invalid param count. Quitting !\n" );
+		return -1;
+	}
+
     glutInit(&argc, argv);
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
@@ -101,6 +77,45 @@ int main(int argc, char** argv)
 
     glutIdleFunc(idle);
     
-    glutMainLoop();
+	void	*pData;
+	size_t	dataSize;
+
+	if NOT( DUT::GrabFile( argv[1], pData, dataSize ) )
+	{
+		printf( "Could not open the file in input. Quitting !\n" );
+		return -1;
+	}
+
+	RI::Parser		parser;
+	RI::Machine		machine;
+
+	for (size_t i=0; i <= dataSize; ++i)
+	{
+		if ( i == dataSize )
+			parser.AddChar( 0 );
+		else
+			parser.AddChar( ((char *)pData)[i] );
+
+		if ( parser.HasNewCommand() )
+		{
+			DStr			cmdName;
+			RI::ParamList	cmdParams;
+
+			parser.FlushNewCommand( &cmdName, &cmdParams );
+
+			printf( "CMD %s ", cmdName.c_str() );
+			
+			if ( cmdParams.size() )
+				printf( "(%i params)", cmdParams.size() );
+
+			puts( "" );
+
+			machine.AddCommand( cmdName, cmdParams );
+		}
+		
+	}	
+
+	glutMainLoop();
+
     return EXIT_SUCCESS;
 }

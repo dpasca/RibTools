@@ -3,7 +3,7 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/xx.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 

@@ -3,7 +3,7 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 
@@ -387,7 +387,7 @@ void State::Rotate( float angDeg, float ax, float ay, float az )
 		return;
 
 	Matrix44 &m = mTransformOpenStack.top().mMatrix;
-	m = Matrix44::Rot( angDeg * 3.14159265f / 180.0f, ax, ay, az ) * m;
+	m = Matrix44::Rot( angDeg * DEG2RAD, ax, ay, az ) * m;
 }
 
 //==================================================================
@@ -398,6 +398,42 @@ void State::Translate( float tx, float ty, float tz )
 
 	Matrix44 &m = mTransformOpenStack.top().mMatrix;
 	m = Matrix44::Translate( tx, ty, tz ) * m;
+}
+
+//==================================================================
+void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
+{
+	const Options	&opt			= mOptionsStack.top();
+	const Matrix44	&mtxViewHomo	= opt.mMtxViewHomo;
+	const Matrix44	&mtxLocalView	= mTransformOpenStack.top().mMatrix;
+
+	Matrix44		mtxLocalHomo = mtxLocalView * mtxViewHomo;
+	float			halfXRes = opt.mXRes * 0.5f;
+	float			halfYRes = opt.mYRes * 0.5f;
+
+	puts( "* Cylinder" );
+
+	for (int uI=0; uI < 16; ++uI)
+	{
+		float	u = uI / 16.0f;
+
+		for (float v=0; v <= 1.0f; v += 1.0f)
+		{
+			float	theta = u * thetamax;
+			float	x = radius * cosf( theta );
+			float	y = radius * sinf( theta );
+			float	z = v * (zmax - zmin);
+
+			Vector4	homoPos = Vector3( x, y, z ) * mtxLocalHomo;
+			
+			float	oow = 1.0f / homoPos.w;
+
+			float sx = halfXRes + halfXRes * oow * homoPos.x;
+			float sy = halfYRes + halfYRes * oow * homoPos.y;
+			
+			printf( "  vtx-scr: %f %f\n", sx, sy );
+		}
+	}
 }
 
 //==================================================================

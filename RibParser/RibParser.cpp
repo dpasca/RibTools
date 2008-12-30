@@ -1,33 +1,18 @@
+/*
+ *  RibParser.cpp
+ *  RibTools
+ *
+ *  Created by Davide Pasca on 08/12/31.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
+ *
+ */
 
 #include <stdio.h>
 #include "RI_Parser.h"
-#include "RibParser.h"
 #include "RI_Machine.h"
+#include "DUtils.h"
 
-//==================================================================
-static bool grabFile( const char *pFileName, void * &pData, size_t &dataSize )
-{
-	pData		= NULL;
-	dataSize	= 0;
-	
-	FILE	*pFile = fopen( pFileName, "rb" );
-	if NOT( pFile )
-	{
-		return false;
-	}
-	
-	fseek( pFile, 0, SEEK_END );
-	dataSize = ftell( pFile );
-	fseek( pFile, 0, SEEK_SET );
-	
-	pData = malloc( dataSize );
-	
-	fread( pData, 1, dataSize, pFile );
-	
-	fclose( pFile );
-	
-	return true;
-}
+#include "RibParser.h"
 
 //==================================================================
 int main( int argc, char *argv[] )
@@ -41,13 +26,13 @@ int main( int argc, char *argv[] )
 	void	*pData;
 	size_t	dataSize;
 
-	if NOT( grabFile( argv[1], pData, dataSize ) )
+	if NOT( DUT::GrabFile( argv[1], pData, dataSize ) )
 	{
 		printf( "Could not open the file in input. Quitting !\n" );
 		return -1;
 	}
 
-	RI::Parser	parser;
+	RI::Parser		parser;
 	RI::Machine		machine;
 
 	for (size_t i=0; i <= dataSize; ++i)

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B16F3F70F0AA50600B53225 /* DUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B16F3F60F0AA50600B53225 /* DUtils.cpp */; };
+		6B16F3F90F0AA51900B53225 /* DUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F3F80F0AA51900B53225 /* DUtils.h */; };
+		6B16F4530F0AC03100B53225 /* DMath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F4520F0AC03100B53225 /* DMath.h */; };
+		6B16F4E50F0AC70C00B53225 /* DVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F4E40F0AC70C00B53225 /* DVector.h */; };
 		6B1F58F10F0954A40082B328 /* DContainers.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B1F58EB0F0954A40082B328 /* DContainers.h */; };
 		6B1F58F20F0954A40082B328 /* DTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B1F58EC0F0954A40082B328 /* DTypes.h */; };
 		6B1F58F30F0954A40082B328 /* DContainers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1F58EF0F0954A40082B328 /* DContainers.cpp */; };
@@ -117,6 +121,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6B16F3F60F0AA50600B53225 /* DUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DUtils.cpp; path = src/DUtils.cpp; sourceTree = "<group>"; };
+		6B16F3F80F0AA51900B53225 /* DUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DUtils.h; path = include/DUtils.h; sourceTree = "<group>"; };
+		6B16F4520F0AC03100B53225 /* DMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMath.h; path = include/DMath.h; sourceTree = "<group>"; };
+		6B16F4E40F0AC70C00B53225 /* DVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DVector.h; path = include/DVector.h; sourceTree = "<group>"; };
 		6B1F58E20F09541D0082B328 /* libDSystem.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDSystem.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B1F58EB0F0954A40082B328 /* DContainers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DContainers.h; path = include/DContainers.h; sourceTree = "<group>"; };
 		6B1F58EC0F0954A40082B328 /* DTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DTypes.h; path = include/DTypes.h; sourceTree = "<group>"; };
@@ -211,6 +219,8 @@
 		6B1F58E90F0954A40082B328 /* DSystem */ = {
 			isa = PBXGroup;
 			children = (
+				6B16F3F80F0AA51900B53225 /* DUtils.h */,
+				6B16F3F60F0AA50600B53225 /* DUtils.cpp */,
 				6B1F58EB0F0954A40082B328 /* DContainers.h */,
 				6B1F58EC0F0954A40082B328 /* DTypes.h */,
 				6B1F58EF0F0954A40082B328 /* DContainers.cpp */,
@@ -222,8 +232,10 @@
 		6B1F59150F0956870082B328 /* DMath */ = {
 			isa = PBXGroup;
 			children = (
-				6B1F59170F0956870082B328 /* DMatrix44.h */,
+				6B16F4E40F0AC70C00B53225 /* DVector.h */,
+				6B16F4520F0AC03100B53225 /* DMath.h */,
 				6B1F59190F0956870082B328 /* DMatrix44.cpp */,
+				6B1F59170F0956870082B328 /* DMatrix44.h */,
 			);
 			path = DMath;
 			sourceTree = "<group>";
@@ -259,27 +271,27 @@
 			isa = PBXGroup;
 			children = (
 				6B8349880F0A7F0700BA7221 /* RI_Attributes.cpp */,
+				6B83497D0F0A7F0700BA7221 /* RI_Attributes.h */,
 				6B8349890F0A7F0700BA7221 /* RI_Base.cpp */,
+				6B83497E0F0A7F0700BA7221 /* RI_Base.h */,
 				6B83498A0F0A7F0700BA7221 /* RI_Machine.cpp */,
+				6B83497F0F0A7F0700BA7221 /* RI_Machine.h */,
 				6B83498B0F0A7F0700BA7221 /* RI_Options.cpp */,
+				6B8349800F0A7F0700BA7221 /* RI_Options.h */,
 				6B83498C0F0A7F0700BA7221 /* RI_Param.cpp */,
+				6B8349810F0A7F0700BA7221 /* RI_Param.h */,
 				6B83498D0F0A7F0700BA7221 /* RI_Params.cpp */,
+				6B8349820F0A7F0700BA7221 /* RI_Params.h */,
 				6B83498E0F0A7F0700BA7221 /* RI_Parser.cpp */,
+				6B8349830F0A7F0700BA7221 /* RI_Parser.h */,
 				6B83498F0F0A7F0700BA7221 /* RI_State.cpp */,
+				6B8349840F0A7F0700BA7221 /* RI_State.h */,
 				6B8349900F0A7F0700BA7221 /* RI_Tokens.cpp */,
+				6B8349850F0A7F0700BA7221 /* RI_Tokens.h */,
 				6B8349910F0A7F0700BA7221 /* RI_Transform.cpp */,
+				6B8349860F0A7F0700BA7221 /* RI_Transform.h */,
 				6B8349920F0A7F0700BA7221 /* Tokenizer.cpp */,
 				6B8349930F0A7F0700BA7221 /* Tokenizer.h */,
-				6B83497D0F0A7F0700BA7221 /* RI_Attributes.h */,
-				6B83497E0F0A7F0700BA7221 /* RI_Base.h */,
-				6B83497F0F0A7F0700BA7221 /* RI_Machine.h */,
-				6B8349800F0A7F0700BA7221 /* RI_Options.h */,
-				6B8349810F0A7F0700BA7221 /* RI_Param.h */,
-				6B8349820F0A7F0700BA7221 /* RI_Params.h */,
-				6B8349830F0A7F0700BA7221 /* RI_Parser.h */,
-				6B8349840F0A7F0700BA7221 /* RI_State.h */,
-				6B8349850F0A7F0700BA7221 /* RI_Tokens.h */,
-				6B8349860F0A7F0700BA7221 /* RI_Transform.h */,
 			);
 			path = RI_System;
 			sourceTree = "<group>";
@@ -287,8 +299,8 @@
 		6B8349CC0F0A8F6800BA7221 /* RibRender */ = {
 			isa = PBXGroup;
 			children = (
-				6B8349C80F0A8EDA00BA7221 /* RibRender.h */,
 				6B8349C90F0A8EDA00BA7221 /* RibRender.cpp */,
+				6B8349C80F0A8EDA00BA7221 /* RibRender.h */,
 				6B6D4CC50F0A91BE00AEC534 /* RibRender-Info.plist */,
 				6B8349C20F0A8E7600BA7221 /* GLUT.framework */,
 				6B8349C40F0A8E7F00BA7221 /* OpenGL.framework */,
@@ -328,6 +340,8 @@
 			files = (
 				6B1F58F10F0954A40082B328 /* DContainers.h in Headers */,
 				6B1F58F20F0954A40082B328 /* DTypes.h in Headers */,
+				6B16F3F90F0AA51900B53225 /* DUtils.h in Headers */,
+				6B16F4530F0AC03100B53225 /* DMath.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +350,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B1F591A0F0956870082B328 /* DMatrix44.h in Headers */,
+				6B16F4E50F0AC70C00B53225 /* DVector.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,6 +508,7 @@
 			files = (
 				6B1F58F30F0954A40082B328 /* DContainers.cpp in Sources */,
 				6B1F58F40F0954A40082B328 /* DTypes.cpp in Sources */,
+				6B16F3F70F0AA50600B53225 /* DUtils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

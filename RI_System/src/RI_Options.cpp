@@ -3,13 +3,14 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 
 #include "DTypes.h"
 #include "RI_Base.h"
 #include "RI_Options.h"
+#include "RI_Tokens.h"
 
 //==================================================================
 namespace RI
@@ -23,6 +24,7 @@ Options::Options() :
 	mLeft(-4.0f/3), mRight(4.0f/3), mBottom(-1), mTop(1),
 	mXMin(0), mXMax(1), mYMin(0), mYMax(1),
 	mProjection("orthographic"),
+	mMtxViewHomo(true),
 	mNearClip(RI_EPSILON), mFarClip(RI_INFINITY),
 	mFStop(RI_INFINITY),
 	mFocalLength(0),
@@ -82,22 +84,38 @@ void Options::cmdCropWindow( float xMin, float xMax, float yMin, float yMax )
 }
 
 //==================================================================
-const char *RI_TOK_PERSPECTIVE	= "perspective";
-const char *RI_TOK_ORTHOGONAL	= "orthogonal";
-
-//==================================================================
 void Options::cmdProjection( ParamList &params )
 {
 	if ( params.size() >= 1 )
 	{
-		if ( params[0].u.stringVal == RI_TOK_PERSPECTIVE )
+		if ( params[0].u.stringVal == RI_PERSPECTIVE )
 		{
-			mProjection	= RI_TOK_PERSPECTIVE;
+			mProjection	= RI_PERSPECTIVE;
+			
+			for (size_t i=1; i < params.size(); ++i)
+			{
+				if ( params[i].type == Param::STR )
+				{
+					if ( params[i].u.stringVal == RI_FOV )
+					{
+						if ( (i+1) >= params.size() )
+						{
+							printf( "Error missing parameter !\n" );
+							return;
+						}
+
+						float fov = params[++i].Flt();
+
+						mMtxViewHomo =
+							Matrix44::Perspective( fov * DEG2RAD, mNearClip, mFarClip );
+					}
+				}
+			}
 		}
 		else
-		if ( params[0].u.stringVal == RI_TOK_ORTHOGONAL )
+		if ( params[0].u.stringVal == RI_ORTHOGRAPHIC )
 		{
-			mProjection	= RI_TOK_ORTHOGONAL;
+			mProjection	= RI_ORTHOGRAPHIC;
 		}
 	}
 }

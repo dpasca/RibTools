@@ -3,7 +3,7 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 
@@ -12,6 +12,7 @@
 
 #include "RI_Base.h"
 #include "RI_Param.h"
+#include "DMath.h"
 
 //==================================================================
 namespace RI
@@ -38,7 +39,10 @@ public:
 	float	mFrameAspectRatio;
 	float	mLeft, mRight, mBottom, mTop;
 	float	mXMin, mXMax, mYMin, mYMax;
-	Token	mProjection;
+	
+	Token		mProjection;
+	Matrix44	mMtxViewHomo;
+	
 	float	mNearClip, mFarClip;
 	float	mFStop, mFocalLength, mFocalDistance;
 	float	mOpenShutter, mCloseShutter;

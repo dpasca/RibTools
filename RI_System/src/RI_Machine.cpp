@@ -3,7 +3,7 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 
@@ -100,6 +100,10 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Scale" )			{ exN( 3, p ); mState.Scale(		p[0].Flt(), p[1].Flt(), p[2].Flt() );	}	else
 	if ( nm == "Rotate" )			{ exN( 4, p ); mState.Rotate(		p[0].Flt(), p[1].Flt(), p[2].Flt(), p[3].Flt() ); }	else
 	if ( nm == "Translate" )		{ exN( 3, p ); mState.Translate(	p[0].Flt(), p[1].Flt(), p[2].Flt() );	}	else
+
+	// primitives
+	if ( nm == "Cylinder" )			{ exN( 4, p ); mState.Cylinder(		p[0].Flt(), p[1].Flt(), p[2].Flt(), p[3].Flt() ); }	else
+
 	// unknown
 									{ unknownCommand( nm.c_str() ); }
 

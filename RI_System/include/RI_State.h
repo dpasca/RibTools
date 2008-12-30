@@ -3,7 +3,7 @@
  *  ribparser
  *
  *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Copyright 2008 Davide Pasca. All rights reserved.
  *
  */
 
@@ -44,7 +44,7 @@ Transform
 *	ObjectBegin/End
 
 */
-	
+
 //==================================================================
 //
 //==================================================================
@@ -55,7 +55,7 @@ class State
 	CopyStack<Attributes>	mAttributesStack;
 	CopyStack<Transform>	mTransformOpenStack;
 	CopyStack<Transform>	mTransformCloseStack;
-	
+
 	enum OpType
 	{
 		OPTYPE_OPTS,
@@ -70,7 +70,7 @@ public:
 
 	void	Begin( Token name );
 	void	End();
-	
+
 	void	FrameBegin( int frame );
 	void	FrameEnd();
 	void	WorldBegin();
@@ -118,6 +118,9 @@ public:
 	void Scale( float sx, float sy, float sz );
 	void Rotate( float angDeg, float ax, float ay, float az );
 	void Translate( float tx, float ty, float tz );
+	
+	// primitives
+	void Cylinder( float radius, float zmin, float zmax, float thetamax );
 
 private:
 	void ErrHandler( Error errCode );
