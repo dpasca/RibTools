@@ -102,6 +102,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Translate" )		{ exN( 3, p ); mState.Translate(	p[0].Flt(), p[1].Flt(), p[2].Flt() );	}	else
 
 	// primitives
+	if ( nm == "Cone" )				{ exN( 3, p ); mState.Cone(			p[0].Flt(), p[1].Flt(), p[2].Flt() ); }	else
 	if ( nm == "Cylinder" )			{ exN( 4, p ); mState.Cylinder(		p[0].Flt(), p[1].Flt(), p[2].Flt(), p[3].Flt() ); }	else
 
 	// unknown

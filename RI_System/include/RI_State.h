@@ -118,9 +118,10 @@ public:
 	void Scale( float sx, float sy, float sz );
 	void Rotate( float angDeg, float ax, float ay, float az );
 	void Translate( float tx, float ty, float tz );
-	
+
 	// primitives
 	void Cylinder( float radius, float zmin, float zmax, float thetamax );
+	void Cone( float height, float radius, float thetamax );
 
 private:
 	void ErrHandler( Error errCode );
