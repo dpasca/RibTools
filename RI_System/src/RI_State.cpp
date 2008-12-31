@@ -8,6 +8,7 @@
  */
 
 #include "RI_State.h"
+#include <GLUT/glut.h>
 
 //==================================================================
 namespace RI
@@ -412,13 +413,17 @@ void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
 	float			halfYRes = opt.mYRes * 0.5f;
 
 	puts( "* Cylinder" );
+	
+	glBegin( GL_TRIANGLE_STRIP );
 
 	for (int uI=0; uI < 16; ++uI)
 	{
 		float	u = uI / 16.0f;
-
+		
 		for (float v=0; v <= 1.0f; v += 1.0f)
 		{
+			glColor3f( u, v, 0 );
+			
 			float	theta = u * thetamax;
 			float	x = radius * cosf( theta );
 			float	y = radius * sinf( theta );
@@ -429,11 +434,16 @@ void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
 			float	oow = 1.0f / homoPos.w;
 
 			float sx = halfXRes + halfXRes * oow * homoPos.x;
-			float sy = halfYRes + halfYRes * oow * homoPos.y;
+			float sy = halfYRes - halfYRes * oow * homoPos.y;
+			float sz = oow * homoPos.z;
 			
-			printf( "  vtx-scr: %f %f\n", sx, sy );
+			printf( "  vtx-scr: %f %f %f\n", sx, sy, sz );
+			
+			glVertex3f( sx, sy, sz );
 		}
 	}
+	
+	glEnd();
 }
 
 //==================================================================

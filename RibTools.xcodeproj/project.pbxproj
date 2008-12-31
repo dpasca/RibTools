@@ -20,6 +20,7 @@
 		6B1F591A0F0956870082B328 /* DMatrix44.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B1F59170F0956870082B328 /* DMatrix44.h */; };
 		6B1F591B0F0956870082B328 /* DMatrix44.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1F59190F0956870082B328 /* DMatrix44.cpp */; };
 		6B1F591C0F0956950082B328 /* libDMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F590E0F09561C0082B328 /* libDMath.a */; };
+		6B41D1A70F0C2B1100BC03E7 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B8349C40F0A8E7F00BA7221 /* OpenGL.framework */; };
 		6B6D4CD40F0A929B00AEC534 /* libDMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F590E0F09561C0082B328 /* libDMath.a */; };
 		6B6D4CD50F0A929F00AEC534 /* libDSystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F58E20F09541D0082B328 /* libDSystem.a */; };
 		6B6D4CD60F0A92A200AEC534 /* libRI_System.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B8349700F0A7EA600BA7221 /* libRI_System.a */; };
@@ -188,6 +189,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B41D1A70F0C2B1100BC03E7 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

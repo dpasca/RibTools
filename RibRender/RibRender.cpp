@@ -20,8 +20,8 @@
 void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-	//gApp.OnPaint();
+
+	glCallList( 1 );
 
     glutSwapBuffers();
 }
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
     glutInitWindowSize(800, 600);
     
     glutCreateWindow( "RibRender" );
-    
+
     glutDisplayFunc( display );
     glutReshapeFunc( reshape );
 	glutPassiveMotionFunc( passiveMotion );
@@ -88,6 +88,8 @@ int main(int argc, char** argv)
 
 	RI::Parser		parser;
 	RI::Machine		machine;
+	
+	glNewList( 1, GL_COMPILE );
 
 	for (size_t i=0; i <= dataSize; ++i)
 	{
@@ -113,7 +115,9 @@ int main(int argc, char** argv)
 			machine.AddCommand( cmdName, cmdParams );
 		}
 		
-	}	
+	}
+	
+	glEndList();
 
 	glutMainLoop();
 

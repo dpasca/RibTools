@@ -56,6 +56,8 @@ public:
 		m.u.m44[1][1] = sy;
 		m.u.m44[2][2] = sz;
 		m.u.m44[3][3] = 1.0f;
+		
+		return m;
 	}
 
 	static Matrix44 Translate( float tx, float ty, float tz )
@@ -65,6 +67,8 @@ public:
 		m.u.m44[3][1] = ty;
 		m.u.m44[3][2] = tz;
 		m.u.m44[3][3] = 1.0f;
+		
+		return m;
 	}
 	
 	static Matrix44 Rot( float ang, float ax, float ay, float az )

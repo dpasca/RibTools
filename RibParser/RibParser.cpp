@@ -33,7 +33,6 @@ int main( int argc, char *argv[] )
 	}
 
 	RI::Parser		parser;
-	RI::Machine		machine;
 
 	for (size_t i=0; i <= dataSize; ++i)
 	{
@@ -55,8 +54,6 @@ int main( int argc, char *argv[] )
 				printf( "(%i params)", cmdParams.size() );
 
 			puts( "" );
-			
-			machine.AddCommand( cmdName, cmdParams );
 		}
 		
 	}
