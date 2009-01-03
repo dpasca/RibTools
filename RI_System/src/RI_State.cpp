@@ -1,6 +1,6 @@
 /*
- *  RI_State.cpp
- *  ribparser
+ *  RI_Framework.cpp
+ *  RibTools
  *
  *  Created by Davide Pasca on 08/12/17.
  *  Copyright 2008 Davide Pasca. All rights reserved.
@@ -8,9 +8,7 @@
  */
 
 #include "RI_State.h"
-#include <GLUT/glut.h>
-
-const static int NSUBDIVS = 16;
+#include "RI_Primitive.h"
 
 //==================================================================
 namespace RI
@@ -162,10 +160,14 @@ void State::WorldBegin()
 {
 	pushMode( MD_WORLD );
 	pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
+
+	mFramework.WorldBegin();
 }
 //==================================================================
 void State::WorldEnd()
 {
+	mFramework.WorldEnd();
+
 	popStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 	popMode( MD_WORLD );
 }
@@ -404,87 +406,21 @@ void State::Translate( float tx, float ty, float tz )
 }
 
 //==================================================================
-void State::Cone( float height, float radius, float thetamax )
+void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
 {
-	const Options	&opt		= mOptionsStack.top();
-	Matrix44	mtxLocalHomo	= mTransformOpenStack.top().mMatrix * opt.mMtxViewHomo;
-	float		halfXRes		= opt.mXRes * 0.5f;
-	float		halfYRes		= opt.mYRes * 0.5f;
-
-	puts( "* Cone" );
-
-	glBegin( GL_TRIANGLE_STRIP );
-
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-		
-		for (float v=0; v <= 1.0f; v += 1.0f)
-		{
-			glColor3f( u, v, 0 );
-			
-			float	theta = u * thetamax;
-			float	x = radius * (1 - v) * cosf( theta );
-			float	y = radius * (1 - v) * sinf( theta );
-			float	z = v * height;
-
-			Vector4	homoPos = Vector3( x, y, z ) * mtxLocalHomo;
-			
-			float	oow = 1.0f / homoPos.w;
-
-			float sx = halfXRes + halfXRes * oow * homoPos.x;
-			float sy = halfYRes - halfYRes * oow * homoPos.y;
-			float sz = oow * homoPos.z;
-			
-			printf( "  vtx-scr: %f %f %f\n", sx, sy, sz );
-			
-			glVertex3f( sx, sy, sz );
-		}
-	}
-	
-	glEnd();
+	mFramework.Insert( new RI::Cylinder( radius, zmin, zmax, thetamax ),
+					  mOptionsStack.top(),
+					  mAttributesStack.top(),
+					  mTransformOpenStack.top() );
 }
 
 //==================================================================
-void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
+void State::Cone( float height, float radius, float thetamax )
 {
-	const Options	&opt		= mOptionsStack.top();
-	Matrix44	mtxLocalHomo	= mTransformOpenStack.top().mMatrix * opt.mMtxViewHomo;
-	float		halfXRes		= opt.mXRes * 0.5f;
-	float		halfYRes		= opt.mYRes * 0.5f;
-
-	puts( "* Cylinder" );
-	
-	glBegin( GL_TRIANGLE_STRIP );
-
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-		
-		for (float v=0; v <= 1.0f; v += 1.0f)
-		{
-			glColor3f( u, v, 0 );
-			
-			float	theta = u * thetamax;
-			float	x = radius * cosf( theta );
-			float	y = radius * sinf( theta );
-			float	z = v * (zmax - zmin);
-
-			Vector4	homoPos = Vector3( x, y, z ) * mtxLocalHomo;
-			
-			float	oow = 1.0f / homoPos.w;
-
-			float sx = halfXRes + halfXRes * oow * homoPos.x;
-			float sy = halfYRes - halfYRes * oow * homoPos.y;
-			float sz = oow * homoPos.z;
-			
-			printf( "  vtx-scr: %f %f %f\n", sx, sy, sz );
-			
-			glVertex3f( sx, sy, sz );
-		}
-	}
-	
-	glEnd();
+	mFramework.Insert( new RI::Cone( height, radius, thetamax ),
+					  mOptionsStack.top(),
+					  mAttributesStack.top(),
+					  mTransformOpenStack.top() );
 }
 
 //==================================================================

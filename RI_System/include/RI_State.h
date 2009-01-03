@@ -15,6 +15,8 @@
 #include "RI_Options.h"
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
+#include "RI_Framework.h"
+#include "RI_Primitive.h"
 
 //==================================================================
 namespace RI
@@ -55,6 +57,8 @@ class State
 	CopyStack<Attributes>	mAttributesStack;
 	CopyStack<Transform>	mTransformOpenStack;
 	CopyStack<Transform>	mTransformCloseStack;
+
+	Framework				mFramework;
 
 	enum OpType
 	{
@@ -122,6 +126,7 @@ public:
 	// primitives
 	void Cylinder( float radius, float zmin, float zmax, float thetamax );
 	void Cone( float height, float radius, float thetamax );
+	void Sphere( float radius, float zmin, float zmax, float thetamax );
 
 private:
 	void ErrHandler( Error errCode );
@@ -147,6 +152,8 @@ private:
 	inline void popStacks( const u_int flags );
 
 	bool verifyOpType( OpType optype );
+	
+	friend class VMaker;
 };
 
 }
