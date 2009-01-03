@@ -47,70 +47,77 @@ public:
 		memset( u.m16, 0, sizeof(float) * 16 );
 		u.m44[0][0] = u.m44[1][1] = u.m44[2][2] = u.m44[3][3] = 1.0f;
 	}
-	
-	static Matrix44 Scale( float sx, float sy, float sz )
-	{
-		Matrix44	m;
-		memset( m.u.m16, 0, sizeof(float) * 16 );
-		m.u.m44[0][0] = sx;
-		m.u.m44[1][1] = sy;
-		m.u.m44[2][2] = sz;
-		m.u.m44[3][3] = 1.0f;
 		
-		return m;
-	}
-
-	static Matrix44 Translate( float tx, float ty, float tz )
-	{
-		Matrix44	m( true );
-		m.u.m44[3][0] = tx;
-		m.u.m44[3][1] = ty;
-		m.u.m44[3][2] = tz;
-		m.u.m44[3][3] = 1.0f;
-		
-		return m;
-	}
-	
-	static Matrix44 Rot( float ang, float ax, float ay, float az )
-	{
-		float   xx, yy, zz, xy, yz, zx, xs, ys, zs;
-
-		float s = sinf( ang );
-		float c = cosf( ang );
-
-		xx = ax * ax;   yy = ay * ay;   zz = az * az;
-		xy = ax * ay;   yz = ay * az;   zx = az * ax;
-		xs = ax * s;    ys = ay * s;    zs = az * s;
-		float one_c = 1 - c;
-
-		return Matrix44(
-				(one_c * xx) + c,	(one_c * xy) + zs,	(one_c * zx) - ys,	0,
-				(one_c * xy) - zs,	(one_c * yy) + c,	(one_c * yz) + xs,	0,
-				(one_c * zx) + ys,	(one_c * yz) - xs,	(one_c * zz) + c,	0,
-				0,					0,					0,					1 );
-	}
-
-	static Matrix44 Perspective( float fov, float n, float f )
-	{
-		float   ootan2 = tanf( fov * 0.5f );
-		DASSERT( ootan2 != 0 );
-		ootan2 = 1.0f / ootan2;
-
-		DASSERT( f != n );
-
-		return Matrix44(
-				ootan2,	0,		0,			0,
-				0,		ootan2,	0,			0,
-				0,		0,		f/(f-n),	1,
-				0,		0,		n*f/(n-f),	0 );
-	}
-	
+	inline static Matrix44 Scale( float sx, float sy, float sz );
+	inline static Matrix44 Translate( float tx, float ty, float tz );
+	inline static Matrix44 Rot( float ang, float ax, float ay, float az );
+	inline static Matrix44 Perspective( float fov, float n, float f );
 
 	void CopyRowMajor( const float *pSrcMtx )
 	{
 		memcpy( u.m16, pSrcMtx, sizeof(float) * 16 );
 	}
+	
+	void PrintOut() const;
 };
+
+//==================================================================
+inline Matrix44 Matrix44::Scale( float sx, float sy, float sz )
+{
+	Matrix44	m;
+	memset( m.u.m16, 0, sizeof(float) * 16 );
+	m.u.m44[0][0] = sx;
+	m.u.m44[1][1] = sy;
+	m.u.m44[2][2] = sz;
+	m.u.m44[3][3] = 1.0f;
+	
+	return m;
+}
+//==================================================================
+inline Matrix44 Matrix44::Translate( float tx, float ty, float tz )
+{
+	Matrix44	m( true );
+	m.u.m44[3][0] = tx;
+	m.u.m44[3][1] = ty;
+	m.u.m44[3][2] = tz;
+	m.u.m44[3][3] = 1.0f;
+	
+	return m;
+}
+//==================================================================
+inline Matrix44 Matrix44::Rot( float ang, float ax, float ay, float az )
+{
+	float   xx, yy, zz, xy, yz, zx, xs, ys, zs;
+
+	float s = sinf( ang );
+	float c = cosf( ang );
+
+	xx = ax * ax;   yy = ay * ay;   zz = az * az;
+	xy = ax * ay;   yz = ay * az;   zx = az * ax;
+	xs = ax * s;    ys = ay * s;    zs = az * s;
+	float one_c = 1 - c;
+
+	return Matrix44(
+			(one_c * xx) + c,	(one_c * xy) + zs,	(one_c * zx) - ys,	0,
+			(one_c * xy) - zs,	(one_c * yy) + c,	(one_c * yz) + xs,	0,
+			(one_c * zx) + ys,	(one_c * yz) - xs,	(one_c * zz) + c,	0,
+			0,					0,					0,					1 );
+}
+//==================================================================
+inline Matrix44 Matrix44::Perspective( float fov, float n, float f )
+{
+	float   ootan2 = tanf( fov * 0.5f );
+	DASSERT( ootan2 != 0 );
+	ootan2 = 1.0f / ootan2;
+
+	DASSERT( f != n );
+
+	return Matrix44(
+			ootan2,	0,		0,			0,
+			0,		ootan2,	0,			0,
+			0,		0,		f/(f-n),	1,
+			0,		0,		n*f/(n-f),	0 );
+}
 
 //==================================================================
 inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)

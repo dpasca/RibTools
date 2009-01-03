@@ -41,7 +41,7 @@ inline void GState::AddVertex( float x, float y, float z, float r, float g, floa
 	float sy = mHalfYRes - mHalfYRes * oow * homoPos.y;
 	float sz = oow * homoPos.z;
 
-	printf( "  vtx-scr: %f %f %f\n", sx, sy, sz );
+	//printf( "  vtx-scr: %f %f %f\n", sx, sy, sz );
 	
 	glColor3f( r, g, b );
 	glVertex3f( sx, sy, sz );
@@ -60,10 +60,10 @@ void Cylinder::Render( GState &gstate )
 
 		for (float v=0; v <= 1.0f; v += 1.0f)
 		{
-			float	theta = u * mThetamax;
+			float	theta = u * mThetamaxRad;
 			float	x = mRadius * cosf( theta );
 			float	y = mRadius * sinf( theta );
-			float	z = v * (mZMax - mZMin);
+			float	z = mZMin + v * (mZMax - mZMin);
 
 			gstate.AddVertex( x, y, z, u, v, 0 );
 		}
@@ -85,7 +85,7 @@ void Cone::Render( GState &gstate )
 
 		for (float v=0; v <= 1.0f; v += 1.0f)
 		{
-			float	theta = u * mThetamax;
+			float	theta = u * mThetamaxRad;
 			float	x = mRadius * (1 - v) * cosf( theta );
 			float	y = mRadius * (1 - v) * sinf( theta );
 			float	z = v * mHeight;
@@ -96,6 +96,60 @@ void Cone::Render( GState &gstate )
 	
 	glEnd();
 }
+
+//==================================================================
+void Sphere::Render( GState &gstate )
+{
+	puts( "* Sphere" );
+	
+	glBegin( GL_TRIANGLE_STRIP );
+
+	float	alphamin	= asinf( mZMin / mRadius );
+	float	alphadelta	= asinf( mZMax / mRadius ) - alphamin;
+
+	float	buffer[NSUBDIVS+1][6];
+
+	for (int uI=0; uI <= NSUBDIVS; ++uI)
+	{
+		float	u = uI / (float)NSUBDIVS;
+
+		for (int vI=0; vI <= NSUBDIVS; ++vI)
+		{
+			float	v = vI / (float)NSUBDIVS;
+
+			float	alpha = alphamin + v * alphadelta;
+			float	theta = u * mThetamaxRad;
+
+			float	x = mRadius * cosf( alpha ) * cosf( theta );
+			float	y = mRadius * cosf( alpha ) * sinf( theta );
+			float	z = mRadius * sinf( alpha );
+
+			if ( uI > 0 )
+			{
+				gstate.AddVertex(
+					buffer[vI][0],
+					buffer[vI][1],
+					buffer[vI][2],
+					buffer[vI][3],
+					buffer[vI][4],
+					buffer[vI][5]
+				);
+
+				gstate.AddVertex( x, y, z, u, v, 0 );
+			}
+
+			buffer[vI][0] = x;
+			buffer[vI][1] = y;
+			buffer[vI][2] = z;
+			buffer[vI][3] = u;
+			buffer[vI][4] = v;
+			buffer[vI][5] = 0;
+		}
+	}
+	
+	glEnd();
+}
+
 
 //==================================================================
 }

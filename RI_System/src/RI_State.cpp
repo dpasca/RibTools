@@ -186,6 +186,9 @@ void State::AttributeEnd()
 //==================================================================
 void State::TransformBegin()
 {
+	//printf( ">> " );
+	//mTransformOpenStack.top().mMatrix.PrintOut();
+
 	pushMode( MD_TRANSFORM );
 	pushStacks( SF_TRAN );
 }
@@ -194,6 +197,9 @@ void State::TransformEnd()
 {
 	popStacks( SF_TRAN );
 	popMode( MD_TRANSFORM );
+
+	//printf( "<< " );
+	//mTransformOpenStack.top().mMatrix.PrintOut();
 }
 //==================================================================
 void State::SolidBegin( Token operation )
@@ -418,6 +424,15 @@ void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
 void State::Cone( float height, float radius, float thetamax )
 {
 	mFramework.Insert( new RI::Cone( height, radius, thetamax ),
+					  mOptionsStack.top(),
+					  mAttributesStack.top(),
+					  mTransformOpenStack.top() );
+}
+
+//==================================================================
+void State::Sphere( float radius, float zmin, float zmax, float thetamax )
+{
+	mFramework.Insert( new RI::Sphere( radius, zmin, zmax, thetamax ),
 					  mOptionsStack.top(),
 					  mAttributesStack.top(),
 					  mTransformOpenStack.top() );

@@ -77,7 +77,7 @@ public:
 	float	mRadius;
 	float	mZMin;
 	float	mZMax;
-	float	mThetamax;
+	float	mThetamaxRad;
 
 public:
 	Cylinder( float radius, float zmin, float zmax, float thetamax ) :
@@ -85,7 +85,7 @@ public:
 		mRadius(radius),
 		mZMin(zmin),
 		mZMax(zmax),
-		mThetamax(thetamax)
+		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
 	
@@ -100,14 +100,14 @@ class Cone : public Primitive
 public:
 	float	mHeight;
 	float	mRadius;
-	float	mThetamax;
+	float	mThetamaxRad;
 
 public:
 	Cone( float height, float radius, float thetamax ) :
 		Primitive(CONE),
 		mHeight(height),
 		mRadius(radius),
-		mThetamax(thetamax)
+		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
 
@@ -123,7 +123,7 @@ public:
 	float	mRadius;
 	float	mZMin;
 	float	mZMax;
-	float	mThetamax;
+	float	mThetamaxRad;
 
 public:
 	Sphere( float radius, float zmin, float zmax, float thetamax ) :
@@ -131,7 +131,7 @@ public:
 		mRadius(radius),
 		mZMin(zmin),
 		mZMax(zmax),
-		mThetamax(thetamax)
+		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
 
