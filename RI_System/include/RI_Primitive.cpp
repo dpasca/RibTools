@@ -31,9 +31,9 @@ GState::GState( const Options		&opt,
 }
 
 //==================================================================
-inline void GState::AddVertex( float x, float y, float z, float r, float g, float b )
+inline void GState::AddVertex( const GVert &vert )
 {
-	Vector4	homoPos = Vector3( x, y, z ) * mMtxLocalHomo;
+	Vector4	homoPos = Vector3( vert.x, vert.y, vert.z ) * mMtxLocalHomo;
 
 	float	oow = 1.0f / homoPos.w;
 
@@ -43,7 +43,7 @@ inline void GState::AddVertex( float x, float y, float z, float r, float g, floa
 
 	//printf( "  vtx-scr: %f %f %f\n", sx, sy, sz );
 	
-	glColor3f( r, g, b );
+	glColor3f( vert.u, vert.v, 0 );
 	glVertex3f( sx, sy, sz );
 }
 
@@ -61,11 +61,16 @@ void Cylinder::Render( GState &gstate )
 		for (float v=0; v <= 1.0f; v += 1.0f)
 		{
 			float	theta = u * mThetamaxRad;
-			float	x = mRadius * cosf( theta );
-			float	y = mRadius * sinf( theta );
-			float	z = mZMin + v * (mZMax - mZMin);
+			
+			GVert	vert;
 
-			gstate.AddVertex( x, y, z, u, v, 0 );
+			vert.x = mRadius * cosf( theta );
+			vert.y = mRadius * sinf( theta );
+			vert.z = mZMin + v * (mZMax - mZMin);
+			vert.u = u;
+			vert.v = v;
+
+			gstate.AddVertex( vert );
 		}
 	}
 	
@@ -85,12 +90,16 @@ void Cone::Render( GState &gstate )
 
 		for (float v=0; v <= 1.0f; v += 1.0f)
 		{
-			float	theta = u * mThetamaxRad;
-			float	x = mRadius * (1 - v) * cosf( theta );
-			float	y = mRadius * (1 - v) * sinf( theta );
-			float	z = v * mHeight;
+			GVert	vert;
 
-			gstate.AddVertex( x, y, z, u, v, 0 );
+			float	theta = u * mThetamaxRad;
+			vert.x = mRadius * (1 - v) * cosf( theta );
+			vert.y = mRadius * (1 - v) * sinf( theta );
+			vert.z = v * mHeight;
+			vert.u = u;
+			vert.v = v;
+
+			gstate.AddVertex( vert );
 		}
 	}
 	
@@ -107,7 +116,7 @@ void Sphere::Render( GState &gstate )
 	float	alphamin	= asinf( mZMin / mRadius );
 	float	alphadelta	= asinf( mZMax / mRadius ) - alphamin;
 
-	float	buffer[NSUBDIVS+1][6];
+	GVert	buffer[NSUBDIVS+1];
 
 	for (int uI=0; uI <= NSUBDIVS; ++uI)
 	{
@@ -120,36 +129,68 @@ void Sphere::Render( GState &gstate )
 			float	alpha = alphamin + v * alphadelta;
 			float	theta = u * mThetamaxRad;
 
-			float	x = mRadius * cosf( alpha ) * cosf( theta );
-			float	y = mRadius * cosf( alpha ) * sinf( theta );
-			float	z = mRadius * sinf( alpha );
+			GVert	vert;
+			vert.x = mRadius * cosf( alpha ) * cosf( theta );
+			vert.y = mRadius * cosf( alpha ) * sinf( theta );
+			vert.z = mRadius * sinf( alpha );
+			vert.u = u;
+			vert.v = v;
 
 			if ( uI > 0 )
 			{
-				gstate.AddVertex(
-					buffer[vI][0],
-					buffer[vI][1],
-					buffer[vI][2],
-					buffer[vI][3],
-					buffer[vI][4],
-					buffer[vI][5]
-				);
-
-				gstate.AddVertex( x, y, z, u, v, 0 );
+				gstate.AddVertex( buffer[vI] );
+				gstate.AddVertex( vert );
 			}
 
-			buffer[vI][0] = x;
-			buffer[vI][1] = y;
-			buffer[vI][2] = z;
-			buffer[vI][3] = u;
-			buffer[vI][4] = v;
-			buffer[vI][5] = 0;
+			buffer[vI] = vert;
 		}
 	}
 	
 	glEnd();
 }
 
+//==================================================================
+void Hyperboloid::Render( GState &gstate )
+{
+	puts( "* Hyperboloid" );
+	
+	glBegin( GL_TRIANGLE_STRIP );
+
+	GVert	buffer[NSUBDIVS+1];
+
+	for (int uI=0; uI <= NSUBDIVS; ++uI)
+	{
+		float	u = uI / (float)NSUBDIVS;
+
+		for (int vI=0; vI <= NSUBDIVS; ++vI)
+		{
+			float	v = vI / (float)NSUBDIVS;
+
+			float	x = mP1.x + (mP2.x - mP1.x) * v;
+			float	y = mP1.y + (mP2.y - mP1.y) * v;
+			float	z = mP1.z + (mP2.z - mP1.z) * v;
+
+			float theta = u * mThetamaxRad;
+
+			GVert	vert;
+			vert.x = x * cosf( theta ) - y * sinf( theta );
+			vert.y = x * sinf( theta ) + y * cosf( theta );
+			vert.z = z;
+			vert.u = u;
+			vert.v = v;
+
+			if ( uI > 0 )
+			{
+				gstate.AddVertex( buffer[vI] );
+				gstate.AddVertex( vert );
+			}
+
+			buffer[vI] = vert;
+		}
+	}
+
+	glEnd();
+}
 
 //==================================================================
 }

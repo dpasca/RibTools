@@ -21,6 +21,22 @@ class Attributes;
 class Transform;
 
 //==================================================================
+/// GVert
+//==================================================================
+struct GVert
+{
+	union 
+	{
+		struct {
+			float	x, y, z;
+			float	u, v;
+		};
+		
+		float	vec[5];
+	};
+};
+
+//==================================================================
 /// GState
 //==================================================================
 class GState
@@ -35,7 +51,7 @@ public:
 			const Attributes	&attr,
 			const Transform		&xform );
 
-	inline void AddVertex( float x, float y, float z, float r, float g, float b );
+	inline void AddVertex( const GVert &vert );
 };
 
 //==================================================================
@@ -48,7 +64,9 @@ public:
 	{
 		CONE,
 		CYLINDER,
-		SPHERE
+		SPHERE,
+		HYPERBOLOID,
+		TORUS,
 	};
 	
 	Type	mType;
@@ -131,6 +149,28 @@ public:
 		mRadius(radius),
 		mZMin(zmin),
 		mZMax(zmax),
+		mThetamaxRad(thetamax*DEG2RAD)
+	{
+	}
+
+	void Render( GState &gstate );
+};
+
+//==================================================================
+/// Hyperboloid
+//==================================================================
+class Hyperboloid : public Primitive
+{
+public:
+	Vector3	mP1;
+	Vector3	mP2;
+	float	mThetamaxRad;
+
+public:
+	Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax ) :
+		Primitive(HYPERBOLOID),
+		mP1(p1),
+		mP2(p2),
 		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}

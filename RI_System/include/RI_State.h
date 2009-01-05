@@ -127,6 +127,7 @@ public:
 	void Cylinder( float radius, float zmin, float zmax, float thetamax );
 	void Cone( float height, float radius, float thetamax );
 	void Sphere( float radius, float zmin, float zmax, float thetamax );
+	void Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax );
 
 private:
 	void ErrHandler( Error errCode );

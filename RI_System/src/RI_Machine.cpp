@@ -105,6 +105,9 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Cone" )				{ exN( 3, p ); mState.Cone(			p[0].Flt(), p[1].Flt(), p[2].Flt() ); }	else
 	if ( nm == "Cylinder" )			{ exN( 4, p ); mState.Cylinder(		p[0].Flt(), p[1].Flt(), p[2].Flt(), p[3].Flt() ); }	else
 	if ( nm == "Sphere" )			{ exN( 4, p ); mState.Sphere(		p[0].Flt(), p[1].Flt(), p[2].Flt(), p[3].Flt() ); }	else
+	if ( nm == "Hyperboloid" )		{ exN( 7, p ); mState.Hyperboloid(	Vector3( p[0].Flt(), p[1].Flt(), p[2].Flt() ),
+																		Vector3( p[3].Flt(), p[4].Flt(), p[5].Flt() ),
+																		p[6].Flt() ); }	else
 
 	// unknown
 									{ unknownCommand( nm.c_str() ); }

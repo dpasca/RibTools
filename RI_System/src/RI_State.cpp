@@ -439,4 +439,13 @@ void State::Sphere( float radius, float zmin, float zmax, float thetamax )
 }
 
 //==================================================================
+void State::Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax )
+{
+	mFramework.Insert( new RI::Hyperboloid( p1, p2, thetamax ),
+					  mOptionsStack.top(),
+					  mAttributesStack.top(),
+					  mTransformOpenStack.top() );
+}
+
+//==================================================================
 }
