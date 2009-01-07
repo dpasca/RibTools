@@ -1,5 +1,5 @@
 /*
- *  RI_Framework.cpp
+ *  RI_State.cpp
  *  RibTools
  *
  *  Created by Davide Pasca on 08/12/17.
@@ -409,42 +409,6 @@ void State::Translate( float tx, float ty, float tz )
 
 	Matrix44 &m = mTransformOpenStack.top().mMatrix;
 	m = Matrix44::Translate( tx, ty, tz ) * m;
-}
-
-//==================================================================
-void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
-{
-	mFramework.Insert( new RI::Cylinder( radius, zmin, zmax, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
-}
-
-//==================================================================
-void State::Cone( float height, float radius, float thetamax )
-{
-	mFramework.Insert( new RI::Cone( height, radius, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
-}
-
-//==================================================================
-void State::Sphere( float radius, float zmin, float zmax, float thetamax )
-{
-	mFramework.Insert( new RI::Sphere( radius, zmin, zmax, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
-}
-
-//==================================================================
-void State::Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax )
-{
-	mFramework.Insert( new RI::Hyperboloid( p1, p2, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
 }
 
 //==================================================================

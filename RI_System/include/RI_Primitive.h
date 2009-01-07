@@ -179,6 +179,35 @@ public:
 };
 
 //==================================================================
+/// Torus
+//==================================================================
+class Torus : public Primitive
+{
+public:
+	float	mMinRadius;
+	float	mMaxRadius;
+	float	mPhiminRad;
+	float	mPhimaxRad;
+	float	mThetamaxRad;
+
+public:
+	Torus( float minRadius, float maxRadius,
+		   float phimin, float phimax,
+		   float thetamax ) :
+		Primitive(TORUS),
+		mMinRadius(minRadius),
+		mMaxRadius(maxRadius),
+		mPhiminRad(phimin*DEG2RAD),
+		mPhimaxRad(phimax*DEG2RAD),
+		mThetamaxRad(thetamax*DEG2RAD)
+	{
+	}
+
+	void Render( GState &gstate );
+};
+
+
+//==================================================================
 }
 
 #endif

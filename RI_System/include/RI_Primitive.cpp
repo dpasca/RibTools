@@ -58,10 +58,10 @@ void Cylinder::Render( GState &gstate )
 	{
 		float	u = uI / (float)NSUBDIVS;
 
+		float	theta = u * mThetamaxRad;
+		
 		for (float v=0; v <= 1.0f; v += 1.0f)
 		{
-			float	theta = u * mThetamaxRad;
-			
 			GVert	vert;
 
 			vert.x = mRadius * cosf( theta );
@@ -88,11 +88,12 @@ void Cone::Render( GState &gstate )
 	{
 		float	u = uI / (float)NSUBDIVS;
 
+		float	theta = u * mThetamaxRad;
+
 		for (float v=0; v <= 1.0f; v += 1.0f)
 		{
 			GVert	vert;
 
-			float	theta = u * mThetamaxRad;
 			vert.x = mRadius * (1 - v) * cosf( theta );
 			vert.y = mRadius * (1 - v) * sinf( theta );
 			vert.z = v * mHeight;
@@ -122,12 +123,13 @@ void Sphere::Render( GState &gstate )
 	{
 		float	u = uI / (float)NSUBDIVS;
 
+		float	theta = u * mThetamaxRad;
+
 		for (int vI=0; vI <= NSUBDIVS; ++vI)
 		{
 			float	v = vI / (float)NSUBDIVS;
 
 			float	alpha = alphamin + v * alphadelta;
-			float	theta = u * mThetamaxRad;
 
 			GVert	vert;
 			vert.x = mRadius * cosf( alpha ) * cosf( theta );
@@ -162,6 +164,8 @@ void Hyperboloid::Render( GState &gstate )
 	{
 		float	u = uI / (float)NSUBDIVS;
 
+		float theta = u * mThetamaxRad;
+
 		for (int vI=0; vI <= NSUBDIVS; ++vI)
 		{
 			float	v = vI / (float)NSUBDIVS;
@@ -169,8 +173,6 @@ void Hyperboloid::Render( GState &gstate )
 			float	x = mP1.x + (mP2.x - mP1.x) * v;
 			float	y = mP1.y + (mP2.y - mP1.y) * v;
 			float	z = mP1.z + (mP2.z - mP1.z) * v;
-
-			float theta = u * mThetamaxRad;
 
 			GVert	vert;
 			vert.x = x * cosf( theta ) - y * sinf( theta );
@@ -189,6 +191,51 @@ void Hyperboloid::Render( GState &gstate )
 		}
 	}
 
+	glEnd();
+}
+
+//==================================================================
+void Torus::Render( GState &gstate )
+{
+	puts( "* Torus" );
+
+	GVert	buffer[NSUBDIVS+1];
+
+	glBegin( GL_TRIANGLE_STRIP );
+	for (int uI=0; uI <= NSUBDIVS; ++uI)
+	{
+		float	u = uI / (float)NSUBDIVS;
+
+		float theta = u * mThetamaxRad;
+
+		//glBegin( GL_TRIANGLE_STRIP );
+		for (int vI=0; vI <= NSUBDIVS; ++vI)
+		{
+			float	v = vI / (float)NSUBDIVS;
+
+			float	phi = mPhiminRad + (mPhimaxRad - mPhiminRad) * v;
+			
+			GVert	vert;
+
+			float	r = mMinRadius * cosf( phi );
+			vert.z	  = mMinRadius * sinf( phi );
+			
+			vert.x	= (mMaxRadius + r) * cosf( theta );
+			vert.y	= (mMaxRadius + r) * sinf( theta );
+
+			vert.u	= u;
+			vert.v	= v;
+
+			if ( uI > 0 )
+			{
+				gstate.AddVertex( buffer[vI] );
+				gstate.AddVertex( vert );
+			}
+
+			buffer[vI] = vert;
+		}
+		//glEnd();
+	}
 	glEnd();
 }
 

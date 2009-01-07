@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B0A68E10F151619000CB0D8 /* RI_State_Prims.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */; };
 		6B16F3F70F0AA50600B53225 /* DUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B16F3F60F0AA50600B53225 /* DUtils.cpp */; };
 		6B16F3F90F0AA51900B53225 /* DUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F3F80F0AA51900B53225 /* DUtils.h */; };
 		6B16F4530F0AC03100B53225 /* DMath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F4520F0AC03100B53225 /* DMath.h */; };
@@ -126,6 +127,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Prims.cpp; path = src/RI_State_Prims.cpp; sourceTree = "<group>"; };
 		6B16F3F60F0AA50600B53225 /* DUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DUtils.cpp; path = src/DUtils.cpp; sourceTree = "<group>"; };
 		6B16F3F80F0AA51900B53225 /* DUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DUtils.h; path = include/DUtils.h; sourceTree = "<group>"; };
 		6B16F4520F0AC03100B53225 /* DMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMath.h; path = include/DMath.h; sourceTree = "<group>"; };
@@ -299,6 +301,7 @@
 				6BFF1D4D0F0FF83800F984E5 /* RI_Primitive.cpp */,
 				6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */,
 				6B83498F0F0A7F0700BA7221 /* RI_State.cpp */,
+				6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */,
 				6B8349840F0A7F0700BA7221 /* RI_State.h */,
 				6B8349900F0A7F0700BA7221 /* RI_Tokens.cpp */,
 				6B8349850F0A7F0700BA7221 /* RI_Tokens.h */,
@@ -554,6 +557,7 @@
 				6B8349CB0F0A8EDA00BA7221 /* RibRender.cpp in Sources */,
 				6BFF1D380F0FDFF500F984E5 /* RI_Framework.cpp in Sources */,
 				6BFF1D4E0F0FF83800F984E5 /* RI_Primitive.cpp in Sources */,
+				6B0A68E10F151619000CB0D8 /* RI_State_Prims.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
