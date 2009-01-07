@@ -128,7 +128,7 @@ public:
 	void Cone( float height, float radius, float thetamax );
 	void Sphere( float radius, float zmin, float zmax, float thetamax );
 	void Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax );
-	void Torus( float minRadius, float maxRadius,
+	void Torus( float maxRadius, float minRadius,
 			   float phimin, float phimax,
 			   float thetamax );
 

@@ -51,12 +51,12 @@ void State::Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax )
 }
 
 //==================================================================
-void State::Torus( float minRadius, float maxRadius,
+void State::Torus( float maxRadius, float minRadius,
 				   float phimin, float phimax,
 				   float thetamax )
 {
 	mFramework.Insert(
-		new RI::Torus( minRadius, maxRadius, phimin, phimax, thetamax ),
+		new RI::Torus( maxRadius, minRadius, phimin, phimax, thetamax ),
 					  mOptionsStack.top(),
 					  mAttributesStack.top(),
 					  mTransformOpenStack.top() );

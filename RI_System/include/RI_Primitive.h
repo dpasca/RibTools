@@ -191,12 +191,12 @@ public:
 	float	mThetamaxRad;
 
 public:
-	Torus( float minRadius, float maxRadius,
+	Torus( float maxRadius, float minRadius,
 		   float phimin, float phimax,
 		   float thetamax ) :
 		Primitive(TORUS),
-		mMinRadius(minRadius),
 		mMaxRadius(maxRadius),
+		mMinRadius(minRadius),
 		mPhiminRad(phimin*DEG2RAD),
 		mPhimaxRad(phimax*DEG2RAD),
 		mThetamaxRad(thetamax*DEG2RAD)

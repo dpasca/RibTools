@@ -201,14 +201,14 @@ void Torus::Render( GState &gstate )
 
 	GVert	buffer[NSUBDIVS+1];
 
-	glBegin( GL_TRIANGLE_STRIP );
+	//glBegin( GL_TRIANGLE_STRIP );
 	for (int uI=0; uI <= NSUBDIVS; ++uI)
 	{
 		float	u = uI / (float)NSUBDIVS;
 
 		float theta = u * mThetamaxRad;
 
-		//glBegin( GL_TRIANGLE_STRIP );
+		glBegin( GL_TRIANGLE_STRIP );
 		for (int vI=0; vI <= NSUBDIVS; ++vI)
 		{
 			float	v = vI / (float)NSUBDIVS;
@@ -234,9 +234,9 @@ void Torus::Render( GState &gstate )
 
 			buffer[vI] = vert;
 		}
-		//glEnd();
+		glEnd();
 	}
-	glEnd();
+	//glEnd();
 }
 
 //==================================================================
