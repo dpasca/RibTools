@@ -40,6 +40,8 @@ void reshape(int width, int height)
 	//glTranslatef( -0.375f, -0.375f, 0 );
 
 	//gApp.SetSize( width, height );
+	
+	glEnable( GL_DEPTH_TEST );
 }
 
 //===============================================================

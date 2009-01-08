@@ -41,10 +41,11 @@ inline void GState::AddVertex( const GVert &vert )
 	float sy = mHalfYRes - mHalfYRes * oow * homoPos.y;
 	float sz = oow * homoPos.z;
 
-	//printf( "  vtx-scr: %f %f %f\n", sx, sy, sz );
+	//printf( "  vtx-scr: %f %f %f %f\n", sx, sy, sz, oow );
 	
+	//glColor3f( (int)(vert.u*8)/8.0f + vert.v/8, 0, 0 );
 	glColor3f( vert.u, vert.v, 0 );
-	glVertex3f( sx, sy, sz );
+	glVertex3f( sx, sy, oow );
 }
 
 //==================================================================
@@ -201,14 +202,14 @@ void Torus::Render( GState &gstate )
 
 	GVert	buffer[NSUBDIVS+1];
 
-	//glBegin( GL_TRIANGLE_STRIP );
+	glBegin( GL_TRIANGLE_STRIP );
 	for (int uI=0; uI <= NSUBDIVS; ++uI)
 	{
 		float	u = uI / (float)NSUBDIVS;
 
 		float theta = u * mThetamaxRad;
 
-		glBegin( GL_TRIANGLE_STRIP );
+		//glBegin( GL_TRIANGLE_STRIP );
 		for (int vI=0; vI <= NSUBDIVS; ++vI)
 		{
 			float	v = vI / (float)NSUBDIVS;
@@ -234,9 +235,9 @@ void Torus::Render( GState &gstate )
 
 			buffer[vI] = vert;
 		}
-		glEnd();
+		//glEnd();
 	}
-	//glEnd();
+	glEnd();
 }
 
 //==================================================================
