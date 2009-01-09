@@ -306,6 +306,7 @@ void State::Format( int xRes, int yRes, float pixelRatio )
 		return;
 
 	mOptionsStack.top().cmdFormat( xRes, yRes, pixelRatio );
+	mFramework.SetOutput( xRes, yRes );
 }
 //==================================================================
 void State::FrameAspectRatio( float ratio )

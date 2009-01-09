@@ -11,12 +11,20 @@
 #include "RI_Framework.h"
 #include "RI_State.h"
 
+#include <GLUT/glut.h>
+
 //==================================================================
 namespace RI
 {
 
 //==================================================================
 /// Framework
+//==================================================================
+void Framework::SetOutput( u_int width, u_int height )
+{
+	glutReshapeWindow( width, height );
+}
+
 //==================================================================
 void Framework::WorldBegin()
 {

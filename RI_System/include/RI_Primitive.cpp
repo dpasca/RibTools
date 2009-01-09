@@ -196,6 +196,49 @@ void Hyperboloid::Render( GState &gstate )
 }
 
 //==================================================================
+void Paraboloid::Render( GState &gstate )
+{
+	puts( "* Paraboloid" );
+
+	glBegin( GL_TRIANGLE_STRIP );
+
+	GVert	buffer[NSUBDIVS+1];
+
+	for (int uI=0; uI <= NSUBDIVS; ++uI)
+	{
+		float	u = uI / (float)NSUBDIVS;
+
+		float theta = u * mThetamaxRad;
+
+		for (int vI=0; vI <= NSUBDIVS; ++vI)
+		{
+			float	v = vI / (float)NSUBDIVS;
+
+			float	z = (mZmax - mZmin) * v;
+
+			float	r = mRmax * sqrtf( z / mZmax );
+
+			GVert	vert;
+			vert.x = r * cosf( theta );
+			vert.y = r * sinf( theta );
+			vert.z = z;
+			vert.u = u;
+			vert.v = v;
+
+			if ( uI > 0 )
+			{
+				gstate.AddVertex( buffer[vI] );
+				gstate.AddVertex( vert );
+			}
+
+			buffer[vI] = vert;
+		}
+	}
+
+	glEnd();
+}
+
+//==================================================================
 void Torus::Render( GState &gstate )
 {
 	puts( "* Torus" );

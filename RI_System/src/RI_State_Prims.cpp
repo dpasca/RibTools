@@ -51,6 +51,15 @@ void State::Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax )
 }
 
 //==================================================================
+void State::Paraboloid( float rmax, float zmin, float zmax, float thetamax )
+{
+	mFramework.Insert( new RI::Paraboloid( rmax, zmin, zmax, thetamax ),
+					  mOptionsStack.top(),
+					  mAttributesStack.top(),
+					  mTransformOpenStack.top() );
+}
+
+//==================================================================
 void State::Torus( float maxRadius, float minRadius,
 				   float phimin, float phimax,
 				   float thetamax )

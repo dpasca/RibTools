@@ -34,6 +34,8 @@ public:
 	{
 	}
 	
+	void SetOutput( u_int width, u_int height );
+	
 	void WorldBegin();
 	void Insert( Primitive			*pPrim,
 				 const Options		&opt,

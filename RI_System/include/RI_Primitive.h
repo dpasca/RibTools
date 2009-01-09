@@ -66,6 +66,7 @@ public:
 		CYLINDER,
 		SPHERE,
 		HYPERBOLOID,
+		PARABOLOID,
 		TORUS,
 	};
 	
@@ -171,6 +172,30 @@ public:
 		Primitive(HYPERBOLOID),
 		mP1(p1),
 		mP2(p2),
+		mThetamaxRad(thetamax*DEG2RAD)
+	{
+	}
+
+	void Render( GState &gstate );
+};
+
+//==================================================================
+/// Paraboloid
+//==================================================================
+class Paraboloid : public Primitive
+{
+public:
+	float	mRmax;
+	float	mZmin;
+	float	mZmax;
+	float	mThetamaxRad;
+
+public:
+	Paraboloid( float rmax, float zmin, float zmax, float thetamax ) :
+		Primitive(PARABOLOID),
+		mRmax(rmax),
+		mZmin(zmin),
+		mZmax(zmax),
 		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}

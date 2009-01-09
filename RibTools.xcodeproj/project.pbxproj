@@ -174,6 +174,7 @@
 		6B8349C80F0A8EDA00BA7221 /* RibRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibRender.h; path = RibRender/RibRender.h; sourceTree = "<group>"; };
 		6B8349C90F0A8EDA00BA7221 /* RibRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RibRender.cpp; path = RibRender/RibRender.cpp; sourceTree = "<group>"; };
 		6BCC7ADF0ED04837004AEDC8 /* ribparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ribparser; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BF635E00F17F85400A68819 /* SimpleMug.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SimpleMug.rib; path = Tests/SimpleMug.rib; sourceTree = "<group>"; };
 		6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Framework.cpp; path = src/RI_Framework.cpp; sourceTree = "<group>"; };
 		6BFF1D390F0FE02200F984E5 /* RI_Framework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Framework.h; path = include/RI_Framework.h; sourceTree = "<group>"; };
 		6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive.h; path = include/RI_Primitive.h; sourceTree = "<group>"; };
@@ -257,6 +258,7 @@
 			isa = PBXGroup;
 			children = (
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
+				6BF635E00F17F85400A68819 /* SimpleMug.rib */,
 				6B0ABFBD0F1667310001C656 /* Pixar-test.rib */,
 			);
 			name = Tests;

@@ -108,6 +108,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Hyperboloid" )		{ exN( 7, p ); mState.Hyperboloid(	Vector3( p[0].Flt(), p[1].Flt(), p[2].Flt() ),
 																		Vector3( p[3].Flt(), p[4].Flt(), p[5].Flt() ),
 																		p[6].Flt() ); }	else
+	if ( nm == "Paraboloid" )		{ exN( 4, p ); mState.Paraboloid(	p[0].Flt(), p[1].Flt(), p[2].Flt(), p[3].Flt() ); }	else
 	if ( nm == "Torus" )			{ exN( 5, p ); mState.Torus(		p[0].Flt(), p[1].Flt(), p[2].Flt(), p[3].Flt(), p[4].Flt() ); }	else
 
 	// unknown
