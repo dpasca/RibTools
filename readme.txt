@@ -16,5 +16,5 @@ Specific reference material:
 
 
 Davide Pasca
-- dpasca@gmail.com
+- dpasca <at> gmail.com
 - http://kazzuya.com
