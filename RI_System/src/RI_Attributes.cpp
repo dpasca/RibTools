@@ -60,4 +60,13 @@ void Attributes::cmdSides( int sides )
 }
 
 //==================================================================
+void Attributes::cmdBasis( Token ubasis, int ustep, Token vbasis, int vstep )
+{
+	mUBasis = ubasis;
+	mVBasis = vbasis;
+	mUStep	= ustep;
+	mVStep	= vstep;
+}
+
+//==================================================================
 }

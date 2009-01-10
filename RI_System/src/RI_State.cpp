@@ -298,6 +298,15 @@ void State::Sides( int sides )
 	mAttributesStack.top().cmdSides( sides );
 }
 
+//==================================================================
+void State::Basis( Token ubasis, int ustep, Token vbasis, int vstep )
+{
+	if NOT( verifyOpType( OPTYPE_ATRB ) )
+		return;
+
+	mAttributesStack.top().cmdBasis( ubasis, ustep, vbasis, vstep );
+}
+
 // options
 //==================================================================
 void State::Format( int xRes, int yRes, float pixelRatio )

@@ -55,11 +55,29 @@ static void mkBound( BoundType &out_Bound, ParamList &cmdParams )
 }
 
 //==================================================================
+static Token matchToken( const char *pStr, Token pAllowedTokens[] )
+{
+	for (int i=0; pAllowedTokens[i] != 0; ++i)
+	{
+		// $$$ maybe case insesitive ?
+		if ( 0 == strcmp( pStr, pAllowedTokens[i] ) )
+			return pAllowedTokens[i];
+	}
+	
+	return NULL;
+}
+
+//==================================================================
 void Machine::AddCommand(	const DStr	&cmdName,
 							ParamList	&cmdParams )
 {
 	const DStr	&nm = cmdName;
 	ParamList	&p = cmdParams;
+
+	static Token tlSolidBegin[]		= { RI_PRIMITIVE, RI_INTERSECTION, RI_UNION, RI_DIFFERENCE, 0 };
+	static Token tlGeometricApproximation[]	= { RI_FLATNESS, 0 };
+	static Token tlOrientation[]	= { RI_OUTSIDE, RI_INSIDE, RI_LH, RI_RH, 0 };
+	static Token tlBasis[]			= { RI_BEZIERBASIS, RI_BSPLINEBASIS, RI_POWERBASIS, RI_CATMULLROMBASIS, RI_HERMITEBASIS, 0 };
 
 	if ( nm == "Begin" )			{ exN( 1, p ); mState.Begin( p[0].PChar() );	}	else
 	if ( nm == "End" )				{ exN( 0, p ); mState.End();					}	else
@@ -71,7 +89,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "AttributeEnd" )		{ exN( 0, p ); mState.AttributeEnd();		}	else
 	if ( nm == "TransformBegin" )	{ exN( 0, p ); mState.TransformBegin();		}	else
 	if ( nm == "TransformEnd" )		{ exN( 0, p ); mState.TransformEnd();		}	else
-	if ( nm == "SolidBegin" )		{ exN( 1, p ); mState.SolidBegin( p[0].PChar() );	}	else
+	if ( nm == "SolidBegin" )		{ exN( 1, p ); mState.SolidBegin( matchToken( p[0].PChar(), tlSolidBegin ) );	}	else
 	if ( nm == "SolidEnd" )			{ exN( 0, p ); mState.SolidEnd();			}	else
 	if ( nm == "ObjectBegin" )		{ exN( 0, p ); mState.ObjectBegin();			}	else
 	if ( nm == "ObjectEnd" )		{ exN( 0, p ); mState.ObjectEnd();			}	else
@@ -82,9 +100,19 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Detail" )			{ BoundType b; mkBound( b, p ); mState.Detail( b ); }	else
 	if ( nm == "DetailRange" )		{ exN( 4, p ); mState.DetailRange(p[0].Flt(),p[1].Flt(),p[2].Flt(),p[3].Flt());	}	else
 	if ( nm == "GeometricApproximation" )
-									{ exN( 2, p ); mState.GeometricApproximation( p[0].PChar(), p[0].Flt() );	}	else
-	if ( nm == "Orientation" )		{ exN( 1, p ); mState.Orientation( p[0].PChar() );	}	else
+									{ exN( 2, p ); mState.GeometricApproximation( matchToken( p[0].PChar(), tlGeometricApproximation ), p[0].Flt() );	}	else
+	if ( nm == "Orientation" )		{ exN( 1, p ); mState.Orientation( matchToken( p[0].PChar(), tlOrientation ) );	}	else
 	if ( nm == "Sides" )			{ exN( 1, p ); mState.Sides( p[0].Int() );		}	else
+	if ( nm == "Basis" )			{
+		exN( 4, p );
+		mState.Basis(
+			matchToken( p[0].PChar(), tlBasis ),
+			p[1].Int(),
+			matchToken( p[2].PChar(), tlBasis ),
+			p[3].Int()
+			);
+	}	else
+
 	// options
 	if ( nm == "Format" )			{ exN( 3, p ); mState.Format(			p[0].Int(), p[1].Int(), p[2].Flt() );	}	else
 	if ( nm == "FrameAspectRatio" )	{ exN( 1, p ); mState.FrameAspectRatio( p[0].Flt() );	}	else

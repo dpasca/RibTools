@@ -110,7 +110,8 @@ static char *gsTestRibFiles[] =
 {
 	"Pixar.rib",
 	"SimpleMug.rib",
-	NULL	
+	"uteapot.rib",
+	NULL
 };
 
 //===============================================================

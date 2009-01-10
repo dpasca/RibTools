@@ -92,3 +92,9 @@ RtToken RI_ABORT			= "abort";
 RtToken RI_HANDLER			= "handler";
 
 RtToken	RI_EMPTY_TOKEN		= "";
+
+RtToken	RI_BEZIERBASIS		= "bezier";
+RtToken	RI_BSPLINEBASIS		= "b-spline";
+RtToken	RI_POWERBASIS		= "power";
+RtToken	RI_CATMULLROMBASIS	= "catmull-rom";
+RtToken	RI_HERMITEBASIS		= "hermite";

@@ -105,6 +105,7 @@ public:
 
 	void Orientation( Token orientation );
 	void Sides( int sides );
+	void Basis( Token ubasis, int ustep, Token vbasis, int vstep );
 
 	// options
 	void Format( int xRes, int yRes, float pixelRatio );

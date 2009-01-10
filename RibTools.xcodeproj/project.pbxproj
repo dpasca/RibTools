@@ -142,6 +142,7 @@
 		6B1F590E0F09561C0082B328 /* libDMath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B1F59170F0956870082B328 /* DMatrix44.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMatrix44.h; path = include/DMatrix44.h; sourceTree = "<group>"; };
 		6B1F59190F0956870082B328 /* DMatrix44.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DMatrix44.cpp; path = src/DMatrix44.cpp; sourceTree = "<group>"; };
+		6B39F4720F19049000FE838F /* uteapot.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = uteapot.rib; path = Tests/uteapot.rib; sourceTree = "<group>"; };
 		6B6D4CC50F0A91BE00AEC534 /* RibRender-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "RibRender-Info.plist"; path = "RibRender/osx/RibRender-Info.plist"; sourceTree = "<group>"; };
 		6B6D4D010F0A93FA00AEC534 /* RibParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RibParser.cpp; sourceTree = "<group>"; };
 		6B6D4D020F0A93FA00AEC534 /* RibParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RibParser.h; sourceTree = "<group>"; };
@@ -260,6 +261,7 @@
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
 				6BF635E00F17F85400A68819 /* SimpleMug.rib */,
 				6B0ABFBD0F1667310001C656 /* Pixar-test.rib */,
+				6B39F4720F19049000FE838F /* uteapot.rib */,
 			);
 			name = Tests;
 			sourceTree = "<group>";

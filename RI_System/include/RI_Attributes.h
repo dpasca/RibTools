@@ -48,7 +48,10 @@ public:
 		mValueApproximation(0),
 
 		mOrientation(RI_OUTSIDE),		// Orientation()
-		mSides(2)						// Sides()
+		mSides(2),						// Sides()
+
+		mUBasis(RI_BEZIERBASIS),
+		mVBasis(RI_BEZIERBASIS)
 	{
 	}
 
@@ -77,22 +80,28 @@ public:
 	
 	void cmdOrientation( Token orientation );
 	void cmdSides( int sides );
+	void cmdBasis( Token ubasis, int ustep, Token vbasis, int vstep );
 
 private:
 	//==================================================================
-	BoundType	mBound;			// Bound()
-	BoundType	mDetail;		// Detail()
+	BoundType	mBound;				// Bound()
+	BoundType	mDetail;			// Detail()
 
-	float	mMinVisible;		// DetailRange()
-	float	mLowerTransition;	//
-	float	mUpperTransition;	//
-	float	mMaxVisible;		//
+	float		mMinVisible;		// DetailRange()
+	float		mLowerTransition;	//
+	float		mUpperTransition;	//
+	float		mMaxVisible;		//
 	
-	Token	mTypeApproximation;	// GeometricApproximation()
-	float	mValueApproximation;
+	Token		mTypeApproximation;	// GeometricApproximation()
+	float		mValueApproximation;
 	
-	Token	mOrientation;		// Orientation()
-	int		mSides;				// Sides()
+	Token		mOrientation;		// Orientation()
+	int			mSides;				// Sides()
+	
+	Token		mUBasis;			// Basis()
+	Token		mVBasis;
+	int			mUStep;
+	int			mVStep;
 };
 
 //==================================================================
