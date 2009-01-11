@@ -51,7 +51,9 @@ public:
 		mSides(2),						// Sides()
 
 		mUBasis(RI_BEZIERBASIS),
-		mVBasis(RI_BEZIERBASIS)
+		mVBasis(RI_BEZIERBASIS),
+		mUStep(3),
+		mVStep(3)
 	{
 	}
 

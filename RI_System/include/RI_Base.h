@@ -35,13 +35,31 @@ enum Mode
 //==================================================================
 enum Error
 {
-	E_OK,
-	E_NESTING,
-	E_NOTOPTIONS,
-	E_NOTATTRIBS,
-	E_NOTPRIMS,
-	E_NOTSTARTED,
-	E_ILLSTATE,
+	E_OK				,
+	E_NESTING			,
+	E_NOTOPTIONS		,
+	E_NOTATTRIBS		,
+	E_NOTPRIMS			,
+	E_NOTSTARTED		,
+	E_ILLSTATE			,
+	E_ARRAYTOOBIG		,
+	E_BADARGUMENT		,
+	E_BADARRAY			,
+	E_BADBASIS			,
+	E_BADCOLOR			,
+	E_BADHANDLE			,
+	E_BADPARAMLIST		,
+	E_BADRIPCODE		,
+	E_BADSTRINGTOKEN	,
+	E_BADTOKEN			,
+	E_BADVERSION		,
+	E_LIMITCHECK		,
+	E_OUTOFMEMORY		,
+	E_PROTOCOLBOTCH		,
+	E_STRINGTOOBIG		,
+	E_SYNTAXERROR		,
+	E_UNREGISTERED		,
+
 };
 	
 //==================================================================
