@@ -21,6 +21,7 @@
 		6B1F591A0F0956870082B328 /* DMatrix44.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B1F59170F0956870082B328 /* DMatrix44.h */; };
 		6B1F591B0F0956870082B328 /* DMatrix44.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1F59190F0956870082B328 /* DMatrix44.cpp */; };
 		6B1F591C0F0956950082B328 /* libDMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F590E0F09561C0082B328 /* libDMath.a */; };
+		6B4047BD0F1A59C300BA7500 /* RI_State_Error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */; };
 		6B41D1A70F0C2B1100BC03E7 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B8349C40F0A8E7F00BA7221 /* OpenGL.framework */; };
 		6B6D4CD40F0A929B00AEC534 /* libDMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F590E0F09561C0082B328 /* libDMath.a */; };
 		6B6D4CD50F0A929F00AEC534 /* libDSystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F58E20F09541D0082B328 /* libDSystem.a */; };
@@ -33,7 +34,6 @@
 		6B8349960F0A7F0700BA7221 /* RI_Machine.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B83497F0F0A7F0700BA7221 /* RI_Machine.h */; };
 		6B8349970F0A7F0700BA7221 /* RI_Options.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B8349800F0A7F0700BA7221 /* RI_Options.h */; };
 		6B8349980F0A7F0700BA7221 /* RI_Param.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B8349810F0A7F0700BA7221 /* RI_Param.h */; };
-		6B8349990F0A7F0700BA7221 /* RI_Params.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B8349820F0A7F0700BA7221 /* RI_Params.h */; };
 		6B83499A0F0A7F0700BA7221 /* RI_Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B8349830F0A7F0700BA7221 /* RI_Parser.h */; };
 		6B83499B0F0A7F0700BA7221 /* RI_State.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B8349840F0A7F0700BA7221 /* RI_State.h */; };
 		6B83499C0F0A7F0700BA7221 /* RI_Tokens.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B8349850F0A7F0700BA7221 /* RI_Tokens.h */; };
@@ -43,7 +43,6 @@
 		6B8349A00F0A7F0700BA7221 /* RI_Machine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498A0F0A7F0700BA7221 /* RI_Machine.cpp */; };
 		6B8349A10F0A7F0700BA7221 /* RI_Options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498B0F0A7F0700BA7221 /* RI_Options.cpp */; };
 		6B8349A20F0A7F0700BA7221 /* RI_Param.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498C0F0A7F0700BA7221 /* RI_Param.cpp */; };
-		6B8349A30F0A7F0700BA7221 /* RI_Params.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498D0F0A7F0700BA7221 /* RI_Params.cpp */; };
 		6B8349A40F0A7F0700BA7221 /* RI_Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498E0F0A7F0700BA7221 /* RI_Parser.cpp */; };
 		6B8349A50F0A7F0700BA7221 /* RI_State.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498F0F0A7F0700BA7221 /* RI_State.cpp */; };
 		6B8349A60F0A7F0700BA7221 /* RI_Tokens.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B8349900F0A7F0700BA7221 /* RI_Tokens.cpp */; };
@@ -143,6 +142,7 @@
 		6B1F59170F0956870082B328 /* DMatrix44.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMatrix44.h; path = include/DMatrix44.h; sourceTree = "<group>"; };
 		6B1F59190F0956870082B328 /* DMatrix44.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DMatrix44.cpp; path = src/DMatrix44.cpp; sourceTree = "<group>"; };
 		6B39F4720F19049000FE838F /* uteapot.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = uteapot.rib; path = Tests/uteapot.rib; sourceTree = "<group>"; };
+		6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Error.cpp; path = src/RI_State_Error.cpp; sourceTree = "<group>"; };
 		6B6D4CC50F0A91BE00AEC534 /* RibRender-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "RibRender-Info.plist"; path = "RibRender/osx/RibRender-Info.plist"; sourceTree = "<group>"; };
 		6B6D4D010F0A93FA00AEC534 /* RibParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RibParser.cpp; sourceTree = "<group>"; };
 		6B6D4D020F0A93FA00AEC534 /* RibParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RibParser.h; sourceTree = "<group>"; };
@@ -152,7 +152,6 @@
 		6B83497F0F0A7F0700BA7221 /* RI_Machine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Machine.h; path = include/RI_Machine.h; sourceTree = "<group>"; };
 		6B8349800F0A7F0700BA7221 /* RI_Options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Options.h; path = include/RI_Options.h; sourceTree = "<group>"; };
 		6B8349810F0A7F0700BA7221 /* RI_Param.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Param.h; path = include/RI_Param.h; sourceTree = "<group>"; };
-		6B8349820F0A7F0700BA7221 /* RI_Params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Params.h; path = include/RI_Params.h; sourceTree = "<group>"; };
 		6B8349830F0A7F0700BA7221 /* RI_Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Parser.h; path = include/RI_Parser.h; sourceTree = "<group>"; };
 		6B8349840F0A7F0700BA7221 /* RI_State.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_State.h; path = include/RI_State.h; sourceTree = "<group>"; };
 		6B8349850F0A7F0700BA7221 /* RI_Tokens.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Tokens.h; path = include/RI_Tokens.h; sourceTree = "<group>"; };
@@ -162,7 +161,6 @@
 		6B83498A0F0A7F0700BA7221 /* RI_Machine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Machine.cpp; path = src/RI_Machine.cpp; sourceTree = "<group>"; };
 		6B83498B0F0A7F0700BA7221 /* RI_Options.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Options.cpp; path = src/RI_Options.cpp; sourceTree = "<group>"; };
 		6B83498C0F0A7F0700BA7221 /* RI_Param.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Param.cpp; path = src/RI_Param.cpp; sourceTree = "<group>"; };
-		6B83498D0F0A7F0700BA7221 /* RI_Params.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Params.cpp; path = src/RI_Params.cpp; sourceTree = "<group>"; };
 		6B83498E0F0A7F0700BA7221 /* RI_Parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Parser.cpp; path = src/RI_Parser.cpp; sourceTree = "<group>"; };
 		6B83498F0F0A7F0700BA7221 /* RI_State.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State.cpp; path = src/RI_State.cpp; sourceTree = "<group>"; };
 		6B8349900F0A7F0700BA7221 /* RI_Tokens.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Tokens.cpp; path = src/RI_Tokens.cpp; sourceTree = "<group>"; };
@@ -300,13 +298,12 @@
 				6B8349800F0A7F0700BA7221 /* RI_Options.h */,
 				6B83498C0F0A7F0700BA7221 /* RI_Param.cpp */,
 				6B8349810F0A7F0700BA7221 /* RI_Param.h */,
-				6B83498D0F0A7F0700BA7221 /* RI_Params.cpp */,
-				6B8349820F0A7F0700BA7221 /* RI_Params.h */,
 				6B83498E0F0A7F0700BA7221 /* RI_Parser.cpp */,
 				6B8349830F0A7F0700BA7221 /* RI_Parser.h */,
 				6BFF1D4D0F0FF83800F984E5 /* RI_Primitive.cpp */,
 				6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */,
 				6B83498F0F0A7F0700BA7221 /* RI_State.cpp */,
+				6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */,
 				6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */,
 				6B8349840F0A7F0700BA7221 /* RI_State.h */,
 				6B8349900F0A7F0700BA7221 /* RI_Tokens.cpp */,
@@ -386,7 +383,6 @@
 				6B8349960F0A7F0700BA7221 /* RI_Machine.h in Headers */,
 				6B8349970F0A7F0700BA7221 /* RI_Options.h in Headers */,
 				6B8349980F0A7F0700BA7221 /* RI_Param.h in Headers */,
-				6B8349990F0A7F0700BA7221 /* RI_Params.h in Headers */,
 				6B83499A0F0A7F0700BA7221 /* RI_Parser.h in Headers */,
 				6B83499B0F0A7F0700BA7221 /* RI_State.h in Headers */,
 				6B83499C0F0A7F0700BA7221 /* RI_Tokens.h in Headers */,
@@ -554,7 +550,6 @@
 				6B8349A00F0A7F0700BA7221 /* RI_Machine.cpp in Sources */,
 				6B8349A10F0A7F0700BA7221 /* RI_Options.cpp in Sources */,
 				6B8349A20F0A7F0700BA7221 /* RI_Param.cpp in Sources */,
-				6B8349A30F0A7F0700BA7221 /* RI_Params.cpp in Sources */,
 				6B8349A40F0A7F0700BA7221 /* RI_Parser.cpp in Sources */,
 				6B8349A50F0A7F0700BA7221 /* RI_State.cpp in Sources */,
 				6B8349A60F0A7F0700BA7221 /* RI_Tokens.cpp in Sources */,
@@ -564,6 +559,7 @@
 				6BFF1D380F0FDFF500F984E5 /* RI_Framework.cpp in Sources */,
 				6BFF1D4E0F0FF83800F984E5 /* RI_Primitive.cpp in Sources */,
 				6B0A68E10F151619000CB0D8 /* RI_State_Prims.cpp in Sources */,
+				6B4047BD0F1A59C300BA7500 /* RI_State_Error.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -134,9 +134,16 @@ public:
 			   float phimin, float phimax,
 			   float thetamax );
 
-private:
+	void Patch( Token type, const ParamList &params );
+
+
 	void ErrHandler( Error errCode );
+	void ErrHandler( Error errCode, const char *pFmt, ... );
+private:
 	bool checkPopMode( Mode expectedMode );
+	bool verifyOpType( OpType optype );
+	bool verifyBasis( Token basis, int steps );
+
 	void pushMode( Mode mode )
 	{
 		mModeStack.push( mode );
@@ -156,10 +163,8 @@ private:
 
 	inline void pushStacks( const u_int flags );
 	inline void popStacks( const u_int flags );
-
-	bool verifyOpType( OpType optype );
 	
-	friend class VMaker;
+	inline void insertPrimitive( Primitive *pPrim );
 };
 
 }

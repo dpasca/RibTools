@@ -39,9 +39,9 @@ extern RtToken	RI_EMPTY_TOKEN;
 
 extern RtToken	RI_BEZIERBASIS;
 extern RtToken	RI_BSPLINEBASIS;
-extern RtToken	RI_POWERBASIS;
 extern RtToken	RI_CATMULLROMBASIS;
 extern RtToken	RI_HERMITEBASIS;
+extern RtToken	RI_POWERBASIS;
 
 
 

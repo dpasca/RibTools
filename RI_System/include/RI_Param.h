@@ -39,13 +39,13 @@ struct Param
 		DVec<float>	floatArrayVal;
 	}u;
 
-	int			Int() const
+	inline int			Int() const
 	{
 		ensType( INT );
 		return u.intVal;
 	}
 	
-	float		Flt() const
+	inline float		Flt() const
 	{
 		if ( type == FLT )	return u.floatVal;	else
 		if ( type == INT )	return u.intVal;	else
@@ -55,6 +55,11 @@ struct Param
 	const int	*PInt( size_t n=(size_t)-1 ) const	{ ensIntArr( n ); return &u.intArrayVal[0];	}
 	const float	*PFlt( size_t n=(size_t)-1 );	// may need to convert from int array
 	const char *PChar() const						{ ensType( STR ); return u.stringVal.c_str();}
+
+
+	operator const char*	() const	{	return PChar();	}
+	operator float			() const	{	return Flt();	}
+	operator int			() const	{	return Int();	}
 
 private:
 	void ensType( u_int type_ ) const

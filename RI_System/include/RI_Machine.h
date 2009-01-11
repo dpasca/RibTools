@@ -38,6 +38,9 @@ public:
 
 private:
 	void unknownCommand( const char *pCmdName );
+	void exN( size_t n, const ParamList &cmdParams );
+	void geN( size_t n, const ParamList &cmdParams );
+
 };
 
 //==================================================================

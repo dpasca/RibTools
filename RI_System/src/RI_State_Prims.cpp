@@ -15,48 +15,42 @@ namespace RI
 {
 
 //==================================================================
-void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
+inline void State::insertPrimitive( Primitive *pPrim )
 {
-	mFramework.Insert( new RI::Cylinder( radius, zmin, zmax, thetamax ),
+	mFramework.Insert( pPrim,
 					  mOptionsStack.top(),
 					  mAttributesStack.top(),
 					  mTransformOpenStack.top() );
+}
+
+//==================================================================
+void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
+{
+	insertPrimitive( new RI::Cylinder( radius, zmin, zmax, thetamax ) );
 }
 
 //==================================================================
 void State::Cone( float height, float radius, float thetamax )
 {
-	mFramework.Insert( new RI::Cone( height, radius, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
+	insertPrimitive( new RI::Cone( height, radius, thetamax ) );
 }
 
 //==================================================================
 void State::Sphere( float radius, float zmin, float zmax, float thetamax )
 {
-	mFramework.Insert( new RI::Sphere( radius, zmin, zmax, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
+	insertPrimitive( new RI::Sphere( radius, zmin, zmax, thetamax ) );
 }
 
 //==================================================================
 void State::Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax )
 {
-	mFramework.Insert( new RI::Hyperboloid( p1, p2, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
+	insertPrimitive( new RI::Hyperboloid( p1, p2, thetamax ) );
 }
 
 //==================================================================
 void State::Paraboloid( float rmax, float zmin, float zmax, float thetamax )
 {
-	mFramework.Insert( new RI::Paraboloid( rmax, zmin, zmax, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
+	insertPrimitive( new RI::Paraboloid( rmax, zmin, zmax, thetamax ) );
 }
 
 //==================================================================
@@ -64,11 +58,13 @@ void State::Torus( float maxRadius, float minRadius,
 				   float phimin, float phimax,
 				   float thetamax )
 {
-	mFramework.Insert(
-		new RI::Torus( maxRadius, minRadius, phimin, phimax, thetamax ),
-					  mOptionsStack.top(),
-					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
+	insertPrimitive( new RI::Torus( maxRadius, minRadius, phimin, phimax, thetamax ) );
+}
+
+//==================================================================
+void State::Patch( Token type, const ParamList &params )
+{
+	insertPrimitive( new RI::Patch( type, params ) );
 }
 
 //==================================================================

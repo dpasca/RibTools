@@ -30,88 +30,6 @@ State::~State()
 }
 
 //==================================================================
-bool State::checkPopMode( Mode expectedMode )
-{
-	if ( mModeStack.top() != expectedMode )
-	{
-		ErrHandler( E_NESTING );
-		return false;
-	}
-	else
-	{
-		mModeStack.pop();
-		return true;
-	}
-}
-
-//==================================================================
-bool State::verifyOpType( OpType optype )
-{
-	Mode	curMode = mModeStack.top();
-
-	if ( optype == OPTYPE_OPTS )
-	{
-		if ( curMode != MD_BASE && curMode != MD_FRAME )
-		{
-			ErrHandler( E_NOTOPTIONS );
-			return false;
-		}
-	}
-	else
-	if ( optype == OPTYPE_ATRB )
-	{
-		if ( curMode != MD_OBJECT )
-		{
-			ErrHandler( E_NOTATTRIBS );
-			return false;
-		}
-	}
-	else
-	if ( optype == OPTYPE_PRIM )
-	{
-		switch( curMode )
-		{
-		case MD_WORLD:
-		case MD_ATTRIBUTE:
-		case MD_TRANSFORM:
-		case MD_SOLID:
-		case MD_OBJECT:
-		case MD_MOTION:
-			// set primitive
-			break;
-
-		default:			
-			ErrHandler( E_NOTPRIMS );
-			return false;
-		}
-	}
-	else
-	if ( optype == OPTYPE_STD_XFORM )
-	{
-		switch( curMode )
-		{
-		case MD_BASE:
-		case MD_FRAME:
-		case MD_WORLD:
-		case MD_ATTRIBUTE:
-		case MD_TRANSFORM:
-		case MD_SOLID:
-		//case MD_OBJECT:	// exclude object...
-		case MD_MOTION:
-			// set primitive
-			break;
-
-		default:			
-			//not sure if it's the proper error for this
-			ErrHandler( E_ILLSTATE );
-			return false;
-		}
-	}
-
-	return true;
-}
-
-//==================================================================
 void State::pushStacks( const u_int flags )
 {
 	if ( flags & SF_OPTS )	mOptionsStack.push();
@@ -125,12 +43,6 @@ void State::popStacks( const u_int flags )
 	if ( flags & SF_OPTS )	mOptionsStack.pop();
 	if ( flags & SF_ATRB )	mAttributesStack.pop();
 	if ( flags & SF_TRAN )	mTransformOpenStack.pop(), mTransformCloseStack.pop();
-}
-
-//==================================================================
-void State::ErrHandler( Error errCode )
-{
-	printf( "Error %s !!\n", ErrorToString( errCode ) );
 }
 
 //==================================================================
@@ -302,6 +214,10 @@ void State::Sides( int sides )
 void State::Basis( Token ubasis, int ustep, Token vbasis, int vstep )
 {
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
+		return;
+
+	if ( !verifyBasis( ubasis, ustep ) ||
+		 !verifyBasis( vbasis, vstep ) )
 		return;
 
 	mAttributesStack.top().cmdBasis( ubasis, ustep, vbasis, vstep );

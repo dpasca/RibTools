@@ -11,6 +11,7 @@
 #define RI_PRIMITIVE_H
 
 #include "DMath.h"
+#include "RI_Param.h"
 
 //==================================================================
 namespace RI
@@ -68,6 +69,8 @@ public:
 		HYPERBOLOID,
 		PARABOLOID,
 		TORUS,
+
+		PATCH,
 	};
 	
 	Type	mType;
@@ -231,6 +234,24 @@ public:
 	void Render( GState &gstate );
 };
 
+//==================================================================
+/// Patch
+//==================================================================
+class Patch : public Primitive
+{
+public:
+	Token		mType;
+	ParamList	mParams;
+
+public:
+	Patch( Token type, const ParamList &params ) :
+		Primitive(PATCH),
+		mParams(params)
+	{
+	}
+
+	void Render( GState &gstate );
+};
 
 //==================================================================
 }

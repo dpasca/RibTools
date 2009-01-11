@@ -17,6 +17,7 @@
 #define NOT(_X_)				(!(_X_))
 #define DASSERT(_X_)			assert(_X_)
 #define DASSTHROW(_X_,_MSG_)	{ bool ok=_X_; if ( !ok ) DAssThrow(ok, _MSG_); }
+#define _countof(_X_)			(sizeof(_X_)/sizeof((_X_)[0]))
 
 //typedef std::vector	DVec;
 #define DVec		std::vector
