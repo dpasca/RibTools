@@ -23,12 +23,13 @@ namespace RI
 //==================================================================
 GState::GState( const Options		&opt,
 				const Attributes	&attr,
-				const Transform		&xform ) :
+				const Transform		&xform,
+				const Matrix44		&mtxWorldCamera ) :
 	mpOpts(&opt),
 	mpAttrs(&attr),
 	mpXForm(&xform)
 {
-	mMtxLocalHomo	= xform.mMatrix * opt.mMtxViewHomo;
+	mMtxLocalHomo	= xform.mMatrix * mtxWorldCamera * opt.mMtxViewHomo;
 	mHalfXRes		= opt.mXRes * 0.5f;
 	mHalfYRes		= opt.mYRes * 0.5f;
 }
@@ -309,7 +310,7 @@ Patch::Patch( RtToken type, ParamList &params, const Attributes &attr, TokenMana
 				if ( (i+1) < params.size() )
 				{
 					gotP = true;
-					
+
 					const float *pHull = params[i+1].PFlt( 3 * 4 * 4 );
 					for (int hi=0; hi < 16; ++hi)
 						mHullPos[hi] = Vector3( pHull + hi*3 );

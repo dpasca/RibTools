@@ -39,7 +39,7 @@ public:
 
 	// Camera
 	int		mXRes, mYRes;
-	int		mPixelAspectRatio;
+	float	mPixelAspectRatio;
 	float	mFrameAspectRatio;
 	float	mLeft, mRight, mBottom, mTop;
 	float	mXMin, mXMax, mYMin, mYMax;

@@ -88,4 +88,40 @@ public:
 	}
 };
 
+//==================================================================
+template <class T, size_t MAX>
+class CopyStackMax
+{
+	T		mVec[MAX];
+	size_t	mSize;
+
+public:
+	CopyStackMax()
+	{
+		mSize = 1;
+	}
+	void push()
+	{
+		DASSTHROW( mSize < MAX, ("Out of bounds !") );
+		mVec[mSize] = mVec[mSize-1];
+		mSize += 1;
+	}
+	
+	void pop()
+	{
+		DASSTHROW( mSize >= 0, ("Out of bounds !") );
+		mSize -= 1;
+	}
+
+	const T &top() const
+	{
+		return mVec[mSize-1];
+	}
+
+	T &top()
+	{
+		return mVec[mSize-1];
+	}
+};
+
 #endif

@@ -37,11 +37,12 @@ void Framework::WorldBegin()
 void Framework::Insert(	Primitive			*pPrim,
 						const Options		&opt,
 						const Attributes	&attr,
-						const Transform		&xform )
+						const Transform		&xform,
+						const Matrix44		&mtxWorldCamera )
 {
 	mpPrims.push_back( pPrim );
 	
-	GState	gstate( opt, attr, xform );
+	GState	gstate( opt, attr, xform, mtxWorldCamera );
 
 	pPrim->Render( gstate );
 }

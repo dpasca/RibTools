@@ -52,14 +52,16 @@ Transform
 //==================================================================
 class State
 {
-	TokenManager			mTokenManager;
-	Stack<Mode>				mModeStack;
-	CopyStack<Options>		mOptionsStack;
-	CopyStack<Attributes>	mAttributesStack;
-	CopyStack<Transform>	mTransformOpenStack;
-	CopyStack<Transform>	mTransformCloseStack;
+	TokenManager					mTokenManager;
+	Stack<Mode>						mModeStack;
+	CopyStackMax<Options,	128>	mOptionsStack;
+	CopyStackMax<Attributes,128>	mAttributesStack;
+	CopyStackMax<Transform, 128>	mTransformOpenStack;
+	CopyStackMax<Transform, 128>	mTransformCloseStack;
 
-	Framework				mFramework;
+	Matrix44						mMtxWorldCamera;
+
+	Framework						mFramework;
 
 	enum OpType
 	{

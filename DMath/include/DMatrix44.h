@@ -51,7 +51,7 @@ public:
 	inline static Matrix44 Scale( float sx, float sy, float sz );
 	inline static Matrix44 Translate( float tx, float ty, float tz );
 	inline static Matrix44 Rot( float ang, float ax, float ay, float az );
-	inline static Matrix44 Perspective( float fov, float n, float f );
+	inline static Matrix44 Perspective( float fov, float aspect, float n, float f );
 
 	void CopyRowMajor( const float *pSrcMtx )
 	{
@@ -104,7 +104,7 @@ inline Matrix44 Matrix44::Rot( float ang, float ax, float ay, float az )
 			0,					0,					0,					1 );
 }
 //==================================================================
-inline Matrix44 Matrix44::Perspective( float fov, float n, float f )
+inline Matrix44 Matrix44::Perspective( float fov, float aspect, float n, float f )
 {
 	float   ootan2 = tanf( fov * 0.5f );
 	DASSERT( ootan2 != 0 );
@@ -113,10 +113,10 @@ inline Matrix44 Matrix44::Perspective( float fov, float n, float f )
 	DASSERT( f != n );
 
 	return Matrix44(
-			ootan2,	0,		0,			0,
-			0,		ootan2,	0,			0,
-			0,		0,		f/(f-n),	1,
-			0,		0,		n*f/(n-f),	0 );
+			ootan2/aspect,	0,		0,			0,
+			0,				ootan2,	0,			0,
+			0,				0,		f/(f-n),	1,
+			0,				0,		n*f/(n-f),	0 );
 }
 
 //==================================================================

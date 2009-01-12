@@ -55,7 +55,8 @@ public:
 	//==================================================================
 	GState( const Options		&opt,
 			const Attributes	&attr,
-			const Transform		&xform );
+			const Transform		&xform,
+			const Matrix44		&mtxWorldCamera );
 
 	inline void AddVertex( const GVert &vert );
 };

@@ -21,6 +21,8 @@ State::State()
 {
 	mModeStack.push( MD_UNDEFINED );
 	Begin( "dummy" );
+
+	mMtxWorldCamera.Identity();
 	
 	mAttributesStack.top().Init( &mTokenManager );
 	mOptionsStack.top().Init( &mTokenManager );
@@ -74,7 +76,15 @@ void State::FrameEnd()
 void State::WorldBegin()
 {
 	pushMode( MD_WORLD );
+
+	// store the current (camera) transformation
+	mMtxWorldCamera = mTransformOpenStack.top().mMatrix;
+
 	pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
+
+	// initalize the world transformation
+	mTransformOpenStack.top().mMatrix.Identity();
+	mTransformCloseStack.top().mMatrix.Identity();
 
 	mFramework.WorldBegin();
 }

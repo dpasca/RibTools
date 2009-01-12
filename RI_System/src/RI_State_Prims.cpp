@@ -20,7 +20,8 @@ inline void State::insertPrimitive( Primitive *pPrim )
 	mFramework.Insert( pPrim,
 					  mOptionsStack.top(),
 					  mAttributesStack.top(),
-					  mTransformOpenStack.top() );
+					  mTransformOpenStack.top(),
+					  mMtxWorldCamera );
 }
 
 //==================================================================

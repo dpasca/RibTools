@@ -40,7 +40,8 @@ public:
 	void Insert( Primitive			*pPrim,
 				 const Options		&opt,
 				 const Attributes	&attr,
-				 const Transform	&xform );
+				 const Transform	&xform,
+				 const Matrix44		&mtxWorldCamera );
 	void WorldEnd();
 };
 

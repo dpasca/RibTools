@@ -48,7 +48,6 @@ void Options::Init( TokenManager *pTManager )
 
 	ParamList	plist;
 	plist.Add( RI_ORTHOGRAPHIC );
-
 	cmdProjection( plist );
 }
 
@@ -125,7 +124,9 @@ void Options::cmdProjection( ParamList &params )
 						float fov = params[++i].Flt();
 
 						mMtxViewHomo =
-							Matrix44::Perspective( fov * DEG2RAD, mNearClip, mFarClip );
+							Matrix44::Perspective( fov * DEG2RAD,
+												  mFrameAspectRatio,
+												  mNearClip, mFarClip );
 					}
 				}
 			}
