@@ -17,23 +17,39 @@ namespace RI
 {
 
 //==================================================================
-Options::Options() :
-	mXRes(640), mYRes(480),
-	mPixelAspectRatio(1.0f),
-	mFrameAspectRatio(4.0f/3),	
-	mLeft(-4.0f/3), mRight(4.0f/3), mBottom(-1), mTop(1),
-	mXMin(0), mXMax(1), mYMin(0), mYMax(1),
-	mProjection("orthographic"),
-	mMtxViewHomo(true),
-	mNearClip(RI_EPSILON),
-	mFarClip(RI_INFINITY),
-	//mFarClip(100),
-	mFStop(RI_INFINITY),
-	mFocalLength(0),
-	mFocalDistance(0),
-	mOpenShutter(0),
-	mCloseShutter(0)
+Options::Options()
 {
+}
+
+//==================================================================
+void Options::Init( TokenManager *pTManager )
+{
+	mpTManager = pTManager;
+	mXRes = 640;
+	mYRes = 480;
+	mPixelAspectRatio = 1.0f;
+	mFrameAspectRatio = 4.0f/3;	
+	mLeft = -4.0f/3;
+	mRight = 4.0f/3;
+	mBottom = -1;
+	mTop = 1;
+	mXMin = 0;
+	mXMax = 1;
+	mYMin = 0;
+	mYMax = 1;
+	mMtxViewHomo = true;
+	mNearClip = RI_EPSILON;
+	mFarClip = RI_INFINITY;
+	mFStop = RI_INFINITY;
+	mFocalLength = 0;
+	mFocalDistance = 0;
+	mOpenShutter = 0;
+	mCloseShutter = 0;
+
+	ParamList	plist;
+	plist.Add( RI_ORTHOGRAPHIC );
+
+	cmdProjection( plist );
 }
 
 //==================================================================
@@ -92,7 +108,7 @@ void Options::cmdProjection( ParamList &params )
 	{
 		if ( params[0].u.stringVal == RI_PERSPECTIVE )
 		{
-			mProjection	= RI_PERSPECTIVE;
+			mpProjectionTok	= mpTManager->FindVoid( RI_PERSPECTIVE );
 			
 			for (size_t i=1; i < params.size(); ++i)
 			{
@@ -117,7 +133,7 @@ void Options::cmdProjection( ParamList &params )
 		else
 		if ( params[0].u.stringVal == RI_ORTHOGRAPHIC )
 		{
-			mProjection	= RI_ORTHOGRAPHIC;
+			mpProjectionTok	= mpTManager->FindVoid( RI_ORTHOGRAPHIC );
 		}
 	}
 }

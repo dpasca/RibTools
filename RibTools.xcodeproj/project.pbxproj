@@ -232,12 +232,12 @@
 		6B1F58E90F0954A40082B328 /* DSystem */ = {
 			isa = PBXGroup;
 			children = (
-				6B16F3F80F0AA51900B53225 /* DUtils.h */,
 				6B16F3F60F0AA50600B53225 /* DUtils.cpp */,
-				6B1F58EB0F0954A40082B328 /* DContainers.h */,
-				6B1F58EC0F0954A40082B328 /* DTypes.h */,
+				6B16F3F80F0AA51900B53225 /* DUtils.h */,
 				6B1F58EF0F0954A40082B328 /* DContainers.cpp */,
+				6B1F58EB0F0954A40082B328 /* DContainers.h */,
 				6B1F58F00F0954A40082B328 /* DTypes.cpp */,
+				6B1F58EC0F0954A40082B328 /* DTypes.h */,
 			);
 			path = DSystem;
 			sourceTree = "<group>";

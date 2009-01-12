@@ -73,7 +73,7 @@ static void mkBound( BoundType &out_Bound, ParamList &cmdParams )
 }
 
 //==================================================================
-static Token matchToken( const char *pStr, Token pAllowedTokens[] )
+static RtToken matchToken( const char *pStr, RtToken pAllowedTokens[] )
 {
 	for (int i=0; pAllowedTokens[i] != 0; ++i)
 	{
@@ -92,11 +92,11 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	const DStr	&nm = cmdName;
 	ParamList	&p = cmdParams;
 
-	static Token tlSolidBegin[]		= { RI_PRIMITIVE, RI_INTERSECTION, RI_UNION, RI_DIFFERENCE, 0 };
-	static Token tlGeometricApproximation[]	= { RI_FLATNESS, 0 };
-	static Token tlOrientation[]	= { RI_OUTSIDE, RI_INSIDE, RI_LH, RI_RH, 0 };
-	static Token tlBasis[]			= { RI_BEZIERBASIS, RI_BSPLINEBASIS, RI_POWERBASIS, RI_CATMULLROMBASIS, RI_HERMITEBASIS, 0 };
-	static Token tlPatch0[]			= { RI_BILINEAR, RI_BICUBIC, 0 };
+	static RtToken tlSolidBegin[]		= { RI_PRIMITIVE, RI_INTERSECTION, RI_UNION, RI_DIFFERENCE, 0 };
+	static RtToken tlGeometricApproximation[]	= { RI_FLATNESS, 0 };
+	static RtToken tlOrientation[]	= { RI_OUTSIDE, RI_INSIDE, RI_LH, RI_RH, 0 };
+	static RtToken tlBasis[]			= { RI_BEZIERBASIS, RI_BSPLINEBASIS, RI_POWERBASIS, RI_CATMULLROMBASIS, RI_HERMITEBASIS, 0 };
+	static RtToken tlPatch0[]			= { RI_BILINEAR, RI_BICUBIC, 0 };
 
 	if ( nm == "Begin" )			{ exN( 1, p ); mState.Begin( p[0] );		}	else
 	if ( nm == "End" )				{ exN( 0, p ); mState.End();				}	else

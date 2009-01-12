@@ -11,6 +11,7 @@
 #define RI_PARAM_H
 
 #include "DTypes.h"
+#include "DContainers.h"
 
 //==================================================================
 namespace RI
@@ -84,7 +85,14 @@ private:
 };
 
 //==================================================================
-typedef DVec<Param>	ParamList;
+class ParamList : public DVec<Param>
+{
+
+public:
+	void Add( const char *pStr );
+	void Add( float val );
+	void Add( int val );
+};
 
 //==================================================================
 }

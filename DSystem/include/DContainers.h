@@ -13,6 +13,22 @@
 #include "DTypes.h"
 
 //==================================================================
+static const size_t	NPOS = (size_t)-1;
+
+//==================================================================
+template<class T>
+class DVec : public std::vector<T>
+{
+public:
+	T *grow( size_t n=1 )
+	{
+		size_t	fromIdx = this->size();
+		this->resize( fromIdx + n );
+		return &(*this)[fromIdx];
+	}
+};
+
+//==================================================================
 template <class T>
 class Stack
 {

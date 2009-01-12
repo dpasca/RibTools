@@ -39,4 +39,29 @@ const float	*Param::PFlt( size_t n )
 }
 
 //==================================================================
+void ParamList::Add( const char *pStr )
+{
+	Param	*p = this->grow();
+
+	p->type = Param::STR;
+	p->u.stringVal = pStr;
+}
+
+void ParamList::Add( float val )
+{
+	Param	*p = this->grow();
+
+	p->type = Param::FLT;
+	p->u.floatVal = val;
+}
+
+void ParamList::Add( int val )
+{
+	Param	*p = this->grow();
+
+	p->type = Param::INT;
+	p->u.intVal = val;
+}
+
+//==================================================================
 }

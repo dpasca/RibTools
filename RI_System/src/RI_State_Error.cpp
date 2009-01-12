@@ -64,7 +64,8 @@ bool State::verifyOpType( OpType optype )
 	else
 	if ( optype == OPTYPE_ATRB )
 	{
-		if ( curMode != MD_OBJECT )
+		if ( curMode != MD_ATTRIBUTE )
+		//if ( curMode != MD_OBJECT )
 		{
 			ErrHandler( E_NOTATTRIBS );
 			return false;
@@ -116,11 +117,11 @@ bool State::verifyOpType( OpType optype )
 }
 
 //==================================================================
-bool State::verifyBasis( Token basis, int steps )
+bool State::verifyBasis( RtToken basis, int steps )
 {
 	struct
 	{
-		Token	token;
+		RtToken	token;
 		int		steps;
 	} table[] = 
 	{

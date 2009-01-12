@@ -34,28 +34,11 @@ struct Color
 //==================================================================
 class Attributes
 {
+	TokenManager	*mpTManager;
+
 public:
-	Attributes() :
-		mBound(RI_INFINITY),			// Bound()
-		mDetail(RI_INFINITY),			// Detail()
-
-		mMinVisible(0),					// DetailRange()
-		mLowerTransition(0),			//
-		mUpperTransition(RI_INFINITY),	//
-		mMaxVisible(RI_INFINITY),		//
-
-		mTypeApproximation(RI_EMPTY_TOKEN),	// GeometricApproximation()
-		mValueApproximation(0),
-
-		mOrientation(RI_OUTSIDE),		// Orientation()
-		mSides(2),						// Sides()
-
-		mUBasis(RI_BEZIERBASIS),
-		mVBasis(RI_BEZIERBASIS),
-		mUStep(3),
-		mVStep(3)
-	{
-	}
+	Attributes();
+	void Init( TokenManager *pTManager );
 
 	Attributes( const Attributes &attributes )	{ *this = attributes; }
 
@@ -77,14 +60,14 @@ public:
 						float	lowerTransition,
 						float	upperTransition,
 						float	maxVisible );
-	void cmdGeometricApproximation(Token typeApproximation,
+	void cmdGeometricApproximation(RtToken typeApproximation,
 								   float valueApproximation );
 	
-	void cmdOrientation( Token orientation );
+	void cmdOrientation( RtToken orientation );
 	void cmdSides( int sides );
-	void cmdBasis( Token ubasis, int ustep, Token vbasis, int vstep );
+	void cmdBasis( RtToken ubasis, int ustep, RtToken vbasis, int vstep );
 
-private:
+public:
 	//==================================================================
 	BoundType	mBound;				// Bound()
 	BoundType	mDetail;			// Detail()
@@ -94,16 +77,16 @@ private:
 	float		mUpperTransition;	//
 	float		mMaxVisible;		//
 	
-	Token		mTypeApproximation;	// GeometricApproximation()
+	cpTokenVoid	mpTypeApproximationTok;	// GeometricApproximation()
 	float		mValueApproximation;
 	
-	Token		mOrientation;		// Orientation()
+	cpTokenVoid	mpOrientationTok;		// Orientation()
 	int			mSides;				// Sides()
 	
-	Token		mUBasis;			// Basis()
-	Token		mVBasis;
-	int			mUStep;
-	int			mVStep;
+	cpTokenBasis	mpUBasisTok;			// Basis()
+	cpTokenBasis	mpVBasisTok;
+	int			mUSteps;
+	int			mVSteps;
 };
 
 //==================================================================

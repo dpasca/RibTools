@@ -11,7 +11,7 @@
 #define TOKENIZER_H
 
 #include "DTypes.h"
-#include <vector>
+#include "DContainers.h"
 #include <string>
 
 //===============================================================
@@ -26,16 +26,16 @@ class Tokenizer
 		COMMENT,
 	};
 	
-	StateEnum	mState;
+	StateEnum		mState;
 
-	int					mDataInt;
-	float				mDataFloat;
-	std::string			mDataString;
-	std::string			mDataAlphanum;
-	std::vector<float>	mFloatArray;
-	std::vector<int>	mIntArray;
-	bool				mIsArrayFloat;
-	std::string			mCurToken;
+	int				mDataInt;
+	float			mDataFloat;
+	std::string		mDataString;
+	std::string		mDataAlphanum;
+	DVec<float>		mFloatArray;
+	DVec<int>		mIntArray;
+	bool			mIsArrayFloat;
+	std::string		mCurToken;
 
 public:
 	enum DataType
@@ -77,12 +77,12 @@ public:
 		mIsArrayFloat = false;
 	}
 
-	const char					*GetDataAphaNum()		const { return mDataAlphanum.c_str();	}
-	int							GetDataInt()			const { return mDataInt;	}
-	float						GetDataFloat()			const { return mDataFloat;	}
-	const std::vector<int>		&GetDataIntAttary()		const	{ return mIntArray; }
-	const std::vector<float>	&GetDataFloatAttary()	const	{ return mFloatArray; }
-	const char					*GetDataString()		const { return mDataString.c_str();	}
+	const char			*GetDataAphaNum()		const { return mDataAlphanum.c_str();	}
+	int					GetDataInt()			const { return mDataInt;	}
+	float				GetDataFloat()			const { return mDataFloat;	}
+	const DVec<int>		&GetDataIntAttary()		const	{ return mIntArray; }
+	const DVec<float>	&GetDataFloatAttary()	const	{ return mFloatArray; }
+	const char			*GetDataString()		const { return mDataString.c_str();	}
 
 private:
 	void	setDataType();

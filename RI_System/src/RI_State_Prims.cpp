@@ -62,9 +62,9 @@ void State::Torus( float maxRadius, float minRadius,
 }
 
 //==================================================================
-void State::Patch( Token type, const ParamList &params )
+void State::Patch( RtToken type, ParamList &params )
 {
-	insertPrimitive( new RI::Patch( type, params ) );
+	insertPrimitive( new RI::Patch( type, params, mAttributesStack.top(), mTokenManager ) );
 }
 
 //==================================================================

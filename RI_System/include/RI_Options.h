@@ -13,6 +13,7 @@
 #include "RI_Base.h"
 #include "RI_Param.h"
 #include "DMath.h"
+#include "RI_Tokens.h"
 
 //==================================================================
 namespace RI
@@ -23,8 +24,11 @@ namespace RI
 //==================================================================
 class Options
 {
+	TokenManager	*mpTManager;
+
 public:
 	Options();
+	void Init( TokenManager *pTManager );
 
 	// avoid initialization of default values and just copy..
 	Options( const Options &options ) {	*this = options; }
@@ -32,7 +36,7 @@ public:
 	~Options();
 
 	//Options &operator=(const Options &options);
-	
+
 	// Camera
 	int		mXRes, mYRes;
 	int		mPixelAspectRatio;
@@ -40,7 +44,7 @@ public:
 	float	mLeft, mRight, mBottom, mTop;
 	float	mXMin, mXMax, mYMin, mYMax;
 	
-	Token		mProjection;
+	cpTokenVoid mpProjectionTok;
 	Matrix44	mMtxViewHomo;
 	
 	float	mNearClip, mFarClip;

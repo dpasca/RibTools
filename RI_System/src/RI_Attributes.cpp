@@ -16,6 +16,30 @@ namespace RI
 //==================================================================
 /// Attributess
 //==================================================================
+Attributes::Attributes()
+{
+}
+
+//==================================================================
+void Attributes::Init( TokenManager *pTManager )
+{
+	mpTManager	= pTManager;
+	mBound		= RI_INFINITY;
+	mDetail		= RI_INFINITY;
+
+	mMinVisible			= 0;
+	mLowerTransition	= 0;
+	mUpperTransition	= RI_INFINITY;
+	mMaxVisible			= RI_INFINITY;
+
+	cmdGeometricApproximation( RI_EMPTY_TOKEN, 0 );
+	cmdOrientation( RI_OUTSIDE );
+	cmdSides( 2 );
+	cmdBasis( RI_BEZIERBASIS, 3, RI_BEZIERBASIS, 3 );
+}
+
+
+//==================================================================
 void Attributes::cmdBound( const BoundType &bound )
 {
 	mBound = bound;
@@ -40,17 +64,17 @@ void Attributes::cmdDetailRange(float	minVisible,
 }
 
 //==================================================================
-void Attributes::cmdGeometricApproximation(Token typeApproximation,
+void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 										   float valueApproximation )
 {
-	mTypeApproximation	= typeApproximation;
-	mValueApproximation	= valueApproximation;
+	mpTypeApproximationTok	= mpTManager->FindVoid( typeApproximation );
+	mValueApproximation		= valueApproximation;
 }
 
 //==================================================================
-void Attributes::cmdOrientation( Token orientation )
+void Attributes::cmdOrientation( RtToken orientation )
 {
-	mOrientation	= orientation;
+	mpOrientationTok	= mpTManager->FindVoid( orientation );
 }
 
 //==================================================================
@@ -60,12 +84,12 @@ void Attributes::cmdSides( int sides )
 }
 
 //==================================================================
-void Attributes::cmdBasis( Token ubasis, int ustep, Token vbasis, int vstep )
+void Attributes::cmdBasis( RtToken ubasis, int ustep, RtToken vbasis, int vstep )
 {
-	mUBasis = ubasis;
-	mVBasis = vbasis;
-	mUStep	= ustep;
-	mVStep	= vstep;
+	mpUBasisTok = mpTManager->FindBasis( ubasis );
+	mpVBasisTok = mpTManager->FindBasis( vbasis );
+	mUSteps	= ustep;
+	mVSteps	= vstep;
 }
 
 //==================================================================

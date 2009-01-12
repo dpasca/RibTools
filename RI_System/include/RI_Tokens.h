@@ -43,6 +43,60 @@ extern RtToken	RI_CATMULLROMBASIS;
 extern RtToken	RI_HERMITEBASIS;
 extern RtToken	RI_POWERBASIS;
 
+//==================================================================
+namespace RI
+{
 
+//==================================================================
+struct TokenBase	{	const char *pName;					};
+struct TokenVoid	: public TokenBase {					};
+struct TokenFloat	: public TokenBase { float		value;	};
+struct TokenInt		: public TokenBase { int		value;	};
+struct TokenPoint	: public TokenBase { RtPoint	value;	};
+struct TokenColor	: public TokenBase { RtColor	value;	};
+struct TokenBasis	: public TokenBase { RtBasis	value;	};
+
+//==================================================================
+typedef const TokenBase*	cpTokenBase	;
+typedef const TokenVoid*	cpTokenVoid	;
+typedef const TokenFloat*	cpTokenFloat	;
+typedef const TokenInt*		cpTokenInt	;
+typedef const TokenPoint*	cpTokenPoint	;
+typedef const TokenColor*	cpTokenColor	;
+typedef const TokenBasis*	cpTokenBasis	;
+
+//==================================================================
+class TokenManager
+{
+	DVec<TokenVoid>		mTokVoid	;
+	DVec<TokenFloat>	mTokFloat	;
+	DVec<TokenInt>		mTokInt		;
+	DVec<TokenPoint>	mTokPoint	;
+	DVec<TokenColor>	mTokColor	;
+	DVec<TokenBasis>	mTokBasis	;
+
+public:
+	enum Type {
+		T_VOID,
+		T_FLOAT,
+		T_INT,
+		T_POINT,
+		T_COLOR,
+		T_BASIS,
+	};
+
+public:
+	TokenManager();
+
+	void FindOrAddToken( const char *pName, const char *pDescr=NULL );
+	void FindOrAddToken( const char *pName, const RtBasis &basis );
+	
+	const TokenBase  *Find( Type type, const char *pName ) const;
+	const TokenVoid  *FindVoid(  const char *pName ) const { return (const TokenVoid *)Find( T_VOID, pName );	}
+	const TokenBasis *FindBasis( const char *pName ) const { return (const TokenBasis *)Find( T_BASIS, pName );	}
+};
+
+//==================================================================
+}
 
 #endif

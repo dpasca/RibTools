@@ -12,6 +12,7 @@
 
 #include "DMath.h"
 #include "RI_Param.h"
+#include "RI_Tokens.h"
 
 //==================================================================
 namespace RI
@@ -46,6 +47,10 @@ class GState
 	float		mHalfXRes;
 	float		mHalfYRes;
 
+	const Options		*mpOpts;
+	const Attributes	*mpAttrs;
+	const Transform		*mpXForm;
+				
 public:
 	//==================================================================
 	GState( const Options		&opt,
@@ -240,15 +245,16 @@ public:
 class Patch : public Primitive
 {
 public:
-	Token		mType;
-	ParamList	mParams;
+	const TokenVoid		*mpIntplTypeTok;
+	ParamList			mParams;
+	const TokenBasis	*mpUBasisTok;
+	const TokenBasis	*mpVBasisTok;
+	int					mUSteps;
+	int					mVSteps;
+	Vector3				mHullPos[16];
 
 public:
-	Patch( Token type, const ParamList &params ) :
-		Primitive(PATCH),
-		mParams(params)
-	{
-	}
+	Patch( RtToken type, ParamList &params, const Attributes &attr, TokenManager &tmanager );
 
 	void Render( GState &gstate );
 };

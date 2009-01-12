@@ -12,6 +12,10 @@
 #ifndef RI_BASE_H
 #define RI_BASE_H
 
+#include "DTypes.h"
+#include "DContainers.h"
+#include "DMath.h"
+
 //==================================================================
 namespace RI
 {
@@ -68,7 +72,7 @@ const char *ErrorToString( Error errCode );
 //==================================================================
 /// 
 //==================================================================
-typedef const char	*Token;
+typedef const char	*RtToken;
 typedef void		*ObjectHandle;
 typedef void		*LightHandle;
 
@@ -106,6 +110,17 @@ struct BoundType
 }
 
 //==================================================================
+/*
+enum VarType
+{
+	VARTYPE_UNKNOWN,
+	VARTYPE_FLOAT,
+	VARTYPE_INT,
+	VARTYPE_BOOLEAN
+};
+*/
+
+//==================================================================
 /// 
 //==================================================================
 typedef short	RtBoolean;
@@ -114,11 +129,12 @@ typedef float	RtFloat;
 
 typedef const char	*RtToken; // DAVIDE - I think we want "const" here..
 
-typedef RtFloat	RtColor[3];
-typedef RtFloat	RtPoint[3];
-typedef RtFloat	RtMatrix[4][4];
-typedef RtFloat	RtBasis[4][4];
-typedef RtFloat	RtBound[6];
+typedef RtFloat		RtColor[3];
+typedef RtFloat		RtPoint[3];
+typedef RtFloat		RtMatrix[4][4];
+//typedef RtFloat	RtBasis[4][4];
+typedef Matrix44	RtBasis;
+typedef RtFloat		RtBound[6];
 
 typedef char	*RtString;
 
@@ -136,5 +152,16 @@ typedef RtPointer RtLightHandle;
 #define RI_INFINITY	1.0e38
 #define RI_EPSILON	1.0e-10
 #define RI_NULL		((RtToken)0)
+
+//==================================================================
+namespace RI
+{
+extern RtBasis	BezierBasis;
+extern RtBasis	BSplineBasis;
+extern RtBasis	CatmullRomBasis;
+extern RtBasis	HermiteBasis;
+extern RtBasis	PowerBasis;
+//==================================================================
+}
 
 #endif

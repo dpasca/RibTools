@@ -52,6 +52,7 @@ Transform
 //==================================================================
 class State
 {
+	TokenManager			mTokenManager;
 	Stack<Mode>				mModeStack;
 	CopyStack<Options>		mOptionsStack;
 	CopyStack<Attributes>	mAttributesStack;
@@ -72,7 +73,7 @@ public:
 	State();
 	~State();
 
-	void	Begin( Token name );
+	void	Begin( RtToken name );
 	void	End();
 
 	void	FrameBegin( int frame );
@@ -83,7 +84,7 @@ public:
 	void	AttributeEnd();
 	void	TransformBegin();
 	void	TransformEnd();
-	void	SolidBegin( Token operation );
+	void	SolidBegin( RtToken operation );
 	void	SolidEnd();
 	ObjectHandle ObjectBegin();
 	void	ObjectEnd();
@@ -100,12 +101,12 @@ public:
 					 float	upperTransition,
 					 float	maxVisible );
 					 
-	void GeometricApproximation(Token typeApproximation,
+	void GeometricApproximation(RtToken typeApproximation,
 								   float valueApproximation );
 
-	void Orientation( Token orientation );
+	void Orientation( RtToken orientation );
 	void Sides( int sides );
-	void Basis( Token ubasis, int ustep, Token vbasis, int vstep );
+	void Basis( RtToken ubasis, int ustep, RtToken vbasis, int vstep );
 
 	// options
 	void Format( int xRes, int yRes, float pixelRatio );
@@ -134,7 +135,7 @@ public:
 			   float phimin, float phimax,
 			   float thetamax );
 
-	void Patch( Token type, const ParamList &params );
+	void Patch( RtToken type, ParamList &params );
 
 
 	void ErrHandler( Error errCode );
@@ -142,7 +143,7 @@ public:
 private:
 	bool checkPopMode( Mode expectedMode );
 	bool verifyOpType( OpType optype );
-	bool verifyBasis( Token basis, int steps );
+	bool verifyBasis( RtToken basis, int steps );
 
 	void pushMode( Mode mode )
 	{

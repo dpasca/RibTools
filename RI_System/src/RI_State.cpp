@@ -21,6 +21,9 @@ State::State()
 {
 	mModeStack.push( MD_UNDEFINED );
 	Begin( "dummy" );
+	
+	mAttributesStack.top().Init( &mTokenManager );
+	mOptionsStack.top().Init( &mTokenManager );
 }
 
 //==================================================================
@@ -46,7 +49,7 @@ void State::popStacks( const u_int flags )
 }
 
 //==================================================================
-void State::Begin( Token name )
+void State::Begin( RtToken name )
 {
 	pushMode( MD_BASE );
 }
@@ -114,7 +117,7 @@ void State::TransformEnd()
 	//mTransformOpenStack.top().mMatrix.PrintOut();
 }
 //==================================================================
-void State::SolidBegin( Token operation )
+void State::SolidBegin( RtToken operation )
 {
 	pushMode( MD_SOLID );
 	pushStacks( SF_ATRB | SF_TRAN );
@@ -183,7 +186,7 @@ void State::DetailRange(float	minVisible,
 					maxVisible );
 }
 //==================================================================
-void State::GeometricApproximation(Token typeApproximation,
+void State::GeometricApproximation(RtToken typeApproximation,
 							   float valueApproximation )
 {
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
@@ -194,7 +197,7 @@ void State::GeometricApproximation(Token typeApproximation,
 							valueApproximation );
 }
 //==================================================================
-void State::Orientation( Token orientation )
+void State::Orientation( RtToken orientation )
 {
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
@@ -211,7 +214,7 @@ void State::Sides( int sides )
 }
 
 //==================================================================
-void State::Basis( Token ubasis, int ustep, Token vbasis, int vstep )
+void State::Basis( RtToken ubasis, int ustep, RtToken vbasis, int vstep )
 {
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
