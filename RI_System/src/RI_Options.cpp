@@ -22,9 +22,9 @@ Options::Options()
 }
 
 //==================================================================
-void Options::Init( TokenManager *pTManager )
+void Options::Init( SymbolList *pTManager )
 {
-	mpTManager = pTManager;
+	mpStatics = pTManager;
 	mXRes = 640;
 	mYRes = 480;
 	mPixelAspectRatio = 1.0f;
@@ -107,7 +107,7 @@ void Options::cmdProjection( ParamList &params )
 	{
 		if ( params[0].u.stringVal == RI_PERSPECTIVE )
 		{
-			mpProjectionTok	= mpTManager->FindVoid( RI_PERSPECTIVE );
+			mpyProjection	= mpStatics->FindVoid( RI_PERSPECTIVE );
 			
 			for (size_t i=1; i < params.size(); ++i)
 			{
@@ -134,7 +134,7 @@ void Options::cmdProjection( ParamList &params )
 		else
 		if ( params[0].u.stringVal == RI_ORTHOGRAPHIC )
 		{
-			mpProjectionTok	= mpTManager->FindVoid( RI_ORTHOGRAPHIC );
+			mpyProjection	= mpStatics->FindVoid( RI_ORTHOGRAPHIC );
 		}
 	}
 }

@@ -288,13 +288,13 @@ void Torus::Render( GState &gstate )
 }
 
 //==================================================================
-Patch::Patch( RtToken type, ParamList &params, const Attributes &attr, TokenManager &tmanager ) :
+Patch::Patch( RtToken type, ParamList &params, const Attributes &attr, SymbolList &tmanager ) :
 	Primitive(PATCH),
 	mParams(params)
 {
-	mpIntplTypeTok = tmanager.FindVoid( type );
-	mpUBasisTok = attr.mpUBasisTok;
-	mpVBasisTok = attr.mpVBasisTok;
+	mpyIntplType = tmanager.FindVoid( type );
+	mpyUBasis = attr.mpyUBasis;
+	mpyVBasis = attr.mpyVBasis;
 	mUSteps = attr.mUSteps;
 	mVSteps = attr.mVSteps;
 
@@ -361,10 +361,10 @@ void Patch::Render( GState &gstate )
 	Vector3	mid2[NSUBDIVS+1];
 	Vector3	top[NSUBDIVS+1];
 	
-	const RtBasis	&uBasis = mpUBasisTok->value;
-	const RtBasis	&vBasis = mpVBasisTok->value;
+	const RtBasis	&uBasis = mpyUBasis->value;
+	const RtBasis	&vBasis = mpyVBasis->value;
 
-	if ( mpIntplTypeTok->pName == RI_BICUBIC )
+	if ( mpyIntplType->pName == RI_BICUBIC )
 	{
 		for (int uI=0; uI <= NSUBDIVS; ++uI)
 		{

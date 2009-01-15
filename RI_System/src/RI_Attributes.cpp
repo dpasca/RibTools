@@ -21,9 +21,9 @@ Attributes::Attributes()
 }
 
 //==================================================================
-void Attributes::Init( TokenManager *pTManager )
+void Attributes::Init( SymbolList *pTManager )
 {
-	mpTManager	= pTManager;
+	mpStatics	= pTManager;
 	mBound		= RI_INFINITY;
 	mDetail		= RI_INFINITY;
 
@@ -67,14 +67,14 @@ void Attributes::cmdDetailRange(float	minVisible,
 void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 										   float valueApproximation )
 {
-	mpTypeApproximationTok	= mpTManager->FindVoid( typeApproximation );
+	mpyTypeApproximation	= mpStatics->FindVoid( typeApproximation );
 	mValueApproximation		= valueApproximation;
 }
 
 //==================================================================
 void Attributes::cmdOrientation( RtToken orientation )
 {
-	mpOrientationTok	= mpTManager->FindVoid( orientation );
+	mpyOrientation	= mpStatics->FindVoid( orientation );
 }
 
 //==================================================================
@@ -86,8 +86,8 @@ void Attributes::cmdSides( int sides )
 //==================================================================
 void Attributes::cmdBasis( RtToken ubasis, int ustep, RtToken vbasis, int vstep )
 {
-	mpUBasisTok = mpTManager->FindBasis( ubasis );
-	mpVBasisTok = mpTManager->FindBasis( vbasis );
+	mpyUBasis = mpStatics->FindBasis( ubasis );
+	mpyVBasis = mpStatics->FindBasis( vbasis );
 	mUSteps	= ustep;
 	mVSteps	= vstep;
 }

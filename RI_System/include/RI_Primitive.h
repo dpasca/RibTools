@@ -12,7 +12,7 @@
 
 #include "DMath.h"
 #include "RI_Param.h"
-#include "RI_Tokens.h"
+#include "RI_Symbol.h"
 
 //==================================================================
 namespace RI
@@ -246,16 +246,16 @@ public:
 class Patch : public Primitive
 {
 public:
-	const TokenVoid		*mpIntplTypeTok;
-	ParamList			mParams;
-	const TokenBasis	*mpUBasisTok;
-	const TokenBasis	*mpVBasisTok;
-	int					mUSteps;
-	int					mVSteps;
-	Vector3				mHullPos[16];
+	CPSymVoid	mpyIntplType;
+	ParamList	mParams;
+	CPSymBasis	mpyUBasis;
+	CPSymBasis	mpyVBasis;
+	int			mUSteps;
+	int			mVSteps;
+	Vector3		mHullPos[16];
 
 public:
-	Patch( RtToken type, ParamList &params, const Attributes &attr, TokenManager &tmanager );
+	Patch( RtToken type, ParamList &params, const Attributes &attr, SymbolList &tmanager );
 
 	void Render( GState &gstate );
 };

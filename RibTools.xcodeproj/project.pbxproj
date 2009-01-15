@@ -53,6 +53,8 @@
 		6B8349C50F0A8E7F00BA7221 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B8349C40F0A8E7F00BA7221 /* OpenGL.framework */; };
 		6B8349CA0F0A8EDA00BA7221 /* RibRender.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B8349C80F0A8EDA00BA7221 /* RibRender.h */; };
 		6B8349CB0F0A8EDA00BA7221 /* RibRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B8349C90F0A8EDA00BA7221 /* RibRender.cpp */; };
+		6BE7302E0F1FA236004FAE21 /* RI_Symbol.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BE7302D0F1FA236004FAE21 /* RI_Symbol.h */; };
+		6BE730300F1FA24D004FAE21 /* RI_Symbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */; };
 		6BFF1D380F0FDFF500F984E5 /* RI_Framework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */; };
 		6BFF1D3A0F0FE02200F984E5 /* RI_Framework.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BFF1D390F0FE02200F984E5 /* RI_Framework.h */; };
 		6BFF1D440F0FEA3900F984E5 /* RI_Primitive.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */; };
@@ -173,6 +175,8 @@
 		6B8349C80F0A8EDA00BA7221 /* RibRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibRender.h; path = RibRender/RibRender.h; sourceTree = "<group>"; };
 		6B8349C90F0A8EDA00BA7221 /* RibRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RibRender.cpp; path = RibRender/RibRender.cpp; sourceTree = "<group>"; };
 		6BCC7ADF0ED04837004AEDC8 /* ribparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ribparser; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BE7302D0F1FA236004FAE21 /* RI_Symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Symbol.h; path = include/RI_Symbol.h; sourceTree = "<group>"; };
+		6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Symbol.cpp; path = src/RI_Symbol.cpp; sourceTree = "<group>"; };
 		6BF635E00F17F85400A68819 /* SimpleMug.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SimpleMug.rib; path = Tests/SimpleMug.rib; sourceTree = "<group>"; };
 		6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Framework.cpp; path = src/RI_Framework.cpp; sourceTree = "<group>"; };
 		6BFF1D390F0FE02200F984E5 /* RI_Framework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Framework.h; path = include/RI_Framework.h; sourceTree = "<group>"; };
@@ -303,13 +307,15 @@
 				6BFF1D4D0F0FF83800F984E5 /* RI_Primitive.cpp */,
 				6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */,
 				6B83498F0F0A7F0700BA7221 /* RI_State.cpp */,
+				6B8349840F0A7F0700BA7221 /* RI_State.h */,
 				6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */,
 				6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */,
-				6B8349840F0A7F0700BA7221 /* RI_State.h */,
 				6B8349900F0A7F0700BA7221 /* RI_Tokens.cpp */,
 				6B8349850F0A7F0700BA7221 /* RI_Tokens.h */,
 				6B8349910F0A7F0700BA7221 /* RI_Transform.cpp */,
 				6B8349860F0A7F0700BA7221 /* RI_Transform.h */,
+				6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */,
+				6BE7302D0F1FA236004FAE21 /* RI_Symbol.h */,
 				6B8349920F0A7F0700BA7221 /* Tokenizer.cpp */,
 				6B8349930F0A7F0700BA7221 /* Tokenizer.h */,
 			);
@@ -391,6 +397,7 @@
 				6B8349CA0F0A8EDA00BA7221 /* RibRender.h in Headers */,
 				6BFF1D3A0F0FE02200F984E5 /* RI_Framework.h in Headers */,
 				6BFF1D440F0FEA3900F984E5 /* RI_Primitive.h in Headers */,
+				6BE7302E0F1FA236004FAE21 /* RI_Symbol.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -560,6 +567,7 @@
 				6BFF1D4E0F0FF83800F984E5 /* RI_Primitive.cpp in Sources */,
 				6B0A68E10F151619000CB0D8 /* RI_State_Prims.cpp in Sources */,
 				6B4047BD0F1A59C300BA7500 /* RI_State_Error.cpp in Sources */,
+				6BE730300F1FA24D004FAE21 /* RI_Symbol.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

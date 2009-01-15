@@ -13,7 +13,7 @@
 #include "RI_Base.h"
 #include "RI_Param.h"
 #include "DMath.h"
-#include "RI_Tokens.h"
+#include "RI_Symbol.h"
 
 //==================================================================
 namespace RI
@@ -24,11 +24,11 @@ namespace RI
 //==================================================================
 class Options
 {
-	TokenManager	*mpTManager;
+	SymbolList	*mpStatics;
 
 public:
 	Options();
-	void Init( TokenManager *pTManager );
+	void Init( SymbolList *pTManager );
 
 	// avoid initialization of default values and just copy..
 	Options( const Options &options ) {	*this = options; }
@@ -44,7 +44,7 @@ public:
 	float	mLeft, mRight, mBottom, mTop;
 	float	mXMin, mXMax, mYMin, mYMax;
 	
-	cpTokenVoid mpProjectionTok;
+	CPSymVoid	mpyProjection;
 	Matrix44	mMtxViewHomo;
 	
 	float	mNearClip, mFarClip;

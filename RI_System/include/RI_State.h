@@ -52,7 +52,7 @@ Transform
 //==================================================================
 class State
 {
-	TokenManager					mTokenManager;
+	SymbolList						mStatics;
 	Stack<Mode>						mModeStack;
 	CopyStackMax<Options,	128>	mOptionsStack;
 	CopyStackMax<Attributes,128>	mAttributesStack;

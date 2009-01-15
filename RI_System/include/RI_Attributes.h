@@ -12,6 +12,7 @@
 
 #include "RI_Base.h"
 #include "RI_Tokens.h"
+#include "RI_Symbol.h"
 
 //==================================================================
 namespace RI
@@ -34,11 +35,11 @@ struct Color
 //==================================================================
 class Attributes
 {
-	TokenManager	*mpTManager;
+	SymbolList	*mpStatics;
 
 public:
 	Attributes();
-	void Init( TokenManager *pTManager );
+	void Init( SymbolList *pTManager );
 
 	Attributes( const Attributes &attributes )	{ *this = attributes; }
 
@@ -77,14 +78,14 @@ public:
 	float		mUpperTransition;	//
 	float		mMaxVisible;		//
 	
-	cpTokenVoid	mpTypeApproximationTok;	// GeometricApproximation()
+	CPSymVoid	mpyTypeApproximation;	// GeometricApproximation()
 	float		mValueApproximation;
 	
-	cpTokenVoid	mpOrientationTok;		// Orientation()
+	CPSymVoid	mpyOrientation;		// Orientation()
 	int			mSides;				// Sides()
 	
-	cpTokenBasis	mpUBasisTok;			// Basis()
-	cpTokenBasis	mpVBasisTok;
+	CPSymBasis	mpyUBasis;			// Basis()
+	CPSymBasis	mpyVBasis;
 	int			mUSteps;
 	int			mVSteps;
 };
