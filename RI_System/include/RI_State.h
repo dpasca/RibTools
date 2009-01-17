@@ -108,7 +108,8 @@ public:
 
 	void Orientation( RtToken orientation );
 	void Sides( int sides );
-	void Basis( RtToken ubasis, int ustep, RtToken vbasis, int vstep );
+	void Basis( RtToken ubasis, const float *pCustomUBasis, int ustep,
+				RtToken vbasis, const float *pCustomVBasis, int vstep );
 
 	// options
 	void Format( int xRes, int yRes, float pixelRatio );
@@ -122,6 +123,7 @@ public:
 
 	// transforms
 	void Identity();
+	void ConcatTransform( const Matrix44 &mtxLeft );
 	void TransformCmd( const float *pMtx );
 	void Scale( float sx, float sy, float sz );
 	void Rotate( float angDeg, float ax, float ay, float az );

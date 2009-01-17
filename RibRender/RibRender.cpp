@@ -87,14 +87,14 @@ static bool renderFile( const char *pFileName )
 			RI::ParamList	cmdParams;
 
 			parser.FlushNewCommand( &cmdName, &cmdParams );
-
+/*
 			printf( "CMD %s ", cmdName.c_str() );
 			
 			if ( cmdParams.size() )
 				printf( "(%i params)", cmdParams.size() );
 
 			puts( "" );
-
+*/
 			machine.AddCommand( cmdName, cmdParams );
 		}
 		
@@ -108,6 +108,10 @@ static bool renderFile( const char *pFileName )
 //===============================================================
 static char *gsTestRibFiles[] =
 {
+	"Airplane.rib",
+	"Bag.rib",
+	"Chair.rib",
+	"Elephant.rib",
 	"Pixar.rib",
 	"SimpleMug.rib",
 	"uteapot.rib",

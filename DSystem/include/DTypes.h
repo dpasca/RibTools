@@ -19,6 +19,8 @@
 #define DASSTHROW(_X_,_MSG_)	{ bool ok=_X_; if ( !ok ) DAssThrow(ok, _MSG_); }
 #define _countof(_X_)			(sizeof(_X_)/sizeof((_X_)[0]))
 
+#define DSAFE_DELETE(_X_)		{ if ( _X_ ) delete (_X_); }
+
 typedef std::string	DStr;
 
 void DAssThrow( bool ok, const char *pMsg );

@@ -312,16 +312,21 @@ void State::Sides( int sides )
 }
 
 //==================================================================
-void State::Basis( RtToken ubasis, int ustep, RtToken vbasis, int vstep )
+void State::Basis( RtToken ubasis, const float *pCustomUBasis, int ustep,
+				   RtToken vbasis, const float *pCustomVBasis, int vstep )
 {
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
 
-	if ( !verifyBasis( ubasis, ustep ) ||
-		 !verifyBasis( vbasis, vstep ) )
+	DASSERT( (ubasis || pCustomUBasis) && (vbasis || pCustomVBasis) );
+
+	if ( (ubasis && !verifyBasis( ubasis, ustep )) ||
+		 (vbasis && !verifyBasis( vbasis, vstep )) )
 		return;
 
-	mAttributesStack.top().cmdBasis( ubasis, ustep, vbasis, vstep );
+	mAttributesStack.top().cmdBasis(
+						ubasis, pCustomUBasis, ustep,
+						vbasis, pCustomVBasis, vstep );
 }
 
 // options
@@ -395,6 +400,15 @@ void State::Shutter( float openShutter, float closeShutter )
 void State::Identity()
 {
 	mTransformOpenStack.top().SetIdentity();
+}
+
+//==================================================================
+void State::ConcatTransform( const Matrix44 &mtxLeft )
+{
+	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
+		return;
+
+	mTransformOpenStack.top().ConcatTransform( mtxLeft );
 }
 
 //==================================================================

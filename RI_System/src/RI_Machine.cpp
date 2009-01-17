@@ -124,12 +124,27 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Sides" )			{ exN( 1, p ); mState.Sides( p[0] );		}	else
 	if ( nm == "Basis" )			{
 		exN( 4, p );
+
+		RtToken		pUName = NULL;
+		RtToken		pVName = NULL;
+		const float	*pUCustom = NULL;
+		const float	*pVCustom = NULL;
+		
+		if ( p[0].IsString() )	pUName = matchToken( p[0], tlBasis );
+		else					pUCustom = p[0].PFlt(16);
+
+		if ( p[2].IsString() )	pVName = matchToken( p[2], tlBasis );
+		else					pVCustom = p[2].PFlt(16);
+
 		mState.Basis(
-			matchToken( p[0], tlBasis ),
+			pUName,
+			pUCustom,
 			p[1],
-			matchToken( p[2], tlBasis ),
+			pVName,
+			pVCustom,
 			p[3]
 			);
+
 	}	else
 
 	// options
@@ -143,6 +158,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Shutter" )			{ exN( 2, p ); mState.Shutter(		p[0], p[1] );	}	else
 	// transformations
 	if ( nm == "Identity" )			{ exN( 0, p ); mState.Identity();							}	else
+	if ( nm == "ConcatTransform" )	{ exN( 1, p ); mState.ConcatTransform(	p[0].PFlt(16) );	}	else
 	if ( nm == "Transform" )		{ exN( 1, p ); mState.TransformCmd(	p[0].PFlt(16) );	}	else
 	if ( nm == "Scale" )			{ exN( 3, p ); mState.Scale(		p[0], p[1], p[2] );	}	else
 	if ( nm == "Rotate" )			{ exN( 4, p ); mState.Rotate(		p[0], p[1], p[2], p[3] ); }	else

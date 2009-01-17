@@ -43,9 +43,7 @@ public:
 
 	Attributes( const Attributes &attributes )	{ *this = attributes; }
 
-	~Attributes()
-	{
-	}
+	~Attributes();
 
 /*
 	//==================================================================
@@ -66,7 +64,11 @@ public:
 	
 	void cmdOrientation( RtToken orientation );
 	void cmdSides( int sides );
-	void cmdBasis( RtToken ubasis, int ustep, RtToken vbasis, int vstep );
+	void cmdBasis(RtToken ubasis, const float *pCustomUBasis, int ustep,
+				  RtToken vbasis, const float *pCustomVBasis, int vstep );
+				  
+	const RtBasis &GetUBasis() const { return mpyUBasis ? mpyUBasis->value : *mpCustomUBasis; }
+	const RtBasis &GetVBasis() const { return mpyVBasis ? mpyVBasis->value : *mpCustomVBasis; }
 
 public:
 	//==================================================================
@@ -85,9 +87,12 @@ public:
 	
 	CPSymVoid	mpyOrientation;		// Orientation()
 	int			mSides;				// Sides()
-	
+
 	CPSymBasis	mpyUBasis;			// Basis()
 	CPSymBasis	mpyVBasis;
+	const RtBasis *mpCustomUBasis;
+	const RtBasis *mpCustomVBasis;
+	
 	int			mUSteps;
 	int			mVSteps;
 };

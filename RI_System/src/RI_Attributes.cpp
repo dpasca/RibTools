@@ -18,6 +18,15 @@ namespace RI
 //==================================================================
 Attributes::Attributes()
 {
+	mpCustomUBasis = NULL;
+	mpCustomVBasis = NULL;
+}
+
+//==================================================================
+Attributes::~Attributes()
+{
+	DSAFE_DELETE( mpCustomUBasis );
+	DSAFE_DELETE( mpCustomVBasis );
 }
 
 //==================================================================
@@ -35,7 +44,10 @@ void Attributes::Init( SymbolList *pTManager )
 	cmdGeometricApproximation( RI_EMPTY_TOKEN, 0 );
 	cmdOrientation( RI_OUTSIDE );
 	cmdSides( 2 );
-	cmdBasis( RI_BEZIERBASIS, 3, RI_BEZIERBASIS, 3 );
+	cmdBasis( RI_BEZIERBASIS, NULL, 3, RI_BEZIERBASIS, NULL, 3 );
+	
+	mpCustomUBasis = NULL;
+	mpCustomVBasis = NULL;
 }
 
 
@@ -90,10 +102,20 @@ void Attributes::cmdSides( int sides )
 }
 
 //==================================================================
-void Attributes::cmdBasis( RtToken ubasis, int ustep, RtToken vbasis, int vstep )
+void Attributes::cmdBasis(
+				RtToken ubasis, const float *pCustomUBasis, int ustep,
+				RtToken vbasis, const float *pCustomVBasis, int vstep )
 {
-	mpyUBasis = mpStatics->FindBasis( ubasis );
-	mpyVBasis = mpStatics->FindBasis( vbasis );
+	if ( ubasis )
+		mpyUBasis = mpStatics->FindBasis( ubasis );
+	else
+		mpCustomUBasis = new Matrix44( pCustomUBasis );
+
+	if ( vbasis )
+		mpyVBasis = mpStatics->FindBasis( vbasis );
+	else
+		mpCustomVBasis = new Matrix44( pCustomVBasis );
+
 	mUSteps	= ustep;
 	mVSteps	= vstep;
 	BumpRevision();

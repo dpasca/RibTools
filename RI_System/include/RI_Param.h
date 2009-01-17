@@ -57,6 +57,8 @@ struct Param
 	const float	*PFlt( size_t n=(size_t)-1 );	// may need to convert from int array
 	const char *PChar() const						{ ensType( STR ); return u.stringVal.c_str();}
 
+	bool IsString() const	{ return type == STR;	}
+
 
 	operator const char*	() const	{	return PChar();	}
 	operator float			() const	{	return Flt();	}

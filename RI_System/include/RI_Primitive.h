@@ -264,13 +264,13 @@ public:
 class Patch : public Primitive
 {
 public:
-	CPSymVoid	mpyIntplType;
-	ParamList	mParams;
-	CPSymBasis	mpyUBasis;
-	CPSymBasis	mpyVBasis;
-	int			mUSteps;
-	int			mVSteps;
-	Vector3		mHullPos[16];
+	CPSymVoid		mpyIntplType;
+	ParamList		mParams;
+	const RtBasis	*mpUBasis;
+	const RtBasis	*mpVBasis;
+	int				mUSteps;
+	int				mVSteps;
+	Vector3			mHullPos[16];
 
 public:
 	Patch( RtToken type, ParamList &params, const Attributes &attr, SymbolList &tmanager );

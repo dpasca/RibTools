@@ -103,7 +103,7 @@ void Parser::AddChar( char ch )
 			//puts( "Unknown !!!" );
 			break;
 	}
-	
+
 	if ( addParam )
 		mCurParams.push_back( param );
 /*

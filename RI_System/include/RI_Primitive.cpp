@@ -59,7 +59,7 @@ inline void GState::AddVertex( const GVert &vert )
 //==================================================================
 void Cylinder::Render( GState &gstate )
 {
-	puts( "* Cylinder" );
+	//puts( "* Cylinder" );
 	
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -89,7 +89,7 @@ void Cylinder::Render( GState &gstate )
 //==================================================================
 void Cone::Render( GState &gstate )
 {
-	puts( "* Cone" );
+	//puts( "* Cone" );
 
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -119,7 +119,7 @@ void Cone::Render( GState &gstate )
 //==================================================================
 void Sphere::Render( GState &gstate )
 {
-	puts( "* Sphere" );
+	//puts( "* Sphere" );
 	
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -163,7 +163,7 @@ void Sphere::Render( GState &gstate )
 //==================================================================
 void Hyperboloid::Render( GState &gstate )
 {
-	puts( "* Hyperboloid" );
+	//puts( "* Hyperboloid" );
 	
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -206,7 +206,7 @@ void Hyperboloid::Render( GState &gstate )
 //==================================================================
 void Paraboloid::Render( GState &gstate )
 {
-	puts( "* Paraboloid" );
+	//puts( "* Paraboloid" );
 
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -249,7 +249,7 @@ void Paraboloid::Render( GState &gstate )
 //==================================================================
 void Torus::Render( GState &gstate )
 {
-	puts( "* Torus" );
+	//puts( "* Torus" );
 
 	GVert	buffer[NSUBDIVS+1];
 
@@ -297,8 +297,8 @@ Patch::Patch( RtToken type, ParamList &params, const Attributes &attr, SymbolLis
 	mParams(params)
 {
 	mpyIntplType = tmanager.FindVoid( type );
-	mpyUBasis = attr.mpyUBasis;
-	mpyVBasis = attr.mpyVBasis;
+	mpUBasis = &attr.GetUBasis();
+	mpVBasis = &attr.GetVBasis();
 	mUSteps = attr.mUSteps;
 	mVSteps = attr.mVSteps;
 
@@ -356,7 +356,7 @@ static Vector3 spline( float t,
 //==================================================================
 void Patch::Render( GState &gstate )
 {
-	puts( "* Patch" );
+	//puts( "* Patch" );
 
 	GVert	buffer[NSUBDIVS+1];
 
@@ -365,8 +365,8 @@ void Patch::Render( GState &gstate )
 	Vector3	mid2[NSUBDIVS+1];
 	Vector3	top[NSUBDIVS+1];
 	
-	const RtBasis	&uBasis = mpyUBasis->value;
-	const RtBasis	&vBasis = mpyVBasis->value;
+	const RtBasis	&uBasis = *mpUBasis;
+	const RtBasis	&vBasis = *mpVBasis;
 
 	if ( mpyIntplType->pName == RI_BICUBIC )
 	{

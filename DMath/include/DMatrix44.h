@@ -30,6 +30,11 @@ public:
 			Identity();
 	}
 
+	Matrix44( const float *pSrcMtx )
+	{
+		CopyRowMajor( pSrcMtx );
+	}
+
 	Matrix44(
 		float m00_, float m01_, float m02_, float m03_,
 		float m10_, float m11_, float m12_, float m13_,

@@ -129,7 +129,6 @@
 
 /* Begin PBXFileReference section */
 		6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Prims.cpp; path = src/RI_State_Prims.cpp; sourceTree = "<group>"; };
-		6B0ABFBD0F1667310001C656 /* Pixar-test.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Pixar-test.rib"; path = "Tests/Pixar-test.rib"; sourceTree = "<group>"; };
 		6B0ABFC00F16675D0001C656 /* Pixar.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Pixar.rib; path = Tests/Pixar.rib; sourceTree = "<group>"; };
 		6B16F3F60F0AA50600B53225 /* DUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DUtils.cpp; path = src/DUtils.cpp; sourceTree = "<group>"; };
 		6B16F3F80F0AA51900B53225 /* DUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DUtils.h; path = include/DUtils.h; sourceTree = "<group>"; };
@@ -177,6 +176,10 @@
 		6BCC7ADF0ED04837004AEDC8 /* ribparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ribparser; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BE7302D0F1FA236004FAE21 /* RI_Symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Symbol.h; path = include/RI_Symbol.h; sourceTree = "<group>"; };
 		6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Symbol.cpp; path = src/RI_Symbol.cpp; sourceTree = "<group>"; };
+		6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Airplane.rib; path = Tests/Airplane.rib; sourceTree = "<group>"; };
+		6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Elephant.rib; path = Tests/Elephant.rib; sourceTree = "<group>"; };
+		6BEE6F3E0F2236BF00BC3132 /* Chair.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Chair.rib; path = Tests/Chair.rib; sourceTree = "<group>"; };
+		6BEE6F3F0F2236BF00BC3132 /* Bag.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Bag.rib; path = Tests/Bag.rib; sourceTree = "<group>"; };
 		6BF635E00F17F85400A68819 /* SimpleMug.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SimpleMug.rib; path = Tests/SimpleMug.rib; sourceTree = "<group>"; };
 		6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Framework.cpp; path = src/RI_Framework.cpp; sourceTree = "<group>"; };
 		6BFF1D390F0FE02200F984E5 /* RI_Framework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Framework.h; path = include/RI_Framework.h; sourceTree = "<group>"; };
@@ -260,9 +263,12 @@
 		6B68A78E0EE3040900993469 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */,
+				6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */,
+				6BEE6F3E0F2236BF00BC3132 /* Chair.rib */,
+				6BEE6F3F0F2236BF00BC3132 /* Bag.rib */,
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
 				6BF635E00F17F85400A68819 /* SimpleMug.rib */,
-				6B0ABFBD0F1667310001C656 /* Pixar-test.rib */,
 				6B39F4720F19049000FE838F /* uteapot.rib */,
 			);
 			name = Tests;
@@ -793,10 +799,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = NO;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-D_GLIBCXX_DEBUG",
-				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 			};
 			name = Debug;
 		};
