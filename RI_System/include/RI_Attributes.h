@@ -33,7 +33,7 @@ struct Color
 //==================================================================
 /// Attributess
 //==================================================================
-class Attributes
+class Attributes : public RevisionTracker
 {
 	SymbolList	*mpStatics;
 
@@ -55,8 +55,8 @@ public:
 	}
 */
 
-	void cmdBound( const BoundType &bound );
-	void cmdDetail( const BoundType &detail );
+	void cmdBound( const Bound &bound );
+	void cmdDetail( const Bound &detail );
 	void cmdDetailRange(float	minVisible,
 						float	lowerTransition,
 						float	upperTransition,
@@ -70,8 +70,10 @@ public:
 
 public:
 	//==================================================================
-	BoundType	mBound;				// Bound()
-	BoundType	mDetail;			// Detail()
+	SymbolList	mSymbols;
+
+	Bound		mBound;				// DoBound()
+	Bound		mDetail;			// Detail()
 
 	float		mMinVisible;		// DetailRange()
 	float		mLowerTransition;	//

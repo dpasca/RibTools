@@ -94,9 +94,9 @@ public:
 	void	MotionEnd();
 
 	// attributes
-	void Bound( const BoundType &bound );
+	void DoBound( const Bound &bound );
 
-	void Detail( const BoundType &detail );
+	void Detail( const Bound &detail );
 
 	void DetailRange(float	minVisible,
 					 float	lowerTransition,

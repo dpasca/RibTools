@@ -29,6 +29,14 @@ class Framework
 {
 	DVec<Primitive *>	mpPrims;
 
+	DVec<Options*>		mpUniqueOptions;
+	DVec<Attributes*>	mpUniqueAttribs;
+	DVec<Transform*>	mpUniqueTransform;
+
+	RevisionChecker		mOptsRev;
+	RevisionChecker		mAttrsRev;
+	RevisionChecker		mTransRev;
+				
 public:
 	Framework()
 	{
@@ -40,9 +48,8 @@ public:
 	void Insert( Primitive			*pPrim,
 				 const Options		&opt,
 				 const Attributes	&attr,
-				 const Transform	&xform,
-				 const Matrix44		&mtxWorldCamera );
-	void WorldEnd();
+				 const Transform	&xform );
+	void WorldEnd( const Matrix44 &mtxWorldCamera );
 };
 
 //==================================================================

@@ -37,27 +37,52 @@ void Framework::WorldBegin()
 void Framework::Insert(	Primitive			*pPrim,
 						const Options		&opt,
 						const Attributes	&attr,
-						const Transform		&xform,
-						const Matrix44		&mtxWorldCamera )
+						const Transform		&xform )
 {
-	mpPrims.push_back( pPrim );
+	if ( mOptsRev.Sync( opt ) )
+		mpUniqueOptions.push_back( new Options( opt ) );
 	
-	GState	gstate( opt, attr, xform, mtxWorldCamera );
+	if ( mAttrsRev.Sync( attr ) )
+		mpUniqueAttribs.push_back( new Attributes( attr ) );
 
-	pPrim->Render( gstate );
+	if ( mTransRev.Sync( xform ) )
+		mpUniqueTransform.push_back( new Transform( xform ) );
+
+	pPrim->SetStates(
+				mpUniqueOptions.back(),
+				mpUniqueAttribs.back(),
+				mpUniqueTransform.back()
+				);
+
+	mpPrims.push_back( pPrim );
 }
 
 //==================================================================
-void Framework::WorldEnd()
+void Framework::WorldEnd( const Matrix44 &mtxWorldCamera )
 {
-/*
-	for (size_t i=0; i < mpPrims.size(); ++i)
-	{
-	}
-*/
+	GState	gstate;
 
 	for (size_t i=0; i < mpPrims.size(); ++i)
-		delete mpPrims[i];
+	{	
+		Primitive	*pPrim = mpPrims[i];
+
+		gstate.Setup(
+				*pPrim->mpOptions,
+				*pPrim->mpAttribs,
+				*pPrim->mpTransform,
+				mtxWorldCamera );
+
+		pPrim->Render( gstate );
+	}
+
+	for (size_t i=0; i < mpUniqueOptions.size(); ++i)	delete mpUniqueOptions[i];
+	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	delete mpUniqueAttribs[i];
+	for (size_t i=0; i < mpUniqueTransform.size(); ++i)	delete mpUniqueTransform[i];
+	for (size_t i=0; i < mpPrims.size(); ++i)			delete mpPrims[i];
+	
+	mpUniqueOptions.clear();
+	mpUniqueAttribs.clear();
+	mpUniqueTransform.clear();
 	mpPrims.clear();
 }
 

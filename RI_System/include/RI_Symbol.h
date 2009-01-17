@@ -59,7 +59,7 @@ public:
 
 	void FindOrAdd( const char *pName, const char *pDescr=NULL );
 	void FindOrAdd( const char *pName, const RtBasis &basis );
-	
+
 	const SymbolBase  *Find( Type type, const char *pName ) const;
 	const SymbolVoid  *FindVoid(  const char *pName ) const { return (const SymbolVoid *)Find( T_VOID, pName );	}
 	const SymbolBasis *FindBasis( const char *pName ) const { return (const SymbolBasis *)Find( T_BASIS, pName );	}

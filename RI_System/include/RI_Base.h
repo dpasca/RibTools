@@ -70,21 +70,57 @@ enum Error
 const char *ErrorToString( Error errCode );
 
 //==================================================================
+class RevisionTracker
+{
+public:
+	int	mRTrackRevisionCount;
+	
+	RevisionTracker() : mRTrackRevisionCount(0) {}
+
+	void BumpRevision()
+	{
+		mRTrackRevisionCount += 1;
+	}
+};
+
+//==================================================================
+class RevisionChecker
+{
+public:
+	int	mCurRevisionCount;
+	
+	RevisionChecker() : mCurRevisionCount(-1) {}
+
+	bool Sync( const RevisionTracker &tracker )
+	{
+		if ( tracker.mRTrackRevisionCount != mCurRevisionCount )
+		{
+			mCurRevisionCount = tracker.mRTrackRevisionCount;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+};
+
+//==================================================================
 /// 
 //==================================================================
 typedef const char	*RtToken;
 typedef void		*ObjectHandle;
 typedef void		*LightHandle;
 
-struct BoundType
+struct Bound
 {
 	float	mBound[6];
 
-	BoundType()
+	Bound()
 	{
 	}
 
-	BoundType( float val )
+	Bound( float val )
 	{
 		mBound[0] = val;
 		mBound[1] = val;
@@ -94,7 +130,7 @@ struct BoundType
 		mBound[5] = val;
 	}
 	
-	BoundType( float x1, float y1, float z1,
+	Bound( float x1, float y1, float z1,
 			   float x2, float y2, float z2 )
 	{
 		mBound[0] = x1;

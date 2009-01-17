@@ -49,11 +49,12 @@ class GState
 
 	const Options		*mpOpts;
 	const Attributes	*mpAttrs;
-	const Transform		*mpXForm;
-				
+	//const Transform		*mpXForm;
+
 public:
 	//==================================================================
-	GState( const Options		&opt,
+	void Setup(
+			const Options		&opt,
 			const Attributes	&attr,
 			const Transform		&xform,
 			const Matrix44		&mtxWorldCamera );
@@ -79,11 +80,17 @@ public:
 		PATCH,
 	};
 	
-	Type	mType;
+	Type		mType;
+	Options		*mpOptions;
+	Attributes	*mpAttribs;
+	Transform	*mpTransform;
 	
 public:
 	Primitive( Type type ) :
-		mType(type)
+		mType(type),
+		mpOptions(NULL),
+		mpAttribs(NULL),
+		mpTransform(NULL)
 	{
 	}
 	
@@ -91,6 +98,17 @@ public:
 	{
 	}
 	
+	void SetStates(
+		Options		*pOptions,
+		Attributes	*pAttribs,
+		Transform	*pTransform
+	)
+	{
+		mpOptions	= pOptions	;
+		mpAttribs	= pAttribs	;
+		mpTransform	= pTransform;
+	}
+
 	virtual void Render( GState &gstate )
 	{
 	}

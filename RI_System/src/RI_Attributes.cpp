@@ -40,15 +40,17 @@ void Attributes::Init( SymbolList *pTManager )
 
 
 //==================================================================
-void Attributes::cmdBound( const BoundType &bound )
+void Attributes::cmdBound( const Bound &bound )
 {
 	mBound = bound;
+	BumpRevision();
 }
 
 //==================================================================
-void Attributes::cmdDetail( const BoundType &detail )
+void Attributes::cmdDetail( const Bound &detail )
 {
 	mDetail = detail;
+	BumpRevision();
 }
 
 //==================================================================
@@ -61,6 +63,7 @@ void Attributes::cmdDetailRange(float	minVisible,
 	mLowerTransition	= lowerTransition;
 	mUpperTransition	= upperTransition;
 	mMaxVisible			= maxVisible;
+	BumpRevision();
 }
 
 //==================================================================
@@ -69,18 +72,21 @@ void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 {
 	mpyTypeApproximation	= mpStatics->FindVoid( typeApproximation );
 	mValueApproximation		= valueApproximation;
+	BumpRevision();
 }
 
 //==================================================================
 void Attributes::cmdOrientation( RtToken orientation )
 {
 	mpyOrientation	= mpStatics->FindVoid( orientation );
+	BumpRevision();
 }
 
 //==================================================================
 void Attributes::cmdSides( int sides )
 {
 	mSides	= sides;
+	BumpRevision();
 }
 
 //==================================================================
@@ -90,6 +96,7 @@ void Attributes::cmdBasis( RtToken ubasis, int ustep, RtToken vbasis, int vstep 
 	mpyVBasis = mpStatics->FindBasis( vbasis );
 	mUSteps	= ustep;
 	mVSteps	= vstep;
+	BumpRevision();
 }
 
 //==================================================================

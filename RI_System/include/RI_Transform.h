@@ -20,9 +20,8 @@ namespace RI
 //==================================================================
 /// Transform
 //==================================================================
-class Transform
+class Transform : public RevisionTracker
 {
-public:
 	Matrix44	mMatrix;
 
 public:
@@ -30,8 +29,29 @@ public:
 
 	// avoid initialization of default values and just copy..
 	Transform( const Transform &fromObj ) {	*this = fromObj; }
-
 	~Transform() {}
+
+	const Matrix44 &GetMatrix() const	{	return mMatrix;		}
+
+	void SetIdentity()
+	{
+		RevisionTracker::BumpRevision();
+		mMatrix.Identity();
+	}
+
+	void ConcatTransform( const Matrix44 &m )
+	{
+		RevisionTracker::BumpRevision();
+
+		// check if not identity ?
+		mMatrix = m * mMatrix;
+	}
+
+	void CopyRowMajor( const float *pSrcMtx )
+	{
+		RevisionTracker::BumpRevision();
+		mMatrix.CopyRowMajor( pSrcMtx );
+	}
 };
 
 //==================================================================

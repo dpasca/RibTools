@@ -22,7 +22,7 @@ namespace RI
 //==================================================================
 /// Options
 //==================================================================
-class Options
+class Options : public RevisionTracker
 {
 	SymbolList	*mpStatics;
 
@@ -36,7 +36,7 @@ public:
 	~Options();
 
 	//Options &operator=(const Options &options);
-
+public:
 	// Camera
 	int		mXRes, mYRes;
 	float	mPixelAspectRatio;
@@ -53,7 +53,7 @@ public:
 	
 	// Display
 	// ...
-
+public:
 	// Functions
 	void cmdFormat( int xRes, int yRes, float pixelRatio );
 	void cmdFrameAspectRatio( float ratio );

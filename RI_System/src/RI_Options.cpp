@@ -68,12 +68,16 @@ void Options::cmdFormat( int xRes, int yRes, float pixelRatio )
 	mXRes			= xRes;
 	mYRes			= yRes;
 	mPixelAspectRatio= pixelRatio;
+	
+	BumpRevision();
 }
 
 //==================================================================
 void Options::cmdFrameAspectRatio( float ratio )
 {
 	mFrameAspectRatio	= ratio;
+
+	BumpRevision();
 }
 
 //==================================================================
@@ -83,6 +87,8 @@ void Options::cmdScreenWindow( float left, float right, float bottom, float top 
 	mRight	= right;
 	mBottom	= bottom;
 	mTop	= top;
+
+	BumpRevision();
 }
 
 //==================================================================
@@ -98,6 +104,8 @@ void Options::cmdCropWindow( float xMin, float xMax, float yMin, float yMax )
 	rymin = clamp (ceil ( yresolution*ymin ), 0, yresolution-1); 
 	rymax = clamp (ceil ( yresolution*ymax -1 ), 0, yresolution-1); 	
 */
+
+	BumpRevision();
 }
 
 //==================================================================
@@ -118,6 +126,7 @@ void Options::cmdProjection( ParamList &params )
 						if ( (i+1) >= params.size() )
 						{
 							printf( "Error missing parameter !\n" );
+							BumpRevision();
 							return;
 						}
 
@@ -137,6 +146,8 @@ void Options::cmdProjection( ParamList &params )
 			mpyProjection	= mpStatics->FindVoid( RI_ORTHOGRAPHIC );
 		}
 	}
+
+	BumpRevision();
 }
 
 //==================================================================
@@ -146,6 +157,8 @@ void Options::cmdClipping( float near, float farr )
 
 	mNearClip	= near;
 	mFarClip	= farr;
+
+	BumpRevision();
 }
 
 //==================================================================
@@ -154,6 +167,8 @@ void Options::cmdDepthOfField( float fStop, float focalLength, float focalDistan
 	mFStop			= fStop;
 	mFocalLength	= focalLength;
 	mFocalDistance	= focalDistance;
+
+	BumpRevision();
 }
 
 //==================================================================
@@ -161,6 +176,8 @@ void Options::cmdShutter( float openShutter, float closeShutter )
 {
 	mOpenShutter	= openShutter;
 	mCloseShutter	= closeShutter;
+
+	BumpRevision();
 }
 
 //==================================================================

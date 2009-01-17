@@ -166,20 +166,20 @@ void State::WorldBegin()
 	pushMode( MD_WORLD );
 
 	// store the current (camera) transformation
-	mMtxWorldCamera = mTransformOpenStack.top().mMatrix;
+	mMtxWorldCamera = mTransformOpenStack.top().GetMatrix();
 
 	pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 
 	// initalize the world transformation
-	mTransformOpenStack.top().mMatrix.Identity();
-	mTransformCloseStack.top().mMatrix.Identity();
+	mTransformOpenStack.top().SetIdentity();
+	mTransformCloseStack.top().SetIdentity();
 
 	mFramework.WorldBegin();
 }
 //==================================================================
 void State::WorldEnd()
 {
-	mFramework.WorldEnd();
+	mFramework.WorldEnd( mMtxWorldCamera );
 
 	popStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 	popMode( MD_WORLD );
@@ -253,7 +253,7 @@ void State::MotionEnd()
 
 // setting attributes
 //==================================================================
-void State::Bound( const BoundType &bound )
+void State::DoBound( const Bound &bound )
 {
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
@@ -261,7 +261,7 @@ void State::Bound( const BoundType &bound )
 	mAttributesStack.top().cmdBound( bound );
 }
 //==================================================================
-void State::Detail( const BoundType &detail )
+void State::Detail( const Bound &detail )
 {
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
@@ -394,8 +394,7 @@ void State::Shutter( float openShutter, float closeShutter )
 //==================================================================
 void State::Identity()
 {
-	Matrix44 &m = mTransformOpenStack.top().mMatrix;
-	m.Identity();
+	mTransformOpenStack.top().SetIdentity();
 }
 
 //==================================================================
@@ -404,8 +403,7 @@ void State::TransformCmd( const float *pMtx )
 	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
 		return;
 
-	Matrix44 &m = mTransformOpenStack.top().mMatrix;
-	m.CopyRowMajor( pMtx );
+	mTransformOpenStack.top().CopyRowMajor( pMtx );
 }
 
 //==================================================================
@@ -414,8 +412,7 @@ void State::Scale( float sx, float sy, float sz )
 	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
 		return;
 
-	Matrix44 &m = mTransformOpenStack.top().mMatrix;
-	m = Matrix44::Scale( sx, sy, sz ) * m;
+	mTransformOpenStack.top().ConcatTransform( Matrix44::Scale( sx, sy, sz ) );
 }
 
 //==================================================================
@@ -424,8 +421,7 @@ void State::Rotate( float angDeg, float ax, float ay, float az )
 	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
 		return;
 
-	Matrix44 &m = mTransformOpenStack.top().mMatrix;
-	m = Matrix44::Rot( angDeg * DEG2RAD, ax, ay, az ) * m;
+	mTransformOpenStack.top().ConcatTransform( Matrix44::Rot( angDeg * DEG2RAD, ax, ay, az ) );
 }
 
 //==================================================================
@@ -434,8 +430,7 @@ void State::Translate( float tx, float ty, float tz )
 	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
 		return;
 
-	Matrix44 &m = mTransformOpenStack.top().mMatrix;
-	m = Matrix44::Translate( tx, ty, tz ) * m;
+	mTransformOpenStack.top().ConcatTransform( Matrix44::Translate( tx, ty, tz ) );
 }
 
 //==================================================================

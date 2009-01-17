@@ -53,7 +53,7 @@ void Machine::geN( size_t n, const ParamList &cmdParams )
 }
 
 //==================================================================
-static void mkBound( BoundType &out_Bound, ParamList &cmdParams )
+static void mkBound( Bound &out_Bound, ParamList &cmdParams )
 {
 	if ( cmdParams.size() == 1 )
 	{
@@ -115,8 +115,8 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "MotionBegin" )		{ exN( 2, p ); mState.MotionBegin( p[0], p[0].PFlt() ); } else
 	if ( nm == "MotionEnd" )		{ exN( 0, p ); mState.MotionEnd();			}	else
 	// attributes
-	if ( nm == "Bound" )			{ BoundType b; mkBound( b, p ); mState.Bound( b );	}	else
-	if ( nm == "Detail" )			{ BoundType b; mkBound( b, p ); mState.Detail( b ); }	else
+	if ( nm == "Bound" )			{ Bound b; mkBound( b, p ); mState.DoBound( b );	}	else
+	if ( nm == "Detail" )			{ Bound b; mkBound( b, p ); mState.Detail( b ); }	else
 	if ( nm == "DetailRange" )		{ exN( 4, p ); mState.DetailRange(p[0],p[1],p[2],p[3]);	}	else
 	if ( nm == "GeometricApproximation" )
 									{ exN( 2, p ); mState.GeometricApproximation( matchToken( p[0], tlGeometricApproximation ), p[0] );	}	else
