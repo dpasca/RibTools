@@ -30,7 +30,7 @@ template <class T>
 const T *findElemByName( const DVec<T> &vec, const char *pName )
 {
 	for (size_t i=0; i < vec.size(); ++i)
-		if ( 0 == strcmp( pName, vec[i].pName ) )
+		if ( 0 == strcasecmp( pName, vec[i].pName ) )
 			return &vec[i];
 
 	return NULL;

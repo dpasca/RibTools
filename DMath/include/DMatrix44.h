@@ -24,7 +24,11 @@ public:
 		float	m44[4][4];
 	} u;
 
-	Matrix44( bool setToIdentity=false )
+	Matrix44()
+	{
+	}
+
+	Matrix44( bool setToIdentity )
 	{
 		if ( setToIdentity )
 			Identity();

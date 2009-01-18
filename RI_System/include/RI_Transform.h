@@ -20,10 +20,8 @@ namespace RI
 //==================================================================
 /// Transform
 //==================================================================
-class Transform : public RevisionTracker
+class Transform
 {
-	Matrix44	mMatrix;
-
 public:
 	Transform() : mMatrix(true)	{ }
 
@@ -31,17 +29,23 @@ public:
 	Transform( const Transform &fromObj ) {	*this = fromObj; }
 	~Transform() {}
 
+	//==================================================================
+	void Init( RevisionTracker *pRevision )
+	{
+		mpRevision = pRevision;
+	}
+
 	const Matrix44 &GetMatrix() const	{	return mMatrix;		}
 
 	void SetIdentity()
 	{
-		RevisionTracker::BumpRevision();
+		mpRevision->BumpRevision();
 		mMatrix.Identity();
 	}
 
 	void ConcatTransform( const Matrix44 &m )
 	{
-		RevisionTracker::BumpRevision();
+		mpRevision->BumpRevision();
 
 		// check if not identity ?
 		mMatrix = m * mMatrix;
@@ -49,9 +53,15 @@ public:
 
 	void CopyRowMajor( const float *pSrcMtx )
 	{
-		RevisionTracker::BumpRevision();
+		mpRevision->BumpRevision();
 		mMatrix.CopyRowMajor( pSrcMtx );
 	}
+
+public:
+	RevisionTracker	*mpRevision;
+
+private:
+	Matrix44	mMatrix;
 };
 
 //==================================================================

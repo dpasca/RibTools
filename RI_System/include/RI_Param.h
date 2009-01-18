@@ -50,7 +50,7 @@ struct Param
 	{
 		if ( type == FLT )	return u.floatVal;	else
 		if ( type == INT )	return u.intVal;	else
-							badType();
+							{ badType(); return 0; }
 	}
 	
 	const int	*PInt( size_t n=(size_t)-1 ) const	{ ensIntArr( n ); return &u.intArrayVal[0];	}

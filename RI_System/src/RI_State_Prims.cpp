@@ -64,7 +64,46 @@ void State::Torus( float maxRadius, float minRadius,
 //==================================================================
 void State::Patch( RtToken type, ParamList &params )
 {
-	insertPrimitive( new RI::Patch( type, params, mAttributesStack.top(), mStatics ) );
+	CPSymVoid	pyPatchType = mStatics.FindVoid( type );
+	
+	if ( pyPatchType->IsNameI( RI_BICUBIC ) )
+		insertPrimitive( new RI::PatchBicubic( type, params, mAttributesStack.top(), mStatics ) );
+//	else
+//	if ( pyPatchType.IsNameI( RI_BILINEAR ) )
+//		insertPrimitive( new RI::PatchBilinear( type, params, mAttributesStack.top(), mStatics ) );
+}
+
+//==================================================================
+void State::PatchMesh( RtToken type, ParamList &params )
+{
+/*
+	int	nu = params[1];
+	int	nv = params[3];
+	
+	CPSymVoid	pyUWrap = mStatics.FindVoid( params[2] );
+	CPSymVoid	pyVWrap = mStatics.FindVoid( params[4] );
+
+	bool	uPeriodic = (0 == strcasecmp( yUWrap.pName, RI_PERIODIC );
+	bool	vPeriodic = (0 == strcasecmp( yVWrap.pName, RI_PERIODIC );
+	
+	int	useNu = nu - 1 + uPeriodic ? 1 + 0;
+	int	useNv = nv - 1 + vPeriodic ? 1 + 0;
+	
+	for (int i=0; i < useNu; ++i)
+	{
+		int	ii = (i+1) % nu;
+
+		for (int j=0; j < useNv; ++j)
+		{
+			int	jj = (j+1) % nv;
+			
+			insertPrimitive(
+					new RI::Patch( type, params, mAttributesStack.top(), mStatics ) );
+		}
+	}
+	
+	//insertPrimitive( new RI::PatchMesh( type, params, mAttributesStack.top(), mStatics ) );
+*/
 }
 
 //==================================================================

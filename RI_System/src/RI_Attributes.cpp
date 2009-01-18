@@ -30,9 +30,11 @@ Attributes::~Attributes()
 }
 
 //==================================================================
-void Attributes::Init( SymbolList *pTManager )
+void Attributes::Init( SymbolList *pStatics, RevisionTracker *pRevision )
 {
-	mpStatics	= pTManager;
+	mpStatics	= pStatics;
+	mpRevision	= pRevision;
+
 	mBound		= RI_INFINITY;
 	mDetail		= RI_INFINITY;
 
@@ -45,24 +47,23 @@ void Attributes::Init( SymbolList *pTManager )
 	cmdOrientation( RI_OUTSIDE );
 	cmdSides( 2 );
 	cmdBasis( RI_BEZIERBASIS, NULL, 3, RI_BEZIERBASIS, NULL, 3 );
-	
+
 	mpCustomUBasis = NULL;
 	mpCustomVBasis = NULL;
 }
-
 
 //==================================================================
 void Attributes::cmdBound( const Bound &bound )
 {
 	mBound = bound;
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
 void Attributes::cmdDetail( const Bound &detail )
 {
 	mDetail = detail;
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -75,7 +76,7 @@ void Attributes::cmdDetailRange(float	minVisible,
 	mLowerTransition	= lowerTransition;
 	mUpperTransition	= upperTransition;
 	mMaxVisible			= maxVisible;
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -84,21 +85,21 @@ void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 {
 	mpyTypeApproximation	= mpStatics->FindVoid( typeApproximation );
 	mValueApproximation		= valueApproximation;
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
 void Attributes::cmdOrientation( RtToken orientation )
 {
 	mpyOrientation	= mpStatics->FindVoid( orientation );
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
 void Attributes::cmdSides( int sides )
 {
 	mSides	= sides;
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -118,7 +119,7 @@ void Attributes::cmdBasis(
 
 	mUSteps	= ustep;
 	mVSteps	= vstep;
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================

@@ -58,6 +58,11 @@ class State
 	CopyStackMax<Attributes,128>	mAttributesStack;
 	CopyStackMax<Transform, 128>	mTransformOpenStack;
 	CopyStackMax<Transform, 128>	mTransformCloseStack;
+	
+	RevisionTracker					mOptionsRevTrack;
+	RevisionTracker					mAttribsRevTrack;
+	RevisionTracker					mTransOpenRevTrack;
+	RevisionTracker					mTransCloseRevTrack;
 
 	Matrix44						mMtxWorldCamera;
 
@@ -140,6 +145,7 @@ public:
 			   float thetamax );
 
 	void Patch( RtToken type, ParamList &params );
+	void PatchMesh( RtToken type, ParamList &params );
 
 
 	void ErrHandler( Error errCode );

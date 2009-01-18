@@ -33,13 +33,13 @@ struct Color
 //==================================================================
 /// Attributess
 //==================================================================
-class Attributes : public RevisionTracker
+class Attributes
 {
 	SymbolList	*mpStatics;
 
 public:
 	Attributes();
-	void Init( SymbolList *pTManager );
+	void Init( SymbolList *pStatics, RevisionTracker *pRevision );
 
 	Attributes( const Attributes &attributes )	{ *this = attributes; }
 
@@ -69,6 +69,9 @@ public:
 				  
 	const RtBasis &GetUBasis() const { return mpyUBasis ? mpyUBasis->value : *mpCustomUBasis; }
 	const RtBasis &GetVBasis() const { return mpyVBasis ? mpyVBasis->value : *mpCustomVBasis; }
+
+public:
+	RevisionTracker	*mpRevision;
 
 public:
 	//==================================================================

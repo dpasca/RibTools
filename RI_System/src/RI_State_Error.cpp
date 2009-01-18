@@ -132,7 +132,7 @@ bool State::verifyBasis( RtToken basis, int steps )
 		RI_POWERBASIS,		4,
 	};
 
-	for (int i=0; i < _countof(table); ++i)
+	for (int i=0; i < (int)_countof(table); ++i)
 	{
 		if ( table[i].token == basis )
 		{

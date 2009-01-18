@@ -22,13 +22,13 @@ namespace RI
 //==================================================================
 /// Options
 //==================================================================
-class Options : public RevisionTracker
+class Options
 {
 	SymbolList	*mpStatics;
 
 public:
 	Options();
-	void Init( SymbolList *pTManager );
+	void Init( SymbolList *pStatics, RevisionTracker *pRevision );
 
 	// avoid initialization of default values and just copy..
 	Options( const Options &options ) {	*this = options; }
@@ -50,6 +50,8 @@ public:
 	float	mNearClip, mFarClip;
 	float	mFStop, mFocalLength, mFocalDistance;
 	float	mOpenShutter, mCloseShutter;
+	
+	RevisionTracker	*mpRevision;
 	
 	// Display
 	// ...

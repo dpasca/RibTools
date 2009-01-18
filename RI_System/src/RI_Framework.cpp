@@ -39,13 +39,13 @@ void Framework::Insert(	Primitive			*pPrim,
 						const Attributes	&attr,
 						const Transform		&xform )
 {
-	if ( mOptsRev.Sync( opt ) )
+	if ( mOptsRev.Sync( *opt.mpRevision ) )
 		mpUniqueOptions.push_back( new Options( opt ) );
 	
-	if ( mAttrsRev.Sync( attr ) )
+	if ( mAttrsRev.Sync( *attr.mpRevision ) )
 		mpUniqueAttribs.push_back( new Attributes( attr ) );
 
-	if ( mTransRev.Sync( xform ) )
+	if ( mTransRev.Sync( *xform.mpRevision ) )
 		mpUniqueTransform.push_back( new Transform( xform ) );
 
 	pPrim->SetStates(
@@ -53,6 +53,9 @@ void Framework::Insert(	Primitive			*pPrim,
 				mpUniqueAttribs.back(),
 				mpUniqueTransform.back()
 				);
+
+	//printf( "Prim xform rev %i\n",
+	//		mpUniqueTransform.back()->mpRevision->mRTrackRevisionCount );
 
 	mpPrims.push_back( pPrim );
 }

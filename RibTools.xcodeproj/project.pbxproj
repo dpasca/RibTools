@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -264,9 +264,9 @@
 			isa = PBXGroup;
 			children = (
 				6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */,
-				6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */,
-				6BEE6F3E0F2236BF00BC3132 /* Chair.rib */,
 				6BEE6F3F0F2236BF00BC3132 /* Bag.rib */,
+				6BEE6F3E0F2236BF00BC3132 /* Chair.rib */,
+				6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */,
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
 				6BF635E00F17F85400A68819 /* SimpleMug.rib */,
 				6B39F4720F19049000FE838F /* uteapot.rib */,
@@ -508,8 +508,11 @@
 /* Begin PBXProject section */
 		6BCC7AD10ED04780004AEDC8 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+			};
 			buildConfigurationList = 6BCC7AD40ED04780004AEDC8 /* Build configuration list for PBXProject "RibTools" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 0;
 			mainGroup = 6BCC7ACF0ED04780004AEDC8;
 			productRefGroup = 6BCC7AE00ED04837004AEDC8 /* Products */;
@@ -797,8 +800,11 @@
 				GCC_DEBUGGING_SYMBOLS = full;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = NO;
+				GCC_WARN_PROTOTYPE_CONVERSION = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 			};
 			name = Debug;
@@ -807,6 +813,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PROTOTYPE_CONVERSION = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
 			};
 			name = Release;
 		};

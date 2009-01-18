@@ -17,14 +17,16 @@ namespace RI
 {
 
 //==================================================================
-Options::Options()
+Options::Options() :
+	mpRevision(NULL)
 {
 }
 
 //==================================================================
-void Options::Init( SymbolList *pTManager )
+void Options::Init( SymbolList *pStatics, RevisionTracker *pRevision )
 {
-	mpStatics = pTManager;
+	mpStatics = pStatics;
+	mpRevision = pRevision;
 	mXRes = 640;
 	mYRes = 480;
 	mPixelAspectRatio = 1.0f;
@@ -69,7 +71,7 @@ void Options::cmdFormat( int xRes, int yRes, float pixelRatio )
 	mYRes			= yRes;
 	mPixelAspectRatio= pixelRatio;
 	
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -77,7 +79,7 @@ void Options::cmdFrameAspectRatio( float ratio )
 {
 	mFrameAspectRatio	= ratio;
 
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -88,7 +90,7 @@ void Options::cmdScreenWindow( float left, float right, float bottom, float top 
 	mBottom	= bottom;
 	mTop	= top;
 
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -105,7 +107,7 @@ void Options::cmdCropWindow( float xMin, float xMax, float yMin, float yMax )
 	rymax = clamp (ceil ( yresolution*ymax -1 ), 0, yresolution-1); 	
 */
 
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -126,7 +128,7 @@ void Options::cmdProjection( ParamList &params )
 						if ( (i+1) >= params.size() )
 						{
 							printf( "Error missing parameter !\n" );
-							BumpRevision();
+							mpRevision->BumpRevision();
 							return;
 						}
 
@@ -147,7 +149,7 @@ void Options::cmdProjection( ParamList &params )
 		}
 	}
 
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -158,7 +160,7 @@ void Options::cmdClipping( float near, float farr )
 	mNearClip	= near;
 	mFarClip	= farr;
 
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -168,7 +170,7 @@ void Options::cmdDepthOfField( float fStop, float focalLength, float focalDistan
 	mFocalLength	= focalLength;
 	mFocalDistance	= focalDistance;
 
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -177,7 +179,7 @@ void Options::cmdShutter( float openShutter, float closeShutter )
 	mOpenShutter	= openShutter;
 	mCloseShutter	= closeShutter;
 
-	BumpRevision();
+	mpRevision->BumpRevision();
 }
 
 //==================================================================

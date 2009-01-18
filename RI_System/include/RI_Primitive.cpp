@@ -16,6 +16,8 @@
 
 const static int NSUBDIVS = 16;
 
+#define PUTPRIMNAME	//puts
+
 //==================================================================
 namespace RI
 {
@@ -29,8 +31,8 @@ void GState::Setup(
 				const Transform		&xform,
 				const Matrix44		&mtxWorldCamera )
 {
-	mpOpts	= &opt;
-	mpAttrs	= &attr;
+	//mpOpts	= &opt;
+	//mpAttrs	= &attr;
 	//,mpXForm(&xform)
 
 	mMtxLocalHomo	= xform.GetMatrix() * mtxWorldCamera * opt.mMtxViewHomo;
@@ -59,7 +61,7 @@ inline void GState::AddVertex( const GVert &vert )
 //==================================================================
 void Cylinder::Render( GState &gstate )
 {
-	//puts( "* Cylinder" );
+	PUTPRIMNAME( "* Cylinder" );
 	
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -89,7 +91,7 @@ void Cylinder::Render( GState &gstate )
 //==================================================================
 void Cone::Render( GState &gstate )
 {
-	//puts( "* Cone" );
+	PUTPRIMNAME( "* Cone" );
 
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -119,7 +121,7 @@ void Cone::Render( GState &gstate )
 //==================================================================
 void Sphere::Render( GState &gstate )
 {
-	//puts( "* Sphere" );
+	PUTPRIMNAME( "* Sphere" );
 	
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -163,7 +165,7 @@ void Sphere::Render( GState &gstate )
 //==================================================================
 void Hyperboloid::Render( GState &gstate )
 {
-	//puts( "* Hyperboloid" );
+	PUTPRIMNAME( "* Hyperboloid" );
 	
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -206,7 +208,7 @@ void Hyperboloid::Render( GState &gstate )
 //==================================================================
 void Paraboloid::Render( GState &gstate )
 {
-	//puts( "* Paraboloid" );
+	PUTPRIMNAME( "* Paraboloid" );
 
 	glBegin( GL_TRIANGLE_STRIP );
 
@@ -249,7 +251,7 @@ void Paraboloid::Render( GState &gstate )
 //==================================================================
 void Torus::Render( GState &gstate )
 {
-	//puts( "* Torus" );
+	PUTPRIMNAME( "* Torus" );
 
 	GVert	buffer[NSUBDIVS+1];
 
@@ -292,46 +294,40 @@ void Torus::Render( GState &gstate )
 }
 
 //==================================================================
-Patch::Patch( RtToken type, ParamList &params, const Attributes &attr, SymbolList &tmanager ) :
-	Primitive(PATCH),
+static void getHullFromParam( Vector3 *pDestHull, int hullN, ParamList &params, int parIdx )
+{
+	const float *pHull = params[parIdx].PFlt( 3 * hullN );
+	for (int hi=0; hi < hullN; ++hi)
+		pDestHull[hi] = Vector3( pHull + hi*3 );	
+}
+
+//==================================================================
+PatchBicubic::PatchBicubic( RtToken type, ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
+	Primitive(PATCHBICUBIC),
 	mParams(params)
 {
-	mpyIntplType = tmanager.FindVoid( type );
+	mpyIntplType = staticSymbols.FindVoid( type );
 	mpUBasis = &attr.GetUBasis();
 	mpVBasis = &attr.GetVBasis();
 	mUSteps = attr.mUSteps;
 	mVSteps = attr.mVSteps;
 
 	bool	gotP = false;
- 
-	for (int i=1; i < params.size(); ++i)
-	{
-		if ( params[i].type == Param::STR )
-		{
-			const char	*pStr = params[i];
-			if ( 0 == strcasecmp( "P", pStr ) )
-			{
-				if ( (i+1) < params.size() )
-				{
-					gotP = true;
 
-					const float *pHull = params[i+1].PFlt( 3 * 4 * 4 );
-					for (int hi=0; hi < 16; ++hi)
-						mHullPos[hi] = Vector3( pHull + hi*3 );
-				}
-			}
-			/*
-			else
-			if ( 0 == strncasecmp( "Pw", pStr ) )
-			{
-				gotP = true;
-			}
-			else
-			if ( 0 == strncasecmp( "Pz", pStr ) )
-			{
-				gotP = true;
-			}
-			*/
+	// expect an odd number of params (patch type param 0 and then couples
+	DASSTHROW( params.size() >= 3 && ((params.size()-1) & 1) == 0,
+			   "Wrong number of parameters" );
+ 
+	for (int i=1; i < (int)params.size(); i += 2)
+	{
+		DASSERT( params[i].type == Param::STR );
+
+		CPSymVoid pyToken = staticSymbols.FindVoid( params[i] );
+		if ( pyToken && pyToken->IsNameI( "P" ) )
+		{
+			gotP = true;
+
+			getHullFromParam( mHullPos, 16, params, i+1 );
 		}
 	}
 	
@@ -354,9 +350,9 @@ static Vector3 spline( float t,
 }
 
 //==================================================================
-void Patch::Render( GState &gstate )
+void PatchBicubic::Render( GState &gstate )
 {
-	//puts( "* Patch" );
+	PUTPRIMNAME( "* PatchBicubic" );
 
 	GVert	buffer[NSUBDIVS+1];
 
@@ -368,50 +364,47 @@ void Patch::Render( GState &gstate )
 	const RtBasis	&uBasis = *mpUBasis;
 	const RtBasis	&vBasis = *mpVBasis;
 
-	if ( mpyIntplType->pName == RI_BICUBIC )
+	for (int uI=0; uI <= NSUBDIVS; ++uI)
 	{
-		for (int uI=0; uI <= NSUBDIVS; ++uI)
-		{
-			float	u = uI / (float)NSUBDIVS;
+		float	u = uI / (float)NSUBDIVS;
 
-			bottom[uI]	= spline(u, uBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
-			mid1[uI]	= spline(u, uBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
-			mid2[uI]	= spline(u, uBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
-			top[uI]		= spline(u, uBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
-		}
-			
-		//glBegin( GL_TRIANGLE_STRIP );
-		for (int uI=0; uI <= NSUBDIVS; ++uI)
-		{
-			float	u = uI / (float)NSUBDIVS;
-
-			glBegin( GL_TRIANGLE_STRIP );
-			for (int vI=0; vI <= NSUBDIVS; ++vI)
-			{
-				float	v = vI / (float)NSUBDIVS;
-
-				Vector3	P = spline( v, vBasis, bottom[uI], mid1[uI], mid2[uI], top[uI] );
-				
-				GVert	vert;
-				vert.x	= P.x;
-				vert.y	= P.y;
-				vert.z	= P.z;
-
-				vert.u	= u;
-				vert.v	= v;
-
-				if ( uI > 0 )
-				{
-					gstate.AddVertex( buffer[vI] );
-					gstate.AddVertex( vert );
-				}
-
-				buffer[vI] = vert;
-			}
-			glEnd();
-		}
-		//glEnd();
+		bottom[uI]	= spline(u, uBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
+		mid1[uI]	= spline(u, uBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
+		mid2[uI]	= spline(u, uBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
+		top[uI]		= spline(u, uBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
 	}
+		
+	//glBegin( GL_TRIANGLE_STRIP );
+	for (int uI=0; uI <= NSUBDIVS; ++uI)
+	{
+		float	u = uI / (float)NSUBDIVS;
+
+		glBegin( GL_TRIANGLE_STRIP );
+		for (int vI=0; vI <= NSUBDIVS; ++vI)
+		{
+			float	v = vI / (float)NSUBDIVS;
+
+			Vector3	P = spline( v, vBasis, bottom[uI], mid1[uI], mid2[uI], top[uI] );
+			
+			GVert	vert;
+			vert.x	= P.x;
+			vert.y	= P.y;
+			vert.z	= P.z;
+
+			vert.u	= u;
+			vert.v	= v;
+
+			if ( uI > 0 )
+			{
+				gstate.AddVertex( buffer[vI] );
+				gstate.AddVertex( vert );
+			}
+
+			buffer[vI] = vert;
+		}
+		glEnd();
+	}
+	//glEnd();
 }
 
 //==================================================================

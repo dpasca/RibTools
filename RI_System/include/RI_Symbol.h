@@ -17,7 +17,16 @@ namespace RI
 {
 
 //==================================================================
-struct SymbolBase	{	const char *pName;					};
+struct SymbolBase
+{
+	const char *pName;
+	
+	bool IsNameI( const char *pStr_ ) const
+	{
+		return 0 == strcasecmp( pName, pStr_ );
+	}
+};
+
 struct SymbolVoid	: public SymbolBase {					};
 struct SymbolFloat	: public SymbolBase { float		value;	};
 struct SymbolInt	: public SymbolBase { int		value;	};

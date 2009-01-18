@@ -112,8 +112,10 @@ State::State()
 	mStatics.FindOrAdd(	RI_HERMITEBASIS				, HermiteBasis		);
 	mStatics.FindOrAdd(	RI_POWERBASIS				, PowerBasis		);	
 	
-	mAttributesStack.top().Init( &mStatics );
-	mOptionsStack.top().Init( &mStatics );
+	mOptionsStack.top().Init( &mStatics, &mOptionsRevTrack );
+	mAttributesStack.top().Init( &mStatics, &mAttribsRevTrack );
+	mTransformOpenStack.top().Init( &mTransOpenRevTrack );
+	mTransformCloseStack.top().Init( &mTransCloseRevTrack );
 }
 
 //==================================================================

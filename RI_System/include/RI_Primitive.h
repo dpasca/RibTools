@@ -47,8 +47,8 @@ class GState
 	float		mHalfXRes;
 	float		mHalfYRes;
 
-	const Options		*mpOpts;
-	const Attributes	*mpAttrs;
+	//const Options		*mpOpts;
+	//const Attributes	*mpAttrs;
 	//const Transform		*mpXForm;
 
 public:
@@ -77,7 +77,8 @@ public:
 		PARABOLOID,
 		TORUS,
 
-		PATCH,
+		PATCHBILINEAR,
+		PATCHBICUBIC,
 	};
 	
 	Type		mType;
@@ -259,9 +260,29 @@ public:
 };
 
 //==================================================================
-/// Patch
+/// PatchBilinear
 //==================================================================
-class Patch : public Primitive
+class PatchBilinear : public Primitive
+{
+public:
+	CPSymVoid		mpyIntplType;
+	ParamList		mParams;
+	const RtBasis	*mpUBasis;
+	const RtBasis	*mpVBasis;
+	int				mUSteps;
+	int				mVSteps;
+	Vector3			mHullPos[4];
+
+public:
+	PatchBilinear( RtToken type, ParamList &params, const Attributes &attr, const SymbolList &staticSymbols );
+
+	void Render( GState &gstate );
+};
+
+//==================================================================
+/// PatchBicubic
+//==================================================================
+class PatchBicubic : public Primitive
 {
 public:
 	CPSymVoid		mpyIntplType;
@@ -273,7 +294,7 @@ public:
 	Vector3			mHullPos[16];
 
 public:
-	Patch( RtToken type, ParamList &params, const Attributes &attr, SymbolList &tmanager );
+	PatchBicubic( RtToken type, ParamList &params, const Attributes &attr, const SymbolList &staticSymbols );
 
 	void Render( GState &gstate );
 };
