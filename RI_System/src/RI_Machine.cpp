@@ -174,6 +174,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Paraboloid" )		{ exN( 4, p ); mState.Paraboloid(	p[0], p[1], p[2], p[3] ); }	else
 	if ( nm == "Torus" )			{ exN( 5, p ); mState.Torus(		p[0], p[1], p[2], p[3], p[4] ); }	else
 	if ( nm == "Patch" )			{ geN( 3, p ); mState.Patch(		matchToken( p[0], tlPatch0 ), p ); }	else
+	if ( nm == "PatchMesh" )		{ geN( 5, p ); mState.PatchMesh(	matchToken( p[0], tlPatch0 ), p ); }	else
 
 	// unknown
 									{ unknownCommand( nm.c_str() ); }

@@ -41,6 +41,7 @@ public:
 	Vector3 operator * (float rval) const { return Vector3( x * rval, y * rval, z * rval ); }
 	Vector3 operator + (float rval) const { return Vector3( x + rval, y + rval, z + rval ); }
 	Vector3 operator + (const Vector3 &rval) const { return Vector3( x + rval.x, y + rval.y, z + rval.z ); }
+	Vector3 operator - (const Vector3 &rval) const { return Vector3( x - rval.x, y - rval.y, z - rval.z ); }
 };
 
 inline Vector3 operator * (float lval, const Vector3 &rval)
