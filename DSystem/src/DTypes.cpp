@@ -9,15 +9,3 @@
 
 #include <exception>
 #include "DTypes.h"
-
-//===============================================================
-void DAssThrow( bool ok, const char *pMsg )
-{
-	if ( ok )
-		return;
-		
-	puts( pMsg );
-
-	throw pMsg;
-}
-

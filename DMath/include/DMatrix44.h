@@ -14,6 +14,7 @@
 #include <math.h>
 #include "DVector.h"
 #include "DTypes.h"
+#include "DUtils.h"
 
 //==================================================================
 class Matrix44

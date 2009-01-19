@@ -11,6 +11,7 @@
 #define DCONTAINERS_H
 
 #include "DTypes.h"
+#include "DUtils.h"
 
 //==================================================================
 static const size_t	NPOS = (size_t)-1;

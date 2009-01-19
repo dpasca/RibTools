@@ -102,10 +102,6 @@ void State::PatchMesh( RtToken type, ParamList &params )
 {
 	CPSymVoid	pyPatchType = mStatics.FindVoid( type );
 
-	// only do bilinear for now
-	if NOT( pyPatchType->IsNameI( RI_BILINEAR ) )
-		return;
-
 	// PatchMesh "bilinear" 2 "nonperiodic" 5 "nonperiodic" "P"  [ -0.995625 2 -0.495465 ...
 	//               0      1       2       3       4        5     6
 
@@ -122,31 +118,74 @@ void State::PatchMesh( RtToken type, ParamList &params )
 		return;
 	
 	const float	*pMeshHull = params[PValuesParIdx].PFlt( 3 * nu * nv );
-	
-	int	useNu = nu - 1 + uPeriodic ? 1 : 0;
-	int	useNv = nv - 1 + vPeriodic ? 1 : 0;
 
-	Vector3	hullv3[4];
-
-	for (int i=0; i < useNu; ++i)
+	if ( pyPatchType->IsNameI( RI_BILINEAR ) )
 	{
-		int	ii = (i+1) % nu;
+		int	nUPatches = nu - 1 + uPeriodic ? 1 : 0;
+		int	nVPatches = nv - 1 + vPeriodic ? 1 : 0;
 
-		for (int j=0; j < useNv; ++j)
+		Vector3	hullv3[4];
+
+		for (int i=0; i < nUPatches; ++i)
 		{
-			int	jj = (j+1) % nv;
-			
-			hullv3[0] = Vector3( &pMeshHull[(i +nu*j )*3] );
-			hullv3[1] = Vector3( &pMeshHull[(ii+nu*j )*3] );
-			hullv3[2] = Vector3( &pMeshHull[(i +nu*jj)*3] );
-			hullv3[3] = Vector3( &pMeshHull[(ii+nu*jj)*3] );
+			int	ii = (i+1) % nu;
 
-			insertPrimitive(
-					new RI::PatchBilinear( params, hullv3 ) );
+			for (int j=0; j < nVPatches; ++j)
+			{
+				int	jj = (j+1) % nv;
+
+				hullv3[0] = Vector3( &pMeshHull[(i +nu*j )*3] );
+				hullv3[1] = Vector3( &pMeshHull[(ii+nu*j )*3] );
+				hullv3[2] = Vector3( &pMeshHull[(i +nu*jj)*3] );
+				hullv3[3] = Vector3( &pMeshHull[(ii+nu*jj)*3] );
+
+				insertPrimitive(
+						new RI::PatchBilinear( params, hullv3 ) );
+			}
 		}
 	}
-	
-	//insertPrimitive( new RI::PatchMesh( type, params, mAttributesStack.top(), mStatics ) );
+	else
+	if ( pyPatchType->IsNameI( RI_BICUBIC ) )
+	{
+		const Attributes	&attr = mAttributesStack.top();
+
+		DASSTHROW( attr.mUSteps >= 1 && attr.mUSteps <= 16, ("Invalid uSteps %i", attr.mUSteps) );
+		DASSTHROW( attr.mVSteps >= 1 && attr.mVSteps <= 16, ("Invalid vSteps %i", attr.mVSteps) );
+		
+		int	nUPatches = uPeriodic ? nu / attr.mUSteps : (nu-4) / attr.mUSteps + 1;
+		int	nVPatches = vPeriodic ? nv / attr.mVSteps : (nv-4) / attr.mVSteps + 1;
+
+		Vector3	hullv3[16];
+		
+		for (int i0=0; i0 < nUPatches; ++i0)
+		{
+			for (int j0=0; j0 < nVPatches; ++j0)
+			{
+				int	hidx = 0;
+
+				for (int j=0; j < 4; ++j)
+				{
+					for (int i=0; i < 4; ++i)
+					{
+						int	srcIdx =  (i + i0 * attr.mUSteps) % nu +
+									 ((j + j0 * attr.mVSteps) % nv ) * nu;
+
+						DASSERT( srcIdx >= 0 && srcIdx < (nu*nv*3) );
+
+						hullv3[hidx++] = Vector3( &pMeshHull[ srcIdx * 3 ]);
+					}
+				}
+
+				insertPrimitive(
+						new RI::PatchBicubic( params, hullv3, attr, mStatics ) );
+			}
+		}
+	}
+	else
+	{
+		DASSTHROW( 0, ("Unrecognized Patch type %s", pyPatchType->pName ) );
+		ErrHandler( E_BADARGUMENT );
+	}
 }
 
 //==================================================================

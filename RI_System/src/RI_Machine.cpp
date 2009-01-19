@@ -35,7 +35,7 @@ void Machine::exN( size_t n, const ParamList &cmdParams )
 				E_BADARGUMENT,
 				"Expecting %i params, got %i",
 				cmdParams.size(), n );
-		DASSTHROW( false, "" );
+		DASSTHROW( false, ("E_BADARGUMENT") );
 	}
 }
 
@@ -48,7 +48,7 @@ void Machine::geN( size_t n, const ParamList &cmdParams )
 				E_BADARGUMENT,
 				"Expecting at least %i params, got %i",
 				cmdParams.size(), n );
-		DASSTHROW( false, "" );
+		DASSTHROW( false, ("E_BADARGUMENT") );
 	}
 }
 
@@ -69,7 +69,7 @@ static void mkBound( Bound &out_Bound, ParamList &cmdParams )
 			out_Bound.mBound[i] = cmdParams[i].u.floatVal;
 	}
 	else
-		DASSTHROW( false, "Wrong param count" );
+		DASSTHROW( false, ("Wrong param count") );
 }
 
 //==================================================================

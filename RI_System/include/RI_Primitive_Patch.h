@@ -47,6 +47,10 @@ public:
 
 public:
 	PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols );
+	PatchBicubic( ParamList &params,
+							const Vector3 hull[16],
+						    const Attributes &attr,
+							const SymbolList &staticSymbols );
 
 	void Render( GState &gstate );
 };

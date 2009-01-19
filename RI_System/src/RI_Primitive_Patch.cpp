@@ -35,7 +35,7 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols
 
 	// expect an odd number of params (patch type param 0 and then couples
 	DASSTHROW( params.size() >= 3 && ((params.size()-1) & 1) == 0,
-			   "Wrong number of parameters" );
+			   ("Wrong number of parameters") );
  
 	for (int i=1; i < (int)params.size(); i += 2)
 	{
@@ -50,7 +50,7 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols
 		}
 	}
 	
-	DASSTHROW( gotP, "Missing hull parameter" );
+	DASSTHROW( gotP, ("Missing hull parameter") );
 }
 
 //==================================================================
@@ -119,7 +119,7 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 
 	// expect an odd number of params (patch type param 0 and then couples
 	DASSTHROW( params.size() >= 3 && ((params.size()-1) & 1) == 0,
-			   "Wrong number of parameters" );
+			   ("Wrong number of parameters") );
  
 	for (int i=1; i < (int)params.size(); i += 2)
 	{
@@ -134,7 +134,24 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 		}
 	}
 	
-	DASSTHROW( gotP, "Missing hull parameter" );
+	DASSTHROW( gotP, ("Missing hull parameter") );
+}
+
+//==================================================================
+PatchBicubic::PatchBicubic( ParamList &params,
+							const Vector3 hull[16],
+						    const Attributes &attr,
+							const SymbolList &staticSymbols ) :
+	Primitive(PATCHBICUBIC),
+	mParams(params)
+{
+	mpUBasis = &attr.GetUBasis();
+	mpVBasis = &attr.GetVBasis();
+	mUSteps = attr.mUSteps;
+	mVSteps = attr.mVSteps;
+
+	for (int i=0; i < 16; ++i)
+		mHullPos[i] = hull[i];
 }
 
 //==================================================================

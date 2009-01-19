@@ -82,7 +82,7 @@ private:
 	}
 	void badType() const
 	{
-		DASSTHROW( false, "Bad Type !!" );
+		DASSTHROW( false, ("Bad Type !!") );
 	}	
 };
 

@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include "DTypes.h"
+#include "DUtils.h"
 
 //==================================================================
 namespace DUT
@@ -37,6 +38,36 @@ bool GrabFile( const char *pFileName, void * &out_pData, size_t &out_dataSize )
 	fclose( pFile );
 	
 	return true;
+}
+
+//==================================================================
+char *SSPrintF( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	char *p = new char [ strlen(buff)+1 ];
+	strcpy( p, buff );
+	
+	return p;
+}
+
+//===============================================================
+void DAssThrow( bool ok, char *pNewCharMsg )
+{
+	if ( ok )
+		return;
+
+	puts( pNewCharMsg );
+
+	delete [] pNewCharMsg;
+
+	throw "Bad !";
 }
 
 //==================================================================
