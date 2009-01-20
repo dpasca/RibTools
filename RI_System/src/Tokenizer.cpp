@@ -105,6 +105,9 @@ bool Tokenizer::AddChar( char ch )
 	{
 		if ( isNewLine( ch ) )
 		{
+			if ( ch == '\n' )
+				mLineNumber += 1;
+
 			ResetState();
 		}
 	}
@@ -130,6 +133,9 @@ bool Tokenizer::AddChar( char ch )
 				mState = NORMAL;
 				mCurToken += ch;
 			}
+			else
+				if ( ch == '\n' )
+					mLineNumber += 1;			
 		}
 	}
 	else
@@ -137,6 +143,9 @@ bool Tokenizer::AddChar( char ch )
 	{
 		if ( isWhite( ch ) )
 		{
+			if ( ch == '\n' )
+				mLineNumber += 1;
+
 			setDataType();
 			return true;
 		}
@@ -175,6 +184,9 @@ bool Tokenizer::inputHandleArray( char ch )
 	
 	if ( isWhite( ch ) || isEndOfArray )
 	{
+		if ( ch == '\n' )
+			mLineNumber += 1;
+
 		if ( mCurToken.length() != 0 )
 		{
 			if ( !mIsArrayFloat && isFloatStr( mCurToken.c_str() ) )

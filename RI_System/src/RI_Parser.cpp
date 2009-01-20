@@ -34,7 +34,11 @@ namespace RI
 {
 
 //==================================================================
-Parser::Parser() : mReachedEOF(false), mpTokenizer(NULL)
+Parser::Parser() :
+	mReachedEOF(false),
+	mpTokenizer(NULL),
+	mNextCommandLine(0),
+	mCurCommandLine(0)
 {
 	mpTokenizer = new Tokenizer();
 }
@@ -68,8 +72,10 @@ void Parser::AddChar( char ch )
 	switch ( mpTokenizer->GetDataType() )
 	{
 	case Tokenizer::DT_ALPHANUMERIC:
+			mCurCommandLine = mNextCommandLine;
 			mCurCommand = mNextCommand;
 			mNextCommand = mpTokenizer->GetDataAphaNum();
+			mNextCommandLine = mpTokenizer->GetCurLineNumber();
 			addParam = false;
 			break;
 			
@@ -122,6 +128,37 @@ void Parser::AddChar( char ch )
 	}
 */		
 	mpTokenizer->ResetState();
+}
+
+//==================================================================
+void Parser::FlushNewCommand( DStr			*out_pCmdName,
+							  DVec<Param>	*out_pParams,
+							  int			*out_pCmdLine )
+{
+	if ( mReachedEOF )
+	{
+		*out_pCmdName	= mNextCommand;
+		*out_pCmdLine	= mNextCommandLine;
+	}
+	else
+	{
+		*out_pCmdName	= mCurCommand;
+		*out_pCmdLine	= mCurCommandLine;
+	}
+
+	*out_pParams	= mCurParams;
+	
+	//mCurCommand		= mNextCommand;
+	mCurCommand	= "";
+	mCurCommandLine = mpTokenizer->GetCurLineNumber();
+	
+	mCurParams.clear();
+}
+
+//==================================================================
+int Parser::GetCurLineNumber() const
+{
+	return mpTokenizer->GetCurLineNumber();
 }
 
 //==================================================================

@@ -64,8 +64,8 @@ bool State::verifyOpType( OpType optype )
 	else
 	if ( optype == OPTYPE_ATRB )
 	{
-		if ( curMode != MD_ATTRIBUTE )
-		//if ( curMode != MD_OBJECT )
+		//if ( curMode != MD_ATTRIBUTE )
+		if ( curMode == MD_OBJECT )
 		{
 			ErrHandler( E_NOTATTRIBS );
 			return false;

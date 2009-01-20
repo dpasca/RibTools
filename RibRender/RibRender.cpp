@@ -85,8 +85,11 @@ static bool renderFile( const char *pFileName )
 		{
 			DStr			cmdName;
 			RI::ParamList	cmdParams;
+			int				cmdLine;
 
-			parser.FlushNewCommand( &cmdName, &cmdParams );
+			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
+			
+//			printf( "%3i - %s\n", cmdLine, cmdName.c_str() );
 /*
 			printf( "CMD %s ", cmdName.c_str() );
 			

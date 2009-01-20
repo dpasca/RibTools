@@ -39,9 +39,9 @@ class Attributes
 
 public:
 	Attributes();
-	void Init( SymbolList *pStatics, RevisionTracker *pRevision );
+	Attributes( const Attributes &attributes );
 
-	Attributes( const Attributes &attributes )	{ *this = attributes; }
+	void Init( SymbolList *pStatics, RevisionTracker *pRevision );
 
 	~Attributes();
 

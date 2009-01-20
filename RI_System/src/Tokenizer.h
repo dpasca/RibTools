@@ -27,6 +27,7 @@ class Tokenizer
 	};
 	
 	StateEnum		mState;
+	int				mLineNumber;
 
 	int				mDataInt;
 	float			mDataFloat;
@@ -58,6 +59,7 @@ public:
 	Tokenizer()
 	{
 		ResetState();
+		mLineNumber = 1;
 	}
 	
 	//===============================================================
@@ -67,6 +69,11 @@ public:
 	DataType	GetDataType() const
 	{
 		return mDataType;
+	}
+	
+	int GetCurLineNumber() const
+	{
+		return mLineNumber;
 	}
 	
 	//===============================================================

@@ -27,7 +27,9 @@ class Parser
 public:
 
 	DStr		mNextCommand;
+	int			mNextCommandLine;
 	DStr		mCurCommand;
+	int			mCurCommandLine;
 	DVec<Param>	mCurParams;
 
 public:
@@ -42,20 +44,11 @@ public:
 				(mNextCommand.length() != 0 && mReachedEOF);
 	}
 	
-	void FlushNewCommand( DStr *out_pCmdName, DVec<Param> *out_pParams )
-	{
-		if ( mReachedEOF )
-			*out_pCmdName	= mNextCommand;
-		else
-			*out_pCmdName	= mCurCommand;
-			
-		*out_pParams	= mCurParams;
-		
-		//mCurCommand		= mNextCommand;
-		mCurCommand	= "";
-		
-		mCurParams.clear();
-	}
+	void FlushNewCommand( DStr			*out_pCmdName,
+						  DVec<Param>	*out_pParams,
+						  int			*out_pCmdLine );
+	
+	int GetCurLineNumber() const;
 	
 private:
 	bool	mReachedEOF;

@@ -45,8 +45,9 @@ int main( int argc, char *argv[] )
 		{
 			DStr			cmdName;
 			RI::ParamList	cmdParams;
+			int				cmdLine;
 
-			parser.FlushNewCommand( &cmdName, &cmdParams );
+			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
 
 			printf( "CMD %s ", cmdName.c_str() );
 			

@@ -23,6 +23,20 @@ Attributes::Attributes()
 }
 
 //==================================================================
+Attributes::Attributes( const Attributes &attributes )
+{
+	*this = attributes;
+	mpCustomUBasis = NULL;
+	mpCustomVBasis = NULL;
+
+	if ( attributes.mpCustomUBasis )
+		mpCustomUBasis = new Matrix44( *attributes.mpCustomUBasis );
+
+	if ( attributes.mpCustomVBasis )
+		mpCustomVBasis = new Matrix44( *attributes.mpCustomVBasis );
+}
+
+//==================================================================
 Attributes::~Attributes()
 {
 	DSAFE_DELETE( mpCustomUBasis );
@@ -110,12 +124,18 @@ void Attributes::cmdBasis(
 	if ( ubasis )
 		mpyUBasis = mpStatics->FindBasis( ubasis );
 	else
+	{
+		DSAFE_DELETE( mpCustomUBasis );
 		mpCustomUBasis = new Matrix44( pCustomUBasis );
+	}
 
 	if ( vbasis )
 		mpyVBasis = mpStatics->FindBasis( vbasis );
 	else
+	{
+		DSAFE_DELETE( mpCustomVBasis );
 		mpCustomVBasis = new Matrix44( pCustomVBasis );
+	}
 
 	mUSteps	= ustep;
 	mVSteps	= vstep;

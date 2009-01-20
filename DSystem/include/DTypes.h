@@ -18,7 +18,7 @@
 #define NOT(_X_)				(!(_X_))
 #define _countof(_X_)			(sizeof(_X_)/sizeof((_X_)[0]))
 
-#define DSAFE_DELETE(_X_)		{ if ( _X_ ) delete (_X_); }
+#define DSAFE_DELETE(_X_)		{ if ( _X_ ) { delete (_X_); (_X_) = 0; } }
 
 typedef std::string	DStr;
 
