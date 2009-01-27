@@ -1,5 +1,5 @@
 /*
- *  RI_Primitive.cpp
+ *  RI_Primitive_Poly.cpp
  *  RibTools
  *
  *  Created by Davide Pasca on 09/01/04.
@@ -19,36 +19,11 @@ namespace RI
 {
 
 //==================================================================
-static void getHullFromParam( Vector3 *pDestHull, int hullN, ParamList &params, int parIdx )
-{
-	const float *pHull = params[parIdx].PFlt( 3 * hullN );
-	for (int hi=0; hi < hullN; ++hi)
-		pDestHull[hi] = Vector3( pHull + hi*3 );	
-}
-
-//==================================================================
 PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols ) :
 	Primitive(PATCHBILINEAR),
 	mParams(params)
 {
-	bool	gotP = false;
-
-	// expect an odd number of params (patch type param 0 and then couples
-	DASSTHROW( params.size() >= 3 && ((params.size()-1) & 1) == 0,
-			   ("Wrong number of parameters") );
- 
-	for (int i=1; i < (int)params.size(); i += 2)
-	{
-		DASSERT( params[i].type == Param::STR );
-
-		CPSymVoid pyToken = staticSymbols.FindVoid( params[i] );
-		if ( pyToken && pyToken->IsNameI( "P" ) )
-		{
-			gotP = true;
-
-			getHullFromParam( mHullPos, 4, params, i+1 );
-		}
-	}
+	bool	gotP = ParamsFindP( params, staticSymbols, mHullPos, 4 );
 	
 	DASSTHROW( gotP, ("Missing hull parameter") );
 }
@@ -113,24 +88,7 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 	mpUBasis = &attr.GetUBasis();
 	mpVBasis = &attr.GetVBasis();
 
-	bool	gotP = false;
-
-	// expect an odd number of params (patch type param 0 and then couples
-	DASSTHROW( params.size() >= 3 && ((params.size()-1) & 1) == 0,
-			   ("Wrong number of parameters") );
- 
-	for (int i=1; i < (int)params.size(); i += 2)
-	{
-		DASSERT( params[i].type == Param::STR );
-
-		CPSymVoid pyToken = staticSymbols.FindVoid( params[i] );
-		if ( pyToken && pyToken->IsNameI( "P" ) )
-		{
-			gotP = true;
-
-			getHullFromParam( mHullPos, 16, params, i+1 );
-		}
-	}
+	bool	gotP = ParamsFindP( params, staticSymbols, mHullPos, 16 );
 	
 	DASSTHROW( gotP, ("Missing hull parameter") );
 }

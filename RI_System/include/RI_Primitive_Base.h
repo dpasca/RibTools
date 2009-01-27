@@ -99,6 +99,8 @@ public:
 
 		PATCHBILINEAR,
 		PATCHBICUBIC,
+
+		POLYGON,
 	};
 	
 	Type		mType;
@@ -118,7 +120,7 @@ public:
 	virtual ~Primitive()
 	{
 	}
-	
+
 	void SetStates(
 		Options		*pOptions,
 		Attributes	*pAttribs,
@@ -134,6 +136,18 @@ public:
 	{
 	}
 };
+
+//==================================================================
+bool ParamsFindP(	ParamList &params,
+					const SymbolList &staticSymbols,
+					DVec<Vector3> &out_vectorP,
+					int fromIdx=1 );
+
+bool ParamsFindP(	ParamList &params,
+					const SymbolList &staticSymbols,
+					Vector3	*pOut_vectorP,
+					int		expectedN,
+					int		fromIdx=1 );
 
 //==================================================================
 }

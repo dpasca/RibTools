@@ -20,6 +20,8 @@
 
 #define DSAFE_DELETE(_X_)		{ if ( _X_ ) { delete (_X_); (_X_) = 0; } }
 
+#define DNPOS					((size_t)-1)
+
 typedef std::string	DStr;
 
 #endif

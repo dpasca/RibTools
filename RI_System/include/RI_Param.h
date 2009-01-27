@@ -18,6 +18,9 @@ namespace RI
 {
 
 //==================================================================
+typedef DVec<float>	FltVec;
+	
+//==================================================================
 struct Param
 {
 	enum
@@ -37,7 +40,7 @@ struct Param
 		float		floatVal;
 		DStr		stringVal;
 		DVec<int>	intArrayVal;
-		DVec<float>	floatArrayVal;
+		FltVec		floatArrayVal;
 	}u;
 
 	inline int			Int() const
@@ -45,7 +48,7 @@ struct Param
 		ensType( INT );
 		return u.intVal;
 	}
-	
+
 	inline float		Flt() const
 	{
 		if ( type == FLT )	return u.floatVal;	else
@@ -53,9 +56,11 @@ struct Param
 							{ badType(); return 0; }
 	}
 	
-	const int	*PInt( size_t n=(size_t)-1 ) const	{ ensIntArr( n ); return &u.intArrayVal[0];	}
-	const float	*PFlt( size_t n=(size_t)-1 );	// may need to convert from int array
-	const char *PChar() const						{ ensType( STR ); return u.stringVal.c_str();}
+	const FltVec	&NumVec( size_t n=DNPOS );	// may need to convert from int array
+
+	const int	*PInt( size_t n=DNPOS ) const	{ ensIntArr( n ); return &u.intArrayVal[0];		}
+	const float	*PFlt( size_t n=DNPOS )			{ return &NumVec( n )[0];						}
+	const char	*PChar()				const	{ ensType( STR ); return u.stringVal.c_str();	}
 
 	bool IsString() const	{ return type == STR;	}
 
@@ -72,12 +77,12 @@ private:
 	}		
 	void ensIntArr( size_t n ) const
 	{
-		if ( type != INT_ARR && (n==(size_t)-1 || u.intArrayVal.size() == n) )
+		if ( type != INT_ARR && (n==DNPOS || u.intArrayVal.size() == n) )
 			badType();
 	}		
 	void ensFltArr( size_t n ) const
 	{
-		if ( type != FLT_ARR && (n==(size_t)-1 || u.floatArrayVal.size() == n) )
+		if ( type != FLT_ARR && (n==DNPOS || u.floatArrayVal.size() == n) )
 			badType();
 	}
 	void badType() const

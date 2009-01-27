@@ -101,6 +101,8 @@
 		6B440B180F24F95500055FCA /* DTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1F58F00F0954A40082B328 /* DTypes.cpp */; };
 		6B440B190F24F95500055FCA /* DTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B1F58EC0F0954A40082B328 /* DTypes.h */; };
 		6B440B1A0F24F95C00055FCA /* DMath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F4520F0AC03100B53225 /* DMath.h */; };
+		6B4B3A820F2F026800BBEDC7 /* RI_Primitive_Poly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B4B3A810F2F026800BBEDC7 /* RI_Primitive_Poly.cpp */; };
+		6B4B3A840F2F029700BBEDC7 /* RI_Primitive_Poly.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B4B3A830F2F029700BBEDC7 /* RI_Primitive_Poly.h */; };
 		6B6D4CD40F0A929B00AEC534 /* libDMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F590E0F09561C0082B328 /* libDMath.a */; };
 		6B6D4CD50F0A929F00AEC534 /* libDSystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F58E20F09541D0082B328 /* libDSystem.a */; };
 		6B6D4CD60F0A92A200AEC534 /* libRI_System.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B8349700F0A7EA600BA7221 /* libRI_System.a */; };
@@ -229,7 +231,8 @@
 		6B39F4720F19049000FE838F /* uteapot.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = uteapot.rib; path = Tests/uteapot.rib; sourceTree = "<group>"; };
 		6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Error.cpp; path = src/RI_State_Error.cpp; sourceTree = "<group>"; };
 		6B4B36E30F2E1BAB00BBEDC7 /* Chair.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Chair.rib; path = Tests/Chair.rib; sourceTree = "<group>"; };
-		6B4B36E80F2E1BC000BBEDC7 /* ChairTest.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ChairTest.rib; path = Tests/ChairTest.rib; sourceTree = "<group>"; };
+		6B4B3A810F2F026800BBEDC7 /* RI_Primitive_Poly.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Primitive_Poly.cpp; path = src/RI_Primitive_Poly.cpp; sourceTree = "<group>"; };
+		6B4B3A830F2F029700BBEDC7 /* RI_Primitive_Poly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive_Poly.h; path = include/RI_Primitive_Poly.h; sourceTree = "<group>"; };
 		6B6D4CC50F0A91BE00AEC534 /* RibRender-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "RibRender-Info.plist"; path = "RibRender/osx/RibRender-Info.plist"; sourceTree = "<group>"; };
 		6B6D4D010F0A93FA00AEC534 /* RibParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RibParser.cpp; sourceTree = "<group>"; };
 		6B6D4D020F0A93FA00AEC534 /* RibParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RibParser.h; sourceTree = "<group>"; };
@@ -357,7 +360,6 @@
 				6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */,
 				6BEE6F3F0F2236BF00BC3132 /* Bag.rib */,
 				6B4B36E30F2E1BAB00BBEDC7 /* Chair.rib */,
-				6B4B36E80F2E1BC000BBEDC7 /* ChairTest.rib */,
 				6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */,
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
 				6BF635E00F17F85400A68819 /* SimpleMug.rib */,
@@ -408,6 +410,8 @@
 				6BD726790F232B78003A4601 /* RI_Primitive_Base.h */,
 				6BD7268E0F236364003A4601 /* RI_Primitive_Patch.cpp */,
 				6BD7268C0F236350003A4601 /* RI_Primitive_Patch.h */,
+				6B4B3A810F2F026800BBEDC7 /* RI_Primitive_Poly.cpp */,
+				6B4B3A830F2F029700BBEDC7 /* RI_Primitive_Poly.h */,
 				6BD7267D0F232C7A003A4601 /* RI_Primitive_Quadric.cpp */,
 				6BD726820F232D51003A4601 /* RI_Primitive_Quadric.h */,
 				6B83498F0F0A7F0700BA7221 /* RI_State.cpp */,
@@ -543,6 +547,7 @@
 				6BD7267A0F232B78003A4601 /* RI_Primitive_Base.h in Headers */,
 				6BD726830F232D51003A4601 /* RI_Primitive_Quadric.h in Headers */,
 				6BD7268D0F236350003A4601 /* RI_Primitive_Patch.h in Headers */,
+				6B4B3A840F2F029700BBEDC7 /* RI_Primitive_Poly.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -759,6 +764,7 @@
 				6BD726800F232C7A003A4601 /* RI_Primitive_Quadric.cpp in Sources */,
 				6BD726810F232C7A003A4601 /* RI_Primitive_Base.cpp in Sources */,
 				6BD7268F0F236364003A4601 /* RI_Primitive_Patch.cpp in Sources */,
+				6B4B3A820F2F026800BBEDC7 /* RI_Primitive_Poly.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
