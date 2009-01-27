@@ -67,8 +67,8 @@ public:
 	void cmdBasis(RtToken ubasis, const float *pCustomUBasis, int ustep,
 				  RtToken vbasis, const float *pCustomVBasis, int vstep );
 				  
-	const RtBasis &GetUBasis() const { return mpyUBasis ? mpyUBasis->value : *mpCustomUBasis; }
-	const RtBasis &GetVBasis() const { return mpyVBasis ? mpyVBasis->value : *mpCustomVBasis; }
+	const RtBasis &GetUBasis() const { return mpCustomUBasis ? *mpCustomUBasis : mpyUBasis->value; }
+	const RtBasis &GetVBasis() const { return mpCustomVBasis ? *mpCustomVBasis : mpyVBasis->value; }
 
 public:
 	RevisionTracker	*mpRevision;

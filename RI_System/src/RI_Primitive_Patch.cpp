@@ -112,8 +112,6 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 {
 	mpUBasis = &attr.GetUBasis();
 	mpVBasis = &attr.GetVBasis();
-	mUSteps = attr.mUSteps;
-	mVSteps = attr.mVSteps;
 
 	bool	gotP = false;
 
@@ -147,8 +145,6 @@ PatchBicubic::PatchBicubic( ParamList &params,
 {
 	mpUBasis = &attr.GetUBasis();
 	mpVBasis = &attr.GetVBasis();
-	mUSteps = attr.mUSteps;
-	mVSteps = attr.mVSteps;
 
 	for (int i=0; i < 16; ++i)
 		mHullPos[i] = hull[i];

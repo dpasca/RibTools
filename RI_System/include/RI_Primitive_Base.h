@@ -72,7 +72,7 @@ public:
 		float sx = mHalfXRes + mHalfXRes * oow * homoPos.x;
 		float sy = mHalfYRes - mHalfYRes * oow * homoPos.y;
 		float sz = oow * homoPos.z;
-
+		
 		//printf( "  vtx-scr: %f %f %f %f\n", sx, sy, sz, oow );
 	#ifdef __gl_h_
 		//glColor3f( (int)(vert.u*8)/8.0f + vert.v/8, 0, 0 );

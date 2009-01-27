@@ -41,8 +41,6 @@ public:
 	ParamList		mParams;
 	const RtBasis	*mpUBasis;
 	const RtBasis	*mpVBasis;
-	int				mUSteps;
-	int				mVSteps;
 	Vector3			mHullPos[16];
 
 public:

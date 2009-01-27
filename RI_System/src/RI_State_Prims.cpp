@@ -117,7 +117,8 @@ void State::PatchMesh( RtToken type, ParamList &params )
 	if ( PValuesParIdx == -1 )
 		return;
 	
-	const float	*pMeshHull = params[PValuesParIdx].PFlt( 3 * nu * nv );
+	int			meshHullSize = 3 * nu * nv;
+	const float	*pMeshHull = params[PValuesParIdx].PFlt( meshHullSize );
 
 	if ( pyPatchType->IsNameI( RI_BILINEAR ) )
 	{
@@ -148,18 +149,21 @@ void State::PatchMesh( RtToken type, ParamList &params )
 	if ( pyPatchType->IsNameI( RI_BICUBIC ) )
 	{
 		const Attributes	&attr = mAttributesStack.top();
-
-		DASSTHROW( attr.mUSteps >= 1 && attr.mUSteps <= 16, ("Invalid uSteps %i", attr.mUSteps) );
-		DASSTHROW( attr.mVSteps >= 1 && attr.mVSteps <= 16, ("Invalid vSteps %i", attr.mVSteps) );
 		
-		int	nUPatches = uPeriodic ? nu / attr.mUSteps : (nu-4) / attr.mUSteps + 1;
-		int	nVPatches = vPeriodic ? nv / attr.mVSteps : (nv-4) / attr.mVSteps + 1;
+		int uSteps = attr.mUSteps;
+		int vSteps = attr.mVSteps;
+
+		DASSTHROW( uSteps >= 1 && uSteps <= 16, ("Invalid uSteps %i", uSteps) );
+		DASSTHROW( vSteps >= 1 && vSteps <= 16, ("Invalid vSteps %i", vSteps) );
+		
+		int	nUPatches = uPeriodic ? nu / uSteps : (nu-4) / uSteps + 1;
+		int	nVPatches = vPeriodic ? nv / vSteps : (nv-4) / vSteps + 1;
 
 		Vector3	hullv3[16];
 		
-		for (int i0=0; i0 < nUPatches; ++i0)
+		for (int j0=0; j0 < nVPatches; ++j0)
 		{
-			for (int j0=0; j0 < nVPatches; ++j0)
+			for (int i0=0; i0 < nUPatches; ++i0)
 			{
 				int	hidx = 0;
 
@@ -167,17 +171,16 @@ void State::PatchMesh( RtToken type, ParamList &params )
 				{
 					for (int i=0; i < 4; ++i)
 					{
-						int	srcIdx =  (i + i0 * attr.mUSteps) % nu +
-									 ((j + j0 * attr.mVSteps) % nv ) * nu;
+						int	srcIdx = ((i + i0 * uSteps) % nu) +
+									 ((j + j0 * vSteps) % nv) * nu;
 
-						DASSERT( srcIdx >= 0 && srcIdx < (nu*nv*3) );
+						DASSERT( srcIdx >= 0 && (srcIdx*3) < meshHullSize );
 
 						hullv3[hidx++] = Vector3( &pMeshHull[ srcIdx * 3 ]);
 					}
 				}
 
-				insertPrimitive(
-						new RI::PatchBicubic( params, hullv3, attr, mStatics ) );
+				insertPrimitive( new RI::PatchBicubic( params, hullv3, attr, mStatics ) );
 			}
 		}
 	}

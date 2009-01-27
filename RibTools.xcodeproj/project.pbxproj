@@ -228,6 +228,8 @@
 		6B1F59190F0956870082B328 /* DMatrix44.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DMatrix44.cpp; path = src/DMatrix44.cpp; sourceTree = "<group>"; };
 		6B39F4720F19049000FE838F /* uteapot.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = uteapot.rib; path = Tests/uteapot.rib; sourceTree = "<group>"; };
 		6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Error.cpp; path = src/RI_State_Error.cpp; sourceTree = "<group>"; };
+		6B4B36E30F2E1BAB00BBEDC7 /* Chair.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Chair.rib; path = Tests/Chair.rib; sourceTree = "<group>"; };
+		6B4B36E80F2E1BC000BBEDC7 /* ChairTest.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ChairTest.rib; path = Tests/ChairTest.rib; sourceTree = "<group>"; };
 		6B6D4CC50F0A91BE00AEC534 /* RibRender-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "RibRender-Info.plist"; path = "RibRender/osx/RibRender-Info.plist"; sourceTree = "<group>"; };
 		6B6D4D010F0A93FA00AEC534 /* RibParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RibParser.cpp; sourceTree = "<group>"; };
 		6B6D4D020F0A93FA00AEC534 /* RibParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RibParser.h; sourceTree = "<group>"; };
@@ -269,7 +271,6 @@
 		6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Symbol.cpp; path = src/RI_Symbol.cpp; sourceTree = "<group>"; };
 		6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Airplane.rib; path = Tests/Airplane.rib; sourceTree = "<group>"; };
 		6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Elephant.rib; path = Tests/Elephant.rib; sourceTree = "<group>"; };
-		6BEE6F3E0F2236BF00BC3132 /* Chair.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Chair.rib; path = Tests/Chair.rib; sourceTree = "<group>"; };
 		6BEE6F3F0F2236BF00BC3132 /* Bag.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Bag.rib; path = Tests/Bag.rib; sourceTree = "<group>"; };
 		6BF635E00F17F85400A68819 /* SimpleMug.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SimpleMug.rib; path = Tests/SimpleMug.rib; sourceTree = "<group>"; };
 		6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Framework.cpp; path = src/RI_Framework.cpp; sourceTree = "<group>"; };
@@ -355,7 +356,8 @@
 			children = (
 				6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */,
 				6BEE6F3F0F2236BF00BC3132 /* Bag.rib */,
-				6BEE6F3E0F2236BF00BC3132 /* Chair.rib */,
+				6B4B36E30F2E1BAB00BBEDC7 /* Chair.rib */,
+				6B4B36E80F2E1BC000BBEDC7 /* ChairTest.rib */,
 				6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */,
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
 				6BF635E00F17F85400A68819 /* SimpleMug.rib */,

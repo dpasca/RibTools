@@ -8,8 +8,10 @@
  */
 
 #include <stdio.h>
+#include <stdexcept>
 #include "DTypes.h"
 #include "DUtils.h"
+
 
 //==================================================================
 namespace DUT
@@ -58,16 +60,29 @@ char *SSPrintF( const char *pFmt, ... )
 }
 
 //===============================================================
-void DAssThrow( bool ok, char *pNewCharMsg )
+void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 {
 	if ( ok )
 		return;
 
-	puts( pNewCharMsg );
+	char	buff[1024];
+	
+	if ( pNewCharMsg )
+	{
+		sprintf( buff, "ASSERT: %s - %s %i\n", pNewCharMsg, pFile, line );
 
-	delete [] pNewCharMsg;
-
-	throw "Bad !";
+		delete [] pNewCharMsg;
+	}
+	else
+	{
+		sprintf( buff, "ASSERT: %s %i\n", pFile, line );
+	}
+	
+	puts( buff );
+	
+#if !defined(NDEBUG)
+#endif
+	throw std::runtime_error( buff );
 }
 
 //==================================================================
