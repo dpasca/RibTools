@@ -119,7 +119,10 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Detail" )			{ Bound b; mkBound( b, p ); mState.Detail( b ); }	else
 	if ( nm == "DetailRange" )		{ exN( 4, p ); mState.DetailRange(p[0],p[1],p[2],p[3]);	}	else
 	if ( nm == "GeometricApproximation" )
-									{ exN( 2, p ); mState.GeometricApproximation( matchToken( p[0], tlGeometricApproximation ), p[0] );	}	else
+									{	exN( 2, p ); 
+										//mState.GeometricApproximation( matchToken( p[0], tlGeometricApproximation ), p[1] );
+										mState.GeometricApproximation( p[0], p[1] );
+									}	else
 	if ( nm == "Orientation" )		{ exN( 1, p ); mState.Orientation( matchToken( p[0], tlOrientation ) );	}	else
 	if ( nm == "Sides" )			{ exN( 1, p ); mState.Sides( p[0] );		}	else
 	if ( nm == "Basis" )			{

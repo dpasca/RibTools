@@ -45,14 +45,17 @@ struct Param
 
 	inline int			Int() const
 	{
-		ensType( INT );
-		return u.intVal;
+		if ( type == INT )		return u.intVal;	else
+		if ( type == INT_ARR )	return u.intArrayVal[0];	else
+								{ badType(); return 0; }
 	}
 
 	inline float		Flt() const
 	{
-		if ( type == FLT )	return u.floatVal;	else
-		if ( type == INT )	return u.intVal;	else
+		if ( type == FLT )		return u.floatVal;	else
+		if ( type == INT )		return u.intVal;	else
+		if ( type == FLT_ARR )	return u.floatArrayVal[0];	else
+		if ( type == INT_ARR )	return u.intArrayVal[0];	else
 							{ badType(); return 0; }
 	}
 	

@@ -69,8 +69,13 @@ bool ParamsFindP(	ParamList &params,
 			
 			const FltVec	&fltVec = params[ i+1 ].NumVec();
 
-			DASSTHROW( (int)(fltVec.size() % 3) == 0, ("Invalid number of arguments") );
-			DASSTHROW( (int)fltVec.size() == 3 * expectedN, ("Invalid number of arguments") );
+			DASSTHROW( (int)fltVec.size() == 3 * expectedN,
+							("Invalid number of arguments."
+							 " Expecting %i but it's %u", 3 * expectedN, fltVec.size() ) );
+
+			DASSTHROW( (int)(fltVec.size() % 3) == 0,
+							("Invalid number of arguments."
+							 " Should be multiple of 3 but it's %u", fltVec.size()) );
 
 			size_t	srcN = fltVec.size();
 

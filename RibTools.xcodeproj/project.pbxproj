@@ -262,6 +262,8 @@
 		6B8349C40F0A8E7F00BA7221 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		6B8349C80F0A8EDA00BA7221 /* RibRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibRender.h; path = RibRender/RibRender.h; sourceTree = "<group>"; };
 		6B8349C90F0A8EDA00BA7221 /* RibRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RibRender.cpp; path = RibRender/RibRender.cpp; sourceTree = "<group>"; };
+		6BBE49050F30479F00902E86 /* dragonhead.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dragonhead.rib; path = Tests/dragonhead.rib; sourceTree = "<group>"; };
+		6BBE49060F30479F00902E86 /* tesselatedcube.rib */ = {isa = PBXFileReference; lastKnownFileType = file; name = tesselatedcube.rib; path = Tests/tesselatedcube.rib; sourceTree = "<group>"; };
 		6BCC7ADF0ED04837004AEDC8 /* ribparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ribparser; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BD726790F232B78003A4601 /* RI_Primitive_Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive_Base.h; path = include/RI_Primitive_Base.h; sourceTree = "<group>"; };
 		6BD7267C0F232C7A003A4601 /* RI_Primitive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Primitive.cpp; path = src/RI_Primitive.cpp; sourceTree = "<group>"; };
@@ -360,9 +362,11 @@
 				6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */,
 				6BEE6F3F0F2236BF00BC3132 /* Bag.rib */,
 				6B4B36E30F2E1BAB00BBEDC7 /* Chair.rib */,
+				6BBE49050F30479F00902E86 /* dragonhead.rib */,
 				6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */,
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
 				6BF635E00F17F85400A68819 /* SimpleMug.rib */,
+				6BBE49060F30479F00902E86 /* tesselatedcube.rib */,
 				6B39F4720F19049000FE838F /* uteapot.rib */,
 			);
 			name = Tests;

@@ -8,6 +8,7 @@
  */
 
 #include <stdio.h>
+#include <stdexcept>
 #include "RI_Parser.h"
 #include "RI_Machine.h"
 #include "DUtils.h"
@@ -15,6 +16,8 @@
 #include "RibRender.h"
 
 #include <GLUT/glut.h>
+
+//#define ECHO_INPUT
 
 //===============================================================
 void display(void)
@@ -80,6 +83,10 @@ static bool renderFile( const char *pFileName )
 			parser.AddChar( 0 );
 		else
 			parser.AddChar( ((char *)pData)[i] );
+		
+#if defined(ECHO_INPUT)
+		printf( "%c", ((char *)pData)[i] );
+#endif
 
 		if ( parser.HasNewCommand() )
 		{
@@ -98,7 +105,14 @@ static bool renderFile( const char *pFileName )
 
 			puts( "" );
 */
-			machine.AddCommand( cmdName, cmdParams );
+
+			try {
+				machine.AddCommand( cmdName, cmdParams );
+			} catch ( std::runtime_error ex )
+			{
+				printf( "ERROR at line: %i\n", cmdLine );
+				break;
+			}
 		}
 		
 	}
@@ -114,10 +128,12 @@ static char *gsTestRibFiles[] =
 	"Airplane.rib",
 	"Bag.rib",
 	"Chair.rib",
+	"dragonhead.rib",
 	"Elephant.rib",
 	"Pixar.rib",
 	"SimpleMug.rib",
 	"uteapot.rib",
+	"tesselatedcube.rib",
 	NULL
 };
 

@@ -35,7 +35,7 @@ Polygon::Polygon( ParamList &params, const Vector3 *pVertsP, int vertsN ) :
 {
 	mVertsP.resize( vertsN );
 	
-	for (size_t i=0; i < vertsN; ++i)
+	for (size_t i=0; i < (size_t)vertsN; ++i)
 		mVertsP[i] = pVertsP[i];
 }
 
@@ -43,6 +43,8 @@ Polygon::Polygon( ParamList &params, const Vector3 *pVertsP, int vertsN ) :
 void Polygon::Render( GState &gstate )
 {
 	PUTPRIMNAME( "* Polygon" );
+	
+	//mVertsP
 
 }
 

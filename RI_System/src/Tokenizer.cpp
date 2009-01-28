@@ -38,6 +38,8 @@ static bool isFloatStr( const char *pStr )
 				ch == '.' ||
 				ch == 'e' ||
 				ch == 'f' ||
+				ch == 'E' ||
+				ch == 'F' ||
 				ch == '-' ||
 				ch == '+'  )
 			return false;
