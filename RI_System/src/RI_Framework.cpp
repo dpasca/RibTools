@@ -26,22 +26,20 @@ void Framework::SetOutput( u_int width, u_int height )
 }
 
 //==================================================================
-void Framework::WorldBegin()
+void Framework::WorldBegin( const Options &opt )
 {
 	for (size_t i=0; i < mpPrims.size(); ++i)
 		delete mpPrims[i];
 	mpPrims.clear();
+
+	mOptions = opt;
 }
 
 //==================================================================
 void Framework::Insert(	Primitive			*pPrim,
-						const Options		&opt,
 						const Attributes	&attr,
 						const Transform		&xform )
 {
-	if ( mOptsRev.Sync( *opt.mpRevision ) )
-		mpUniqueOptions.push_back( new Options( opt ) );
-	
 	if ( mAttrsRev.Sync( *attr.mpRevision ) )
 		mpUniqueAttribs.push_back( new Attributes( attr ) );
 
@@ -49,7 +47,6 @@ void Framework::Insert(	Primitive			*pPrim,
 		mpUniqueTransform.push_back( new Transform( xform ) );
 
 	pPrim->SetStates(
-				mpUniqueOptions.back(),
 				mpUniqueAttribs.back(),
 				mpUniqueTransform.back()
 				);
@@ -63,6 +60,8 @@ void Framework::Insert(	Primitive			*pPrim,
 //==================================================================
 void Framework::WorldEnd( const Matrix44 &mtxWorldCamera )
 {
+	glutReshapeWindow( mOptions.mXRes, mOptions.mYRes );
+
 	GState	gstate;
 
 	for (size_t i=0; i < mpPrims.size(); ++i)
@@ -70,7 +69,7 @@ void Framework::WorldEnd( const Matrix44 &mtxWorldCamera )
 		Primitive	*pPrim = mpPrims[i];
 
 		gstate.Setup(
-				*pPrim->mpOptions,
+				mOptions,
 				*pPrim->mpAttribs,
 				*pPrim->mpTransform,
 				mtxWorldCamera );
@@ -78,12 +77,10 @@ void Framework::WorldEnd( const Matrix44 &mtxWorldCamera )
 		pPrim->Render( gstate );
 	}
 
-	for (size_t i=0; i < mpUniqueOptions.size(); ++i)	delete mpUniqueOptions[i];
 	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	delete mpUniqueAttribs[i];
 	for (size_t i=0; i < mpUniqueTransform.size(); ++i)	delete mpUniqueTransform[i];
 	for (size_t i=0; i < mpPrims.size(); ++i)			delete mpPrims[i];
 	
-	mpUniqueOptions.clear();
 	mpUniqueAttribs.clear();
 	mpUniqueTransform.clear();
 	mpPrims.clear();

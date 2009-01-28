@@ -13,6 +13,7 @@
 #include "RI_Base.h"
 #include "RI_Primitive.h"
 #include "DContainers.h"
+#include "RI_Options.h"
 
 //==================================================================
 namespace RI
@@ -29,11 +30,11 @@ class Framework
 {
 	DVec<Primitive *>	mpPrims;
 
-	DVec<Options*>		mpUniqueOptions;
+	Options				mOptions;
+
 	DVec<Attributes*>	mpUniqueAttribs;
 	DVec<Transform*>	mpUniqueTransform;
 
-	RevisionChecker		mOptsRev;
 	RevisionChecker		mAttrsRev;
 	RevisionChecker		mTransRev;
 				
@@ -44,9 +45,8 @@ public:
 	
 	void SetOutput( u_int width, u_int height );
 	
-	void WorldBegin();
+	void WorldBegin( const Options &opt );
 	void Insert( Primitive			*pPrim,
-				 const Options		&opt,
 				 const Attributes	&attr,
 				 const Transform	&xform );
 	void WorldEnd( const Matrix44 &mtxWorldCamera );

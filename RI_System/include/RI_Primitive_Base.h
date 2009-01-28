@@ -104,14 +104,12 @@ public:
 	};
 	
 	Type		mType;
-	Options		*mpOptions;
 	Attributes	*mpAttribs;
 	Transform	*mpTransform;
 	
 public:
 	Primitive( Type type ) :
 		mType(type),
-		mpOptions(NULL),
 		mpAttribs(NULL),
 		mpTransform(NULL)
 	{
@@ -122,12 +120,10 @@ public:
 	}
 
 	void SetStates(
-		Options		*pOptions,
 		Attributes	*pAttribs,
 		Transform	*pTransform
 	)
 	{
-		mpOptions	= pOptions	;
 		mpAttribs	= pAttribs	;
 		mpTransform	= pTransform;
 	}
