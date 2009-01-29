@@ -191,4 +191,11 @@ void State::PatchMesh( RtToken type, ParamList &params )
 }
 
 //==================================================================
+void State::Polygon( ParamList &params )
+{
+	insertPrimitive( new RI::Polygon( params, mStatics ) );
+}
+
+	
+//==================================================================
 }

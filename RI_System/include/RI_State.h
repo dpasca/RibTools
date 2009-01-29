@@ -146,6 +146,7 @@ public:
 
 	void Patch( RtToken type, ParamList &params );
 	void PatchMesh( RtToken type, ParamList &params );
+	void Polygon( ParamList &params );
 
 
 	void ErrHandler( Error errCode );

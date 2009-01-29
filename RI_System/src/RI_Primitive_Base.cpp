@@ -38,9 +38,11 @@ bool ParamsFindP(	ParamList &params,
 			const FltVec	&fltVec = params[ i+1 ].NumVec();
 			
 			DASSTHROW( (fltVec.size() % 3) == 0, ("Invalid number of arguments") );
+			
+			out_vectorP.resize( fltVec.size() / 3 );
 
-			for (size_t iv=0; iv < fltVec.size(); iv += 3)
-				out_vectorP[iv] = Vector3( &fltVec[ iv ] );
+			for (size_t iv=0, id=0; iv < fltVec.size(); iv += 3)
+				out_vectorP[id++] = Vector3( &fltVec[ iv ] );
 
 			return true;
 		}

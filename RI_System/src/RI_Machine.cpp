@@ -179,6 +179,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Patch" )			{ geN( 3, p ); mState.Patch(		matchToken( p[0], tlPatch0 ), p ); }	else
 	if ( nm == "PatchMesh" )		{ geN( 5, p ); mState.PatchMesh(	matchToken( p[0], tlPatch0 ), p ); }	else
 
+	if ( nm == "Polygon" )			{ geN( 2, p ); mState.Polygon( p ); }	else
 	// unknown
 									{ unknownCommand( nm.c_str() ); }
 

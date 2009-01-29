@@ -130,10 +130,11 @@ static char *gsTestRibFiles[] =
 	"Chair.rib",
 	"dragonhead.rib",
 	"Elephant.rib",
+	"Enterprise_ncc1701d.rib",
 	"Pixar.rib",
 	"SimpleMug.rib",
 	"uteapot.rib",
-	"tesselatedcube.rib",
+	"WarBird.rib",
 	NULL
 };
 

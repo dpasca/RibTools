@@ -228,6 +228,8 @@
 		6B1F590E0F09561C0082B328 /* libDMath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B1F59170F0956870082B328 /* DMatrix44.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMatrix44.h; path = include/DMatrix44.h; sourceTree = "<group>"; };
 		6B1F59190F0956870082B328 /* DMatrix44.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DMatrix44.cpp; path = src/DMatrix44.cpp; sourceTree = "<group>"; };
+		6B33FDE80F319DF800B5028F /* Enterprise_ncc1701d.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Enterprise_ncc1701d.rib; path = Tests/Enterprise_ncc1701d.rib; sourceTree = "<group>"; };
+		6B33FDE90F319E0900B5028F /* WarBird.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = WarBird.rib; path = Tests/WarBird.rib; sourceTree = "<group>"; };
 		6B39F4720F19049000FE838F /* uteapot.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = uteapot.rib; path = Tests/uteapot.rib; sourceTree = "<group>"; };
 		6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Error.cpp; path = src/RI_State_Error.cpp; sourceTree = "<group>"; };
 		6B4B36E30F2E1BAB00BBEDC7 /* Chair.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Chair.rib; path = Tests/Chair.rib; sourceTree = "<group>"; };
@@ -263,7 +265,6 @@
 		6B8349C80F0A8EDA00BA7221 /* RibRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibRender.h; path = RibRender/RibRender.h; sourceTree = "<group>"; };
 		6B8349C90F0A8EDA00BA7221 /* RibRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RibRender.cpp; path = RibRender/RibRender.cpp; sourceTree = "<group>"; };
 		6BBE49050F30479F00902E86 /* dragonhead.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dragonhead.rib; path = Tests/dragonhead.rib; sourceTree = "<group>"; };
-		6BBE49060F30479F00902E86 /* tesselatedcube.rib */ = {isa = PBXFileReference; lastKnownFileType = file; name = tesselatedcube.rib; path = Tests/tesselatedcube.rib; sourceTree = "<group>"; };
 		6BCC7ADF0ED04837004AEDC8 /* ribparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ribparser; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BD726790F232B78003A4601 /* RI_Primitive_Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive_Base.h; path = include/RI_Primitive_Base.h; sourceTree = "<group>"; };
 		6BD7267C0F232C7A003A4601 /* RI_Primitive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Primitive.cpp; path = src/RI_Primitive.cpp; sourceTree = "<group>"; };
@@ -364,10 +365,11 @@
 				6B4B36E30F2E1BAB00BBEDC7 /* Chair.rib */,
 				6BBE49050F30479F00902E86 /* dragonhead.rib */,
 				6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */,
+				6B33FDE80F319DF800B5028F /* Enterprise_ncc1701d.rib */,
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
 				6BF635E00F17F85400A68819 /* SimpleMug.rib */,
-				6BBE49060F30479F00902E86 /* tesselatedcube.rib */,
 				6B39F4720F19049000FE838F /* uteapot.rib */,
+				6B33FDE90F319E0900B5028F /* WarBird.rib */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
