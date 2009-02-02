@@ -116,6 +116,8 @@ State::State()
 	mAttributesStack.top().Init( &mStatics, &mAttribsRevTrack );
 	mTransformOpenStack.top().Init( &mTransOpenRevTrack );
 	mTransformCloseStack.top().Init( &mTransCloseRevTrack );
+	
+	mFramework.Init( &mStatics );
 }
 
 //==================================================================

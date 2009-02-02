@@ -54,6 +54,29 @@ public:
 };
 
 //==================================================================
+/// PatchMesh
+//==================================================================
+class PatchMesh : public Primitive
+{
+public:
+	CPSymVoid		mpyPatchType;
+	ParamList		mParams;
+
+public:
+	PatchMesh(RtToken type,
+			  ParamList &params,
+			  const SymbolList &staticSymbols );
+
+		bool IsSplitable() const	{	return true; }
+		void Split( Framework &fwork );
+	
+	void Render( GState &gstate )
+	{
+	}
+};
+
+	
+//==================================================================
 }
 
 #endif

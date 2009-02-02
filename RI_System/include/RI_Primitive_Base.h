@@ -24,6 +24,7 @@ namespace RI
 class Options;
 class Attributes;
 class Transform;
+class Framework;
 
 //==================================================================
 /// GVert
@@ -99,6 +100,7 @@ public:
 
 		PATCHBILINEAR,
 		PATCHBICUBIC,
+		PATCHMESH,
 
 		POLYGON,
 	};
@@ -118,6 +120,15 @@ public:
 	virtual ~Primitive()
 	{
 	}
+	
+	virtual bool IsSplitable() const
+	{
+		return false;
+	}
+	
+	virtual void Split( Framework &fwork )
+	{
+	}
 
 	void SetStates(
 		Attributes	*pAttribs,
@@ -126,6 +137,12 @@ public:
 	{
 		mpAttribs	= pAttribs	;
 		mpTransform	= pTransform;
+	}
+
+	void CopyStates( Primitive &fromPrim )
+	{
+		mpAttribs	= fromPrim.mpAttribs	;
+		mpTransform	= fromPrim.mpTransform;
 	}
 
 	virtual void Render( GState &gstate )

@@ -13,10 +13,119 @@
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
 #include "RI_Primitive_Patch.h"
+#include "RI_Framework.h"
 
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+PatchMesh::PatchMesh( RtToken type,
+					  ParamList &params,
+					  const SymbolList &staticSymbols ) :
+	Primitive(PATCHMESH),
+	mParams(params)
+{
+	mpyPatchType = staticSymbols.FindVoid( type );
+}
+
+
+//==================================================================
+void PatchMesh::Split( Framework &fwork )
+{
+	// PatchMesh "bilinear" 2 "nonperiodic" 5 "nonperiodic" "P"  [ -0.995625 2 -0.495465 ...
+	//               0      1       2       3       4        5     6
+
+	int			nu		= mParams[1];
+	CPSymVoid	pyUWrap = fwork.mpStatics->FindVoid( mParams[2] );
+	int			nv		= mParams[3];
+	CPSymVoid	pyVWrap = fwork.mpStatics->FindVoid( mParams[4] );
+
+	bool	uPeriodic = pyUWrap->IsNameI( RI_PERIODIC );
+	bool	vPeriodic = pyVWrap->IsNameI( RI_PERIODIC );
+		
+	int	PValuesParIdx = findParam( "P", Param::FLT_ARR, 5, mParams );
+	if ( PValuesParIdx == -1 )
+		return;
+	
+	int			meshHullSize = 3 * nu * nv;
+	const float	*pMeshHull = mParams[PValuesParIdx].PFlt( meshHullSize );
+
+	if ( mpyPatchType->IsNameI( RI_BILINEAR ) )
+	{
+		int	nUPatches = nu - 1 + uPeriodic ? 1 : 0;
+		int	nVPatches = nv - 1 + vPeriodic ? 1 : 0;
+
+		Vector3	hullv3[4];
+
+		for (int i=0; i < nUPatches; ++i)
+		{
+			int	ii = (i+1) % nu;
+
+			for (int j=0; j < nVPatches; ++j)
+			{
+				int	jj = (j+1) % nv;
+
+				hullv3[0] = Vector3( &pMeshHull[(i +nu*j )*3] );
+				hullv3[1] = Vector3( &pMeshHull[(ii+nu*j )*3] );
+				hullv3[2] = Vector3( &pMeshHull[(i +nu*jj)*3] );
+				hullv3[3] = Vector3( &pMeshHull[(ii+nu*jj)*3] );
+
+				fwork.InsertSplitted(
+						new RI::PatchBilinear( mParams, hullv3 ),
+						*this
+						);
+			}
+		}
+	}
+	else
+	if ( mpyPatchType->IsNameI( RI_BICUBIC ) )
+	{
+		const Attributes	&attr = *mpAttribs;
+		
+		int uSteps = attr.mUSteps;
+		int vSteps = attr.mVSteps;
+
+		DASSTHROW( uSteps >= 1 && uSteps <= 16, ("Invalid uSteps %i", uSteps) );
+		DASSTHROW( vSteps >= 1 && vSteps <= 16, ("Invalid vSteps %i", vSteps) );
+		
+		int	nUPatches = uPeriodic ? nu / uSteps : (nu-4) / uSteps + 1;
+		int	nVPatches = vPeriodic ? nv / vSteps : (nv-4) / vSteps + 1;
+
+		Vector3	hullv3[16];
+		
+		for (int j0=0; j0 < nVPatches; ++j0)
+		{
+			for (int i0=0; i0 < nUPatches; ++i0)
+			{
+				int	hidx = 0;
+
+				for (int j=0; j < 4; ++j)
+				{
+					for (int i=0; i < 4; ++i)
+					{
+						int	srcIdx = ((i + i0 * uSteps) % nu) +
+									 ((j + j0 * vSteps) % nv) * nu;
+
+						DASSERT( srcIdx >= 0 && (srcIdx*3) < meshHullSize );
+
+						hullv3[hidx++] = Vector3( &pMeshHull[ srcIdx * 3 ]);
+					}
+				}
+
+				fwork.InsertSplitted(
+						new RI::PatchBicubic( mParams, hullv3, attr, *fwork.mpStatics ),
+						*this
+						);
+			}
+		}
+	}
+	else
+	{
+		DASSTHROW( 0, ("Unrecognized Patch type %s", mpyPatchType->pName ) );
+		//ErrHandler( E_BADARGUMENT );
+	}	
+}
 
 //==================================================================
 PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols ) :

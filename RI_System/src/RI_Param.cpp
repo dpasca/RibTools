@@ -14,6 +14,30 @@ namespace RI
 {
 
 //==================================================================
+int findParam( const char *pFindName, u_int expectedType, int fromIdx, ParamList &params )
+{
+	DASSERT( ((params.size()-fromIdx) & 1) == 0 );
+
+	if NOT( ((params.size()-fromIdx) & 1) == 0 )
+		return -1;
+
+	for (int i=fromIdx; i < (int)params.size(); i += 2)
+	{
+		DASSERT( params[i].type == Param::STR );
+
+		if ( 0 == strcasecmp( pFindName, params[i] ) )
+		{
+			if ( params[i+1].type == expectedType )
+				return i+1;
+			else
+				return -1;
+		}
+	}
+
+	return -1;
+}
+
+//==================================================================
 const FltVec &Param::NumVec( size_t n )
 {
 	if ( type == FLT_ARR )

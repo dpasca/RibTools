@@ -58,6 +58,17 @@ void Framework::Insert(	Primitive			*pPrim,
 }
 
 //==================================================================
+void Framework::InsertSplitted(	
+						Primitive			*pSplitPrim,
+						Primitive			&srcPrim
+						)
+{
+	pSplitPrim->CopyStates( srcPrim );
+
+	mpPrims.push_back( pSplitPrim );
+}
+
+//==================================================================
 void Framework::WorldEnd( const Matrix44 &mtxWorldCamera )
 {
 	glutReshapeWindow( mOptions.mXRes, mOptions.mYRes );
@@ -67,14 +78,19 @@ void Framework::WorldEnd( const Matrix44 &mtxWorldCamera )
 	for (size_t i=0; i < mpPrims.size(); ++i)
 	{	
 		Primitive	*pPrim = mpPrims[i];
+		
+		if ( pPrim->IsSplitable() )
+			pPrim->Split( *this );
+		else
+		{
+			gstate.Setup(
+					mOptions,
+					*pPrim->mpAttribs,
+					*pPrim->mpTransform,
+					mtxWorldCamera );
 
-		gstate.Setup(
-				mOptions,
-				*pPrim->mpAttribs,
-				*pPrim->mpTransform,
-				mtxWorldCamera );
-
-		pPrim->Render( gstate );
+			pPrim->Render( gstate );
+		}
 	}
 
 	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	delete mpUniqueAttribs[i];

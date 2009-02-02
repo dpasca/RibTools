@@ -29,7 +29,11 @@ class Transform;
 class Framework
 {
 	DVec<Primitive *>	mpPrims;
+	
+public:
+	SymbolList			*mpStatics;
 
+private:
 	Options				mOptions;
 
 	DVec<Attributes*>	mpUniqueAttribs;
@@ -39,16 +43,29 @@ class Framework
 	RevisionChecker		mTransRev;
 				
 public:
-	Framework()
+	Framework() :
+		mpStatics(NULL)
 	{
 	}
-	
+
+	void Init( SymbolList *pStatics )
+	{
+		mpStatics = pStatics;
+	}
+
 	void SetOutput( u_int width, u_int height );
 	
 	void WorldBegin( const Options &opt );
+
 	void Insert( Primitive			*pPrim,
 				 const Attributes	&attr,
 				 const Transform	&xform );
+
+	void InsertSplitted(	
+						Primitive			*pSplitPrim,
+						Primitive			&srcPrim
+						);
+
 	void WorldEnd( const Matrix44 &mtxWorldCamera );
 };
 

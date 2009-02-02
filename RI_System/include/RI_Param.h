@@ -105,6 +105,9 @@ public:
 };
 
 //==================================================================
+	int findParam( const char *pFindName, u_int expectedType, int fromIdx, ParamList &params );
+
+//==================================================================
 }
 
 #endif
