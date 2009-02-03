@@ -55,6 +55,20 @@ void Parser::AddChar( char ch )
 {
 	if ( ch == 0 )
 	{
+		mCurCommand			= mNextCommand;
+		mCurCommandLine		= mNextCommandLine;
+
+		if ( mpTokenizer->AddChar( '\n' ) )
+		{
+			mNextCommand		= mpTokenizer->GetDataAphaNum();
+			mNextCommandLine	= mpTokenizer->GetCurLineNumber();
+		}
+		else
+		{
+			mNextCommand		= "";
+			mNextCommandLine	= -1;
+		}
+
 		mReachedEOF = true;
 		return;
 	}
@@ -67,51 +81,53 @@ void Parser::AddChar( char ch )
 	//printf( "> %s\t", Tokenizer::GetDataTypeName( mpTokenizer->GetDataType() ) );
 
 	Param	param;
-	bool	addParam = true;
-	
+
 	switch ( mpTokenizer->GetDataType() )
 	{
 	case Tokenizer::DT_ALPHANUMERIC:
-			mCurCommandLine = mNextCommandLine;
-			mCurCommand = mNextCommand;
-			mNextCommand = mpTokenizer->GetDataAphaNum();
-			mNextCommandLine = mpTokenizer->GetCurLineNumber();
-			addParam = false;
+			mCurCommand			= mNextCommand;
+			mCurCommandLine		= mNextCommandLine;
+			mNextCommand		= mpTokenizer->GetDataAphaNum();
+			mNextCommandLine	= mpTokenizer->GetCurLineNumber();
 			break;
 			
 	case Tokenizer::DT_INT:
 			param.type				= Param::INT;
 			param.u.intVal			= mpTokenizer->GetDataInt();
+			mCurParams.push_back( param );
 			break;
 	
 	case Tokenizer::DT_FLOAT:
 			param.type				= Param::FLT;
 			param.u.floatVal		= mpTokenizer->GetDataFloat();
+			mCurParams.push_back( param );
 			break;
 	
 	case Tokenizer::DT_INT_ARRAY:
 			param.type				= Param::INT_ARR;
 			param.u.intArrayVal		= mpTokenizer->GetDataIntAttary();
+			mCurParams.push_back( param );
 			break;
 	
 	case Tokenizer::DT_FLOAT_ARRAY:
 			param.type				= Param::FLT_ARR;
 			param.u.floatArrayVal	= mpTokenizer->GetDataFloatAttary();
+			mCurParams.push_back( param );
 			break;
 
 	case Tokenizer::DT_STRING:
 			param.type				= Param::STR;
 			param.u.stringVal		= mpTokenizer->GetDataString();
+			mCurParams.push_back( param );
 			break;
 	
 	default:
 			param.type = Param::UNKNOWN;
 			//puts( "Unknown !!!" );
+			mCurParams.push_back( param );
 			break;
 	}
 
-	if ( addParam )
-		mCurParams.push_back( param );
 /*
 	switch ( mpTokenizer->GetDataType() )
 	{
@@ -135,24 +151,24 @@ void Parser::FlushNewCommand( DStr			*out_pCmdName,
 							  DVec<Param>	*out_pParams,
 							  int			*out_pCmdLine )
 {
+	*out_pCmdName	= mCurCommand;
+	*out_pCmdLine	= mCurCommandLine;
+	*out_pParams	= mCurParams;
+
+	mCurParams.clear();
+
 	if ( mReachedEOF )
 	{
-		*out_pCmdName	= mNextCommand;
-		*out_pCmdLine	= mNextCommandLine;
+		mCurCommand			= mNextCommand;
+		mCurCommandLine		= mNextCommandLine;
+
+		mNextCommand		= "";
+		mNextCommandLine	= -1;
 	}
 	else
 	{
-		*out_pCmdName	= mCurCommand;
-		*out_pCmdLine	= mCurCommandLine;
+		mCurCommand			= "";	
 	}
-
-	*out_pParams	= mCurParams;
-	
-	//mCurCommand		= mNextCommand;
-	mCurCommand	= "";
-	mCurCommandLine = mpTokenizer->GetCurLineNumber();
-	
-	mCurParams.clear();
 }
 
 //==================================================================

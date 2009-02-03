@@ -16,7 +16,8 @@ namespace RI
 //==================================================================
 void State::ErrHandler( Error errCode )
 {
-	printf( "Error %s\n", ErrorToString( errCode ) );
+	//printf( "Error %s\n", ErrorToString( errCode ) );
+	DASSTHROW( 0, ("Error %s\n", ErrorToString( errCode )) );
 }
 
 //==================================================================
@@ -30,7 +31,8 @@ void State::ErrHandler( Error errCode, const char *pFmt, ... )
 
 	va_end( vl );
 
-	printf( "Error %s -- %s\n", ErrorToString( errCode ), buff );
+	//printf( "Error %s -- %s\n", ErrorToString( errCode ), buff );
+	DASSTHROW( 0, ("Error %s -- %s\n", ErrorToString( errCode ), buff) );
 }
 
 //==================================================================

@@ -83,12 +83,12 @@ static bool renderFile( const char *pFileName )
 			parser.AddChar( 0 );
 		else
 			parser.AddChar( ((char *)pData)[i] );
-		
+
 #if defined(ECHO_INPUT)
 		printf( "%c", ((char *)pData)[i] );
 #endif
 
-		if ( parser.HasNewCommand() )
+		while ( parser.HasNewCommand() )
 		{
 			DStr			cmdName;
 			RI::ParamList	cmdParams;
@@ -97,14 +97,14 @@ static bool renderFile( const char *pFileName )
 			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
 			
 //			printf( "%3i - %s\n", cmdLine, cmdName.c_str() );
-/*
+
 			printf( "CMD %s ", cmdName.c_str() );
 			
 			if ( cmdParams.size() )
 				printf( "(%i params)", cmdParams.size() );
 
 			puts( "" );
-*/
+
 
 			try {
 				machine.AddCommand( cmdName, cmdParams );

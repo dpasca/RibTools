@@ -40,8 +40,7 @@ public:
 
 	bool HasNewCommand() const
 	{
-		return	(mCurCommand.length() != 0 && mNextCommand.length() != 0) ||
-				(mNextCommand.length() != 0 && mReachedEOF);
+		return	( mCurCommand.length() != 0 );
 	}
 	
 	void FlushNewCommand( DStr			*out_pCmdName,
