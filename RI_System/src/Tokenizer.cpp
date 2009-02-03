@@ -98,19 +98,21 @@ bool Tokenizer::AddChar( char ch )
 	{
 		if ( ch == '#' )
 		{
-			setDataType();
-			mState = COMMENT;
+			//setDataType();
+			mStateInComment = true;
+			//mState = COMMENT;
 		}
 	}
 	
-	if ( mState == COMMENT )
+	if ( mStateInComment )
 	{
 		if ( isNewLine( ch ) )
 		{
 			if ( ch == '\n' )
 				mLineNumber += 1;
 
-			ResetState();
+			mStateInComment = false;
+			//ResetState();
 		}
 	}
 	else

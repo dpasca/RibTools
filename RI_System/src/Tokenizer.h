@@ -23,10 +23,10 @@ class Tokenizer
 		NORMAL,
 		STRING,
 		ARRAY,
-		COMMENT,
 	};
 	
 	StateEnum		mState;
+	bool			mStateInComment;
 	int				mLineNumber;
 
 	int				mDataInt;
@@ -80,6 +80,7 @@ public:
 	void ResetState()
 	{
 		mState = UNKNOWN;
+		mStateInComment = false;
 		mCurToken = "";
 		mIsArrayFloat = false;
 	}
