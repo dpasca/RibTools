@@ -81,37 +81,7 @@ void State::PatchMesh( RtToken type, ParamList &params )
 //==================================================================
 void State::Polygon( ParamList &params )
 {
-	//insertPrimitive( new RI::Polygon( params, mStatics ) );
-
-	int	PValuesParIdx = findParam( "P", Param::FLT_ARR, 0, params );
-	if ( PValuesParIdx == -1 )
-	{
-		DASSTHROW( 0, ("Missing 'P'") );
-		return;
-	}
-
-	const FltVec	&paramP = params[PValuesParIdx].NumVec();
-	
-	int	last	= (int)paramP.size()/3 - 1;
-	int	start	= 1;
-	int	end		= DMIN( (int)3, last );
-	
-	Vector3	patchVerts[4];
-	
-	while ( (end - start) == 2 )
-	{
-		patchVerts[0].Set( &paramP[3 * 0] );
-		patchVerts[1].Set( &paramP[3 * start] );
-		patchVerts[2].Set( &paramP[3 * end] );
-		patchVerts[3].Set( &paramP[3 * (start+1)] );
-
-		insertPrimitive( new PatchBilinear( params, patchVerts ) );
-		
-		start	= end;
-		end		= DMIN( start+2, last );
-	}
-	
-	printf( "start %i, end %i\n", start, end );
+	insertPrimitive( new RI::Polygon( params, mStatics ) );
 }
 
 	

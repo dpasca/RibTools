@@ -22,14 +22,24 @@ namespace RI
 class Polygon : public Primitive
 {
 public:
-	//ParamList		mParams;
-	DVec<Vector3>	mVertsP;
+	ParamList		mParams;
 
 public:
 	Polygon( ParamList &params, const SymbolList &staticSymbols );
-	Polygon( ParamList &params, const Vector3 *pVertsP, int vertsN );
 
-	void Render( GState &gstate );
+		bool IsSplitable() const	{	return true; }
+		void Split( Framework &fwork );
+
+	//void Render( GState &gstate );
+
+private:
+	void splitAddTriangle(
+				Framework &fwork,
+				const Vector3 &v1,
+				const Vector3 &v2,
+				const Vector3 &v3
+				);
+
 };
 
 //==================================================================

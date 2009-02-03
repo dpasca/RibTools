@@ -29,7 +29,6 @@ PatchMesh::PatchMesh( RtToken type,
 	mpyPatchType = staticSymbols.FindVoid( type );
 }
 
-
 //==================================================================
 void PatchMesh::Split( Framework &fwork )
 {
