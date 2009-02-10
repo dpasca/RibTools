@@ -26,7 +26,7 @@ class Machine
 	State	mState;
 
 public:
-	Machine();
+	Machine( FrameworkBase *pFramework );
 	
 	void AddCommand(const DStr	&cmdName,
 					ParamList	&cmdParams );

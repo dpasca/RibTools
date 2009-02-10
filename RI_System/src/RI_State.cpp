@@ -17,13 +17,14 @@ namespace RI
 //==================================================================
 /// State
 //==================================================================
-State::State()
+State::State( FrameworkBase *pFramework ) :
+	mpFramework(pFramework)
 {
 	mModeStack.push( MD_UNDEFINED );
 	Begin( "dummy" );
 
 	mMtxWorldCamera.Identity();
-	
+
 	mStatics.FindOrAdd(	RI_FRAMEBUFFER				);
 	mStatics.FindOrAdd(	RI_FILE						);
 	mStatics.FindOrAdd(	RI_RGB						);
@@ -117,7 +118,7 @@ State::State()
 	mTransformOpenStack.top().Init( &mTransOpenRevTrack );
 	mTransformCloseStack.top().Init( &mTransCloseRevTrack );
 	
-	mFramework.Init( &mStatics );
+	mpFramework->SetStatics( &mStatics );
 }
 
 //==================================================================
@@ -178,12 +179,12 @@ void State::WorldBegin()
 	mTransformOpenStack.top().SetIdentity();
 	mTransformCloseStack.top().SetIdentity();
 
-	mFramework.WorldBegin( mOptionsStack.top() );
+	mpFramework->WorldBegin( mOptionsStack.top(), mMtxWorldCamera );
 }
 //==================================================================
 void State::WorldEnd()
 {
-	mFramework.WorldEnd( mMtxWorldCamera );
+	mpFramework->WorldEnd();
 
 	popStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 	popMode( MD_WORLD );

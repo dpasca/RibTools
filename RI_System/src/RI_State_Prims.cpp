@@ -17,7 +17,7 @@ namespace RI
 //==================================================================
 inline void State::insertPrimitive( Primitive *pPrim )
 {
-	mFramework.Insert( pPrim,
+	mpFramework->Insert( pPrim,
 					  mAttributesStack.top(),
 					  mTransformOpenStack.top() );
 }

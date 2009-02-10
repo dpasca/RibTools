@@ -20,14 +20,20 @@
 		6B1F591A0F0956870082B328 /* DMatrix44.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B1F59170F0956870082B328 /* DMatrix44.h */; };
 		6B1F591B0F0956870082B328 /* DMatrix44.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1F59190F0956870082B328 /* DMatrix44.cpp */; };
 		6B1F591C0F0956950082B328 /* libDMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F590E0F09561C0082B328 /* libDMath.a */; };
+		6B279BAC0F3F03C50050CC99 /* RI_FrameworkBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B279BAA0F3F03C50050CC99 /* RI_FrameworkBase.h */; };
+		6B279BAD0F3F03C50050CC99 /* RI_FrameworkREYES.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B279BAB0F3F03C50050CC99 /* RI_FrameworkREYES.h */; };
+		6B279BB80F3F03E30050CC99 /* RI_FrameworkREYES.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B279BB70F3F03E30050CC99 /* RI_FrameworkREYES.cpp */; };
+		6B279BBC0F3F06740050CC99 /* RI_HiderBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B279BBB0F3F06740050CC99 /* RI_HiderBase.h */; };
+		6B279BBE0F3F07C40050CC99 /* RI_HiderREYES.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B279BBD0F3F07C40050CC99 /* RI_HiderREYES.h */; };
+		6B279C6D0F3F136E0050CC99 /* RI_HiderREYES.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B279C6C0F3F136E0050CC99 /* RI_HiderREYES.cpp */; };
+		6B3E1AEF0F3E9F29000D8BDD /* RI_MicroPolygonGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B3E1AEE0F3E9F29000D8BDD /* RI_MicroPolygonGrid.cpp */; };
+		6B3E1AF10F3E9F50000D8BDD /* RI_MicroPolygonGrid.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B3E1AF00F3E9F50000D8BDD /* RI_MicroPolygonGrid.h */; };
 		6B4047BD0F1A59C300BA7500 /* RI_State_Error.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */; };
 		6B41D1A70F0C2B1100BC03E7 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B8349C40F0A8E7F00BA7221 /* OpenGL.framework */; };
 		6B440AB50F24F7FC00055FCA /* RI_Attributes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B8349880F0A7F0700BA7221 /* RI_Attributes.cpp */; };
 		6B440AB60F24F7FC00055FCA /* RI_Attributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B83497D0F0A7F0700BA7221 /* RI_Attributes.h */; };
 		6B440AB70F24F7FC00055FCA /* RI_Base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B8349890F0A7F0700BA7221 /* RI_Base.cpp */; };
 		6B440AB80F24F7FC00055FCA /* RI_Base.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B83497E0F0A7F0700BA7221 /* RI_Base.h */; };
-		6B440AB90F24F7FC00055FCA /* RI_Framework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */; };
-		6B440ABA0F24F7FC00055FCA /* RI_Framework.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BFF1D390F0FE02200F984E5 /* RI_Framework.h */; };
 		6B440ABB0F24F7FC00055FCA /* RI_Machine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498A0F0A7F0700BA7221 /* RI_Machine.cpp */; };
 		6B440ABC0F24F7FC00055FCA /* RI_Machine.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B83497F0F0A7F0700BA7221 /* RI_Machine.h */; };
 		6B440ABD0F24F7FC00055FCA /* RI_Options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498B0F0A7F0700BA7221 /* RI_Options.cpp */; };
@@ -60,8 +66,6 @@
 		6B440AD80F24F7FC00055FCA /* RI_Attributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B83497D0F0A7F0700BA7221 /* RI_Attributes.h */; };
 		6B440AD90F24F7FC00055FCA /* RI_Base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B8349890F0A7F0700BA7221 /* RI_Base.cpp */; };
 		6B440ADA0F24F7FC00055FCA /* RI_Base.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B83497E0F0A7F0700BA7221 /* RI_Base.h */; };
-		6B440ADB0F24F7FC00055FCA /* RI_Framework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */; };
-		6B440ADC0F24F7FC00055FCA /* RI_Framework.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BFF1D390F0FE02200F984E5 /* RI_Framework.h */; };
 		6B440ADD0F24F7FC00055FCA /* RI_Machine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498A0F0A7F0700BA7221 /* RI_Machine.cpp */; };
 		6B440ADE0F24F7FC00055FCA /* RI_Machine.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B83497F0F0A7F0700BA7221 /* RI_Machine.h */; };
 		6B440ADF0F24F7FC00055FCA /* RI_Options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B83498B0F0A7F0700BA7221 /* RI_Options.cpp */; };
@@ -142,8 +146,6 @@
 		6BD7268F0F236364003A4601 /* RI_Primitive_Patch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD7268E0F236364003A4601 /* RI_Primitive_Patch.cpp */; };
 		6BE7302E0F1FA236004FAE21 /* RI_Symbol.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BE7302D0F1FA236004FAE21 /* RI_Symbol.h */; };
 		6BE730300F1FA24D004FAE21 /* RI_Symbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */; };
-		6BFF1D380F0FDFF500F984E5 /* RI_Framework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */; };
-		6BFF1D3A0F0FE02200F984E5 /* RI_Framework.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BFF1D390F0FE02200F984E5 /* RI_Framework.h */; };
 		6BFF1D440F0FEA3900F984E5 /* RI_Primitive.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */; };
 /* End PBXBuildFile section */
 
@@ -228,9 +230,17 @@
 		6B1F590E0F09561C0082B328 /* libDMath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B1F59170F0956870082B328 /* DMatrix44.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMatrix44.h; path = include/DMatrix44.h; sourceTree = "<group>"; };
 		6B1F59190F0956870082B328 /* DMatrix44.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DMatrix44.cpp; path = src/DMatrix44.cpp; sourceTree = "<group>"; };
+		6B279BAA0F3F03C50050CC99 /* RI_FrameworkBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_FrameworkBase.h; path = include/RI_FrameworkBase.h; sourceTree = "<group>"; };
+		6B279BAB0F3F03C50050CC99 /* RI_FrameworkREYES.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_FrameworkREYES.h; path = include/RI_FrameworkREYES.h; sourceTree = "<group>"; };
+		6B279BB70F3F03E30050CC99 /* RI_FrameworkREYES.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_FrameworkREYES.cpp; path = src/RI_FrameworkREYES.cpp; sourceTree = "<group>"; };
+		6B279BBB0F3F06740050CC99 /* RI_HiderBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_HiderBase.h; path = include/RI_HiderBase.h; sourceTree = "<group>"; };
+		6B279BBD0F3F07C40050CC99 /* RI_HiderREYES.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_HiderREYES.h; path = include/RI_HiderREYES.h; sourceTree = "<group>"; };
+		6B279C6C0F3F136E0050CC99 /* RI_HiderREYES.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_HiderREYES.cpp; path = src/RI_HiderREYES.cpp; sourceTree = "<group>"; };
 		6B33FDE80F319DF800B5028F /* Enterprise_ncc1701d.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Enterprise_ncc1701d.rib; path = Tests/Enterprise_ncc1701d.rib; sourceTree = "<group>"; };
 		6B33FDE90F319E0900B5028F /* WarBird.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = WarBird.rib; path = Tests/WarBird.rib; sourceTree = "<group>"; };
 		6B39F4720F19049000FE838F /* uteapot.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = uteapot.rib; path = Tests/uteapot.rib; sourceTree = "<group>"; };
+		6B3E1AEE0F3E9F29000D8BDD /* RI_MicroPolygonGrid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_MicroPolygonGrid.cpp; path = src/RI_MicroPolygonGrid.cpp; sourceTree = "<group>"; };
+		6B3E1AF00F3E9F50000D8BDD /* RI_MicroPolygonGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_MicroPolygonGrid.h; path = include/RI_MicroPolygonGrid.h; sourceTree = "<group>"; };
 		6B4047BC0F1A59C300BA7500 /* RI_State_Error.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Error.cpp; path = src/RI_State_Error.cpp; sourceTree = "<group>"; };
 		6B4B36E30F2E1BAB00BBEDC7 /* Chair.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Chair.rib; path = Tests/Chair.rib; sourceTree = "<group>"; };
 		6B4B3A810F2F026800BBEDC7 /* RI_Primitive_Poly.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Primitive_Poly.cpp; path = src/RI_Primitive_Poly.cpp; sourceTree = "<group>"; };
@@ -279,8 +289,6 @@
 		6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Elephant.rib; path = Tests/Elephant.rib; sourceTree = "<group>"; };
 		6BEE6F3F0F2236BF00BC3132 /* Bag.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Bag.rib; path = Tests/Bag.rib; sourceTree = "<group>"; };
 		6BF635E00F17F85400A68819 /* SimpleMug.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SimpleMug.rib; path = Tests/SimpleMug.rib; sourceTree = "<group>"; };
-		6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Framework.cpp; path = src/RI_Framework.cpp; sourceTree = "<group>"; };
-		6BFF1D390F0FE02200F984E5 /* RI_Framework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Framework.h; path = include/RI_Framework.h; sourceTree = "<group>"; };
 		6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive.h; path = include/RI_Primitive.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -400,10 +408,16 @@
 				6B83497D0F0A7F0700BA7221 /* RI_Attributes.h */,
 				6B8349890F0A7F0700BA7221 /* RI_Base.cpp */,
 				6B83497E0F0A7F0700BA7221 /* RI_Base.h */,
-				6BFF1D370F0FDFF500F984E5 /* RI_Framework.cpp */,
-				6BFF1D390F0FE02200F984E5 /* RI_Framework.h */,
+				6B279BAA0F3F03C50050CC99 /* RI_FrameworkBase.h */,
+				6B279BB70F3F03E30050CC99 /* RI_FrameworkREYES.cpp */,
+				6B279BAB0F3F03C50050CC99 /* RI_FrameworkREYES.h */,
+				6B279BBB0F3F06740050CC99 /* RI_HiderBase.h */,
+				6B279C6C0F3F136E0050CC99 /* RI_HiderREYES.cpp */,
+				6B279BBD0F3F07C40050CC99 /* RI_HiderREYES.h */,
 				6B83498A0F0A7F0700BA7221 /* RI_Machine.cpp */,
 				6B83497F0F0A7F0700BA7221 /* RI_Machine.h */,
+				6B3E1AEE0F3E9F29000D8BDD /* RI_MicroPolygonGrid.cpp */,
+				6B3E1AF00F3E9F50000D8BDD /* RI_MicroPolygonGrid.h */,
 				6B83498B0F0A7F0700BA7221 /* RI_Options.cpp */,
 				6B8349800F0A7F0700BA7221 /* RI_Options.h */,
 				6B83498C0F0A7F0700BA7221 /* RI_Param.cpp */,
@@ -483,7 +497,6 @@
 				6B16F3F90F0AA51900B53225 /* DUtils.h in Headers */,
 				6B440AD80F24F7FC00055FCA /* RI_Attributes.h in Headers */,
 				6B440ADA0F24F7FC00055FCA /* RI_Base.h in Headers */,
-				6B440ADC0F24F7FC00055FCA /* RI_Framework.h in Headers */,
 				6B440ADE0F24F7FC00055FCA /* RI_Machine.h in Headers */,
 				6B440AE00F24F7FC00055FCA /* RI_Options.h in Headers */,
 				6B440AE20F24F7FC00055FCA /* RI_Param.h in Headers */,
@@ -511,7 +524,6 @@
 				6B16F4E50F0AC70C00B53225 /* DVector.h in Headers */,
 				6B440AB60F24F7FC00055FCA /* RI_Attributes.h in Headers */,
 				6B440AB80F24F7FC00055FCA /* RI_Base.h in Headers */,
-				6B440ABA0F24F7FC00055FCA /* RI_Framework.h in Headers */,
 				6B440ABC0F24F7FC00055FCA /* RI_Machine.h in Headers */,
 				6B440ABE0F24F7FC00055FCA /* RI_Options.h in Headers */,
 				6B440AC00F24F7FC00055FCA /* RI_Param.h in Headers */,
@@ -547,13 +559,17 @@
 				6B83499D0F0A7F0700BA7221 /* RI_Transform.h in Headers */,
 				6B8349A90F0A7F0700BA7221 /* Tokenizer.h in Headers */,
 				6B8349CA0F0A8EDA00BA7221 /* RibRender.h in Headers */,
-				6BFF1D3A0F0FE02200F984E5 /* RI_Framework.h in Headers */,
 				6BFF1D440F0FEA3900F984E5 /* RI_Primitive.h in Headers */,
 				6BE7302E0F1FA236004FAE21 /* RI_Symbol.h in Headers */,
 				6BD7267A0F232B78003A4601 /* RI_Primitive_Base.h in Headers */,
 				6BD726830F232D51003A4601 /* RI_Primitive_Quadric.h in Headers */,
 				6BD7268D0F236350003A4601 /* RI_Primitive_Patch.h in Headers */,
 				6B4B3A840F2F029700BBEDC7 /* RI_Primitive_Poly.h in Headers */,
+				6B3E1AF10F3E9F50000D8BDD /* RI_MicroPolygonGrid.h in Headers */,
+				6B279BAC0F3F03C50050CC99 /* RI_FrameworkBase.h in Headers */,
+				6B279BAD0F3F03C50050CC99 /* RI_FrameworkREYES.h in Headers */,
+				6B279BBC0F3F06740050CC99 /* RI_HiderBase.h in Headers */,
+				6B279BBE0F3F07C40050CC99 /* RI_HiderREYES.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -698,7 +714,6 @@
 				6B16F3F70F0AA50600B53225 /* DUtils.cpp in Sources */,
 				6B440AD70F24F7FC00055FCA /* RI_Attributes.cpp in Sources */,
 				6B440AD90F24F7FC00055FCA /* RI_Base.cpp in Sources */,
-				6B440ADB0F24F7FC00055FCA /* RI_Framework.cpp in Sources */,
 				6B440ADD0F24F7FC00055FCA /* RI_Machine.cpp in Sources */,
 				6B440ADF0F24F7FC00055FCA /* RI_Options.cpp in Sources */,
 				6B440AE10F24F7FC00055FCA /* RI_Param.cpp in Sources */,
@@ -725,7 +740,6 @@
 				6B1F591B0F0956870082B328 /* DMatrix44.cpp in Sources */,
 				6B440AB50F24F7FC00055FCA /* RI_Attributes.cpp in Sources */,
 				6B440AB70F24F7FC00055FCA /* RI_Base.cpp in Sources */,
-				6B440AB90F24F7FC00055FCA /* RI_Framework.cpp in Sources */,
 				6B440ABB0F24F7FC00055FCA /* RI_Machine.cpp in Sources */,
 				6B440ABD0F24F7FC00055FCA /* RI_Options.cpp in Sources */,
 				6B440ABF0F24F7FC00055FCA /* RI_Param.cpp in Sources */,
@@ -762,7 +776,6 @@
 				6B8349A70F0A7F0700BA7221 /* RI_Transform.cpp in Sources */,
 				6B8349A80F0A7F0700BA7221 /* Tokenizer.cpp in Sources */,
 				6B8349CB0F0A8EDA00BA7221 /* RibRender.cpp in Sources */,
-				6BFF1D380F0FDFF500F984E5 /* RI_Framework.cpp in Sources */,
 				6B0A68E10F151619000CB0D8 /* RI_State_Prims.cpp in Sources */,
 				6B4047BD0F1A59C300BA7500 /* RI_State_Error.cpp in Sources */,
 				6BE730300F1FA24D004FAE21 /* RI_Symbol.cpp in Sources */,
@@ -771,6 +784,9 @@
 				6BD726810F232C7A003A4601 /* RI_Primitive_Base.cpp in Sources */,
 				6BD7268F0F236364003A4601 /* RI_Primitive_Patch.cpp in Sources */,
 				6B4B3A820F2F026800BBEDC7 /* RI_Primitive_Poly.cpp in Sources */,
+				6B3E1AEF0F3E9F29000D8BDD /* RI_MicroPolygonGrid.cpp in Sources */,
+				6B279BB80F3F03E30050CC99 /* RI_FrameworkREYES.cpp in Sources */,
+				6B279C6D0F3F136E0050CC99 /* RI_HiderREYES.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

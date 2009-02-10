@@ -1,41 +1,38 @@
 /*
- *  RI_Framework.h
+ *  RI_FrameworkREYES.cpp
  *  RibTools
  *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
+ *  Created by Davide Pasca on 09/02/08.
+ *  Copyright 2009 Davide Pasca. All rights reserved.
  *
  */
 
-#ifndef RI_FRAMEWORK_H
-#define RI_FRAMEWORK_H
+#ifndef RI_FRAMEWORKREYES_H
+#define RI_FRAMEWORKREYES_H
 
 #include "RI_Base.h"
 #include "RI_Primitive.h"
 #include "DContainers.h"
 #include "RI_Options.h"
+#include "RI_FrameworkBase.h"
+#include "RI_HiderREYES.h"
 
 //==================================================================
 namespace RI
 {
 
-class Options;
 class Attributes;
 class Transform;
 
 //==================================================================
-/// Framework
+/// FrameworkREYES
 //==================================================================
-class Framework
+class FrameworkREYES : public FrameworkBase
 {
-	DVec<Primitive *>	mpPrims;
+	HiderREYES			mHiderREYES;
+	Options				mOptions;	//temporary, will remove
 	
-public:
-	SymbolList			*mpStatics;
-
 private:
-	Options				mOptions;
-
 	DVec<Attributes*>	mpUniqueAttribs;
 	DVec<Transform*>	mpUniqueTransform;
 
@@ -43,19 +40,11 @@ private:
 	RevisionChecker		mTransRev;
 				
 public:
-	Framework() :
-		mpStatics(NULL)
-	{
-	}
+	FrameworkREYES();
 
-	void Init( SymbolList *pStatics )
-	{
-		mpStatics = pStatics;
-	}
-
-	void SetOutput( u_int width, u_int height );
-	
-	void WorldBegin( const Options &opt );
+	void WorldBegin(
+				const Options &opt,
+				const Matrix44 &mtxWorldCamera );
 
 	void Insert( Primitive			*pPrim,
 				 const Attributes	&attr,
@@ -66,7 +55,9 @@ public:
 						Primitive			&srcPrim
 						);
 
-	void WorldEnd( const Matrix44 &mtxWorldCamera );
+	void Remove( Primitive *pPrim );
+
+	void WorldEnd();
 };
 
 //==================================================================

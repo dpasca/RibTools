@@ -89,4 +89,6 @@ public:
 };
 
 
+typedef	Vector3	Point3;
+
 #endif

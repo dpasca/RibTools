@@ -28,13 +28,11 @@ public:
 	Polygon( ParamList &params, const SymbolList &staticSymbols );
 
 		bool IsSplitable() const	{	return true; }
-		void Split( Framework &fwork );
-
-	//void Render( GState &gstate );
+		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 
 private:
 	void splitAddTriangle(
-				Framework &fwork,
+				FrameworkBase &fwork,
 				const Vector3 &v1,
 				const Vector3 &v2,
 				const Vector3 &v3

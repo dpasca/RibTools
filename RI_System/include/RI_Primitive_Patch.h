@@ -11,6 +11,7 @@
 #define RI_PRIMITIVE_PATCH_H
 
 #include "RI_Primitive_Base.h"
+#include "RI_MicroPolygonGrid.h"
 
 //==================================================================
 namespace RI
@@ -19,8 +20,10 @@ namespace RI
 //==================================================================
 /// PatchBilinear
 //==================================================================
-class PatchBilinear : public Primitive
+class PatchBilinear : public DiceablePrim
 {
+	MicroPolygonGrid	mGrid;
+
 public:
 	ParamList		mParams;
 	Vector3			mHullPos[4];
@@ -35,7 +38,7 @@ public:
 //==================================================================
 /// PatchBicubic
 //==================================================================
-class PatchBicubic : public Primitive
+class PatchBicubic : public DiceablePrim
 {
 public:
 	ParamList		mParams;
@@ -68,11 +71,7 @@ public:
 			  const SymbolList &staticSymbols );
 
 		bool IsSplitable() const	{	return true; }
-		void Split( Framework &fwork );
-	
-	void Render( GState &gstate )
-	{
-	}
+		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 };
 
 	

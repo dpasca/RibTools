@@ -14,7 +14,7 @@
 #include "RI_Transform.h"
 #include "RI_Primitive_Poly.h"
 #include "RI_Primitive_Patch.h"
-#include "RI_Framework.h"
+#include "RI_FrameworkBase.h"
 
 //==================================================================
 namespace RI
@@ -29,7 +29,7 @@ Polygon::Polygon( ParamList &params, const SymbolList &staticSymbols ) :
 
 //==================================================================
 void Polygon::splitAddTriangle(
-				Framework &fwork,
+				FrameworkBase &fwork,
 				const Vector3 &v1,
 				const Vector3 &v2,
 				const Vector3 &v3
@@ -59,7 +59,7 @@ void Polygon::splitAddTriangle(
 }
 
 //==================================================================
-void Polygon::Split( Framework &fwork )
+void Polygon::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 {
 	int	PValuesParIdx = findParam( "P", Param::FLT_ARR, 0, mParams );
 	if ( PValuesParIdx == -1 )

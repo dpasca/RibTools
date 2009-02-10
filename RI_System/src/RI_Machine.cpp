@@ -16,7 +16,8 @@ namespace RI
 //==================================================================
 /// 
 //==================================================================
-Machine::Machine()
+Machine::Machine( FrameworkBase *pFramework ) :
+	mState(pFramework)
 {
 }
 

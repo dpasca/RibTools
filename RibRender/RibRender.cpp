@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include "RI_Parser.h"
 #include "RI_Machine.h"
+#include "RI_FrameworkREYES.h"
 #include "DUtils.h"
 
 #include "RibRender.h"
@@ -72,8 +73,9 @@ static bool renderFile( const char *pFileName )
 		return false;
 	}
 
-	RI::Parser		parser;
-	RI::Machine		machine;
+	RI::Parser			parser;
+	RI::FrameworkREYES	frameworkREYES;
+	RI::Machine			machine( &frameworkREYES );
 	
 	glNewList( 1, GL_COMPILE );
 

@@ -1,15 +1,15 @@
 /*
- *  RI_Framework.cpp
+ *  RI_FrameworkREYES.cpp
  *  RibTools
  *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
+ *  Created by Davide Pasca on 09/02/08.
+ *  Copyright 2009 Davide Pasca. All rights reserved.
  *
  */
 
 #include "RI_Base.h"
-#include "RI_Framework.h"
 #include "RI_State.h"
+#include "RI_FrameworkREYES.h"
 
 #include <GLUT/glut.h>
 
@@ -18,25 +18,25 @@ namespace RI
 {
 
 //==================================================================
-/// Framework
+/// FrameworkREYES
 //==================================================================
-void Framework::SetOutput( u_int width, u_int height )
+FrameworkREYES::FrameworkREYES()
 {
-	glutReshapeWindow( width, height );
+	mpHider = &mHiderREYES;
 }
 
 //==================================================================
-void Framework::WorldBegin( const Options &opt )
+void FrameworkREYES::WorldBegin(
+						const Options &opt,
+						const Matrix44 &mtxWorldCamera )
 {
-	for (size_t i=0; i < mpPrims.size(); ++i)
-		delete mpPrims[i];
-	mpPrims.clear();
-
 	mOptions = opt;
+	mpHider->WorldBegin( opt, mtxWorldCamera );
 }
 
 //==================================================================
-void Framework::Insert(	Primitive			*pPrim,
+void FrameworkREYES::Insert(
+						Primitive			*pPrim,
 						const Attributes	&attr,
 						const Transform		&xform )
 {
@@ -54,33 +54,51 @@ void Framework::Insert(	Primitive			*pPrim,
 	//printf( "Prim xform rev %i\n",
 	//		mpUniqueTransform.back()->mpRevision->mRTrackRevisionCount );
 
-	mpPrims.push_back( pPrim );
+	mpHider->Insert( pPrim, attr, xform );
 }
 
 //==================================================================
-void Framework::InsertSplitted(	
+void FrameworkREYES::InsertSplitted(	
 						Primitive			*pSplitPrim,
 						Primitive			&srcPrim
 						)
 {
-	pSplitPrim->CopyStates( srcPrim );
-
-	mpPrims.push_back( pSplitPrim );
+	mpHider->InsertSplitted( pSplitPrim, srcPrim );
 }
 
 //==================================================================
-void Framework::WorldEnd( const Matrix44 &mtxWorldCamera )
+void FrameworkREYES::Remove( Primitive *pPrim )
 {
-	glutReshapeWindow( mOptions.mXRes, mOptions.mYRes );
+}
+
+//==================================================================
+void FrameworkREYES::WorldEnd()
+{
+	DVec<Primitive *>	pPrimList = mpHider->GetPrimList();
 
 	GState	gstate;
 
-	for (size_t i=0; i < mpPrims.size(); ++i)
+	for (size_t i=0; i < pPrimList.size(); ++i)
 	{	
-		Primitive	*pPrim = mpPrims[i];
-		
+		Primitive	*pPrim = pPrimList[i];
+
+		MicroPolygonGrid	grid;
+
+		bool	uSplit = false;
+		bool	vSplit = false;
+
+		if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
+		{
+			pPrim->Dice( grid );
+			// should check backface and trim
+			// grid.displace();
+			// grid.shade();
+			mpHider->Hide( grid );
+		}
+		else
 		if ( pPrim->IsSplitable() )
-			pPrim->Split( *this );
+			pPrim->Split( *this, uSplit, vSplit );
+/*
 		else
 		{
 			gstate.Setup(
@@ -91,15 +109,15 @@ void Framework::WorldEnd( const Matrix44 &mtxWorldCamera )
 
 			pPrim->Render( gstate );
 		}
+*/
 	}
 
 	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	delete mpUniqueAttribs[i];
 	for (size_t i=0; i < mpUniqueTransform.size(); ++i)	delete mpUniqueTransform[i];
-	for (size_t i=0; i < mpPrims.size(); ++i)			delete mpPrims[i];
-	
 	mpUniqueAttribs.clear();
 	mpUniqueTransform.clear();
-	mpPrims.clear();
+
+	mpHider->WorldEnd();
 }
 
 

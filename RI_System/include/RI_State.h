@@ -15,7 +15,7 @@
 #include "RI_Options.h"
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
-#include "RI_Framework.h"
+#include "RI_FrameworkBase.h"
 #include "RI_Primitive.h"
 
 //==================================================================
@@ -66,7 +66,7 @@ class State
 
 	Matrix44						mMtxWorldCamera;
 
-	Framework						mFramework;
+	FrameworkBase					*mpFramework;
 
 	enum OpType
 	{
@@ -77,7 +77,7 @@ class State
 	};
 
 public:
-	State();
+	State( FrameworkBase *pFramework );
 	~State();
 
 	void	Begin( RtToken name );

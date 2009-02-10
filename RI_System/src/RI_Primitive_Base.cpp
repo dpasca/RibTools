@@ -13,10 +13,31 @@
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
 #include "RI_Primitive.h"
+#include "RI_HiderBase.h"
 
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+void Primitive::Dice( MicroPolygonGrid &g )
+{
+	Point3	*pPoints = g.mpPoints;
+	
+	float	du = 1.0f / g.mYDim;
+	float	dv = 1.0f / g.mXDim;
+
+	float	v = 0.0f;
+	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
+	{
+		float	u = 0.0f;
+		for (int j=0; j < (int)g.mXDim; ++j, u += du)
+		{
+			EvalP( u, v, *pPoints, g.mMtxObjectCurrent );
+			++pPoints;
+		}
+	}
+}
 
 //==================================================================
 bool ParamsFindP(	ParamList &params,
@@ -90,7 +111,24 @@ bool ParamsFindP(	ParamList &params,
 	
 	return false;
 }
-	
+
+//==================================================================
+bool DiceablePrim::IsDiceable(
+						MicroPolygonGrid &g,
+						HiderBase *pHider,
+						bool &out_uSplit,
+						bool &out_vSplit ) const
+{
+	g.Setup(
+			20,
+			20,
+			mpTransform->GetMatrix() * pHider->mMtxWorldCamera
+			);
+
+	out_uSplit = true;
+	out_vSplit = true;
+	return true;
+}
 
 //==================================================================
 }

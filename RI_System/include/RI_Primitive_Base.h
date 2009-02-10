@@ -13,6 +13,7 @@
 #include "DMath.h"
 #include "RI_Param.h"
 #include "RI_Symbol.h"
+#include "RI_MicroPolygonGrid.h"
 
 const static int NSUBDIVS = 16;
 #define PUTPRIMNAME	//puts
@@ -24,7 +25,8 @@ namespace RI
 class Options;
 class Attributes;
 class Transform;
-class Framework;
+class FrameworkBase;
+class MicroPolygonGrid;
 
 //==================================================================
 /// GVert
@@ -50,10 +52,6 @@ class GState
 	Matrix44	mMtxLocalHomo;
 	float		mHalfXRes;
 	float		mHalfYRes;
-
-	//const Options		*mpOpts;
-	//const Attributes	*mpAttrs;
-	//const Transform		*mpXForm;
 
 public:
 	//==================================================================
@@ -104,11 +102,11 @@ public:
 
 		POLYGON,
 	};
-	
-	Type		mType;
-	Attributes	*mpAttribs;
-	Transform	*mpTransform;
-	
+
+	Type				mType;
+	Attributes			*mpAttribs;
+	Transform			*mpTransform;
+
 public:
 	Primitive( Type type ) :
 		mType(type),
@@ -116,19 +114,29 @@ public:
 		mpTransform(NULL)
 	{
 	}
-	
+
 	virtual ~Primitive()
 	{
 	}
-	
-	virtual bool IsSplitable() const
-	{
-		return false;
-	}
-	
-	virtual void Split( Framework &fwork )
-	{
-	}
+
+	virtual bool	IsSplitable() const			{ return false;	}
+	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit )	{}
+	virtual void	EvalP(
+						float uGrid,
+						float vGrid,
+						Point3 &out_pt,
+						const Matrix44 &mtxObjectCurrent ) const {}
+
+	virtual bool	IsDiceable(
+						MicroPolygonGrid &g,
+						class HiderBase *pHider,
+						bool &out_uSplit,
+						bool &out_vSplit ) const
+					{
+						return false;
+					}
+
+	virtual void	Dice( MicroPolygonGrid &g );
 
 	void SetStates(
 		Attributes	*pAttribs,
@@ -148,6 +156,22 @@ public:
 	virtual void Render( GState &gstate )
 	{
 	}
+};
+
+//==================================================================
+class DiceablePrim : public Primitive
+{
+public:
+	DiceablePrim( Type type ) :
+		Primitive(type)
+	{
+	}
+
+		bool	IsDiceable(
+						MicroPolygonGrid &g,
+						HiderBase *pHider,
+						bool &out_uSplit,
+						bool &out_vSplit ) const;
 };
 
 //==================================================================

@@ -13,7 +13,7 @@
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
 #include "RI_Primitive_Patch.h"
-#include "RI_Framework.h"
+#include "RI_FrameworkBase.h"
 
 //==================================================================
 namespace RI
@@ -26,11 +26,12 @@ PatchMesh::PatchMesh( RtToken type,
 	Primitive(PATCHMESH),
 	mParams(params)
 {
+
 	mpyPatchType = staticSymbols.FindVoid( type );
 }
 
 //==================================================================
-void PatchMesh::Split( Framework &fwork )
+void PatchMesh::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 {
 	// PatchMesh "bilinear" 2 "nonperiodic" 5 "nonperiodic" "P"  [ -0.995625 2 -0.495465 ...
 	//               0      1       2       3       4        5     6
@@ -128,9 +129,10 @@ void PatchMesh::Split( Framework &fwork )
 
 //==================================================================
 PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols ) :
-	Primitive(PATCHBILINEAR),
+	DiceablePrim(PATCHBILINEAR),
 	mParams(params)
 {
+
 	bool	gotP = ParamsFindP( params, staticSymbols, mHullPos, 4 );
 	
 	DASSTHROW( gotP, ("Missing hull parameter") );
@@ -138,9 +140,10 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols
 
 //==================================================================
 PatchBilinear::PatchBilinear( ParamList &params, const Vector3 hull[4] ) :
-	Primitive(PATCHBILINEAR),
+	DiceablePrim(PATCHBILINEAR),
 	mParams(params)
 {
+
 	for (int i=0; i < 4; ++i)
 		mHullPos[i] = hull[i];
 }
@@ -190,7 +193,7 @@ void PatchBilinear::Render( GState &gstate )
 
 //==================================================================
 PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
-	Primitive(PATCHBICUBIC),
+	DiceablePrim(PATCHBICUBIC),
 	mParams(params)
 {
 	mpUBasis = &attr.GetUBasis();
@@ -206,7 +209,7 @@ PatchBicubic::PatchBicubic( ParamList &params,
 							const Vector3 hull[16],
 						    const Attributes &attr,
 							const SymbolList &staticSymbols ) :
-	Primitive(PATCHBICUBIC),
+	DiceablePrim(PATCHBICUBIC),
 	mParams(params)
 {
 	mpUBasis = &attr.GetUBasis();

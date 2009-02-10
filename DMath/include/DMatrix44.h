@@ -174,5 +174,16 @@ inline Vector4 operator * ( const Vector3 &v, const Matrix44 &a )
 	);
 }
 
+//==================================================================
+inline Vector3 MultiplyMV3( const Vector3 &v, const Matrix44 &a )
+{
+	float	x = v.x, y = v.y, z = v.z;
+
+	return Vector3(
+		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
+		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
+		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2]
+	);
+}
 
 #endif
