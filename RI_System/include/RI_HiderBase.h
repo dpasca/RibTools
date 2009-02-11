@@ -30,11 +30,13 @@ class HiderBase
 {
 public:
 	Matrix44	mMtxWorldCamera;
+	Matrix44	mMtxCameraProj;
 	float		mHalfXRes;
 	float		mHalfYRes;
 
 public:
-	virtual ~HiderBase() {}
+	HiderBase()				{}
+	virtual ~HiderBase()	{}
 
 	virtual void WorldBegin(
 					const Options &opt,
