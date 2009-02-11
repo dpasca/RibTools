@@ -52,16 +52,23 @@ public:
 		mpData = new float [ mWd * 3 * mHe ];
 	}
 	
+	void Clear()
+	{
+		memset( mpData, 0, sizeof(float) * mWd * 3 * mHe );
+	}
+	
 	void SetSample( int x, int y, const float *pVal )
 	{
 		if ( x >= 0 && y >= 0 && x < (int)mWd && y < (int)mHe )
 		{
-			float	*pDest = &mpData[ (x + y * mHe) * 3 ];
+			float	*pDest = &mpData[ (x + mWd * y) * 3 ];
 			pDest[0] = pVal[0];
 			pDest[1] = pVal[1];
 			pDest[2] = pVal[2];
 		}
 	}
+	
+	const float *GetData() const { return mpData;	}
 };
 
 //==================================================================
@@ -96,6 +103,8 @@ public:
 	void WorldEnd();
 	
 	void Hide( MicroPolygonGrid &g );
+	
+	const float *GetOutputData() const { return mDestBuff.GetData(); }
 
 	DVec<Primitive *>	&GetPrimList()	{ return mpPrims;	}
 	

@@ -38,12 +38,11 @@ void HiderREYES::WorldBegin(
 
 	mOptions = opt;
 
-	glutReshapeWindow( mOptions.mXRes, mOptions.mYRes );
-
 	mMtxWorldCamera	= mtxWorldCamera;
 	mMtxCameraProj	= opt.mMtxViewHomo;
 	
 	mDestBuff.Setup( opt.mXRes, opt.mYRes );
+	mDestBuff.Clear();
 }
 
 //==================================================================
@@ -105,8 +104,8 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 			
 			float	oow = 1.0f / Pproj.w;
 			
-			int	winX = (int)(destHalfWd + destWd * Pproj.x * oow);
-			int	winY = (int)(destHalfHe - destHe * Pproj.y * oow);
+			int	winX = (int)(destHalfWd + destHalfWd * Pproj.x * oow);
+			int	winY = (int)(destHalfHe - destHalfHe * Pproj.y * oow);
 
 			float	destCol[3] =
 			{

@@ -31,16 +31,16 @@ class FrameworkREYES : public FrameworkBase
 {
 	HiderREYES			mHiderREYES;
 	Options				mOptions;	//temporary, will remove
-	
+
 private:
 	DVec<Attributes*>	mpUniqueAttribs;
 	DVec<Transform*>	mpUniqueTransform;
 
 	RevisionChecker		mAttrsRev;
 	RevisionChecker		mTransRev;
-				
+
 public:
-	FrameworkREYES();
+	FrameworkREYES( RenderOutputBase *pRenderOutput );
 
 	void WorldBegin(
 				const Options &opt,

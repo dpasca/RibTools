@@ -59,6 +59,8 @@ public:
 	
 	virtual void Hide( MicroPolygonGrid &g ) = 0;
 	
+	virtual const float *GetOutputData() const = 0;
+
 	virtual DVec<Primitive *>	&GetPrimList() = 0;
 };
 

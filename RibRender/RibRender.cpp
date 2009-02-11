@@ -9,23 +9,27 @@
 
 #include <stdio.h>
 #include <stdexcept>
+#include "DUtils.h"
 #include "RI_Parser.h"
 #include "RI_Machine.h"
 #include "RI_FrameworkREYES.h"
-#include "DUtils.h"
-
+#include "RenderOutputOpenGL.h"
 #include "RibRender.h"
 
 #include <GLUT/glut.h>
 
 //#define ECHO_INPUT
 
+//==================================================================
+static RenderOutputOpenGL	*gpsRenderOutput;
+
 //===============================================================
 void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glCallList( 1 );
+	if ( gpsRenderOutput )
+		gpsRenderOutput->Blit();
 
     glutSwapBuffers();
 }
@@ -72,13 +76,13 @@ static bool renderFile( const char *pFileName )
 		printf( "Could not open the file in input. Quitting !\n" );
 		return false;
 	}
+	
+	gpsRenderOutput = new RenderOutputOpenGL();
 
 	RI::Parser			parser;
-	RI::FrameworkREYES	frameworkREYES;
+	RI::FrameworkREYES	frameworkREYES( gpsRenderOutput );
 	RI::Machine			machine( &frameworkREYES );
 	
-	glNewList( 1, GL_COMPILE );
-
 	for (size_t i=0; i <= dataSize; ++i)
 	{
 		if ( i == dataSize )
@@ -118,8 +122,6 @@ static bool renderFile( const char *pFileName )
 		}
 		
 	}
-
-	glEndList();
 
 	return true;
 }

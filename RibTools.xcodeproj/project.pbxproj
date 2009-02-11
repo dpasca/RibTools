@@ -146,6 +146,7 @@
 		6BD7268F0F236364003A4601 /* RI_Primitive_Patch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD7268E0F236364003A4601 /* RI_Primitive_Patch.cpp */; };
 		6BE7302E0F1FA236004FAE21 /* RI_Symbol.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BE7302D0F1FA236004FAE21 /* RI_Symbol.h */; };
 		6BE730300F1FA24D004FAE21 /* RI_Symbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */; };
+		6BF0ADBC0F432D010055A4C5 /* RenderOutputOpenGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BF0ADBA0F432D010055A4C5 /* RenderOutputOpenGL.cpp */; };
 		6BFF1D440F0FEA3900F984E5 /* RI_Primitive.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */; };
 /* End PBXBuildFile section */
 
@@ -288,6 +289,8 @@
 		6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Airplane.rib; path = Tests/Airplane.rib; sourceTree = "<group>"; };
 		6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Elephant.rib; path = Tests/Elephant.rib; sourceTree = "<group>"; };
 		6BEE6F3F0F2236BF00BC3132 /* Bag.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Bag.rib; path = Tests/Bag.rib; sourceTree = "<group>"; };
+		6BF0ADBA0F432D010055A4C5 /* RenderOutputOpenGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderOutputOpenGL.cpp; path = RibRender/RenderOutputOpenGL.cpp; sourceTree = "<group>"; };
+		6BF0ADBB0F432D010055A4C5 /* RenderOutputOpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderOutputOpenGL.h; path = RibRender/RenderOutputOpenGL.h; sourceTree = "<group>"; };
 		6BF635E00F17F85400A68819 /* SimpleMug.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SimpleMug.rib; path = Tests/SimpleMug.rib; sourceTree = "<group>"; };
 		6BFF1D430F0FEA3900F984E5 /* RI_Primitive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive.h; path = include/RI_Primitive.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -453,6 +456,8 @@
 		6B8349CC0F0A8F6800BA7221 /* RibRender */ = {
 			isa = PBXGroup;
 			children = (
+				6BF0ADBA0F432D010055A4C5 /* RenderOutputOpenGL.cpp */,
+				6BF0ADBB0F432D010055A4C5 /* RenderOutputOpenGL.h */,
 				6B8349C90F0A8EDA00BA7221 /* RibRender.cpp */,
 				6B8349C80F0A8EDA00BA7221 /* RibRender.h */,
 				6B6D4CC50F0A91BE00AEC534 /* RibRender-Info.plist */,
@@ -795,6 +800,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B6D4CE10F0A92EA00AEC534 /* RibRender.cpp in Sources */,
+				6BF0ADBC0F432D010055A4C5 /* RenderOutputOpenGL.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

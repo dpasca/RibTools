@@ -21,6 +21,17 @@ class Attributes;
 class Transform;
 class Primitive;
 class HiderBase;
+class SymbolList;
+
+//==================================================================
+class RenderOutputBase
+{
+public:
+	virtual ~RenderOutputBase() {};
+	
+	virtual void Update( u_int w, u_int h, const float *pSrcData ) = 0;
+	virtual void Blit() const = 0;
+};
 
 //==================================================================
 /// FrameworkBase
@@ -28,13 +39,20 @@ class HiderBase;
 class FrameworkBase
 {
 public:
-	SymbolList	*mpStatics;
+	RenderOutputBase	*mpRenderOutput;
+	SymbolList			*mpStatics;
 
 protected:
-	HiderBase	*mpHider;
+	HiderBase			*mpHider;
 
 public:
-	FrameworkBase() : mpStatics(NULL), mpHider(NULL) {}
+	FrameworkBase( RenderOutputBase	*pRenderOutput ) :
+		mpRenderOutput(pRenderOutput),
+		mpStatics(NULL),
+		mpHider(NULL)
+	{
+	}
+
 	virtual ~FrameworkBase() {}
 
 	void SetStatics( SymbolList *pStatics ) { mpStatics = pStatics;	}

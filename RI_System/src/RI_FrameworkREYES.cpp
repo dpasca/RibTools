@@ -20,7 +20,8 @@ namespace RI
 //==================================================================
 /// FrameworkREYES
 //==================================================================
-FrameworkREYES::FrameworkREYES()
+FrameworkREYES::FrameworkREYES( RenderOutputBase *pRenderOutput ) :
+	FrameworkBase( pRenderOutput )
 {
 	mpHider = &mHiderREYES;
 }
@@ -118,6 +119,13 @@ void FrameworkREYES::WorldEnd()
 	mpUniqueTransform.clear();
 
 	mpHider->WorldEnd();
+
+	//glutReshapeWindow( mOptions.mXRes, mOptions.mYRes );
+	mpRenderOutput->Update(
+				mOptions.mXRes,
+				mOptions.mYRes,
+				mpHider->GetOutputData()
+				);
 }
 
 
