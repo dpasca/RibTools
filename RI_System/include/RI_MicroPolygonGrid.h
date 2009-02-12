@@ -22,6 +22,8 @@ namespace RI
 class MicroPolygonGrid
 {
 public:
+	static const u_int	MAX_SIZE = 128 * 128;
+	
 	u_int		mXDim;
 	u_int		mYDim;
 	Point3		*mpPoints;

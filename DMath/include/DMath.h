@@ -11,6 +11,7 @@
 #define DMATH_H
 
 #include <math.h>
+#include <float.h>
 
 #define DEG2RAD	(3.14159265f/180)
 

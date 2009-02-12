@@ -114,7 +114,7 @@ typedef void		*LightHandle;
 
 struct Bound
 {
-	float	mBound[6];
+	Vector3	mBox[2];
 
 	Bound()
 	{
@@ -122,23 +122,34 @@ struct Bound
 
 	Bound( float val )
 	{
-		mBound[0] = val;
-		mBound[1] = val;
-		mBound[2] = val;
-		mBound[3] = val;
-		mBound[4] = val;
-		mBound[5] = val;
+		mBox[0].Set( val, val, val );
+		mBox[1].Set( val, val, val );
 	}
 	
 	Bound( float x1, float y1, float z1,
-			   float x2, float y2, float z2 )
+		   float x2, float y2, float z2 )
 	{
-		mBound[0] = x1;
-		mBound[1] = y1;
-		mBound[2] = z1;
-		mBound[3] = x2;
-		mBound[4] = y2;
-		mBound[5] = y2;
+		mBox[0].Set( x1, y1, z1 );
+		mBox[1].Set( x2, y2, z2 );
+	}
+	
+	void SetMin( const float *p )			{ mBox[0].Set( p[0], p[1], p[2] );	}
+	void SetMax( const float *p )			{ mBox[1].Set( p[0], p[1], p[2] );	}
+	void SetMin( float x, float y, float z ){ mBox[0].Set( x, y, z );	}
+	void SetMax( float x, float y, float z ){ mBox[1].Set( x, y, z );	}
+	
+	void Reset()
+	{
+		mBox[0].Set( FLT_MAX, FLT_MAX, FLT_MAX );
+		mBox[1].Set( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+	}
+	
+	bool IsValid() const
+	{
+		return
+			mBox[0].x < FLT_MAX && mBox[1].x > -FLT_MAX &&
+			mBox[0].y < FLT_MAX && mBox[1].y > -FLT_MAX &&
+			mBox[0].z < FLT_MAX && mBox[1].z > -FLT_MAX;
 	}
 };
 

@@ -11,6 +11,53 @@
 #define DVECTOR_H
 
 //==================================================================
+/// Vector2
+//==================================================================
+class Vector2
+{
+public:
+	
+	union {
+		
+		struct {
+			float	x, y;
+		};
+		
+		float	v2[2];
+	};
+
+	//==================================================================
+	Vector2()
+	{}
+	
+	Vector2( float x_, float y_ ) :
+		x(x_), y(y_)
+	{}
+
+	Vector2( const float *p_ ) :
+		x(p_[0]), y(p_[1])
+	{}
+
+	void Set( float x_, float y_ )
+	{
+		x = x_;
+		y = y_;
+	}
+	
+	void Set( const float *p_ )
+	{
+		x = p_[0];
+		y = p_[1];
+	}
+	
+	Vector2 operator * (float rval) const { return Vector2( x * rval, y * rval ); }
+	Vector2 operator + (float rval) const { return Vector2( x + rval, y + rval ); }
+	Vector2 operator + (const Vector2 &rval) const { return Vector2( x + rval.x, y + rval.y ); }
+	Vector2 operator - (const Vector2 &rval) const { return Vector2( x - rval.x, y - rval.y ); }
+};
+
+
+//==================================================================
 /// Vector3
 //==================================================================
 class Vector3
@@ -89,6 +136,8 @@ public:
 };
 
 
+typedef	Vector2	Point2;
 typedef	Vector3	Point3;
+typedef	Vector4	Point4;
 
 #endif

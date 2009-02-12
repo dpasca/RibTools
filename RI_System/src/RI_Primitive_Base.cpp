@@ -117,17 +117,35 @@ bool DiceablePrim::IsDiceable(
 						MicroPolygonGrid &g,
 						HiderBase *pHider,
 						bool &out_uSplit,
-						bool &out_vSplit ) const
+						bool &out_vSplit )
 {
-	g.Setup(
-			20,
-			20,
-			mpTransform->GetMatrix() * pHider->mMtxWorldCamera
-			);
+	Matrix44 mtxLocalCamera =
+				mpTransform->GetMatrix() *
+					pHider->mMtxWorldCamera;
+	
+	Bound	bound;
+	MakeBound( bound );
+	float pixelArea = pHider->RasterEstimate( bound );
+	
+	if ( pixelArea > MicroPolygonGrid::MAX_SIZE )
+	{
+		out_uSplit = true;
+		out_vSplit = true;
+		return false;
+	}
+	else
+	{
+		float	dim = sqrtf( pixelArea );
+		g.Setup(
+				(int)dim,
+				(int)dim,
+				mtxLocalCamera
+				);
 
-	out_uSplit = true;
-	out_vSplit = true;
-	return true;
+		out_uSplit = false;
+		out_vSplit = false;
+		return true;
+	}
 }
 
 //==================================================================

@@ -32,6 +32,8 @@ public:
 	PatchBilinear( ParamList &params, const SymbolList &staticSymbols );
 	PatchBilinear( ParamList &params, const Vector3 hull[4] );
 
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+
 	void Render( GState &gstate );
 };
 
@@ -53,6 +55,8 @@ public:
 						    const Attributes &attr,
 							const SymbolList &staticSymbols );
 
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+
 	void Render( GState &gstate );
 };
 
@@ -70,6 +74,7 @@ public:
 			  ParamList &params,
 			  const SymbolList &staticSymbols );
 
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 		bool IsSplitable() const	{	return true; }
 		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 };

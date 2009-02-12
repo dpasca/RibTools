@@ -118,6 +118,8 @@ public:
 	virtual ~Primitive()
 	{
 	}
+	
+	virtual void	MakeBound( Bound &out_bound ) = 0;
 
 	virtual bool	IsSplitable() const			{ return false;	}
 	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit )	{}
@@ -131,7 +133,7 @@ public:
 						MicroPolygonGrid &g,
 						class HiderBase *pHider,
 						bool &out_uSplit,
-						bool &out_vSplit ) const
+						bool &out_vSplit )
 					{
 						return false;
 					}
@@ -171,7 +173,7 @@ public:
 						MicroPolygonGrid &g,
 						HiderBase *pHider,
 						bool &out_uSplit,
-						bool &out_vSplit ) const;
+						bool &out_vSplit );
 };
 
 //==================================================================

@@ -27,6 +27,7 @@ public:
 public:
 	Polygon( ParamList &params, const SymbolList &staticSymbols );
 
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 		bool IsSplitable() const	{	return true; }
 		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 

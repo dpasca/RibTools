@@ -60,14 +60,20 @@ static void mkBound( Bound &out_Bound, ParamList &cmdParams )
 	{
 		const float *pSrc = cmdParams[0].PFlt(6);
 
-		for (size_t i=0; i < 6; ++i)
-			out_Bound.mBound[i] = pSrc[i];
+		out_Bound.SetMin( pSrc + 0 );
+		out_Bound.SetMax( pSrc + 3 );
 	}
 	else
 	if ( cmdParams.size() == 6 )
 	{
-		for (size_t i=0; i < 6; ++i)
-			out_Bound.mBound[i] = cmdParams[i].u.floatVal;
+		out_Bound.SetMin(
+					cmdParams[0].u.floatVal,
+					cmdParams[1].u.floatVal,
+					cmdParams[2].u.floatVal );
+		out_Bound.SetMax(
+					cmdParams[3].u.floatVal,
+					cmdParams[4].u.floatVal,
+					cmdParams[5].u.floatVal );
 	}
 	else
 		DASSTHROW( false, ("Wrong param count") );

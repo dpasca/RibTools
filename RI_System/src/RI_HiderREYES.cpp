@@ -78,7 +78,33 @@ void HiderREYES::WorldEnd()
 
 	mpPrims.clear();
 }
+	
+//==================================================================
+float HiderREYES::RasterEstimate( const Bound &b ) const
+{
+	return 50*50;	// temporary fixed value
+}
 
+//==================================================================
+void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
+{
+	float destHalfWd	= (float)mDestBuff.mWd * 0.5f;
+	float destHalfHe	= (float)mDestBuff.mHe * 0.5f;
+
+	for (size_t i=0; i < n; ++i)
+	{
+		Vector4	Pproj = pSrc[i] * mMtxCameraProj;
+		
+		float	oow = 1.0f / Pproj.w;
+		
+		pDes[i].Set( 
+				destHalfWd + destHalfWd * Pproj.x * oow,
+				destHalfHe - destHalfHe * Pproj.y * oow
+				);
+	}
+}
+	
+	
 //==================================================================
 void HiderREYES::Hide( MicroPolygonGrid &g )
 {

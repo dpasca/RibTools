@@ -37,6 +37,8 @@ public:
 	{
 	}
 
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+
 		void EvalP( float uGrid,
 					float vGrid,
 					Point3 &out_pt,
@@ -63,6 +65,8 @@ public:
 		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
+
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 
 		void EvalP( float uGrid,
 					float vGrid,
@@ -93,6 +97,8 @@ public:
 	{
 	}
 
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+
 		void EvalP( float uGrid,
 					float vGrid,
 					Point3 &out_pt,
@@ -120,7 +126,9 @@ public:
 	{
 	}
 
-		void EvalP( float uGrid,
+	void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+
+	void EvalP( float uGrid,
 					float vGrid,
 					Point3 &out_pt,
 					const Matrix44 &mtxObjectCurrent ) const;
@@ -148,6 +156,8 @@ public:
 		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
+
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 
 		void EvalP( float uGrid,
 					float vGrid,
@@ -181,6 +191,8 @@ public:
 		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
+	
+		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 
 		void EvalP( float uGrid,
 					float vGrid,

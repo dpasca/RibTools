@@ -102,12 +102,16 @@ public:
 
 	void WorldEnd();
 	
+	float RasterEstimate( const Bound &b ) const;
+
 	void Hide( MicroPolygonGrid &g );
 	
 	const float *GetOutputData() const { return mDestBuff.GetData(); }
 
 	DVec<Primitive *>	&GetPrimList()	{ return mpPrims;	}
 	
+private:
+	void pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n );
 };
 
 //==================================================================

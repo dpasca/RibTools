@@ -57,6 +57,8 @@ public:
 
 	virtual void WorldEnd() = 0;
 	
+	virtual float RasterEstimate( const Bound &b ) const = 0;
+
 	virtual void Hide( MicroPolygonGrid &g ) = 0;
 	
 	virtual const float *GetOutputData() const = 0;
