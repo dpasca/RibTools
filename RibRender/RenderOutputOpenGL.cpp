@@ -87,6 +87,8 @@ void RenderOutputOpenGL::alloc( u_int w, u_int h )
 	mHe = h;
 	glTexImage2D( GL_TEXTURE_2D, 0, 3, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
 	mpBuffer = new u_char [ w * h * 3 ];
+	
+	glutReshapeWindow( w, h );
 }
 
 //==================================================================

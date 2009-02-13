@@ -154,10 +154,11 @@ public:
 		mpAttribs	= fromPrim.mpAttribs	;
 		mpTransform	= fromPrim.mpTransform;
 	}
-
+/*
 	virtual void Render( GState &gstate )
 	{
 	}
+*/
 };
 
 //==================================================================

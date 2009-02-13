@@ -78,7 +78,7 @@ void HiderREYES::WorldEnd()
 
 	mpPrims.clear();
 }
-	
+
 //==================================================================
 float HiderREYES::RasterEstimate( const Bound &b ) const
 {

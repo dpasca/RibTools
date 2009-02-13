@@ -143,6 +143,17 @@ struct Bound
 		mBox[0].Set( FLT_MAX, FLT_MAX, FLT_MAX );
 		mBox[1].Set( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 	}
+
+	void Expand( const Vector3 &p )
+	{
+		mBox[0].x = DMIN( mBox[0].x, p.x );
+		mBox[0].y = DMIN( mBox[0].y, p.y );
+		mBox[0].z = DMIN( mBox[0].z, p.z );
+
+		mBox[1].x = DMAX( mBox[1].x, p.x );
+		mBox[1].y = DMAX( mBox[1].y, p.y );
+		mBox[1].z = DMAX( mBox[1].z, p.z );
+	}
 	
 	bool IsValid() const
 	{

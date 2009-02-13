@@ -167,6 +167,69 @@ void Torus::EvalP(
 }
 
 //==================================================================
+inline Point3 polar( float radius, float theta )
+{
+	return Point3( cosf(theta)*radius, sinf(theta)*radius, 0 );
+}
+
+//==================================================================
+inline void bounds2DSweepL(
+					Bound &out_bound,
+					float rmin,
+					float rmax,
+					float tmin,
+					float tmax )
+{
+	out_bound.Reset();
+	out_bound.Expand( polar(rmin,tmin) );
+	out_bound.Expand( polar(rmax,tmin) );
+	out_bound.Expand( polar(rmin,tmax) );
+	out_bound.Expand( polar(rmax,tmax) );
+	
+	if ( tmin < (float)M_PI_2 && tmax > (float)M_PI_2 )
+		out_bound.Expand( polar( rmax, M_PI_2 ) );
+
+	if ( tmin < (float)M_PI && tmax > (float)M_PI )
+		out_bound.Expand( polar( rmax, M_PI ) );
+
+	if ( tmin < (float)(M_PI+M_PI_2) && tmax > (float)(M_PI+M_PI_2) )
+		out_bound.Expand( polar( rmax, (float)(M_PI+M_PI_2) ) );
+}
+
+//==================================================================
+void Cylinder::MakeBound( Bound &out_bound )
+{
+}
+
+void Cone::MakeBound( Bound &out_bound )
+{
+}
+
+void Sphere::MakeBound( Bound &out_bound )
+{
+	//bounds2DSweepL( out_bound, );
+}
+
+void Hyperboloid::MakeBound( Bound &out_bound )
+{
+}
+
+void Paraboloid::MakeBound( Bound &out_bound )
+{
+}
+
+void Torus::MakeBound( Bound &out_bound )
+{
+}
+
+/*
+void Disk::MakeBound( Bound &out_bound )
+{
+}
+*/
+
+/*
+//==================================================================
 void Cylinder::Render( GState &gstate )
 {
 	PUTPRIMNAME( "* Cylinder" );
@@ -400,6 +463,7 @@ void Torus::Render( GState &gstate )
 	}
 	glEnd();
 }
+*/
 
 //==================================================================
 }

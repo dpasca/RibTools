@@ -24,6 +24,7 @@
 #define DNPOS					((size_t)-1)
 
 #define	DMIN(_A_,_B_)			((_A_) < (_B_) ? (_A_) : (_B_))
+#define	DMAX(_A_,_B_)			((_A_) > (_B_) ? (_A_) : (_B_))
 
 typedef std::string	DStr;
 

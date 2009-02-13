@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		void MakeBound( Bound &out_bound );
 
 		void EvalP( float uGrid,
 					float vGrid,
@@ -66,7 +66,7 @@ public:
 	{
 	}
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		void MakeBound( Bound &out_bound );
 
 		void EvalP( float uGrid,
 					float vGrid,
@@ -97,7 +97,7 @@ public:
 	{
 	}
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		void MakeBound( Bound &out_bound );
 
 		void EvalP( float uGrid,
 					float vGrid,
@@ -126,9 +126,9 @@ public:
 	{
 	}
 
-	void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		void MakeBound( Bound &out_bound );
 
-	void EvalP( float uGrid,
+		void EvalP( float uGrid,
 					float vGrid,
 					Point3 &out_pt,
 					const Matrix44 &mtxObjectCurrent ) const;
@@ -157,7 +157,7 @@ public:
 	{
 	}
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		void MakeBound( Bound &out_bound );
 
 		void EvalP( float uGrid,
 					float vGrid,
@@ -192,7 +192,7 @@ public:
 	{
 	}
 	
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		void MakeBound( Bound &out_bound );
 
 		void EvalP( float uGrid,
 					float vGrid,
