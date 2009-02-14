@@ -28,9 +28,11 @@ class RenderOutputBase
 {
 public:
 	virtual ~RenderOutputBase() {};
-	
+
 	virtual void Update( u_int w, u_int h, const float *pSrcData ) = 0;
 	virtual void Blit() const = 0;
+	virtual u_int GetCurWd() const = 0;
+	virtual u_int GetCurHe() const = 0;
 };
 
 //==================================================================

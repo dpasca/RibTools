@@ -16,8 +16,10 @@ namespace RI
 //==================================================================
 /// 
 //==================================================================
-Machine::Machine( FrameworkBase *pFramework ) :
-	mState(pFramework)
+Machine::Machine( FrameworkBase *pFramework, int forcedWd, int forcedHe ) :
+	mState(pFramework),
+	mForcedWd(forcedWd),
+	mForcedHe(forcedHe)
 {
 }
 
@@ -157,10 +159,19 @@ void Machine::AddCommand(	const DStr	&cmdName,
 			p[3]
 			);
 
-	}	else
-
+	}
+	else
 	// options
-	if ( nm == "Format" )			{ exN( 3, p ); mState.Format(			p[0], p[1], p[2] );	}	else
+	if ( nm == "Format" )
+	{
+		exN( 3, p );
+
+		if ( mForcedWd > 0 && mForcedHe > 0 )
+			mState.Format( mForcedWd, mForcedHe, p[2] );
+		else
+			mState.Format( p[0], p[1], p[2] );
+	}
+	else
 	if ( nm == "FrameAspectRatio" )	{ exN( 1, p ); mState.FrameAspectRatio( p[0] );	}	else
 	if ( nm == "ScreenWindow" )		{ exN( 4, p ); mState.ScreenWindow(		p[0], p[1], p[2], p[3] );	}	else
 	if ( nm == "CropWindow" )		{ exN( 4, p ); mState.CropWindow(		p[0], p[1], p[2], p[3] );	}	else

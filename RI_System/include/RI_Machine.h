@@ -24,9 +24,11 @@ namespace RI
 class Machine
 {
 	State	mState;
+	int		mForcedWd;
+	int		mForcedHe;
 
 public:
-	Machine( FrameworkBase *pFramework );
+	Machine( FrameworkBase *pFramework, int forcedWd=-1, int forcedHe=-1 );
 	
 	void AddCommand(const DStr	&cmdName,
 					ParamList	&cmdParams );

@@ -30,6 +30,8 @@ public:
 
 		void Update( u_int w, u_int h, const float *pSrcData );	
 		void Blit() const;
+		u_int GetCurWd() const {	return mWd; }
+		u_int GetCurHe() const {	return mHe;	}
 
 private:
 	void alloc( u_int w, u_int h );

@@ -120,6 +120,9 @@ void FrameworkREYES::WorldEnd()
 
 	mpHider->WorldEnd();
 
+	DASSERT( mpHider->GetOutputDataWd() == (u_int)mOptions.mXRes );
+	DASSERT( mpHider->GetOutputDataHe() == (u_int)mOptions.mYRes );
+
 	//glutReshapeWindow( mOptions.mXRes, mOptions.mYRes );
 	mpRenderOutput->Update(
 				mOptions.mXRes,

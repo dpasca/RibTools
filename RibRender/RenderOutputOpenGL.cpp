@@ -16,6 +16,17 @@
 RenderOutputOpenGL::RenderOutputOpenGL() :
 	mpBuffer(NULL), mTexId(0), mWd(0), mHe(0)
 {
+	const char *pExtensionsStr = (const char *)glGetString( GL_EXTENSIONS );
+	
+	if (
+		0 == strstr( pExtensionsStr, "GL_ARB_texture_non_power_of_two" ) &&
+		0 == strstr( pExtensionsStr, "GL_ARB_texture_rectangle" ) &&
+		0 == strstr( pExtensionsStr, "GL_EXT_texture_rectangle" )
+	)
+	{
+		DASSTHROW( false, ("Non power of two texture not supported !!") );
+	}
+
 	glGenTextures( 1, &mTexId );
 	glBindTexture( GL_TEXTURE_2D, mTexId );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -34,6 +45,7 @@ void RenderOutputOpenGL::Update( u_int w, u_int h, const float *pSrcData )
 {
 	glBindTexture( GL_TEXTURE_2D, mTexId );
 
+	//glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 	alloc( w, h );
 	convert( w, h, pSrcData );
 	glTexSubImage2D(
@@ -43,9 +55,11 @@ void RenderOutputOpenGL::Update( u_int w, u_int h, const float *pSrcData )
 					0,
 					w,
 					h,
-					GL_RGB,
+					GL_RGBA,
 					GL_UNSIGNED_BYTE,
 					mpBuffer );
+
+	//glPixelStorei( GL_PACK_ALIGNMENT, 0 );
 }
 
 //==================================================================
@@ -85,8 +99,8 @@ void RenderOutputOpenGL::alloc( u_int w, u_int h )
 
 	mWd = w;
 	mHe = h;
-	glTexImage2D( GL_TEXTURE_2D, 0, 3, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
-	mpBuffer = new u_char [ w * h * 3 ];
+	glTexImage2D( GL_TEXTURE_2D, 0, 3, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+	mpBuffer = new u_char [ w * h * 4 ];
 	
 	glutReshapeWindow( w, h );
 }
@@ -96,8 +110,8 @@ void RenderOutputOpenGL::convert( u_int w, u_int h, const float *pSrcData )
 {
 	u_char	*pDest = mpBuffer;
 
-	for (u_int i=0; i < w; ++i)
-		for (u_int j=0; j < h; ++j)
+	for (u_int j=0; j < h; ++j)
+		for (u_int i=0; i < w; ++i)
 		{
 			float	r = pSrcData[0] * 255.0f;
 			float	g = pSrcData[1] * 255.0f;
@@ -111,6 +125,7 @@ void RenderOutputOpenGL::convert( u_int w, u_int h, const float *pSrcData )
 			pDest[0] = (u_char)r;
 			pDest[1] = (u_char)g;
 			pDest[2] = (u_char)b;
-			pDest += 3;
+			pDest[3] = 255;
+			pDest += 4;
 		}
 }

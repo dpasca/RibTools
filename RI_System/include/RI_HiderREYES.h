@@ -69,6 +69,8 @@ public:
 	}
 	
 	const float *GetData() const { return mpData;	}
+	u_int		GetWd() const	 { return mWd;	}
+	u_int		GetHe() const	 { return mHe;	}
 };
 
 //==================================================================
@@ -106,6 +108,8 @@ public:
 
 	void Hide( MicroPolygonGrid &g );
 	
+	u_int		GetOutputDataWd() const	{ return mDestBuff.GetWd();	}
+	u_int		GetOutputDataHe() const	{ return mDestBuff.GetHe();	}
 	const float *GetOutputData() const { return mDestBuff.GetData(); }
 
 	DVec<Primitive *>	&GetPrimList()	{ return mpPrims;	}

@@ -22,52 +22,33 @@
 
 //==================================================================
 static RenderOutputOpenGL	*gpsRenderOutput;
+static char					gpFileToRender[2048];
 
 //===============================================================
-void display(void)
+static bool renderFile( const char *pFileName, int forcedWd=-1, int forcedHe=-1 )
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	if ( gpsRenderOutput )
-		gpsRenderOutput->Blit();
-
-    glutSwapBuffers();
-}
-
-//===============================================================
-void reshape(int width, int height)
-{
-    glViewport(0, 0, width, height);
-
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
-	gluOrtho2D(0, width, height, 0);
+	static std::string	sLastFileName;
+	static int			sLastUsedWd;
+	static int			sLastUsedHe;
 	
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
-	//glTranslatef( -0.375f, -0.375f, 0 );
+	// remember the last used file name
+	if ( pFileName )
+		sLastFileName = pFileName;
+	else
+	{
+		if ( sLastFileName.length() )
+		{
+			pFileName = sLastFileName.c_str();
+			if ( forcedWd == sLastUsedWd &&
+				 forcedHe == sLastUsedHe )
+			{
+				return false;
+			}
+		}
+		else
+			return false;
+	}
 
-	//gApp.SetSize( width, height );
-	
-	glEnable( GL_DEPTH_TEST );
-}
-
-//===============================================================
-static void passiveMotion( int x, int y )
-{
-	//gApp.SetCursorPos( x, y );
-	glutPostRedisplay();
-}
-
-//===============================================================
-void idle(void)
-{
-    glutPostRedisplay();
-}
-
-//===============================================================
-static bool renderFile( const char *pFileName )
-{
 	void	*pData;
 	size_t	dataSize;
 
@@ -81,7 +62,7 @@ static bool renderFile( const char *pFileName )
 
 	RI::Parser			parser;
 	RI::FrameworkREYES	frameworkREYES( gpsRenderOutput );
-	RI::Machine			machine( &frameworkREYES );
+	RI::Machine			machine( &frameworkREYES, forcedWd, forcedHe );
 	
 	for (size_t i=0; i <= dataSize; ++i)
 	{
@@ -120,10 +101,63 @@ static bool renderFile( const char *pFileName )
 				break;
 			}
 		}
-		
 	}
 
+	sLastUsedWd = (int)gpsRenderOutput->GetCurWd();
+	sLastUsedHe = (int)gpsRenderOutput->GetCurHe();
+
 	return true;
+}
+
+//===============================================================
+void display(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if ( gpsRenderOutput )
+		gpsRenderOutput->Blit();
+
+    glutSwapBuffers();
+}
+
+//===============================================================
+void reshape(int width, int height)
+{
+    glViewport(0, 0, width, height);
+
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	gluOrtho2D(0, width, height, 0);
+	
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
+	//glTranslatef( -0.375f, -0.375f, 0 );
+
+	//gApp.SetSize( width, height );
+	
+	glEnable( GL_DEPTH_TEST );
+	
+	// render the last loaded file
+	renderFile( NULL, width, height );
+}
+
+//===============================================================
+static void passiveMotion( int x, int y )
+{
+	//gApp.SetCursorPos( x, y );
+	glutPostRedisplay();
+}
+
+//===============================================================
+void idle(void)
+{
+	if ( gpFileToRender[0] )
+	{
+		renderFile( gpFileToRender );
+		gpFileToRender[0] = 0;
+	}
+
+    glutPostRedisplay();
 }
 
 //===============================================================
@@ -145,13 +179,10 @@ static char *gsTestRibFiles[] =
 //===============================================================
 static void menuFunc( int id )
 {
-	char	buff[4096];
-	strcpy( buff, "../../Tests/" );
-	strcat( buff, gsTestRibFiles[id] );
+	strcpy( gpFileToRender, "../../Tests/" );
+	strcat( gpFileToRender, gsTestRibFiles[id] );
 	
-	printf( "%s\n", buff );
-
-	renderFile( buff );
+	printf( "%s\n", gpFileToRender );
 }
 
 //===============================================================
@@ -186,7 +217,7 @@ int main(int argc, char** argv)
 	
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-	renderFile( argv[1] );
+	strcpy( gpFileToRender, argv[1] );
 
 	glutMainLoop();
 
