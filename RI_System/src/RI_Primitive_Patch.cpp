@@ -147,7 +147,7 @@ PatchBilinear::PatchBilinear( ParamList &params, const Vector3 hull[4] ) :
 	for (int i=0; i < 4; ++i)
 		mHullPos[i] = hull[i];
 }
-
+/*
 //==================================================================
 void PatchBilinear::Render( GState &gstate )
 {
@@ -190,6 +190,7 @@ void PatchBilinear::Render( GState &gstate )
 	}
 	//glEnd();
 }
+*/
 
 //==================================================================
 PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
@@ -233,7 +234,7 @@ static Vector3 spline( float t,
 		+(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3)*t
 		+(b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3);
 }
-
+/*
 //==================================================================
 void PatchBicubic::Render( GState &gstate )
 {
@@ -291,6 +292,7 @@ void PatchBicubic::Render( GState &gstate )
 	}
 	//glEnd();
 }
+*/
 
 //==================================================================
 }

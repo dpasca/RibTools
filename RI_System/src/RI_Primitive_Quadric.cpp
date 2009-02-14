@@ -26,10 +26,8 @@ void Cylinder::EvalP(
 			Point3 &out_pt,
 			const Matrix44 &mtxObjectCurrent ) const
 {
-	float	umin = 0, vmin = 0;
-	float	umax = 1, vmax = 1;	
-	float	u = umin + (umax - umin) * uGrid;
-	float	v = vmin + (vmax - vmin) * vGrid;
+	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
+	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
 
 	float	theta = u * mThetamaxRad;
 
@@ -48,10 +46,8 @@ void Cone::EvalP(
 			Point3 &out_pt,
 			const Matrix44 &mtxObjectCurrent ) const
 {
-	float	umin = 0, vmin = 0;
-	float	umax = 1, vmax = 1;	
-	float	u = umin + (umax - umin) * uGrid;
-	float	v = vmin + (vmax - vmin) * vGrid;
+	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
+	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
 
 	float	theta = u * mThetamaxRad;
 
@@ -70,10 +66,8 @@ void Sphere::EvalP(
 			Point3 &out_pt,
 			const Matrix44 &mtxObjectCurrent ) const
 {
-	float	umin = 0, vmin = 0;
-	float	umax = 1, vmax = 1;	
-	float	u = umin + (umax - umin) * uGrid;
-	float	v = vmin + (vmax - vmin) * vGrid;
+	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
+	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
 
 	// $$$ following 2 are "uniform"
 	float	alphamin	= asinf( mZMin / mRadius );
@@ -97,10 +91,8 @@ void Hyperboloid::EvalP(
 			Point3 &out_pt,
 			const Matrix44 &mtxObjectCurrent ) const
 {
-	float	umin = 0, vmin = 0;
-	float	umax = 1, vmax = 1;	
-	float	u = umin + (umax - umin) * uGrid;
-	float	v = vmin + (vmax - vmin) * vGrid;
+	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
+	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
 
 	float	theta = u * mThetamaxRad;
 
@@ -123,10 +115,8 @@ void Paraboloid::EvalP(
 			Point3 &out_pt,
 			const Matrix44 &mtxObjectCurrent ) const
 {
-	float	umin = 0, vmin = 0;
-	float	umax = 1, vmax = 1;	
-	float	u = umin + (umax - umin) * uGrid;
-	float	v = vmin + (vmax - vmin) * vGrid;
+	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
+	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
 
 	float	theta = u * mThetamaxRad;
 
@@ -148,10 +138,8 @@ void Torus::EvalP(
 			Point3 &out_pt,
 			const Matrix44 &mtxObjectCurrent ) const
 {
-	float	umin = 0, vmin = 0;
-	float	umax = 1, vmax = 1;	
-	float	u = umin + (umax - umin) * uGrid;
-	float	v = vmin + (vmax - vmin) * vGrid;
+	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
+	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
 
 	float	theta = u * mThetamaxRad;
 
@@ -199,27 +187,36 @@ inline void bounds2DSweepL(
 //==================================================================
 void Cylinder::MakeBound( Bound &out_bound )
 {
+	float	tuMin = mThetamaxRad * mURange[0];
+	float	tuMax = mThetamaxRad * mURange[1];
+	bounds2DSweepL( out_bound, mRadius, mRadius, tuMin, tuMax );
+	out_bound.mBox[0].z = mZMin + mVRange[0]*(mZMax - mZMin);
+	out_bound.mBox[1].z = mZMin + mVRange[1]*(mZMax - mZMin);
 }
 
 void Cone::MakeBound( Bound &out_bound )
 {
+	out_bound.Reset();
 }
 
 void Sphere::MakeBound( Bound &out_bound )
 {
-	//bounds2DSweepL( out_bound, );
+	out_bound.Reset();
 }
 
 void Hyperboloid::MakeBound( Bound &out_bound )
 {
+	out_bound.Reset();
 }
 
 void Paraboloid::MakeBound( Bound &out_bound )
 {
+	out_bound.Reset();
 }
 
 void Torus::MakeBound( Bound &out_bound )
 {
+	out_bound.Reset();
 }
 
 /*

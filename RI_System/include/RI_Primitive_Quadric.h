@@ -37,6 +37,8 @@ public:
 	{
 	}
 
+		Cylinder *Clone() const {	return new Cylinder( *this ); }
+
 		void MakeBound( Bound &out_bound );
 
 		void EvalP( float uGrid,
@@ -65,6 +67,8 @@ public:
 		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
+
+		Cone *Clone() const {	return new Cone( *this ); }
 
 		void MakeBound( Bound &out_bound );
 
@@ -97,6 +101,8 @@ public:
 	{
 	}
 
+		Sphere *Clone() const {	return new Sphere( *this ); }
+
 		void MakeBound( Bound &out_bound );
 
 		void EvalP( float uGrid,
@@ -125,6 +131,8 @@ public:
 		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
+
+		Hyperboloid *Clone() const { return new Hyperboloid( *this ); }
 
 		void MakeBound( Bound &out_bound );
 
@@ -156,6 +164,8 @@ public:
 		mThetamaxRad(thetamax*DEG2RAD)
 	{
 	}
+
+		Paraboloid *Clone() const {	return new Paraboloid( *this ); }
 
 		void MakeBound( Bound &out_bound );
 
@@ -192,6 +202,8 @@ public:
 	{
 	}
 	
+		Torus *Clone() const {	return new Torus( *this ); }
+
 		void MakeBound( Bound &out_bound );
 
 		void EvalP( float uGrid,

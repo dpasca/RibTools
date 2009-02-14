@@ -27,6 +27,8 @@ public:
 public:
 	Polygon( ParamList &params, const SymbolList &staticSymbols );
 
+		Polygon *Clone() const {	DASSERT( 0 ); return NULL; }
+
 		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 		bool IsSplitable() const	{	return true; }
 		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );

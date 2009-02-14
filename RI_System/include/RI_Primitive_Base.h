@@ -68,12 +68,12 @@ public:
 
 		float	oow = 1.0f / homoPos.w;
 
+		//printf( "  vtx-scr: %f %f %f %f\n", sx, sy, sz, oow );
+	#ifdef __gl_h_
 		float sx = mHalfXRes + mHalfXRes * oow * homoPos.x;
 		float sy = mHalfYRes - mHalfYRes * oow * homoPos.y;
 		float sz = oow * homoPos.z;
-		
-		//printf( "  vtx-scr: %f %f %f %f\n", sx, sy, sz, oow );
-	#ifdef __gl_h_
+
 		//glColor3f( (int)(vert.u*8)/8.0f + vert.v/8, 0, 0 );
 		glColor3f( vert.u, vert.v, 0 );
 		glVertex3f( sx, sy, oow );
@@ -106,6 +106,11 @@ public:
 	Type				mType;
 	Attributes			*mpAttribs;
 	Transform			*mpTransform;
+	
+	// some prims may no need these.. like for the polygons
+	// ..but for now we add them anyway !
+	float				mURange[2];
+	float				mVRange[2];
 
 public:
 	Primitive( Type type ) :
@@ -113,16 +118,32 @@ public:
 		mpAttribs(NULL),
 		mpTransform(NULL)
 	{
+		mURange[0] = 0;
+		mURange[1] = 1;
+		mVRange[0] = 0;
+		mVRange[1] = 1;
 	}
-
+/*
+	Primitive( const Primitive *pSrc ) :
+		mType(		pSrc->mType),
+		mpAttribs(	pSrc->mpAttribs),
+		mpTransform(pSrc->mpTransform),
+		mURange(	pSrc->mURange),
+		mVRange(	pSrc->mVRange)
+	{
+	}
+*/
 	virtual ~Primitive()
 	{
 	}
 	
+	virtual Primitive	*Clone() const = 0;
+	
 	virtual void	MakeBound( Bound &out_bound ) = 0;
 
-	virtual bool	IsSplitable() const			{ return false;	}
-	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit )	{}
+	virtual bool	IsSplitable() const			{ return true;	}
+	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
+
 	virtual void	EvalP(
 						float uGrid,
 						float vGrid,

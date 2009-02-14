@@ -11,7 +11,6 @@
 #define RI_PRIMITIVE_PATCH_H
 
 #include "RI_Primitive_Base.h"
-#include "RI_MicroPolygonGrid.h"
 
 //==================================================================
 namespace RI
@@ -22,8 +21,6 @@ namespace RI
 //==================================================================
 class PatchBilinear : public DiceablePrim
 {
-	MicroPolygonGrid	mGrid;
-
 public:
 	ParamList		mParams;
 	Vector3			mHullPos[4];
@@ -31,6 +28,8 @@ public:
 public:
 	PatchBilinear( ParamList &params, const SymbolList &staticSymbols );
 	PatchBilinear( ParamList &params, const Vector3 hull[4] );
+
+		PatchBilinear *Clone() const {	return new PatchBilinear( *this ); }
 
 		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 
@@ -55,6 +54,8 @@ public:
 						    const Attributes &attr,
 							const SymbolList &staticSymbols );
 
+		PatchBicubic *Clone() const {	return new PatchBicubic( *this ); }
+
 		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 
 	void Render( GState &gstate );
@@ -73,6 +74,8 @@ public:
 	PatchMesh(RtToken type,
 			  ParamList &params,
 			  const SymbolList &staticSymbols );
+
+		PatchMesh *Clone() const {	DASSERT( 0 ); return NULL; }
 
 		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
 		bool IsSplitable() const	{	return true; }

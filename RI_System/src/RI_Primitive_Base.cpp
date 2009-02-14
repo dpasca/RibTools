@@ -14,10 +14,65 @@
 #include "RI_Transform.h"
 #include "RI_Primitive.h"
 #include "RI_HiderBase.h"
+#include "RI_FrameworkBase.h"
 
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
+{
+	if ( uSplit )
+	{
+		// U split
+		Primitive *pPrimsSU[2] =
+		{
+			Clone(),
+			Clone()
+		};
+		float	uMid = (mURange[0] + mURange[1]) * 0.5f;
+		pPrimsSU[0]->mURange[1] = uMid;
+		pPrimsSU[1]->mURange[0] = uMid;
+		fwork.InsertSplitted( pPrimsSU[0], *this );
+		fwork.InsertSplitted( pPrimsSU[1], *this );
+		
+		if ( vSplit )
+		{
+			// optional "recursive" V split
+			for (size_t i=0; i < 2; ++i)
+			{
+				Primitive	*pNewThis = pPrimsSU[i];
+				Primitive *pPrimsSV[2] =
+				{
+					pNewThis->Clone(),
+					pNewThis->Clone()
+				};
+				float	vMid = (pNewThis->mVRange[0] + pNewThis->mVRange[1]) * 0.5f;
+				pPrimsSV[0]->mVRange[1] = vMid;
+				pPrimsSV[1]->mVRange[0] = vMid;
+				fwork.InsertSplitted( pPrimsSV[0], *this );
+				fwork.InsertSplitted( pPrimsSV[1], *this );
+			}
+		}
+	}
+	else
+	{
+		// exclusive V split
+		if ( vSplit )
+		{
+			Primitive *pPrim1 = Clone();
+			Primitive *pPrim2 = Clone();
+			
+			float	vMid = (mVRange[0] + mVRange[1]) * 0.5f;
+			pPrim1->mVRange[1] = vMid;
+			pPrim2->mVRange[0] = vMid;
+
+			fwork.InsertSplitted( pPrim1, *this );
+			fwork.InsertSplitted( pPrim2, *this );
+		}
+	}
+}
 
 //==================================================================
 void Primitive::Dice( MicroPolygonGrid &g )
