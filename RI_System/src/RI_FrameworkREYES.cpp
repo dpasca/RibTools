@@ -75,7 +75,7 @@ void FrameworkREYES::Remove( Primitive *pPrim )
 //==================================================================
 void FrameworkREYES::WorldEnd()
 {
-	DVec<Primitive *>	pPrimList = mpHider->GetPrimList();
+	DVec<Primitive *>	&pPrimList = mpHider->GetPrimList();
 
 	GState	gstate;
 
@@ -99,18 +99,6 @@ void FrameworkREYES::WorldEnd()
 		else
 		if ( pPrim->IsSplitable() )
 			pPrim->Split( *this, uSplit, vSplit );
-/*
-		else
-		{
-			gstate.Setup(
-					mOptions,
-					*pPrim->mpAttribs,
-					*pPrim->mpTransform,
-					mtxWorldCamera );
-
-			pPrim->Render( gstate );
-		}
-*/
 	}
 
 	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	delete mpUniqueAttribs[i];

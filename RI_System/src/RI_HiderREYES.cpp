@@ -60,6 +60,9 @@ void HiderREYES::InsertSplitted(
 					Primitive	&srcPrim
 					)
 {
+	// $$$ mark splitted stuff to never be used again !
+	DASSERT( srcPrim.IsUsable() );
+	
 	pSplitPrim->CopyStates( srcPrim );
 
 	mpPrims.push_back( pSplitPrim );
@@ -111,20 +114,31 @@ float HiderREYES::RasterEstimate( const Bound &b ) const
 	{
 		Vector4	Pproj = boxVerts[i] * mMtxCameraProj;
 		
-		float	oow = 1.0f / Pproj.w;
+		if ( Pproj.w > 0 )
+		{
+			float	oow = 1.0f / Pproj.w;
 
-		float	winX = destHalfWd + destHalfWd * Pproj.x * oow;
-		float	winY = destHalfHe - destHalfHe * Pproj.y * oow;
-		
-		minX = DMIN( minX, winX );
-		minY = DMIN( minY, winY );
-		maxX = DMAX( maxX, winX );
-		maxY = DMAX( maxY, winY );
+			float	winX = destHalfWd + destHalfWd * Pproj.x * oow;
+			float	winY = destHalfHe - destHalfHe * Pproj.y * oow;
+			
+			minX = DMIN( minX, winX );
+			minY = DMIN( minY, winY );
+			maxX = DMAX( maxX, winX );
+			maxY = DMAX( maxY, winY );
+		}
+		else
+		{
+			// $$$ this shouldn't happen
+		}
 	}
 	
-	float	squareArea = (maxY - minY) * (maxX - minX);
-
-	return squareArea;
+	if ( maxX > minX && maxY > minY )
+	{
+		float	squareArea = (maxY - minY) * (maxX - minX);
+		return squareArea / 128;
+	}
+	else
+		return 0.0f;	// invalid or zero area...
 }
 
 //==================================================================

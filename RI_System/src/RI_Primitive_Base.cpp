@@ -36,24 +36,22 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 		pPrimsSU[1]->mURange[0] = uMid;
 		fwork.InsertSplitted( pPrimsSU[0], *this );
 		fwork.InsertSplitted( pPrimsSU[1], *this );
+		this->MarkUnusable();
 		
 		if ( vSplit )
 		{
-			// optional "recursive" V split
-			for (size_t i=0; i < 2; ++i)
-			{
-				Primitive	*pNewThis = pPrimsSU[i];
-				Primitive *pPrimsSV[2] =
-				{
-					pNewThis->Clone(),
-					pNewThis->Clone()
-				};
-				float	vMid = (pNewThis->mVRange[0] + pNewThis->mVRange[1]) * 0.5f;
-				pPrimsSV[0]->mVRange[1] = vMid;
-				pPrimsSV[1]->mVRange[0] = vMid;
-				fwork.InsertSplitted( pPrimsSV[0], *this );
-				fwork.InsertSplitted( pPrimsSV[1], *this );
-			}
+			// optional V split
+			float	vMid = (mVRange[0] + mVRange[1]) * 0.5f;
+
+			Primitive *pPrimLB = pPrimsSU[0]->Clone();
+			Primitive *pPrimRB = pPrimsSU[1]->Clone();
+			fwork.InsertSplitted( pPrimLB, *pPrimsSU[0] );
+			fwork.InsertSplitted( pPrimRB, *pPrimsSU[1] );
+
+			pPrimsSU[0]->mVRange[1] = vMid;
+			pPrimsSU[1]->mVRange[1] = vMid;
+			pPrimLB->mVRange[0] = vMid;
+			pPrimRB->mVRange[0] = vMid;
 		}
 	}
 	else
@@ -70,6 +68,7 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 
 			fwork.InsertSplitted( pPrim1, *this );
 			fwork.InsertSplitted( pPrim2, *this );
+			this->MarkUnusable();
 		}
 	}
 }
@@ -189,6 +188,7 @@ bool DiceablePrim::IsDiceable(
 		return false;
 	}
 	else
+	if ( pixelArea > 1 )	// at least one pixel !
 	{
 		float	dim = sqrtf( pixelArea );
 		g.Setup(
@@ -201,6 +201,8 @@ bool DiceablePrim::IsDiceable(
 		out_vSplit = false;
 		return true;
 	}
+	else
+		return false;
 }
 
 //==================================================================

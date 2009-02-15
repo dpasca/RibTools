@@ -111,12 +111,14 @@ public:
 	// ..but for now we add them anyway !
 	float				mURange[2];
 	float				mVRange[2];
+	u_int				mSplitCnt;
 
 public:
 	Primitive( Type type ) :
 		mType(type),
 		mpAttribs(NULL),
-		mpTransform(NULL)
+		mpTransform(NULL),
+		mSplitCnt(0)
 	{
 		mURange[0] = 0;
 		mURange[1] = 1;
@@ -174,6 +176,17 @@ public:
 	{
 		mpAttribs	= fromPrim.mpAttribs	;
 		mpTransform	= fromPrim.mpTransform;
+	}
+	
+	bool IsUsable() const
+	{
+		return mpAttribs != 0 && mpTransform != 0;
+	}
+
+	void MarkUnusable()
+	{
+		mpAttribs	= 0;
+		mpTransform	= 0;
 	}
 /*
 	virtual void Render( GState &gstate )
