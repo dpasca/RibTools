@@ -33,10 +33,9 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		void EvalP( float uGrid,
-					float vGrid,
-					Point3 &out_pt,
-					const Matrix44 &mtxObjectCurrent ) const;
+		Point3 &EvalP(	float uGrid,
+						float vGrid,
+						Point3 &out_pt ) const;
 };
 
 //==================================================================
@@ -59,9 +58,11 @@ public:
 
 		PatchBicubic *Clone() const {	return new PatchBicubic( *this ); }
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		void MakeBound( Bound &out_bound );
 
-	void Render( GState &gstate );
+		Point3 &EvalP(	float uGrid,
+						float vGrid,
+						Point3 &out_pt ) const;
 };
 
 //==================================================================

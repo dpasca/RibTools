@@ -158,9 +158,9 @@ struct Bound
 	bool IsValid() const
 	{
 		return
-			mBox[0].x < mBox[1].x &&
-			mBox[0].y < mBox[1].y &&
-			mBox[0].z < mBox[1].z;
+			mBox[0].x <= mBox[1].x &&
+			mBox[0].y <= mBox[1].y &&
+			mBox[0].z <= mBox[1].z;
 	}
 };
 

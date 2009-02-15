@@ -66,10 +66,10 @@ public:
 	{
 		Vector4	homoPos = Vector3( vert.x, vert.y, vert.z ) * mMtxLocalHomo;
 
-		float	oow = 1.0f / homoPos.w;
-
 		//printf( "  vtx-scr: %f %f %f %f\n", sx, sy, sz, oow );
 	#ifdef __gl_h_
+		float	oow = 1.0f / homoPos.w;
+
 		float sx = mHalfXRes + mHalfXRes * oow * homoPos.x;
 		float sy = mHalfYRes - mHalfYRes * oow * homoPos.y;
 		float sz = oow * homoPos.z;
@@ -146,11 +146,10 @@ public:
 	virtual bool	IsSplitable() const			{ return true;	}
 	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 
-	virtual void	EvalP(
+	virtual Point3	&EvalP(
 						float uGrid,
 						float vGrid,
-						Point3 &out_pt,
-						const Matrix44 &mtxObjectCurrent ) const {}
+						Point3 &out_pt ) const { return out_pt; }
 
 	virtual bool	IsDiceable(
 						MicroPolygonGrid &g,

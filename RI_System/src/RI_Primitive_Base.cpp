@@ -94,7 +94,10 @@ void Primitive::Dice( MicroPolygonGrid &g )
 		float	u = 0.0f;
 		for (int j=0; j < (int)g.mXDim; ++j, u += du)
 		{
-			EvalP( u, v, *pPoints, g.mMtxObjectCurrent );
+			EvalP( u, v, *pPoints );
+
+			*pPoints = MultiplyMV3( *pPoints, g.mMtxObjectCurrent );
+
 			++pPoints;
 		}
 	}
@@ -194,19 +197,22 @@ bool DiceablePrim::IsDiceable(
 	if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
 	{
 		float	dim = sqrtf( pixelArea );
-		
-		if ( dim < 0 )
-			dim = 1;
+		if ( dim > 0 )
+		{
+			int	dimX = (int)ceilf( dim );
+			int	dimY = (int)ceilf( dim );
 
-		g.Setup(
-				(int)dim,
-				(int)dim,
-				mURange,
-				mVRange,
-				mtxLocalCamera
-				);
+			g.Setup(dimX,
+					dimY,
+					mURange,
+					mVRange,
+					mtxLocalCamera
+					);
 
-		return true;
+			return true;
+		}
+		else
+			return false;
 	}
 	else
 	{

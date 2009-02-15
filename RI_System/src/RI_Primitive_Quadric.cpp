@@ -20,51 +20,46 @@ namespace RI
 {
 
 //==================================================================
-void Cylinder::EvalP(
+Point3 &Cylinder::EvalP(
 			float uGrid,
 			float vGrid,
-			Point3 &out_pt,
-			const Matrix44 &mtxObjectCurrent ) const
+			Point3 &out_pt ) const
 {
 	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
 	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
 
 	float	theta = u * mThetamaxRad;
 
-	Point3	Po;
-	Po.x = mRadius * cosf( theta );
-	Po.y = mRadius * sinf( theta );
-	Po.z = mZMin + v * (mZMax - mZMin);
+	out_pt.x = mRadius * cosf( theta );
+	out_pt.y = mRadius * sinf( theta );
+	out_pt.z = mZMin + v * (mZMax - mZMin);
 	
-	out_pt = MultiplyMV3( Po, mtxObjectCurrent );
+	return out_pt;
 }
 
 //==================================================================
-void Cone::EvalP(
+Point3 &Cone::EvalP(
 			float uGrid,
 			float vGrid,
-			Point3 &out_pt,
-			const Matrix44 &mtxObjectCurrent ) const
+			Point3 &out_pt ) const
 {
 	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
 	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
 
 	float	theta = u * mThetamaxRad;
 
-	Point3	Po;
-	Po.x = mRadius * (1 - v) * cosf( theta );
-	Po.y = mRadius * (1 - v) * sinf( theta );
-	Po.z = v * mHeight;
+	out_pt.x = mRadius * (1 - v) * cosf( theta );
+	out_pt.y = mRadius * (1 - v) * sinf( theta );
+	out_pt.z = v * mHeight;
 	
-	out_pt = MultiplyMV3( Po, mtxObjectCurrent );
+	return out_pt;
 }
 
 //==================================================================
-void Sphere::EvalP(
+Point3 &Sphere::EvalP(
 			float uGrid,
 			float vGrid,
-			Point3 &out_pt,
-			const Matrix44 &mtxObjectCurrent ) const
+			Point3 &out_pt ) const
 {
 	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
 	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
@@ -76,20 +71,18 @@ void Sphere::EvalP(
 	float	theta = u * mThetamaxRad;
 	float	alpha = alphamin + v * alphadelta;
 
-	Point3	Po;
-	Po.x = mRadius * cosf( alpha ) * cosf( theta );
-	Po.y = mRadius * cosf( alpha ) * sinf( theta );
-	Po.z = mRadius * sinf( alpha );
+	out_pt.x = mRadius * cosf( alpha ) * cosf( theta );
+	out_pt.y = mRadius * cosf( alpha ) * sinf( theta );
+	out_pt.z = mRadius * sinf( alpha );
 	
-	out_pt = MultiplyMV3( Po, mtxObjectCurrent );
+	return out_pt;
 }
 
 //==================================================================
-void Hyperboloid::EvalP(
+Point3 &Hyperboloid::EvalP(
 			float uGrid,
 			float vGrid,
-			Point3 &out_pt,
-			const Matrix44 &mtxObjectCurrent ) const
+			Point3 &out_pt ) const
 {
 	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
 	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
@@ -100,20 +93,18 @@ void Hyperboloid::EvalP(
 	float	y = mP1.y + (mP2.y - mP1.y) * v;
 	float	z = mP1.z + (mP2.z - mP1.z) * v;
 
-	Point3	Po;
-	Po.x = x * cosf( theta ) - y * sinf( theta );
-	Po.y = x * sinf( theta ) + y * cosf( theta );
-	Po.z = z;
+	out_pt.x = x * cosf( theta ) - y * sinf( theta );
+	out_pt.y = x * sinf( theta ) + y * cosf( theta );
+	out_pt.z = z;
 	
-	out_pt = MultiplyMV3( Po, mtxObjectCurrent );
+	return out_pt;
 }
 
 //==================================================================
-void Paraboloid::EvalP(
+Point3 &Paraboloid::EvalP(
 			float uGrid,
 			float vGrid,
-			Point3 &out_pt,
-			const Matrix44 &mtxObjectCurrent ) const
+			Point3 &out_pt ) const
 {
 	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
 	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
@@ -123,20 +114,18 @@ void Paraboloid::EvalP(
 	float	z = (mZmax - mZmin) * v;
 	float	r = mRmax * sqrtf( z / mZmax );
 
-	Point3	Po;
-	Po.x = r * cosf( theta );
-	Po.y = r * sinf( theta );
-	Po.z = z;
+	out_pt.x = r * cosf( theta );
+	out_pt.y = r * sinf( theta );
+	out_pt.z = z;
 
-	out_pt = MultiplyMV3( Po, mtxObjectCurrent );
+	return out_pt;
 }
 
 //==================================================================
-void Torus::EvalP(
+Point3 &Torus::EvalP(
 			float uGrid,
 			float vGrid,
-			Point3 &out_pt,
-			const Matrix44 &mtxObjectCurrent ) const
+			Point3 &out_pt ) const
 {
 	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
 	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
@@ -146,12 +135,11 @@ void Torus::EvalP(
 	float	phi = mPhiminRad + (mPhimaxRad - mPhiminRad) * v;
 	float	r = mMinRadius * cosf( phi );
 
-	Point3	Po;
-	Po.x = (mMaxRadius + r) * cosf( theta );
-	Po.y = (mMaxRadius + r) * sinf( theta );
-	Po.z = mMinRadius * sinf( phi );
+	out_pt.x = (mMaxRadius + r) * cosf( theta );
+	out_pt.y = (mMaxRadius + r) * sinf( theta );
+	out_pt.z = mMinRadius * sinf( phi );
 	
-	out_pt = MultiplyMV3( Po, mtxObjectCurrent );
+	return out_pt;
 }
 
 //==================================================================

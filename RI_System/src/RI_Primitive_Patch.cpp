@@ -132,7 +132,6 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols
 	DiceablePrim(PATCHBILINEAR),
 	mParams(params)
 {
-
 	bool	gotP = ParamsFindP( params, staticSymbols, mHullPos, 4 );
 	
 	DASSTHROW( gotP, ("Missing hull parameter") );
@@ -143,50 +142,35 @@ PatchBilinear::PatchBilinear( ParamList &params, const Vector3 hull[4] ) :
 	DiceablePrim(PATCHBILINEAR),
 	mParams(params)
 {
-
 	for (int i=0; i < 4; ++i)
 		mHullPos[i] = hull[i];
 }
 
 //==================================================================
-void PatchBilinear::MakeBound( Bound &out_bound )
-{
-	out_bound.Reset();
-	
-	for (size_t i=0; i < 2; ++i)
-	{
-		float	u = mURange[i];
-
-		for (size_t j=0; j < 2; ++j)
-		{
-			float	v	= mVRange[j];
-
-			Point3	Po	= DMix(
-							DMix( mHullPos[0], mHullPos[2], v ),
-							DMix( mHullPos[1], mHullPos[3], v ),
-							u );
-
-			out_bound.Expand( Po );
-		}
-	}
-}
-
-//==================================================================
-void PatchBilinear::EvalP(
+Point3 &PatchBilinear::EvalP(
 			float uGrid,
 			float vGrid,
-			Point3 &out_pt,
-			const Matrix44 &mtxObjectCurrent ) const
+			Point3 &out_pt) const
 {
 	float	u		= DMix( mURange[0], mURange[1], uGrid );
 	float	v		= DMix( mVRange[0], mVRange[1], vGrid );
 	Vector3	left	= DMix( mHullPos[0], mHullPos[2], v );
 	Vector3	right	= DMix( mHullPos[1], mHullPos[3], v );
-	Point3	Po		= DMix( left, right, u );
-	
-	out_pt = MultiplyMV3( Po, mtxObjectCurrent );
+	out_pt			= DMix( left, right, u );
+
+	return out_pt;
 }
 
+//==================================================================
+void PatchBilinear::MakeBound( Bound &out_bound )
+{
+	Point3	Po;
+	out_bound.Reset();
+	out_bound.Expand( EvalP( mURange[0], mVRange[0], Po ) );
+	out_bound.Expand( EvalP( mURange[1], mVRange[0], Po ) );
+	out_bound.Expand( EvalP( mURange[0], mVRange[1], Po ) );
+	out_bound.Expand( EvalP( mURange[1], mVRange[1], Po ) );
+}
 
 /*
 //==================================================================
@@ -275,6 +259,40 @@ static Vector3 spline( float t,
 		+(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3)*t
 		+(b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3);
 }
+
+//==================================================================
+Point3 &PatchBicubic::EvalP(
+			float uGrid,
+			float vGrid,
+			Point3 &out_pt ) const
+{
+	float	u		= DMix( mURange[0], mURange[1], uGrid );
+	float	v		= DMix( mVRange[0], mVRange[1], vGrid );
+
+	const RtBasis	&uBasis = *mpUBasis;
+	const RtBasis	&vBasis = *mpVBasis;
+
+	Point3	uBottom	= spline(u, uBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
+	Point3	uMid1	= spline(u, uBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
+	Point3	uMid2	= spline(u, uBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
+	Point3	uTop	= spline(u, uBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
+
+	out_pt = spline( v, vBasis, uBottom, uMid1, uMid2, uTop );
+
+	return out_pt;
+}
+
+//==================================================================
+void PatchBicubic::MakeBound( Bound &out_bound )
+{
+	Point3	Po;
+	out_bound.Reset();
+	out_bound.Expand( EvalP( mURange[0], mVRange[0], Po ) );
+	out_bound.Expand( EvalP( mURange[1], mVRange[0], Po ) );
+	out_bound.Expand( EvalP( mURange[0], mVRange[1], Po ) );
+	out_bound.Expand( EvalP( mURange[1], mVRange[1], Po ) );
+}
+
 /*
 //==================================================================
 void PatchBicubic::Render( GState &gstate )

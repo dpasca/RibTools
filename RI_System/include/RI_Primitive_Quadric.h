@@ -41,12 +41,9 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		void EvalP( float uGrid,
-					float vGrid,
-					Point3 &out_pt,
-					const Matrix44 &mtxObjectCurrent ) const;
-
-	void Render( GState &gstate );
+		Point3 &EvalP(	float uGrid,
+						float vGrid,
+						Point3 &out_pt ) const;
 };
 
 //==================================================================
@@ -72,12 +69,9 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		void EvalP( float uGrid,
-					float vGrid,
-					Point3 &out_pt,
-					const Matrix44 &mtxObjectCurrent ) const;
-
-	void Render( GState &gstate );
+		Point3 &EvalP(	float uGrid,
+						float vGrid,
+						Point3 &out_pt ) const;
 };
 
 //==================================================================
@@ -105,12 +99,9 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		void EvalP( float uGrid,
-					float vGrid,
-					Point3 &out_pt,
-					const Matrix44 &mtxObjectCurrent ) const;
-
-	void Render( GState &gstate );
+		Point3 &EvalP(	float uGrid,
+						float vGrid,
+						Point3 &out_pt ) const;
 };
 
 //==================================================================
@@ -136,12 +127,9 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		void EvalP( float uGrid,
-					float vGrid,
-					Point3 &out_pt,
-					const Matrix44 &mtxObjectCurrent ) const;
-
-	void Render( GState &gstate );
+		Point3 &EvalP(	float uGrid,
+						float vGrid,
+						Point3 &out_pt ) const;
 };
 
 //==================================================================
@@ -169,12 +157,9 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		void EvalP( float uGrid,
-					float vGrid,
-					Point3 &out_pt,
-					const Matrix44 &mtxObjectCurrent ) const;
-
-	void Render( GState &gstate );
+		Point3 &EvalP(	float uGrid,
+						float vGrid,
+						Point3 &out_pt ) const;
 };
 
 //==================================================================
@@ -206,12 +191,9 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		void EvalP( float uGrid,
-					float vGrid,
-					Point3 &out_pt,
-					const Matrix44 &mtxObjectCurrent ) const;
-
-	void Render( GState &gstate );
+		Point3 &EvalP(	float uGrid,
+						float vGrid,
+						Point3 &out_pt ) const;
 };
 
 //==================================================================
