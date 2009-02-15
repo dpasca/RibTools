@@ -140,4 +140,13 @@ typedef	Vector2	Point2;
 typedef	Vector3	Point3;
 typedef	Vector4	Point4;
 
+//==================================================================
+/// 
+//==================================================================
+template <class T>
+inline T DMix( const T &a, const T &b, float t )
+{
+	return a + (b - a) * t;
+}
+
 #endif

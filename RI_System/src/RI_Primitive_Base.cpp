@@ -23,6 +23,13 @@ namespace RI
 //==================================================================
 void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 {
+	if ( mSplitCnt > 8 )
+	{
+		// $$$ too many splits !!!
+		mSplitCnt = mSplitCnt;
+		return;
+	}
+
 	if ( uSplit )
 	{
 		// U split
@@ -184,9 +191,13 @@ bool DiceablePrim::IsDiceable(
 	MakeBound( bound );
 	float pixelArea = pHider->RasterEstimate( bound, mtxLocalCamera );
 	
-	if ( /*mSplitCnt >= 1 ||*/ (pixelArea > 1 && pixelArea <= MicroPolygonGrid::MAX_SIZE) )
+	if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
 	{
 		float	dim = sqrtf( pixelArea );
+		
+		if ( dim < 0 )
+			dim = 1;
+
 		g.Setup(
 				(int)dim,
 				(int)dim,

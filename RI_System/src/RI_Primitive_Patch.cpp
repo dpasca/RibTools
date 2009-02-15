@@ -147,6 +147,47 @@ PatchBilinear::PatchBilinear( ParamList &params, const Vector3 hull[4] ) :
 	for (int i=0; i < 4; ++i)
 		mHullPos[i] = hull[i];
 }
+
+//==================================================================
+void PatchBilinear::MakeBound( Bound &out_bound )
+{
+	out_bound.Reset();
+	
+	for (size_t i=0; i < 2; ++i)
+	{
+		float	u = mURange[i];
+
+		for (size_t j=0; j < 2; ++j)
+		{
+			float	v	= mVRange[j];
+
+			Point3	Po	= DMix(
+							DMix( mHullPos[0], mHullPos[2], v ),
+							DMix( mHullPos[1], mHullPos[3], v ),
+							u );
+
+			out_bound.Expand( Po );
+		}
+	}
+}
+
+//==================================================================
+void PatchBilinear::EvalP(
+			float uGrid,
+			float vGrid,
+			Point3 &out_pt,
+			const Matrix44 &mtxObjectCurrent ) const
+{
+	float	u		= DMix( mURange[0], mURange[1], uGrid );
+	float	v		= DMix( mVRange[0], mVRange[1], vGrid );
+	Vector3	left	= DMix( mHullPos[0], mHullPos[2], v );
+	Vector3	right	= DMix( mHullPos[1], mHullPos[3], v );
+	Point3	Po		= DMix( left, right, u );
+	
+	out_pt = MultiplyMV3( Po, mtxObjectCurrent );
+}
+
+
 /*
 //==================================================================
 void PatchBilinear::Render( GState &gstate )

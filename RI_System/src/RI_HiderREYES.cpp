@@ -89,7 +89,7 @@ float HiderREYES::RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) con
 {
 	if NOT( b.IsValid() )
 	{
-		return MicroPolygonGrid::MAX_SIZE;
+		return MicroPolygonGrid::MAX_SIZE / 4;
 	}
 	
 	Vector3	boxVerts[8] =
@@ -132,9 +132,9 @@ float HiderREYES::RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) con
 		}
 		else
 		{
-			// $$$ this shouldn't happen
+			// $$$ this shouldn't happen ..once proper
+			// front plane clipping is implemented 8)
 			return 0.0f;
-			//return MicroPolygonGrid::MAX_SIZE*2;
 		}
 	}
 	

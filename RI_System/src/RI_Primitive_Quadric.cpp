@@ -196,7 +196,13 @@ void Cylinder::MakeBound( Bound &out_bound )
 
 void Cone::MakeBound( Bound &out_bound )
 {
-	out_bound.Reset();
+	float	tuMin = mThetamaxRad * mURange[0];
+	float	tuMax = mThetamaxRad * mURange[1];
+	float	rMin = mRadius * (1 - mVRange[1]);
+	float	rMax = mRadius * (1 - mVRange[0]);
+	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
+	out_bound.mBox[0].z = mVRange[0] * mHeight;
+	out_bound.mBox[1].z = mVRange[1] * mHeight;
 }
 
 void Sphere::MakeBound( Bound &out_bound )

@@ -31,9 +31,12 @@ public:
 
 		PatchBilinear *Clone() const {	return new PatchBilinear( *this ); }
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		void MakeBound( Bound &out_bound );
 
-	void Render( GState &gstate );
+		void EvalP( float uGrid,
+					float vGrid,
+					Point3 &out_pt,
+					const Matrix44 &mtxObjectCurrent ) const;
 };
 
 //==================================================================
