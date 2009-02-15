@@ -104,7 +104,7 @@ public:
 
 	void WorldEnd();
 	
-	float RasterEstimate( const Bound &b ) const;
+	float RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) const;
 
 	void Hide( MicroPolygonGrid &g );
 	

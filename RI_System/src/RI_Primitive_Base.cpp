@@ -37,7 +37,7 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 		fwork.InsertSplitted( pPrimsSU[0], *this );
 		fwork.InsertSplitted( pPrimsSU[1], *this );
 		this->MarkUnusable();
-		
+
 		if ( vSplit )
 		{
 			// optional V split
@@ -173,36 +173,36 @@ bool DiceablePrim::IsDiceable(
 						bool &out_uSplit,
 						bool &out_vSplit )
 {
+	out_uSplit = false;
+	out_vSplit = false;
+	
 	Matrix44 mtxLocalCamera =
 				mpTransform->GetMatrix() *
 					pHider->mMtxWorldCamera;
 	
 	Bound	bound;
 	MakeBound( bound );
-	float pixelArea = pHider->RasterEstimate( bound );
+	float pixelArea = pHider->RasterEstimate( bound, mtxLocalCamera );
 	
-	if ( pixelArea > MicroPolygonGrid::MAX_SIZE )
-	{
-		out_uSplit = true;
-		out_vSplit = true;
-		return false;
-	}
-	else
-	if ( pixelArea > 1 )	// at least one pixel !
+	if ( /*mSplitCnt >= 1 ||*/ (pixelArea > 1 && pixelArea <= MicroPolygonGrid::MAX_SIZE) )
 	{
 		float	dim = sqrtf( pixelArea );
 		g.Setup(
 				(int)dim,
 				(int)dim,
+				mURange,
+				mVRange,
 				mtxLocalCamera
 				);
 
-		out_uSplit = false;
-		out_vSplit = false;
 		return true;
 	}
 	else
+	{
+		out_uSplit = true;
+		out_vSplit = true;
 		return false;
+	}
 }
 
 //==================================================================

@@ -17,6 +17,8 @@ namespace RI
 void MicroPolygonGrid::Setup(
 						u_int xdim,
 						u_int ydim,
+						const float uRange[2],
+						const float vRange[2],
 						const Matrix44 &mtxObjectCurrent )
 {
 	DSAFE_DELETE_ARRAY( mpPoints );
@@ -24,6 +26,10 @@ void MicroPolygonGrid::Setup(
 	mXDim = xdim;
 	mYDim = ydim;
 	mMtxObjectCurrent = mtxObjectCurrent;
+	mURange[0] = uRange[0];
+	mURange[1] = uRange[1];
+	mVRange[0] = vRange[0];
+	mVRange[1] = vRange[1];
 }
 
 //==================================================================

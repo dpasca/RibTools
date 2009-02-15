@@ -64,6 +64,8 @@ void HiderREYES::InsertSplitted(
 	DASSERT( srcPrim.IsUsable() );
 	
 	pSplitPrim->CopyStates( srcPrim );
+	
+	pSplitPrim->mSplitCnt += 1;
 
 	mpPrims.push_back( pSplitPrim );
 }
@@ -83,14 +85,14 @@ void HiderREYES::WorldEnd()
 }
 
 //==================================================================
-float HiderREYES::RasterEstimate( const Bound &b ) const
+float HiderREYES::RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) const
 {
 	if NOT( b.IsValid() )
 	{
-		return 10 * 10;
+		return MicroPolygonGrid::MAX_SIZE;
 	}
-
-	Vector3	boxVerts[8]=
+	
+	Vector3	boxVerts[8] =
 	{
 		Vector3( b.mBox[0].x, b.mBox[0].y, b.mBox[0].z ),
 		Vector3( b.mBox[1].x, b.mBox[0].y, b.mBox[0].z ),
@@ -109,10 +111,12 @@ float HiderREYES::RasterEstimate( const Bound &b ) const
 	float minY =  FLT_MAX;
 	float maxX = -FLT_MAX;
 	float maxY = -FLT_MAX;
+	
+	Matrix44	mtxLocalProj = mtxLocalCamera * mMtxCameraProj;
 
 	for (size_t i=0; i < 8; ++i)
 	{
-		Vector4	Pproj = boxVerts[i] * mMtxCameraProj;
+		Vector4	Pproj = boxVerts[i] * mtxLocalProj;
 		
 		if ( Pproj.w > 0 )
 		{
@@ -129,13 +133,15 @@ float HiderREYES::RasterEstimate( const Bound &b ) const
 		else
 		{
 			// $$$ this shouldn't happen
+			return 0.0f;
+			//return MicroPolygonGrid::MAX_SIZE*2;
 		}
 	}
 	
 	if ( maxX > minX && maxY > minY )
 	{
 		float	squareArea = (maxY - minY) * (maxX - minX);
-		return squareArea / 128;
+		return squareArea;
 	}
 	else
 		return 0.0f;	// invalid or zero area...
@@ -163,8 +169,8 @@ void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 //==================================================================
 void HiderREYES::Hide( MicroPolygonGrid &g )
 {
-	float du = 1.0f / g.mXDim;
-	float dv = 1.0f / g.mYDim;
+	float du = (g.mURange[1] - g.mURange[0]) / g.mXDim;
+	float dv = (g.mVRange[1] - g.mVRange[0]) / g.mYDim;
 	
 	float destHalfWd	= (float)mDestBuff.mWd * 0.5f;
 	float destHalfHe	= (float)mDestBuff.mHe * 0.5f;
@@ -173,11 +179,11 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 
 	for (u_int iv=0; iv < g.mYDim; ++iv)
 	{
-		float	v = iv * dv;
+		float	v = g.mVRange[0] + iv * dv;
 		
 		for (u_int iu=0; iu < g.mXDim; ++iu)
 		{
-			float	u = iu * du;
+			float	u = g.mURange[0] + iu * du;
 			
 			Vector4	Pproj = *pRuns++ * mMtxCameraProj;
 			
