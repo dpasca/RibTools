@@ -156,7 +156,6 @@ inline void bounds2DSweepL(
 					float tmin,
 					float tmax )
 {
-	out_bound.Reset();
 	out_bound.Expand( polar(rmin,tmin) );
 	out_bound.Expand( polar(rmax,tmin) );
 	out_bound.Expand( polar(rmin,tmax) );
@@ -173,10 +172,53 @@ inline void bounds2DSweepL(
 }
 
 //==================================================================
+inline void bounds2DSweepR(
+					Bound &out_bound,
+					float r,
+					float phiMin,
+					float phiMax )
+{
+	out_bound.Expand( polar(r, phiMin) );
+	out_bound.Expand( polar(r, phiMax) );
+
+	for (int i=-3; i < 4; ++i)
+	{
+		float	phi = i * (float)M_PI_2;
+		if ( phiMin < phi && phiMax > phi )
+			out_bound.Expand( polar( r, phi ) );
+	}
+}
+
+//==================================================================
+inline void bounds2DSweepP(
+					Bound &out_bound,
+					const Point3 &p,
+					float theMin,
+					float theMax )
+{
+	float	r = sqrtf( p.x * p.x + p.y * p.y );
+	float	delta = atan2f( p.y, p.x );
+	
+	theMin += delta;
+	theMax += delta;
+	
+	out_bound.Expand( polar(r, theMin) );
+	out_bound.Expand( polar(r, theMax) );
+
+	for (int i=-1; i < 6; ++i)
+	{
+		float	the = i * (float)M_PI_2;
+		if ( theMin < the && theMax > the )
+			out_bound.Expand( polar( r, the ) );
+	}
+}
+
+//==================================================================
 void Cylinder::MakeBound( Bound &out_bound )
 {
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
+	out_bound.Reset();
 	bounds2DSweepL( out_bound, mRadius, mRadius, tuMin, tuMax );
 	out_bound.mBox[0].z = mZMin + mVRange[0]*(mZMax - mZMin);
 	out_bound.mBox[1].z = mZMin + mVRange[1]*(mZMax - mZMin);
@@ -186,8 +228,10 @@ void Cone::MakeBound( Bound &out_bound )
 {
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
+
 	float	rMin = mRadius * (1 - mVRange[1]);
 	float	rMax = mRadius * (1 - mVRange[0]);
+	out_bound.Reset();
 	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
 	out_bound.mBox[0].z = mVRange[0] * mHeight;
 	out_bound.mBox[1].z = mVRange[1] * mHeight;
@@ -195,22 +239,82 @@ void Cone::MakeBound( Bound &out_bound )
 
 void Sphere::MakeBound( Bound &out_bound )
 {
+	float	tuMin = mThetamaxRad * mURange[0];
+	float	tuMax = mThetamaxRad * mURange[1];
+
+	float	alphaMin = asinf( mZMin / mRadius );
+	float	alphaMax = asinf( mZMax / mRadius );
+
+	float	aVMin = DMix( alphaMin, alphaMax, mVRange[0] );
+	float	aVMax = DMix( alphaMin, alphaMax, mVRange[1] );
+
+	float	rVMin = cosf( aVMin ) * mRadius;
+	float	rVMax = cosf( aVMax ) * mRadius;
+	float	rMin = DMIN( rVMin, rVMax );
+	
+	float	rMax;
+	
+	if ( aVMin < 0 && aVMax > 0 )
+		rMax = mRadius;
+	else
+		rMax = DMAX( rVMin, rVMax );
+	
 	out_bound.Reset();
+	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
+
+	out_bound.mBox[0].z = sinf( aVMin ) * mRadius;
+	out_bound.mBox[1].z = sinf( aVMax ) * mRadius;
 }
 
 void Hyperboloid::MakeBound( Bound &out_bound )
 {
+	float	tuMin = mThetamaxRad * mURange[0];
+	float	tuMax = mThetamaxRad * mURange[1];
+	Point3	pMin; EvalP( 0, mVRange[0], pMin );
+	Point3	pMax; EvalP( 0, mVRange[1], pMax );
+
 	out_bound.Reset();
+	bounds2DSweepP( out_bound, pMin, tuMin, tuMax );
+	bounds2DSweepP( out_bound, pMax, tuMin, tuMax );
+	
+	out_bound.mBox[0].z = DMIN( pMin.z, pMax.z );
+	out_bound.mBox[1].z = DMAX( pMin.z, pMax.z );
 }
 
 void Paraboloid::MakeBound( Bound &out_bound )
 {
+	float	scale = mRmax / sqrtf( mZmax );
+
+	float	tuMin = mThetamaxRad * mURange[0];
+	float	tuMax = mThetamaxRad * mURange[1];
+	float	zVMin = mZmin + mVRange[0] * (mZmax-mZmin);
+	float	zVMax = mZmin + mVRange[1] * (mZmax-mZmin);
+	float	rMin = sqrtf( zVMin ) * scale;
+	float	rMax = sqrtf( zVMax ) * scale;
 	out_bound.Reset();
+	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
+	out_bound.mBox[0].z = zVMin;
+	out_bound.mBox[1].z = zVMax;
 }
 
 void Torus::MakeBound( Bound &out_bound )
 {
+	float	tuMin = mThetamaxRad * mURange[0];
+	float	tuMax = mThetamaxRad * mURange[1];
+
+	float	phiVMin = DMix( mPhiminRad, mPhimaxRad, mVRange[0] );
+	float	phiVMax = DMix( mPhiminRad, mPhimaxRad, mVRange[1] );
+
+	Bound	a;
+	a.Reset();
+	bounds2DSweepR( a, mMinRadius, phiVMin, phiVMax );
+	float	rMin = a.mBox[0].x + mMaxRadius;
+	float	rMax = a.mBox[1].x + mMaxRadius;
+
 	out_bound.Reset();
+	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
+	out_bound.mBox[0].z = a.mBox[0].y;
+	out_bound.mBox[1].z = a.mBox[1].y;
 }
 
 /*
