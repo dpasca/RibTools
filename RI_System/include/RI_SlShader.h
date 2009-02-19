@@ -92,8 +92,10 @@ public:
 				SlSymbol::Type	type,
 				bool			isVarying,
 				void			*pValue );
-				
+
 	SlValue	*Bind( MicroPolygonGrid &g );
+	
+	void Run( MicroPolygonGrid &g );
 };
 
 //==================================================================

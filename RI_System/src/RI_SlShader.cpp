@@ -8,6 +8,7 @@
  */
 
 #include "RI_SlShader.h"
+#include "RI_SlRunContext.h"
 
 //==================================================================
 namespace RI
@@ -83,6 +84,39 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 	}
 
 	return pDataSegment;
+}
+
+//==================================================================
+typedef void (*ShaderInstruction)( SlRunContext &ctx );
+
+//==================================================================
+void SlInst_AddFFF( SlRunContext &ctx )
+{
+	// ...
+}
+
+//==================================================================
+static ShaderInstruction	sInstructionTable[] =
+{
+	SlInst_AddFFF
+};
+
+//==================================================================
+void SlShaderInstance::Run( MicroPolygonGrid &g )
+{
+	SlRunContext	ctx;
+	
+	ctx.mProgramCounter = 0;
+	ctx.mpDataSegment	= Bind( g );
+	ctx.InitializeSIMD( g );
+	ctx.mpShaderInst	= this;
+	
+	while ( ctx.mProgramCounter < mpShader->mCode.size() )
+	{
+		const SlCPUWord	*pWord = ctx.GetOp( 0 );
+		
+		sInstructionTable[pWord->mOpCode.mTableOffset]( ctx );
+	}
 }
 
 //==================================================================

@@ -36,39 +36,39 @@ public:
 		mpDataSegment	= 0;
 		mpShaderInst	= 0;
 	}
-	
-	SlCPUWord *GeOp( u_int argc )
+
+	SlCPUWord *GetOp( u_int argc )
 	{
 		return &mpShaderInst->mpShader->mCode[mProgramCounter + argc];
 	}
-	const SlCPUWord *GeOp( u_int argc ) const
+	const SlCPUWord *GetOp( u_int argc ) const
 	{
 		return &mpShaderInst->mpShader->mCode[mProgramCounter + argc];
 	}
 	
 	u_int	GetOpCount() const
 	{
-		return GeOp(0)->mOpCode.mOperandCount;
+		return GetOp(0)->mOpCode.mOperandCount;
 	}
 
 	SlValue			&GetValue( u_int argc )
 	{
-		return mpDataSegment[GeOp(argc)->mSymbol.mTableOffset];
+		return mpDataSegment[GetOp(argc)->mSymbol.mTableOffset];
 	}
 	const SlValue	&GetValue( u_int argc ) const
 	{
-		return mpDataSegment[GeOp(argc)->mSymbol.mTableOffset];
+		return mpDataSegment[GetOp(argc)->mSymbol.mTableOffset];
 	}
 	
 	SlSymbol &GetSymbol( u_int argc )
 	{
 		return mpShaderInst->mpShader->mSymbols[
-						GeOp(argc)->mSymbol.mTableOffset ];
+						GetOp(argc)->mSymbol.mTableOffset ];
 	}
 
 	bool IsSymbolVarying( u_int argc ) const
 	{
-		return GeOp(argc)->mSymbol.mIsVarying;
+		return GetOp(argc)->mSymbol.mIsVarying;
 	}
 
 	float		*GetFloat ( u_int argc ) { return GetValue(argc).Data.pFloatValue;	}
