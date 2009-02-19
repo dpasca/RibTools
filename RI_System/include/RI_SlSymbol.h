@@ -62,7 +62,7 @@ public:
 
 			if (symbol.mType == type &&
 				symbol.mIsVarying == isVarying && 
-				0 == strcasecmp( symbol.mpToken, pName ) )
+				0 == strcmp( symbol.mpToken, pName ) )
 			{
 				// found !!!
 				return NULL;

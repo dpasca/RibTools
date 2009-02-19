@@ -140,6 +140,8 @@
 		6BC1DC170F4C7B1B00C2D1EA /* RI_SlSymbol.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BC1DC160F4C7B1B00C2D1EA /* RI_SlSymbol.h */; };
 		6BC1DC190F4C7C4400C2D1EA /* RI_SlShader.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BC1DC180F4C7C4400C2D1EA /* RI_SlShader.h */; };
 		6BC1DC1E0F4C7EE000C2D1EA /* RI_SlShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BC1DC1D0F4C7EE000C2D1EA /* RI_SlShader.cpp */; };
+		6BC9E5730F4DC78400F979DE /* RI_SlRunContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BC9E5720F4DC78400F979DE /* RI_SlRunContext.h */; };
+		6BC9E5790F4DC81C00F979DE /* RI_SlRunContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BC9E5780F4DC81C00F979DE /* RI_SlRunContext.cpp */; };
 		6BD7267A0F232B78003A4601 /* RI_Primitive_Base.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BD726790F232B78003A4601 /* RI_Primitive_Base.h */; };
 		6BD7267F0F232C7A003A4601 /* RI_Primitive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD7267C0F232C7A003A4601 /* RI_Primitive.cpp */; };
 		6BD726800F232C7A003A4601 /* RI_Primitive_Quadric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD7267D0F232C7A003A4601 /* RI_Primitive_Quadric.cpp */; };
@@ -282,6 +284,8 @@
 		6BC1DC160F4C7B1B00C2D1EA /* RI_SlSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_SlSymbol.h; path = include/RI_SlSymbol.h; sourceTree = "<group>"; };
 		6BC1DC180F4C7C4400C2D1EA /* RI_SlShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_SlShader.h; path = include/RI_SlShader.h; sourceTree = "<group>"; };
 		6BC1DC1D0F4C7EE000C2D1EA /* RI_SlShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_SlShader.cpp; path = src/RI_SlShader.cpp; sourceTree = "<group>"; };
+		6BC9E5720F4DC78400F979DE /* RI_SlRunContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_SlRunContext.h; path = include/RI_SlRunContext.h; sourceTree = "<group>"; };
+		6BC9E5780F4DC81C00F979DE /* RI_SlRunContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_SlRunContext.cpp; path = src/RI_SlRunContext.cpp; sourceTree = "<group>"; };
 		6BCC7ADF0ED04837004AEDC8 /* ribparser */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ribparser; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BD726790F232B78003A4601 /* RI_Primitive_Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive_Base.h; path = include/RI_Primitive_Base.h; sourceTree = "<group>"; };
 		6BD7267C0F232C7A003A4601 /* RI_Primitive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Primitive.cpp; path = src/RI_Primitive.cpp; sourceTree = "<group>"; };
@@ -456,6 +460,8 @@
 				6BC1DC160F4C7B1B00C2D1EA /* RI_SlSymbol.h */,
 				6BC1DC1D0F4C7EE000C2D1EA /* RI_SlShader.cpp */,
 				6BC1DC180F4C7C4400C2D1EA /* RI_SlShader.h */,
+				6BC9E5780F4DC81C00F979DE /* RI_SlRunContext.cpp */,
+				6BC9E5720F4DC78400F979DE /* RI_SlRunContext.h */,
 				6B8349920F0A7F0700BA7221 /* Tokenizer.cpp */,
 				6B8349930F0A7F0700BA7221 /* Tokenizer.h */,
 			);
@@ -586,6 +592,7 @@
 				6B279BBE0F3F07C40050CC99 /* RI_HiderREYES.h in Headers */,
 				6BC1DC170F4C7B1B00C2D1EA /* RI_SlSymbol.h in Headers */,
 				6BC1DC190F4C7C4400C2D1EA /* RI_SlShader.h in Headers */,
+				6BC9E5730F4DC78400F979DE /* RI_SlRunContext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -804,6 +811,7 @@
 				6B279BB80F3F03E30050CC99 /* RI_FrameworkREYES.cpp in Sources */,
 				6B279C6D0F3F136E0050CC99 /* RI_HiderREYES.cpp in Sources */,
 				6BC1DC1E0F4C7EE000C2D1EA /* RI_SlShader.cpp in Sources */,
+				6BC9E5790F4DC81C00F979DE /* RI_SlRunContext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

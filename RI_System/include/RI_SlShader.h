@@ -79,6 +79,7 @@ public:
 //==================================================================
 class SlShaderInstance
 {
+public:
 	SlShader			*mpShader;
 	//DVec<SlParameter>	mCallingParams;
 	SlSymbolList		mCallingParams;
