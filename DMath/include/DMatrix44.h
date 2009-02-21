@@ -186,4 +186,17 @@ inline Vector3 MultiplyMV3( const Vector3 &v, const Matrix44 &a )
 	);
 }
 
+//==================================================================
+inline Vector4 MultiplyV4M( const Matrix44 &a, const Vector4 &v )
+{
+	float	x = v.x, y = v.y, z = v.z, w = v.w;
+
+	return Vector4(
+		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3] * w,
+		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3] * w,
+		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3] * w,
+		a.u.m44[3][0] * x + a.u.m44[3][1] * y + a.u.m44[3][2] * z + a.u.m44[3][3] * w
+	);
+}
+
 #endif

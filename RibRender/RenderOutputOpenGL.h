@@ -11,8 +11,6 @@
 #define RENDEROUTPUTOPENGL_H
 
 #include "RI_FrameworkBase.h"
-#include "RenderOutputOpenGL.h"
-#include <GLUT/glut.h>
 
 //==================================================================
 // RenderOutputOpenGL
