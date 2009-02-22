@@ -17,6 +17,9 @@
 #include "DUtils.h"
 
 //==================================================================
+//#define DMATRIX44_POST_MODE
+
+//==================================================================
 class Matrix44
 {
 public:
@@ -58,10 +61,13 @@ public:
 		u.m44[0][0] = u.m44[1][1] = u.m44[2][2] = u.m44[3][3] = 1.0f;
 	}
 		
+	inline Matrix44 GetTranspose() const;
+
 	inline static Matrix44 Scale( float sx, float sy, float sz );
 	inline static Matrix44 Translate( float tx, float ty, float tz );
 	inline static Matrix44 Rot( float ang, float ax, float ay, float az );
 	inline static Matrix44 Perspective( float fov, float aspect, float n, float f );
+	inline static Matrix44 PerspectiveRH0( float fov, float aspect, float n, float f );
 
 	void CopyRowMajor( const float *pSrcMtx )
 	{
@@ -70,6 +76,18 @@ public:
 	
 	void PrintOut() const;
 };
+
+//==================================================================
+inline Matrix44 Matrix44::GetTranspose() const
+{
+	Matrix44	out;
+
+	for (int i=0; i < 4; ++i)
+		for (int j=0; j < 4; ++j)
+			out.u.m44[i][j] = u.m44[j][i];
+
+	return out;
+}
 
 //==================================================================
 inline Matrix44 Matrix44::Scale( float sx, float sy, float sz )
@@ -113,6 +131,7 @@ inline Matrix44 Matrix44::Rot( float ang, float ax, float ay, float az )
 			(one_c * zx) + ys,	(one_c * yz) - xs,	(one_c * zz) + c,	0,
 			0,					0,					0,					1 );
 }
+
 //==================================================================
 inline Matrix44 Matrix44::Perspective( float fov, float aspect, float n, float f )
 {
@@ -130,6 +149,22 @@ inline Matrix44 Matrix44::Perspective( float fov, float aspect, float n, float f
 }
 
 //==================================================================
+inline Matrix44 Matrix44::PerspectiveRH0( float fov, float aspect, float n, float f )
+{
+	float   ootan2 = tanf( fov * 0.5f );
+	DASSERT( ootan2 != 0 );
+	ootan2 = 1.0f / ootan2;
+
+	DASSERT( f != n );
+
+	return Matrix44(
+			ootan2/aspect,	0,		0,			0,
+			0,				ootan2,	0,			0,
+			0,				0,		f/(n-f),	-1,
+			0,				0,		n*f/(n-f),	0 );
+}
+
+//==================================================================
 inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 {
 	Matrix44	tmp;
@@ -139,7 +174,11 @@ inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 		{
 			float	sum = 0;
 			for (size_t i=0; i < 4; ++i)
+				#ifdef DMATRIX44_POST_MODE
+				sum += m1.u.m44[i][c] * m2.u.m44[r][i];
+				#else
 				sum += m1.u.m44[r][i] * m2.u.m44[i][c];
+				#endif
 
 			tmp.u.m44[r][c] = sum;
 		}
@@ -149,53 +188,60 @@ inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 }
 
 //==================================================================
-inline Vector4 operator * ( const Vector4 &v, const Matrix44 &a )
-{
-	float	x = v.x, y = v.y, z = v.z, w = v.w;
-
-	return Vector4(
-		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0] * w,
-		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1] * w,
-		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2] * w,
-		a.u.m44[0][3] * x + a.u.m44[1][3] * y + a.u.m44[2][3] * z + a.u.m44[3][3] * w
-	);
-}
-
-//==================================================================
-inline Vector4 operator * ( const Vector3 &v, const Matrix44 &a )
+inline Vector4 MultiplyV3W1M( const Vector3 &v, const Matrix44 &a )
 {
 	float	x = v.x, y = v.y, z = v.z;
 
 	return Vector4(
+#ifdef DMATRIX44_POST_MODE
+		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
+		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
+		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3],
+		a.u.m44[3][0] * x + a.u.m44[3][1] * y + a.u.m44[3][2] * z + a.u.m44[3][3]
+#else
 		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
 		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
 		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2],
 		a.u.m44[0][3] * x + a.u.m44[1][3] * y + a.u.m44[2][3] * z + a.u.m44[3][3]
+#endif
 	);
 }
 
 //==================================================================
-inline Vector3 MultiplyMV3( const Vector3 &v, const Matrix44 &a )
+inline Vector4 MultiplyMV3W1( const Matrix44 &a, const Vector3 &v )
+{
+	float	x = v.x, y = v.y, z = v.z;
+
+	return Vector4(
+#ifdef DMATRIX44_POST_MODE
+		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
+		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
+		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2],
+		a.u.m44[0][3] * x + a.u.m44[1][3] * y + a.u.m44[2][3] * z + a.u.m44[3][3]
+#else
+		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
+		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
+		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3],
+		a.u.m44[3][0] * x + a.u.m44[3][1] * y + a.u.m44[3][2] * z + a.u.m44[3][3]
+#endif
+	);
+}
+
+//==================================================================
+inline Vector3 MultiplyV3M( const Vector3 &v, const Matrix44 &a )
 {
 	float	x = v.x, y = v.y, z = v.z;
 
 	return Vector3(
+#ifdef DMATRIX44_POST_MODE
+		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
+		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
+		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3]
+#else
 		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
 		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
 		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2]
-	);
-}
-
-//==================================================================
-inline Vector4 MultiplyV4M( const Matrix44 &a, const Vector4 &v )
-{
-	float	x = v.x, y = v.y, z = v.z, w = v.w;
-
-	return Vector4(
-		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3] * w,
-		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3] * w,
-		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3] * w,
-		a.u.m44[3][0] * x + a.u.m44[3][1] * y + a.u.m44[3][2] * z + a.u.m44[3][3] * w
+#endif
 	);
 }
 

@@ -116,7 +116,7 @@ float HiderREYES::RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) con
 
 	for (size_t i=0; i < 8; ++i)
 	{
-		Vector4	Pproj = boxVerts[i] * mtxLocalProj;
+		Vector4	Pproj = MultiplyV3W1M( boxVerts[i], mtxLocalProj );
 		
 		if ( Pproj.w > 0 )
 		{
@@ -155,7 +155,7 @@ void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 
 	for (size_t i=0; i < n; ++i)
 	{
-		Vector4	Pproj = pSrc[i] * mMtxCameraProj;
+		Vector4	Pproj = MultiplyV3W1M( pSrc[i], mMtxCameraProj );
 		
 		float	oow = 1.0f / Pproj.w;
 		
@@ -185,7 +185,7 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 		{
 			float	u = g.mURange[0] + iu * du;
 			
-			Vector4	Pproj = *pRuns++ * mMtxCameraProj;
+			Vector4	Pproj = MultiplyV3W1M( *pRuns++, mMtxCameraProj );
 			
 			float	oow = 1.0f / Pproj.w;
 

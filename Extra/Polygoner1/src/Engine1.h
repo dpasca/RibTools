@@ -120,10 +120,13 @@ public:
 };
 
 //===============================================================
+typedef DVec<ObjBase *>	ObjList;
+
+//===============================================================
 class Container
 {
 public:
-	DVec<ObjBase *>	mpObjects[ObjBase::OT_N];
+	ObjList	mpObjects[ObjBase::OT_N];
 	
 	void AddObject( ObjBase *pObj )
 	{
@@ -137,11 +140,51 @@ class RendBuff
 public:
 	u_int	mWd;
 	u_int	mHe;
+	u_int	mChansN;
+	float	*mpData;
+
+	RendBuff( u_int wd=0, u_int he=0, u_int chansN=0 ) :
+		mWd(0),
+		mHe(0),
+		mChansN(chansN),
+		mpData(0)
+	{
+		Resize( wd, he, chansN );
+	}
 	
+	~RendBuff()
+	{
+		DSAFE_DELETE_ARRAY( mpData );
+	}
 	
+	void Resize( u_int wd, u_int he, u_int chansN )
+	{
+		if ( wd != mWd && he != mHe && chansN != mChansN )
+		{
+			mWd = wd;
+			mHe = he;
+			mChansN = chansN;
+			mpData = new float [ wd * chansN * he ];
+		}
+	}
+	
+	void Clear()
+	{
+		memset( mpData, 0, sizeof(float) * mChansN * mWd * mHe );
+	}
+	
+	float *GetPix( u_int x, u_int y )
+	{
+		DASSERT( x < mWd && y < mHe );
+
+		return mpData + (x + y * mWd) * mChansN;
+	}
 };
 
 //===============================================================
-void RendMesh( const Mesh *pMesh, const Matrix44 &mtxProjLocal );
+void RendMesh(
+			RendBuff		&rendBuff,
+			const Mesh		&mesh,
+			const Matrix44	&mtxProjLocal );
 
 #endif

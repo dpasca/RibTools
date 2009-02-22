@@ -64,7 +64,7 @@ public:
 	//==================================================================
 	inline void AddVertex( const GVert &vert )
 	{
-		Vector4	homoPos = Vector3( vert.x, vert.y, vert.z ) * mMtxLocalHomo;
+		Vector4	homoPos = MultiplyV3W1M( Vector3( vert.x, vert.y, vert.z ), mMtxLocalHomo );
 
 		//printf( "  vtx-scr: %f %f %f %f\n", sx, sy, sz, oow );
 	#ifdef __gl_h_

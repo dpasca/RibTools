@@ -96,7 +96,7 @@ void Primitive::Dice( MicroPolygonGrid &g )
 		{
 			EvalP( u, v, *pPoints );
 
-			*pPoints = MultiplyMV3( *pPoints, g.mMtxObjectCurrent );
+			*pPoints = MultiplyV3M( *pPoints, g.mMtxObjectCurrent );
 
 			++pPoints;
 		}

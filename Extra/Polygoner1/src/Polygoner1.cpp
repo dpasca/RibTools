@@ -7,18 +7,63 @@
  *
  */
 
+#include <stdexcept>
 #include <GLUT/glut.h>
 #include "Engine1.h"
+#include "DU_RenderOutput.h"
 #include "Polygoner1.h"
 
 //===============================================================
-static Container	sContainer;
+class App
+{
+public:
+	RendBuff			mRendBuff;
+	Container			mContainer;
+	DU::RenderOutput	mRendOutput;
+
+	//===============================================================
+	void OnDisplay()
+	{
+		mRendBuff.Clear();
+
+		Matrix44	mtxProjCam =
+			Matrix44::PerspectiveRH0(
+							M_PI/180.0f * 70.0f,
+							(float)mRendBuff.mWd / mRendBuff.mHe,
+							0.01f,
+							1000.0f );
+
+		Matrix44	mtxCamWorld = Matrix44::Translate( 0, 0, -50.0f );
+		Matrix44	mtxProjWorld = mtxProjCam * mtxCamWorld;
+
+		const ObjList	&nodesList = mContainer.mpObjects[ObjBase::OT_NODE];
+		for (size_t ni=0; ni < nodesList.size(); ++ni)
+		{
+			const Node	&node = *(const Node *)nodesList[ni];
+			
+			for (size_t mi=0; mi < node.mpMeshes.size(); ++mi)
+			{
+				const Mesh	&mesh = *node.mpMeshes[mi];
+				
+				RendMesh( mRendBuff, mesh, mtxProjWorld );
+			}
+		}
+
+		mRendOutput.Update( mRendBuff.mWd, mRendBuff.mHe, mRendBuff.mpData );
+		mRendOutput.Blit();
+	}
+};
+
+//===============================================================
+static App	*gpApp;
 
 //===============================================================
 void display(void)
 {
-	glClearColor( 0.2f, 0.2f, 0.2f, 0 );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	//glClearColor( 0.2f, 0.2f, 0.2f, 0 );
+    //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+	gpApp->OnDisplay();
 
     glutSwapBuffers();
 }
@@ -35,7 +80,9 @@ void reshape(int width, int height)
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	
-	glEnable( GL_DEPTH_TEST );
+	glDisable( GL_DEPTH_TEST );
+	
+	gpApp->mRendBuff.Resize( width, height, 3 );
 }
 
 //===============================================================
@@ -52,9 +99,12 @@ void idle(void)
 //===============================================================
 static void loadObj( const char *pFileName, Container &container  )
 {
+	char curPath[1024];
+	getcwd( curPath, 1024 );
+	
 	FILE	*pFile = fopen( pFileName, "r" );
 	if NOT( pFile )
-		return;
+		throw std::runtime_error( "Could not open file" );
 
 	Node	*pNode = new Node( pFileName );
 	Mesh	*pMesh = new Mesh( pFileName );
@@ -118,7 +168,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
 
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
     glutInitWindowSize( 640, 480 );
     
     glutCreateWindow( "Polygoner1" );
@@ -130,15 +180,19 @@ int main(int argc, char** argv)
 /*	
 	glutCreateMenu( menuFunc );
 
-	for (int i=0; gsTestRibFiles[i]; ++i)
-		 glutAddMenuEntry( gsTestRibFiles[i], i );
+	for (int i=0; gpApp->mTestRibFiles[i]; ++i)
+		 glutAddMenuEntry( gpApp->mTestRibFiles[i], i );
 	
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	strcpy( gpFileToRender, argv[1] );
 */
 
-	loadObj( "../TestData/cessna.obj", sContainer );
+	App		app;
+	gpApp = &app;
+
+
+	loadObj( "cessna.obj", gpApp->mContainer );
 
 	glutMainLoop();
 

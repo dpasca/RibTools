@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B1C19E20F5124A000D56A54 /* libDSystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B3ECEF30F5064EB00315C53 /* libDSystem.a */; };
+		6B1C1A520F512D9B00D56A54 /* cessna.obj in Resources */ = {isa = PBXBuildFile; fileRef = 6B3ECFE70F508FED00315C53 /* cessna.obj */; };
 		6B3ECE260F5060DF00315C53 /* DU_RenderOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B3ECE220F5060DF00315C53 /* DU_RenderOutput.cpp */; };
 		6B3ECE270F5060DF00315C53 /* Polygoner1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B3ECE240F5060DF00315C53 /* Polygoner1.cpp */; };
 		6B3ECF830F508BD200315C53 /* Engine1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B3ECF820F508BD200315C53 /* Engine1.cpp */; };
 		6B9EB65A0F505DBC006676C5 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B9EB6580F505DBC006676C5 /* GLUT.framework */; };
 		6B9EB65B0F505DBC006676C5 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B9EB6590F505DBC006676C5 /* OpenGL.framework */; };
-		6B9EB67D0F505E3E006676C5 /* DMath in Resources */ = {isa = PBXBuildFile; fileRef = 6B9EB6730F505E3E006676C5 /* DMath */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -20,7 +21,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 6B3ECEEE0F5064EB00315C53 /* DSystem.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D2AAC06F0554671400DB518D /* libDSystem.a */;
+			remoteGlobalIDString = D2AAC06F0554671400DB518D;
 			remoteInfo = DSystem;
 		};
 /* End PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B1C19E20F5124A000D56A54 /* libDSystem.a in Frameworks */,
 				6B9EB65A0F505DBC006676C5 /* GLUT.framework in Frameworks */,
 				6B9EB65B0F505DBC006676C5 /* OpenGL.framework in Frameworks */,
 			);
@@ -173,7 +175,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B9EB67D0F505E3E006676C5 /* DMath in Resources */,
+				6B1C1A520F512D9B00D56A54 /* cessna.obj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
