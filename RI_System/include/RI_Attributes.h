@@ -13,22 +13,11 @@
 #include "RI_Base.h"
 #include "RI_Tokens.h"
 #include "RI_Symbol.h"
+#include "RI_SlShader.h"
 
 //==================================================================
 namespace RI
 {
-
-//==================================================================
-struct Color
-{
-	union {
-		float	rgb[3];
-
-		struct {
-			float	r, g, b;
-		} col;
-	};
-};
 
 //==================================================================
 /// Attributess
@@ -70,6 +59,9 @@ public:
 	const RtBasis &GetUBasis() const { return mpCustomUBasis ? *mpCustomUBasis : mpyUBasis->value; }
 	const RtBasis &GetVBasis() const { return mpCustomVBasis ? *mpCustomVBasis : mpyVBasis->value; }
 
+	void cmdColor( const Color &color );
+	void cmdOpacity( const Color &color );
+
 public:
 	RevisionTracker	*mpRevision;
 
@@ -98,6 +90,10 @@ public:
 	
 	int			mUSteps;
 	int			mVSteps;
+	
+	Color				mColor;
+	Color				mOpacity;
+	SlShaderInstance	*mpShaderInstance;
 };
 
 //==================================================================

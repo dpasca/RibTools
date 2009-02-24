@@ -64,6 +64,9 @@ void Attributes::Init( SymbolList *pStatics, RevisionTracker *pRevision )
 
 	mpCustomUBasis = NULL;
 	mpCustomVBasis = NULL;
+	
+	mColor.Set( 1, 1, 1 );
+	mOpacity.Set( 1, 1, 1 );
 }
 
 //==================================================================
@@ -140,6 +143,18 @@ void Attributes::cmdBasis(
 	mUSteps	= ustep;
 	mVSteps	= vstep;
 	mpRevision->BumpRevision();
+}
+
+//==================================================================
+void Attributes::cmdColor( const Color &color )
+{
+	mColor = color;
+}
+
+//==================================================================
+void Attributes::cmdOpacity( const Color &color )
+{
+	mOpacity = color;
 }
 
 //==================================================================

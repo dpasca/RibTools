@@ -17,7 +17,7 @@
 #include "DUtils.h"
 
 //==================================================================
-//#define DMATRIX44_POST_MODE
+//#define DMATRIX44_ROWMTX_MODE
 
 //==================================================================
 class Matrix44
@@ -174,7 +174,7 @@ inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 		{
 			float	sum = 0;
 			for (size_t i=0; i < 4; ++i)
-				#ifdef DMATRIX44_POST_MODE
+				#ifdef DMATRIX44_ROWMTX_MODE
 				sum += m1.u.m44[i][c] * m2.u.m44[r][i];
 				#else
 				sum += m1.u.m44[r][i] * m2.u.m44[i][c];
@@ -193,7 +193,7 @@ inline Vector4 MultiplyV3W1M( const Vector3 &v, const Matrix44 &a )
 	float	x = v.x, y = v.y, z = v.z;
 
 	return Vector4(
-#ifdef DMATRIX44_POST_MODE
+#ifdef DMATRIX44_ROWMTX_MODE
 		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
 		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
 		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3],
@@ -213,7 +213,7 @@ inline Vector4 MultiplyMV3W1( const Matrix44 &a, const Vector3 &v )
 	float	x = v.x, y = v.y, z = v.z;
 
 	return Vector4(
-#ifdef DMATRIX44_POST_MODE
+#ifdef DMATRIX44_ROWMTX_MODE
 		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
 		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
 		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2],
@@ -233,7 +233,7 @@ inline Vector3 MultiplyV3M( const Vector3 &v, const Matrix44 &a )
 	float	x = v.x, y = v.y, z = v.z;
 
 	return Vector3(
-#ifdef DMATRIX44_POST_MODE
+#ifdef DMATRIX44_ROWMTX_MODE
 		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
 		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
 		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3]

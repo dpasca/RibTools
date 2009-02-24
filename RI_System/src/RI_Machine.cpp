@@ -179,6 +179,10 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Clipping" )			{ exN( 2, p ); mState.Clipping(		p[0], p[1] );	}	else
 	if ( nm == "DepthOfField" )		{ exN( 3, p ); mState.DepthOfField(	p[0], p[1], p[2] );	}	else
 	if ( nm == "Shutter" )			{ exN( 2, p ); mState.Shutter(		p[0], p[1] );	}	else
+	if ( nm == "Color"	)			{ exN( 1, p ); mState.ColorSet(		p[0].PFlt(3) );	}	else
+	if ( nm == "Opacity" )			{ exN( 1, p ); mState.Opacity(		p[0].PFlt(3) );	}	else
+	
+	
 	// transformations
 	if ( nm == "Identity" )			{ exN( 0, p ); mState.Identity();							}	else
 	if ( nm == "ConcatTransform" )	{ exN( 1, p ); mState.ConcatTransform(	p[0].PFlt(16) );	}	else

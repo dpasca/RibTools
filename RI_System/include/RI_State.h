@@ -27,7 +27,7 @@ namespace RI
 
 
 Options
-*	WorldBegin/End
+*	WorldBegin/EndÏ
 *	FrameBegin/End
 	
 Attributes
@@ -115,6 +115,9 @@ public:
 	void Sides( int sides );
 	void Basis( RtToken ubasis, const float *pCustomUBasis, int ustep,
 				RtToken vbasis, const float *pCustomVBasis, int vstep );
+				
+	void ColorSet( const Color &col );
+	void Opacity( const Color &col );
 
 	// options
 	void Format( int xRes, int yRes, float pixelRatio );

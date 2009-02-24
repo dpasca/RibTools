@@ -143,6 +143,7 @@ public:
 typedef	Vector2	Point2;
 typedef	Vector3	Point3;
 typedef	Vector4	Point4;
+typedef	Vector3	Color;
 
 //==================================================================
 /// 

@@ -334,6 +334,24 @@ void State::Basis( RtToken ubasis, const float *pCustomUBasis, int ustep,
 						vbasis, pCustomVBasis, vstep );
 }
 
+//==================================================================
+void State::ColorSet( const Color &col )
+{
+	if NOT( verifyOpType( OPTYPE_ATRB ) )
+		return;
+
+	mAttributesStack.top().cmdColor( col );
+}
+
+//==================================================================
+void State::Opacity( const Color &col )
+{
+	if NOT( verifyOpType( OPTYPE_ATRB ) )
+		return;
+
+	mAttributesStack.top().cmdOpacity( col );
+}
+
 // options
 //==================================================================
 void State::Format( int xRes, int yRes, float pixelRatio )

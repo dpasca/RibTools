@@ -35,8 +35,8 @@ void RendMesh(
 	
 	for (size_t i=0; i < posSize; i += 3)
 	{
-		Vector4	posProj = MultiplyMV3W1( mtxTmp, Vector3( &pPos[i] ) );
-		//Vector4	posProj = MultiplyV3W1M( Vector3( &pPos[i] ), mtxTmp );
+		//Vector4	posProj = MultiplyMV3W1( mtxTmp, Vector3( &pPos[i] ) );
+		Vector4	posProj = MultiplyV3W1M( Vector3( &pPos[i] ), mtxTmp );
 		
 		u_int	ccode = 0;
 		if ( posProj.x < -posProj.w )	ccode |= CCODE_LFT;

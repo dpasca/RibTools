@@ -34,7 +34,7 @@ public:
 							1000.0f );
 
 		Matrix44	mtxCamWorld = Matrix44::Translate( 0, 0, -50.0f );
-		Matrix44	mtxProjWorld = mtxProjCam * mtxCamWorld;
+		Matrix44	mtxProjWorld = mtxCamWorld * mtxProjCam;
 
 		const ObjList	&nodesList = mContainer.mpObjects[ObjBase::OT_NODE];
 		for (size_t ni=0; ni < nodesList.size(); ++ni)
