@@ -45,6 +45,16 @@ public:
 	bool	mIsVarying;
 	u_int	mArraySize;
 	void	*mpDefaultVal;
+	
+	void Reset()
+	{
+		mpToken = NULL;
+		mType = FLOAT;
+		mStorage = CONSTANT;
+		mIsVarying = false;
+		mArraySize = 0;
+		mpDefaultVal = NULL;
+	}
 };
 
 //==================================================================

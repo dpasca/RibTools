@@ -91,9 +91,11 @@ void FrameworkREYES::WorldEnd()
 		if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
 		{
 			pPrim->Dice( grid );
+
 			// should check backface and trim
 			// grid.displace();
-			// grid.shade();
+			grid.Shade();
+
 			mpHider->Hide( grid );
 		}
 		else

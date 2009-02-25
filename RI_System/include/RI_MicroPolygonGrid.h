@@ -13,6 +13,7 @@
 #include "DTypes.h"
 #include "DContainers.h"
 #include "DMath.h"
+#include "RI_SlSymbol.h"
 
 //==================================================================
 namespace RI
@@ -24,22 +25,20 @@ class MicroPolygonGrid
 public:
 	static const u_int	MAX_SIZE = 64 * 64;
 	
-	u_int		mXDim;
-	u_int		mYDim;
-	u_int		mPointsN;
-	Point3		*mpPoints;
-	Matrix44	mMtxObjectCurrent;
-	float		mURange[2];
-	float		mVRange[2];
+	u_int			mXDim;
+	u_int			mYDim;
+	u_int			mPointsN;
+	Point3			*mpPoints;
+	Matrix44		mMtxObjectCurrent;
+	float			mURange[2];
+	float			mVRange[2];
+	SlSymbolList	mSymbols;
 	
 	MicroPolygonGrid() : mXDim(0), mYDim(0), mpPoints(0), mPointsN(0)
 	{
 	}
 
-	~MicroPolygonGrid()
-	{
-		DSAFE_DELETE_ARRAY( mpPoints );
-	}
+	~MicroPolygonGrid();
 
 	void Setup(u_int xdim,
 			   u_int ydim,
@@ -48,6 +47,8 @@ public:
 			   const Matrix44 &mtxObjectCurrent );
 			   
 	u_int GetPointsN() const { return mPointsN; }
+	
+	void Shade();
 };
 
 //==================================================================

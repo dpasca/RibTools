@@ -21,11 +21,6 @@ void MicroPolygonGrid::Setup(
 						const float vRange[2],
 						const Matrix44 &mtxObjectCurrent )
 {
-	DSAFE_DELETE_ARRAY( mpPoints );
-	
-	// $$$ why +1 ? For derivatives ?
-	mpPoints = new Point3[ (xdim+1) * (ydim+1) ];
-
 	mXDim = xdim;
 	mYDim = ydim;
 	mPointsN = mXDim * mYDim;
@@ -34,7 +29,77 @@ void MicroPolygonGrid::Setup(
 	mURange[1] = uRange[1];
 	mVRange[0] = vRange[0];
 	mVRange[1] = vRange[1];
+
+	// $$$ why +1 ? For derivatives ?
+	//mpPoints = new Point3[ (xdim+1) * (ydim+1) ];
+
+	SlSymbol	symbol;
+
+	symbol.Reset();
+
+	// allocate some standard varying params
+	symbol.mIsVarying = true;
+	symbol.mArraySize = mPointsN;
+	symbol.mStorage = SlSymbol::PARAMETER;
+
+	symbol.mpToken = "P";
+	symbol.mType = SlSymbol::POINT;
+	symbol.mpDefaultVal = new Point3 [ mPointsN ];
+	mSymbols.push_back( symbol );
+	mpPoints = (Point3 *)symbol.mpDefaultVal;
+
+	symbol.mpToken = "Ci";
+	symbol.mType = SlSymbol::COLOR;
+	symbol.mpDefaultVal = new Color [ mPointsN ];
+	mSymbols.push_back( symbol );
+	
+	symbol.mpToken = "Oi";
+	symbol.mType = SlSymbol::COLOR;
+	symbol.mpDefaultVal = new Color [ mPointsN ];
+	mSymbols.push_back( symbol );
+	
+	symbol.mpToken = "Cs";
+	symbol.mType = SlSymbol::COLOR;
+	symbol.mpDefaultVal = new Color [ mPointsN ];
+	mSymbols.push_back( symbol );
+	
+	symbol.mpToken = "Os";
+	symbol.mType = SlSymbol::COLOR;
+	symbol.mpDefaultVal = new Color [ mPointsN ];
+	mSymbols.push_back( symbol );	
 }
 
+//==================================================================
+MicroPolygonGrid::~MicroPolygonGrid()
+{
+	for (size_t i=0; i < mSymbols.size(); ++i)
+	{
+		if ( mSymbols[i].mIsVarying )
+		{
+			switch ( mSymbols[i].mType )
+			{
+			case SlSymbol::FLOAT:	delete [] ((float *)mSymbols[i].mpDefaultVal); break;
+			case SlSymbol::POINT:	delete [] ((Point3 *)mSymbols[i].mpDefaultVal ); break;
+			case SlSymbol::COLOR:	delete [] ((Color *)mSymbols[i].mpDefaultVal ); break;
+			case SlSymbol::STRING:	delete [] ((char *)mSymbols[i].mpDefaultVal ); break;
+			case SlSymbol::VECTOR:	delete [] ((Vector3 *)mSymbols[i].mpDefaultVal ); break;
+			case SlSymbol::NORMAL:	delete [] ((Vector3 *)mSymbols[i].mpDefaultVal ); break;
+			case SlSymbol::MATRIX:	delete [] ((Matrix44 *)mSymbols[i].mpDefaultVal ); break;
+
+			default:
+				DASSERT( 0 );
+				break;
+			}
+		}
+	}
+}
+
+//==================================================================
+void MicroPolygonGrid::Shade()
+{
+	
+}
+
+	
 //==================================================================
 }

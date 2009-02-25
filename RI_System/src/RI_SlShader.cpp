@@ -51,13 +51,11 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 			break;
 
 		case SlSymbol::PARAMETER:
-			/* have to sort this out...
 			pDataSegment[i].Data.pVoidValue = 
-				g.LookupVariable(
-							symbol.mpToken,
-							symbol.mType,
-							symbol.mIsVarying );
-			*/
+				g.mSymbols.LookupVariable(
+								symbol.mpToken,
+								symbol.mType,
+								symbol.mIsVarying );
 				
 			if NOT( pDataSegment[i].Data.pVoidValue )
 			{
