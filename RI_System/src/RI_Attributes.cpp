@@ -67,6 +67,8 @@ void Attributes::Init( SymbolList *pStatics, RevisionTracker *pRevision )
 	
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
+
+	mpShaderInstance = NULL;
 }
 
 //==================================================================

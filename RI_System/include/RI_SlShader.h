@@ -72,6 +72,8 @@ public:
 	DStr			mShaderName;
 	DVec<SlSymbol>	mSymbols;
 	DVec<SlCPUWord>	mCode;
+	
+	SlShader();
 };
 
 //==================================================================
