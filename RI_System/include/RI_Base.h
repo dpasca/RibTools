@@ -106,6 +106,62 @@ public:
 };
 
 //==================================================================
+class ResourceBase
+{
+	std::string	mName;
+	size_t		mRefCount;
+	
+	friend class ResourceManager;
+
+public:
+	ResourceBase() :
+		mRefCount(0)
+	{
+	}
+	
+	virtual ~ResourceBase()
+	{
+		DASSERT( mRefCount == 0 );
+	}
+	
+	void AddRef()
+	{
+		mRefCount += 1;
+	}
+
+	void SubRef()
+	{
+		DASSERT( mRefCount >= 1 );
+		mRefCount -= 1;
+	}
+};
+
+//==================================================================
+/// ResourceManager
+//==================================================================
+class ResourceManager
+{
+	DVec<ResourceBase *>	mpList;
+public:
+	ResourceManager()
+	{
+	}
+	
+	~ResourceManager()
+	{
+		Collect();
+	}
+	
+	ResourceBase *AddResource( ResourceBase *pRes )
+	{
+		mpList.push_back( pRes );
+		return pRes;
+	}
+
+	void Collect();
+};
+
+//==================================================================
 /// 
 //==================================================================
 typedef const char	*RtToken;

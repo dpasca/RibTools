@@ -66,7 +66,7 @@ union SlCPUWord
 //==================================================================
 /// SlShader
 //==================================================================
-class SlShader
+class SlShader : public ResourceBase
 {
 public:
 	DStr			mShaderName;

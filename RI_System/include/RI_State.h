@@ -67,6 +67,8 @@ class State
 	Matrix44						mMtxWorldCamera;
 
 	FrameworkBase					*mpFramework;
+	
+	ResourceManager					mpShadersList;
 
 	enum OpType
 	{
@@ -154,6 +156,7 @@ public:
 
 	void ErrHandler( Error errCode );
 	void ErrHandler( Error errCode, const char *pFmt, ... );
+
 private:
 	bool checkPopMode( Mode expectedMode );
 	bool verifyOpType( OpType optype );
@@ -180,6 +183,8 @@ private:
 	inline void popStacks( const u_int flags );
 	
 	inline void insertPrimitive( Primitive *pPrim );
+	
+	void makeDefaultShaders();
 };
 
 }

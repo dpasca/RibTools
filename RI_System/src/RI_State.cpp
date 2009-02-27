@@ -119,6 +119,14 @@ State::State( FrameworkBase *pFramework ) :
 	mTransformCloseStack.top().Init( &mTransCloseRevTrack );
 	
 	mpFramework->SetStatics( &mStatics );
+	
+	makeDefaultShaders();
+}
+
+//==================================================================
+void State::makeDefaultShaders()
+{
+	SlShader *pShader = (SlShader *)mpShadersList.AddResource( new SlShader() );
 }
 
 //==================================================================

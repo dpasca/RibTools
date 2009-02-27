@@ -90,4 +90,26 @@ RtBasis	PowerBasis
 );
 
 //==================================================================
+/// ResourceManager
+//==================================================================
+void ResourceManager::Collect()
+{
+	size_t	wi = 0;
+	for (size_t ri=0; ri < mpList.size(); ++ri)
+	{
+		if ( mpList[ri]->mRefCount == 0 )
+		{
+			delete mpList[ri];
+			mpList[ri] = NULL;
+		}
+		else
+		{
+			if ( wi != ri )
+				mpList[wi++] = mpList[ri];
+		}
+	}
+	mpList.resize( wi );
+}
+
+//==================================================================
 }
