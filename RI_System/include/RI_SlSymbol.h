@@ -39,7 +39,7 @@ public:
 		GLOBAL,
 	};
 	
-	RtToken	mpToken;
+	DStr	mName;
 	Type	mType;
 	Storage	mStorage;
 	bool	mIsVarying;
@@ -48,7 +48,7 @@ public:
 	
 	void Reset()
 	{
-		mpToken = NULL;
+		mName.clear();
 		mType = FLOAT;
 		mStorage = CONSTANT;
 		mIsVarying = false;
@@ -72,7 +72,7 @@ public:
 
 			if (symbol.mType == type &&
 				symbol.mIsVarying == isVarying && 
-				0 == strcmp( symbol.mpToken, pName ) )
+				0 == strcmp( symbol.mName.c_str(), pName ) )
 			{
 				// found !!!
 				return NULL;

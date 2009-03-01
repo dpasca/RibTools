@@ -42,28 +42,28 @@ void MicroPolygonGrid::Setup(
 	symbol.mArraySize = mPointsN;
 	symbol.mStorage = SlSymbol::PARAMETER;
 
-	symbol.mpToken = "P";
+	symbol.mName = "P";
 	symbol.mType = SlSymbol::POINT;
 	symbol.mpDefaultVal = new Point3 [ mPointsN ];
 	mSymbols.push_back( symbol );
 	mpPoints = (Point3 *)symbol.mpDefaultVal;
 
-	symbol.mpToken = "Ci";
+	symbol.mName = "Ci";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = new Color [ mPointsN ];
 	mSymbols.push_back( symbol );
 	
-	symbol.mpToken = "Oi";
+	symbol.mName = "Oi";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = new Color [ mPointsN ];
 	mSymbols.push_back( symbol );
 	
-	symbol.mpToken = "Cs";
+	symbol.mName = "Cs";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = new Color [ mPointsN ];
 	mSymbols.push_back( symbol );
 	
-	symbol.mpToken = "Os";
+	symbol.mName = "Os";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = new Color [ mPointsN ];
 	mSymbols.push_back( symbol );	

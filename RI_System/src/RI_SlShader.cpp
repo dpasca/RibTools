@@ -20,8 +20,8 @@ namespace RI
 //==================================================================
 const char *pColorCopyShader =
 ".data"	"\n"
-"	Ci		point varying parameter"	"\n"
-"	Oi		point varying"	"\n"
+"	Ci		parameter varying point"	"\n"
+"	Oi		parameter varying color"	"\n"
 ""	"\n"
 ".code"	"\n"
 "	move	Oi, Ci"	"\n"
@@ -47,32 +47,105 @@ private:
 	void doParse( DUT::MemFile &file )
 	{
 		char		lineBuff[1024];
-		
 		Section		curSection = CODE;
+		int			lineCnt = 0;
 		
 		while ( file.ReadTextLine( lineBuff, sizeof(lineBuff) ) )
 		{
 			DUT::StrStripBeginEndWhite( lineBuff );
-
+			
+			if ( 0 == strcasecmp( lineBuff, ".data" ) )
+				curSection = DATA;
+			else
+			if ( 0 == strcasecmp( lineBuff, ".code" ) )
+				curSection = CODE;
+			else
 			if ( curSection == DATA )
 			{
-				parseDataLine( lineBuff );
+				parseDataLine( lineBuff, lineCnt );
 			}
 			else
 			{
-				parseCodeLine( lineBuff );
+				parseCodeLine( lineBuff, lineCnt );
 			}
+
+			++lineCnt;
 		}
 	}
 
 	//==================================================================
-	void parseDataLine( const char lineBuff[] )
+	bool parseDataLine( char lineBuff[], int lineCnt )
 	{
 		printf( "DATA: %s\n", lineBuff );
+		
+		const char *pLineEnd = lineBuff + strlen( lineBuff );
+		
+		char *pTokCtx;
+		char *pTok;
+		
+		SlSymbol	symbol;		
+		symbol.Reset();
+
+		if NOT( pTok = strtok_r( lineBuff, " \t", &pTokCtx ) )
+			return true;
+
+		symbol.mName = pTok;
+
+		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+		{
+			printf( "ERROR: Expecting storage definition\n" );
+			return false;
+		}
+			
+		if ( 0 == strcmp( pTok, "constant"  ) ) symbol.mStorage = SlSymbol::CONSTANT ; else
+		if ( 0 == strcmp( pTok, "parameter" ) ) symbol.mStorage = SlSymbol::PARAMETER; else
+		if ( 0 == strcmp( pTok, "temporary" ) ) symbol.mStorage = SlSymbol::TEMPORARY; else
+		if ( 0 == strcmp( pTok, "global"	) ) symbol.mStorage = SlSymbol::GLOBAL   ; else
+		{
+			printf( "ERROR: Invalid storage definition: '%s'\n", pTok );
+			return false;
+		}
+
+		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+		{
+			printf( "ERROR: Expecting variability definition\n" );
+			return false;
+		}
+
+		if ( 0 == strcmp( pTok, "varying"	) ) symbol.mIsVarying = true ; else
+		if ( 0 == strcmp( pTok, "uniform"	) ) symbol.mIsVarying = false; else
+		{
+			printf( "ERROR: Invalid variability definition: '%s'\n", pTok );
+			return false;
+		}
+
+		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+		{
+			printf( "ERROR: Expecting type definition\n" );
+			return false;
+		}
+
+		if ( 0 == strcmp( pTok, "float"  ) ) symbol.mType = SlSymbol::FLOAT ; else
+		if ( 0 == strcmp( pTok, "point"  ) ) symbol.mType = SlSymbol::POINT ; else
+		if ( 0 == strcmp( pTok, "color"  ) ) symbol.mType = SlSymbol::COLOR ; else
+		if ( 0 == strcmp( pTok, "string" ) ) symbol.mType = SlSymbol::STRING; else
+		if ( 0 == strcmp( pTok, "vector" ) ) symbol.mType = SlSymbol::VECTOR; else
+		if ( 0 == strcmp( pTok, "normal" ) ) symbol.mType = SlSymbol::NORMAL; else
+		if ( 0 == strcmp( pTok, "matrix" ) ) symbol.mType = SlSymbol::MATRIX; else
+		{
+			printf( "ERROR: Invalid type definition: '%s'\n", pTok );
+			return false;
+		}
+
+		const char *pDefaultValueStr = pTok + strlen(pTok) + 1;
+		if ( pDefaultValueStr < pLineEnd )
+			printf( "Default value '%s'\n", pDefaultValueStr );			
+
+		return true;
 	}
 
 	//==================================================================
-	void parseCodeLine( const char lineBuff[] )
+	void parseCodeLine( const char lineBuff[], int lineCnt )
 	{
 		printf( "CODE: %s\n", lineBuff );
 	}
@@ -143,7 +216,7 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 		case SlSymbol::PARAMETER:
 			pDataSegment[i].Data.pVoidValue = 
 				g.mSymbols.LookupVariable(
-								symbol.mpToken,
+								symbol.mName.c_str(),
 								symbol.mType,
 								symbol.mIsVarying );
 				
@@ -151,7 +224,7 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 			{
 				pDataSegment[i].Data.pVoidValue = 
 					mCallingParams.LookupVariable(
-										symbol.mpToken,
+										symbol.mName.c_str(),
 										symbol.mType,
 										symbol.mIsVarying );
 			}
