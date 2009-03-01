@@ -9,6 +9,7 @@
 
 #include "RI_SlShader.h"
 #include "RI_SlRunContext.h"
+#include "DUtils.h"
 
 //==================================================================
 namespace RI
@@ -17,8 +18,76 @@ namespace RI
 //==================================================================
 /// SlShader
 //==================================================================
+const char *pColorCopyShader =
+".data"	"\n"
+"	Ci		point varying parameter"	"\n"
+"	Oi		point varying"	"\n"
+""	"\n"
+".code"	"\n"
+"	move	Oi, Ci"	"\n"
+;
+
+//==================================================================
+class ShaderAsmParser
+{
+	enum Section
+	{
+		DATA,
+		CODE,
+	};
+	
+public:
+	ShaderAsmParser( DUT::MemFile &file )
+	{
+		doParse( file );
+	}
+
+private:
+	//==================================================================
+	void doParse( DUT::MemFile &file )
+	{
+		char		lineBuff[1024];
+		
+		Section		curSection = CODE;
+		
+		while ( file.ReadTextLine( lineBuff, sizeof(lineBuff) ) )
+		{
+			DUT::StrStripBeginEndWhite( lineBuff );
+
+			if ( curSection == DATA )
+			{
+				parseDataLine( lineBuff );
+			}
+			else
+			{
+				parseCodeLine( lineBuff );
+			}
+		}
+	}
+
+	//==================================================================
+	void parseDataLine( const char lineBuff[] )
+	{
+		printf( "DATA: %s\n", lineBuff );
+	}
+
+	//==================================================================
+	void parseCodeLine( const char lineBuff[] )
+	{
+		printf( "CODE: %s\n", lineBuff );
+	}
+};
+
+//==================================================================
+/// SlShader
+//==================================================================
 SlShader::SlShader()
 {
+	DUT::MemFile	file(	(const void *)pColorCopyShader,
+							strlen(pColorCopyShader) );
+
+	ShaderAsmParser	parser( file );
+
 	// initialize with a custom default shader for now !
 	SlCPUWord		word;
 	

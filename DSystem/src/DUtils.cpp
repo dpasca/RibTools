@@ -86,4 +86,114 @@ void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 }
 
 //==================================================================
+/// MemFile
+//==================================================================
+MemFile::MemFile( const void *pDataSrc, size_t dataSize ) :
+	mpData((const U8 *)pDataSrc),
+	mDataSize(dataSize),
+	mReadPos(0),
+	mOwnData(false),
+	mIsReadOnly(true)
+{
+}
+
+//==================================================================
+MemFile::MemFile( const char *pFileName ) :
+	mpData(NULL),
+	mDataSize(0),
+	mReadPos(0),
+	mOwnData(true),
+	mIsReadOnly(true)
+{
+	void	*pData;
+	size_t	dataSize;
+	if NOT( DUT::GrabFile( pFileName, pData, dataSize ) )
+	{
+		DASSTHROW( 0, ("Could not open the file %s in input.", pFileName) );
+	}
+	
+	mpData = (const U8 *)pData;
+	mDataSize = dataSize;
+}
+
+//==================================================================
+MemFile::~MemFile()
+{
+	if ( mOwnData )
+		DSAFE_DELETE_ARRAY( mpData );
+}
+
+//==================================================================
+bool MemFile::ReadTextLine( char *pDestStr, size_t destStrMaxSize )
+{
+	if ( mReadPos >= mDataSize )
+		return false;
+
+	size_t	destIdx = 0;
+	while ( mReadPos < mDataSize )
+	{
+		char ch = mpData[ mReadPos++ ];
+
+		if ( ch == '\n' )
+		{
+			break;
+		}
+		else
+		{
+			DASSTHROW( destIdx < destStrMaxSize, ("Writing out of bounds !") );
+			pDestStr[ destIdx++ ] = ch;
+		}
+	}
+
+	DASSTHROW( destIdx < destStrMaxSize, ("Writing out of bounds !") );
+	pDestStr[ destIdx ] = 0;
+	
+	DASSERT( mReadPos <= mDataSize );
+
+	return true;
+}
+
+//==================================================================
+static bool isWhite( char ch )
+{
+	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f';
+}
+
+//==================================================================
+void StrStripBeginEndWhite( char *pStr )
+{
+	size_t	len = strlen( pStr );
+
+	if NOT( len )
+		return;
+	
+	int	newLen = len;
+	for (int i=(int)len-1; i >= 0; --i)
+	{
+		char ch = pStr[i];
+		if ( isWhite( ch ) )
+			pStr[i] = 0;
+		else
+		{
+			newLen = i + 1;
+			break;
+		}
+	}
+
+	size_t	di = 0;
+	bool	foundNonWhite = false;
+	for (int si=0; si < newLen; ++si)
+	{
+		char ch = pStr[si];
+
+		if ( foundNonWhite || !isWhite( ch ) )
+		{
+			pStr[di++] = pStr[si];
+			foundNonWhite = true;
+		}
+	}
+	pStr[di] = 0;
+}
+
+//==================================================================
 }
