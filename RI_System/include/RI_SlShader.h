@@ -19,6 +19,17 @@ namespace RI
 {
 
 //==================================================================
+enum OpCodeID
+{
+	OP_MOV,
+	OP_ADD,
+	OP_SUB,
+	OP_MUL,
+	OP_DIV,
+	OP_NORMALIZE
+};
+
+//==================================================================
 class SlValue
 {
 public:
@@ -73,7 +84,7 @@ public:
 	DVec<SlSymbol>	mSymbols;
 	DVec<SlCPUWord>	mCode;
 	
-	SlShader();
+	SlShader( const char *pShaderSource );
 };
 
 //==================================================================

@@ -124,9 +124,23 @@ State::State( FrameworkBase *pFramework ) :
 }
 
 //==================================================================
+/// SlShader
+//==================================================================
+static const char *gspColorCopyShader =
+".data"	"\n"
+"	Ci		parameter varying point"	"\n"
+"	Oi		parameter varying color"	"\n"
+""	"\n"
+".code"	"\n"
+"	mov		Oi	Ci"	"\n"
+;
+
+//==================================================================
 void State::makeDefaultShaders()
 {
-	SlShader *pShader = (SlShader *)mpShadersList.AddResource( new SlShader() );
+	SlShader *pShader =
+		(SlShader *)mpShadersList.AddResource(
+						new SlShader( gspColorCopyShader ) );
 }
 
 //==================================================================

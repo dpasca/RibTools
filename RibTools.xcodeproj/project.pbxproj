@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B0404BB0F5F048000521FB2 /* RI_SlShaderAsmParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B0404BA0F5F048000521FB2 /* RI_SlShaderAsmParser.h */; };
+		6B0404BD0F5F04A300521FB2 /* RI_SlShaderAsmParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B0404BC0F5F04A300521FB2 /* RI_SlShaderAsmParser.cpp */; };
 		6B0A68E10F151619000CB0D8 /* RI_State_Prims.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */; };
 		6B16F3F70F0AA50600B53225 /* DUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B16F3F60F0AA50600B53225 /* DUtils.cpp */; };
 		6B16F3F90F0AA51900B53225 /* DUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F3F80F0AA51900B53225 /* DUtils.h */; };
@@ -222,6 +224,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6B0404BA0F5F048000521FB2 /* RI_SlShaderAsmParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_SlShaderAsmParser.h; path = include/RI_SlShaderAsmParser.h; sourceTree = "<group>"; };
+		6B0404BC0F5F04A300521FB2 /* RI_SlShaderAsmParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_SlShaderAsmParser.cpp; path = src/RI_SlShaderAsmParser.cpp; sourceTree = "<group>"; };
 		6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Prims.cpp; path = src/RI_State_Prims.cpp; sourceTree = "<group>"; };
 		6B0ABFC00F16675D0001C656 /* Pixar.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Pixar.rib; path = Tests/Pixar.rib; sourceTree = "<group>"; };
 		6B16F3F60F0AA50600B53225 /* DUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DUtils.cpp; path = src/DUtils.cpp; sourceTree = "<group>"; };
@@ -460,6 +464,8 @@
 				6BC1DC160F4C7B1B00C2D1EA /* RI_SlSymbol.h */,
 				6BC1DC1D0F4C7EE000C2D1EA /* RI_SlShader.cpp */,
 				6BC1DC180F4C7C4400C2D1EA /* RI_SlShader.h */,
+				6B0404BC0F5F04A300521FB2 /* RI_SlShaderAsmParser.cpp */,
+				6B0404BA0F5F048000521FB2 /* RI_SlShaderAsmParser.h */,
 				6BC9E5780F4DC81C00F979DE /* RI_SlRunContext.cpp */,
 				6BC9E5720F4DC78400F979DE /* RI_SlRunContext.h */,
 				6B8349920F0A7F0700BA7221 /* Tokenizer.cpp */,
@@ -593,6 +599,7 @@
 				6BC1DC170F4C7B1B00C2D1EA /* RI_SlSymbol.h in Headers */,
 				6BC1DC190F4C7C4400C2D1EA /* RI_SlShader.h in Headers */,
 				6BC9E5730F4DC78400F979DE /* RI_SlRunContext.h in Headers */,
+				6B0404BB0F5F048000521FB2 /* RI_SlShaderAsmParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -812,6 +819,7 @@
 				6B279C6D0F3F136E0050CC99 /* RI_HiderREYES.cpp in Sources */,
 				6BC1DC1E0F4C7EE000C2D1EA /* RI_SlShader.cpp in Sources */,
 				6BC9E5790F4DC81C00F979DE /* RI_SlRunContext.cpp in Sources */,
+				6B0404BD0F5F04A300521FB2 /* RI_SlShaderAsmParser.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
