@@ -30,7 +30,7 @@ public:
 	Attributes();
 	Attributes( const Attributes &attributes );
 
-	void Init( SymbolList *pStatics, RevisionTracker *pRevision );
+	void Init( SymbolList *pStatics, ResourceManager *pResManager, RevisionTracker *pRevision );
 
 	~Attributes();
 
@@ -93,7 +93,7 @@ public:
 	
 	Color				mColor;
 	Color				mOpacity;
-	SlShaderInstance	*mpShaderInstance;
+	SlShaderInstance	mShaderInstance;
 };
 
 //==================================================================

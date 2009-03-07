@@ -19,7 +19,8 @@ namespace RI
 //==================================================================
 /// SlShader
 //==================================================================
-SlShader::SlShader( const char *pShaderSource )
+SlShader::SlShader( const char *pShaderName, const char *pShaderSource ) :
+	ResourceBase(pShaderName)
 {
 	DUT::MemFile	file((const void *)pShaderSource,
 						  strlen(pShaderSource) );

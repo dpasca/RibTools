@@ -94,7 +94,7 @@ void FrameworkREYES::WorldEnd()
 
 			// should check backface and trim
 			// grid.displace();
-			grid.Shade();
+			//grid.Shade( *pPrim->mpAttribs );
 
 			mpHider->Hide( grid );
 		}

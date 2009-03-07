@@ -84,7 +84,7 @@ public:
 	DVec<SlSymbol>	mSymbols;
 	DVec<SlCPUWord>	mCode;
 	
-	SlShader( const char *pShaderSource );
+	SlShader( const char *pName, const char *pShaderSource );
 };
 
 //==================================================================

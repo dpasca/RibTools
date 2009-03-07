@@ -68,7 +68,7 @@ class State
 
 	FrameworkBase					*mpFramework;
 	
-	ResourceManager					mpShadersList;
+	ResourceManager					mResManager;
 
 	enum OpType
 	{

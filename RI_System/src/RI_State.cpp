@@ -113,14 +113,14 @@ State::State( FrameworkBase *pFramework ) :
 	mStatics.FindOrAdd(	RI_HERMITEBASIS				, HermiteBasis		);
 	mStatics.FindOrAdd(	RI_POWERBASIS				, PowerBasis		);	
 	
+	makeDefaultShaders();
+
 	mOptionsStack.top().Init( &mStatics, &mOptionsRevTrack );
-	mAttributesStack.top().Init( &mStatics, &mAttribsRevTrack );
+	mAttributesStack.top().Init( &mStatics, &mResManager, &mAttribsRevTrack );
 	mTransformOpenStack.top().Init( &mTransOpenRevTrack );
 	mTransformCloseStack.top().Init( &mTransCloseRevTrack );
 	
 	mpFramework->SetStatics( &mStatics );
-	
-	makeDefaultShaders();
 }
 
 //==================================================================
@@ -139,8 +139,8 @@ static const char *gspColorCopyShader =
 void State::makeDefaultShaders()
 {
 	SlShader *pShader =
-		(SlShader *)mpShadersList.AddResource(
-						new SlShader( gspColorCopyShader ) );
+		(SlShader *)mResManager.AddResource(
+						new SlShader( "Default", gspColorCopyShader ) );
 }
 
 //==================================================================

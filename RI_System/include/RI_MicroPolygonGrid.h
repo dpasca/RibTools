@@ -20,6 +20,9 @@ namespace RI
 {
 
 //==================================================================
+class Attributes;
+
+//==================================================================
 class MicroPolygonGrid
 {
 public:
@@ -48,7 +51,7 @@ public:
 			   
 	u_int GetPointsN() const { return mPointsN; }
 	
-	void Shade();
+	void Shade( Attributes &attribs );
 };
 
 //==================================================================

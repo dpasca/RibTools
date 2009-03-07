@@ -7,6 +7,7 @@
  *
  */
 
+#include "RI_Attributes.h"
 #include "RI_MicroPolygonGrid.h"
 
 //==================================================================
@@ -95,9 +96,9 @@ MicroPolygonGrid::~MicroPolygonGrid()
 }
 
 //==================================================================
-void MicroPolygonGrid::Shade()
+void MicroPolygonGrid::Shade( Attributes &attribs )
 {
-	
+	attribs.mShaderInstance.Run( *this );
 }
 
 	

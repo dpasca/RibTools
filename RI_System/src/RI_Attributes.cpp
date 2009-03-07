@@ -41,10 +41,13 @@ Attributes::~Attributes()
 {
 	DSAFE_DELETE( mpCustomUBasis );
 	DSAFE_DELETE( mpCustomVBasis );
+
+	if ( mShaderInstance.mpShader )
+		mShaderInstance.mpShader->SubRef();
 }
 
 //==================================================================
-void Attributes::Init( SymbolList *pStatics, RevisionTracker *pRevision )
+void Attributes::Init( SymbolList *pStatics, ResourceManager *pResManager, RevisionTracker *pRevision )
 {
 	mpStatics	= pStatics;
 	mpRevision	= pRevision;
@@ -67,8 +70,9 @@ void Attributes::Init( SymbolList *pStatics, RevisionTracker *pRevision )
 	
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
-
-	mpShaderInstance = NULL;
+	
+	mShaderInstance.mpShader = (SlShader *)pResManager->FindResource( "Default" );
+	mShaderInstance.mpShader->AddRef();
 }
 
 //==================================================================

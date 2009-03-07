@@ -114,7 +114,8 @@ class ResourceBase
 	friend class ResourceManager;
 
 public:
-	ResourceBase() :
+	ResourceBase( const char *pName ) :
+		mName(pName),
 		mRefCount(0)
 	{
 	}
@@ -156,6 +157,15 @@ public:
 	{
 		mpList.push_back( pRes );
 		return pRes;
+	}
+	
+	ResourceBase *FindResource( const char *pName )
+	{
+		for (size_t i=0; i < mpList.size(); ++i)
+			if ( 0 == strcasecmp( pName, mpList[i]->mName.c_str() ) )
+				return mpList[i];
+
+		return NULL;
 	}
 
 	void Collect();
