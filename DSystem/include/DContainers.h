@@ -55,6 +55,11 @@ public:
 	{
 		return mVec.back();
 	}
+	
+	void clear()
+	{
+		mVec.clear();
+	}
 };
 
 //==================================================================
@@ -86,6 +91,11 @@ public:
 	T &top()
 	{
 		return mVec.back();
+	}
+
+	void clear()
+	{
+		mVec.clear();
 	}
 };
 
@@ -122,6 +132,14 @@ public:
 	T &top()
 	{
 		return mVec[mSize-1];
+	}
+	
+	void clear()
+	{
+		for (size_t i=0; i < mSize; ++i)
+			mVec[i].~T();
+			
+		mSize = 0;
 	}
 };
 

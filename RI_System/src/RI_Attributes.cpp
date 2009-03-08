@@ -34,6 +34,9 @@ Attributes::Attributes( const Attributes &attributes )
 
 	if ( attributes.mpCustomVBasis )
 		mpCustomVBasis = new Matrix44( *attributes.mpCustomVBasis );
+	
+	if ( mShaderInstance.mpShader )
+		mShaderInstance.mpShader->AddRef();
 }
 
 //==================================================================
@@ -43,7 +46,10 @@ Attributes::~Attributes()
 	DSAFE_DELETE( mpCustomVBasis );
 
 	if ( mShaderInstance.mpShader )
+	{
 		mShaderInstance.mpShader->SubRef();
+		mShaderInstance.mpShader = NULL;
+	}
 }
 
 //==================================================================
@@ -70,6 +76,8 @@ void Attributes::Init( SymbolList *pStatics, ResourceManager *pResManager, Revis
 	
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
+	
+	DASSERT( mShaderInstance.mpShader == NULL );
 	
 	mShaderInstance.mpShader = (SlShader *)pResManager->FindResource( "Default" );
 	mShaderInstance.mpShader->AddRef();

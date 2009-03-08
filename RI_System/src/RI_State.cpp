@@ -147,6 +147,12 @@ void State::makeDefaultShaders()
 State::~State()
 {
 	End();
+
+	mModeStack.clear();
+	mOptionsStack.clear();
+	mAttributesStack.clear();
+	mTransformOpenStack.clear();
+	mTransformCloseStack.clear();
 }
 
 //==================================================================
