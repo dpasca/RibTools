@@ -26,17 +26,48 @@ Attributes::Attributes()
 Attributes::Attributes( const Attributes &attributes )
 {
 	*this = attributes;
+}
+
+//==================================================================
+const Attributes& Attributes::operator=(const Attributes& rhs)
+{
+	mpStatics			= rhs.mpStatics;
+	
+	mpRevision			= rhs.mpRevision			;
+	mSymbols			= rhs.mSymbols				;
+	mBound				= rhs.mBound				;
+	mDetail				= rhs.mDetail				;
+	mMinVisible			= rhs.mMinVisible			;
+	mLowerTransition	= rhs.mLowerTransition		;
+	mUpperTransition	= rhs.mUpperTransition		;
+	mMaxVisible			= rhs.mMaxVisible			;
+	mpyTypeApproximation= rhs.mpyTypeApproximation	;
+	mValueApproximation	= rhs.mValueApproximation	;
+	mpyOrientation		= rhs.mpyOrientation		;
+	mSides				= rhs.mSides				;
+	mpyUBasis			= rhs.mpyUBasis				;
+	mpyVBasis			= rhs.mpyVBasis				;
+
 	mpCustomUBasis = NULL;
 	mpCustomVBasis = NULL;
 
-	if ( attributes.mpCustomUBasis )
-		mpCustomUBasis = new Matrix44( *attributes.mpCustomUBasis );
+	if ( rhs.mpCustomUBasis )
+		mpCustomUBasis = new Matrix44( *rhs.mpCustomUBasis );
 
-	if ( attributes.mpCustomVBasis )
-		mpCustomVBasis = new Matrix44( *attributes.mpCustomVBasis );
+	if ( rhs.mpCustomVBasis )
+		mpCustomVBasis = new Matrix44( *rhs.mpCustomVBasis );	
+
 	
+	mUSteps				= rhs.mUSteps				;
+	mVSteps				= rhs.mVSteps				;
+	mColor				= rhs.mColor				;
+	mOpacity			= rhs.mOpacity				;
+	mShaderInstance		= rhs.mShaderInstance		;
+		
 	if ( mShaderInstance.mpShader )
 		mShaderInstance.mpShader->AddRef();
+	
+	return *this;
 }
 
 //==================================================================

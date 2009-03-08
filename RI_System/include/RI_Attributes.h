@@ -30,6 +30,8 @@ public:
 	Attributes();
 	Attributes( const Attributes &attributes );
 
+	const Attributes& operator=(const Attributes& rhs);
+
 	void Init( SymbolList *pStatics, ResourceManager *pResManager, RevisionTracker *pRevision );
 
 	~Attributes();

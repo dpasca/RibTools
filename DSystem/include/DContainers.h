@@ -103,18 +103,23 @@ public:
 template <class T, size_t MAX>
 class CopyStackMax
 {
-	T		mVec[MAX];
+	u_char	mVec[ sizeof(T) * MAX ];
 	size_t	mSize;
 
 public:
 	CopyStackMax()
 	{
+		T	*p = (T *)&mVec[0];
+		new ( p ) T;
 		mSize = 1;
 	}
+
 	void push()
 	{
 		DASSTHROW( mSize < MAX, ("Out of bounds !") );
-		mVec[mSize] = mVec[mSize-1];
+
+		*(T *)&mVec[mSize * sizeof(T)] = top();
+		
 		mSize += 1;
 	}
 	
@@ -126,19 +131,19 @@ public:
 
 	const T &top() const
 	{
-		return mVec[mSize-1];
+		return *(const T *)&mVec[(mSize-1) * sizeof(T)];
 	}
 
 	T &top()
 	{
-		return mVec[mSize-1];
+		return *(T *)&mVec[(mSize-1) * sizeof(T)];
 	}
 	
 	void clear()
 	{
 		for (size_t i=0; i < mSize; ++i)
 			mVec[i].~T();
-			
+
 		mSize = 0;
 	}
 };
