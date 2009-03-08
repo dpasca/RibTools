@@ -43,6 +43,32 @@ struct Param
 		FltVec		floatArrayVal;
 	}u;
 
+	Param() : type(UNKNOWN) {}
+	~Param() {}
+
+	/*
+	
+	const Param &operator=( const Param &rhs )
+	{
+		type = rhs.type;
+		switch ( type )
+		{
+		case INT:		u.intVal = rhs.u.intVal;	break;
+		case FLT:		u.floatVal = rhs.u.floatVal;	break;
+		case INT_ARR: 	u.stringVal = rhs.u.stringVal;	break;
+		case FLT_ARR: 	u.intArrayVal = rhs.u.intArrayVal;	break;
+		case STR:		u.floatArrayVal = rhs.u.floatArrayVal;	break;
+
+		case UNKNOWN:
+		default:
+				DASSERT( 0 );
+				break;
+		}
+		
+		return *this;
+	}
+	*/
+
 	inline int			Int() const
 	{
 		if ( type == INT )		return u.intVal;	else

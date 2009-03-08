@@ -30,7 +30,7 @@ public:
 	int			mNextCommandLine;
 	DStr		mCurCommand;
 	int			mCurCommandLine;
-	DVec<Param>	mCurParams;
+	ParamList	mCurParams;
 
 public:
 	Parser();
@@ -43,9 +43,9 @@ public:
 		return	( mCurCommand.length() != 0 );
 	}
 	
-	void FlushNewCommand( DStr			*out_pCmdName,
-						  DVec<Param>	*out_pParams,
-						  int			*out_pCmdLine );
+	void FlushNewCommand( DStr		*out_pCmdName,
+						  ParamList	*out_pParams,
+						  int		*out_pCmdLine );
 	
 	int GetCurLineNumber() const;
 	

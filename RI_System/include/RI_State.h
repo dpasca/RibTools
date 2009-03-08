@@ -54,10 +54,10 @@ class State
 {
 	SymbolList						mStatics;
 	Stack<Mode>						mModeStack;
-	CopyStackMax<Options,	128>	mOptionsStack;
-	CopyStackMax<Attributes,128>	mAttributesStack;
-	CopyStackMax<Transform, 128>	mTransformOpenStack;
-	CopyStackMax<Transform, 128>	mTransformCloseStack;
+	CopyStack<Options	>	mOptionsStack;
+	CopyStack<Attributes>	mAttributesStack;
+	CopyStack<Transform	>	mTransformOpenStack;
+	CopyStack<Transform	>	mTransformCloseStack;
 	
 	RevisionTracker					mOptionsRevTrack;
 	RevisionTracker					mAttribsRevTrack;

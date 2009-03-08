@@ -147,9 +147,9 @@ void Parser::AddChar( char ch )
 }
 
 //==================================================================
-void Parser::FlushNewCommand( DStr			*out_pCmdName,
-							  DVec<Param>	*out_pParams,
-							  int			*out_pCmdLine )
+void Parser::FlushNewCommand( DStr		*out_pCmdName,
+							  ParamList	*out_pParams,
+							  int		*out_pCmdLine )
 {
 	*out_pCmdName	= mCurCommand;
 	*out_pCmdLine	= mCurCommandLine;

@@ -36,6 +36,10 @@ public:
 
 	~Attributes();
 
+private:
+	void copyFrom(const Attributes& rhs);
+
+public:
 /*
 	//==================================================================
 	Attributes &operator=(const Attributes &attributes)

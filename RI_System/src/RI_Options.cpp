@@ -18,6 +18,7 @@ namespace RI
 
 //==================================================================
 Options::Options() :
+	mpStatics(NULL),
 	mpRevision(NULL)
 {
 }

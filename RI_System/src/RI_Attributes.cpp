@@ -25,11 +25,22 @@ Attributes::Attributes()
 //==================================================================
 Attributes::Attributes( const Attributes &attributes )
 {
-	*this = attributes;
+	copyFrom( attributes );
 }
 
 //==================================================================
 const Attributes& Attributes::operator=(const Attributes& rhs)
+{
+	DSAFE_DELETE( mpCustomUBasis );
+	DSAFE_DELETE( mpCustomVBasis );
+	
+	copyFrom( rhs );
+	
+	return *this;
+}
+	
+//==================================================================
+void Attributes::copyFrom(const Attributes& rhs)
 {
 	mpStatics			= rhs.mpStatics;
 	
@@ -66,8 +77,6 @@ const Attributes& Attributes::operator=(const Attributes& rhs)
 		
 	if ( mShaderInstance.mpShader )
 		mShaderInstance.mpShader->AddRef();
-	
-	return *this;
 }
 
 //==================================================================
