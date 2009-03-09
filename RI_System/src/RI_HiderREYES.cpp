@@ -175,7 +175,10 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 	float destHalfWd	= (float)mDestBuff.mWd * 0.5f;
 	float destHalfHe	= (float)mDestBuff.mHe * 0.5f;
 
-	const Point3	*pRuns = g.mpPoints;
+	const Point3	*pRuns	= g.mpPoints;
+
+	const Color		*pOi	= (const Color *)
+		g.mSymbols.LookupVariable( "Oi", SlSymbol::COLOR, true )->mpDefaultVal;
 
 	for (u_int iv=0; iv < g.mYDim; ++iv)
 	{
@@ -192,12 +195,23 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 			int	winX = (int)(destHalfWd + destHalfWd * Pproj.x * oow);
 			int	winY = (int)(destHalfHe - destHalfHe * Pproj.y * oow);
 
+
 			float	destCol[3] =
 			{
 				u,
 				v,
 				0
 			};
+/*
+			float	destCol[3] =
+			{
+				pOi->x,
+				pOi->y,
+				pOi->z
+			};
+*/
+			
+			++pOi;
 
 			mDestBuff.SetSample( winX, winY, destCol );
 		}

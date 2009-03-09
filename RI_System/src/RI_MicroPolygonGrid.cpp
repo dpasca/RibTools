@@ -101,6 +101,5 @@ void MicroPolygonGrid::Shade( Attributes &attribs )
 	attribs.mShaderInstance.Run( *this );
 }
 
-	
 //==================================================================
 }

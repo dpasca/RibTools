@@ -237,6 +237,8 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 		word.mSymbol.mTableOffset = (u_int)symbolIdx;
 		word.mSymbol.mIsVarying	  = mpShader->mSymbols[symbolIdx].mIsVarying;
+
+		mpShader->mCode.push_back( word );
 	}
 
 	return true;

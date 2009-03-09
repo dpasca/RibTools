@@ -65,25 +65,34 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 			break;
 
 		case SlSymbol::PARAMETER:
-			pDataSegment[i].Data.pVoidValue = 
-				g.mSymbols.LookupVariable(
-								symbol.mName.c_str(),
-								symbol.mType,
-								symbol.mIsVarying );
-				
-			if NOT( pDataSegment[i].Data.pVoidValue )
 			{
-				pDataSegment[i].Data.pVoidValue = 
-					mCallingParams.LookupVariable(
-										symbol.mName.c_str(),
-										symbol.mType,
-										symbol.mIsVarying );
-			}
+				SlSymbol	*pFoundSymbol = NULL;
 
-			if NOT( pDataSegment[i].Data.pVoidValue )
-			{
-				pDataSegment[i].Data.pVoidValue = 
-									symbol.mpDefaultVal;
+				pFoundSymbol =
+					g.mSymbols.LookupVariable(
+									symbol.mName.c_str(),
+									symbol.mType,
+									symbol.mIsVarying );
+
+				if NOT( pFoundSymbol )
+				{
+					pFoundSymbol =
+						mCallingParams.LookupVariable(
+											symbol.mName.c_str(),
+											symbol.mType,
+											symbol.mIsVarying );
+				}
+
+				if NOT( pFoundSymbol )
+				{
+					if NOT( symbol.mpDefaultVal )
+						DASSTHROW( 0, ("Could not bind symbol %s", symbol.mName.c_str()) );
+
+					pDataSegment[i].Data.pVoidValue = symbol.mpDefaultVal;
+				}
+				else
+					pDataSegment[i].Data.pVoidValue = pFoundSymbol->mpDefaultVal;
+
 			}
 			break;
 
@@ -182,7 +191,6 @@ static ShaderInstruction	sInstructionTable[] =
 //==================================================================
 void SlShaderInstance::Run( MicroPolygonGrid &g )
 {
-
 	SlRunContext	ctx;
 	
 	ctx.mProgramCounter = 0;

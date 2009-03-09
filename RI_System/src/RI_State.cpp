@@ -128,7 +128,7 @@ State::State( FrameworkBase *pFramework ) :
 //==================================================================
 static const char *gspColorCopyShader =
 ".data"	"\n"
-"	Ci		parameter varying point"	"\n"
+"	Ci		parameter varying color"	"\n"
 "	Oi		parameter varying color"	"\n"
 ""	"\n"
 ".code"	"\n"

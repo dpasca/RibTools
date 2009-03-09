@@ -53,17 +53,19 @@ public:
 
 	SlValue			&GetValue( u_int argc )
 	{
-		return mpDataSegment[GetOp(argc)->mSymbol.mTableOffset];
+		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
+		return mpDataSegment[tableOff];
 	}
 	const SlValue	&GetValue( u_int argc ) const
 	{
-		return mpDataSegment[GetOp(argc)->mSymbol.mTableOffset];
+		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
+		return mpDataSegment[tableOff];
 	}
-	
+
 	SlSymbol &GetSymbol( u_int argc )
 	{
-		return mpShaderInst->mpShader->mSymbols[
-						GetOp(argc)->mSymbol.mTableOffset ];
+		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
+		return mpShaderInst->mpShader->mSymbols[tableOff ];
 	}
 
 	bool IsSymbolVarying( u_int argc ) const

@@ -61,7 +61,7 @@ public:
 class SlSymbolList : public DVec<SlSymbol>
 {
 public:
-	void *LookupVariable(
+	SlSymbol *LookupVariable(
 			const char		*pName,
 			SlSymbol::Type	type,
 			bool			isVarying )
@@ -75,7 +75,7 @@ public:
 				0 == strcmp( symbol.mName.c_str(), pName ) )
 			{
 				// found !!!
-				return NULL;
+				return &symbol;
 			}
 		}
 
