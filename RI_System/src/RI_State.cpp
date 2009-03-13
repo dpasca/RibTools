@@ -126,13 +126,16 @@ State::State( FrameworkBase *pFramework ) :
 //==================================================================
 /// SlShader
 //==================================================================
-static const char *gspColorCopyShader =
+static const char *gspConstantShader =
 ".data"	"\n"
+"	Cs		parameter varying color"	"\n"
+"	Os		parameter varying color"	"\n"
 "	Ci		parameter varying color"	"\n"
 "	Oi		parameter varying color"	"\n"
 ""	"\n"
 ".code"	"\n"
-"	mov		Oi	Ci"	"\n"
+"	mov		Ci	Cs"	"\n"
+"	mov		Oi	Os"	"\n"
 ;
 
 //==================================================================
@@ -140,7 +143,7 @@ void State::makeDefaultShaders()
 {
 	SlShader *pShader =
 		(SlShader *)mResManager.AddResource(
-						new SlShader( "Default", gspColorCopyShader ) );
+						new SlShader( "constant", gspConstantShader ) );
 }
 
 //==================================================================

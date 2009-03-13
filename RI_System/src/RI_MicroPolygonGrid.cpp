@@ -15,6 +15,19 @@ namespace RI
 {
 
 //==================================================================
+static Color *newColArray( float r, float g, float b, size_t n )
+{
+	Color	*pCol = new Color [n];
+	
+	for (size_t i=0; i < n; ++i)
+	{
+		pCol[i].Set( r, g, b );
+	}
+
+	return pCol;
+}
+
+//==================================================================
 void MicroPolygonGrid::Setup(
 						u_int xdim,
 						u_int ydim,
@@ -51,23 +64,23 @@ void MicroPolygonGrid::Setup(
 
 	symbol.mName = "Ci";
 	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = new Color [ mPointsN ];
+	symbol.mpDefaultVal = newColArray( 1, 0, 0, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Oi";
 	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = new Color [ mPointsN ];
+	symbol.mpDefaultVal = newColArray( 0, 1, 0, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Cs";
 	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = new Color [ mPointsN ];
+	symbol.mpDefaultVal = newColArray( 0, 0, 1, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Os";
 	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = new Color [ mPointsN ];
-	mSymbols.push_back( symbol );	
+	symbol.mpDefaultVal = newColArray( 1, 1, 0, mPointsN );
+	mSymbols.push_back( symbol );
 }
 
 //==================================================================

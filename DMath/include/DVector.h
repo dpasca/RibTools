@@ -49,13 +49,14 @@ public:
 		x = p_[0];
 		y = p_[1];
 	}
-	
+
 	Vector2 operator * (float rval) const { return Vector2( x * rval, y * rval ); }
 	Vector2 operator + (float rval) const { return Vector2( x + rval, y + rval ); }
 	Vector2 operator + (const Vector2 &rval) const { return Vector2( x + rval.x, y + rval.y ); }
 	Vector2 operator - (const Vector2 &rval) const { return Vector2( x - rval.x, y - rval.y ); }
+	Vector2 operator * (const Vector2 &rval) const { return Vector2( x * rval.x, y * rval.y ); }
+	Vector2 operator / (const Vector2 &rval) const { return Vector2( x / rval.x, y / rval.y ); }
 };
-
 
 //==================================================================
 /// Vector3
@@ -103,6 +104,8 @@ public:
 	Vector3 operator + (float rval) const { return Vector3( x + rval, y + rval, z + rval ); }
 	Vector3 operator + (const Vector3 &rval) const { return Vector3( x + rval.x, y + rval.y, z + rval.z ); }
 	Vector3 operator - (const Vector3 &rval) const { return Vector3( x - rval.x, y - rval.y, z - rval.z ); }
+	Vector3 operator * (const Vector3 &rval) const { return Vector3( x * rval.x, y * rval.y, z * rval.z ); }
+	Vector3 operator / (const Vector3 &rval) const { return Vector3( x / rval.x, y / rval.y, z / rval.z ); }
 };
 
 inline Vector3 operator * (float lval, const Vector3 &rval)
@@ -137,6 +140,11 @@ public:
 	Vector4( const Vector3 v3_, float w_ ) :
 		x(v3_.x), y(v3_.y), z(v3_.z), w(w_)
 	{}
+
+	Vector4 operator + (const Vector4 &rval) const { return Vector4( x + rval.x, y + rval.y, z + rval.z, w + rval.w ); }
+	Vector4 operator - (const Vector4 &rval) const { return Vector4( x - rval.x, y - rval.y, z - rval.z, w - rval.w ); }
+	Vector4 operator * (const Vector4 &rval) const { return Vector4( x * rval.x, y * rval.y, z * rval.z, w * rval.w ); }
+	Vector4 operator / (const Vector4 &rval) const { return Vector4( x / rval.x, y / rval.y, z / rval.z, w / rval.w ); }
 };
 
 

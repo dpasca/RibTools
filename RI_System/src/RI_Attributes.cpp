@@ -119,7 +119,7 @@ void Attributes::Init( SymbolList *pStatics, ResourceManager *pResManager, Revis
 	
 	DASSERT( mShaderInstance.mpShader == NULL );
 	
-	mShaderInstance.mpShader = (SlShader *)pResManager->FindResource( "Default" );
+	mShaderInstance.mpShader = (SlShader *)pResManager->FindResource( "constant" );
 	mShaderInstance.mpShader->AddRef();
 }
 

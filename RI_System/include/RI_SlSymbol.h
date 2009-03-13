@@ -29,6 +29,7 @@ public:
 		VECTOR,
 		NORMAL,
 		MATRIX,
+		TYPES_N
 	};
 	
 	enum Storage
@@ -80,6 +81,18 @@ public:
 		}
 
 		return NULL;
+	}
+
+	void *LookupVariableData(
+			const char		*pName,
+			SlSymbol::Type	type,
+			bool			isVarying )
+	{
+		SlSymbol	*pSym = LookupVariable( pName, type, isVarying );
+		if NOT( pSym )
+			return NULL;
+		else
+			return pSym->mpDefaultVal;
 	}
 };
 

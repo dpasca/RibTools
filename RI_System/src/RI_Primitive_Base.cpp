@@ -84,9 +84,12 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 void Primitive::Dice( MicroPolygonGrid &g )
 {
 	Point3	*pPoints = g.mpPoints;
-	
-	float	du = 1.0f / g.mYDim;
-	float	dv = 1.0f / g.mXDim;
+
+	Color	*pOs = (Color *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
+	Color	*pCs = (Color *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
+
+	float	du = 1.0f / g.mXDim;
+	float	dv = 1.0f / g.mYDim;
 
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
@@ -96,9 +99,13 @@ void Primitive::Dice( MicroPolygonGrid &g )
 		{
 			EvalP( u, v, *pPoints );
 
-			*pPoints = MultiplyV3M( *pPoints, g.mMtxObjectCurrent );
+			*pPoints++ = MultiplyV3M( *pPoints, g.mMtxObjectCurrent );
 
-			++pPoints;
+			*pOs++ = mpAttribs->mOpacity;
+			*pCs++ = mpAttribs->mColor;
+
+			//*pOs++ = Color( 1, 0, 0 );
+			//*pCs++ = Color( 0, 1, 0 );
 		}
 	}
 }

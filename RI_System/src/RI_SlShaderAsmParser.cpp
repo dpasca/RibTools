@@ -188,6 +188,28 @@ int ShaderAsmParser::findSymbol( const char *pName ) const
 }
 
 //==================================================================
+static OperTypeID getOperTypeFromSlSymbolType( SlSymbol::Type slSymType, bool &out_success )
+{
+	out_success = true;
+
+	switch ( slSymType )
+	{
+	case SlSymbol::FLOAT:	return OPRTYPE_F1 ;
+	//case SlSymbol:::		return OPRTYPE_F2 ;
+	case SlSymbol::POINT:
+	case SlSymbol::COLOR:
+	case SlSymbol::VECTOR:
+							return OPRTYPE_F3 ;
+	//case SlSymbol:::		return OPRTYPE_F4 ;
+	case SlSymbol::MATRIX:	return OPRTYPE_M44;
+	
+	default:
+		out_success = false;
+		return OPRTYPE_F1;
+	}
+}
+
+//==================================================================
 bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 {
 	//printf( "CODE: %s\n", lineBuff );
@@ -209,13 +231,17 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 		return false;
 	}
 
-	SlCPUWord		word;
-	word.mOpCode.mTableOffset	= opCodeIdx;
-	word.mOpCode.mOperandCount	= pOpDef->OperCnt;
-	mpShader->mCode.push_back( word );
+	SlCPUWord		instruction;
+	instruction.mOpCode.mTableOffset	= opCodeIdx;
+	instruction.mOpCode.mOperandCount	= pOpDef->OperCnt;
+	instruction.mOpCode.mDestOpType		= 0;
+	size_t	instrIdx = mpShader->mCode.size();
+	mpShader->mCode.push_back( instruction );
 
 	for (u_int i=0; i < pOpDef->OperCnt; ++i)
 	{
+		SlCPUWord	word;
+		
 		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 		{
 			printf( "ERROR: missing operand #%i, "
@@ -239,7 +265,24 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 		word.mSymbol.mIsVarying	  = mpShader->mSymbols[symbolIdx].mIsVarying;
 
 		mpShader->mCode.push_back( word );
+		
+		// copy the type of the first operator into the opcode
+		if ( i == 0 )
+		{
+			bool success;
+			instruction.mOpCode.mDestOpType =
+				getOperTypeFromSlSymbolType( mpShader->mSymbols[symbolIdx].mType, success );
+				
+			if NOT( success )
+			{
+				printf( "ERROR: Invalid operand type !\n", pTok );
+				return false;
+			}
+		}
 	}
+
+	// write again
+	mpShader->mCode[instrIdx] = instruction;
 
 	return true;
 }

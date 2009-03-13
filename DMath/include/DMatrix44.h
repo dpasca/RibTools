@@ -73,8 +73,13 @@ public:
 	{
 		memcpy( u.m16, pSrcMtx, sizeof(float) * 16 );
 	}
-	
+
 	void PrintOut() const;
+
+	Matrix44 operator + (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]+rval.u.m16[i]; return m_; }
+	Matrix44 operator - (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]-rval.u.m16[i]; return m_; }
+//	Matrix44 operator * (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]*rval.u.m16[i]; return m_; }
+	Matrix44 operator / (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]/rval.u.m16[i]; return m_; }
 };
 
 //==================================================================

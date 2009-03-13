@@ -19,6 +19,17 @@ namespace RI
 {
 
 //==================================================================
+enum OperTypeID
+{
+	OPRTYPE_F1 ,
+	OPRTYPE_F2 ,
+	OPRTYPE_F3 ,
+	OPRTYPE_F4 ,
+	OPRTYPE_M44,
+	OPRTYPE_N
+};
+
+//==================================================================
 enum OpCodeID
 {
 	OP_MOV,
@@ -26,7 +37,8 @@ enum OpCodeID
 	OP_SUB,
 	OP_MUL,
 	OP_DIV,
-	OP_NORMALIZE
+	OP_NORMALIZE,
+	OP_N
 };
 
 //==================================================================
@@ -50,7 +62,8 @@ public:
 struct SlOpCode
 {
 	u_int	mTableOffset;
-	u_int	mOperandCount;
+	u_short	mOperandCount;
+	u_short	mDestOpType;
 };
 
 //==================================================================
