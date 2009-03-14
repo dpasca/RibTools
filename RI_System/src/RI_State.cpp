@@ -127,15 +127,48 @@ State::State( FrameworkBase *pFramework ) :
 /// SlShader
 //==================================================================
 static const char *gspConstantShader =
-".data"	"\n"
-"	Cs		parameter varying color"	"\n"
-"	Os		parameter varying color"	"\n"
-"	Ci		parameter varying color"	"\n"
-"	Oi		parameter varying color"	"\n"
-""	"\n"
-".code"	"\n"
-"	mov		Ci	Cs"	"\n"
-"	mov		Oi	Os"	"\n"
+".data \n"
+"	Cs		parameter varying color \n"
+"	Os		parameter varying color \n"
+"	Ci		parameter varying color \n"
+"	Oi		parameter varying color \n"
+" \n"
+".code \n"
+"	movvv	Ci	Cs \n"
+"	movvv	Oi	Os \n"
+;
+
+//==================================================================
+static const char *gspMatteShader =
+".data \n"
+"	Cs		parameter varying color \n"
+"	Os		parameter varying color \n"
+"	Ci		parameter varying color \n"
+"	Oi		parameter varying color \n"
+"	N		parameter varying normal \n"
+"	I		parameter varying vector \n"
+
+"	Ka		parameter uniform float 1 \n"
+"	Kd		parameter uniform float 1 \n"
+
+"	Nf		temporary varying normal \n"
+" \n"
+".code \n"
+"	normalize	$v0		N \n"
+"	faceforward	Nf	$v0	I \n"
+
+"	diffuse		$v0	Nf \n"		// -- Kd * diffuse( Nf )
+"	mulvs		$v0	$v0	Kd \n"
+
+"	ambient		$v1	\n"			// -- Ka * ambient()
+"	mulvs		$v1	$v1	Ka	\n"
+
+"	addvv		$v0	$v0	$v1 \n"	// +
+
+"	mulvv		$v0	$v0	Cs \n"	// * Cs
+"	mulvv		Ci	$v0	Os \n"	// * Os -> Ci
+
+"	movvv		Oi	Os \n"		// Oi = Os
 ;
 
 //==================================================================

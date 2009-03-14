@@ -32,11 +32,21 @@ enum OperTypeID
 //==================================================================
 enum OpCodeID
 {
-	OP_MOV,
-	OP_ADD,
-	OP_SUB,
-	OP_MUL,
-	OP_DIV,
+	OP_MOVSS,
+	OP_MOVVS,
+	OP_MOVVV,
+	OP_ADDSS,
+	OP_ADDVS,
+	OP_ADDVV,
+	OP_SUBSS,
+	OP_SUBVS,
+	OP_SUBVV,
+	OP_MULSS,
+	OP_MULVS,
+	OP_MULVV,
+	OP_DIVSS,
+	OP_DIVVS,
+	OP_DIVVV,
 	OP_NORMALIZE,
 	OP_N
 };

@@ -25,11 +25,21 @@ struct OpCodeDef
 //==================================================================
 static OpCodeDef	gsOpCodeDefs[] =
 {
-	"mov",			2,
-	"add",			3,
-	"sub",			3,
-	"mul",			3,
-	"div",			3,
+	"movss",		2,
+	"movvs",		2,
+	"movvv",		2,
+	"addss",		3,
+	"addvs",		3,
+	"addvv",		3,
+	"subss",		3,
+	"subvs",		3,
+	"subvv",		3,
+	"mulss",		3,
+	"mulvs",		3,
+	"mulvv",		3,
+	"divss",		3,
+	"divvs",		3,
+	"divvv",		3,
 	"normalize",	2,
 	NULL
 };
@@ -207,6 +217,12 @@ static OperTypeID getOperTypeFromSlSymbolType( SlSymbol::Type slSymType, bool &o
 		out_success = false;
 		return OPRTYPE_F1;
 	}
+}
+
+//==================================================================
+static bool isTempSymbol( const char *pTok )
+{
+	return pTok[0] == '$';
 }
 
 //==================================================================

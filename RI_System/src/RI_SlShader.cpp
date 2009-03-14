@@ -111,11 +111,11 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 typedef void (*ShaderInstruction)( SlRunContext &ctx );
 
 //==================================================================
-template <class T>
+template <class TA, class TB>
 void Inst_Copy( SlRunContext &ctx )
 {
-		  T*	lhs	= (		 T*)ctx.GetVoid( 1 );
-	const T*	op1	= (const T*)ctx.GetVoid( 2 );
+		  TA*	lhs	= (		 TA*)ctx.GetVoid( 1 );
+	const TB*	op1	= (const TB*)ctx.GetVoid( 2 );
 	
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -145,12 +145,12 @@ void Inst_Copy( SlRunContext &ctx )
 }
 
 //==================================================================
-template <class T, const char OPNAME>
+template <class TA, class TB, const char OPNAME>
 void Inst_AlOp( SlRunContext &ctx )
 {
-		  T*	lhs	= (		 T*)ctx.GetFloat( 1 );
-	const T*	op1	= (const T*)ctx.GetFloat( 2 );
-	const T*	op2	= (const T*)ctx.GetFloat( 3 );
+		  TA*	lhs	= (		 TA*)ctx.GetFloat( 1 );
+	const TA*	op1	= (const TA*)ctx.GetFloat( 2 );
+	const TB*	op2	= (const TB*)ctx.GetFloat( 3 );
 	
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -180,7 +180,7 @@ void Inst_AlOp( SlRunContext &ctx )
 		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
 				 !ctx.IsSymbolVarying( 3 ) );
 
-		T	tmp;
+		TA	tmp;
 		if ( OPNAME == '+' ) tmp = op1[0] + op2[0]; else
 		if ( OPNAME == '-' ) tmp = op1[0] - op2[0]; else
 		if ( OPNAME == '*' ) tmp = op1[0] * op2[0]; else
@@ -195,20 +195,33 @@ void Inst_AlOp( SlRunContext &ctx )
 }
 
 //==================================================================
-#define F1	float
-#define F2	Vector2
-#define F3	Vector3
-#define F4	Vector4
-#define F44	Matrix44
+#define SINGLE	float
+#define VECTOR	Vector3
+#define MATRIX	Matrix44
 
 //==================================================================
-static ShaderInstruction	sInstructionTable[OP_N][OPRTYPE_N] =
+static ShaderInstruction	sInstructionTable[OP_N] =
 {
-Inst_Copy<F1>,	  Inst_Copy<F2>,	Inst_Copy<F3>,	  Inst_Copy<F4>,	Inst_Copy<F44>,
-Inst_AlOp<F1,'+'>,Inst_AlOp<F2,'+'>,Inst_AlOp<F3,'+'>,Inst_AlOp<F4,'+'>,Inst_AlOp<F44,'+'>,
-Inst_AlOp<F1,'-'>,Inst_AlOp<F2,'-'>,Inst_AlOp<F3,'-'>,Inst_AlOp<F4,'-'>,Inst_AlOp<F44,'-'>,
-Inst_AlOp<F1,'*'>,Inst_AlOp<F2,'*'>,Inst_AlOp<F3,'*'>,Inst_AlOp<F4,'*'>,Inst_AlOp<F44,'*'>,
-Inst_AlOp<F1,'/'>,Inst_AlOp<F2,'/'>,Inst_AlOp<F3,'/'>,Inst_AlOp<F4,'/'>,Inst_AlOp<F44,'/'>,
+Inst_Copy<SINGLE,SINGLE>,
+Inst_Copy<VECTOR,SINGLE>,
+Inst_Copy<VECTOR,VECTOR>,
+
+Inst_AlOp<SINGLE,SINGLE,'+'>,
+Inst_AlOp<VECTOR,SINGLE,'+'>,
+Inst_AlOp<VECTOR,VECTOR,'+'>,
+
+Inst_AlOp<SINGLE,SINGLE,'-'>,
+Inst_AlOp<VECTOR,SINGLE,'-'>,
+Inst_AlOp<VECTOR,VECTOR,'-'>,
+
+Inst_AlOp<SINGLE,SINGLE,'*'>,
+Inst_AlOp<VECTOR,SINGLE,'*'>,
+Inst_AlOp<VECTOR,VECTOR,'*'>,
+
+Inst_AlOp<SINGLE,SINGLE,'/'>,
+Inst_AlOp<VECTOR,SINGLE,'/'>,
+Inst_AlOp<VECTOR,VECTOR,'/'>,
+
 };
 
 //==================================================================
@@ -225,7 +238,8 @@ void SlShaderInstance::Run( MicroPolygonGrid &g )
 	{
 		const SlCPUWord	*pWord = ctx.GetOp( 0 );
 		
-		sInstructionTable[pWord->mOpCode.mTableOffset][pWord->mOpCode.mDestOpType]( ctx );
+		// [pWord->mOpCode.mDestOpType]
+		sInstructionTable[pWord->mOpCode.mTableOffset]( ctx );
 	}
 }
 
