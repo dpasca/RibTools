@@ -174,9 +174,15 @@ static const char *gspMatteShader =
 //==================================================================
 void State::makeDefaultShaders()
 {
-	SlShader *pShader =
+	SlShader *pShader;
+	
+	pShader =
 		(SlShader *)mResManager.AddResource(
 						new SlShader( "constant", gspConstantShader ) );
+
+	pShader =
+		(SlShader *)mResManager.AddResource(
+						new SlShader( "matte", gspMatteShader ) );
 }
 
 //==================================================================

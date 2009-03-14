@@ -41,7 +41,8 @@ private:
 	bool doParse( DUT::MemFile &file );
 	bool parseDataLine( char lineBuff[], int lineCnt );
 	const OpCodeDef	*findOpDef( const char *pOpName, u_int &opCodeIdx );
-	int findSymbol( const char *pName ) const;
+	int findSymbol( const char *pName, bool ignoreCase ) const;
+	int findOrAddTempSymbol( const char *pName );
 	bool parseCodeLine( char lineBuff[], int lineCnt );
 };
 

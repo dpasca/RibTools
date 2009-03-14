@@ -104,6 +104,13 @@ public:
 	Vector3 operator - (const Vector3 &rval) const { return Vector3( x - rval.x, y - rval.y, z - rval.z ); }
 	Vector3 operator * (const Vector3 &rval) const { return Vector3( x * rval.x, y * rval.y, z * rval.z ); }
 	Vector3 operator / (const Vector3 &rval) const { return Vector3( x / rval.x, y / rval.y, z / rval.z ); }
+	
+	Vector3 GetNormalized() const
+	{
+		float	oom = 1.0f / sqrtf( x * x + y * y + z * z );
+		
+		return Vector3( x * oom, y * oom, z * oom );
+	}
 };
 
 inline Vector3 operator * (float lval, const Vector3 &rval)

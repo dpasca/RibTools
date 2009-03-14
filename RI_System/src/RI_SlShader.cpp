@@ -195,6 +195,59 @@ void Inst_AlOp( SlRunContext &ctx )
 }
 
 //==================================================================
+static void Inst_Normalize( SlRunContext &ctx )
+{
+		  Vector3*	lhs	= (		 Vector3*)ctx.GetVoid( 1 );
+	const Vector3*	op1	= (const Vector3*)ctx.GetVoid( 2 );
+	
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	
+	if ( lhs_varying )
+	{
+		bool	op1_varying = ctx.IsSymbolVarying( 2 );
+		int		op1_offset = 0;
+		
+		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = op1[op1_offset].GetNormalized();
+
+			if ( op1_varying )	++op1_offset;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		Vector3	tmp = op1[0].GetNormalized();
+
+		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = tmp;
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
+static void Inst_Faceforward( SlRunContext &ctx )
+{
+	ctx.NextInstruction();
+}
+
+//==================================================================
+static void Inst_Diffuse( SlRunContext &ctx )
+{
+	ctx.NextInstruction();
+}
+
+//==================================================================
+static void Inst_Ambient( SlRunContext &ctx )
+{
+	ctx.NextInstruction();
+}
+
+//==================================================================
 #define SINGLE	float
 #define VECTOR	Vector3
 #define MATRIX	Matrix44
@@ -222,6 +275,10 @@ Inst_AlOp<SINGLE,SINGLE,'/'>,
 Inst_AlOp<VECTOR,SINGLE,'/'>,
 Inst_AlOp<VECTOR,VECTOR,'/'>,
 
+Inst_Normalize,
+Inst_Faceforward,
+Inst_Diffuse,
+Inst_Ambient,
 };
 
 //==================================================================

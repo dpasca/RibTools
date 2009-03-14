@@ -41,6 +41,9 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"divvs",		3,
 	"divvv",		3,
 	"normalize",	2,
+	"faceforward",	3,
+	"diffuse",		2,
+	"ambient",		1,
 	NULL
 };
 
@@ -183,19 +186,67 @@ const OpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &opCodeI
 }
 
 //==================================================================
-int ShaderAsmParser::findSymbol( const char *pName ) const
+int ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
 {
 	for (size_t i=0; i < mpShader->mSymbols.size(); ++i)
 	{
 		const char *pShaderSymName = mpShader->mSymbols[i].mName.c_str();
-		if ( 0 == strcasecmp( pName, pShaderSymName ) )
+		
+		if ( ignoreCase )
 		{
-			return i;
+			if ( 0 == strcasecmp( pName, pShaderSymName ) )
+				return i;
+		}
+		else
+		{
+			if ( 0 == strcmp( pName, pShaderSymName ) )
+				return i;
 		}
 	}
 
 	return -1;
 }
+
+//==================================================================
+int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
+{
+	int	idx = findSymbol( pName, true );
+	if ( idx != -1 )
+		return idx;
+		
+	size_t	len = strlen( pName );
+	if ( len < 3 )
+		return -1;
+		
+	SlSymbol	symbol;		
+	symbol.Reset();
+	symbol.mName	= pName;
+	symbol.mStorage	= SlSymbol::TEMPORARY;
+	symbol.mIsVarying	= true;
+	symbol.mArraySize	= 0;
+	symbol.mpDefaultVal	= NULL;
+
+	int	retIdx = (int)mpShader->mSymbols.size();
+
+	if ( pName[1] == 's' || pName[1] == 'S' )
+	{
+		// scalar base
+		symbol.mType	= SlSymbol::FLOAT;
+		mpShader->mSymbols.push_back( symbol );
+		return retIdx;
+	}
+	else
+	if ( pName[1] == 'v' || pName[1] == 'V' )
+	{
+		// vector base
+		symbol.mType	= SlSymbol::VECTOR;
+		mpShader->mSymbols.push_back( symbol );
+		return retIdx;
+	}
+	else
+		return -1;
+}
+
 
 //==================================================================
 static OperTypeID getOperTypeFromSlSymbolType( SlSymbol::Type slSymType, bool &out_success )
@@ -209,6 +260,7 @@ static OperTypeID getOperTypeFromSlSymbolType( SlSymbol::Type slSymType, bool &o
 	case SlSymbol::POINT:
 	case SlSymbol::COLOR:
 	case SlSymbol::VECTOR:
+	case SlSymbol::NORMAL:
 							return OPRTYPE_F3 ;
 	//case SlSymbol:::		return OPRTYPE_F4 ;
 	case SlSymbol::MATRIX:	return OPRTYPE_M44;
@@ -270,7 +322,16 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 		DUT::StrStripBeginEndWhite( pTok );
 
-		int	symbolIdx = findSymbol( pTok );
+		int	symbolIdx;
+		if ( isTempSymbol( pTok ) )
+		{
+			symbolIdx = findOrAddTempSymbol( pTok );
+		}
+		else
+		{
+			symbolIdx = findSymbol( pTok, false );
+		}
+
 		if ( symbolIdx == -1 )
 		{
 			printf( "ERROR: Symbol '%s' unknown !\n", pTok );
@@ -291,7 +352,7 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 				
 			if NOT( success )
 			{
-				printf( "ERROR: Invalid operand type !\n", pTok );
+				printf( "ERROR: Invalid operand type for '%s' !\n", pTok );
 				return false;
 			}
 		}
