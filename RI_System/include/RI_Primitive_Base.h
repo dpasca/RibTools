@@ -166,7 +166,7 @@ public:
 						return false;
 					}
 
-	virtual void	Dice( MicroPolygonGrid &g );
+	virtual void	Dice( MicroPolygonGrid &g, const Point3 &camWorldPos );
 
 	Vector2 CalcLocalUV( const Vector2 &gridUV )
 	{

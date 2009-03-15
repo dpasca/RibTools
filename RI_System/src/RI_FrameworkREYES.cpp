@@ -77,7 +77,7 @@ void FrameworkREYES::WorldEnd()
 {
 	DVec<Primitive *>	&pPrimList = mpHider->GetPrimList();
 
-	GState	gstate;
+	Point3	camWorldPos = mpHider->mMtxWorldCamera.GetTranslation();
 
 	for (size_t i=0; i < pPrimList.size(); ++i)
 	{	
@@ -90,7 +90,7 @@ void FrameworkREYES::WorldEnd()
 
 		if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
 		{
-			pPrim->Dice( grid );
+			pPrim->Dice( grid, camWorldPos );
 
 			// should check backface and trim
 			// grid.displace();

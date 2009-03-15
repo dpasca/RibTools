@@ -172,6 +172,19 @@ static const char *gspMatteShader =
 ;
 
 //==================================================================
+static const char *gspNormalColorShader =
+".data \n"
+"	Ci		parameter varying color \n"
+"	Oi		parameter varying color \n"
+"	N		parameter varying normal \n"
+
+" \n"
+".code \n"
+"	movvv	Ci	N \n"
+"	movvv	Oi	N \n"
+;
+
+//==================================================================
 void State::makeDefaultShaders()
 {
 	SlShader *pShader;

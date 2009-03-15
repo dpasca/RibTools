@@ -62,6 +62,8 @@ public:
 class SlSymbolList : public DVec<SlSymbol>
 {
 public:
+	~SlSymbolList();
+
 	SlSymbol *LookupVariable(
 			const char		*pName,
 			SlSymbol::Type	type,

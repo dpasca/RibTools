@@ -116,6 +116,15 @@ public:
 		
 		return Vector3( x * oom, y * oom, z * oom );
 	}
+
+	Vector3 GetCross( const Vector3 &r_ ) const
+	{
+		return Vector3(
+			y * r_.z - z * r_.y,
+			z * r_.x - x * r_.z,
+			x * r_.y - y * r_.x
+		);
+	}
 };
 
 inline Vector3 operator * (float lval, const Vector3 &rval)

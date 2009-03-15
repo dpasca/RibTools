@@ -81,10 +81,13 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 }
 
 //==================================================================
-void Primitive::Dice( MicroPolygonGrid &g )
+void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camWorldPos )
 {
 	Point3	*pPoints = g.mpPoints;
 
+	Vector3	*pI	 = (Color *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
+	Vector3	*pN  = (Color *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
+	Vector3	*pNg = (Color *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
 	Color	*pOs = (Color *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
 	Color	*pCs = (Color *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
 
@@ -97,13 +100,23 @@ void Primitive::Dice( MicroPolygonGrid &g )
 		float	u = 0.0f;
 		for (int j=0; j < (int)g.mXDim; ++j, u += du)
 		{
+			Vector3	pos;
 			Vector2	locUV = CalcLocalUV( Vector2( u, v ) );
-			EvalP( locUV.x, locUV.y, *pPoints );
+			EvalP( locUV.x, locUV.y, pos );
+			pos = MultiplyV3M( pos, g.mMtxObjectCurrent );
+			
+			Vector3	dPdu;
+			Vector3	dPdv;
+			Eval_dPdu_dPdv( locUV.x, locUV.y, dPdu, dPdv );
+			
+			Vector3	nor = dPdu.GetCross( dPdv ).GetNormalized();
 
-			*pPoints++ = MultiplyV3M( *pPoints, g.mMtxObjectCurrent );
-
-			*pOs++ = mpAttribs->mOpacity;
-			*pCs++ = mpAttribs->mColor;
+			*pPoints++	= pos;
+			*pI++		= pos - camWorldPos;
+			*pN++		= nor;
+			*pNg++		= nor;
+			*pOs++		= mpAttribs->mOpacity;
+			*pCs++		= mpAttribs->mColor;
 
 			//*pOs++ = Color( 1, 0, 0 );
 			//*pCs++ = Color( 0, 1, 0 );

@@ -62,6 +62,11 @@ void MicroPolygonGrid::Setup(
 	mSymbols.push_back( symbol );
 	mpPoints = (Point3 *)symbol.mpDefaultVal;
 
+	symbol.mName = "I";
+	symbol.mType = SlSymbol::VECTOR;
+	symbol.mpDefaultVal = new Vector3 [ mPointsN ];
+	mSymbols.push_back( symbol );
+
 	symbol.mName = "N";
 	symbol.mType = SlSymbol::NORMAL;
 	symbol.mpDefaultVal = new Vector3 [ mPointsN ];
@@ -96,26 +101,6 @@ void MicroPolygonGrid::Setup(
 //==================================================================
 MicroPolygonGrid::~MicroPolygonGrid()
 {
-	for (size_t i=0; i < mSymbols.size(); ++i)
-	{
-		if ( mSymbols[i].mIsVarying )
-		{
-			switch ( mSymbols[i].mType )
-			{
-			case SlSymbol::FLOAT:	delete [] ((float *)mSymbols[i].mpDefaultVal); break;
-			case SlSymbol::POINT:	delete [] ((Point3 *)mSymbols[i].mpDefaultVal ); break;
-			case SlSymbol::COLOR:	delete [] ((Color *)mSymbols[i].mpDefaultVal ); break;
-			case SlSymbol::STRING:	delete [] ((char *)mSymbols[i].mpDefaultVal ); break;
-			case SlSymbol::VECTOR:	delete [] ((Vector3 *)mSymbols[i].mpDefaultVal ); break;
-			case SlSymbol::NORMAL:	delete [] ((Vector3 *)mSymbols[i].mpDefaultVal ); break;
-			case SlSymbol::MATRIX:	delete [] ((Matrix44 *)mSymbols[i].mpDefaultVal ); break;
-
-			default:
-				DASSERT( 0 );
-				break;
-			}
-		}
-	}
 }
 
 //==================================================================

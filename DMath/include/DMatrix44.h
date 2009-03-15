@@ -73,6 +73,15 @@ public:
 	{
 		memcpy( u.m16, pSrcMtx, sizeof(float) * 16 );
 	}
+	
+	Vector3 GetTranslation() const
+	{
+		return Vector3(
+			u.m44[3][0],
+			u.m44[3][1],
+			u.m44[3][2]
+		);
+	}
 
 	void PrintOut() const;
 

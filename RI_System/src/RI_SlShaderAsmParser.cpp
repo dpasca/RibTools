@@ -165,7 +165,58 @@ bool ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 
 	const char *pDefaultValueStr = pTok + strlen(pTok) + 1;
 	if ( pDefaultValueStr < pLineEnd )
+	{
+		switch ( symbol.mType )
+		{
+		case SlSymbol::FLOAT :
+						symbol.mpDefaultVal = new float;
+						sscanf( pDefaultValueStr, "%f", symbol.mpDefaultVal );
+						break;
+
+		case SlSymbol::POINT :
+						symbol.mpDefaultVal = new Point3();
+						sscanf(
+							pDefaultValueStr,
+							"%f %f %f",
+							&((Point3 *)symbol.mpDefaultVal)->x,
+							&((Point3 *)symbol.mpDefaultVal)->y,
+							&((Point3 *)symbol.mpDefaultVal)->z
+							);
+						break;
+
+		case SlSymbol::COLOR :
+						symbol.mpDefaultVal = new Color();
+						sscanf(
+							pDefaultValueStr,
+							"%f %f %f",
+							&((Color *)symbol.mpDefaultVal)->x,
+							&((Color *)symbol.mpDefaultVal)->y,
+							&((Color *)symbol.mpDefaultVal)->z
+							);
+						break;
+		
+		case SlSymbol::VECTOR:
+		case SlSymbol::NORMAL:
+						symbol.mpDefaultVal = new Vector3();
+						sscanf(
+							pDefaultValueStr,
+							"%f %f %f",
+							&((Vector3 *)symbol.mpDefaultVal)->x,
+							&((Vector3 *)symbol.mpDefaultVal)->y,
+							&((Vector3 *)symbol.mpDefaultVal)->z
+							);
+						break;
+		
+		case SlSymbol::STRING:
+		case SlSymbol::MATRIX:
+			{
+				printf( "Currently unsupported default value (^^;> '%s'\n", pTok );
+				return false;
+			}
+		}
+	
 		printf( "Default value '%s'\n", pDefaultValueStr );
+	}
 		
 	mpShader->mSymbols.push_back( symbol );
 

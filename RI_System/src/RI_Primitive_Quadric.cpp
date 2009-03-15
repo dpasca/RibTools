@@ -148,16 +148,16 @@ Point3 &Hyperboloid::EvalP(
 			float v,
 			Point3 &out_pt ) const
 {
-	float	theta = u * mThetamaxRad;
+	float	uTheta = u * mThetamaxRad;
+	float	cosUTheta = cosf( uTheta );
+	float	sinUTheta = sinf( uTheta );
 
-	float	x = mP1.x + (mP2.x - mP1.x) * v;
-	float	y = mP1.y + (mP2.y - mP1.y) * v;
-	float	z = mP1.z + (mP2.z - mP1.z) * v;
+	Vector3	p1p2v = DMix( mP1, mP2, v );
 
-	out_pt.x = x * cosf( theta ) - y * sinf( theta );
-	out_pt.y = x * sinf( theta ) + y * cosf( theta );
-	out_pt.z = z;
-	
+	out_pt.x = p1p2v.x * cosUTheta - p1p2v.y * sinUTheta;
+	out_pt.y = p1p2v.x * sinUTheta + p1p2v.y * cosUTheta;
+	out_pt.z = p1p2v.z;
+
 	return out_pt;
 }
 
@@ -168,7 +168,21 @@ void Hyperboloid::Eval_dPdu_dPdv(
 			Vector3 &out_dPdu,
 			Vector3 &out_dPdv ) const
 {
-	// wooooo
+	float	uTheta = u * mThetamaxRad;
+	float	cosUTheta = cosf( uTheta );
+	float	sinUTheta = sinf( uTheta );
+
+	Vector3	p1p2v = DMix( mP1, mP2, v );
+
+	out_dPdu.x = mThetamaxRad * (p1p2v.x * -sinUTheta - p1p2v.y *  cosUTheta);
+	out_dPdu.y = mThetamaxRad * (p1p2v.x *  cosUTheta + p1p2v.y * -sinUTheta);
+	out_dPdu.z = 0;
+
+	Vector3	dp = mP2 - mP1;
+
+	out_dPdv.x = dp.x * cosUTheta - dp.y * sinUTheta;
+	out_dPdv.y = dp.y * sinUTheta + dp.y * cosUTheta;
+	out_dPdv.z = dp.z;
 }
 
 //==================================================================
@@ -177,13 +191,15 @@ Point3 &Paraboloid::EvalP(
 			float v,
 			Point3 &out_pt ) const
 {
-	float	theta = u * mThetamaxRad;
+	float	uTheta = u * mThetamaxRad;
+	float	cosUTheta = cosf( uTheta );
+	float	sinUTheta = sinf( uTheta );
+	float	scale = mRmax / sqrtf( mZmax );
+	float	z = DMix( mZmin, mZmax, v );
+	float	r = scale * sqrtf( z );
 
-	float	z = (mZmax - mZmin) * v;
-	float	r = mRmax * sqrtf( z / mZmax );
-
-	out_pt.x = r * cosf( theta );
-	out_pt.y = r * sinf( theta );
+	out_pt.x = r * cosUTheta;
+	out_pt.y = r * sinUTheta;
 	out_pt.z = z;
 
 	return out_pt;
@@ -196,7 +212,24 @@ void Paraboloid::Eval_dPdu_dPdv(
 			Vector3 &out_dPdu,
 			Vector3 &out_dPdv ) const
 {
-	// wooooo
+	float	uTheta = u * mThetamaxRad;
+	float	cosUTheta = cosf( uTheta );
+	float	sinUTheta = sinf( uTheta );
+	float	scale = mRmax / sqrtf( mZmax );
+	float	z = DMix( mZmin, mZmax, v );
+	float	r = scale * sqrtf( z );
+
+	float	tmp1 = r * mThetamaxRad;
+	out_dPdu.x = tmp1 * -sinUTheta;
+	out_dPdu.y = tmp1 *  cosUTheta;
+	out_dPdu.z = 0;
+
+	float	dz = mZmax - mZmin;
+	float	dx = 0.5f * dz / sqrtf( z ) * scale;
+
+	out_dPdv.x = dx * cosUTheta;
+	out_dPdv.y = dx * sinUTheta;
+	out_dPdv.z = dz;
 }
 
 //==================================================================
@@ -205,13 +238,14 @@ Point3 &Torus::EvalP(
 			float v,
 			Point3 &out_pt ) const
 {
-	float	theta = u * mThetamaxRad;
+	float	uTheta = u * mThetamaxRad;
+	float	cosUTheta = cosf( uTheta );
+	float	sinUTheta = sinf( uTheta );
+	float	phi = DMix( mPhiminRad, mPhimaxRad, v );
+	float	sx = cosf( phi ) * mMinRadius + mMaxRadius;
 
-	float	phi = mPhiminRad + (mPhimaxRad - mPhiminRad) * v;
-	float	r = mMinRadius * cosf( phi );
-
-	out_pt.x = (mMaxRadius + r) * cosf( theta );
-	out_pt.y = (mMaxRadius + r) * sinf( theta );
+	out_pt.x = sx * cosUTheta;
+	out_pt.y = sx * sinUTheta;
 	out_pt.z = mMinRadius * sinf( phi );
 	
 	return out_pt;
@@ -224,7 +258,22 @@ void Torus::Eval_dPdu_dPdv(
 			Vector3 &out_dPdu,
 			Vector3 &out_dPdv ) const
 {
-	// wooooo
+	float	uTheta = u * mThetamaxRad;
+	float	cosUTheta = cosf( uTheta );
+	float	sinUTheta = sinf( uTheta );
+	float	phi = DMix( mPhiminRad, mPhimaxRad, v );
+	float	sx = cosf( phi ) * mMinRadius + mMaxRadius;
+
+	out_dPdu.x = sx * mThetamaxRad * -sinUTheta;
+	out_dPdu.y = sx * mThetamaxRad *  cosUTheta;
+	out_dPdu.z = 0;
+
+	float dphi	= mPhimaxRad - mPhiminRad;
+	float dsx	= dphi * -sinf( phi ) * mMinRadius;
+
+	out_dPdv.x = dsx * cosUTheta;
+	out_dPdv.y = dsx * sinUTheta;
+	out_dPdv.z = dphi * cosf( phi ) * mMinRadius;
 }
 
 //==================================================================
