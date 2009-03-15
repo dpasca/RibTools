@@ -95,6 +95,11 @@ public:
 		y = p_[1];
 		z = p_[2];
 	}
+
+	void SetZero()
+	{
+		x = y = z = 0;
+	}
 	
 	Vector3 operator + (float rval) const { return Vector3( x + rval, y + rval, z + rval ); }
 	Vector3 operator - (float rval) const { return Vector3( x - rval, y - rval, z - rval ); }

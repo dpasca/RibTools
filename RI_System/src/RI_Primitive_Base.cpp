@@ -97,7 +97,8 @@ void Primitive::Dice( MicroPolygonGrid &g )
 		float	u = 0.0f;
 		for (int j=0; j < (int)g.mXDim; ++j, u += du)
 		{
-			EvalP( u, v, *pPoints );
+			Vector2	locUV = CalcLocalUV( Vector2( u, v ) );
+			EvalP( locUV.x, locUV.y, *pPoints );
 
 			*pPoints++ = MultiplyV3M( *pPoints, g.mMtxObjectCurrent );
 

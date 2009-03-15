@@ -21,13 +21,10 @@ namespace RI
 
 //==================================================================
 Point3 &Cylinder::EvalP(
-			float uGrid,
-			float vGrid,
+			float u,
+			float v,
 			Point3 &out_pt ) const
 {
-	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
-	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
-
 	float	theta = u * mThetamaxRad;
 
 	out_pt.x = mRadius * cosf( theta );
@@ -38,14 +35,31 @@ Point3 &Cylinder::EvalP(
 }
 
 //==================================================================
+void Cylinder::Eval_dPdu_dPdv(
+			float u,
+			float v,
+			Vector3 &out_dPdu,
+			Vector3 &out_dPdv ) const
+{
+	float	theta = u * mThetamaxRad;
+
+	float	tmp = mThetamaxRad * mRadius;
+
+	out_dPdu.x = tmp * -sinf( theta );
+	out_dPdu.y = tmp *  cosf( theta );
+	out_dPdu.z = 0;
+
+	out_dPdv.x = 0;
+	out_dPdv.y = 0;
+	out_dPdv.z = mZMax - mZMin;
+}
+
+//==================================================================
 Point3 &Cone::EvalP(
-			float uGrid,
-			float vGrid,
+			float u,
+			float v,
 			Point3 &out_pt ) const
 {
-	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
-	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
-
 	float	theta = u * mThetamaxRad;
 
 	out_pt.x = mRadius * (1 - v) * cosf( theta );
@@ -56,14 +70,34 @@ Point3 &Cone::EvalP(
 }
 
 //==================================================================
+void Cone::Eval_dPdu_dPdv(
+			float u,
+			float v,
+			Vector3 &out_dPdu,
+			Vector3 &out_dPdv ) const
+{
+	float	theta = u * mThetamaxRad;
+	
+	float	cosUTheta = cosf( theta );
+	float	sinUTheta = sinf( theta );
+
+	float	tmp = mThetamaxRad * mRadius * (1-v);
+
+	out_dPdu.x = tmp * -sinUTheta;
+	out_dPdu.y = tmp *  cosUTheta;
+	out_dPdu.z = 0;
+
+	out_dPdv.x = mRadius * -cosUTheta;
+	out_dPdv.y = mRadius * -sinUTheta;
+	out_dPdv.z = mHeight;
+}
+
+//==================================================================
 Point3 &Sphere::EvalP(
-			float uGrid,
-			float vGrid,
+			float u,
+			float v,
 			Point3 &out_pt ) const
 {
-	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
-	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
-
 	// $$$ following 2 are "uniform"
 	float	alphamin	= asinf( mZMin / mRadius );
 	float	alphadelta	= asinf( mZMax / mRadius ) - alphamin;
@@ -79,14 +113,41 @@ Point3 &Sphere::EvalP(
 }
 
 //==================================================================
+void Sphere::Eval_dPdu_dPdv(
+			float u,
+			float v,
+			Vector3 &out_dPdu,
+			Vector3 &out_dPdv ) const
+{
+	// $$$ following 2 are "uniform"
+	float	alphamin	= asinf( mZMin / mRadius );
+	float	alphadelta	= asinf( mZMax / mRadius ) - alphamin;
+
+	float	theta = u * mThetamaxRad;
+	float	alpha = alphamin + v * alphadelta;
+	
+	float	cosAlpha = cosf( alpha );
+	float	cosUTheta = cosf( theta );
+	float	sinUTheta = sinf( theta );
+
+	float	tmp1 = mThetamaxRad * mRadius;
+	out_dPdu.x = tmp1 * -sinUTheta * cosAlpha;
+	out_dPdu.y = tmp1 *  cosUTheta * cosAlpha;
+	out_dPdu.z = 0;
+
+	float	tmp2 = alphadelta * mRadius;
+	float	tmp3 = tmp2 * -sinf( alpha );
+	out_dPdv.x = tmp3 * cosUTheta;
+	out_dPdv.y = tmp3 * sinUTheta;
+	out_dPdv.z = tmp2 * cosAlpha;
+}
+
+//==================================================================
 Point3 &Hyperboloid::EvalP(
-			float uGrid,
-			float vGrid,
+			float u,
+			float v,
 			Point3 &out_pt ) const
 {
-	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
-	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
-
 	float	theta = u * mThetamaxRad;
 
 	float	x = mP1.x + (mP2.x - mP1.x) * v;
@@ -101,14 +162,21 @@ Point3 &Hyperboloid::EvalP(
 }
 
 //==================================================================
+void Hyperboloid::Eval_dPdu_dPdv(
+			float u,
+			float v,
+			Vector3 &out_dPdu,
+			Vector3 &out_dPdv ) const
+{
+	// wooooo
+}
+
+//==================================================================
 Point3 &Paraboloid::EvalP(
-			float uGrid,
-			float vGrid,
+			float u,
+			float v,
 			Point3 &out_pt ) const
 {
-	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
-	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
-
 	float	theta = u * mThetamaxRad;
 
 	float	z = (mZmax - mZmin) * v;
@@ -122,14 +190,21 @@ Point3 &Paraboloid::EvalP(
 }
 
 //==================================================================
+void Paraboloid::Eval_dPdu_dPdv(
+			float u,
+			float v,
+			Vector3 &out_dPdu,
+			Vector3 &out_dPdv ) const
+{
+	// wooooo
+}
+
+//==================================================================
 Point3 &Torus::EvalP(
-			float uGrid,
-			float vGrid,
+			float u,
+			float v,
 			Point3 &out_pt ) const
 {
-	float	u = mURange[0] + (mURange[1] - mURange[0]) * uGrid;
-	float	v = mVRange[0] + (mVRange[1] - mVRange[0]) * vGrid;
-
 	float	theta = u * mThetamaxRad;
 
 	float	phi = mPhiminRad + (mPhimaxRad - mPhiminRad) * v;
@@ -140,6 +215,16 @@ Point3 &Torus::EvalP(
 	out_pt.z = mMinRadius * sinf( phi );
 	
 	return out_pt;
+}
+
+//==================================================================
+void Torus::Eval_dPdu_dPdv(
+			float u,
+			float v,
+			Vector3 &out_dPdu,
+			Vector3 &out_dPdv ) const
+{
+	// wooooo
 }
 
 //==================================================================

@@ -148,17 +148,25 @@ PatchBilinear::PatchBilinear( ParamList &params, const Vector3 hull[4] ) :
 
 //==================================================================
 Point3 &PatchBilinear::EvalP(
-			float uGrid,
-			float vGrid,
+			float u,
+			float v,
 			Point3 &out_pt) const
 {
-	float	u		= DMix( mURange[0], mURange[1], uGrid );
-	float	v		= DMix( mVRange[0], mVRange[1], vGrid );
 	Vector3	left	= DMix( mHullPos[0], mHullPos[2], v );
 	Vector3	right	= DMix( mHullPos[1], mHullPos[3], v );
 	out_pt			= DMix( left, right, u );
 
 	return out_pt;
+}
+
+//==================================================================
+void PatchBilinear::Eval_dPdu_dPdv(
+			float u,
+			float v,
+			Vector3 &out_dPdu,
+			Vector3 &out_dPdv ) const
+{
+	// wooooo
 }
 
 //==================================================================
@@ -262,13 +270,10 @@ static Vector3 spline( float t,
 
 //==================================================================
 Point3 &PatchBicubic::EvalP(
-			float uGrid,
-			float vGrid,
+			float u,
+			float v,
 			Point3 &out_pt ) const
 {
-	float	u		= DMix( mURange[0], mURange[1], uGrid );
-	float	v		= DMix( mVRange[0], mVRange[1], vGrid );
-
 	const RtBasis	&uBasis = *mpUBasis;
 	const RtBasis	&vBasis = *mpVBasis;
 
@@ -280,6 +285,16 @@ Point3 &PatchBicubic::EvalP(
 	out_pt = spline( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
 	return out_pt;
+}
+
+//==================================================================
+void PatchBicubic::Eval_dPdu_dPdv(
+			float u,
+			float v,
+			Vector3 &out_dPdu,
+			Vector3 &out_dPdv ) const
+{
+	// wooooo
 }
 
 //==================================================================

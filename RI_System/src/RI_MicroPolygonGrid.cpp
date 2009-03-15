@@ -62,6 +62,16 @@ void MicroPolygonGrid::Setup(
 	mSymbols.push_back( symbol );
 	mpPoints = (Point3 *)symbol.mpDefaultVal;
 
+	symbol.mName = "N";
+	symbol.mType = SlSymbol::NORMAL;
+	symbol.mpDefaultVal = new Vector3 [ mPointsN ];
+	mSymbols.push_back( symbol );
+
+	symbol.mName = "Ng";
+	symbol.mType = SlSymbol::NORMAL;
+	symbol.mpDefaultVal = new Vector3 [ mPointsN ];
+	mSymbols.push_back( symbol );
+
 	symbol.mName = "Ci";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = newColArray( 1, 0, 0, mPointsN );

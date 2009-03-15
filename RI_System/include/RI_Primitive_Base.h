@@ -147,9 +147,15 @@ public:
 	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 
 	virtual Point3	&EvalP(
-						float uGrid,
-						float vGrid,
+						float u,
+						float v,
 						Point3 &out_pt ) const { return out_pt; }
+
+	virtual void	Eval_dPdu_dPdv(
+						float u,
+						float v,
+						Vector3 &out_dPdu,
+						Vector3 &out_dPdv ) const { out_dPdu.SetZero(); out_dPdv.SetZero(); }
 
 	virtual bool	IsDiceable(
 						MicroPolygonGrid &g,
@@ -161,6 +167,15 @@ public:
 					}
 
 	virtual void	Dice( MicroPolygonGrid &g );
+
+	Vector2 CalcLocalUV( const Vector2 &gridUV )
+	{
+		return
+			Vector2(
+				DMix( mURange[0], mURange[1], gridUV.x ),
+				DMix( mVRange[0], mVRange[1], gridUV.y )
+			);
+	}
 
 	void SetStates(
 		Attributes	*pAttribs,
