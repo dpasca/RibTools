@@ -15,49 +15,68 @@ namespace RI
 {
 
 //==================================================================
+void *SlSymbol::AllocClone( size_t size )
+{
+	DASSERT( mpDefaultVal == NULL );
+
+	void	*pOutData = NULL;
+
+	switch ( mType )
+	{
+	case SlSymbol::FLOAT:	pOutData = new float	[ size ]; break;
+	case SlSymbol::POINT:	pOutData = new Point3	[ size ]; break;
+	case SlSymbol::COLOR:	pOutData = new Color	[ size ]; break;
+	case SlSymbol::STRING:	pOutData = new char		[ size ]; break;
+	case SlSymbol::VECTOR:	pOutData = new Vector3	[ size ]; break;
+	case SlSymbol::NORMAL:	pOutData = new Vector3	[ size ]; break;
+	case SlSymbol::MATRIX:	pOutData = new Matrix44 [ size ]; break;
+	}
+	
+	return pOutData;
+}
+
+//==================================================================
+void SlSymbol::AllocData()
+{
+	DASSERT( mpDefaultVal == NULL );
+
+	mpDefaultVal = AllocClone( mArraySize );
+}
+
+//==================================================================
+void SlSymbol::FreeClone( void *pData )
+{
+	if NOT( pData )
+		return;
+
+	switch ( mType )
+	{
+	case SlSymbol::FLOAT:	delete [] ((float *)pData); break;
+	case SlSymbol::POINT:	delete [] ((Point3 *)pData ); break;
+	case SlSymbol::COLOR:	delete [] ((Color *)pData ); break;
+	case SlSymbol::STRING:	delete [] ((char *)pData ); break;
+	case SlSymbol::VECTOR:	delete [] ((Vector3 *)pData ); break;
+	case SlSymbol::NORMAL:	delete [] ((Vector3 *)pData ); break;
+	case SlSymbol::MATRIX:	delete [] ((Matrix44 *)pData ); break;
+	}
+}
+
+//==================================================================
+void SlSymbol::FreeData()
+{
+	if NOT( mpDefaultVal )
+		return;
+
+	FreeClone( mpDefaultVal );
+	mpDefaultVal = NULL;
+}
+
+//==================================================================
 SlSymbolList::~SlSymbolList()
 {
 	for (size_t i=0; i < size(); ++i)
 	{
-		void	*pDefVal = (*this)[i].mpDefaultVal;
-
-		if NOT( pDefVal )
-			continue;
-
-		if ( (*this)[i].mIsVarying )
-		{
-			switch ( (*this)[i].mType )
-			{
-			case SlSymbol::FLOAT:	delete [] ((float *)pDefVal); break;
-			case SlSymbol::POINT:	delete [] ((Point3 *)pDefVal ); break;
-			case SlSymbol::COLOR:	delete [] ((Color *)pDefVal ); break;
-			case SlSymbol::STRING:	delete [] ((char *)pDefVal ); break;
-			case SlSymbol::VECTOR:	delete [] ((Vector3 *)pDefVal ); break;
-			case SlSymbol::NORMAL:	delete [] ((Vector3 *)pDefVal ); break;
-			case SlSymbol::MATRIX:	delete [] ((Matrix44 *)pDefVal ); break;
-
-			default:
-				DASSERT( 0 );
-				break;
-			}
-		}
-		else
-		{
-			switch ( (*this)[i].mType )
-			{
-			case SlSymbol::FLOAT:	delete ((float *)pDefVal); break;
-			case SlSymbol::POINT:	delete ((Point3 *)pDefVal ); break;
-			case SlSymbol::COLOR:	delete ((Color *)pDefVal ); break;
-			case SlSymbol::STRING:	delete ((char *)pDefVal ); break;
-			case SlSymbol::VECTOR:	delete ((Vector3 *)pDefVal ); break;
-			case SlSymbol::NORMAL:	delete ((Vector3 *)pDefVal ); break;
-			case SlSymbol::MATRIX:	delete ((Matrix44 *)pDefVal ); break;
-
-			default:
-				DASSERT( 0 );
-				break;
-			}
-		}
+		(*this)[i].FreeData();
 	}
 }
 

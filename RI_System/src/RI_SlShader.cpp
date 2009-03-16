@@ -96,7 +96,8 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 			}
 			break;
 
-		case SlSymbol::TEMPORARY:
+		case SlSymbol::TEMPORARY:			
+			pDataSegment[i].Data.pVoidValue = symbol.AllocClone( g.mPointsN );
 			break;
 
 		case SlSymbol::GLOBAL:
@@ -106,6 +107,39 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 
 	return pDataSegment;
 }
+
+//==================================================================
+void SlShaderInstance::Unbind( SlValue * &pDataSegment )
+{
+	size_t	symbolsN = mpShader->mSymbols.size();
+
+	for (size_t i=0; i < symbolsN; ++i)
+	{
+		SlSymbol	&symbol = mpShader->mSymbols[i];
+
+		switch ( symbol.mStorage )
+		{
+		case SlSymbol::CONSTANT:
+			pDataSegment[i].Data.pVoidValue = NULL;
+			break;
+
+		case SlSymbol::PARAMETER:
+			pDataSegment[i].Data.pVoidValue = NULL;
+			break;
+
+		case SlSymbol::TEMPORARY:			
+			symbol.FreeClone( pDataSegment[i].Data.pVoidValue );
+			break;
+
+		case SlSymbol::GLOBAL:
+			break;
+		}
+	}
+	
+	delete [] pDataSegment;
+	pDataSegment = NULL;
+}
+
 
 //==================================================================
 typedef void (*ShaderInstruction)( SlRunContext &ctx );
@@ -298,6 +332,8 @@ void SlShaderInstance::Run( MicroPolygonGrid &g )
 		// [pWord->mOpCode.mDestOpType]
 		sInstructionTable[pWord->mOpCode.mTableOffset]( ctx );
 	}
+	
+	Unbind( ctx.mpDataSegment );
 }
 
 //==================================================================

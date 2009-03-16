@@ -56,6 +56,11 @@ public:
 		mArraySize = 0;
 		mpDefaultVal = NULL;
 	}
+	
+	void AllocData();
+	void FreeData();
+	void *AllocClone( size_t size );
+	void FreeClone( void *pData );
 };
 
 //==================================================================

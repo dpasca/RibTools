@@ -125,6 +125,7 @@ public:
 
 public:
 	SlShaderInstance();
+	~SlShaderInstance() {}
 	
 	void SetParameter(
 				const char		*pParamName,
@@ -133,6 +134,7 @@ public:
 				void			*pValue );
 
 	SlValue	*Bind( MicroPolygonGrid &g );
+	void Unbind( SlValue * &pDataSegment );
 	
 	void Run( MicroPolygonGrid &g );
 };

@@ -15,16 +15,12 @@ namespace RI
 {
 
 //==================================================================
-static Color *newColArray( float r, float g, float b, size_t n )
+static void fillColArray( Color *pCol, size_t n, float r, float g, float b )
 {
-	Color	*pCol = new Color [n];
-	
 	for (size_t i=0; i < n; ++i)
 	{
 		pCol[i].Set( r, g, b );
 	}
-
-	return pCol;
 }
 
 //==================================================================
@@ -58,43 +54,55 @@ void MicroPolygonGrid::Setup(
 
 	symbol.mName = "P";
 	symbol.mType = SlSymbol::POINT;
-	symbol.mpDefaultVal = new Point3 [ mPointsN ];
+	symbol.mpDefaultVal = NULL;
+	symbol.AllocData();
 	mSymbols.push_back( symbol );
 	mpPoints = (Point3 *)symbol.mpDefaultVal;
 
 	symbol.mName = "I";
 	symbol.mType = SlSymbol::VECTOR;
-	symbol.mpDefaultVal = new Vector3 [ mPointsN ];
+	symbol.mpDefaultVal = NULL;
+	symbol.AllocData();
 	mSymbols.push_back( symbol );
 
 	symbol.mName = "N";
 	symbol.mType = SlSymbol::NORMAL;
-	symbol.mpDefaultVal = new Vector3 [ mPointsN ];
+	symbol.mpDefaultVal = NULL;
+	symbol.AllocData();
 	mSymbols.push_back( symbol );
 
 	symbol.mName = "Ng";
 	symbol.mType = SlSymbol::NORMAL;
-	symbol.mpDefaultVal = new Vector3 [ mPointsN ];
+	symbol.mpDefaultVal = NULL;
+	symbol.AllocData();
 	mSymbols.push_back( symbol );
 
 	symbol.mName = "Ci";
 	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = newColArray( 1, 0, 0, mPointsN );
+	symbol.mpDefaultVal = NULL;
+	symbol.AllocData();
+	fillColArray( (Color *)symbol.mpDefaultVal, 1, 0, 0, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Oi";
 	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = newColArray( 0, 1, 0, mPointsN );
+	symbol.mpDefaultVal = NULL;
+	symbol.AllocData();
+	fillColArray( (Color *)symbol.mpDefaultVal, 0, 1, 0, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Cs";
 	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = newColArray( 0, 0, 1, mPointsN );
+	symbol.mpDefaultVal = NULL;
+	symbol.AllocData();
+	fillColArray( (Color *)symbol.mpDefaultVal, 0, 0, 1, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Os";
 	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = newColArray( 1, 1, 0, mPointsN );
+	symbol.mpDefaultVal = NULL;
+	symbol.AllocData();
+	fillColArray( (Color *)symbol.mpDefaultVal, 1, 1, 0, mPointsN );
 	mSymbols.push_back( symbol );
 }
 
