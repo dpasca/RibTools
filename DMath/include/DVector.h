@@ -125,6 +125,11 @@ public:
 			x * r_.y - y * r_.x
 		);
 	}
+
+	float GetDot( const Vector3 &r_ ) const
+	{
+		return  x * r_.x + y * r_.y + z * r_.z;
+	}
 };
 
 inline Vector3 operator * (float lval, const Vector3 &rval)

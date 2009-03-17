@@ -61,6 +61,8 @@ public:
 	void FreeData();
 	void *AllocClone( size_t size );
 	void FreeClone( void *pData );
+	
+	const void *GetData() const { return mpDefaultVal; }
 };
 
 //==================================================================
@@ -90,12 +92,42 @@ public:
 		return NULL;
 	}
 
+	SlSymbol *LookupVariable(
+			const char		*pName,
+			SlSymbol::Type	type )
+	{
+		for (size_t i=0; i < size(); ++i)
+		{
+			SlSymbol	&symbol = (*this)[i];
+
+			if (symbol.mType == type &&
+				0 == strcmp( symbol.mName.c_str(), pName ) )
+			{
+				// found !!!
+				return &symbol;
+			}
+		}
+
+		return NULL;
+	}
+
 	void *LookupVariableData(
 			const char		*pName,
 			SlSymbol::Type	type,
 			bool			isVarying )
 	{
 		SlSymbol	*pSym = LookupVariable( pName, type, isVarying );
+		if NOT( pSym )
+			return NULL;
+		else
+			return pSym->mpDefaultVal;
+	}
+
+	void *LookupVariableData(
+			const char		*pName,
+			SlSymbol::Type	type )
+	{
+		SlSymbol	*pSym = LookupVariable( pName, type );
 		if NOT( pSym )
 			return NULL;
 		else

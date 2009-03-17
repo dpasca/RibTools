@@ -27,6 +27,7 @@ public:
 	int					*mpSIMDFlags;
 	SlValue				*mpDataSegment;
 	SlShaderInstance	*mpShaderInst;
+	SlSymbolList		*mpSymbols;
 
 	SlRunContext()
 	{
@@ -35,6 +36,7 @@ public:
 		mpSIMDFlags		= 0;
 		mpDataSegment	= 0;
 		mpShaderInst	= 0;
+		mpSymbols		= 0;
 	}
 
 	SlCPUWord *GetOp( u_int argc )

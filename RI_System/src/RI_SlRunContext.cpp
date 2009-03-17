@@ -23,6 +23,8 @@ void SlRunContext::InitializeSIMD( MicroPolygonGrid &g )
 	mpSIMDFlags = new int [ mSIMDCount ];
 	for (u_int i=0; i < mSIMDCount; ++i)
 		mpSIMDFlags[i] = 0;
+		
+	mpSymbols = &g.mSymbols;
 }
 
 

@@ -264,20 +264,108 @@ static void Inst_Normalize( SlRunContext &ctx )
 }
 
 //==================================================================
+inline float sign( float val )
+{
+	if ( val < 0 ) return -1; else
+	if ( val > 0 ) return 1; else
+				   return 0;
+}
+
+//==================================================================
 static void Inst_Faceforward( SlRunContext &ctx )
 {
+		  Vector3*	lhs	= (		 Vector3*)ctx.GetVoid( 1 );
+	const Vector3*	pN	= (const Vector3*)ctx.GetVoid( 2 );
+	const Vector3*	pI	= (const Vector3*)ctx.GetVoid( 3 );
+	
+	const SlSymbol*	pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", SlSymbol::NORMAL );
+	const Vector3*	pNg = (const Vector3 *)pNgSymbol->GetData();
+	
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	bool	N_varying	= ctx.IsSymbolVarying( 2 );
+	bool	I_varying	= ctx.IsSymbolVarying( 3 );
+	bool	Ng_varying	= pNgSymbol->mIsVarying;
+	
+	if ( lhs_varying )
+	{
+		int		N_offset	= 0;
+		int		I_offset	= 0;
+		int		Ng_offset	= 0;
+		
+		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = pN[N_offset] * sign( pI[N_offset].GetDot( pNg[Ng_offset] ) );
+
+			if ( N_varying )	++N_offset;
+			if ( I_varying )	++I_offset;
+			if ( Ng_varying )	++Ng_varying;
+		}
+	}
+	else
+	{
+		DASSERT( !N_varying		);
+		DASSERT( !I_varying		);
+		DASSERT( !Ng_varying	);
+
+		Vector3	tmp = pN[0] * sign( pI[0].GetDot( pNg[0] ) );
+
+		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = tmp;
+	}
+
 	ctx.NextInstruction();
 }
 
 //==================================================================
+// this is a simplified version.. until lights become available 8)
 static void Inst_Diffuse( SlRunContext &ctx )
 {
+		  Color*	lhs	= (		 Vector3*)ctx.GetVoid( 1 );
+	const Color*	op1	= (const Vector3*)ctx.GetVoid( 2 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	
+	if ( lhs_varying )
+	{
+		bool	op1_varying = ctx.IsSymbolVarying( 2 );
+		int		op1_offset = 0;
+		
+		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = op1[op1_offset].GetNormalized().GetDot( Vector3(0, 0, 1) );
+
+			if ( op1_varying )	++op1_offset;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		Vector3	tmp = op1[0].GetNormalized().GetDot( Vector3(0, 0, 1) );
+
+		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = tmp;
+	}
+
 	ctx.NextInstruction();
 }
 
 //==================================================================
+// this is a simplified version.. until lights become available 8)
 static void Inst_Ambient( SlRunContext &ctx )
 {
+	Color*	lhs	= (		 Color*)ctx.GetVoid( 1 );
+
+	for (u_int i=0; i < ctx.mSIMDCount; ++i)
+	{
+		if ( ctx.IsProcessorActive( i ) )
+			lhs[i] = Vector3( 0.2f, 0.2f, 0.2f );
+	}
+
 	ctx.NextInstruction();
 }
 
