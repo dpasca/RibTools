@@ -86,6 +86,19 @@ void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 }
 
 //==================================================================
+const char *GetFileNameOnly( const char *pPathFileName )
+{
+	int	idx = 0;
+	int	len = strlen( pPathFileName );
+	
+	for (int i=len-1; i >= 0; --i)
+		if ( pPathFileName[i] == '/' || pPathFileName[i] == '\\' )
+			return pPathFileName + i + 1;
+			
+	return pPathFileName + len;
+}
+
+//==================================================================
 /// MemFile
 //==================================================================
 MemFile::MemFile( const void *pDataSrc, size_t dataSize ) :

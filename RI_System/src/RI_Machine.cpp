@@ -16,8 +16,12 @@ namespace RI
 //==================================================================
 /// 
 //==================================================================
-Machine::Machine( FrameworkBase *pFramework, int forcedWd, int forcedHe ) :
-	mState(pFramework),
+Machine::Machine(
+			FrameworkBase *pFramework,
+			const char *pDefaultShadersDir,
+			int forcedWd,
+			int forcedHe ) :
+	mState(pFramework, pDefaultShadersDir),
 	mForcedWd(forcedWd),
 	mForcedHe(forcedHe)
 {

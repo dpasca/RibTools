@@ -79,7 +79,7 @@ class State
 	};
 
 public:
-	State( FrameworkBase *pFramework );
+	State( FrameworkBase *pFramework, const char *pDefaultShadersDir );
 	~State();
 
 	void	Begin( RtToken name );
@@ -184,7 +184,7 @@ private:
 	
 	inline void insertPrimitive( Primitive *pPrim );
 	
-	void makeDefaultShaders();
+	void makeDefaultShaders( const char *pBasePath );
 };
 
 }

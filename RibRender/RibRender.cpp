@@ -23,9 +23,15 @@
 //==================================================================
 static RenderOutputOpenGL	*gpsRenderOutput;
 static char					gpFileToRender[2048];
+static char					gDefaultResDir[2048];
+static char					gStartDir[2048];
 
 //===============================================================
-static bool renderFile( const char *pFileName, int forcedWd=-1, int forcedHe=-1 )
+static bool renderFile(
+				const char *pFileName,
+				const char *pDefaultResourcesDir,
+				int forcedWd=-1,
+				int forcedHe=-1 )
 {
 	static std::string	sLastFileName;
 	static int			sLastUsedWd;
@@ -60,9 +66,13 @@ static bool renderFile( const char *pFileName, int forcedWd=-1, int forcedHe=-1 
 	
 	gpsRenderOutput = new RenderOutputOpenGL();
 
+	char	defaultShadersDir[4096];
+	sprintf( defaultShadersDir, "%s/Shaders", pDefaultResourcesDir );
+	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
+
 	RI::Parser			parser;
 	RI::FrameworkREYES	frameworkREYES( gpsRenderOutput );
-	RI::Machine			machine( &frameworkREYES, forcedWd, forcedHe );
+	RI::Machine			machine( &frameworkREYES, defaultShadersDir, forcedWd, forcedHe );
 	
 	for (size_t i=0; i <= dataSize; ++i)
 	{
@@ -138,7 +148,7 @@ void reshape(int width, int height)
 	glEnable( GL_DEPTH_TEST );
 	
 	// render the last loaded file
-	renderFile( NULL, width, height );
+	renderFile( NULL, gDefaultResDir, width, height );
 }
 
 //===============================================================
@@ -153,7 +163,7 @@ void idle(void)
 {
 	if ( gpFileToRender[0] )
 	{
-		renderFile( gpFileToRender );
+		renderFile( gpFileToRender, gDefaultResDir );
 		gpFileToRender[0] = 0;
 	}
 
@@ -179,10 +189,11 @@ static char *gsTestRibFiles[] =
 //===============================================================
 static void menuFunc( int id )
 {
-	strcpy( gpFileToRender, "../../Tests/" );
+	strcpy( gpFileToRender, gStartDir );
+	strcat( gpFileToRender, "/../../Tests/" );
 	strcat( gpFileToRender, gsTestRibFiles[id] );
 	
-	printf( "%s\n", gpFileToRender );
+	printf( "Render File: %s\n", gpFileToRender );
 }
 
 //===============================================================
@@ -194,9 +205,11 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	char buff[1024];
-	getcwd( buff, sizeof(buff) );
-	printf( "%s\n", buff );
+	getcwd( gStartDir, sizeof(gStartDir) );
+	printf( "gStartDir: %s\n", gStartDir );
+
+	sprintf( gDefaultResDir, "%s/../../RibRender/Resources", gStartDir );
+	printf( "gDefaultResDir: %s\n", gStartDir );
 
     glutInit(&argc, argv);
 

@@ -1,0 +1,8 @@
+.data
+	Ci		parameter varying color
+	Oi		parameter varying color
+	N		parameter varying normal
+
+.code
+	movvv	Ci	N
+	movvv	Oi	N

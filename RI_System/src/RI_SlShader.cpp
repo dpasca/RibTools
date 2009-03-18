@@ -19,13 +19,27 @@ namespace RI
 //==================================================================
 /// SlShader
 //==================================================================
-SlShader::SlShader( const char *pShaderName, const char *pShaderSource ) :
-	ResourceBase(pShaderName)
+SlShader::SlShader( const CtorParams &params ) :
+	ResourceBase(params.pName)
 {
-	DUT::MemFile	file((const void *)pShaderSource,
-						  strlen(pShaderSource) );
+	if ( params.pSource )
+	{
+		DUT::MemFile	file((const void *)params.pSource,
+							  strlen(params.pSource) );
 
-	ShaderAsmParser	parser( file, this );
+		ShaderAsmParser	parser( file, this );
+	}
+	else
+	if ( params.pSourceFileName )
+	{
+		DUT::MemFile	file( params.pSourceFileName );
+
+		ShaderAsmParser	parser( file, this );
+	}
+	else
+	{
+		DASSTHROW( 0, ("Missing parameters !") );
+	}
 }
 
 //==================================================================

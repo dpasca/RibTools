@@ -28,7 +28,10 @@ class Machine
 	int		mForcedHe;
 
 public:
-	Machine( FrameworkBase *pFramework, int forcedWd=-1, int forcedHe=-1 );
+	Machine(FrameworkBase *pFramework,
+			const char *pDefaultShadersDir,
+			int forcedWd=-1,
+			int forcedHe=-1 );
 	
 	void AddCommand(const DStr	&cmdName,
 					ParamList	&cmdParams );

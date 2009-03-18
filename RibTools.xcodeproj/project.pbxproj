@@ -152,6 +152,8 @@
 		6BD726830F232D51003A4601 /* RI_Primitive_Quadric.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BD726820F232D51003A4601 /* RI_Primitive_Quadric.h */; };
 		6BD7268D0F236350003A4601 /* RI_Primitive_Patch.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BD7268C0F236350003A4601 /* RI_Primitive_Patch.h */; };
 		6BD7268F0F236364003A4601 /* RI_Primitive_Patch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD7268E0F236364003A4601 /* RI_Primitive_Patch.cpp */; };
+		6BE494DA0F7155CF00C87822 /* dbg_normal_col.rrasm in Resources */ = {isa = PBXBuildFile; fileRef = 6BE494D70F7155CF00C87822 /* dbg_normal_col.rrasm */; };
+		6BE494DB0F7155CF00C87822 /* matte.rrasm in Resources */ = {isa = PBXBuildFile; fileRef = 6BE494D80F7155CF00C87822 /* matte.rrasm */; };
 		6BE7302E0F1FA236004FAE21 /* RI_Symbol.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BE7302D0F1FA236004FAE21 /* RI_Symbol.h */; };
 		6BE730300F1FA24D004FAE21 /* RI_Symbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */; };
 		6BF0ADBC0F432D010055A4C5 /* RenderOutputOpenGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BF0ADBA0F432D010055A4C5 /* RenderOutputOpenGL.cpp */; };
@@ -300,6 +302,8 @@
 		6BD726820F232D51003A4601 /* RI_Primitive_Quadric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive_Quadric.h; path = include/RI_Primitive_Quadric.h; sourceTree = "<group>"; };
 		6BD7268C0F236350003A4601 /* RI_Primitive_Patch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Primitive_Patch.h; path = include/RI_Primitive_Patch.h; sourceTree = "<group>"; };
 		6BD7268E0F236364003A4601 /* RI_Primitive_Patch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Primitive_Patch.cpp; path = src/RI_Primitive_Patch.cpp; sourceTree = "<group>"; };
+		6BE494D70F7155CF00C87822 /* dbg_normal_col.rrasm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dbg_normal_col.rrasm; sourceTree = "<group>"; };
+		6BE494D80F7155CF00C87822 /* matte.rrasm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = matte.rrasm; sourceTree = "<group>"; };
 		6BE7302D0F1FA236004FAE21 /* RI_Symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_Symbol.h; path = include/RI_Symbol.h; sourceTree = "<group>"; };
 		6BE7302F0F1FA24D004FAE21 /* RI_Symbol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_Symbol.cpp; path = src/RI_Symbol.cpp; sourceTree = "<group>"; };
 		6BEE6F3C0F2236BF00BC3132 /* Airplane.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Airplane.rib; path = Tests/Airplane.rib; sourceTree = "<group>"; };
@@ -480,6 +484,7 @@
 		6B8349CC0F0A8F6800BA7221 /* RibRender */ = {
 			isa = PBXGroup;
 			children = (
+				6BE494D40F7155CF00C87822 /* Resources */,
 				6BF0ADBA0F432D010055A4C5 /* RenderOutputOpenGL.cpp */,
 				6BF0ADBB0F432D010055A4C5 /* RenderOutputOpenGL.h */,
 				6B8349C90F0A8EDA00BA7221 /* RibRender.cpp */,
@@ -512,6 +517,24 @@
 				6B8349B00F0A8DDE00BA7221 /* RibRender.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6BE494D40F7155CF00C87822 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6BE494D50F7155CF00C87822 /* Shaders */,
+			);
+			name = Resources;
+			path = RibRender/Resources;
+			sourceTree = "<group>";
+		};
+		6BE494D50F7155CF00C87822 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				6BE494D70F7155CF00C87822 /* dbg_normal_col.rrasm */,
+				6BE494D80F7155CF00C87822 /* matte.rrasm */,
+			);
+			path = Shaders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -732,6 +755,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6BE494DA0F7155CF00C87822 /* dbg_normal_col.rrasm in Resources */,
+				6BE494DB0F7155CF00C87822 /* matte.rrasm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

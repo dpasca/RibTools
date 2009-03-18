@@ -110,7 +110,21 @@ public:
 	DVec<SlSymbol>	mSymbols;
 	DVec<SlCPUWord>	mCode;
 	
-	SlShader( const char *pName, const char *pShaderSource );
+	struct CtorParams
+	{
+		const char	*pName;
+		const char	*pSource;
+		const char	*pSourceFileName;
+		
+		CtorParams() :
+			pName(NULL),
+			pSource(NULL),
+			pSourceFileName(NULL)
+		{
+		}
+	};
+	
+	SlShader( const CtorParams &params );
 };
 
 //==================================================================

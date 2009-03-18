@@ -42,6 +42,9 @@ char *SSPrintF( const char *pFmt, ... );
 void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg );
 
 //==================================================================
+const char *GetFileNameOnly( const char *pPathFileName );
+
+//==================================================================
 /// MemFile
 //==================================================================
 class MemFile

@@ -1,0 +1,29 @@
+.data
+	Cs		parameter varying color
+	Os		parameter varying color
+	Ci		parameter varying color
+	Oi		parameter varying color
+	N		parameter varying normal
+	I		parameter varying vector
+
+	Ka		parameter uniform float 1
+	Kd		parameter uniform float 1
+
+	Nf		temporary varying normal
+
+.code
+	normalize	$v0		N
+	faceforward	Nf	$v0	I
+
+	diffuse		$v0	Nf		// -- Kd * diffuse( Nf )
+	mulvs		$v0	$v0	Kd
+
+	ambient		$v1			// -- Ka * ambient()
+	mulvs		$v1	$v1	Ka
+
+	addvv		$v0	$v0	$v1	// +
+
+	mulvv		$v0	$v0	Cs	// * Cs
+	mulvv		Ci	$v0	Os	// * Os -> Ci
+
+	movvv		Oi	Os		// Oi = Os

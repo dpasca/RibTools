@@ -1,0 +1,9 @@
+.data
+	Cs		parameter varying color
+	Os		parameter varying color
+	Ci		parameter varying color
+	Oi		parameter varying color
+
+.code
+	movvv	Ci	Cs
+	movvv	Oi	Os

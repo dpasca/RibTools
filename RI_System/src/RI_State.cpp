@@ -17,7 +17,7 @@ namespace RI
 //==================================================================
 /// State
 //==================================================================
-State::State( FrameworkBase *pFramework ) :
+State::State( FrameworkBase *pFramework, const char *pDefaultShadersDir ) :
 	mpFramework(pFramework)
 {
 	mModeStack.push( MD_UNDEFINED );
@@ -113,7 +113,7 @@ State::State( FrameworkBase *pFramework ) :
 	mStatics.FindOrAdd(	RI_HERMITEBASIS				, HermiteBasis		);
 	mStatics.FindOrAdd(	RI_POWERBASIS				, PowerBasis		);	
 	
-	makeDefaultShaders();
+	makeDefaultShaders( pDefaultShadersDir );
 
 	mOptionsStack.top().Init( &mStatics, &mOptionsRevTrack );
 	mAttributesStack.top().Init( &mStatics, &mResManager, &mAttribsRevTrack );
@@ -124,78 +124,23 @@ State::State( FrameworkBase *pFramework ) :
 }
 
 //==================================================================
-/// SlShader
-//==================================================================
-static const char *gspConstantShader =
-".data \n"
-"	Cs		parameter varying color \n"
-"	Os		parameter varying color \n"
-"	Ci		parameter varying color \n"
-"	Oi		parameter varying color \n"
-" \n"
-".code \n"
-"	movvv	Ci	Cs \n"
-"	movvv	Oi	Os \n"
-;
-
-//==================================================================
-static const char *gspMatteShader =
-".data \n"
-"	Cs		parameter varying color \n"
-"	Os		parameter varying color \n"
-"	Ci		parameter varying color \n"
-"	Oi		parameter varying color \n"
-"	N		parameter varying normal \n"
-"	I		parameter varying vector \n"
-
-"	Ka		parameter uniform float 1 \n"
-"	Kd		parameter uniform float 1 \n"
-
-"	Nf		temporary varying normal \n"
-" \n"
-".code \n"
-"	normalize	$v0		N \n"
-"	faceforward	Nf	$v0	I \n"
-
-"	diffuse		$v0	Nf \n"		// -- Kd * diffuse( Nf )
-"	mulvs		$v0	$v0	Kd \n"
-
-"	ambient		$v1	\n"			// -- Ka * ambient()
-"	mulvs		$v1	$v1	Ka	\n"
-
-"	addvv		$v0	$v0	$v1 \n"	// +
-
-"	mulvv		$v0	$v0	Cs \n"	// * Cs
-"	mulvv		Ci	$v0	Os \n"	// * Os -> Ci
-
-"	movvv		Oi	Os \n"		// Oi = Os
-;
-
-//==================================================================
-static const char *gspNormalColorShader =
-".data \n"
-"	Ci		parameter varying color \n"
-"	Oi		parameter varying color \n"
-"	N		parameter varying normal \n"
-
-" \n"
-".code \n"
-"	movvv	Ci	N \n"
-"	movvv	Oi	N \n"
-;
-
-//==================================================================
-void State::makeDefaultShaders()
+void State::makeDefaultShaders( const char *pBasePath )
 {
 	SlShader *pShader;
-	
-	pShader =
-		(SlShader *)mResManager.AddResource(
-						new SlShader( "constant", gspConstantShader ) );
 
-	pShader =
-		(SlShader *)mResManager.AddResource(
-						new SlShader( "matte", gspMatteShader ) );
+	char	buff[1024];
+	
+	SlShader::CtorParams	params;
+
+	params.pName			= "constant";
+	params.pSourceFileName	= buff;	
+	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
+
+	params.pName			= "matte";
+	params.pSourceFileName	= buff;	
+	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
 }
 
 //==================================================================
