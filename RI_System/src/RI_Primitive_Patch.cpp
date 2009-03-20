@@ -166,7 +166,13 @@ void PatchBilinear::Eval_dPdu_dPdv(
 			Vector3 &out_dPdu,
 			Vector3 &out_dPdv ) const
 {
-	// wooooo
+	Vector3	left	= mHullPos[2] - mHullPos[0];
+	Vector3	right	= mHullPos[3] - mHullPos[1];
+	out_dPdv		= DMix( left, right, u );
+
+	Vector3	bottom	= mHullPos[1] - mHullPos[0];
+	Vector3	top		= mHullPos[3] - mHullPos[2];
+	out_dPdu		= DMix( bottom, top, v );
 }
 
 //==================================================================
@@ -254,18 +260,39 @@ PatchBicubic::PatchBicubic( ParamList &params,
 }
 
 //==================================================================
-static Vector3 spline( float t,
+static inline Vector3 spline( float t,
 					const RtBasis &b,
 					const Vector3 &p0,
 					const Vector3 &p1,
 					const Vector3 &p2,
 					const Vector3 &p3 )
 {
-	return
-		 (b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3)*t*t*t
-		+(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3)*t*t
-		+(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3)*t
-		+(b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3);
+	Vector3 v0(b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3);
+	Vector3 v1(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3);
+	Vector3 v2(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3);
+	Vector3 v3(b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3);
+
+	return	v0 *t*t*t +
+			v1 *t*t +
+			v2 *t +
+			v3 ;
+}
+
+//==================================================================
+static inline Vector3 splineDeriv( float t,
+					const RtBasis &b,
+					const Vector3 &p0,
+					const Vector3 &p1,
+					const Vector3 &p2,
+					const Vector3 &p3 )
+{
+	Vector3 v0(b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3);
+	Vector3 v1(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3);
+	Vector3 v2(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3);
+
+	return	v0 *3*t*t +
+			v1 *2*t +
+			v2 ;
 }
 
 //==================================================================
@@ -294,7 +321,22 @@ void PatchBicubic::Eval_dPdu_dPdv(
 			Vector3 &out_dPdu,
 			Vector3 &out_dPdv ) const
 {
-	// wooooo
+	const RtBasis	&uBasis = *mpUBasis;
+	const RtBasis	&vBasis = *mpVBasis;
+
+	Point3	uBottom	= spline(u, uBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
+	Point3	uMid1	= spline(u, uBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
+	Point3	uMid2	= spline(u, uBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
+	Point3	uTop	= spline(u, uBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
+
+	out_dPdv = splineDeriv( v, vBasis, uBottom, uMid1, uMid2, uTop );
+
+	Point3	vBottom	= spline(v, vBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
+	Point3	vMid1	= spline(v, vBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
+	Point3	vMid2	= spline(v, vBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
+	Point3	vTop	= spline(v, vBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
+
+	out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
 }
 
 //==================================================================
