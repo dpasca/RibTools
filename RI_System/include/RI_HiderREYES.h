@@ -24,6 +24,7 @@ class Primitive;
 //==================================================================
 /// DestBuffer
 //==================================================================
+template <u_int NCHANS>
 class DestBuffer
 {
 	float				*mpData;
@@ -49,23 +50,39 @@ public:
 	{
 		mWd	= wd;
 		mHe	= he;
-		mpData = new float [ mWd * 3 * mHe ];
+		mpData = new float [ mWd * NCHANS * mHe ];
 	}
 	
 	void Clear()
 	{
-		memset( mpData, 0, sizeof(float) * mWd * 3 * mHe );
+		memset( mpData, 0, sizeof(float) * mWd * NCHANS * mHe );
+	}
+
+	void Fill( float val )
+	{
+		size_t	size = mWd * NCHANS * mHe;
+		for(size_t i=0; i < size; ++i)
+			mpData[i] = val;
 	}
 	
 	void SetSample( int x, int y, const float *pVal )
 	{
 		if ( x >= 0 && y >= 0 && x < (int)mWd && y < (int)mHe )
 		{
-			float	*pDest = &mpData[ (x + mWd * y) * 3 ];
-			pDest[0] = pVal[0];
-			pDest[1] = pVal[1];
-			pDest[2] = pVal[2];
+			float	*pDest = &mpData[ (x + mWd * y) * NCHANS ];
+			for (u_int ci=0; ci < NCHANS; ++ci)
+				pDest[ci] = pVal[ci];
 		}
+	}
+
+	float *GetSamplePtr( int x, int y )
+	{
+		if ( x >= 0 && y >= 0 && x < (int)mWd && y < (int)mHe )
+		{
+			return &mpData[ (x + mWd * y) * NCHANS + 0 ];
+		}
+		else
+			return NULL;
 	}
 	
 	const float *GetData() const { return mpData;	}
@@ -80,7 +97,8 @@ class HiderREYES : public HiderBase
 {
 	Options				mOptions;
 	DVec<Primitive *>	mpPrims;
-	DestBuffer			mDestBuff;
+	DestBuffer<3>		mDestBuff;
+	DestBuffer<1>		mZBuff;
 
 public:
 	HiderREYES();

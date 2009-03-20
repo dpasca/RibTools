@@ -43,6 +43,9 @@ void HiderREYES::WorldBegin(
 	
 	mDestBuff.Setup( opt.mXRes, opt.mYRes );
 	mDestBuff.Clear();
+	
+	mZBuff.Setup( opt.mXRes, opt.mYRes );
+	mZBuff.Fill( FLT_MAX );
 }
 
 //==================================================================
@@ -180,6 +183,10 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 	const Color	*pOi = (const Color *)g.mSymbols.LookupVariableData( "Oi", SlSymbol::COLOR, true );
 	const Color	*pCi = (const Color *)g.mSymbols.LookupVariableData( "Ci", SlSymbol::COLOR, true );
 
+	u_int destWd	= mDestBuff.mWd;
+	u_int destHe	= mDestBuff.mHe;
+
+
 	for (u_int iv=0; iv < g.mYDim; ++iv)
 	{
 		float	v = g.mVRange[0] + iv * dv;
@@ -194,27 +201,34 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 
 			int	winX = (int)(destHalfWd + destHalfWd * Pproj.x * oow);
 			int	winY = (int)(destHalfHe - destHalfHe * Pproj.y * oow);
+			
+			if ( (u_int)winX >= destWd || (u_int)winY >= destHe )
+				continue;
 
-/*
+#if 0
 			float	destCol[3] =
 			{
 				u,
 				v,
 				0
 			};
-*/
-
+#else
 			float	destCol[3] =
 			{
 				pCi->x,
 				pCi->y,
 				pCi->z
 			};
-			
+#endif
 			++pCi;
 			++pOi;
 
-			mDestBuff.SetSample( winX, winY, destCol );
+			float	*pZSample = mZBuff.GetSamplePtr( winX, winY );
+			if ( Pproj.z < *pZSample )
+			{
+				*pZSample = Pproj.z;
+				mDestBuff.SetSample( winX, winY, destCol );
+			}
 		}
 	}
 
