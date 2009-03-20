@@ -118,10 +118,15 @@ void RenderOutputOpenGL::convert( u_int w, u_int h, const float *pSrcData )
 			float	b = pSrcData[2] * 255.0f;
 			pSrcData += 3;
 
+#if 1
 			if ( r < 0 ) r = 0; else if ( r > 255 ) r = 255;
 			if ( g < 0 ) g = 0; else if ( g > 255 ) g = 255;
 			if ( b < 0 ) b = 0; else if ( b > 255 ) b = 255;
-
+#else
+			if ( r < 0 ) r = -r; if ( r > 255 ) r = 255;
+			if ( g < 0 ) g = -g; if ( g > 255 ) g = 255;
+			if ( b < 0 ) b = -b; if ( b > 255 ) b = 255;
+#endif
 			pDest[0] = (u_char)r;
 			pDest[1] = (u_char)g;
 			pDest[2] = (u_char)b;

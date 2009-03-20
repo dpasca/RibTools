@@ -60,6 +60,28 @@ ShaderAsmParser::ShaderAsmParser( DUT::MemFile &file, SlShader *pShader ) :
 }
 
 //==================================================================
+static void stripComments( char *pTxt )
+{
+	while ( pTxt[0] )
+	{
+		if ( pTxt[0] == ';' )
+		{
+			pTxt[0] = 0;
+			return;
+		}
+
+		if ( pTxt[0] == '/' )
+			if ( pTxt[1] == '/' )
+			{
+				pTxt[0] = 0;
+				return;
+			}
+			
+		++pTxt;
+	}
+}
+
+//==================================================================
 bool ShaderAsmParser::doParse( DUT::MemFile &file )
 {
 	char		lineBuff[1024];
@@ -68,6 +90,8 @@ bool ShaderAsmParser::doParse( DUT::MemFile &file )
 	
 	while ( file.ReadTextLine( lineBuff, sizeof(lineBuff) ) )
 	{
+		stripComments( lineBuff );
+	
 		DUT::StrStripBeginEndWhite( lineBuff );
 		
 		if ( 0 == strcasecmp( lineBuff, ".data" ) )

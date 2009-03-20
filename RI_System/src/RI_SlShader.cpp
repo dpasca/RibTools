@@ -280,9 +280,9 @@ static void Inst_Normalize( SlRunContext &ctx )
 //==================================================================
 inline float sign( float val )
 {
-	if ( val < 0 ) return -1; else
-	if ( val > 0 ) return 1; else
-				   return 0;
+	if ( val < 0 )	return -1; else
+	if ( val > 0 )	return 1; else
+					return 0;
 }
 
 //==================================================================
@@ -294,7 +294,7 @@ static void Inst_Faceforward( SlRunContext &ctx )
 	
 	const SlSymbol*	pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", SlSymbol::NORMAL );
 	const Vector3*	pNg = (const Vector3 *)pNgSymbol->GetData();
-	
+
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	bool	N_varying	= ctx.IsSymbolVarying( 2 );
 	bool	I_varying	= ctx.IsSymbolVarying( 3 );
@@ -309,11 +309,11 @@ static void Inst_Faceforward( SlRunContext &ctx )
 		for (u_int i=0; i < ctx.mSIMDCount; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = pN[N_offset] * sign( pI[N_offset].GetDot( pNg[Ng_offset] ) );
+				lhs[i] = pN[N_offset] * sign( -pI[I_offset].GetDot( pNg[Ng_offset] ) );
 
 			if ( N_varying )	++N_offset;
 			if ( I_varying )	++I_offset;
-			if ( Ng_varying )	++Ng_varying;
+			if ( Ng_varying )	++Ng_offset;
 		}
 	}
 	else
@@ -322,7 +322,7 @@ static void Inst_Faceforward( SlRunContext &ctx )
 		DASSERT( !I_varying		);
 		DASSERT( !Ng_varying	);
 
-		Vector3	tmp = pN[0] * sign( pI[0].GetDot( pNg[0] ) );
+		Vector3	tmp = pN[0] * sign( -pI[0].GetDot( pNg[0] ) );
 
 		for (u_int i=0; i < ctx.mSIMDCount; ++i)
 			if ( ctx.IsProcessorActive( i ) )

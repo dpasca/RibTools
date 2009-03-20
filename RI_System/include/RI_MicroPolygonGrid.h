@@ -27,7 +27,7 @@ class MicroPolygonGrid
 {
 public:
 	static const u_int	MAX_SIZE = 64 * 64;
-	
+
 	u_int			mXDim;
 	u_int			mYDim;
 	u_int			mPointsN;

@@ -93,6 +93,12 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camWorldPos )
 
 	float	du = 1.0f / g.mXDim;
 	float	dv = 1.0f / g.mYDim;
+	
+	Matrix44 mtxObjectCurrentNorm = g.mMtxObjectCurrent;
+	mtxObjectCurrentNorm.u.m44[3][0] = 0;
+	mtxObjectCurrentNorm.u.m44[3][1] = 0;
+	mtxObjectCurrentNorm.u.m44[3][2] = 0;
+	mtxObjectCurrentNorm.u.m44[3][3] = 1;
 
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
@@ -104,15 +110,18 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camWorldPos )
 			Vector2	locUV = CalcLocalUV( Vector2( u, v ) );
 			EvalP( locUV.x, locUV.y, pos );
 			pos = MultiplyV3M( pos, g.mMtxObjectCurrent );
-			
+
 			Vector3	dPdu;
 			Vector3	dPdv;
 			Eval_dPdu_dPdv( locUV.x, locUV.y, dPdu, dPdv );
 			
-			Vector3	nor = dPdu.GetCross( dPdv ).GetNormalized();
+			Vector3 objNor = dPdu.GetCross( dPdv );
+			Vector3	nor = MultiplyV3M( objNor, mtxObjectCurrentNorm ).GetNormalized();
 
 			*pPoints++	= pos;
-			*pI++		= pos - camWorldPos;
+			//*pI++		= pos - camWorldPos;
+			*pI++		= (pos - camWorldPos).GetNormalized();
+			//*pN++		= Vector3(0,0,0) - (pos - camWorldPos).GetNormalized();
 			*pN++		= nor;
 			*pNg++		= nor;
 			*pOs++		= mpAttribs->mOpacity;

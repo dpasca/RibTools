@@ -141,6 +141,16 @@ void State::makeDefaultShaders( const char *pBasePath )
 	params.pSourceFileName	= buff;	
 	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
 	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
+
+	params.pName			= "dbg_normal_col";
+	params.pSourceFileName	= buff;	
+	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
+
+	params.pName			= "test";
+	params.pSourceFileName	= buff;	
+	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
 }
 
 //==================================================================

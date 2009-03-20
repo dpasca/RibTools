@@ -9,7 +9,9 @@
 /* Begin PBXBuildFile section */
 		6B0404BB0F5F048000521FB2 /* RI_SlShaderAsmParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B0404BA0F5F048000521FB2 /* RI_SlShaderAsmParser.h */; };
 		6B0404BD0F5F04A300521FB2 /* RI_SlShaderAsmParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B0404BC0F5F04A300521FB2 /* RI_SlShaderAsmParser.cpp */; };
+		6B07711F0F73B32A00BDFFA6 /* constant.rrasm in Resources */ = {isa = PBXBuildFile; fileRef = 6B07711E0F73B32A00BDFFA6 /* constant.rrasm */; };
 		6B0A68E10F151619000CB0D8 /* RI_State_Prims.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */; };
+		6B12838D0F73C27C00DF88C7 /* test.rrasm in Resources */ = {isa = PBXBuildFile; fileRef = 6B12838C0F73C27C00DF88C7 /* test.rrasm */; };
 		6B16F3F70F0AA50600B53225 /* DUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B16F3F60F0AA50600B53225 /* DUtils.cpp */; };
 		6B16F3F90F0AA51900B53225 /* DUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F3F80F0AA51900B53225 /* DUtils.h */; };
 		6B16F4E50F0AC70C00B53225 /* DVector.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B16F4E40F0AC70C00B53225 /* DVector.h */; };
@@ -229,8 +231,10 @@
 /* Begin PBXFileReference section */
 		6B0404BA0F5F048000521FB2 /* RI_SlShaderAsmParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_SlShaderAsmParser.h; path = include/RI_SlShaderAsmParser.h; sourceTree = "<group>"; };
 		6B0404BC0F5F04A300521FB2 /* RI_SlShaderAsmParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_SlShaderAsmParser.cpp; path = src/RI_SlShaderAsmParser.cpp; sourceTree = "<group>"; };
+		6B07711E0F73B32A00BDFFA6 /* constant.rrasm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = constant.rrasm; sourceTree = "<group>"; };
 		6B0A68E00F151619000CB0D8 /* RI_State_Prims.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_State_Prims.cpp; path = src/RI_State_Prims.cpp; sourceTree = "<group>"; };
 		6B0ABFC00F16675D0001C656 /* Pixar.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Pixar.rib; path = Tests/Pixar.rib; sourceTree = "<group>"; };
+		6B12838C0F73C27C00DF88C7 /* test.rrasm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.rrasm; sourceTree = "<group>"; };
 		6B16F3F60F0AA50600B53225 /* DUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DUtils.cpp; path = src/DUtils.cpp; sourceTree = "<group>"; };
 		6B16F3F80F0AA51900B53225 /* DUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DUtils.h; path = include/DUtils.h; sourceTree = "<group>"; };
 		6B16F4520F0AC03100B53225 /* DMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMath.h; path = include/DMath.h; sourceTree = "<group>"; };
@@ -531,6 +535,8 @@
 		6BE494D50F7155CF00C87822 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				6B12838C0F73C27C00DF88C7 /* test.rrasm */,
+				6B07711E0F73B32A00BDFFA6 /* constant.rrasm */,
 				6BE494D70F7155CF00C87822 /* dbg_normal_col.rrasm */,
 				6BE494D80F7155CF00C87822 /* matte.rrasm */,
 			);
@@ -757,6 +763,8 @@
 			files = (
 				6BE494DA0F7155CF00C87822 /* dbg_normal_col.rrasm in Resources */,
 				6BE494DB0F7155CF00C87822 /* matte.rrasm in Resources */,
+				6B07711F0F73B32A00BDFFA6 /* constant.rrasm in Resources */,
+				6B12838D0F73C27C00DF88C7 /* test.rrasm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
