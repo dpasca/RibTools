@@ -12,9 +12,9 @@
 
 #include <string.h>
 #include <math.h>
-#include "DVector.h"
-#include "DTypes.h"
-#include "DUtils.h"
+#include "DMath/include/DVector.h"
+#include "DSystem/include/DTypes.h"
+#include "DSystem/include/DUtils.h"
 
 //==================================================================
 //#define DMATRIX44_ROWMTX_MODE

@@ -12,7 +12,6 @@
 
 #include "RI_Base.h"
 #include "RI_Primitive.h"
-#include "DContainers.h"
 #include "RI_Options.h"
 #include "RI_FrameworkBase.h"
 #include "RI_HiderREYES.h"

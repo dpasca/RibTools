@@ -10,7 +10,7 @@
 #ifndef RENDEROUTPUTOPENGL_H
 #define RENDEROUTPUTOPENGL_H
 
-#include "RI_FrameworkBase.h"
+#include "RI_System/include/RI_FrameworkBase.h"
 
 //==================================================================
 // RenderOutputOpenGL
@@ -21,6 +21,11 @@ class RenderOutputOpenGL : public RI::RenderOutputBase
 	u_int	mTexId;
 	u_int	mWd;
 	u_int	mHe;
+	u_int	mTexWd;
+	u_int	mTexHe;
+
+private:
+	bool	mSupportsNonPow2;
 
 public:
 	RenderOutputOpenGL();	

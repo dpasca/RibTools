@@ -11,7 +11,6 @@
 #define RI_HIDERBASE_H
 
 #include "RI_Base.h"
-#include "DMath.h"
 #include "RI_MicroPolygonGrid.h"
 
 //==================================================================

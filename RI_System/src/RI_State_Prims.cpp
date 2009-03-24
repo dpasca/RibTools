@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "RI_State.h"
 #include "RI_Primitive.h"
 

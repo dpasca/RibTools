@@ -12,9 +12,9 @@
 #ifndef RI_BASE_H
 #define RI_BASE_H
 
-#include "DTypes.h"
-#include "DContainers.h"
-#include "DMath.h"
+#include "DSystem/include/DTypes.h"
+#include "DSystem/include/DContainers.h"
+#include "DMath/include/DMath.h"
 
 //==================================================================
 namespace RI
@@ -273,8 +273,8 @@ typedef RtPointer RtLightHandle;
 
 #define RI_FALSE	0
 #define RI_TRUE		(! RI_FALSE)
-#define RI_INFINITY	1.0e38
-#define RI_EPSILON	1.0e-10
+#define RI_INFINITY	1.0e38f
+#define RI_EPSILON	1.0e-10f
 #define RI_NULL		((RtToken)0)
 
 //==================================================================

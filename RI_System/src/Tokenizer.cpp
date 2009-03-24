@@ -7,8 +7,8 @@
  *
  */
 
+#include "stdafx.h"
 #include "Tokenizer.h"
-
 
 //===============================================================
 const char *Tokenizer::GetDataTypeName( DataType dtype )
@@ -200,7 +200,7 @@ bool Tokenizer::inputHandleArray( char ch )
 
 			if ( mIsArrayFloat )
 			{
-				float val = atof( mCurToken.c_str() );
+				float val = (float)atof( mCurToken.c_str() );
 				mFloatArray.push_back( val );
 			}
 			else
@@ -242,7 +242,7 @@ void Tokenizer::setDataType()
 		else
 		if ( isFloatStr( mCurToken.c_str() ) )
 		{
-			mDataFloat = atof( mCurToken.c_str() );
+			mDataFloat = (float)atof( mCurToken.c_str() );
 			mDataType = DT_FLOAT;
 		}
 		else

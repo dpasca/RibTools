@@ -10,9 +10,9 @@
 #ifndef RI_MICROPOLYGONGRID_H
 #define RI_MICROPOLYGONGRID_H
 
-#include "DTypes.h"
-#include "DContainers.h"
-#include "DMath.h"
+#include "DSystem/include/DTypes.h"
+#include "DSystem/include/DContainers.h"
+#include "DMath/include/DMath.h"
 #include "RI_SlSymbol.h"
 
 //==================================================================

@@ -8,13 +8,17 @@
  */
 
 #include "RenderOutputOpenGL.h"
-#include <GLUT/glut.h>
+#ifdef _MSC_VER
+	#include <GL/glut.h>
+#else
+	#include <GLUT/glut.h>
+#endif
 
 //==================================================================
 // RenderOutputOpenGL
 //==================================================================
 RenderOutputOpenGL::RenderOutputOpenGL() :
-	mpBuffer(NULL), mTexId(0), mWd(0), mHe(0)
+	mpBuffer(NULL), mTexId(0), mWd(0), mHe(0), mTexWd(0), mTexHe(0)
 {
 	const char *pExtensionsStr = (const char *)glGetString( GL_EXTENSIONS );
 	
@@ -24,7 +28,12 @@ RenderOutputOpenGL::RenderOutputOpenGL() :
 		0 == strstr( pExtensionsStr, "GL_EXT_texture_rectangle" )
 	)
 	{
-		DASSTHROW( false, ("Non power of two texture not supported !!") );
+		mSupportsNonPow2 = false;
+		//DASSTHROW( false, ("Non power of two texture not supported !!") );
+	}
+	else
+	{
+		mSupportsNonPow2 = true;
 	}
 
 	glGenTextures( 1, &mTexId );
@@ -79,16 +88,39 @@ void RenderOutputOpenGL::Blit() const
 
 	glBindTexture( GL_TEXTURE_2D, mTexId );
 	
-	float w = mWd;
-	float h = mHe;
+	float w = (float)mWd;
+	float h = (float)mHe;
+
+	float s2 = (float)mWd / mTexWd;
+	float t2 = (float)mHe / mTexHe;
 
 	glColor3f( 1, 1, 1 );
 	glBegin( GL_QUADS );
-		glTexCoord2f( 0, 0 ); glVertex2f( w*0, h*0 );
-		glTexCoord2f( 1, 0 ); glVertex2f( w*1, h*0 );
-		glTexCoord2f( 1, 1 ); glVertex2f( w*1, h*1 );
-		glTexCoord2f( 0, 1 ); glVertex2f( w*0, h*1 );
+		glTexCoord2f( 0,  0 );  glVertex2f( w*0, h*0 );
+		glTexCoord2f( s2, 0 );  glVertex2f( w*1, h*0 );
+		glTexCoord2f( s2, t2 ); glVertex2f( w*1, h*1 );
+		glTexCoord2f( 0,  t2 ); glVertex2f( w*0, h*1 );
 	glEnd();
+}
+
+//==================================================================
+static u_int getNextPow2( u_int val )
+{
+	if ( val == 0 )
+		return 0;
+
+	for (u_int i=1; i < 32; ++i)
+	{
+		u_int	l = 1 << i-1;
+		u_int	r = 1 << i;
+		if ( val >= l && val <= r )
+		{
+			return r;
+		}
+	}
+
+	DASSERT( 0 );
+	return 0;
 }
 
 //==================================================================
@@ -99,7 +131,19 @@ void RenderOutputOpenGL::alloc( u_int w, u_int h )
 
 	mWd = w;
 	mHe = h;
-	glTexImage2D( GL_TEXTURE_2D, 0, 3, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
+
+	if ( mSupportsNonPow2 )
+	{
+		mTexWd = mWd;
+		mTexHe = mHe;
+	}
+	else
+	{
+		mTexWd = getNextPow2( mWd );
+		mTexHe = getNextPow2( mHe );
+	}
+
+	glTexImage2D( GL_TEXTURE_2D, 0, 3, mTexWd, mTexHe, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 	mpBuffer = new u_char [ w * h * 4 ];
 	
 	glutReshapeWindow( w, h );

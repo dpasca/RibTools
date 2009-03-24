@@ -11,7 +11,7 @@
 #define RI_STATE_H
 
 #include "RI_Base.h"
-#include "DContainers.h"
+#include "DSystem/include/DContainers.h"
 #include "RI_Options.h"
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
@@ -27,7 +27,7 @@ namespace RI
 
 
 Options
-*	WorldBegin/EndÏ
+*	WorldBegin/End
 *	FrameBegin/End
 	
 Attributes
@@ -120,6 +120,7 @@ public:
 				
 	void ColorSet( const Color &col );
 	void Opacity( const Color &col );
+	void LightSource( ParamList &params );
 
 	// options
 	void Format( int xRes, int yRes, float pixelRatio );

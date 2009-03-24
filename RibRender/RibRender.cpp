@@ -9,14 +9,19 @@
 
 #include <stdio.h>
 #include <stdexcept>
-#include "DUtils.h"
-#include "RI_Parser.h"
-#include "RI_Machine.h"
-#include "RI_FrameworkREYES.h"
+#include "DSystem/include/DUtils.h"
+#include "RI_System/include/RI_Parser.h"
+#include "RI_System/include/RI_Machine.h"
+#include "RI_System/include/RI_FrameworkREYES.h"
 #include "RenderOutputOpenGL.h"
 #include "RibRender.h"
 
-#include <GLUT/glut.h>
+#ifdef _MSC_VER
+	#include <GL/glut.h>
+	#include <direct.h>
+#else
+	#include <GLUT/glut.h>
+#endif
 
 //#define ECHO_INPUT
 
@@ -64,6 +69,7 @@ static bool renderFile(
 		return false;
 	}
 	
+	DSAFE_DELETE( gpsRenderOutput );
 	gpsRenderOutput = new RenderOutputOpenGL();
 
 	char	defaultShadersDir[4096];
@@ -155,7 +161,7 @@ void reshape(int width, int height)
 static void passiveMotion( int x, int y )
 {
 	//gApp.SetCursorPos( x, y );
-	glutPostRedisplay();
+	//glutPostRedisplay();
 }
 
 //===============================================================
@@ -165,9 +171,15 @@ void idle(void)
 	{
 		renderFile( gpFileToRender, gDefaultResDir );
 		gpFileToRender[0] = 0;
-	}
 
-    glutPostRedisplay();
+		glutPostRedisplay();
+	}
+	else
+	{
+		// Sleep because freeglut goes nuts with mainloop
+		Sleep( 1 );
+	}
+	//glutPostRedisplay();
 }
 
 //===============================================================

@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "RI_State.h"
 #include "RI_Primitive.h"
 
@@ -388,6 +389,15 @@ void State::Opacity( const Color &col )
 		return;
 
 	mAttributesStack.top().cmdOpacity( col );
+}
+
+//==================================================================
+void State::LightSource( ParamList &params )
+{
+	if NOT( verifyOpType( OPTYPE_ATRB ) )
+		return;
+
+	mAttributesStack.top().cmdLightSource( params );
 }
 
 // options

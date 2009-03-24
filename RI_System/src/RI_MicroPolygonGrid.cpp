@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "RI_Attributes.h"
 #include "RI_MicroPolygonGrid.h"
 

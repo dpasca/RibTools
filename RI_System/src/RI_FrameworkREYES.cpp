@@ -7,11 +7,10 @@
  *
  */
 
+#include "stdafx.h"
 #include "RI_Base.h"
 #include "RI_State.h"
 #include "RI_FrameworkREYES.h"
-
-#include <GLUT/glut.h>
 
 //==================================================================
 namespace RI

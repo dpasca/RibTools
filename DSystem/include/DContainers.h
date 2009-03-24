@@ -232,7 +232,7 @@ public:
 template <class T, size_t MAX>
 class CopyStackMax
 {
-	u_char	mVec[ sizeof(T) * MAX ];
+	U8		mVec[ sizeof(T) * MAX ];
 	size_t	mSize;
 
 public:

@@ -7,7 +7,7 @@
  *
  */
 
-#include <GLUT/GLUT.h>
+#include "stdafx.h"
 #include "RI_Primitive.h"
 #include "RI_HiderREYES.h"
 

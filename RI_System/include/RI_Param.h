@@ -10,8 +10,8 @@
 #ifndef RI_PARAM_H
 #define RI_PARAM_H
 
-#include "DTypes.h"
-#include "DContainers.h"
+#include "DSystem/include/DTypes.h"
+#include "DSystem/include/DContainers.h"
 
 //==================================================================
 namespace RI
@@ -79,9 +79,9 @@ struct Param
 	inline float		Flt() const
 	{
 		if ( type == FLT )		return u.floatVal;	else
-		if ( type == INT )		return u.intVal;	else
+		if ( type == INT )		return (float)u.intVal;	else
 		if ( type == FLT_ARR )	return u.floatArrayVal[0];	else
-		if ( type == INT_ARR )	return u.intArrayVal[0];	else
+		if ( type == INT_ARR )	return (float)u.intArrayVal[0];	else
 							{ badType(); return 0; }
 	}
 	

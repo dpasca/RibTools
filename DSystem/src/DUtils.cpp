@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdexcept>
+#include <stdarg.h>
 #include "DTypes.h"
 #include "DUtils.h"
 

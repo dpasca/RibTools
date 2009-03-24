@@ -10,7 +10,7 @@
 #ifndef RI_MACHINE_H
 #define RI_MACHINE_H
 
-#include "DContainers.h"
+#include "DSystem/include/DContainers.h"
 #include "RI_Base.h"
 #include "RI_State.h"
 

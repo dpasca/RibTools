@@ -11,6 +11,7 @@
 #define RI_ATTRIBUTES_H
 
 #include "RI_Base.h"
+#include "RI_Param.h"
 #include "RI_Tokens.h"
 #include "RI_Symbol.h"
 #include "RI_SlShader.h"
@@ -67,6 +68,7 @@ public:
 
 	void cmdColor( const Color &color );
 	void cmdOpacity( const Color &color );
+	void cmdLightSource( ParamList &params );
 
 public:
 	RevisionTracker	*mpRevision;

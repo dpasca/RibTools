@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "RI_Param.h"
 
 //==================================================================
@@ -52,7 +53,7 @@ const FltVec &Param::NumVec( size_t n )
 			ensIntArr( n );
 
 		u.floatArrayVal.resize( n );
-		for (size_t i; i < u.intArrayVal.size(); ++i)
+		for (size_t i=0; i < u.intArrayVal.size(); ++i)
 			u.floatArrayVal[i] = (float)u.intArrayVal[i];
 	}
 	else

@@ -10,7 +10,7 @@
 #ifndef RI_PARSER_H
 #define RI_PARSER_H
 
-#include "DTypes.h"
+#include "DSystem/include/DTypes.h"
 #include "RI_Param.h"
 
 //==================================================================

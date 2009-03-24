@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "RI_Machine.h"
 
 //==================================================================
@@ -163,6 +164,13 @@ void Machine::AddCommand(	const DStr	&cmdName,
 			p[3]
 			);
 
+	}
+	else
+	if ( nm == "LightSource" )
+	{
+		mState.LightSource( p );
+		//exN( 1, p );
+		//mState.FrameAspectRatio( p[0] );
 	}
 	else
 	// options

@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include <stdio.h>
 #include "Tokenizer.h"
 #include "RI_Parser.h"

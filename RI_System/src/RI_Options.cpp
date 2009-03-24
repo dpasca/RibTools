@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "DTypes.h"
 #include "RI_Base.h"
 #include "RI_Options.h"

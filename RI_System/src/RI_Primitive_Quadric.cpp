@@ -7,7 +7,7 @@
  *
  */
 
-#include <GLUT/glut.h>
+#include "stdafx.h"
 #include "DMath.h"
 #include "RI_Options.h"
 #include "RI_Attributes.h"
@@ -296,10 +296,10 @@ inline void bounds2DSweepL(
 	out_bound.Expand( polar(rmax,tmax) );
 	
 	if ( tmin < (float)M_PI_2 && tmax > (float)M_PI_2 )
-		out_bound.Expand( polar( rmax, M_PI_2 ) );
+		out_bound.Expand( polar( rmax, (float)M_PI_2 ) );
 
 	if ( tmin < (float)M_PI && tmax > (float)M_PI )
-		out_bound.Expand( polar( rmax, M_PI ) );
+		out_bound.Expand( polar( rmax, (float)M_PI ) );
 
 	if ( tmin < (float)(M_PI+M_PI_2) && tmax > (float)(M_PI+M_PI_2) )
 		out_bound.Expand( polar( rmax, (float)(M_PI+M_PI_2) ) );

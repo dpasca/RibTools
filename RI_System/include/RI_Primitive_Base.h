@@ -10,7 +10,7 @@
 #ifndef RI_PRIMITIVE_BASE_H
 #define RI_PRIMITIVE_BASE_H
 
-#include "DMath.h"
+#include "DMath/include/DMath.h"
 #include "RI_Param.h"
 #include "RI_Symbol.h"
 #include "RI_MicroPolygonGrid.h"

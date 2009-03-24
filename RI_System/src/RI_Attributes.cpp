@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "RI_Attributes.h"
 
 //==================================================================
@@ -209,6 +210,12 @@ void Attributes::cmdColor( const Color &color )
 void Attributes::cmdOpacity( const Color &color )
 {
 	mOpacity = color;
+}
+
+//==================================================================
+void Attributes::cmdLightSource( ParamList &params )
+{
+	
 }
 
 //==================================================================

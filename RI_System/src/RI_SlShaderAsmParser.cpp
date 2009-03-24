@@ -7,6 +7,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "DUtils.h"
 #include "RI_SlRunContext.h"
 #include "RI_SlShaderAsmParser.h"

@@ -12,7 +12,7 @@
 
 #include "RI_Base.h"
 #include "RI_Param.h"
-#include "DMath.h"
+#include "DMath/include/DMath.h"
 #include "RI_Symbol.h"
 
 //==================================================================

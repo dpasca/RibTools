@@ -7,6 +7,8 @@
  *
  */
 
+#include "stdafx.h"
+#include <stdarg.h>
 #include "RI_State.h"
 
 //==================================================================
