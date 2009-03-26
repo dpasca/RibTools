@@ -82,28 +82,28 @@ void MicroPolygonGrid::Setup(
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, 1, 0, 0, mPointsN );
+	fillColArray( (Color *)symbol.mpDefaultVal, 1.0f, 0.0f, 0.0f, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Oi";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, 0, 1, 0, mPointsN );
+	fillColArray( (Color *)symbol.mpDefaultVal, 0.0f, 1.0f, 0.0f, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Cs";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, 0, 0, 1, mPointsN );
+	fillColArray( (Color *)symbol.mpDefaultVal, 0.0f, 0.0f, 1.0f, mPointsN );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Os";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, 1, 1, 0, mPointsN );
+	fillColArray( (Color *)symbol.mpDefaultVal, 1.0f, 1.0f, 0.0f, mPointsN );
 	mSymbols.push_back( symbol );
 }
 

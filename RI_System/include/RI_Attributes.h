@@ -15,6 +15,7 @@
 #include "RI_Tokens.h"
 #include "RI_Symbol.h"
 #include "RI_SlShader.h"
+#include "RI_LightSource.h"
 
 //==================================================================
 namespace RI
@@ -68,7 +69,7 @@ public:
 
 	void cmdColor( const Color &color );
 	void cmdOpacity( const Color &color );
-	void cmdLightSource( ParamList &params );
+	bool cmdLightSource( ParamList &params );
 
 public:
 	RevisionTracker	*mpRevision;

@@ -193,6 +193,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_LightSource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_LightSource.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_Machine.cpp"
 				>
 			</File>

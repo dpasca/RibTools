@@ -92,7 +92,7 @@ struct Param
 	const char	*PChar()				const	{ ensType( STR ); return u.stringVal.c_str();	}
 
 	bool IsString() const	{ return type == STR;	}
-
+	bool IsIntVal() const	{ return type == INT || type == INT_ARR; }
 
 	operator const char*	() const	{	return PChar();	}
 	operator float			() const	{	return Flt();	}

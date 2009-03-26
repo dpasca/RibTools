@@ -331,10 +331,10 @@ void PatchBicubic::Eval_dPdu_dPdv(
 
 	out_dPdv = splineDeriv( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
-	Point3	vBottom	= spline(v, vBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
-	Point3	vMid1	= spline(v, vBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
-	Point3	vMid2	= spline(v, vBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
-	Point3	vTop	= spline(v, vBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
+	Point3	vBottom	= spline(v, vBasis, mHullPos[ 0], mHullPos[ 4], mHullPos[ 8], mHullPos[12]);
+	Point3	vMid1	= spline(v, vBasis, mHullPos[ 1], mHullPos[ 5], mHullPos[ 9], mHullPos[13]);
+	Point3	vMid2	= spline(v, vBasis, mHullPos[ 2], mHullPos[ 6], mHullPos[10], mHullPos[14]);
+	Point3	vTop	= spline(v, vBasis, mHullPos[ 3], mHullPos[ 7], mHullPos[11], mHullPos[15]);
 
 	out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
 }

@@ -15,7 +15,7 @@ namespace RI
 {
 
 //==================================================================
-/// Attributess
+/// Attributes
 //==================================================================
 Attributes::Attributes()
 {
@@ -213,10 +213,32 @@ void Attributes::cmdOpacity( const Color &color )
 }
 
 //==================================================================
-void Attributes::cmdLightSource( ParamList &params )
+bool Attributes::cmdLightSource( ParamList &params )
 {
-	
-}
+	const char	*pLightTypeName = "";
 
+	LightSource	light;
+
+	// get type and ID
+	if ( params.size() < 2 || !params[0].IsString() || !params[1].IsIntVal() )
+	{
+		printf( "Error: bad LightSource definition !\n" );
+		return false;
+	}
+
+	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
+	{
+		light.mType = LightSource::TYPE_AMBIENT;
+	}
+	else
+	if ( 0 == strcasecmp( "distantlight", params[0].PChar() ) )
+	{
+		light.mType = LightSource::TYPE_DISTANT;
+	}
+
+	light.mID = params[1].Int();
+
+	return true;
+}
 //==================================================================
 }
