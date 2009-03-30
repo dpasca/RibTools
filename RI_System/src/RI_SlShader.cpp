@@ -347,11 +347,13 @@ static inline void illuminate(
 		const LightSource	&light = lights[li];
 		if ( light.mType == LightSource::TYPE_DISTANT )
 		{
-			float	norLightCosA = Nn.GetDot( -light.mRend.mDistant.mDir );
-			if ( norLightCosA < illConeCosA )
+			float	norLightCosA = Nn.GetDot( light.mRend.mDistant.mDir );
+			//if ( norLightCosA < illConeCosA )
 				accCol += light.mColor * norLightCosA;
 		}
 	}
+
+	//DASSERT( accCol.x >= 0 && accCol.y >= 0 && accCol.z >= 0 );
 }
 
 //==================================================================
@@ -434,6 +436,8 @@ static void Inst_Ambient( SlRunContext &ctx )
 		if ( light.mType == LightSource::TYPE_AMBIENT )
 			ambCol += light.mColor * light.mIntesity;
 	}
+
+	//DASSERT( ambCol.x >= 0 && ambCol.y >= 0 && ambCol.z >= 0 );
 
 	for (u_int i=0; i < ctx.mSIMDCount; ++i)
 	{

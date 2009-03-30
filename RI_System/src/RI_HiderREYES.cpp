@@ -144,7 +144,7 @@ float HiderREYES::RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) con
 	if ( maxX > minX && maxY > minY )
 	{
 		float	squareArea = (maxY - minY) * (maxX - minX);
-		return squareArea;
+		return squareArea * 2;
 	}
 	else
 		return 0.0f;	// invalid or zero area...

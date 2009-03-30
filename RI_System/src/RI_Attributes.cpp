@@ -243,7 +243,6 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform )
 
 	light.mID = params[1].Int();
 
-
 	for (size_t i=2; i < params.size(); ++i)
 	{
 		if NOT( params[i].IsString() )
@@ -286,6 +285,17 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform )
 	}
 
 	light.UpdateRend( xform );
+
+	// if we are overwriting a light, then erase the previous one !
+	// ..based on the ID
+	for (size_t i=0; i < mLights.size()-1; ++i)
+	{
+		if ( light.mID == mLights[i].mID )
+		{
+			mLights.erase( mLights.begin() + i );
+			break;
+		}
+	}
 
 	return true;
 }

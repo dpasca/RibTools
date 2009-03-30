@@ -157,9 +157,9 @@ void RenderOutputOpenGL::convert( u_int w, u_int h, const float *pSrcData )
 	for (u_int j=0; j < h; ++j)
 		for (u_int i=0; i < w; ++i)
 		{
-			float	r = pSrcData[0] * 255.0f;
-			float	g = pSrcData[1] * 255.0f;
-			float	b = pSrcData[2] * 255.0f;
+			int	r = (int)(pSrcData[0] * 255.0f);
+			int	g = (int)(pSrcData[1] * 255.0f);
+			int	b = (int)(pSrcData[2] * 255.0f);
 			pSrcData += 3;
 
 #if 1
