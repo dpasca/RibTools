@@ -11,6 +11,7 @@
 #include "RI_SlShader.h"
 #include "RI_SlRunContext.h"
 #include "RI_SlShaderAsmParser.h"
+#include "RI_Attributes.h"
 #include "DUtils.h"
 
 //==================================================================
@@ -334,23 +335,68 @@ static void Inst_Faceforward( SlRunContext &ctx )
 }
 
 //==================================================================
+static inline void illuminate(
+				Color &accCol,
+				const DVec<LightSource> &lights,
+				const Point3 &pos,
+				const Vector3 &Nn,
+				float illConeCosA )
+{
+	for (size_t li=0; li < lights.size(); ++li)
+	{
+		const LightSource	&light = lights[li];
+		if ( light.mType == LightSource::TYPE_DISTANT )
+		{
+			float	norLightCosA = Nn.GetDot( -light.mRend.mDistant.mDir );
+			if ( norLightCosA < illConeCosA )
+				accCol += light.mColor * norLightCosA;
+		}
+	}
+}
+
+//==================================================================
 // this is a simplified version.. until lights become available 8)
+/*
+{
+color C = 0;
+illuminance( P, N, PI/2 )
+	C += Cl * normalize(L).N;
+return C;
+*/
+
 static void Inst_Diffuse( SlRunContext &ctx )
 {
 		  Color*	lhs	= (		 Vector3*)ctx.GetVoid( 1 );
-	const Color*	op1	= (const Vector3*)ctx.GetVoid( 2 );
+	const Vector3*	op1	= (const Vector3*)ctx.GetVoid( 2 );
+
+	const SlSymbol*	pPSymbol = ctx.mpSymbols->LookupVariable( "P", SlSymbol::POINT );
+	const Point3*	pP = (const Point3 *)pPSymbol->GetData();
+
+	const DVec<LightSource>	&lights = ctx.mpAttribs->mLights;
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	float	illConeCosA = cosf( (float)M_PI_2 );
 	
 	if ( lhs_varying )
 	{
 		bool	op1_varying = ctx.IsSymbolVarying( 2 );
 		int		op1_offset = 0;
-		
+
 		for (u_int i=0; i < ctx.mSIMDCount; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = op1[op1_offset].GetNormalized().GetDot( Vector3(0, 0, 1) );
+			{
+				Vector3	Nn = op1[op1_offset].GetNormalized();
+
+				Color	col( 0, 0, 0 );
+
+				illuminate( col, lights, *pP, Nn, illConeCosA );
+
+				lhs[i] = col;
+			}
+
+			++pP;
 
 			if ( op1_varying )	++op1_offset;
 		}
@@ -359,11 +405,14 @@ static void Inst_Diffuse( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		Vector3	tmp = op1[0].GetNormalized().GetDot( Vector3(0, 0, 1) );
+		Vector3	Nn = op1[0].GetNormalized();
+
+		Color	col( 0, 0, 0 );
+		illuminate( col, lights, *pP, Nn, illConeCosA );
 
 		for (u_int i=0; i < ctx.mSIMDCount; ++i)
 			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = tmp;
+				lhs[i] = col;
 	}
 
 	ctx.NextInstruction();
@@ -375,10 +424,21 @@ static void Inst_Ambient( SlRunContext &ctx )
 {
 	Color*	lhs	= (		 Color*)ctx.GetVoid( 1 );
 
+	Color	ambCol( 0, 0, 0 );
+
+	const DVec<LightSource>	&lights = ctx.mpAttribs->mLights;
+	for (size_t i=0; i < lights.size(); ++i)
+	{
+		const LightSource	&light = lights[i];
+
+		if ( light.mType == LightSource::TYPE_AMBIENT )
+			ambCol += light.mColor * light.mIntesity;
+	}
+
 	for (u_int i=0; i < ctx.mSIMDCount; ++i)
 	{
 		if ( ctx.IsProcessorActive( i ) )
-			lhs[i] = Vector3( 0.2f, 0.2f, 0.2f );
+			lhs[i] = ambCol;
 	}
 
 	ctx.NextInstruction();
@@ -419,7 +479,7 @@ Inst_Ambient,
 };
 
 //==================================================================
-void SlShaderInstance::Run( MicroPolygonGrid &g )
+void SlShaderInstance::Run( MicroPolygonGrid &g, const Attributes *pAttribs )
 {
 	SlRunContext	ctx;
 	
@@ -427,6 +487,7 @@ void SlShaderInstance::Run( MicroPolygonGrid &g )
 	ctx.mpDataSegment	= Bind( g );
 	ctx.InitializeSIMD( g );
 	ctx.mpShaderInst	= this;
+	ctx.mpAttribs		= pAttribs;
 
 	while ( ctx.mProgramCounter < mpShader->mCode.size() )
 	{

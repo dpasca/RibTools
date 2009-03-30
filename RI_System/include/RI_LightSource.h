@@ -12,6 +12,9 @@
 namespace RI
 {
 
+//==================================================================
+class Transform;
+
 // LightSource "distantlight" 2 "intensity" [1] "lightcolor" [0.5 0.2 0.0] "from" [-1000 500 1000] "to" [0 0 0]
 //==================================================================
 /// LightSource
@@ -30,10 +33,27 @@ public:
 	u_int	mID;
 	float	mIntesity;
 	Color	mColor;
-	Point3	mFromPos;
-	Point3	mToPos;
+	Point3	mLocFromPos;
+	Point3	mLocToPos;
+
+	struct  // union would be nice
+	{
+		struct 
+		{
+			Vector3	mDir;
+		} mDistant;
+
+		struct  
+		{
+			Point3	mFromPos;
+			Point3	mToPos;
+		} mCone;
+
+	} mRend;
 
 	LightSource();
+
+	void UpdateRend( const Transform &xform );
 };
 
 

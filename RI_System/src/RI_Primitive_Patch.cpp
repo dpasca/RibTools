@@ -147,32 +147,27 @@ PatchBilinear::PatchBilinear( ParamList &params, const Vector3 hull[4] ) :
 }
 
 //==================================================================
-Point3 &PatchBilinear::EvalP(
+void PatchBilinear::Eval_dPdu_dPdv(
 			float u,
 			float v,
-			Point3 &out_pt) const
+			Point3 &out_pt,
+			Vector3 *out_dPdu,
+			Vector3 *out_dPdv ) const
 {
 	Vector3	left	= DMix( mHullPos[0], mHullPos[2], v );
 	Vector3	right	= DMix( mHullPos[1], mHullPos[3], v );
 	out_pt			= DMix( left, right, u );
 
-	return out_pt;
-}
+	if ( out_dPdu )
+	{
+		Vector3	left	= mHullPos[2] - mHullPos[0];
+		Vector3	right	= mHullPos[3] - mHullPos[1];
+		*out_dPdv		= DMix( left, right, u );
 
-//==================================================================
-void PatchBilinear::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Vector3 &out_dPdu,
-			Vector3 &out_dPdv ) const
-{
-	Vector3	left	= mHullPos[2] - mHullPos[0];
-	Vector3	right	= mHullPos[3] - mHullPos[1];
-	out_dPdv		= DMix( left, right, u );
-
-	Vector3	bottom	= mHullPos[1] - mHullPos[0];
-	Vector3	top		= mHullPos[3] - mHullPos[2];
-	out_dPdu		= DMix( bottom, top, v );
+		Vector3	bottom	= mHullPos[1] - mHullPos[0];
+		Vector3	top		= mHullPos[3] - mHullPos[2];
+		*out_dPdu		= DMix( bottom, top, v );
+	}
 }
 
 //==================================================================
@@ -185,51 +180,6 @@ void PatchBilinear::MakeBound( Bound &out_bound )
 	out_bound.Expand( EvalP( mURange[0], mVRange[1], Po ) );
 	out_bound.Expand( EvalP( mURange[1], mVRange[1], Po ) );
 }
-
-/*
-//==================================================================
-void PatchBilinear::Render( GState &gstate )
-{
-	PUTPRIMNAME( "* PatchBilinear" );
-
-	GVert	buffer[NSUBDIVS+1];
-		
-	//glBegin( GL_TRIANGLE_STRIP );
-	for (int vI=0; vI <= NSUBDIVS; ++vI)
-	{
-		float	v = vI / (float)NSUBDIVS;
-
-		Vector3	left = mHullPos[0] + v * (mHullPos[2] - mHullPos[0]);
-		Vector3	right= mHullPos[1] + v * (mHullPos[3] - mHullPos[1]);
-
-		glBegin( GL_TRIANGLE_STRIP );
-		for (int uI=0; uI <= NSUBDIVS; ++uI)
-		{
-			float	u = uI / (float)NSUBDIVS;
-
-			Vector3	P = left + u * (right - left);
-			
-			GVert	vert;
-			vert.x	= P.x;
-			vert.y	= P.y;
-			vert.z	= P.z;
-
-			vert.u	= u;
-			vert.v	= v;
-
-			if ( vI > 0 )
-			{
-				gstate.AddVertex( buffer[uI] );
-				gstate.AddVertex( vert );
-			}
-
-			buffer[uI] = vert;
-		}
-		glEnd();
-	}
-	//glEnd();
-}
-*/
 
 //==================================================================
 PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
@@ -296,10 +246,12 @@ static inline Vector3 splineDeriv( float t,
 }
 
 //==================================================================
-Point3 &PatchBicubic::EvalP(
+void PatchBicubic::Eval_dPdu_dPdv(
 			float u,
 			float v,
-			Point3 &out_pt ) const
+			Point3 &out_pt,
+			Vector3 *out_dPdu,
+			Vector3 *out_dPdv ) const
 {
 	const RtBasis	&uBasis = *mpUBasis;
 	const RtBasis	&vBasis = *mpVBasis;
@@ -311,32 +263,17 @@ Point3 &PatchBicubic::EvalP(
 
 	out_pt = spline( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
-	return out_pt;
-}
+	if ( out_dPdu )
+	{
+		*out_dPdv = splineDeriv( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
-//==================================================================
-void PatchBicubic::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Vector3 &out_dPdu,
-			Vector3 &out_dPdv ) const
-{
-	const RtBasis	&uBasis = *mpUBasis;
-	const RtBasis	&vBasis = *mpVBasis;
+		Point3	vBottom	= spline(v, vBasis, mHullPos[ 0], mHullPos[ 4], mHullPos[ 8], mHullPos[12]);
+		Point3	vMid1	= spline(v, vBasis, mHullPos[ 1], mHullPos[ 5], mHullPos[ 9], mHullPos[13]);
+		Point3	vMid2	= spline(v, vBasis, mHullPos[ 2], mHullPos[ 6], mHullPos[10], mHullPos[14]);
+		Point3	vTop	= spline(v, vBasis, mHullPos[ 3], mHullPos[ 7], mHullPos[11], mHullPos[15]);
 
-	Point3	uBottom	= spline(u, uBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
-	Point3	uMid1	= spline(u, uBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
-	Point3	uMid2	= spline(u, uBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
-	Point3	uTop	= spline(u, uBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
-
-	out_dPdv = splineDeriv( v, vBasis, uBottom, uMid1, uMid2, uTop );
-
-	Point3	vBottom	= spline(v, vBasis, mHullPos[ 0], mHullPos[ 4], mHullPos[ 8], mHullPos[12]);
-	Point3	vMid1	= spline(v, vBasis, mHullPos[ 1], mHullPos[ 5], mHullPos[ 9], mHullPos[13]);
-	Point3	vMid2	= spline(v, vBasis, mHullPos[ 2], mHullPos[ 6], mHullPos[10], mHullPos[14]);
-	Point3	vTop	= spline(v, vBasis, mHullPos[ 3], mHullPos[ 7], mHullPos[11], mHullPos[15]);
-
-	out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
+		*out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
+	}
 }
 
 //==================================================================
@@ -349,66 +286,6 @@ void PatchBicubic::MakeBound( Bound &out_bound )
 	out_bound.Expand( EvalP( mURange[0], mVRange[1], Po ) );
 	out_bound.Expand( EvalP( mURange[1], mVRange[1], Po ) );
 }
-
-/*
-//==================================================================
-void PatchBicubic::Render( GState &gstate )
-{
-	PUTPRIMNAME( "* PatchBicubic" );
-
-	GVert	buffer[NSUBDIVS+1];
-
-	Vector3	bottom[NSUBDIVS+1];
-	Vector3	mid1[NSUBDIVS+1];
-	Vector3	mid2[NSUBDIVS+1];
-	Vector3	top[NSUBDIVS+1];
-	
-	const RtBasis	&uBasis = *mpUBasis;
-	const RtBasis	&vBasis = *mpVBasis;
-
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-
-		bottom[uI]	= spline(u, uBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
-		mid1[uI]	= spline(u, uBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
-		mid2[uI]	= spline(u, uBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
-		top[uI]		= spline(u, uBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
-	}
-		
-	//glBegin( GL_TRIANGLE_STRIP );
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-
-		glBegin( GL_TRIANGLE_STRIP );
-		for (int vI=0; vI <= NSUBDIVS; ++vI)
-		{
-			float	v = vI / (float)NSUBDIVS;
-
-			Vector3	P = spline( v, vBasis, bottom[uI], mid1[uI], mid2[uI], top[uI] );
-			
-			GVert	vert;
-			vert.x	= P.x;
-			vert.y	= P.y;
-			vert.z	= P.z;
-
-			vert.u	= u;
-			vert.v	= v;
-
-			if ( uI > 0 )
-			{
-				gstate.AddVertex( buffer[vI] );
-				gstate.AddVertex( vert );
-			}
-
-			buffer[vI] = vert;
-		}
-		glEnd();
-	}
-	//glEnd();
-}
-*/
 
 //==================================================================
 }

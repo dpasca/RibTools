@@ -121,6 +121,7 @@ public:
 	void ColorSet( const Color &col );
 	void Opacity( const Color &col );
 	void LightSource( ParamList &params );
+	void Surface( ParamList &params );
 
 	// options
 	void Format( int xRes, int yRes, float pixelRatio );

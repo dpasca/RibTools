@@ -26,7 +26,8 @@ namespace RI
 //==================================================================
 class Attributes
 {
-	SymbolList	*mpStatics;
+	SymbolList		*mpStatics;
+	ResourceManager *mpResManager;
 
 public:
 	Attributes();
@@ -69,7 +70,8 @@ public:
 
 	void cmdColor( const Color &color );
 	void cmdOpacity( const Color &color );
-	bool cmdLightSource( ParamList &params );
+	bool cmdLightSource( ParamList &params, const Transform &xform );
+	void cmdSurface( ParamList &params );
 
 public:
 	RevisionTracker	*mpRevision;
@@ -103,6 +105,8 @@ public:
 	Color				mColor;
 	Color				mOpacity;
 	SlShaderInstance	mShaderInstance;
+
+	DVec<LightSource>	mLights;
 };
 
 //==================================================================

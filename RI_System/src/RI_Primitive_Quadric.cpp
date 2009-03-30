@@ -20,83 +20,72 @@ namespace RI
 {
 
 //==================================================================
-Point3 &Cylinder::EvalP(
+void Cylinder::Eval_dPdu_dPdv(
 			float u,
 			float v,
-			Point3 &out_pt ) const
+			Point3 &out_pt,
+			Vector3 *out_dPdu,
+			Vector3 *out_dPdv ) const
 {
 	float	theta = u * mThetamaxRad;
 
 	out_pt.x = mRadius * cosf( theta );
 	out_pt.y = mRadius * sinf( theta );
 	out_pt.z = mZMin + v * (mZMax - mZMin);
-	
-	return out_pt;
-}
 
-//==================================================================
-void Cylinder::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Vector3 &out_dPdu,
-			Vector3 &out_dPdv ) const
-{
-	float	theta = u * mThetamaxRad;
+	if ( out_dPdu )
+	{
+		float	tmp = mThetamaxRad * mRadius;
 
-	float	tmp = mThetamaxRad * mRadius;
+		out_dPdu->x = tmp * -sinf( theta );
+		out_dPdu->y = tmp *  cosf( theta );
+		out_dPdu->z = 0;
 
-	out_dPdu.x = tmp * -sinf( theta );
-	out_dPdu.y = tmp *  cosf( theta );
-	out_dPdu.z = 0;
-
-	out_dPdv.x = 0;
-	out_dPdv.y = 0;
-	out_dPdv.z = mZMax - mZMin;
-}
-
-//==================================================================
-Point3 &Cone::EvalP(
-			float u,
-			float v,
-			Point3 &out_pt ) const
-{
-	float	theta = u * mThetamaxRad;
-
-	out_pt.x = mRadius * (1 - v) * cosf( theta );
-	out_pt.y = mRadius * (1 - v) * sinf( theta );
-	out_pt.z = v * mHeight;
-	
-	return out_pt;
+		out_dPdv->x = 0;
+		out_dPdv->y = 0;
+		out_dPdv->z = mZMax - mZMin;
+	}
 }
 
 //==================================================================
 void Cone::Eval_dPdu_dPdv(
 			float u,
 			float v,
-			Vector3 &out_dPdu,
-			Vector3 &out_dPdv ) const
+			Point3 &out_pt,
+			Vector3 *out_dPdu,
+			Vector3 *out_dPdv ) const
 {
 	float	theta = u * mThetamaxRad;
-	
 	float	cosUTheta = cosf( theta );
 	float	sinUTheta = sinf( theta );
 
-	float	tmp = mThetamaxRad * mRadius * (1-v);
+	float	rad1V = mRadius * (1 - v);
+	
+	out_pt.x = rad1V * cosUTheta;
+	out_pt.y = rad1V * sinUTheta;
+	out_pt.z = v * mHeight;
 
-	out_dPdu.x = tmp * -sinUTheta;
-	out_dPdu.y = tmp *  cosUTheta;
-	out_dPdu.z = 0;
+	if ( out_dPdu )
+	{
+		float	tmp = mThetamaxRad * rad1V;
 
-	out_dPdv.x = mRadius * -cosUTheta;
-	out_dPdv.y = mRadius * -sinUTheta;
-	out_dPdv.z = mHeight;
+		out_dPdu->x = tmp * -sinUTheta;
+		out_dPdu->y = tmp *  cosUTheta;
+		out_dPdu->z = 0;
+
+		out_dPdv->x = mRadius * -cosUTheta;
+		out_dPdv->y = mRadius * -sinUTheta;
+		out_dPdv->z = mHeight;
+	}
 }
 
 //==================================================================
-Point3 &Sphere::EvalP(
+void Sphere::Eval_dPdu_dPdv(
 			float u,
 			float v,
-			Point3 &out_pt ) const
+			Point3 &out_pt,
+			Vector3 *out_dPdu,
+			Vector3 *out_dPdv ) const
 {
 	// $$$ following 2 are "uniform"
 	float	alphamin	= asinf( mZMin / mRadius );
@@ -109,44 +98,32 @@ Point3 &Sphere::EvalP(
 	out_pt.y = mRadius * cosf( alpha ) * sinf( theta );
 	out_pt.z = mRadius * sinf( alpha );
 	
-	return out_pt;
+	if ( out_dPdu )
+	{
+		float	cosAlpha = cosf( alpha );
+		float	cosUTheta = cosf( theta );
+		float	sinUTheta = sinf( theta );
+
+		float	tmp1 = mThetamaxRad * mRadius;
+		out_dPdu->x = tmp1 * -sinUTheta * cosAlpha;
+		out_dPdu->y = tmp1 *  cosUTheta * cosAlpha;
+		out_dPdu->z = 0;
+
+		float	tmp2 = alphadelta * mRadius;
+		float	tmp3 = tmp2 * -sinf( alpha );
+		out_dPdv->x = tmp3 * cosUTheta;
+		out_dPdv->y = tmp3 * sinUTheta;
+		out_dPdv->z = tmp2 * cosAlpha;
+	}
 }
 
 //==================================================================
-void Sphere::Eval_dPdu_dPdv(
+void Hyperboloid::Eval_dPdu_dPdv(
 			float u,
 			float v,
-			Vector3 &out_dPdu,
-			Vector3 &out_dPdv ) const
-{
-	// $$$ following 2 are "uniform"
-	float	alphamin	= asinf( mZMin / mRadius );
-	float	alphadelta	= asinf( mZMax / mRadius ) - alphamin;
-
-	float	theta = u * mThetamaxRad;
-	float	alpha = alphamin + v * alphadelta;
-	
-	float	cosAlpha = cosf( alpha );
-	float	cosUTheta = cosf( theta );
-	float	sinUTheta = sinf( theta );
-
-	float	tmp1 = mThetamaxRad * mRadius;
-	out_dPdu.x = tmp1 * -sinUTheta * cosAlpha;
-	out_dPdu.y = tmp1 *  cosUTheta * cosAlpha;
-	out_dPdu.z = 0;
-
-	float	tmp2 = alphadelta * mRadius;
-	float	tmp3 = tmp2 * -sinf( alpha );
-	out_dPdv.x = tmp3 * cosUTheta;
-	out_dPdv.y = tmp3 * sinUTheta;
-	out_dPdv.z = tmp2 * cosAlpha;
-}
-
-//==================================================================
-Point3 &Hyperboloid::EvalP(
-			float u,
-			float v,
-			Point3 &out_pt ) const
+			Point3 &out_pt,
+			Vector3 *out_dPdu,
+			Vector3 *out_dPdv ) const
 {
 	float	uTheta = u * mThetamaxRad;
 	float	cosUTheta = cosf( uTheta );
@@ -158,38 +135,27 @@ Point3 &Hyperboloid::EvalP(
 	out_pt.y = p1p2v.x * sinUTheta + p1p2v.y * cosUTheta;
 	out_pt.z = p1p2v.z;
 
-	return out_pt;
+	if ( out_dPdu )
+	{
+		out_dPdu->x = mThetamaxRad * (p1p2v.x * -sinUTheta - p1p2v.y *  cosUTheta);
+		out_dPdu->y = mThetamaxRad * (p1p2v.x *  cosUTheta + p1p2v.y * -sinUTheta);
+		out_dPdu->z = 0;
+
+		Vector3	dp = mP2 - mP1;
+
+		out_dPdv->x = dp.x * cosUTheta - dp.y * sinUTheta;
+		out_dPdv->y = dp.y * sinUTheta + dp.y * cosUTheta;
+		out_dPdv->z = dp.z;
+	}
 }
 
 //==================================================================
-void Hyperboloid::Eval_dPdu_dPdv(
+void Paraboloid::Eval_dPdu_dPdv(
 			float u,
 			float v,
-			Vector3 &out_dPdu,
-			Vector3 &out_dPdv ) const
-{
-	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = cosf( uTheta );
-	float	sinUTheta = sinf( uTheta );
-
-	Vector3	p1p2v = DMix( mP1, mP2, v );
-
-	out_dPdu.x = mThetamaxRad * (p1p2v.x * -sinUTheta - p1p2v.y *  cosUTheta);
-	out_dPdu.y = mThetamaxRad * (p1p2v.x *  cosUTheta + p1p2v.y * -sinUTheta);
-	out_dPdu.z = 0;
-
-	Vector3	dp = mP2 - mP1;
-
-	out_dPdv.x = dp.x * cosUTheta - dp.y * sinUTheta;
-	out_dPdv.y = dp.y * sinUTheta + dp.y * cosUTheta;
-	out_dPdv.z = dp.z;
-}
-
-//==================================================================
-Point3 &Paraboloid::EvalP(
-			float u,
-			float v,
-			Point3 &out_pt ) const
+			Point3 &out_pt,
+			Vector3 *out_dPdu,
+			Vector3 *out_dPdv ) const
 {
 	float	uTheta = u * mThetamaxRad;
 	float	cosUTheta = cosf( uTheta );
@@ -202,41 +168,29 @@ Point3 &Paraboloid::EvalP(
 	out_pt.y = r * sinUTheta;
 	out_pt.z = z;
 
-	return out_pt;
+	if ( out_dPdu )
+	{
+		float	tmp1 = r * mThetamaxRad;
+		out_dPdu->x = tmp1 * -sinUTheta;
+		out_dPdu->y = tmp1 *  cosUTheta;
+		out_dPdu->z = 0;
+
+		float	dz = mZmax - mZmin;
+		float	dx = 0.5f * dz / sqrtf( z ) * scale;
+
+		out_dPdv->x = dx * cosUTheta;
+		out_dPdv->y = dx * sinUTheta;
+		out_dPdv->z = dz;
+	}
 }
 
 //==================================================================
-void Paraboloid::Eval_dPdu_dPdv(
+void Torus::Eval_dPdu_dPdv(
 			float u,
 			float v,
-			Vector3 &out_dPdu,
-			Vector3 &out_dPdv ) const
-{
-	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = cosf( uTheta );
-	float	sinUTheta = sinf( uTheta );
-	float	scale = mRmax / sqrtf( mZmax );
-	float	z = DMix( mZmin, mZmax, v );
-	float	r = scale * sqrtf( z );
-
-	float	tmp1 = r * mThetamaxRad;
-	out_dPdu.x = tmp1 * -sinUTheta;
-	out_dPdu.y = tmp1 *  cosUTheta;
-	out_dPdu.z = 0;
-
-	float	dz = mZmax - mZmin;
-	float	dx = 0.5f * dz / sqrtf( z ) * scale;
-
-	out_dPdv.x = dx * cosUTheta;
-	out_dPdv.y = dx * sinUTheta;
-	out_dPdv.z = dz;
-}
-
-//==================================================================
-Point3 &Torus::EvalP(
-			float u,
-			float v,
-			Point3 &out_pt ) const
+			Point3 &out_pt,
+			Vector3 *out_dPdu,
+			Vector3 *out_dPdv ) const
 {
 	float	uTheta = u * mThetamaxRad;
 	float	cosUTheta = cosf( uTheta );
@@ -247,33 +201,20 @@ Point3 &Torus::EvalP(
 	out_pt.x = sx * cosUTheta;
 	out_pt.y = sx * sinUTheta;
 	out_pt.z = mMinRadius * sinf( phi );
-	
-	return out_pt;
-}
 
-//==================================================================
-void Torus::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Vector3 &out_dPdu,
-			Vector3 &out_dPdv ) const
-{
-	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = cosf( uTheta );
-	float	sinUTheta = sinf( uTheta );
-	float	phi = DMix( mPhiminRad, mPhimaxRad, v );
-	float	sx = cosf( phi ) * mMinRadius + mMaxRadius;
+	if ( out_dPdu )
+	{
+		out_dPdu->x = sx * mThetamaxRad * -sinUTheta;
+		out_dPdu->y = sx * mThetamaxRad *  cosUTheta;
+		out_dPdu->z = 0;
 
-	out_dPdu.x = sx * mThetamaxRad * -sinUTheta;
-	out_dPdu.y = sx * mThetamaxRad *  cosUTheta;
-	out_dPdu.z = 0;
+		float dphi	= mPhimaxRad - mPhiminRad;
+		float dsx	= dphi * -sinf( phi ) * mMinRadius;
 
-	float dphi	= mPhimaxRad - mPhiminRad;
-	float dsx	= dphi * -sinf( phi ) * mMinRadius;
-
-	out_dPdv.x = dsx * cosUTheta;
-	out_dPdv.y = dsx * sinUTheta;
-	out_dPdv.z = dphi * cosf( phi ) * mMinRadius;
+		out_dPdv->x = dsx * cosUTheta;
+		out_dPdv->y = dsx * sinUTheta;
+		out_dPdv->z = dphi * cosf( phi ) * mMinRadius;
+	}
 }
 
 //==================================================================
@@ -450,249 +391,6 @@ void Torus::MakeBound( Bound &out_bound )
 	out_bound.mBox[0].z = a.mBox[0].y;
 	out_bound.mBox[1].z = a.mBox[1].y;
 }
-
-/*
-void Disk::MakeBound( Bound &out_bound )
-{
-}
-*/
-
-/*
-//==================================================================
-void Cylinder::Render( GState &gstate )
-{
-	PUTPRIMNAME( "* Cylinder" );
-	
-	glBegin( GL_TRIANGLE_STRIP );
-
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-
-		float	theta = u * mThetamaxRad;
-		
-		for (float v=0; v <= 1.0f; v += 1.0f)
-		{
-			GVert	vert;
-
-			vert.x = mRadius * cosf( theta );
-			vert.y = mRadius * sinf( theta );
-			vert.z = mZMin + v * (mZMax - mZMin);
-			vert.u = u;
-			vert.v = v;
-
-			gstate.AddVertex( vert );
-		}
-	}
-	
-	glEnd();
-}
-
-//==================================================================
-void Cone::Render( GState &gstate )
-{
-	PUTPRIMNAME( "* Cone" );
-
-	glBegin( GL_TRIANGLE_STRIP );
-
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-
-		float	theta = u * mThetamaxRad;
-
-		for (float v=0; v <= 1.0f; v += 1.0f)
-		{
-			GVert	vert;
-
-			vert.x = mRadius * (1 - v) * cosf( theta );
-			vert.y = mRadius * (1 - v) * sinf( theta );
-			vert.z = v * mHeight;
-			vert.u = u;
-			vert.v = v;
-
-			gstate.AddVertex( vert );
-		}
-	}
-	
-	glEnd();
-}
-
-//==================================================================
-void Sphere::Render( GState &gstate )
-{
-	PUTPRIMNAME( "* Sphere" );
-	
-	glBegin( GL_TRIANGLE_STRIP );
-
-	float	alphamin	= asinf( mZMin / mRadius );
-	float	alphadelta	= asinf( mZMax / mRadius ) - alphamin;
-
-	GVert	buffer[NSUBDIVS+1];
-
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-
-		float	theta = u * mThetamaxRad;
-
-		for (int vI=0; vI <= NSUBDIVS; ++vI)
-		{
-			float	v = vI / (float)NSUBDIVS;
-
-			float	alpha = alphamin + v * alphadelta;
-
-			GVert	vert;
-			vert.x = mRadius * cosf( alpha ) * cosf( theta );
-			vert.y = mRadius * cosf( alpha ) * sinf( theta );
-			vert.z = mRadius * sinf( alpha );
-			vert.u = u;
-			vert.v = v;
-
-			if ( uI > 0 )
-			{
-				gstate.AddVertex( buffer[vI] );
-				gstate.AddVertex( vert );
-			}
-
-			buffer[vI] = vert;
-		}
-	}
-	
-	glEnd();
-}
-
-//==================================================================
-void Hyperboloid::Render( GState &gstate )
-{
-	PUTPRIMNAME( "* Hyperboloid" );
-	
-	glBegin( GL_TRIANGLE_STRIP );
-
-	GVert	buffer[NSUBDIVS+1];
-
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-
-		float theta = u * mThetamaxRad;
-
-		for (int vI=0; vI <= NSUBDIVS; ++vI)
-		{
-			float	v = vI / (float)NSUBDIVS;
-
-			float	x = mP1.x + (mP2.x - mP1.x) * v;
-			float	y = mP1.y + (mP2.y - mP1.y) * v;
-			float	z = mP1.z + (mP2.z - mP1.z) * v;
-
-			GVert	vert;
-			vert.x = x * cosf( theta ) - y * sinf( theta );
-			vert.y = x * sinf( theta ) + y * cosf( theta );
-			vert.z = z;
-			vert.u = u;
-			vert.v = v;
-
-			if ( uI > 0 )
-			{
-				gstate.AddVertex( buffer[vI] );
-				gstate.AddVertex( vert );
-			}
-
-			buffer[vI] = vert;
-		}
-	}
-
-	glEnd();
-}
-
-//==================================================================
-void Paraboloid::Render( GState &gstate )
-{
-	PUTPRIMNAME( "* Paraboloid" );
-
-	glBegin( GL_TRIANGLE_STRIP );
-
-	GVert	buffer[NSUBDIVS+1];
-
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-
-		float theta = u * mThetamaxRad;
-
-		for (int vI=0; vI <= NSUBDIVS; ++vI)
-		{
-			float	v = vI / (float)NSUBDIVS;
-
-			float	z = (mZmax - mZmin) * v;
-
-			float	r = mRmax * sqrtf( z / mZmax );
-
-			GVert	vert;
-			vert.x = r * cosf( theta );
-			vert.y = r * sinf( theta );
-			vert.z = z;
-			vert.u = u;
-			vert.v = v;
-
-			if ( uI > 0 )
-			{
-				gstate.AddVertex( buffer[vI] );
-				gstate.AddVertex( vert );
-			}
-
-			buffer[vI] = vert;
-		}
-	}
-
-	glEnd();
-}
-
-//==================================================================
-void Torus::Render( GState &gstate )
-{
-	PUTPRIMNAME( "* Torus" );
-
-	GVert	buffer[NSUBDIVS+1];
-
-	glBegin( GL_TRIANGLE_STRIP );
-	for (int uI=0; uI <= NSUBDIVS; ++uI)
-	{
-		float	u = uI / (float)NSUBDIVS;
-
-		float theta = u * mThetamaxRad;
-
-		//glBegin( GL_TRIANGLE_STRIP );
-		for (int vI=0; vI <= NSUBDIVS; ++vI)
-		{
-			float	v = vI / (float)NSUBDIVS;
-
-			float	phi = mPhiminRad + (mPhimaxRad - mPhiminRad) * v;
-			
-			GVert	vert;
-
-			float	r = mMinRadius * cosf( phi );
-			vert.z	  = mMinRadius * sinf( phi );
-			
-			vert.x	= (mMaxRadius + r) * cosf( theta );
-			vert.y	= (mMaxRadius + r) * sinf( theta );
-
-			vert.u	= u;
-			vert.v	= v;
-
-			if ( uI > 0 )
-			{
-				gstate.AddVertex( buffer[vI] );
-				gstate.AddVertex( vert );
-			}
-
-			buffer[vI] = vert;
-		}
-		//glEnd();
-	}
-	glEnd();
-}
-*/
 
 //==================================================================
 }

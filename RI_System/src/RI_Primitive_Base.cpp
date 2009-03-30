@@ -107,13 +107,11 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camWorldPos )
 		for (int j=0; j < (int)g.mXDim; ++j, u += du)
 		{
 			Vector3	pos;
-			Vector2	locUV = CalcLocalUV( Vector2( u, v ) );
-			EvalP( locUV.x, locUV.y, pos );
-			pos = MultiplyV3M( pos, g.mMtxObjectCurrent );
-
 			Vector3	dPdu;
 			Vector3	dPdv;
-			Eval_dPdu_dPdv( locUV.x, locUV.y, dPdu, dPdv );
+			Vector2	locUV = CalcLocalUV( Vector2( u, v ) );
+			Eval_dPdu_dPdv( locUV.x, locUV.y, pos, &dPdu, &dPdv );
+			pos = MultiplyV3M( pos, g.mMtxObjectCurrent );
 			
 			Vector3 objNor = dPdu.GetCross( dPdv );
 			Vector3	nor = MultiplyV3M( objNor, mtxObjectCurrentNorm ).GetNormalized();

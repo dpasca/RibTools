@@ -41,15 +41,12 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		Point3 &EvalP(	float u,
-						float v,
-						Point3 &out_pt ) const;
-
 		void Eval_dPdu_dPdv(
 					float u,
 					float v,
-					Vector3 &out_dPdu,
-					Vector3 &out_dPdv ) const;
+					Point3 &out_pt,
+					Vector3 *out_dPdu,
+					Vector3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -75,15 +72,12 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		Point3 &EvalP(	float u,
-						float v,
-						Point3 &out_pt ) const;
-
 		void Eval_dPdu_dPdv(
 					float u,
 					float v,
-					Vector3 &out_dPdu,
-					Vector3 &out_dPdv ) const;
+					Point3 &out_pt,
+					Vector3 *out_dPdu,
+					Vector3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -111,15 +105,12 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		Point3 &EvalP(	float u,
-						float v,
-						Point3 &out_pt ) const;
-
 		void Eval_dPdu_dPdv(
 					float u,
 					float v,
-					Vector3 &out_dPdu,
-					Vector3 &out_dPdv ) const;
+					Point3 &out_pt,
+					Vector3 *out_dPdu,
+					Vector3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -145,15 +136,12 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		Point3 &EvalP(	float u,
-						float v,
-						Point3 &out_pt ) const;
-
 		void Eval_dPdu_dPdv(
 					float u,
 					float v,
-					Vector3 &out_dPdu,
-					Vector3 &out_dPdv ) const;
+					Point3 &out_pt,
+					Vector3 *out_dPdu,
+					Vector3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -181,15 +169,12 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		Point3 &EvalP(	float u,
-						float v,
-						Point3 &out_pt ) const;
-
 		void Eval_dPdu_dPdv(
 					float u,
 					float v,
-					Vector3 &out_dPdu,
-					Vector3 &out_dPdv ) const;
+					Point3 &out_pt,
+					Vector3 *out_dPdu,
+					Vector3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -221,15 +206,12 @@ public:
 
 		void MakeBound( Bound &out_bound );
 
-		Point3 &EvalP(	float u,
-						float v,
-						Point3 &out_pt ) const;
-
 		void Eval_dPdu_dPdv(
 					float u,
 					float v,
-					Vector3 &out_dPdu,
-					Vector3 &out_dPdv ) const;
+					Point3 &out_pt,
+					Vector3 *out_dPdu,
+					Vector3 *out_dPdv ) const;
 };
 
 //==================================================================

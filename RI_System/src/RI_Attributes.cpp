@@ -19,8 +19,9 @@ namespace RI
 //==================================================================
 Attributes::Attributes()
 {
-	mpCustomUBasis = NULL;
-	mpCustomVBasis = NULL;
+	mpCustomUBasis	= NULL;
+	mpCustomVBasis	= NULL;
+	mpResManager	= NULL;
 }
 
 //==================================================================
@@ -39,11 +40,12 @@ const Attributes& Attributes::operator=(const Attributes& rhs)
 	
 	return *this;
 }
-	
+
 //==================================================================
 void Attributes::copyFrom(const Attributes& rhs)
 {
 	mpStatics			= rhs.mpStatics;
+	mpResManager		= rhs.mpResManager;
 	
 	mpRevision			= rhs.mpRevision			;
 	mSymbols			= rhs.mSymbols				;
@@ -78,6 +80,8 @@ void Attributes::copyFrom(const Attributes& rhs)
 		
 	if ( mShaderInstance.mpShader )
 		mShaderInstance.mpShader->AddRef();
+
+	mLights				= rhs.mLights;
 }
 
 //==================================================================
@@ -97,6 +101,7 @@ Attributes::~Attributes()
 void Attributes::Init( SymbolList *pStatics, ResourceManager *pResManager, RevisionTracker *pRevision )
 {
 	mpStatics	= pStatics;
+	mpResManager= pResManager;
 	mpRevision	= pRevision;
 
 	mBound		= RI_INFINITY;
@@ -120,7 +125,7 @@ void Attributes::Init( SymbolList *pStatics, ResourceManager *pResManager, Revis
 	
 	DASSERT( mShaderInstance.mpShader == NULL );
 	
-	mShaderInstance.mpShader = (SlShader *)pResManager->FindResource( "matte" );
+	mShaderInstance.mpShader = (SlShader *)pResManager->FindResource( "dbg_normal_col" );
 	mShaderInstance.mpShader->AddRef();
 }
 
@@ -213,11 +218,11 @@ void Attributes::cmdOpacity( const Color &color )
 }
 
 //==================================================================
-bool Attributes::cmdLightSource( ParamList &params )
+bool Attributes::cmdLightSource( ParamList &params, const Transform &xform )
 {
 	const char	*pLightTypeName = "";
 
-	LightSource	light;
+	LightSource	&light = *mLights.grow();
 
 	// get type and ID
 	if ( params.size() < 2 || !params[0].IsString() || !params[1].IsIntVal() )
@@ -238,7 +243,63 @@ bool Attributes::cmdLightSource( ParamList &params )
 
 	light.mID = params[1].Int();
 
+
+	for (size_t i=2; i < params.size(); ++i)
+	{
+		if NOT( params[i].IsString() )
+			continue;
+
+		const char *pName = params[i].PChar();
+
+		// check for strings that require no extra param here.. if any !
+
+		// follow for params that require a following param
+		bool	hasNextParam = ((i+1) < params.size());
+		if NOT( hasNextParam )
+		{
+			printf( "Expecting parameter !" );
+			return false;
+		}
+
+		if ( 0 == strcasecmp( pName, "from" ) )
+		{
+			light.mLocFromPos = params[i+1].PFlt( 3 );
+		}
+		else
+		if ( 0 == strcasecmp( pName, "to" ) )
+		{
+			light.mLocToPos = params[i+1].PFlt( 3 );
+		}
+		else
+		if ( 0 == strcasecmp( pName, "intensity" ) )
+		{
+			light.mIntesity = params[i+1].Flt();
+		}
+		else
+		if ( 0 == strcasecmp( pName, "lightcolor" ) )
+		{
+			light.mColor = Color( params[i+1].PFlt( 3 ) );
+		}
+
+		if NOT( hasNextParam )
+			i += 1;
+	}
+
+	light.UpdateRend( xform );
+
 	return true;
 }
+
+//==================================================================
+void Attributes::cmdSurface( ParamList &params )
+{
+	if ( mShaderInstance.mpShader )
+	{
+		mShaderInstance.mpShader->SubRef();
+	}
+	mShaderInstance.mpShader = (SlShader *)mpResManager->FindResource( "matte" );
+	mShaderInstance.mpShader->AddRef();
+}
+
 //==================================================================
 }

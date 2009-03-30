@@ -397,7 +397,16 @@ void State::LightSource( ParamList &params )
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
 
-	mAttributesStack.top().cmdLightSource( params );
+	mAttributesStack.top().cmdLightSource( params, mTransformOpenStack.top() );
+}
+
+//==================================================================
+void State::Surface( ParamList &params )
+{
+	if NOT( verifyOpType( OPTYPE_ATRB ) )
+		return;
+
+	mAttributesStack.top().cmdSurface( params );
 }
 
 // options

@@ -7,6 +7,7 @@
 //==================================================================
 
 #include "stdafx.h"
+#include "RI_Transform.h"
 #include "RI_LightSource.h"
 
 //==================================================================
@@ -18,8 +19,21 @@ LightSource::LightSource()
 {
 	mIntesity	= 1;
 	mColor		= Color( 1 );
-	mFromPos	= Point3( 0, 0, 1 );
-	mToPos		= Point3( 0, 0, 0 );
+	mLocFromPos	= Point3( 0, 0, 1 );
+	mLocToPos	= Point3( 0, 0, 0 );
+}
+
+//==================================================================
+void LightSource::UpdateRend( const Transform &xform )
+{
+	if ( mType == TYPE_DISTANT )
+	{
+		mRend.mDistant.mDir =
+			(
+				MultiplyV3M( mLocToPos,		xform.GetMatrix() ) -
+				MultiplyV3M( mLocFromPos,	xform.GetMatrix() )
+			).GetNormalized();
+	}
 }
 
 //==================================================================

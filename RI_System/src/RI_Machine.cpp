@@ -173,6 +173,11 @@ void Machine::AddCommand(	const DStr	&cmdName,
 		//mState.FrameAspectRatio( p[0] );
 	}
 	else
+	if ( nm == "Surface" )
+	{
+		mState.Surface( p );
+	}
+	else
 	// options
 	if ( nm == "Format" )
 	{

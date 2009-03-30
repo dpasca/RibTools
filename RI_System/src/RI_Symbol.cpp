@@ -69,8 +69,6 @@ void SymbolList::FindOrAdd( const char *pName, const RtBasis &basis )
 //==================================================================
 const SymbolBase *SymbolList::Find( Type type, const char *pName ) const
 {
-	size_t	idx;
-
 	switch ( type )
 	{
 	case	T_VOID:		return (const SymbolBase *)findElemByName( mVoidLst	, pName );

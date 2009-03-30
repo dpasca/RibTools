@@ -28,6 +28,7 @@ public:
 	SlValue				*mpDataSegment;
 	SlShaderInstance	*mpShaderInst;
 	SlSymbolList		*mpSymbols;
+	const Attributes	*mpAttribs;
 
 	SlRunContext()
 	{
@@ -37,6 +38,7 @@ public:
 		mpDataSegment	= 0;
 		mpShaderInst	= 0;
 		mpSymbols		= 0;
+		mpAttribs		= 0;
 	}
 
 	SlCPUWord *GetOp( u_int argc )

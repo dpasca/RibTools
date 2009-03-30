@@ -146,16 +146,22 @@ public:
 	virtual bool	IsSplitable() const			{ return true;	}
 	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 
-	virtual Point3	&EvalP(
+	inline Point3	&EvalP(
 						float u,
 						float v,
-						Point3 &out_pt ) const { return out_pt; }
+						Point3 &out_pt ) const
+	{
+		Eval_dPdu_dPdv( u, v, out_pt, NULL, NULL );
+		return out_pt;
+	}
 
 	virtual void	Eval_dPdu_dPdv(
 						float u,
 						float v,
-						Vector3 &out_dPdu,
-						Vector3 &out_dPdv ) const { out_dPdu.SetZero(); out_dPdv.SetZero(); }
+						Point3 &out_pt,
+						Vector3 *out_dPdu,
+						Vector3 *out_dPdv ) const = 0;
+	//{ out_pt->SetZero(); out_dPdu->SetZero(); out_dPdv->SetZero(); }
 
 	virtual bool	IsDiceable(
 						MicroPolygonGrid &g,

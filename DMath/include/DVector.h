@@ -109,7 +109,11 @@ public:
 	Vector3 operator - (const Vector3 &rval) const { return Vector3( x - rval.x, y - rval.y, z - rval.z ); }
 	Vector3 operator * (const Vector3 &rval) const { return Vector3( x * rval.x, y * rval.y, z * rval.z ); }
 	Vector3 operator / (const Vector3 &rval) const { return Vector3( x / rval.x, y / rval.y, z / rval.z ); }
-	
+
+	Vector3 operator -() const	{ return Vector3( -x, -y, -z ); }
+
+	Vector3 operator +=(const Vector3 &rval)	{ *this = *this + rval; return *this; }
+
 	Vector3 GetNormalized() const
 	{
 		float	oom = 1.0f / sqrtf( x * x + y * y + z * z );

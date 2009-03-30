@@ -150,7 +150,7 @@ public:
 	SlValue	*Bind( MicroPolygonGrid &g );
 	void Unbind( SlValue * &pDataSegment );
 	
-	void Run( MicroPolygonGrid &g );
+	void Run( MicroPolygonGrid &g, const Attributes *pAttribs );
 };
 
 //==================================================================

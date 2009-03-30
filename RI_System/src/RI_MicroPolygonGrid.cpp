@@ -82,28 +82,28 @@ void MicroPolygonGrid::Setup(
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, 1.0f, 0.0f, 0.0f, mPointsN );
+	fillColArray( (Color *)symbol.mpDefaultVal, mPointsN, 1.0f, 0.0f, 0.0f );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Oi";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, 0.0f, 1.0f, 0.0f, mPointsN );
+	fillColArray( (Color *)symbol.mpDefaultVal, mPointsN, 0.0f, 1.0f, 0.0f );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Cs";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, 0.0f, 0.0f, 1.0f, mPointsN );
+	fillColArray( (Color *)symbol.mpDefaultVal, mPointsN, 1.0f, 1.0f, 1.0f );
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Os";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, 1.0f, 1.0f, 0.0f, mPointsN );
+	fillColArray( (Color *)symbol.mpDefaultVal, mPointsN, 1.0f, 1.0f, 1.0f );
 	mSymbols.push_back( symbol );
 }
 
@@ -115,7 +115,7 @@ MicroPolygonGrid::~MicroPolygonGrid()
 //==================================================================
 void MicroPolygonGrid::Shade( Attributes &attribs )
 {
-	attribs.mShaderInstance.Run( *this );
+	attribs.mShaderInstance.Run( *this, &attribs );
 }
 
 //==================================================================
