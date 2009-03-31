@@ -16,7 +16,7 @@
 //==================================================================
 static const size_t	NPOS = (size_t)-1;
 
-#if 0
+#if 1
 //==================================================================
 template <class T>
 class DVec
@@ -24,7 +24,11 @@ class DVec
 	T		*mpData;
 	size_t	mSize;
 	size_t	mSizeAlloc;
-	
+
+public:
+	typedef const T	*const_iterator;
+	typedef T		*iterator;
+
 public:
 	DVec() :
 		mpData(NULL),
@@ -33,30 +37,31 @@ public:
 	{
 	}
 
-	DVec( const DVec &from )
+	DVec( const DVec &from ) :
+		mpData(NULL),
+		mSize(0),
+		mSizeAlloc(0)
 	{
 		copyFrom( from );
 	}
 	
 	virtual ~DVec()
 	{
+		clear();
 		freeAll();
 	}
 	
-	const DVec& operator=(const DVec& rhs)
+	void operator=(const DVec& rhs)
 	{
+		clear();
 		freeAll();
 		copyFrom( rhs );
-		return *this;
 	}
 
 private:
 	void copyFrom( const DVec& from )
 	{
-		mSize		= from.mSize;
-		mSizeAlloc	= from.mSize;
-		
-		mpData = (T *)new u_char [ sizeof(T) * mSizeAlloc ];
+		resize( from.mSize );
 
 		for (size_t i=0; i < mSize; ++i)
 			mpData[i] = from.mpData[i];
@@ -64,7 +69,6 @@ private:
 	
 	void freeAll()
 	{
-		clear();
 		mSizeAlloc = 0;
 		if ( mpData )
 			delete [] (u_char *)mpData;
@@ -73,6 +77,9 @@ private:
 
 public:
 	size_t size() const { return mSize; }
+
+	iterator		begin()			{ return mpData;	}
+	const_iterator	begin()	const	{ return mpData;	}
 
 	void clear()
 	{
@@ -87,11 +94,17 @@ public:
 		if ( newSize > mSizeAlloc )
 		{
 			size_t newSizeAlloc = mSizeAlloc * 2;
+
+			if ( newSizeAlloc == 0 )
+			{
+				newSizeAlloc = (sizeof(T) < 128 ? 128 : sizeof(T)) / sizeof(T);
+			}
+
 			if ( newSizeAlloc < newSize )
 				newSizeAlloc = newSize;
 
 			T *newPData = (T *)new u_char [ sizeof(T) * newSizeAlloc ];
-			
+
 			if ( mpData )
 			{
 				memcpy( newPData, mpData, mSize * sizeof(T) );
@@ -111,24 +124,35 @@ public:
 		else
 		{
 			for (size_t i=mSize; i < newSize; ++i)
-				new (&mpData[i]) T();
+				new (&mpData[i]) T;
 		}
 		
 		mSize = newSize;
-		
 	}
 
 	T *grow( size_t n=1 )
 	{
-		size_t	fromIdx = this->size();
-		this->resize( fromIdx + n );
-		return &(*this)[fromIdx];
+		size_t	fromIdx = size();
+		resize( fromIdx + n );
+		return mpData + fromIdx;
+	}
+
+	void erase( iterator it )
+	{
+		DASSTHROW( it >= mpData && it < (mpData+mSize), ("Out of bounds !") );
+		size_t	idx = it - mpData;
+		mpData[idx].~T();
+		for (size_t i=idx; i < mSize-1; ++i)
+		{
+			mpData[i] = mpData[i+1];
+		}
+		mSize -= 1;
 	}
 	
 	void push_back( const T &val )
 	{
-		T *pDest = grow();
-		*pDest = val;
+		T	tmp = val;
+		*grow() = tmp;
 	}
 
 	void pop_back()

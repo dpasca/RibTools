@@ -20,6 +20,7 @@
 //#define DMATRIX44_ROWMTX_MODE
 
 //==================================================================
+//__declspec(align(16))
 class Matrix44
 {
 public:

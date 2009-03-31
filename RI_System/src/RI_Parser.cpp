@@ -81,7 +81,7 @@ void Parser::AddChar( char ch )
 
 	//printf( "> %s\t", Tokenizer::GetDataTypeName( mpTokenizer->GetDataType() ) );
 
-	Param	param;
+	Param	*param = NULL;
 
 	switch ( mpTokenizer->GetDataType() )
 	{
@@ -93,39 +93,39 @@ void Parser::AddChar( char ch )
 			break;
 			
 	case Tokenizer::DT_INT:
-			param.type				= Param::INT;
-			param.u.intVal			= mpTokenizer->GetDataInt();
-			mCurParams.push_back( param );
+			param = mCurParams.grow();
+			param->type				= Param::INT;
+			param->u.intVal			= mpTokenizer->GetDataInt();
 			break;
 	
 	case Tokenizer::DT_FLOAT:
-			param.type				= Param::FLT;
-			param.u.floatVal		= mpTokenizer->GetDataFloat();
-			mCurParams.push_back( param );
+			param = mCurParams.grow();
+			param->type				= Param::FLT;
+			param->u.floatVal		= mpTokenizer->GetDataFloat();
 			break;
 	
 	case Tokenizer::DT_INT_ARRAY:
-			param.type				= Param::INT_ARR;
-			param.u.intArrayVal		= mpTokenizer->GetDataIntAttary();
-			mCurParams.push_back( param );
+			param = mCurParams.grow();
+			param->type				= Param::INT_ARR;
+			param->u.intArrayVal		= mpTokenizer->GetDataIntAttary();
 			break;
 	
 	case Tokenizer::DT_FLOAT_ARRAY:
-			param.type				= Param::FLT_ARR;
-			param.u.floatArrayVal	= mpTokenizer->GetDataFloatAttary();
-			mCurParams.push_back( param );
+			param = mCurParams.grow();
+			param->type				= Param::FLT_ARR;
+			param->u.floatArrayVal	= mpTokenizer->GetDataFloatAttary();
 			break;
 
 	case Tokenizer::DT_STRING:
-			param.type				= Param::STR;
-			param.u.stringVal		= mpTokenizer->GetDataString();
-			mCurParams.push_back( param );
+			param = mCurParams.grow();
+			param->type				= Param::STR;
+			param->u.stringVal		= mpTokenizer->GetDataString();
 			break;
 	
 	default:
-			param.type = Param::UNKNOWN;
+			param = mCurParams.grow();
+			param->type = Param::UNKNOWN;
 			//puts( "Unknown !!!" );
-			mCurParams.push_back( param );
 			break;
 	}
 

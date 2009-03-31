@@ -134,7 +134,7 @@ MemFile::MemFile( const char *pFileName ) :
 MemFile::~MemFile()
 {
 	if ( mOwnData )
-		DSAFE_DELETE_ARRAY( mpData );
+		free( (void *)mpData );
 }
 
 //==================================================================

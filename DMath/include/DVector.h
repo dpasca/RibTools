@@ -61,6 +61,7 @@ public:
 //==================================================================
 /// Vector3
 //==================================================================
+//__declspec(align(16))
 class Vector3
 {
 public:
@@ -144,6 +145,7 @@ inline Vector3 operator * (float lval, const Vector3 &rval)
 //==================================================================
 /// Vector4
 //==================================================================
+//__declspec(align(16))
 class Vector4
 {
 public:
@@ -165,7 +167,7 @@ public:
 		x(x_), y(y_), z(z_), w(w_)
 	{}
 
-	Vector4( const Vector3 v3_, float w_ ) :
+	Vector4( const Vector3 &v3_, float w_ ) :
 		x(v3_.x), y(v3_.y), z(v3_.z), w(w_)
 	{}
 
