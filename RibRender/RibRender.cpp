@@ -192,6 +192,7 @@ static char *gsTestRibFiles[] =
 	"Elephant.rib",
 	"Enterprise_ncc1701d.rib",
 	"Pixar.rib",
+	"sebtest.rib",
 	"SimpleMug.rib",
 	"uteapot.rib",
 	"WarBird.rib",

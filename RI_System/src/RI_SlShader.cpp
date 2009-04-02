@@ -357,6 +357,19 @@ static inline void illuminate(
 }
 
 //==================================================================
+static inline Color specularbrdf(
+						 const Vector3 &L,
+						 const Vector3 &V,
+						 const Vector3 &N,
+						 float ooRoughness
+						)
+{
+	Vector3	H = (L + V).GetNormalized();
+	float	nh = N.GetDot( H );
+	float	a = powf( DMAX( 0, nh ), ooRoughness );
+}
+
+//==================================================================
 // this is a simplified version.. until lights become available 8)
 /*
 {

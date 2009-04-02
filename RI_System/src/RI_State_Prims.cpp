@@ -85,6 +85,11 @@ void State::Polygon( ParamList &params )
 	insertPrimitive( new RI::Polygon( params, mStatics ) );
 }
 
+//==================================================================
+void State::PointsGeneralPolygons( ParamList &params )
+{
+	insertPrimitive( new RI::PointsGeneralPolygons( params, mStatics ) );
+}
 	
 //==================================================================
 }

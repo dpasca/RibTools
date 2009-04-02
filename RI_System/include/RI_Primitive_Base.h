@@ -101,6 +101,8 @@ public:
 		PATCHMESH,
 
 		POLYGON,
+
+		POINTSGENERALPOLYGONS,
 	};
 
 	Type				mType;

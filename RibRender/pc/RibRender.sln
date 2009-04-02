@@ -1,16 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibRender", "RibRender.vcproj", "{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C3632A81-4487-40B8-823C-B0A75717948E} = {C3632A81-4487-40B8-823C-B0A75717948E}
-		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D} = {9FDE0D95-64D2-4D7C-A318-66500E46DD8D}
-		{44DB4ABA-217C-45F5-AD4C-22233D683C80} = {44DB4ABA-217C-45F5-AD4C-22233D683C80}
-		{2160E8D3-238C-4B10-AFFF-B90CAD4D6234} = {2160E8D3-238C-4B10-AFFF-B90CAD4D6234}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freeglut_static", "..\..\external\freeglut-2.4.0\freeglut_static.vcproj", "{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSystem", "..\..\DSystem\pc\DSystem.vcproj", "{44DB4ABA-217C-45F5-AD4C-22233D683C80}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RI_System", "..\..\RI_System\pc\RI_System.vcproj", "{2160E8D3-238C-4B10-AFFF-B90CAD4D6234}"
@@ -21,20 +11,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RI_System", "..\..\RI_Syste
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DMath", "..\..\DMath\pc\DMath.vcproj", "{C3632A81-4487-40B8-823C-B0A75717948E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibRender", "RibRender.vcproj", "{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C3632A81-4487-40B8-823C-B0A75717948E} = {C3632A81-4487-40B8-823C-B0A75717948E}
+		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D} = {9FDE0D95-64D2-4D7C-A318-66500E46DD8D}
+		{44DB4ABA-217C-45F5-AD4C-22233D683C80} = {44DB4ABA-217C-45F5-AD4C-22233D683C80}
+		{2160E8D3-238C-4B10-AFFF-B90CAD4D6234} = {2160E8D3-238C-4B10-AFFF-B90CAD4D6234}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freeglut_static", "..\..\external\freeglut-2.4.0\freeglut_static.vcproj", "{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}.Debug|Win32.Build.0 = Debug|Win32
-		{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}.Release|Win32.ActiveCfg = Release|Win32
-		{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}.Release|Win32.Build.0 = Release|Win32
-		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}.Debug|Win32.Build.0 = Debug|Win32
-		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}.Release|Win32.ActiveCfg = Release|Win32
-		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}.Release|Win32.Build.0 = Release|Win32
 		{44DB4ABA-217C-45F5-AD4C-22233D683C80}.Debug|Win32.ActiveCfg = Debug|Win32
 		{44DB4ABA-217C-45F5-AD4C-22233D683C80}.Debug|Win32.Build.0 = Debug|Win32
 		{44DB4ABA-217C-45F5-AD4C-22233D683C80}.Release|Win32.ActiveCfg = Release|Win32
@@ -47,6 +39,14 @@ Global
 		{C3632A81-4487-40B8-823C-B0A75717948E}.Debug|Win32.Build.0 = Debug|Win32
 		{C3632A81-4487-40B8-823C-B0A75717948E}.Release|Win32.ActiveCfg = Release|Win32
 		{C3632A81-4487-40B8-823C-B0A75717948E}.Release|Win32.Build.0 = Release|Win32
+		{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}.Debug|Win32.Build.0 = Debug|Win32
+		{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}.Release|Win32.ActiveCfg = Release|Win32
+		{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}.Release|Win32.Build.0 = Release|Win32
+		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}.Debug|Win32.Build.0 = Debug|Win32
+		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}.Release|Win32.ActiveCfg = Release|Win32
+		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

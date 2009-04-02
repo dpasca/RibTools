@@ -87,9 +87,11 @@ struct Param
 	
 	const FltVec	&NumVec( size_t n=DNPOS );	// may need to convert from int array
 
-	const int	*PInt( size_t n=DNPOS ) const	{ ensIntArr( n ); return &u.intArrayVal[0];		}
-	const float	*PFlt( size_t n=DNPOS )			{ return &NumVec( n )[0];						}
-	const char	*PChar()				const	{ ensType( STR ); return u.stringVal.c_str();	}
+	const int		*PInt( size_t n=DNPOS ) const	{ ensIntArr( n );		return &u.intArrayVal[0];		}
+	size_t			IntArrSize() const				{ ensIntArr( DNPOS );	return u.intArrayVal.size();	}
+	const float		*PFlt( size_t n=DNPOS )			{ return &NumVec( n )[0];						}
+	size_t			FltArrSize()					{ return NumVec().size();						}
+	const char		*PChar()				const	{ ensType( STR ); return u.stringVal.c_str();	}
 
 	bool IsString() const	{ return type == STR;	}
 	bool IsIntVal() const	{ return type == INT || type == INT_ARR; }

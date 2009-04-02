@@ -209,12 +209,14 @@ void Attributes::cmdBasis(
 void Attributes::cmdColor( const Color &color )
 {
 	mColor = color;
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
 void Attributes::cmdOpacity( const Color &color )
 {
 	mOpacity = color;
+	mpRevision->BumpRevision();
 }
 
 //==================================================================
@@ -297,6 +299,8 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform )
 		}
 	}
 
+	mpRevision->BumpRevision();
+
 	return true;
 }
 
@@ -309,6 +313,8 @@ void Attributes::cmdSurface( ParamList &params )
 	}
 	mShaderInstance.mpShader = (SlShader *)mpResManager->FindResource( "matte" );
 	mShaderInstance.mpShader->AddRef();
+
+	mpRevision->BumpRevision();
 }
 
 //==================================================================

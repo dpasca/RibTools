@@ -154,7 +154,7 @@ public:
 	void Patch( RtToken type, ParamList &params );
 	void PatchMesh( RtToken type, ParamList &params );
 	void Polygon( ParamList &params );
-
+	void PointsGeneralPolygons( ParamList &params );
 
 	void ErrHandler( Error errCode );
 	void ErrHandler( Error errCode, const char *pFmt, ... );

@@ -192,6 +192,8 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 	bool	gotP = ParamsFindP( params, staticSymbols, mHullPos, 16 );
 	
 	DASSTHROW( gotP, ("Missing hull parameter") );
+
+	setupEvalCalc();
 }
 
 //==================================================================
@@ -207,6 +209,23 @@ PatchBicubic::PatchBicubic( ParamList &params,
 
 	for (int i=0; i < 16; ++i)
 		mHullPos[i] = hull[i];
+
+	setupEvalCalc();
+}
+
+//==================================================================
+void PatchBicubic::setupEvalCalc()
+{
+	// only needed for diceing and for evals for bbox and other estimators
+	mCalcU[0].Setup( *mpUBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3] );
+	mCalcU[1].Setup( *mpUBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7] );
+	mCalcU[2].Setup( *mpUBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11] );
+	mCalcU[3].Setup( *mpUBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15] );
+
+	mCalcV[0].Setup( *mpVBasis, mHullPos[ 0], mHullPos[ 4], mHullPos[ 8], mHullPos[12] );
+	mCalcV[1].Setup( *mpVBasis, mHullPos[ 1], mHullPos[ 5], mHullPos[ 9], mHullPos[13] );
+	mCalcV[2].Setup( *mpVBasis, mHullPos[ 2], mHullPos[ 6], mHullPos[10], mHullPos[14] );
+	mCalcV[3].Setup( *mpVBasis, mHullPos[ 3], mHullPos[ 7], mHullPos[11], mHullPos[15] );
 }
 
 //==================================================================
@@ -256,10 +275,10 @@ void PatchBicubic::Eval_dPdu_dPdv(
 	const RtBasis	&uBasis = *mpUBasis;
 	const RtBasis	&vBasis = *mpVBasis;
 
-	Point3	uBottom	= spline(u, uBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3]);
-	Point3	uMid1	= spline(u, uBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7]);
-	Point3	uMid2	= spline(u, uBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11]);
-	Point3	uTop	= spline(u, uBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15]);
+	Point3	uBottom	= mCalcU[0].Eval( u );
+	Point3	uMid1	= mCalcU[1].Eval( u );
+	Point3	uMid2	= mCalcU[2].Eval( u );
+	Point3	uTop	= mCalcU[3].Eval( u );
 
 	out_pt = spline( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
@@ -267,10 +286,10 @@ void PatchBicubic::Eval_dPdu_dPdv(
 	{
 		*out_dPdv = splineDeriv( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
-		Point3	vBottom	= spline(v, vBasis, mHullPos[ 0], mHullPos[ 4], mHullPos[ 8], mHullPos[12]);
-		Point3	vMid1	= spline(v, vBasis, mHullPos[ 1], mHullPos[ 5], mHullPos[ 9], mHullPos[13]);
-		Point3	vMid2	= spline(v, vBasis, mHullPos[ 2], mHullPos[ 6], mHullPos[10], mHullPos[14]);
-		Point3	vTop	= spline(v, vBasis, mHullPos[ 3], mHullPos[ 7], mHullPos[11], mHullPos[15]);
+		Point3	vBottom	= mCalcV[0].Eval( v );
+		Point3	vMid1	= mCalcV[1].Eval( v );
+		Point3	vMid2	= mCalcV[2].Eval( v );
+		Point3	vTop	= mCalcV[3].Eval( v );
 
 		*out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
 	}

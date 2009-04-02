@@ -236,6 +236,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Tests\sebtest.rib"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Tests\SimpleMug.rib"
 				>
 			</File>
@@ -264,6 +268,10 @@
 				</File>
 				<File
 					RelativePath="..\Resources\Shaders\matte.rrasm"
+					>
+				</File>
+				<File
+					RelativePath="..\Resources\Shaders\metal.rrasm"
 					>
 				</File>
 				<File
