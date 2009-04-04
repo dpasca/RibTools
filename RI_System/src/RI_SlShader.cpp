@@ -367,6 +367,8 @@ static inline Color specularbrdf(
 	Vector3	H = (L + V).GetNormalized();
 	float	nh = N.GetDot( H );
 	float	a = powf( DMAX( 0, nh ), ooRoughness );
+	
+	return Color( 1, 0, 0 );
 }
 
 //==================================================================

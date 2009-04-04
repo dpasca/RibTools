@@ -7,7 +7,14 @@
  *
  */
 
-#include <malloc.h>
+#ifdef _MSC_VER
+	#include <malloc.h>
+
+#elif defined(__MACH__)
+	#include <mm_malloc.h>
+
+#endif
+
 #include "DContainers.h"
 
 #if defined(_mm_malloc) && defined(_mm_free)

@@ -24,6 +24,7 @@
 		6B1F591A0F0956870082B328 /* DMatrix44.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B1F59170F0956870082B328 /* DMatrix44.h */; };
 		6B1F591B0F0956870082B328 /* DMatrix44.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1F59190F0956870082B328 /* DMatrix44.cpp */; };
 		6B1F591C0F0956950082B328 /* libDMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1F590E0F09561C0082B328 /* libDMath.a */; };
+		6B26E7F20F86818F006DCEF7 /* sebtest.rib in Resources */ = {isa = PBXBuildFile; fileRef = 6B26E7F10F86818F006DCEF7 /* sebtest.rib */; };
 		6B279BAC0F3F03C50050CC99 /* RI_FrameworkBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B279BAA0F3F03C50050CC99 /* RI_FrameworkBase.h */; };
 		6B279BAD0F3F03C50050CC99 /* RI_FrameworkREYES.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B279BAB0F3F03C50050CC99 /* RI_FrameworkREYES.h */; };
 		6B279BB80F3F03E30050CC99 /* RI_FrameworkREYES.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B279BB70F3F03E30050CC99 /* RI_FrameworkREYES.cpp */; };
@@ -247,6 +248,8 @@
 		6B1F590E0F09561C0082B328 /* libDMath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B1F59170F0956870082B328 /* DMatrix44.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMatrix44.h; path = include/DMatrix44.h; sourceTree = "<group>"; };
 		6B1F59190F0956870082B328 /* DMatrix44.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DMatrix44.cpp; path = src/DMatrix44.cpp; sourceTree = "<group>"; };
+		6B26E7F10F86818F006DCEF7 /* sebtest.rib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sebtest.rib; path = Tests/sebtest.rib; sourceTree = "<group>"; };
+		6B26E7F60F8683A8006DCEF7 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = osx/stdafx.h; sourceTree = "<group>"; };
 		6B279BAA0F3F03C50050CC99 /* RI_FrameworkBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_FrameworkBase.h; path = include/RI_FrameworkBase.h; sourceTree = "<group>"; };
 		6B279BAB0F3F03C50050CC99 /* RI_FrameworkREYES.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RI_FrameworkREYES.h; path = include/RI_FrameworkREYES.h; sourceTree = "<group>"; };
 		6B279BB70F3F03E30050CC99 /* RI_FrameworkREYES.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RI_FrameworkREYES.cpp; path = src/RI_FrameworkREYES.cpp; sourceTree = "<group>"; };
@@ -402,6 +405,7 @@
 				6BEE6F3D0F2236BF00BC3132 /* Elephant.rib */,
 				6B33FDE80F319DF800B5028F /* Enterprise_ncc1701d.rib */,
 				6B0ABFC00F16675D0001C656 /* Pixar.rib */,
+				6B26E7F10F86818F006DCEF7 /* sebtest.rib */,
 				6BF635E00F17F85400A68819 /* SimpleMug.rib */,
 				6B39F4720F19049000FE838F /* uteapot.rib */,
 				6B33FDE90F319E0900B5028F /* WarBird.rib */,
@@ -431,6 +435,7 @@
 		6B83497B0F0A7F0700BA7221 /* RI_System */ = {
 			isa = PBXGroup;
 			children = (
+				6B26E7F60F8683A8006DCEF7 /* stdafx.h */,
 				6B8349880F0A7F0700BA7221 /* RI_Attributes.cpp */,
 				6B83497D0F0A7F0700BA7221 /* RI_Attributes.h */,
 				6B8349890F0A7F0700BA7221 /* RI_Base.cpp */,
@@ -765,6 +770,7 @@
 				6BE494DB0F7155CF00C87822 /* matte.rrasm in Resources */,
 				6B07711F0F73B32A00BDFFA6 /* constant.rrasm in Resources */,
 				6B12838D0F73C27C00DF88C7 /* test.rrasm in Resources */,
+				6B26E7F20F86818F006DCEF7 /* sebtest.rib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -931,7 +937,6 @@
 		6B1F58E30F09541E0082B328 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -946,7 +951,6 @@
 		6B1F58E40F09541E0082B328 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -961,7 +965,6 @@
 		6B1F590F0F09561C0082B328 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -976,7 +979,6 @@
 		6B1F59100F09561C0082B328 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -991,14 +993,15 @@
 		6B8349710F0A7EA700BA7221 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/lib;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1012,13 +1015,14 @@
 		6B8349720F0A7EA700BA7221 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/lib;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1033,7 +1037,6 @@
 		6B8349B30F0A8DDF00BA7221 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1044,6 +1047,7 @@
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "../../../**";
 				INFOPLIST_FILE = "RibRender/osx/RibRender-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = (
@@ -1058,7 +1062,6 @@
 		6B8349B40F0A8DDF00BA7221 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -1068,6 +1071,7 @@
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "../../../**";
 				INFOPLIST_FILE = "RibRender/osx/RibRender-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = (
@@ -1092,7 +1096,9 @@
 				GCC_WARN_PEDANTIC = NO;
 				GCC_WARN_PROTOTYPE_CONVERSION = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
+				HEADER_SEARCH_PATHS = "";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				USER_HEADER_SEARCH_PATHS = "./**";
 			};
 			name = Debug;
 		};
@@ -1104,6 +1110,8 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PROTOTYPE_CONVERSION = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
+				HEADER_SEARCH_PATHS = "";
+				USER_HEADER_SEARCH_PATHS = "./**";
 			};
 			name = Release;
 		};

@@ -177,7 +177,9 @@ void idle(void)
 	else
 	{
 		// Sleep because freeglut goes nuts with mainloop
+		#ifdef _MSC_VER
 		Sleep( 1 );
+		#endif
 	}
 	//glutPostRedisplay();
 }
