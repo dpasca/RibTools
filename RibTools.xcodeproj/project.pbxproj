@@ -945,6 +945,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = DSystem;
+				USER_HEADER_SEARCH_PATHS = "../** ../include";
 			};
 			name = Debug;
 		};
@@ -973,6 +974,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = DMath;
+				USER_HEADER_SEARCH_PATHS = "../** ../include";
 			};
 			name = Debug;
 		};
@@ -1009,6 +1011,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = RI_System;
+				USER_HEADER_SEARCH_PATHS = "../**";
 			};
 			name = Debug;
 		};
@@ -1098,7 +1101,6 @@
 				GCC_WARN_SIGN_COMPARE = YES;
 				HEADER_SEARCH_PATHS = "";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				USER_HEADER_SEARCH_PATHS = "./**";
 			};
 			name = Debug;
 		};
