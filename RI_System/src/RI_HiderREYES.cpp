@@ -25,6 +25,8 @@ HiderREYES::HiderREYES()
 //==================================================================
 HiderREYES::~HiderREYES()
 {
+	for (size_t i=0; i < mpBuckets.size(); ++i)
+		delete mpBuckets[i];
 }
 
 //==================================================================
@@ -32,10 +34,6 @@ void HiderREYES::WorldBegin(
 					const Options &opt,
 					const Matrix44 &mtxWorldCamera )
 {
-	for (size_t i=0; i < mpPrims.size(); ++i)
-		delete mpPrims[i];
-	mpPrims.clear();
-
 	mOptions = opt;
 
 	mMtxWorldCamera	= mtxWorldCamera;
@@ -46,6 +44,8 @@ void HiderREYES::WorldBegin(
 	
 	mZBuff.Setup( opt.mXRes, opt.mYRes );
 	mZBuff.Fill( FLT_MAX );
+
+	mpBuckets.push_back( new Bucket() );
 }
 
 //==================================================================
@@ -54,7 +54,7 @@ void HiderREYES::Insert(
 			const Attributes	&attr,
 			const Transform		&xform )
 {
-	mpPrims.push_back( pPrim );
+	mpBuckets[0]->mpPrims.push_back( pPrim );
 }
 
 //==================================================================
@@ -70,7 +70,7 @@ void HiderREYES::InsertSplitted(
 	
 	pSplitPrim->mSplitCnt += 1;
 
-	mpPrims.push_back( pSplitPrim );
+	mpBuckets[0]->mpPrims.push_back( pSplitPrim );
 }
 
 //==================================================================
@@ -81,10 +81,10 @@ void HiderREYES::Remove( Primitive *pPrim )
 //==================================================================
 void HiderREYES::WorldEnd()
 {
-	for (size_t i=0; i < mpPrims.size(); ++i)
-		delete mpPrims[i];
+	for (size_t i=0; i < mpBuckets.size(); ++i)
+		delete mpBuckets[i];
 
-	mpPrims.clear();
+	mpBuckets.clear();
 }
 
 //==================================================================

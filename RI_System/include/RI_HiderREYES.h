@@ -95,10 +95,12 @@ public:
 //==================================================================
 class HiderREYES : public HiderBase
 {
-	Options				mOptions;
-	DVec<Primitive *>	mpPrims;
-	DestBuffer<3>		mDestBuff;
-	DestBuffer<1>		mZBuff;
+	friend class FrameworkREYES;
+
+	Options			mOptions;
+	DestBuffer<3>	mDestBuff;
+	DestBuffer<1>	mZBuff;
+	DVec<Bucket *>	mpBuckets;
 
 public:
 	HiderREYES();
@@ -129,8 +131,6 @@ public:
 	u_int		GetOutputDataWd() const	{ return mDestBuff.GetWd();	}
 	u_int		GetOutputDataHe() const	{ return mDestBuff.GetHe();	}
 	const float *GetOutputData() const { return mDestBuff.GetData(); }
-
-	DVec<Primitive *>	&GetPrimList()	{ return mpPrims;	}
 	
 private:
 	void pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n );

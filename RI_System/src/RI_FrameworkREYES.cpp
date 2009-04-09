@@ -74,32 +74,35 @@ void FrameworkREYES::Remove( Primitive *pPrim )
 //==================================================================
 void FrameworkREYES::WorldEnd()
 {
-	DVec<Primitive *>	&pPrimList = mpHider->GetPrimList();
-
 	Point3	camWorldPos = mpHider->mMtxWorldCamera.GetTranslation();
 
-	for (size_t i=0; i < pPrimList.size(); ++i)
-	{	
-		Primitive	*pPrim = pPrimList[i];
+	for (size_t bi=0; bi < mHiderREYES.mpBuckets.size(); ++bi)
+	{
+		DVec<Primitive *>	&pPrimList = mHiderREYES.mpBuckets[bi]->GetPrimList();
 
-		MicroPolygonGrid	grid;
-
-		bool	uSplit = false;
-		bool	vSplit = false;
-
-		if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
+		for (size_t i=0; i < pPrimList.size(); ++i)
 		{
-			pPrim->Dice( grid, camWorldPos );
+			Primitive	*pPrim = pPrimList[i];
 
-			// should check backface and trim
-			// grid.displace();
-			grid.Shade( *pPrim->mpAttribs );
+			MicroPolygonGrid	grid;
 
-			mpHider->Hide( grid );
+			bool	uSplit = false;
+			bool	vSplit = false;
+
+			if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
+			{
+				pPrim->Dice( grid, camWorldPos );
+
+				// should check backface and trim
+				// grid.displace();
+				grid.Shade( *pPrim->mpAttribs );
+
+				mpHider->Hide( grid );
+			}
+			else
+			if ( pPrim->IsSplitable() )
+				pPrim->Split( *this, uSplit, vSplit );
 		}
-		else
-		if ( pPrim->IsSplitable() )
-			pPrim->Split( *this, uSplit, vSplit );
 	}
 
 	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	delete mpUniqueAttribs[i];

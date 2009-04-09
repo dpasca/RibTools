@@ -23,15 +23,47 @@ class Transform;
 class Primitive;
 
 //==================================================================
+/// Bucket
+//==================================================================
+class Bucket
+{
+public:
+	float	mX1;
+	float	mY1;
+	float	mX2;
+	float	mY2;
+
+	DVec<Primitive *>	mpPrims;
+
+public:
+	Bucket() :
+		mX1(0),
+		mY1(0),
+		mX2(0),
+		mY2(0)
+	{
+	}
+
+	~Bucket()
+	{
+		for (size_t i=0; i < mpPrims.size(); ++i)
+			delete mpPrims[i];
+	}
+
+
+	DVec<Primitive *>	&GetPrimList()	{ return mpPrims;	}
+};
+
+//==================================================================
 /// HiderBase
 //==================================================================
 class HiderBase
 {
 public:
-	Matrix44	mMtxWorldCamera;
-	Matrix44	mMtxCameraProj;
-	float		mHalfXRes;
-	float		mHalfYRes;
+	Matrix44		mMtxWorldCamera;
+	Matrix44		mMtxCameraProj;
+	float			mHalfXRes;
+	float			mHalfYRes;
 
 public:
 	HiderBase()				{}
@@ -55,7 +87,7 @@ public:
 	virtual void Remove( Primitive *pPrim ) = 0;
 
 	virtual void WorldEnd() = 0;
-	
+
 	virtual float RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) const = 0;
 
 	virtual void Hide( MicroPolygonGrid &g ) = 0;
@@ -63,8 +95,6 @@ public:
 	virtual u_int		GetOutputDataWd() const = 0;
 	virtual u_int		GetOutputDataHe() const = 0;
 	virtual const float *GetOutputData() const = 0;
-
-	virtual DVec<Primitive *>	&GetPrimList() = 0;
 };
 
 //==================================================================
