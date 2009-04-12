@@ -8,6 +8,11 @@
 
 #include "RenderOutputFile.h"
 
+extern "C" 
+{
+	#include "jpeglib.h"
+};
+
 //==================================================================
 // RenderOutputFile
 //==================================================================
@@ -26,20 +31,61 @@ RenderOutputFile::~RenderOutputFile()
 }
 
 //==================================================================
+static void write_JPEG_file(
+			const char * filename,
+			int quality,
+			const JSAMPLE * image_buffer,
+			int image_width,
+			int image_height
+			)
+{
+	struct jpeg_compress_struct cinfo;
+	struct jpeg_error_mgr jerr;
+	/* More stuff */
+	FILE * outfile;		/* target file */
+	int row_stride;		/* physical row width in image buffer */
+
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
+
+	if ( 0 != fopen_s( &outfile, filename, "wb" ) )
+	{
+		DASSTHROW( 0, ("can't open %s\n", filename) );
+	}
+	jpeg_stdio_dest(&cinfo, outfile);
+
+	cinfo.image_width = image_width; 	/* image width and height, in pixels */
+	cinfo.image_height = image_height;
+	cinfo.input_components = 3;		/* # of color components per pixel */
+	cinfo.in_color_space = JCS_RGB; 	/* colorspace of input image */
+
+	jpeg_set_defaults(&cinfo);
+	jpeg_set_quality(&cinfo, quality, TRUE /* limit to baseline-JPEG values */);
+
+	jpeg_start_compress(&cinfo, TRUE);
+	row_stride = image_width * 3;	/* JSAMPLEs per row in image_buffer */
+
+	const JSAMPLE *row_pointer[1];	/* pointer to JSAMPLE row[s] */
+
+	while (cinfo.next_scanline < cinfo.image_height)
+	{
+		row_pointer[0] = & image_buffer[cinfo.next_scanline * row_stride];
+		jpeg_write_scanlines(&cinfo, (JSAMPARRAY)row_pointer, 1);
+	}
+
+	jpeg_finish_compress(&cinfo);
+	fclose(outfile);
+
+	jpeg_destroy_compress(&cinfo);
+}
+
+//==================================================================
 void RenderOutputFile::Update( u_int w, u_int h, const float *pSrcData )
 {
 	alloc( w, h );
 	convert( w, h, pSrcData );
 
-	FILE	*pFile;
-	if ( 0 != fopen_s( &pFile, mpFileName, "wb" ) )
-	{
-		DASSTHROW( 0, ("Failed to open %s for writing", mpFileName) );
-	}
-
-	// mpBuffer
-
-	fclose( pFile );
+	write_JPEG_file( mpFileName, 100, mpBuffer, w, h );
 }
 
 //==================================================================
