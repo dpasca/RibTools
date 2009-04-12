@@ -8,49 +8,22 @@
 
 #include <stdio.h>
 #include <stdexcept>
+#include <direct.h>
 #include "DSystem/include/DUtils.h"
 #include "RI_System/include/RI_Parser.h"
 #include "RI_System/include/RI_Machine.h"
 #include "RI_System/include/RI_FrameworkREYES.h"
+#include "RenderOutputFile.h"
 #include "RibRenderFile.h"
-
-#if 0
-
-//==================================================================
-static RenderOutputFile	*gpsRenderOutput;
-static char				gpFileToRender[2048];
-static char				gDefaultResDir[2048];
-static char				gStartDir[2048];
 
 //===============================================================
 static bool renderFile(
-				const char *pFileName,
-				const char *pDefaultResourcesDir,
-				int forcedWd=-1,
-				int forcedHe=-1 )
+	const char *pFileName,
+	const char *pDefaultResourcesDir,
+	RenderOutputFile *pRenderOutput,
+	int forcedWd=-1,
+	int forcedHe=-1 )
 {
-	static std::string	sLastFileName;
-	static int			sLastUsedWd;
-	static int			sLastUsedHe;
-	
-	// remember the last used file name
-	if ( pFileName )
-		sLastFileName = pFileName;
-	else
-	{
-		if ( sLastFileName.length() )
-		{
-			pFileName = sLastFileName.c_str();
-			if ( forcedWd == sLastUsedWd &&
-				 forcedHe == sLastUsedHe )
-			{
-				return false;
-			}
-		}
-		else
-			return false;
-	}
-
 	void	*pData;
 	size_t	dataSize;
 
@@ -60,15 +33,12 @@ static bool renderFile(
 		return false;
 	}
 	
-	DSAFE_DELETE( gpsRenderOutput );
-	gpsRenderOutput = new RenderOutputFile();
-
 	char	defaultShadersDir[4096];
-	sprintf( defaultShadersDir, "%s/Shaders", pDefaultResourcesDir );
+	sprintf_s( defaultShadersDir, "%s/Shaders", pDefaultResourcesDir );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
 	RI::Parser			parser;
-	RI::FrameworkREYES	frameworkREYES( gpsRenderOutput );
+	RI::FrameworkREYES	frameworkREYES( pRenderOutput );
 	RI::Machine			machine( &frameworkREYES, defaultShadersDir, forcedWd, forcedHe );
 	
 	for (size_t i=0; i <= dataSize; ++i)
@@ -78,10 +48,6 @@ static bool renderFile(
 		else
 			parser.AddChar( ((char *)pData)[i] );
 
-#if defined(ECHO_INPUT)
-		printf( "%c", ((char *)pData)[i] );
-#endif
-
 		while ( parser.HasNewCommand() )
 		{
 			DStr			cmdName;
@@ -90,8 +56,6 @@ static bool renderFile(
 
 			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
 			
-//			printf( "%3i - %s\n", cmdLine, cmdName.c_str() );
-
 			printf( "CMD %s ", cmdName.c_str() );
 			
 			if ( cmdParams.size() )
@@ -110,11 +74,14 @@ static bool renderFile(
 		}
 	}
 
-	sLastUsedWd = (int)gpsRenderOutput->GetCurWd();
-	sLastUsedHe = (int)gpsRenderOutput->GetCurHe();
-
 	return true;
 }
+
+
+#if 0
+//==================================================================
+static RenderOutputFile	*gpsRenderOutput;
+static char				gpFileToRender[2048];
 
 //===============================================================
 void display(void)
@@ -145,7 +112,7 @@ void reshape(int width, int height)
 	glEnable( GL_DEPTH_TEST );
 	
 	// render the last loaded file
-	renderFile( NULL, gDefaultResDir, width, height );
+	renderFile( NULL, defaultResDir, width, height );
 }
 
 //===============================================================
@@ -160,7 +127,7 @@ void idle(void)
 {
 	if ( gpFileToRender[0] )
 	{
-		renderFile( gpFileToRender, gDefaultResDir );
+		renderFile( gpFileToRender, defaultResDir );
 		gpFileToRender[0] = 0;
 
 		glutPostRedisplay();
@@ -195,7 +162,7 @@ static char *gsTestRibFiles[] =
 //===============================================================
 static void menuFunc( int id )
 {
-	strcpy( gpFileToRender, gStartDir );
+	strcpy( gpFileToRender, startDir );
 	strcat( gpFileToRender, "/../../Tests/" );
 	strcat( gpFileToRender, gsTestRibFiles[id] );
 	
@@ -203,6 +170,8 @@ static void menuFunc( int id )
 }
 
 #endif
+
+//===============================================================
 
 //===============================================================
 int main(int argc, char** argv)
@@ -213,13 +182,23 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
+	char	defaultResDir[2048];
+	char	startDir[2048];
+
+	_getcwd( startDir, sizeof(startDir) );
+	printf( "startDir: %s\n", startDir );
+
+	sprintf_s( defaultResDir, "%s/../../Resources", startDir );
+	printf( "defaultResDir: %s\n", startDir );
+
+	char	outName[4096];
+	sprintf_s( outName, "%s.jpg", argv[1] );
+
+	RenderOutputFile	rendOut( outName );
+
+	renderFile( argv[1], defaultResDir, &rendOut );
+
 /*
-	getcwd( gStartDir, sizeof(gStartDir) );
-	printf( "gStartDir: %s\n", gStartDir );
-
-	sprintf( gDefaultResDir, "%s/../../Resources", gStartDir );
-	printf( "gDefaultResDir: %s\n", gStartDir );
-
     glutInit(&argc, argv);
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
