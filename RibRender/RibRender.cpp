@@ -223,7 +223,7 @@ int main(int argc, char** argv)
 	getcwd( gStartDir, sizeof(gStartDir) );
 	printf( "gStartDir: %s\n", gStartDir );
 
-	sprintf( gDefaultResDir, "%s/../../RibRender/Resources", gStartDir );
+	sprintf( gDefaultResDir, "%s/../../Resources", gStartDir );
 	printf( "gDefaultResDir: %s\n", gStartDir );
 
     glutInit(&argc, argv);

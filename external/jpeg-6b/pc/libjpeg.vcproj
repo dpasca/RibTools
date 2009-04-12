@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="RI_System"
-	ProjectGUID="{2160E8D3-238C-4B10-AFFF-B90CAD4D6234}"
-	RootNamespace="RI_System"
+	Name="libjpeg"
+	ProjectGUID="{870ECA6E-C5A8-4AFA-8A10-7FEE94960F23}"
+	RootNamespace="libjpeg"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -41,14 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../;../include;../../DSystem/include;../../DMath/include"
+				AdditionalIncludeDirectories=".;pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				EnableEnhancedInstructionSet="2"
-				FloatingPointModel="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4996"
@@ -106,18 +104,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
-				InlineFunctionExpansion="2"
+				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				AdditionalIncludeDirectories="../../;../include;../../DSystem/include;../../DMath/include"
+				AdditionalIncludeDirectories=".;pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				EnableEnhancedInstructionSet="2"
-				FloatingPointModel="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4996"
@@ -160,275 +153,229 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\src\RI_Attributes.cpp"
+				RelativePath="..\jcapimin.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Attributes.h"
+				RelativePath="..\jcapistd.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Base.cpp"
+				RelativePath="..\jccoefct.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Base.h"
+				RelativePath="..\jccolor.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_FrameworkBase.h"
+				RelativePath="..\jcdctmgr.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_FrameworkREYES.cpp"
+				RelativePath="..\jchuff.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_FrameworkREYES.h"
+				RelativePath="..\jchuff.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_HiderBase.h"
+				RelativePath="..\jcinit.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_HiderREYES.cpp"
+				RelativePath="..\jcmainct.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_HiderREYES.h"
+				RelativePath="..\jcmarker.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_LightSource.cpp"
+				RelativePath="..\jcmaster.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_LightSource.h"
+				RelativePath="..\jcomapi.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Machine.cpp"
+				RelativePath=".\jconfig.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Machine.h"
+				RelativePath="..\jcparam.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_MicroPolygonGrid.cpp"
+				RelativePath="..\jcphuff.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_MicroPolygonGrid.h"
+				RelativePath="..\jcprepct.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Options.cpp"
+				RelativePath="..\jcsample.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Options.h"
+				RelativePath="..\jctrans.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Param.cpp"
+				RelativePath="..\jdapimin.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Param.h"
+				RelativePath="..\jdapistd.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Parser.cpp"
+				RelativePath="..\jdatadst.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Parser.h"
+				RelativePath="..\jdatasrc.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Primitive.cpp"
+				RelativePath="..\jdcoefct.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Primitive.h"
+				RelativePath="..\jdcolor.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Primitive_Base.cpp"
+				RelativePath="..\jdct.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Primitive_Base.h"
+				RelativePath="..\jddctmgr.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Primitive_Patch.cpp"
+				RelativePath="..\jdhuff.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Primitive_Patch.h"
+				RelativePath="..\jdhuff.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Primitive_Poly.cpp"
+				RelativePath="..\jdinput.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Primitive_Poly.h"
+				RelativePath="..\jdmainct.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Primitive_Quadric.cpp"
+				RelativePath="..\jdmarker.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Primitive_Quadric.h"
+				RelativePath="..\jdmaster.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_SlRunContext.cpp"
+				RelativePath="..\jdmerge.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_SlRunContext.h"
+				RelativePath="..\jdphuff.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_SlShader.cpp"
+				RelativePath="..\jdpostct.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_SlShader.h"
+				RelativePath="..\jdsample.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_SlShaderAsmParser.cpp"
+				RelativePath="..\jdtrans.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_SlShaderAsmParser.h"
+				RelativePath="..\jerror.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_SlSymbol.cpp"
+				RelativePath="..\jerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_SlSymbol.h"
+				RelativePath="..\jfdctflt.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_State.cpp"
+				RelativePath="..\jfdctfst.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_State.h"
+				RelativePath="..\jfdctint.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_State_Error.cpp"
+				RelativePath="..\jidctflt.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_State_Prims.cpp"
+				RelativePath="..\jidctfst.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Symbol.cpp"
+				RelativePath="..\jidctint.c"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Symbol.h"
+				RelativePath="..\jidctred.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Tokens.cpp"
+				RelativePath="..\jinclude.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Tokens.h"
+				RelativePath="..\jmemnobs.c"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Transform.cpp"
+				RelativePath="..\jmemsys.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_Transform.h"
+				RelativePath="..\jmorecfg.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\Tokenizer.cpp"
+				RelativePath="..\jpegint.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\Tokenizer.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Precompiled Headers"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
+				RelativePath="..\jpeglib.h"
 				>
 			</File>
 			<File
-				RelativePath=".\targetver.h"
+				RelativePath="..\jquant1.c"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="Resources"
-			>
-			<Filter
-				Name="Shaders"
+			<File
+				RelativePath="..\jquant2.c"
 				>
-				<File
-					RelativePath="..\..\Resources\Shaders\constant.rrasm"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Resources\Shaders\dbg_normal_col.rrasm"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Resources\Shaders\matte.rrasm"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Resources\Shaders\metal.rrasm"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Resources\Shaders\test.rrasm"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath="..\jutils.c"
+				>
+			</File>
+			<File
+				RelativePath="..\jversion.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

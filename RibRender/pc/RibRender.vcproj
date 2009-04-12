@@ -252,34 +252,6 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="Resources"
-			>
-			<Filter
-				Name="Shaders"
-				>
-				<File
-					RelativePath="..\Resources\Shaders\constant.rrasm"
-					>
-				</File>
-				<File
-					RelativePath="..\Resources\Shaders\dbg_normal_col.rrasm"
-					>
-				</File>
-				<File
-					RelativePath="..\Resources\Shaders\matte.rrasm"
-					>
-				</File>
-				<File
-					RelativePath="..\Resources\Shaders\metal.rrasm"
-					>
-				</File>
-				<File
-					RelativePath="..\Resources\Shaders\test.rrasm"
-					>
-				</File>
-			</Filter>
-		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
