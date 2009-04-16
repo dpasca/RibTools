@@ -45,7 +45,7 @@ public:
 	float	mXMin, mXMax, mYMin, mYMax;
 	
 	CPSymVoid	mpyProjection;
-	Matrix44	mMtxViewHomo;
+	Matrix44	mMtxCamProj;
 	
 	float	mNearClip, mFarClip;
 	float	mFStop, mFocalLength, mFocalDistance;

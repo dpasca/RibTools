@@ -45,43 +45,6 @@ struct GVert
 };
 
 //==================================================================
-/// GState
-//==================================================================
-class GState
-{
-	Matrix44	mMtxLocalHomo;
-	float		mHalfXRes;
-	float		mHalfYRes;
-
-public:
-	//==================================================================
-	void Setup(
-			const Options		&opt,
-			const Attributes	&attr,
-			const Transform		&xform,
-			const Matrix44		&mtxWorldCamera );
-
-	//==================================================================
-	inline void AddVertex( const GVert &vert )
-	{
-		Vector4	homoPos = MultiplyV3W1M( Vector3( vert.x, vert.y, vert.z ), mMtxLocalHomo );
-
-		//printf( "  vtx-scr: %f %f %f %f\n", sx, sy, sz, oow );
-	#ifdef __gl_h_
-		float	oow = 1.0f / homoPos.w;
-
-		float sx = mHalfXRes + mHalfXRes * oow * homoPos.x;
-		float sy = mHalfYRes - mHalfYRes * oow * homoPos.y;
-		float sz = oow * homoPos.z;
-
-		//glColor3f( (int)(vert.u*8)/8.0f + vert.v/8, 0, 0 );
-		glColor3f( vert.u, vert.v, 0 );
-		glVertex3f( sx, sy, oow );
-	#endif
-	}
-};
-
-//==================================================================
 /// Primitive
 //==================================================================
 class Primitive
@@ -174,7 +137,7 @@ public:
 						return false;
 					}
 
-	virtual void	Dice( MicroPolygonGrid &g, const Point3 &camWorldPos );
+	virtual void	Dice( MicroPolygonGrid &g, const Point3 &camPosWS );
 
 	Vector2 CalcLocalUV( const Vector2 &gridUV )
 	{

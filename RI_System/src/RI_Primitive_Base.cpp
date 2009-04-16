@@ -81,9 +81,9 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 }
 
 //==================================================================
-void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camWorldPos )
+void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS )
 {
-	Point3	*pPoints = g.mpPoints;
+	Point3	*pPointsWS = g.mpPointsWS;
 
 	Vector3	*pI	 = (Color *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
 	Vector3	*pN  = (Color *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
@@ -93,12 +93,12 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camWorldPos )
 
 	float	du = 1.0f / g.mXDim;
 	float	dv = 1.0f / g.mYDim;
-	
-	Matrix44 mtxObjectCurrentNorm = g.mMtxObjectCurrent;
-	mtxObjectCurrentNorm.u.m44[3][0] = 0;
-	mtxObjectCurrentNorm.u.m44[3][1] = 0;
-	mtxObjectCurrentNorm.u.m44[3][2] = 0;
-	mtxObjectCurrentNorm.u.m44[3][3] = 1;
+
+	Matrix44 mtxLocalWorldNorm = g.mMtxLocalWorld;
+	mtxLocalWorldNorm.u.m44[3][0] = 0;
+	mtxLocalWorldNorm.u.m44[3][1] = 0;
+	mtxLocalWorldNorm.u.m44[3][2] = 0;
+	mtxLocalWorldNorm.u.m44[3][3] = 1;
 
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
@@ -106,22 +106,23 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camWorldPos )
 		float	u = 0.0f;
 		for (int j=0; j < (int)g.mXDim; ++j, u += du)
 		{
-			Vector3	pos;
+			Vector2	locUV = CalcLocalUV( Vector2( u, v ) );
 			Vector3	dPdu;
 			Vector3	dPdv;
-			Vector2	locUV = CalcLocalUV( Vector2( u, v ) );
-			Eval_dPdu_dPdv( locUV.x, locUV.y, pos, &dPdu, &dPdv );
-			pos = MultiplyV3M( pos, g.mMtxObjectCurrent );
-			
-			Vector3 objNor = dPdu.GetCross( dPdv );
-			Vector3	nor = MultiplyV3M( objNor, mtxObjectCurrentNorm ).GetNormalized();
+			Vector3	posLS;
+			Eval_dPdu_dPdv( locUV.x, locUV.y, posLS, &dPdu, &dPdv );
 
-			*pPoints++	= pos;
+			Vector3	posWS = MultiplyV3M( posLS, g.mMtxLocalWorld );
+			Vector3 norLS = dPdu.GetCross( dPdv );
+
+			Vector3	norWS = MultiplyV3M( norLS, mtxLocalWorldNorm ).GetNormalized();
+
+			*pPointsWS++	= posWS;
 			//*pI++		= pos - camWorldPos;
-			*pI++		= (pos - camWorldPos).GetNormalized();
+			*pI++		= (posWS - camPosWS).GetNormalized();
 			//*pN++		= Vector3(0,0,0) - (pos - camWorldPos).GetNormalized();
-			*pN++		= nor;
-			*pNg++		= nor;
+			*pN++		= norWS;
+			*pNg++		= norWS;
 			*pOs++		= mpAttribs->mOpacity;
 			*pCs++		= mpAttribs->mColor;
 
@@ -214,13 +215,17 @@ bool DiceablePrim::IsDiceable(
 	out_uSplit = false;
 	out_vSplit = false;
 	
+/*
 	Matrix44 mtxLocalCamera =
 				mpTransform->GetMatrix() *
 					pHider->mMtxWorldCamera;
+*/
+
+	const Matrix44 &mtxLocalWorld = mpTransform->GetMatrix();
 	
 	Bound	bound;
 	MakeBound( bound );
-	float pixelArea = pHider->RasterEstimate( bound, mtxLocalCamera );
+	float pixelArea = pHider->RasterEstimate( bound, mtxLocalWorld );
 	
 	if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
 	{
@@ -234,7 +239,7 @@ bool DiceablePrim::IsDiceable(
 					dimY,
 					mURange,
 					mVRange,
-					mtxLocalCamera
+					mtxLocalWorld
 					);
 
 			return true;

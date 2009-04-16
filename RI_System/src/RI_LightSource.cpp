@@ -28,11 +28,18 @@ void LightSource::UpdateRend( const Transform &xform )
 {
 	if ( mType == TYPE_DISTANT )
 	{
-		mRend.mDistant.mDir =
-			(
-				MultiplyV3M( mLocToPos,		xform.GetMatrix() ) -
-				MultiplyV3M( mLocFromPos,	xform.GetMatrix() )
-			).GetNormalized();
+#if 1
+		Vector3	diff =
+					MultiplyV3M( mLocToPos,		xform.GetMatrix() ) -
+					MultiplyV3M( mLocFromPos,	xform.GetMatrix() );
+
+		mRend.mDistant.mDir = -diff.GetNormalized();
+#else
+
+		Vector3	diff = mLocToPos - mLocFromPos;
+		diff = MultiplyV3M( diff, xform.GetMatrix() );
+		mRend.mDistant.mDir = diff.GetNormalized();
+#endif
 	}
 }
 

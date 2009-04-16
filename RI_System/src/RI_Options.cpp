@@ -41,7 +41,7 @@ void Options::Init( SymbolList *pStatics, RevisionTracker *pRevision )
 	mXMax = 1;
 	mYMin = 0;
 	mYMax = 1;
-	mMtxViewHomo = true;
+	mMtxCamProj = true;
 	mNearClip = RI_EPSILON;
 	mFarClip = RI_INFINITY;
 	mFStop = RI_INFINITY;
@@ -136,7 +136,7 @@ void Options::cmdProjection( ParamList &params )
 
 						float fov = params[++i].Flt();
 
-						mMtxViewHomo =
+						mMtxCamProj =
 							Matrix44::Perspective( fov * DEG2RAD,
 												  mFrameAspectRatio,
 												  mNearClip, mFarClip );

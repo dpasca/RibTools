@@ -37,7 +37,7 @@ void HiderREYES::WorldBegin(
 	mOptions = opt;
 
 	mMtxWorldCamera	= mtxWorldCamera;
-	mMtxCameraProj	= opt.mMtxViewHomo;
+	mMtxWorldProj	= mMtxWorldCamera * opt.mMtxCamProj;
 	
 	mDestBuff.Setup( opt.mXRes, opt.mYRes );
 	mDestBuff.Clear();
@@ -88,7 +88,7 @@ void HiderREYES::WorldEnd()
 }
 
 //==================================================================
-float HiderREYES::RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) const
+float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const
 {
 	if NOT( b.IsValid() )
 	{
@@ -115,7 +115,7 @@ float HiderREYES::RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) con
 	float maxX = -FLT_MAX;
 	float maxY = -FLT_MAX;
 	
-	Matrix44	mtxLocalProj = mtxLocalCamera * mMtxCameraProj;
+	Matrix44	mtxLocalProj = mtxLocalWorld * mMtxWorldProj;
 
 	for (size_t i=0; i < 8; ++i)
 	{
@@ -150,6 +150,7 @@ float HiderREYES::RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) con
 		return 0.0f;	// invalid or zero area...
 }
 
+/*
 //==================================================================
 void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 {
@@ -158,7 +159,7 @@ void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 
 	for (size_t i=0; i < n; ++i)
 	{
-		Vector4	Pproj = MultiplyV3W1M( pSrc[i], mMtxCameraProj );
+		Vector4	Pproj = MultiplyV3W1M( pSrc[i], mMtxCamProj );
 		
 		float	oow = 1.0f / Pproj.w;
 		
@@ -168,6 +169,7 @@ void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 				);
 	}
 }
+*/
 
 //==================================================================
 void HiderREYES::Hide( MicroPolygonGrid &g )
@@ -178,7 +180,7 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 	float destHalfWd	= (float)mDestBuff.mWd * 0.5f;
 	float destHalfHe	= (float)mDestBuff.mHe * 0.5f;
 
-	const Point3	*pRuns	= g.mpPoints;
+	const Point3	*pRunsWS	= g.mpPointsWS;
 
 	const Color	*pOi = (const Color *)g.mSymbols.LookupVariableData( "Oi", SlSymbol::COLOR, true );
 	const Color	*pCi = (const Color *)g.mSymbols.LookupVariableData( "Ci", SlSymbol::COLOR, true );
@@ -195,7 +197,7 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 		{
 			float	u = g.mURange[0] + iu * du;
 			
-			Vector4	Pproj = MultiplyV3W1M( *pRuns++, mMtxCameraProj );
+			Vector4	Pproj = MultiplyV3W1M( *pRunsWS++, mMtxWorldProj );
 			
 			float	oow = 1.0f / Pproj.w;
 

@@ -124,7 +124,7 @@ public:
 
 	void WorldEnd();
 	
-	float RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) const;
+	float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const;
 
 	void Hide( MicroPolygonGrid &g );
 	
@@ -133,7 +133,7 @@ public:
 	const float *GetOutputData() const { return mDestBuff.GetData(); }
 	
 private:
-	void pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n );
+	//void pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n );
 };
 
 //==================================================================

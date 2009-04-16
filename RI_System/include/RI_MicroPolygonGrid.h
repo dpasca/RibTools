@@ -31,13 +31,13 @@ public:
 	u_int			mXDim;
 	u_int			mYDim;
 	u_int			mPointsN;
-	Point3			*mpPoints;
-	Matrix44		mMtxObjectCurrent;
+	Point3			*mpPointsWS;
+	Matrix44		mMtxLocalWorld;
 	float			mURange[2];
 	float			mVRange[2];
 	SlSymbolList	mSymbols;
 	
-	MicroPolygonGrid() : mXDim(0), mYDim(0), mpPoints(0), mPointsN(0)
+	MicroPolygonGrid() : mXDim(0), mYDim(0), mpPointsWS(0), mPointsN(0)
 	{
 	}
 
@@ -47,7 +47,7 @@ public:
 			   u_int ydim,
 			   const float uRange[2],
 			   const float vRange[2],
-			   const Matrix44 &mtxObjectCurrent );
+			   const Matrix44 &mtxLocalWorld );
 			   
 	u_int GetPointsN() const { return mPointsN; }
 	

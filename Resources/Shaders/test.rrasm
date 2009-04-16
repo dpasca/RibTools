@@ -19,4 +19,5 @@
 	;movvv		Ci	I 
 	;faceforward	Nf	$v0	I
 	;movvv		Ci	Nf		// 
+	movvv		Ci	I		// 
 	movvv		Oi	Os		// Oi = Os

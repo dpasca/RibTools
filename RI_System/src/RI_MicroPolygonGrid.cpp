@@ -30,12 +30,12 @@ void MicroPolygonGrid::Setup(
 						u_int ydim,
 						const float uRange[2],
 						const float vRange[2],
-						const Matrix44 &mtxObjectCurrent )
+						const Matrix44 &mtxLocalWorld )
 {
 	mXDim = xdim;
 	mYDim = ydim;
 	mPointsN = mXDim * mYDim;
-	mMtxObjectCurrent = mtxObjectCurrent;
+	mMtxLocalWorld = mtxLocalWorld;
 	mURange[0] = uRange[0];
 	mURange[1] = uRange[1];
 	mVRange[0] = vRange[0];
@@ -58,7 +58,7 @@ void MicroPolygonGrid::Setup(
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
 	mSymbols.push_back( symbol );
-	mpPoints = (Point3 *)symbol.mpDefaultVal;
+	mpPointsWS = (Point3 *)symbol.mpDefaultVal;
 
 	symbol.mName = "I";
 	symbol.mType = SlSymbol::VECTOR;

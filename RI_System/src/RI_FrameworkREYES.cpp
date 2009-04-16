@@ -74,7 +74,7 @@ void FrameworkREYES::Remove( Primitive *pPrim )
 //==================================================================
 void FrameworkREYES::WorldEnd()
 {
-	Point3	camWorldPos = mpHider->mMtxWorldCamera.GetTranslation();
+	Point3	camPosWS = mpHider->mMtxWorldCamera.GetTranslation();
 
 	for (size_t bi=0; bi < mHiderREYES.mpBuckets.size(); ++bi)
 	{
@@ -91,7 +91,7 @@ void FrameworkREYES::WorldEnd()
 
 			if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
 			{
-				pPrim->Dice( grid, camWorldPos );
+				pPrim->Dice( grid, camPosWS );
 
 				// should check backface and trim
 				// grid.displace();

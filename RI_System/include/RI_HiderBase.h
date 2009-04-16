@@ -61,7 +61,7 @@ class HiderBase
 {
 public:
 	Matrix44		mMtxWorldCamera;
-	Matrix44		mMtxCameraProj;
+	Matrix44		mMtxWorldProj;
 	float			mHalfXRes;
 	float			mHalfYRes;
 
@@ -88,7 +88,7 @@ public:
 
 	virtual void WorldEnd() = 0;
 
-	virtual float RasterEstimate( const Bound &b, Matrix44 &mtxLocalCamera ) const = 0;
+	virtual float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const = 0;
 
 	virtual void Hide( MicroPolygonGrid &g ) = 0;
 	

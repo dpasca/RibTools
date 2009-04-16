@@ -19,22 +19,4 @@ namespace RI
 {
 
 //==================================================================
-/// GState
-//==================================================================
-void GState::Setup(
-				const Options		&opt,
-				const Attributes	&attr,
-				const Transform		&xform,
-				const Matrix44		&mtxWorldCamera )
-{
-	//mpOpts	= &opt;
-	//mpAttrs	= &attr;
-	//,mpXForm(&xform)
-
-	mMtxLocalHomo	= xform.GetMatrix() * mtxWorldCamera * opt.mMtxViewHomo;
-	mHalfXRes		= opt.mXRes * 0.5f;
-	mHalfYRes		= opt.mYRes * 0.5f;
-}
-
-//==================================================================
 }
