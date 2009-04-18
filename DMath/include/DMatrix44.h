@@ -56,6 +56,18 @@ public:
 		u.m44[3][0] = m30_; u.m44[3][1] = m31_; u.m44[3][2] = m32_; u.m44[3][3] = m33_;
 	}
 
+	Vector3 GetV3( size_t idx ) const
+	{
+		return Vector3( u.m44[idx] );
+	}
+
+	void SetV3( size_t idx, const Vector3 &v )
+	{
+		u.m44[idx][0] = v.x;
+		u.m44[idx][1] = v.y;
+		u.m44[idx][2] = v.z;
+	}
+
 	void Identity()
 	{
 		memset( u.m16, 0, sizeof(float) * 16 );
@@ -63,6 +75,10 @@ public:
 	}
 		
 	inline Matrix44 GetTranspose() const;
+	inline Matrix44 GetAs33() const;
+	inline Matrix44 GetOrthonormal() const;
+
+	Matrix44 GetInverse( bool *out_pSuccess=0 ) const;
 
 	inline static Matrix44 Scale( float sx, float sy, float sz );
 	inline static Matrix44 Translate( float tx, float ty, float tz );
@@ -90,6 +106,9 @@ public:
 	Matrix44 operator - (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]-rval.u.m16[i]; return m_; }
 //	Matrix44 operator * (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]*rval.u.m16[i]; return m_; }
 	Matrix44 operator / (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]/rval.u.m16[i]; return m_; }
+
+	Matrix44 operator *  (const float rval) const	 { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]*rval; return m_; }
+	void	 operator *= (const float rval)			 { for(int i=0;i<16;++i) u.m16[i] *= u.m16[i]*rval; }
 };
 
 //==================================================================
@@ -100,6 +119,40 @@ inline Matrix44 Matrix44::GetTranspose() const
 	for (int i=0; i < 4; ++i)
 		for (int j=0; j < 4; ++j)
 			out.u.m44[i][j] = u.m44[j][i];
+
+	return out;
+}
+
+//==================================================================
+inline Matrix44 Matrix44::GetAs33() const
+{
+	Matrix44	out( true );
+
+	for (int i=0; i < 3; ++i)
+		for (int j=0; j < 3; ++j)
+			out.u.m44[i][j] = u.m44[i][j];
+
+	return out;
+}
+
+//==================================================================
+inline Matrix44 Matrix44::GetOrthonormal() const
+{
+	Matrix44	out( true );
+
+	Vector3	v0 = GetV3(0);
+	Vector3	v1 = GetV3(1);
+	Vector3	v2 = GetV3(2);
+
+	v0 = v0.GetNormalized(); 
+	v1 = v2.GetCross( v0 );
+	v1 = v1.GetNormalized(); 
+	v2 = v0.GetCross( v1 );
+
+	out.SetV3( 0, v0 );
+	out.SetV3( 1, v1 );
+	out.SetV3( 2, v2 );
+	out.SetV3( 3, GetV3(3) );
 
 	return out;
 }

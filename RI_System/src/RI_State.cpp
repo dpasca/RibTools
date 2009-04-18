@@ -207,6 +207,8 @@ void State::FrameEnd()
 //==================================================================
 void State::WorldBegin()
 {
+	mOptionsStack.top().Finalize();
+
 	pushMode( MD_WORLD );
 
 	// store the current (camera) transformation

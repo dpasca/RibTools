@@ -171,6 +171,11 @@ public:
 		x(v3_.x), y(v3_.y), z(v3_.z), w(w_)
 	{}
 
+	Vector3 GetAsV3() const
+	{
+		return Vector3( v4 );
+	}
+
 	Vector4 operator + (const Vector4 &rval) const { return Vector4( x + rval.x, y + rval.y, z + rval.z, w + rval.w ); }
 	Vector4 operator - (const Vector4 &rval) const { return Vector4( x - rval.x, y - rval.y, z - rval.z, w - rval.w ); }
 	Vector4 operator * (const Vector4 &rval) const { return Vector4( x * rval.x, y * rval.y, z * rval.z, w * rval.w ); }

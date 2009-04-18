@@ -74,7 +74,17 @@ void FrameworkREYES::Remove( Primitive *pPrim )
 //==================================================================
 void FrameworkREYES::WorldEnd()
 {
+#if 0
+	Point3	camPosWS =
+		MultiplyV3M(
+			-mpHider->mMtxWorldCamera.GetTranslation(),
+				mpHider->mMtxWorldCamera.GetAs33().GetInverse()
+		);
+#else
+
 	Point3	camPosWS = mpHider->mMtxWorldCamera.GetTranslation();
+
+#endif
 
 	for (size_t bi=0; bi < mHiderREYES.mpBuckets.size(); ++bi)
 	{

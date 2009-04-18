@@ -45,6 +45,7 @@ public:
 	float	mXMin, mXMax, mYMin, mYMax;
 	
 	CPSymVoid	mpyProjection;
+	ParamList	mProjectionParams;
 	Matrix44	mMtxCamProj;
 	
 	float	mNearClip, mFarClip;
@@ -65,6 +66,8 @@ public:
 	void cmdClipping( float near, float farr );
 	void cmdDepthOfField( float fStop, float focalLength, float focalDistance );
 	void cmdShutter( float openShutter, float closeShutter );
+
+	void Finalize();
 
 };
 	

@@ -85,20 +85,16 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS )
 {
 	Point3	*pPointsWS = g.mpPointsWS;
 
-	Vector3	*pI	 = (Color *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
-	Vector3	*pN  = (Color *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
-	Vector3	*pNg = (Color *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
-	Color	*pOs = (Color *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
-	Color	*pCs = (Color *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
+	Vector3	*pI	 = (Vector3	*)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
+	Vector3	*pN  = (Vector3	*)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
+	Vector3	*pNg = (Vector3	*)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
+	Color	*pOs = (Color	*)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
+	Color	*pCs = (Color	*)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
 
 	float	du = 1.0f / g.mXDim;
 	float	dv = 1.0f / g.mYDim;
 
-	Matrix44 mtxLocalWorldNorm = g.mMtxLocalWorld;
-	mtxLocalWorldNorm.u.m44[3][0] = 0;
-	mtxLocalWorldNorm.u.m44[3][1] = 0;
-	mtxLocalWorldNorm.u.m44[3][2] = 0;
-	mtxLocalWorldNorm.u.m44[3][3] = 1;
+	Matrix44 mtxLocalWorldNorm = g.mMtxLocalWorld.GetAs33().GetOrthonormal();
 
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
@@ -112,15 +108,14 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS )
 			Vector3	posLS;
 			Eval_dPdu_dPdv( locUV.x, locUV.y, posLS, &dPdu, &dPdv );
 
-			Vector3	posWS = MultiplyV3M( posLS, g.mMtxLocalWorld );
-			Vector3 norLS = dPdu.GetCross( dPdv );
+			Vector3 norLS = dPdu.GetCross( dPdv ).GetNormalized();
 
+			Vector3	posWS = MultiplyV3M( posLS, g.mMtxLocalWorld );
 			Vector3	norWS = MultiplyV3M( norLS, mtxLocalWorldNorm ).GetNormalized();
 
 			*pPointsWS++	= posWS;
 			//*pI++		= pos - camWorldPos;
-			*pI++		= (posWS - camPosWS).GetNormalized();
-			//*pN++		= Vector3(0,0,0) - (pos - camWorldPos).GetNormalized();
+			*pI++		= (posWS - -camPosWS).GetNormalized();
 			*pN++		= norWS;
 			*pNg++		= norWS;
 			*pOs++		= mpAttribs->mOpacity;
