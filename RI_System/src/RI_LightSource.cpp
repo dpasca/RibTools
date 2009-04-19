@@ -19,26 +19,31 @@ LightSource::LightSource()
 {
 	mIntesity	= 1;
 	mColor		= Color( 1 );
-	mLocFromPos	= Point3( 0, 0, 1 );
-	mLocToPos	= Point3( 0, 0, 0 );
+	mLocFromPos	= Point3( 0, 0, 0 );
+	mLocToPos	= Point3( 0, 0, 1 );
 }
 
 //==================================================================
-void LightSource::UpdateRend( const Transform &xform )
+void LightSource::UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam )
 {
 	if ( mType == TYPE_DISTANT )
 	{
-#if 1
+#if 0
 		Vector3	diff =
-					MultiplyV3M( mLocToPos,		xform.GetMatrix() ) -
-					MultiplyV3M( mLocFromPos,	xform.GetMatrix() );
+					V3__V3W1_Mul_M44( mLocToPos,	xform.GetMatrix() ) -
+					V3__V3W1_Mul_M44( mLocFromPos,	xform.GetMatrix() );
 
-		mRend.mDistant.mDir = -diff.GetNormalized();
+		mRend.mDistant.mDirWS = diff.GetNormalized();
 #else
 
-		Vector3	diff = mLocToPos - mLocFromPos;
-		diff = MultiplyV3M( diff, xform.GetMatrix() );
-		mRend.mDistant.mDir = diff.GetNormalized();
+		const Matrix44 &mtxLocalWorld = xform.GetMatrix();
+
+		Vector3	diffLS = mLocToPos - mLocFromPos;
+		Vector3	diffWS = V3__V3W1_Mul_M44( diffLS, mtxLocalWorld );
+		Vector3	diffCS = V3__V3W1_Mul_M44( diffWS, mtxWorldCam );
+
+		mRend.mDistant.mDirWS = -diffWS.GetNormalized();
+		mRend.mDistant.mDirCS = -diffCS.GetNormalized();
 #endif
 	}
 }

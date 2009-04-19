@@ -119,7 +119,7 @@ float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld 
 
 	for (size_t i=0; i < 8; ++i)
 	{
-		Vector4	Pproj = MultiplyV3W1M( boxVerts[i], mtxLocalProj );
+		Vector4	Pproj = V4__V3W1_Mul_M44( boxVerts[i], mtxLocalProj );
 		
 		if ( Pproj.w > 0 )
 		{
@@ -197,7 +197,7 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 		{
 			float	u = g.mURange[0] + iu * du;
 			
-			Vector4	Pproj = MultiplyV3W1M( *pRunsWS++, mMtxWorldProj );
+			Vector4	Pproj = V4__V3W1_Mul_M44( *pRunsWS++, mMtxWorldProj );
 			
 			float	oow = 1.0f / Pproj.w;
 

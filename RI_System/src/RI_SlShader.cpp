@@ -29,14 +29,14 @@ SlShader::SlShader( const CtorParams &params ) :
 		DUT::MemFile	file((const void *)params.pSource,
 							  strlen(params.pSource) );
 
-		ShaderAsmParser	parser( file, this );
+		ShaderAsmParser	parser( file, this, params.pName );
 	}
 	else
 	if ( params.pSourceFileName )
 	{
 		DUT::MemFile	file( params.pSourceFileName );
 
-		ShaderAsmParser	parser( file, this );
+		ShaderAsmParser	parser( file, this, params.pName );
 	}
 	else
 	{
@@ -347,7 +347,7 @@ static inline void illuminate(
 		const LightSource	&light = lights[li];
 		if ( light.mType == LightSource::TYPE_DISTANT )
 		{
-			float	norLightCosA = Nn.GetDot( light.mRend.mDistant.mDir );
+			float	norLightCosA = Nn.GetDot( light.mRend.mDistant.mDirCS );
 			//if ( norLightCosA < illConeCosA )
 				accCol += light.mColor * norLightCosA;
 		}

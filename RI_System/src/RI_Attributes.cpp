@@ -57,7 +57,7 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mMaxVisible			= rhs.mMaxVisible			;
 	mpyTypeApproximation= rhs.mpyTypeApproximation	;
 	mValueApproximation	= rhs.mValueApproximation	;
-	mpyOrientation		= rhs.mpyOrientation		;
+	mOrientationFlipped	= rhs.mOrientationFlipped	;
 	mSides				= rhs.mSides				;
 	mpyUBasis			= rhs.mpyUBasis				;
 	mpyVBasis			= rhs.mpyVBasis				;
@@ -168,7 +168,26 @@ void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 //==================================================================
 void Attributes::cmdOrientation( RtToken orientation )
 {
-	mpyOrientation	= mpStatics->FindVoid( orientation );
+	if ( 0 == _stricmp( orientation, RI_INSIDE ) )
+	{
+		mOrientationFlipped = true;
+	}
+	else
+	if ( 0 == _stricmp( orientation, RI_OUTSIDE ) )
+	{
+		mOrientationFlipped = false;
+	}
+	else
+	if ( 0 == _stricmp( orientation, RI_LH ) )
+	{
+		printf( "WARNING: Unsupported LH orientation\n" );	// TODO
+	}
+	else
+	if ( 0 == _stricmp( orientation, RI_RH ) )
+	{
+		printf( "WARNING: Unsupported RH orientation\n" );	// TODO
+	}
+
 	mpRevision->BumpRevision();
 }
 
@@ -220,7 +239,7 @@ void Attributes::cmdOpacity( const Color &color )
 }
 
 //==================================================================
-bool Attributes::cmdLightSource( ParamList &params, const Transform &xform )
+bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam )
 {
 	const char	*pLightTypeName = "";
 
@@ -286,7 +305,7 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform )
 			i += 1;
 	}
 
-	light.UpdateRend( xform );
+	light.UpdateRend( xform, mtxWorldCam );
 
 	// if we are overwriting a light, then erase the previous one !
 	// ..based on the ID

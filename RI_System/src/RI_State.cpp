@@ -399,7 +399,10 @@ void State::LightSource( ParamList &params )
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
 
-	mAttributesStack.top().cmdLightSource( params, mTransformOpenStack.top() );
+	mAttributesStack.top().cmdLightSource(
+								params,
+								mTransformOpenStack.top(),
+								mMtxWorldCamera );
 }
 
 //==================================================================

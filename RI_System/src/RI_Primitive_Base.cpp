@@ -81,7 +81,7 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 }
 
 //==================================================================
-void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS )
+void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS, const Matrix44 &mtxWorldCamera )
 {
 	Point3	*pPointsWS = g.mpPointsWS;
 
@@ -94,7 +94,15 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS )
 	float	du = 1.0f / g.mXDim;
 	float	dv = 1.0f / g.mYDim;
 
-	Matrix44 mtxLocalWorldNorm = g.mMtxLocalWorld.GetAs33().GetOrthonormal();
+	Matrix44 mtxLocalCamera		= g.mMtxLocalWorld * mtxWorldCamera;
+
+	Matrix44 mtxLocalCameraNorm = mtxLocalCamera.GetAs33();
+
+	if ( mpAttribs->mOrientationFlipped )
+		mtxLocalCameraNorm = mtxLocalCameraNorm * Matrix44::Scale( -1, -1, -1 );
+
+	Vector3	camPosCS = mtxWorldCamera.GetTranslation();
+	//V3__V3W1_Mul_M44( camPosWS, mtxWorldCamera );
 
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
@@ -110,14 +118,21 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS )
 
 			Vector3 norLS = dPdu.GetCross( dPdv ).GetNormalized();
 
-			Vector3	posWS = MultiplyV3M( posLS, g.mMtxLocalWorld );
-			Vector3	norWS = MultiplyV3M( norLS, mtxLocalWorldNorm ).GetNormalized();
+			//norLS = Vector3( 0, 0, 1 );
+
+			Vector3	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
+
+			Vector3	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
+
+			Vector3	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
+			//Vector3	norWS = V3__M44_Mul_V3W1( mtxLocalWorldNorm, norLS ).GetNormalized();
 
 			*pPointsWS++	= posWS;
 			//*pI++		= pos - camWorldPos;
-			*pI++		= (posWS - -camPosWS).GetNormalized();
-			*pN++		= norWS;
-			*pNg++		= norWS;
+			//*pI++		= (posCS - -camPosCS).GetNormalized();
+			*pI++		= (posCS - -camPosCS).GetNormalized();
+			*pN++		= norCS;
+			*pNg++		= norCS;
 			*pOs++		= mpAttribs->mOpacity;
 			*pCs++		= mpAttribs->mColor;
 

@@ -138,6 +138,7 @@ inline Matrix44 Matrix44::GetAs33() const
 //==================================================================
 inline Matrix44 Matrix44::GetOrthonormal() const
 {
+	// TODO: verify that this actually works !!
 	Matrix44	out( true );
 
 	Vector3	v0 = GetV3(0);
@@ -256,27 +257,7 @@ inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 }
 
 //==================================================================
-inline Vector4 MultiplyV3W1M( const Vector3 &v, const Matrix44 &a )
-{
-	float	x = v.x, y = v.y, z = v.z;
-
-	return Vector4(
-#ifdef DMATRIX44_ROWMTX_MODE
-		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
-		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
-		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3],
-		a.u.m44[3][0] * x + a.u.m44[3][1] * y + a.u.m44[3][2] * z + a.u.m44[3][3]
-#else
-		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
-		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
-		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2],
-		a.u.m44[0][3] * x + a.u.m44[1][3] * y + a.u.m44[2][3] * z + a.u.m44[3][3]
-#endif
-	);
-}
-
-//==================================================================
-inline Vector4 MultiplyMV3W1( const Matrix44 &a, const Vector3 &v )
+inline Vector4 V4__M44_Mul_V3W1( const Matrix44 &a, const Vector3 &v )
 {
 	float	x = v.x, y = v.y, z = v.z;
 
@@ -296,7 +277,45 @@ inline Vector4 MultiplyMV3W1( const Matrix44 &a, const Vector3 &v )
 }
 
 //==================================================================
-inline Vector3 MultiplyV3M( const Vector3 &v, const Matrix44 &a )
+inline Vector3 V3__M44_Mul_V3W1( const Matrix44 &a, const Vector3 &v )
+{
+	float	x = v.x, y = v.y, z = v.z;
+
+	return Vector3(
+#ifdef DMATRIX44_ROWMTX_MODE
+		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
+		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
+		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2]
+#else
+		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
+		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
+		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3]
+#endif
+	);
+}
+
+//==================================================================
+inline Vector4 V4__V3W1_Mul_M44( const Vector3 &v, const Matrix44 &a )
+{
+	float	x = v.x, y = v.y, z = v.z;
+
+	return Vector4(
+#ifdef DMATRIX44_ROWMTX_MODE
+		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
+		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
+		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3],
+		a.u.m44[3][0] * x + a.u.m44[3][1] * y + a.u.m44[3][2] * z + a.u.m44[3][3]
+#else
+		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
+		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
+		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2],
+		a.u.m44[0][3] * x + a.u.m44[1][3] * y + a.u.m44[2][3] * z + a.u.m44[3][3]
+#endif
+	);
+}
+
+//==================================================================
+inline Vector3 V3__V3W1_Mul_M44( const Vector3 &v, const Matrix44 &a )
 {
 	float	x = v.x, y = v.y, z = v.z;
 

@@ -11,10 +11,13 @@
 
 	Nf		temporary varying normal
 
+	Koe		constant uniform normal 2 2 2
+
 .code
 	normalize	$v0		N
-	faceforward	$v0	$v0	I
-	movvv		Ci	$v0
+	;faceforward	$v0	$v0	I
+	;mulvv		$v0	$v0	Koe
+	;movvv		Ci	$v0
 	;mulvv		Ci	I	$v0
 	;movvv		Ci	I 
 	;faceforward	Nf	$v0	I

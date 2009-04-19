@@ -31,19 +31,23 @@ class ShaderAsmParser
 		CODE,
 	};
 	
-	SlShader	*mpShader;
+	SlShader		*mpShader;
+	DUT::MemFile	*mpFile;
+	const char		*mpName;
 	
 public:
 	//==================================================================
-	ShaderAsmParser( DUT::MemFile &file, SlShader *pShader );
+	ShaderAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName );
 
 private:
-	bool doParse( DUT::MemFile &file );
-	bool parseDataLine( char lineBuff[], int lineCnt );
+	void doParse( DUT::MemFile &file );
+	void parseDataLine( char lineBuff[], int lineCnt );
 	const OpCodeDef	*findOpDef( const char *pOpName, u_int &opCodeIdx );
 	int findSymbol( const char *pName, bool ignoreCase ) const;
 	int findOrAddTempSymbol( const char *pName );
-	bool parseCodeLine( char lineBuff[], int lineCnt );
+	void parseCodeLine( char lineBuff[], int lineCnt );
+
+	void onError( const char *pFmt, ... );
 };
 
 //==================================================================

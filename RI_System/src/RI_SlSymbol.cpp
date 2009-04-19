@@ -18,7 +18,7 @@ namespace RI
 //==================================================================
 void *SlSymbol::AllocClone( size_t size )
 {
-	DASSERT( mpDefaultVal == NULL );
+	DASSTHROW( mpDefaultVal == NULL, ("Shouldn't have a defualt value !!!") );
 
 	void	*pOutData = NULL;
 
@@ -39,7 +39,7 @@ void *SlSymbol::AllocClone( size_t size )
 //==================================================================
 void SlSymbol::AllocData()
 {
-	DASSERT( mpDefaultVal == NULL );
+	DASSTHROW( mpDefaultVal == NULL, ("Shouldn't have a defualt value !!!") );
 
 	mpDefaultVal = AllocClone( mArraySize );
 }

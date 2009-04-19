@@ -70,7 +70,7 @@ public:
 
 	void cmdColor( const Color &color );
 	void cmdOpacity( const Color &color );
-	bool cmdLightSource( ParamList &params, const Transform &xform );
+	bool cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam );
 	void cmdSurface( ParamList &params );
 
 public:
@@ -91,7 +91,7 @@ public:
 	CPSymVoid	mpyTypeApproximation;	// GeometricApproximation()
 	float		mValueApproximation;
 	
-	CPSymVoid	mpyOrientation;		// Orientation()
+	bool		mOrientationFlipped;// Orientation()
 	int			mSides;				// Sides()
 
 	CPSymBasis	mpyUBasis;			// Basis()

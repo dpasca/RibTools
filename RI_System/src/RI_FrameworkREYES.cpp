@@ -101,7 +101,7 @@ void FrameworkREYES::WorldEnd()
 
 			if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
 			{
-				pPrim->Dice( grid, camPosWS );
+				pPrim->Dice( grid, camPosWS, mpHider->mMtxWorldCamera );
 
 				// should check backface and trim
 				// grid.displace();

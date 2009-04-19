@@ -8,6 +8,7 @@
  */
 
 #include "stdafx.h"
+#include <stdarg.h>
 #include "DUtils.h"
 #include "RI_SlRunContext.h"
 #include "RI_SlShaderAsmParser.h"
@@ -51,13 +52,12 @@ static OpCodeDef	gsOpCodeDefs[] =
 //==================================================================
 /// ShaderAsmParser
 //==================================================================
-ShaderAsmParser::ShaderAsmParser( DUT::MemFile &file, SlShader *pShader ) :
-	mpShader(pShader)
+ShaderAsmParser::ShaderAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName ) :
+	mpFile(&file),
+	mpShader(pShader),
+	mpName(pName)
 {
-	if NOT( doParse( file ) )
-	{
-		DASSTHROW( 0, ("Error parsing shader") );
-	}
+	doParse( file );
 }
 
 //==================================================================
@@ -83,7 +83,7 @@ static void stripComments( char *pTxt )
 }
 
 //==================================================================
-bool ShaderAsmParser::doParse( DUT::MemFile &file )
+void ShaderAsmParser::doParse( DUT::MemFile &file )
 {
 	char		lineBuff[1024];
 	Section		curSection = CODE;
@@ -91,41 +91,43 @@ bool ShaderAsmParser::doParse( DUT::MemFile &file )
 	
 	while ( file.ReadTextLine( lineBuff, sizeof(lineBuff) ) )
 	{
-		stripComments( lineBuff );
+		char	lineWork[1024];
+
+		strcpy_s( lineWork, lineBuff );
+
+		stripComments( lineWork );
 	
-		DUT::StrStripBeginEndWhite( lineBuff );
-		
-		if ( 0 == strcasecmp( lineBuff, ".data" ) )
-			curSection = DATA;
-		else
-		if ( 0 == strcasecmp( lineBuff, ".code" ) )
-			curSection = CODE;
-		else
-		if ( curSection == DATA )
+		DUT::StrStripBeginEndWhite( lineWork );
+
+		try 
 		{
-			if NOT( parseDataLine( lineBuff, lineCnt ) )
+			if ( 0 == strcasecmp( lineWork, ".data" ) )
+				curSection = DATA;
+			else
+			if ( 0 == strcasecmp( lineWork, ".code" ) )
+				curSection = CODE;
+			else
+			if ( curSection == DATA )
 			{
-				printf( "On line (%i)\n", lineCnt );
-				return false;
+				parseDataLine( lineWork, lineCnt );
+			}
+			else
+			{
+				parseCodeLine( lineWork, lineCnt );
 			}
 		}
-		else
+		catch ( ... )
 		{
-			if NOT( parseCodeLine( lineBuff, lineCnt ) )
-			{
-				printf( "On line (%i)\n", lineCnt );
-				return false;
-			}
+			printf( "For shader '%s' at line %i\n%i) %s", mpName, lineCnt+1, lineCnt+1, lineBuff );
+			throw;
 		}
 
 		++lineCnt;
 	}
-	
-	return true;
 }
 
 //==================================================================
-bool ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
+void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 {
 	//printf( "DATA: %s\n", lineBuff );
 	
@@ -138,14 +140,13 @@ bool ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	symbol.Reset();
 
 	if NOT( pTok = strtok_r( lineBuff, " \t", &pTokCtx ) )
-		return true;
+		return;
 
 	symbol.mName = pTok;
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
-		printf( "ERROR: Expecting storage definition\n" );
-		return false;
+		onError( "ERROR: Expecting storage definition" );
 	}
 		
 	if ( 0 == strcmp( pTok, "constant"  ) ) symbol.mStorage = SlSymbol::CONSTANT ; else
@@ -153,27 +154,28 @@ bool ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	if ( 0 == strcmp( pTok, "temporary" ) ) symbol.mStorage = SlSymbol::TEMPORARY; else
 	if ( 0 == strcmp( pTok, "global"	) ) symbol.mStorage = SlSymbol::GLOBAL   ; else
 	{
-		printf( "ERROR: Invalid storage definition: '%s'\n", pTok );
-		return false;
+		onError( "ERROR: Invalid storage definition: '%s'", pTok );
 	}
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
-		printf( "ERROR: Expecting variability definition\n" );
-		return false;
+		onError( "ERROR: Expecting variability definition" );
 	}
 
 	if ( 0 == strcmp( pTok, "varying"	) ) symbol.mIsVarying = true ; else
 	if ( 0 == strcmp( pTok, "uniform"	) ) symbol.mIsVarying = false; else
 	{
-		printf( "ERROR: Invalid variability definition: '%s'\n", pTok );
-		return false;
+		onError( "ERROR: Invalid variability definition: '%s'", pTok );
 	}
+
+	if NOT( symbol.mIsVarying )
+		if ( symbol.mStorage == SlSymbol::TEMPORARY )
+			onError( "Use 'temporary' only for varying values !" );
+
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
-		printf( "ERROR: Expecting type definition\n" );
-		return false;
+		onError( "ERROR: Expecting type definition" );
 	}
 
 	if ( 0 == strcmp( pTok, "float"  ) ) symbol.mType = SlSymbol::FLOAT ; else
@@ -184,59 +186,74 @@ bool ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	if ( 0 == strcmp( pTok, "normal" ) ) symbol.mType = SlSymbol::NORMAL; else
 	if ( 0 == strcmp( pTok, "matrix" ) ) symbol.mType = SlSymbol::MATRIX; else
 	{
-		printf( "ERROR: Invalid type definition: '%s'\n", pTok );
-		return false;
+		onError( "ERROR: Invalid type definition: '%s'", pTok );
 	}
+
+	int	defParamCnt = 0;
 
 	const char *pDefaultValueStr = pTok + strlen(pTok) + 1;
 	if ( pDefaultValueStr < pLineEnd )
 	{
+		if ( symbol.mIsVarying )
+			onError( "No default values possible for varying variables !" );
+
 		switch ( symbol.mType )
 		{
 		case SlSymbol::FLOAT :
 						symbol.mpDefaultVal = new float;
-						sscanf( pDefaultValueStr, "%f", symbol.mpDefaultVal );
+						defParamCnt = sscanf( pDefaultValueStr, "%f", symbol.mpDefaultVal );
+
+						if ( defParamCnt != 1 )
+							onError( "Got %i values, but %i are required !", defParamCnt, 1 );
 						break;
 
 		case SlSymbol::POINT :
 						symbol.mpDefaultVal = new Point3();
-						sscanf(
+						defParamCnt = sscanf(
 							pDefaultValueStr,
 							"%f %f %f",
 							&((Point3 *)symbol.mpDefaultVal)->x,
 							&((Point3 *)symbol.mpDefaultVal)->y,
 							&((Point3 *)symbol.mpDefaultVal)->z
 							);
+
+						if ( defParamCnt != 3 )
+							onError( "Got %i values, but %i are required !", defParamCnt, 3 );
 						break;
 
 		case SlSymbol::COLOR :
 						symbol.mpDefaultVal = new Color();
-						sscanf(
+						defParamCnt = sscanf(
 							pDefaultValueStr,
 							"%f %f %f",
 							&((Color *)symbol.mpDefaultVal)->x,
 							&((Color *)symbol.mpDefaultVal)->y,
 							&((Color *)symbol.mpDefaultVal)->z
 							);
+
+						if ( defParamCnt != 3 )
+							onError( "Got %i values, but %i are required !", defParamCnt, 3 );
 						break;
 		
 		case SlSymbol::VECTOR:
 		case SlSymbol::NORMAL:
 						symbol.mpDefaultVal = new Vector3();
-						sscanf(
+						defParamCnt = sscanf(
 							pDefaultValueStr,
 							"%f %f %f",
 							&((Vector3 *)symbol.mpDefaultVal)->x,
 							&((Vector3 *)symbol.mpDefaultVal)->y,
 							&((Vector3 *)symbol.mpDefaultVal)->z
 							);
+
+						if ( defParamCnt != 3 )
+							onError( "Got %i values, but %i are required !", defParamCnt, 3 );
 						break;
 		
 		case SlSymbol::STRING:
 		case SlSymbol::MATRIX:
 			{
-				printf( "Currently unsupported default value (^^;> '%s'\n", pTok );
-				return false;
+				onError( "Currently unsupported default value (^^;> '%s'", pTok );
 			}
 		}
 	
@@ -244,8 +261,6 @@ bool ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	}
 		
 	mpShader->mSymbols.push_back( symbol );
-
-	return true;
 }
 
 //==================================================================
@@ -354,7 +369,7 @@ static bool isTempSymbol( const char *pTok )
 }
 
 //==================================================================
-bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
+void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 {
 	//printf( "CODE: %s\n", lineBuff );
 	
@@ -362,7 +377,7 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 	char *pTok;
 
 	if NOT( pTok = strtok_r( lineBuff, " \t", &pTokCtx ) )
-		return true;
+		return;
 		
 	DUT::StrStripBeginEndWhite( pTok );
 	
@@ -371,8 +386,7 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 	
 	if NOT( pOpDef )
 	{
-		printf( "ERROR: Unknown opcode '%s' !\n", pTok );
-		return false;
+		onError( "ERROR: Unknown opcode '%s' !\n", pTok );
 	}
 
 	SlCPUWord		instruction;
@@ -388,12 +402,10 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 		
 		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 		{
-			printf( "ERROR: missing operand #%i, "
+			onError( "ERROR: missing operand #%i, "
 					"expecting %i operands\n",
 					i+1,
 					pOpDef->OperCnt );
-
-			return false;
 		}
 
 		DUT::StrStripBeginEndWhite( pTok );
@@ -410,8 +422,7 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 		if ( symbolIdx == -1 )
 		{
-			printf( "ERROR: Symbol '%s' unknown !\n", pTok );
-			return false;
+			onError( "ERROR: Symbol '%s' unknown !\n", pTok );
 		}
 
 		word.mSymbol.mTableOffset = (u_int)symbolIdx;
@@ -428,16 +439,29 @@ bool ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 				
 			if NOT( success )
 			{
-				printf( "ERROR: Invalid operand type for '%s' !\n", pTok );
-				return false;
+				onError( "ERROR: Invalid operand type for '%s' !\n", pTok );
 			}
 		}
 	}
 
 	// write again
 	mpShader->mCode[instrIdx] = instruction;
+}
 
-	return true;
+//==================================================================
+void ShaderAsmParser::onError( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	puts( buff );
+
+	throw std::runtime_error( buff );
 }
 
 //==================================================================

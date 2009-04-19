@@ -40,7 +40,8 @@ public:
 	{
 		struct 
 		{
-			Vector3	mDir;
+			Vector3	mDirWS;
+			Vector3	mDirCS;
 		} mDistant;
 
 		struct  
@@ -53,7 +54,7 @@ public:
 
 	LightSource();
 
-	void UpdateRend( const Transform &xform );
+	void UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam );
 };
 
 
