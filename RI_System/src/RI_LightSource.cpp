@@ -15,7 +15,7 @@ namespace RI
 {
 
 //==================================================================
-LightSource::LightSource()
+LightSourceT::LightSourceT()
 {
 	mIntesity	= 1;
 	mColor		= Color( 1 );
@@ -24,7 +24,7 @@ LightSource::LightSource()
 }
 
 //==================================================================
-void LightSource::UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam )
+void LightSourceT::UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam )
 {
 	if ( mType == TYPE_DISTANT )
 	{

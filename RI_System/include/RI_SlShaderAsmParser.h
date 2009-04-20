@@ -46,6 +46,7 @@ private:
 	int findSymbol( const char *pName, bool ignoreCase ) const;
 	int findOrAddTempSymbol( const char *pName );
 	void parseCodeLine( char lineBuff[], int lineCnt );
+	void getVector( const char *pStr, float out_val[], int n );
 
 	void onError( const char *pFmt, ... );
 };

@@ -127,6 +127,27 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 }
 
 //==================================================================
+void ShaderAsmParser::getVector( const char *pStr, float out_val[], int n )
+{
+	int	gotN;
+	
+	if ( n == 1 ) gotN = sscanf( pStr, "%f"			, out_val+0, out_val+1, out_val+2 ); else
+	if ( n == 2 ) gotN = sscanf( pStr, "%f %f"		, out_val+0, out_val+1, out_val+2 ); else
+	if ( n == 3 ) gotN = sscanf( pStr, "%f %f %f"	, out_val+0, out_val+1, out_val+2 ); else
+	if ( n == 4 ) gotN = sscanf( pStr, "%f %f %f %f", out_val+0, out_val+1, out_val+2 ); else
+	{
+		onError( "getVector() can't handle so many dimensions (^^;) !" );
+	}
+
+	if ( gotN != n && gotN != 1 )
+		onError( "Got %i values, but %i (or 1) are required !", gotN, n );
+
+	if ( gotN == 1 )
+		for (int i=1; i < n; ++i)
+			out_val[i] = out_val[0];
+}
+
+//==================================================================
 void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 {
 	//printf( "DATA: %s\n", lineBuff );
@@ -201,53 +222,23 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 		{
 		case SlSymbol::FLOAT :
 						symbol.mpDefaultVal = new float;
-						defParamCnt = sscanf( pDefaultValueStr, "%f", symbol.mpDefaultVal );
-
-						if ( defParamCnt != 1 )
-							onError( "Got %i values, but %i are required !", defParamCnt, 1 );
+						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 1 );
 						break;
 
 		case SlSymbol::POINT :
 						symbol.mpDefaultVal = new Point3();
-						defParamCnt = sscanf(
-							pDefaultValueStr,
-							"%f %f %f",
-							&((Point3 *)symbol.mpDefaultVal)->x,
-							&((Point3 *)symbol.mpDefaultVal)->y,
-							&((Point3 *)symbol.mpDefaultVal)->z
-							);
-
-						if ( defParamCnt != 3 )
-							onError( "Got %i values, but %i are required !", defParamCnt, 3 );
+						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 3 );
 						break;
 
 		case SlSymbol::COLOR :
 						symbol.mpDefaultVal = new Color();
-						defParamCnt = sscanf(
-							pDefaultValueStr,
-							"%f %f %f",
-							&((Color *)symbol.mpDefaultVal)->x,
-							&((Color *)symbol.mpDefaultVal)->y,
-							&((Color *)symbol.mpDefaultVal)->z
-							);
-
-						if ( defParamCnt != 3 )
-							onError( "Got %i values, but %i are required !", defParamCnt, 3 );
+						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 3 );
 						break;
 		
 		case SlSymbol::VECTOR:
 		case SlSymbol::NORMAL:
 						symbol.mpDefaultVal = new Vector3();
-						defParamCnt = sscanf(
-							pDefaultValueStr,
-							"%f %f %f",
-							&((Vector3 *)symbol.mpDefaultVal)->x,
-							&((Vector3 *)symbol.mpDefaultVal)->y,
-							&((Vector3 *)symbol.mpDefaultVal)->z
-							);
-
-						if ( defParamCnt != 3 )
-							onError( "Got %i values, but %i are required !", defParamCnt, 3 );
+						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 3 );
 						break;
 		
 		case SlSymbol::STRING:

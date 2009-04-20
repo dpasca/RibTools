@@ -117,7 +117,7 @@ State::State( FrameworkBase *pFramework, const char *pDefaultShadersDir ) :
 	makeDefaultShaders( pDefaultShadersDir );
 
 	mOptionsStack.top().Init( &mStatics, &mOptionsRevTrack );
-	mAttributesStack.top().Init( &mStatics, &mResManager, &mAttribsRevTrack );
+	mAttributesStack.top().Init( this, &mStatics, &mResManager, &mAttribsRevTrack );
 	mTransformOpenStack.top().Init( &mTransOpenRevTrack );
 	mTransformCloseStack.top().Init( &mTransCloseRevTrack );
 	
@@ -529,6 +529,23 @@ void State::Translate( float tx, float ty, float tz )
 		return;
 
 	mTransformOpenStack.top().ConcatTransform( Matrix44::Translate( tx, ty, tz ) );
+}
+
+//==================================================================
+size_t State::AddLightSource( LightSourceT *pLSource )
+{
+	for (size_t i=0; i < mpLightSources.size(); ++i)
+	{
+		if ( pLSource->mID == mpLightSources[i]->mID )
+		{
+			mpLightSources[i] = pLSource;
+			return i;
+		}
+	}
+
+	// add if didn't replace any existing light
+	mpLightSources.push_back( pLSource );
+	return mpLightSources.size() - 1;
 }
 
 //==================================================================

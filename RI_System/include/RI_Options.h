@@ -31,7 +31,7 @@ public:
 	void Init( SymbolList *pStatics, RevisionTracker *pRevision );
 
 	// avoid initialization of default values and just copy..
-	Options( const Options &options ) {	*this = options; }
+	//Options( const Options &options ) {	*this = options; }
 
 	~Options();
 

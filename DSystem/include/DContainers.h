@@ -51,11 +51,13 @@ public:
 		freeAll();
 	}
 	
-	void operator=(const DVec& rhs)
+	DVec &operator=(const DVec& rhs)
 	{
 		clear();
 		freeAll();
 		copyFrom( rhs );
+
+		return *this;
 	}
 
 private:
@@ -151,7 +153,7 @@ public:
 	
 	void push_back( const T &val )
 	{
-		T	tmp = val;
+		T	tmp = val;	// TODO: why needs this ?!
 		*grow() = tmp;
 	}
 
@@ -159,6 +161,20 @@ public:
 	{
 		DASSERT( mSize >= 1 );
 		resize( mSize - 1 );
+	}
+
+	void find_or_push_back( const T &val )
+	{
+		for (size_t i=0; i < mSize; ++i)
+		{
+			if ( mpData[i] == val )
+			{
+				return;
+			}
+		}
+
+		T	tmp = val;	// TODO: why needs this ?!
+		*grow() = tmp;
 	}
 
 	const	T &back() const { DASSERT( mSize >= 1 ); return mpData[mSize-1]; }

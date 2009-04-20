@@ -12,6 +12,7 @@
 #include "RI_SlRunContext.h"
 #include "RI_SlShaderAsmParser.h"
 #include "RI_Attributes.h"
+#include "RI_State.h"
 #include "DUtils.h"
 
 //==================================================================
@@ -337,15 +338,19 @@ static void Inst_Faceforward( SlRunContext &ctx )
 //==================================================================
 static inline void illuminate(
 				Color &accCol,
-				const DVec<LightSource> &lights,
+				const DVec<LightSourceT *>	&pLights,
+				const DVec<U16>				&activeLights,
 				const Point3 &pos,
 				const Vector3 &Nn,
 				float illConeCosA )
 {
-	for (size_t li=0; li < lights.size(); ++li)
+	for (size_t i=0; i < activeLights.size(); ++i)
 	{
-		const LightSource	&light = lights[li];
-		if ( light.mType == LightSource::TYPE_DISTANT )
+		size_t		li	= activeLights[i];
+
+		const LightSourceT	&light = *pLights[ li ];
+
+		if ( light.mType == LightSourceT::TYPE_DISTANT )
 		{
 			float	norLightCosA = Nn.GetDot( light.mRend.mDistant.mDirCS );
 			//if ( norLightCosA < illConeCosA )
@@ -389,7 +394,8 @@ static void Inst_Diffuse( SlRunContext &ctx )
 	const SlSymbol*	pPSymbol = ctx.mpSymbols->LookupVariable( "P", SlSymbol::POINT );
 	const Point3*	pP = (const Point3 *)pPSymbol->GetData();
 
-	const DVec<LightSource>	&lights = ctx.mpAttribs->mLights;
+	const DVec<LightSourceT *>	&pLights	= ctx.mpAttribs->mpState->GetLightSources();
+	const DVec<U16>				&actLights	= ctx.mpAttribs->mActiveLights;
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -408,7 +414,7 @@ static void Inst_Diffuse( SlRunContext &ctx )
 
 				Color	col( 0, 0, 0 );
 
-				illuminate( col, lights, *pP, Nn, illConeCosA );
+				illuminate( col, pLights, actLights, *pP, Nn, illConeCosA );
 
 				lhs[i] = col;
 			}
@@ -425,7 +431,7 @@ static void Inst_Diffuse( SlRunContext &ctx )
 		Vector3	Nn = op1[0].GetNormalized();
 
 		Color	col( 0, 0, 0 );
-		illuminate( col, lights, *pP, Nn, illConeCosA );
+		illuminate( col, pLights, actLights, *pP, Nn, illConeCosA );
 
 		for (u_int i=0; i < ctx.mSIMDCount; ++i)
 			if ( ctx.IsProcessorActive( i ) )
@@ -443,12 +449,16 @@ static void Inst_Ambient( SlRunContext &ctx )
 
 	Color	ambCol( 0, 0, 0 );
 
-	const DVec<LightSource>	&lights = ctx.mpAttribs->mLights;
-	for (size_t i=0; i < lights.size(); ++i)
-	{
-		const LightSource	&light = lights[i];
+	const DVec<LightSourceT *>	&pLights	= ctx.mpAttribs->mpState->GetLightSources();
+	const DVec<U16>				&actLights	= ctx.mpAttribs->mActiveLights;
 
-		if ( light.mType == LightSource::TYPE_AMBIENT )
+	for (size_t i=0; i < actLights.size(); ++i)
+	{
+		size_t		li	= actLights[i];
+
+		const LightSourceT	&light = *pLights[ li ];
+
+		if ( light.mType == LightSourceT::TYPE_AMBIENT )
 			ambCol += light.mColor * light.mIntesity;
 	}
 

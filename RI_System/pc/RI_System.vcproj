@@ -409,11 +409,19 @@
 				Name="Shaders"
 				>
 				<File
+					RelativePath="..\..\Resources\Shaders\ambientlight.rrasm"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Resources\Shaders\constant.rrasm"
 					>
 				</File>
 				<File
 					RelativePath="..\..\Resources\Shaders\dbg_normal_col.rrasm"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Resources\Shaders\distantlight.rrasm"
 					>
 				</File>
 				<File

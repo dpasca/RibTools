@@ -17,6 +17,7 @@
 #include "RI_Transform.h"
 #include "RI_FrameworkBase.h"
 #include "RI_Primitive.h"
+#include "RI_LightSource.h"
 
 //==================================================================
 namespace RI
@@ -52,23 +53,25 @@ Transform
 //==================================================================
 class State
 {
-	SymbolList						mStatics;
-	Stack<Mode>						mModeStack;
+	SymbolList				mStatics;
+	Stack<Mode>				mModeStack;
 	CopyStack<Options	>	mOptionsStack;
 	CopyStack<Attributes>	mAttributesStack;
 	CopyStack<Transform	>	mTransformOpenStack;
 	CopyStack<Transform	>	mTransformCloseStack;
 	
-	RevisionTracker					mOptionsRevTrack;
-	RevisionTracker					mAttribsRevTrack;
-	RevisionTracker					mTransOpenRevTrack;
-	RevisionTracker					mTransCloseRevTrack;
+	RevisionTracker			mOptionsRevTrack;
+	RevisionTracker			mAttribsRevTrack;
+	RevisionTracker			mTransOpenRevTrack;
+	RevisionTracker			mTransCloseRevTrack;
 
-	Matrix44						mMtxWorldCamera;
+	DVec<LightSourceT *>	mpLightSources;
 
-	FrameworkBase					*mpFramework;
+	Matrix44				mMtxWorldCamera;
+
+	FrameworkBase			*mpFramework;
 	
-	ResourceManager					mResManager;
+	ResourceManager			mResManager;
 
 	enum OpType
 	{
@@ -158,6 +161,9 @@ public:
 
 	void ErrHandler( Error errCode );
 	void ErrHandler( Error errCode, const char *pFmt, ... );
+
+	size_t AddLightSource( LightSourceT *pLSource );
+	const DVec<LightSourceT *>	&GetLightSources()	{	return mpLightSources;	}
 
 private:
 	bool checkPopMode( Mode expectedMode );

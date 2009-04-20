@@ -8,6 +8,7 @@
  */
 
 #include "stdafx.h"
+#include "RI_State.h"
 #include "RI_Attributes.h"
 
 //==================================================================
@@ -31,7 +32,7 @@ Attributes::Attributes( const Attributes &attributes )
 }
 
 //==================================================================
-const Attributes& Attributes::operator=(const Attributes& rhs)
+Attributes& Attributes::operator=(const Attributes& rhs)
 {
 	DSAFE_DELETE( mpCustomUBasis );
 	DSAFE_DELETE( mpCustomVBasis );
@@ -44,6 +45,7 @@ const Attributes& Attributes::operator=(const Attributes& rhs)
 //==================================================================
 void Attributes::copyFrom(const Attributes& rhs)
 {
+	mpState				= rhs.mpState;
 	mpStatics			= rhs.mpStatics;
 	mpResManager		= rhs.mpResManager;
 	
@@ -81,7 +83,7 @@ void Attributes::copyFrom(const Attributes& rhs)
 	if ( mShaderInstance.mpShader )
 		mShaderInstance.mpShader->AddRef();
 
-	mLights				= rhs.mLights;
+	mActiveLights		= rhs.mActiveLights;
 }
 
 //==================================================================
@@ -98,8 +100,13 @@ Attributes::~Attributes()
 }
 
 //==================================================================
-void Attributes::Init( SymbolList *pStatics, ResourceManager *pResManager, RevisionTracker *pRevision )
+void Attributes::Init(
+				  State				*pState,
+				  SymbolList		*pStatics,
+				  ResourceManager	*pResManager,
+				  RevisionTracker	*pRevision )
 {
+	mpState		= pState;
 	mpStatics	= pStatics;
 	mpResManager= pResManager;
 	mpRevision	= pRevision;
@@ -243,8 +250,6 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 {
 	const char	*pLightTypeName = "";
 
-	LightSource	&light = *mLights.grow();
-
 	// get type and ID
 	if ( params.size() < 2 || !params[0].IsString() || !params[1].IsIntVal() )
 	{
@@ -252,17 +257,19 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		return false;
 	}
 
+	LightSourceT	*pLight = new LightSourceT();
+
 	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
 	{
-		light.mType = LightSource::TYPE_AMBIENT;
+		pLight->mType = LightSourceT::TYPE_AMBIENT;
 	}
 	else
 	if ( 0 == strcasecmp( "distantlight", params[0].PChar() ) )
 	{
-		light.mType = LightSource::TYPE_DISTANT;
+		pLight->mType = LightSourceT::TYPE_DISTANT;
 	}
 
-	light.mID = params[1].Int();
+	pLight->mID = params[1].Int();
 
 	for (size_t i=2; i < params.size(); ++i)
 	{
@@ -283,40 +290,32 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 
 		if ( 0 == strcasecmp( pName, "from" ) )
 		{
-			light.mLocFromPos = params[i+1].PFlt( 3 );
+			pLight->mLocFromPos = params[i+1].PFlt( 3 );
 		}
 		else
 		if ( 0 == strcasecmp( pName, "to" ) )
 		{
-			light.mLocToPos = params[i+1].PFlt( 3 );
+			pLight->mLocToPos = params[i+1].PFlt( 3 );
 		}
 		else
 		if ( 0 == strcasecmp( pName, "intensity" ) )
 		{
-			light.mIntesity = params[i+1].Flt();
+			pLight->mIntesity = params[i+1].Flt();
 		}
 		else
 		if ( 0 == strcasecmp( pName, "lightcolor" ) )
 		{
-			light.mColor = Color( params[i+1].PFlt( 3 ) );
+			pLight->mColor = Color( params[i+1].PFlt( 3 ) );
 		}
 
 		if NOT( hasNextParam )
 			i += 1;
 	}
 
-	light.UpdateRend( xform, mtxWorldCam );
+	pLight->UpdateRend( xform, mtxWorldCam );
 
-	// if we are overwriting a light, then erase the previous one !
-	// ..based on the ID
-	for (size_t i=0; i < mLights.size()-1; ++i)
-	{
-		if ( light.mID == mLights[i].mID )
-		{
-			mLights.erase( mLights.begin() + i );
-			break;
-		}
-	}
+	size_t listIdx = mpState->AddLightSource( pLight );
+	mActiveLights.find_or_push_back( listIdx );
 
 	mpRevision->BumpRevision();
 

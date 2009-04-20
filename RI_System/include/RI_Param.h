@@ -47,8 +47,7 @@ struct Param
 	~Param() {}
 
 	/*
-	
-	const Param &operator=( const Param &rhs )
+	Param &operator=( const Param &rhs )
 	{
 		type = rhs.type;
 		switch ( type )

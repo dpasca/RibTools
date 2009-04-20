@@ -1,0 +1,25 @@
+;	light
+;	distantlight(
+;		float intensity = 1;
+;		color lightcolor = 1;
+;		point from = point "shader" (0,0,0);
+;		point to   = point "shader" (0,0,1);
+;	{
+;		solar(to-from, 0.0)
+;			Cl = intensity * lightcolor;
+;	}
+	
+.data
+	Cl			parameter varying color
+
+	intensity	parameter uniform float 1
+	lightcolor	parameter uniform color 1
+
+	from		parameter uniform point 0 0 0 "shader"
+	to			parameter uniform point 0 0 1 "shader"
+
+
+.code
+	; temporary
+
+	movvv		Cl lightcolor

@@ -22,20 +22,66 @@ namespace RI
 {
 
 //==================================================================
-/// Attributess
+class State;
+
+//==================================================================
+/// Attributes
 //==================================================================
 class Attributes
 {
+public:
+	State			*mpState;
+
+private:
 	SymbolList		*mpStatics;
 	ResourceManager *mpResManager;
+
+public:
+	RevisionTracker	*mpRevision;
+
+public:
+	//==================================================================
+	SymbolList			mSymbols;
+					
+	Bound				mBound;				// DoBound()
+	Bound				mDetail;			// Detail()
+				
+	float				mMinVisible;		// DetailRange()
+	float				mLowerTransition;	//
+	float				mUpperTransition;	//
+	float				mMaxVisible;		//
+					
+	CPSymVoid			mpyTypeApproximation;	// GeometricApproximation()
+	float				mValueApproximation;
+					
+	bool				mOrientationFlipped;// Orientation()
+	int					mSides;				// Sides()
+
+	CPSymBasis			mpyUBasis;			// Basis()
+	CPSymBasis			mpyVBasis;
+	const RtBasis		*mpCustomUBasis;
+	const RtBasis		*mpCustomVBasis;
+	
+	int					mUSteps;
+	int					mVSteps;
+
+	Color				mColor;
+	Color				mOpacity;
+	SlShaderInstance	mShaderInstance;
+
+	DVec<U16>			mActiveLights;
 
 public:
 	Attributes();
 	Attributes( const Attributes &attributes );
 
-	const Attributes& operator=(const Attributes& rhs);
+	Attributes& operator=(const Attributes& rhs);
 
-	void Init( SymbolList *pStatics, ResourceManager *pResManager, RevisionTracker *pRevision );
+	void Init(
+			State			*pState,
+			SymbolList		*pStatics,
+			ResourceManager	*pResManager,
+			RevisionTracker	*pRevision );
 
 	~Attributes();
 
@@ -43,14 +89,6 @@ private:
 	void copyFrom(const Attributes& rhs);
 
 public:
-/*
-	//==================================================================
-	Attributes &operator=(const Attributes &attributes)
-	{
-		*this = attributes;
-	}
-*/
-
 	void cmdBound( const Bound &bound );
 	void cmdDetail( const Bound &detail );
 	void cmdDetailRange(float	minVisible,
@@ -72,41 +110,6 @@ public:
 	void cmdOpacity( const Color &color );
 	bool cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam );
 	void cmdSurface( ParamList &params );
-
-public:
-	RevisionTracker	*mpRevision;
-
-public:
-	//==================================================================
-	SymbolList	mSymbols;
-
-	Bound		mBound;				// DoBound()
-	Bound		mDetail;			// Detail()
-
-	float		mMinVisible;		// DetailRange()
-	float		mLowerTransition;	//
-	float		mUpperTransition;	//
-	float		mMaxVisible;		//
-	
-	CPSymVoid	mpyTypeApproximation;	// GeometricApproximation()
-	float		mValueApproximation;
-	
-	bool		mOrientationFlipped;// Orientation()
-	int			mSides;				// Sides()
-
-	CPSymBasis	mpyUBasis;			// Basis()
-	CPSymBasis	mpyVBasis;
-	const RtBasis *mpCustomUBasis;
-	const RtBasis *mpCustomVBasis;
-	
-	int			mUSteps;
-	int			mVSteps;
-	
-	Color				mColor;
-	Color				mOpacity;
-	SlShaderInstance	mShaderInstance;
-
-	DVec<LightSource>	mLights;
 };
 
 //==================================================================

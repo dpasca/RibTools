@@ -65,6 +65,7 @@ void Options::Init( SymbolList *pStatics, RevisionTracker *pRevision )
 Options::~Options()
 {
 }
+
 /*
 //==================================================================
 Options &Options::operator=(const Options &options)
@@ -72,6 +73,7 @@ Options &Options::operator=(const Options &options)
 	*this = options;
 }
 */
+
 //==================================================================
 void Options::cmdFormat( int xRes, int yRes, float pixelRatio )
 {

@@ -1,10 +1,13 @@
 //==================================================================
-/// RI_LightSource
+/// RI_LightSource.h
 ///
 /// Created by Davide Pasca - 2009/3/25
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
+
+#ifndef RI_LIGHTSOURCE_H
+#define RI_LIGHTSOURCE_H
 
 #include "RI_Base.h"
 
@@ -19,7 +22,7 @@ class Transform;
 //==================================================================
 /// LightSource
 //==================================================================
-class LightSource
+class LightSourceT
 {
 public:
 	enum Type
@@ -52,11 +55,12 @@ public:
 
 	} mRend;
 
-	LightSource();
+	LightSourceT();
 
 	void UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam );
 };
 
-
 //==================================================================
 }
+
+#endif
