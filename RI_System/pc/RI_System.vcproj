@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\RI_MicroPolygon.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_MicroPolygonGrid.cpp"
 				>
 			</File>

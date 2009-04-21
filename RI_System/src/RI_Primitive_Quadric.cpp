@@ -295,8 +295,8 @@ void Cylinder::MakeBound( Bound &out_bound )
 	float	tuMax = mThetamaxRad * mURange[1];
 	out_bound.Reset();
 	bounds2DSweepL( out_bound, mRadius, mRadius, tuMin, tuMax );
-	out_bound.mBox[0].z = mZMin + mVRange[0]*(mZMax - mZMin);
-	out_bound.mBox[1].z = mZMin + mVRange[1]*(mZMax - mZMin);
+	out_bound.mBox[0].z = DMix( mZMin, mZMax, mVRange[0] );
+	out_bound.mBox[1].z = DMix( mZMin, mZMax, mVRange[1] );
 }
 
 void Cone::MakeBound( Bound &out_bound )
