@@ -106,7 +106,8 @@ public:
 	
 	virtual Primitive	*Clone() const = 0;
 	
-	virtual void	MakeBound( Bound &out_bound ) = 0;
+	// make a 3D bound, return false if the bound cannot be made
+	virtual bool	MakeBound( Bound &out_bound ) const = 0;
 
 	virtual bool	IsSplitable() const			{ return true;	}
 	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
@@ -137,7 +138,7 @@ public:
 						return false;
 					}
 
-	virtual void	Dice( MicroPolygonGrid &g, const Point3 &camPosWS, const Matrix44 &mtxWorldCamera );
+	virtual void	Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera );
 
 	Vector2 CalcLocalUV( const Vector2 &gridUV )
 	{

@@ -39,7 +39,7 @@ public:
 
 		Cylinder *Clone() const {	return new Cylinder( *this ); }
 
-		void MakeBound( Bound &out_bound );
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 					float u,
@@ -70,7 +70,7 @@ public:
 
 		Cone *Clone() const {	return new Cone( *this ); }
 
-		void MakeBound( Bound &out_bound );
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 					float u,
@@ -103,7 +103,7 @@ public:
 
 		Sphere *Clone() const {	return new Sphere( *this ); }
 
-		void MakeBound( Bound &out_bound );
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 					float u,
@@ -134,7 +134,7 @@ public:
 
 		Hyperboloid *Clone() const { return new Hyperboloid( *this ); }
 
-		void MakeBound( Bound &out_bound );
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 					float u,
@@ -167,7 +167,7 @@ public:
 
 		Paraboloid *Clone() const {	return new Paraboloid( *this ); }
 
-		void MakeBound( Bound &out_bound );
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 					float u,
@@ -204,7 +204,7 @@ public:
 	
 		Torus *Clone() const {	return new Torus( *this ); }
 
-		void MakeBound( Bound &out_bound );
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 					float u,

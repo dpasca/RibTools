@@ -31,7 +31,7 @@ public:
 
 		PatchBilinear *Clone() const {	return new PatchBilinear( *this ); }
 
-		void MakeBound( Bound &out_bound );
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 					float u,
@@ -102,7 +102,7 @@ public:
 
 		PatchBicubic *Clone() const {	return new PatchBicubic( *this ); }
 
-		void MakeBound( Bound &out_bound );
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 					float u,
@@ -131,7 +131,7 @@ public:
 
 		PatchMesh *Clone() const {	DASSERT( 0 ); return NULL; }
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		bool MakeBound( Bound &out_bound ) const { out_bound.Reset(); return false; }
 		bool IsSplitable() const	{	return true; }
 		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 

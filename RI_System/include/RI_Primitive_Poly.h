@@ -29,7 +29,7 @@ public:
 
 		Polygon *Clone() const {	DASSERT( 0 ); return NULL; }
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		bool MakeBound( Bound &out_bound ) const { out_bound.Reset(); return false; }
 		bool IsSplitable() const	{	return true; }
 		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 
@@ -63,7 +63,7 @@ public:
 
 		PointsGeneralPolygons *Clone() const {	DASSERT( 0 ); return NULL; }
 
-		void MakeBound( Bound &out_bound ) { out_bound.Reset(); }
+		bool MakeBound( Bound &out_bound ) const { out_bound.Reset(); return false; }
 		bool IsSplitable() const	{	return true; }
 		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 

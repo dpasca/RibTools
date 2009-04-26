@@ -10,10 +10,26 @@
 #include "stdafx.h"
 #include "RI_Primitive.h"
 #include "RI_HiderREYES.h"
+#include "RI_Transform.h"
+
+static const u_int	BUCKET_SIZE = 128;
 
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+static void MakeCube( const Bound &b, Vector3 out_box[8] )
+{
+	out_box[0] = Vector3( b.mBox[0].x, b.mBox[0].y, b.mBox[0].z );
+	out_box[1] = Vector3( b.mBox[1].x, b.mBox[0].y, b.mBox[0].z );
+	out_box[2] = Vector3( b.mBox[0].x, b.mBox[1].y, b.mBox[0].z );
+	out_box[3] = Vector3( b.mBox[1].x, b.mBox[1].y, b.mBox[0].z );
+	out_box[4] = Vector3( b.mBox[0].x, b.mBox[0].y, b.mBox[1].z );
+	out_box[5] = Vector3( b.mBox[1].x, b.mBox[0].y, b.mBox[1].z );
+	out_box[6] = Vector3( b.mBox[0].x, b.mBox[1].y, b.mBox[1].z );
+	out_box[7] = Vector3( b.mBox[1].x, b.mBox[1].y, b.mBox[1].z );
+}
 
 //==================================================================
 /// HiderREYES
@@ -45,16 +61,80 @@ void HiderREYES::WorldBegin(
 	mZBuff.Setup( opt.mXRes, opt.mYRes );
 	mZBuff.Fill( FLT_MAX );
 
-	mpBuckets.push_back( new Bucket() );
+	for (int y=0; y < opt.mYRes; y += BUCKET_SIZE)
+	{
+		int	y2 = y + BUCKET_SIZE;
+		y2 = DMIN( y2, opt.mYRes );
+
+		for (int x=0; x < opt.mXRes; x += BUCKET_SIZE)
+		{
+			int	x2 = x + BUCKET_SIZE;
+			x2 = DMIN( x2, opt.mXRes );
+
+			if ( mDbg.mOnlyBucketAtX == -1 ||
+				 mDbg.mOnlyBucketAtX >= x &&
+				 mDbg.mOnlyBucketAtY >= y &&
+				 mDbg.mOnlyBucketAtX < x2 &&
+				 mDbg.mOnlyBucketAtY < y2 )
+			{
+				mpBuckets.push_back(
+						new Bucket( x, y, x2, y2 ) );
+			}
+		}
+	}
 }
 
 //==================================================================
-void HiderREYES::Insert(
-			Primitive			*pPrim,
-			const Attributes	&attr,
-			const Transform		&xform )
+void HiderREYES::Insert( Primitive *pPrim )
 {
-	mpBuckets[0]->mpPrims.push_back( pPrim );
+	Bound	bound;
+	if NOT( pPrim->MakeBound( bound ) )
+	{
+		// not boundable.. needs split !
+		mpBuckets[0]->mpPrims.push_back( pPrim );
+	}
+	else
+	{
+		const Matrix44 &mtxLocalWorld = pPrim->mpTransform->GetMatrix();
+
+		float bound2df[4];
+
+		if NOT( makeRasterBound( bound, mtxLocalWorld, bound2df ) )
+		{
+			// delete what we can't understand 8)
+			pPrim->MarkUnusable();
+			//DSAFE_DELETE( pPrim );
+			return;
+		}
+
+		int minX = (int)floorf( bound2df[0] );
+		int minY = (int)floorf( bound2df[1] );
+		int maxX =  (int)ceilf( bound2df[2] );
+		int maxY =  (int)ceilf( bound2df[3] );
+
+		if ( minX >= (int)mDestBuff.mWd ||
+			 minY >= (int)mDestBuff.mHe ||
+			 maxX <	0 ||
+			 maxY <	0 )
+		{
+			// completely outside
+			pPrim->MarkUnusable();
+			//DSAFE_DELETE( pPrim );
+			return;
+		}
+
+		int	clampedMinX = D::Clamp( minX, 0, (int)mDestBuff.mWd-1 );
+		int	clampedMinY = D::Clamp( minY, 0, (int)mDestBuff.mHe-1 );
+
+		for (size_t i=0; i < mpBuckets.size(); ++i)
+		{
+			if ( mpBuckets[i]->Contains( clampedMinX, clampedMinY ) )
+			{
+				mpBuckets[i]->mpPrims.push_back( pPrim );
+				break;
+			}
+		}
+	}
 }
 
 //==================================================================
@@ -65,12 +145,12 @@ void HiderREYES::InsertSplitted(
 {
 	// $$$ mark splitted stuff to never be used again !
 	DASSERT( srcPrim.IsUsable() );
-	
+
 	pSplitPrim->CopyStates( srcPrim );
-	
+
 	pSplitPrim->mSplitCnt += 1;
 
-	mpBuckets[0]->mpPrims.push_back( pSplitPrim );
+	Insert( pSplitPrim );
 }
 
 //==================================================================
@@ -81,6 +161,21 @@ void HiderREYES::Remove( Primitive *pPrim )
 //==================================================================
 void HiderREYES::WorldEnd()
 {
+	if ( mDbg.mShowBuckets )
+	{
+		float borderCol[] = { 1, 0, 0 };
+		for (size_t bi=0; bi < mpBuckets.size(); ++bi)
+		{
+			const Bucket	*pBucket = mpBuckets[bi];
+
+			mDestBuff.DrawHLine( pBucket->mX1, pBucket->mY1, pBucket->mX2, borderCol );
+			mDestBuff.DrawHLine( pBucket->mX1, pBucket->mY2, pBucket->mX2, borderCol );
+
+			mDestBuff.DrawVLine( pBucket->mX1, pBucket->mY1, pBucket->mY2, borderCol );
+			mDestBuff.DrawVLine( pBucket->mX2, pBucket->mY1, pBucket->mY2, borderCol );
+		}
+	}
+
 	for (size_t i=0; i < mpBuckets.size(); ++i)
 		delete mpBuckets[i];
 
@@ -88,24 +183,13 @@ void HiderREYES::WorldEnd()
 }
 
 //==================================================================
-float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const
+bool HiderREYES::makeRasterBound(
+						const Bound &b,
+						const Matrix44 &mtxLocalWorld,
+						float out_bound2d[4] ) const
 {
-	if NOT( b.IsValid() )
-	{
-		return MicroPolygonGrid::MAX_SIZE / 4;
-	}
-	
-	Vector3	boxVerts[8] =
-	{
-		Vector3( b.mBox[0].x, b.mBox[0].y, b.mBox[0].z ),
-		Vector3( b.mBox[1].x, b.mBox[0].y, b.mBox[0].z ),
-		Vector3( b.mBox[0].x, b.mBox[1].y, b.mBox[0].z ),
-		Vector3( b.mBox[1].x, b.mBox[1].y, b.mBox[0].z ),
-		Vector3( b.mBox[0].x, b.mBox[0].y, b.mBox[1].z ),
-		Vector3( b.mBox[1].x, b.mBox[0].y, b.mBox[1].z ),
-		Vector3( b.mBox[0].x, b.mBox[1].y, b.mBox[1].z ),
-		Vector3( b.mBox[1].x, b.mBox[1].y, b.mBox[1].z ),
-	};
+	Vector3	boxVerts[8];
+	MakeCube( b, boxVerts );
 
 	float destHalfWd	= (float)mDestBuff.mWd * 0.5f;
 	float destHalfHe	= (float)mDestBuff.mHe * 0.5f;
@@ -114,7 +198,7 @@ float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld 
 	float minY =  FLT_MAX;
 	float maxX = -FLT_MAX;
 	float maxY = -FLT_MAX;
-	
+
 	Matrix44	mtxLocalProj = mtxLocalWorld * mMtxWorldProj;
 
 	for (size_t i=0; i < 8; ++i)
@@ -127,7 +211,7 @@ float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld 
 
 			float	winX = destHalfWd + destHalfWd * Pproj.x * oow;
 			float	winY = destHalfHe - destHalfHe * Pproj.y * oow;
-			
+
 			minX = DMIN( minX, winX );
 			minY = DMIN( minY, winY );
 			maxX = DMAX( maxX, winX );
@@ -137,13 +221,33 @@ float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld 
 		{
 			// $$$ this shouldn't happen ..once proper
 			// front plane clipping is implemented 8)
-			return 0.0f;
+			DASSERT( 0 );
 		}
 	}
-	
-	if ( maxX > minX && maxY > minY )
+
+	out_bound2d[0] = minX;
+	out_bound2d[1] = minY;
+	out_bound2d[2] = maxX;
+	out_bound2d[3] = maxY;
+
+	return minX < maxX && minY < maxY;
+}
+
+//==================================================================
+float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const
+{
+	if NOT( b.IsValid() )
 	{
-		float	squareArea = (maxY - minY) * (maxX - minX);
+		return MicroPolygonGrid::MAX_SIZE / 4;
+	}
+
+	float	bound2d[4];
+
+	bool valid = makeRasterBound( b, mtxLocalWorld, bound2d );
+
+	if ( valid )
+	{
+		float	squareArea = (bound2d[3] - bound2d[1]) * (bound2d[2] - bound2d[0]);
 		return squareArea * 2;
 	}
 	else

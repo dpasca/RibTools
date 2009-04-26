@@ -28,7 +28,9 @@ class Transform;
 //==================================================================
 class FrameworkREYES : public FrameworkBase
 {
+public:
 	HiderREYES			mHiderREYES;
+private:
 	Options				mOptions;	//temporary, will remove
 
 private:
@@ -45,9 +47,9 @@ public:
 				const Options &opt,
 				const Matrix44 &mtxWorldCamera );
 
-	void Insert( Primitive			*pPrim,
-				 const Attributes	&attr,
-				 const Transform	&xform );
+	void Insert(	Primitive			*pPrim,
+					const Attributes	&attr,
+					const Transform		&xform );
 
 	void InsertSplitted(	
 						Primitive			*pSplitPrim,

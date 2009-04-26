@@ -50,15 +50,18 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 			// optional V split
 			float	vMid = (mVRange[0] + mVRange[1]) * 0.5f;
 
-			Primitive *pPrimLB = pPrimsSU[0]->Clone();
-			Primitive *pPrimRB = pPrimsSU[1]->Clone();
-			fwork.InsertSplitted( pPrimLB, *pPrimsSU[0] );
-			fwork.InsertSplitted( pPrimRB, *pPrimsSU[1] );
-
-			pPrimsSU[0]->mVRange[1] = vMid;
-			pPrimsSU[1]->mVRange[1] = vMid;
-			pPrimLB->mVRange[0] = vMid;
-			pPrimRB->mVRange[0] = vMid;
+			// check.. because we can't be sure that the primitive didn't fail
+			// at insertion time
+			for (size_t i=0; i < 2; ++i)
+			{
+				if ( pPrimsSU[i]->IsUsable() )
+				{
+					Primitive *pNewPrim = pPrimsSU[i]->Clone();
+					pPrimsSU[i]->mVRange[1] = vMid;
+					pNewPrim->mVRange[0] = vMid;
+					fwork.InsertSplitted( pNewPrim, *pPrimsSU[i] );
+				}
+			}
 		}
 	}
 	else
@@ -81,7 +84,7 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 }
 
 //==================================================================
-void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS, const Matrix44 &mtxWorldCamera )
+void Primitive::Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera )
 {
 	Point3	*pPointsWS = g.mpPointsWS;
 
@@ -102,7 +105,6 @@ void Primitive::Dice( MicroPolygonGrid &g, const Point3 &camPosWS, const Matrix4
 		mtxLocalCameraNorm = mtxLocalCameraNorm * Matrix44::Scale( -1, -1, -1 );
 
 	Vector3	camPosCS = mtxWorldCamera.GetTranslation();
-	//V3__V3W1_Mul_M44( camPosWS, mtxWorldCamera );
 
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
@@ -222,47 +224,41 @@ bool DiceablePrim::IsDiceable(
 						bool &out_uSplit,
 						bool &out_vSplit )
 {
-	out_uSplit = false;
-	out_vSplit = false;
-	
-/*
-	Matrix44 mtxLocalCamera =
-				mpTransform->GetMatrix() *
-					pHider->mMtxWorldCamera;
-*/
-
 	const Matrix44 &mtxLocalWorld = mpTransform->GetMatrix();
 	
 	Bound	bound;
-	MakeBound( bound );
-	float pixelArea = pHider->RasterEstimate( bound, mtxLocalWorld );
-	
-	if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
+	if ( MakeBound( bound ) )
 	{
-		float	dim = sqrtf( pixelArea );
-		if ( dim > 0 )
+		out_uSplit = false;
+		out_vSplit = false;
+
+		float pixelArea = pHider->RasterEstimate( bound, mtxLocalWorld );
+		
+		if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
 		{
-			int	dimX = (int)ceilf( dim );
-			int	dimY = (int)ceilf( dim );
+			float	dim = sqrtf( pixelArea );
+			if ( dim > 0 )
+			{
+				int	dimX = (int)ceilf( dim );
+				int	dimY = (int)ceilf( dim );
 
-			g.Setup(dimX,
-					dimY,
-					mURange,
-					mVRange,
-					mtxLocalWorld
-					);
+				g.Setup(dimX,
+						dimY,
+						mURange,
+						mVRange,
+						mtxLocalWorld
+						);
 
-			return true;
+				return true;
+			}
+			else
+				return false;
 		}
-		else
-			return false;
 	}
-	else
-	{
-		out_uSplit = true;
-		out_vSplit = true;
-		return false;
-	}
+
+	out_uSplit = true;
+	out_vSplit = true;
+	return false;
 }
 
 //==================================================================

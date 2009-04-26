@@ -171,7 +171,7 @@ void PatchBilinear::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-void PatchBilinear::MakeBound( Bound &out_bound )
+bool PatchBilinear::MakeBound( Bound &out_bound ) const
 {
 	Point3	Po;
 	out_bound.Reset();
@@ -179,6 +179,7 @@ void PatchBilinear::MakeBound( Bound &out_bound )
 	out_bound.Expand( EvalP( mURange[1], mVRange[0], Po ) );
 	out_bound.Expand( EvalP( mURange[0], mVRange[1], Po ) );
 	out_bound.Expand( EvalP( mURange[1], mVRange[1], Po ) );
+	return true;
 }
 
 //==================================================================
@@ -296,7 +297,7 @@ void PatchBicubic::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-void PatchBicubic::MakeBound( Bound &out_bound )
+bool PatchBicubic::MakeBound( Bound &out_bound ) const
 {
 	Point3	Po;
 	out_bound.Reset();
@@ -304,6 +305,7 @@ void PatchBicubic::MakeBound( Bound &out_bound )
 	out_bound.Expand( EvalP( mURange[1], mVRange[0], Po ) );
 	out_bound.Expand( EvalP( mURange[0], mVRange[1], Po ) );
 	out_bound.Expand( EvalP( mURange[1], mVRange[1], Po ) );
+	return true;
 }
 
 //==================================================================

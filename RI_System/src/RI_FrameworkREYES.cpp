@@ -54,7 +54,7 @@ void FrameworkREYES::Insert(
 	//printf( "Prim xform rev %i\n",
 	//		mpUniqueTransform.back()->mpRevision->mRTrackRevisionCount );
 
-	mpHider->Insert( pPrim, attr, xform );
+	mpHider->Insert( pPrim );
 }
 
 //==================================================================
@@ -94,6 +94,9 @@ void FrameworkREYES::WorldEnd()
 		{
 			Primitive	*pPrim = pPrimList[i];
 
+			if NOT( pPrim->IsUsable() )
+				continue;
+
 			MicroPolygonGrid	grid;
 
 			bool	uSplit = false;
@@ -101,7 +104,7 @@ void FrameworkREYES::WorldEnd()
 
 			if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
 			{
-				pPrim->Dice( grid, camPosWS, mpHider->mMtxWorldCamera );
+				pPrim->Dice( grid, mpHider->mMtxWorldCamera );
 
 				// should check backface and trim
 				// grid.displace();

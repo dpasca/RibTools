@@ -28,19 +28,19 @@ class Primitive;
 class Bucket
 {
 public:
-	float	mX1;
-	float	mY1;
-	float	mX2;
-	float	mY2;
+	int	mX1;
+	int	mY1;
+	int	mX2;
+	int	mY2;
 
 	DVec<Primitive *>	mpPrims;
 
 public:
-	Bucket() :
-		mX1(0),
-		mY1(0),
-		mX2(0),
-		mY2(0)
+	Bucket( int x1, int y1, int x2, int y2 ) :
+		mX1(x1),
+		mY1(y1),
+		mX2(x2),
+		mY2(y2)
 	{
 	}
 
@@ -48,6 +48,11 @@ public:
 	{
 		for (size_t i=0; i < mpPrims.size(); ++i)
 			delete mpPrims[i];
+	}
+
+	bool Contains( int x, int y )
+	{
+		return x >= mX1 && y >= mY1 && x < mX2 && y < mY2;
 	}
 
 
@@ -74,10 +79,7 @@ public:
 					const Matrix44 &mtxWorldCamera
 				) = 0;
 
-	virtual void Insert(
-				Primitive			*pPrim,
-				 const Attributes	&attr,
-				 const Transform	&xform ) = 0;
+	virtual void Insert( Primitive *pPrim ) = 0;
 
 	virtual void InsertSplitted(	
 						Primitive			*pSplitPrim,

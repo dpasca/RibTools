@@ -196,7 +196,20 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Clipping" )			{ exN( 2, p ); mState.Clipping(		p[0], p[1] );	}	else
 	if ( nm == "DepthOfField" )		{ exN( 3, p ); mState.DepthOfField(	p[0], p[1], p[2] );	}	else
 	if ( nm == "Shutter" )			{ exN( 2, p ); mState.Shutter(		p[0], p[1] );	}	else
-	if ( nm == "Color"	)			{ exN( 1, p ); mState.ColorSet(		p[0].PFlt(3) );	}	else
+	if ( nm == "Color"	)			
+	{
+		geN( 1, p );
+		if ( p.size() == 1 )
+			mState.ColorSet( p[0].PFlt(3) );
+		else
+		if ( p.size() == 3 )
+			mState.ColorSet( Color( p[0].Flt(), p[1].Flt(), p[2].Flt() ) );
+		else
+		{
+			DASSTHROW( false, ("Wrong param count") );
+		}
+	}
+	else
 	if ( nm == "Opacity" )			{ exN( 1, p ); mState.Opacity(		p[0].PFlt(3) );	}	else
 	
 	
