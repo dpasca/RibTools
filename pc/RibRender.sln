@@ -1,21 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSystem", "DSystem\pc\DSystem.vcproj", "{44DB4ABA-217C-45F5-AD4C-22233D683C80}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DSystem", "..\DSystem\pc\DSystem.vcproj", "{44DB4ABA-217C-45F5-AD4C-22233D683C80}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RI_System", "RI_System\pc\RI_System.vcproj", "{2160E8D3-238C-4B10-AFFF-B90CAD4D6234}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RI_System", "..\RI_System\pc\RI_System.vcproj", "{2160E8D3-238C-4B10-AFFF-B90CAD4D6234}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C3632A81-4487-40B8-823C-B0A75717948E} = {C3632A81-4487-40B8-823C-B0A75717948E}
 		{44DB4ABA-217C-45F5-AD4C-22233D683C80} = {44DB4ABA-217C-45F5-AD4C-22233D683C80}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DMath", "DMath\pc\DMath.vcproj", "{C3632A81-4487-40B8-823C-B0A75717948E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DMath", "..\DMath\pc\DMath.vcproj", "{C3632A81-4487-40B8-823C-B0A75717948E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freeglut_static", "external\freeglut-2.4.0\freeglut_static.vcproj", "{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freeglut_static", "..\external\freeglut-2.4.0\freeglut_static.vcproj", "{9FDE0D95-64D2-4D7C-A318-66500E46DD8D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "external\jpeg-6b\pc\libjpeg.vcproj", "{870ECA6E-C5A8-4AFA-8A10-7FEE94960F23}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "..\external\jpeg-6b\pc\libjpeg.vcproj", "{870ECA6E-C5A8-4AFA-8A10-7FEE94960F23}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibRenderTool", "RibRenderTool\pc\RibRenderTool.vcproj", "{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibRenderTool", "..\RibRenderTool\pc\RibRenderTool.vcproj", "{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C3632A81-4487-40B8-823C-B0A75717948E} = {C3632A81-4487-40B8-823C-B0A75717948E}
 		{9FDE0D95-64D2-4D7C-A318-66500E46DD8D} = {9FDE0D95-64D2-4D7C-A318-66500E46DD8D}
@@ -23,7 +23,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibRenderTool", "RibRenderT
 		{2160E8D3-238C-4B10-AFFF-B90CAD4D6234} = {2160E8D3-238C-4B10-AFFF-B90CAD4D6234}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibRenderFile", "RibRenderFile\pc\RibRenderFile.vcproj", "{C913A525-2C67-4105-B536-C24D3B1E3EEB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibRenderFile", "..\RibRenderFile\pc\RibRenderFile.vcproj", "{C913A525-2C67-4105-B536-C24D3B1E3EEB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{870ECA6E-C5A8-4AFA-8A10-7FEE94960F23} = {870ECA6E-C5A8-4AFA-8A10-7FEE94960F23}
 		{C3632A81-4487-40B8-823C-B0A75717948E} = {C3632A81-4487-40B8-823C-B0A75717948E}
