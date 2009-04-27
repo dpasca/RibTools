@@ -19,7 +19,7 @@ public:
 	char				mFileToRender[2048];
 	char				mDefaultResDir[2048];
 	char				mStartDir[2048];
-	static char			*msTestRibFiles[];
+	DVec<DStr>			mTestRibFiles;
 
 	bool				mDbgPickBucket;
 	int					mDbgDrawOnlyBucketAtX;

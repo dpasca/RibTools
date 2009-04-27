@@ -123,12 +123,13 @@ void HiderREYES::Insert( Primitive *pPrim )
 			return;
 		}
 
-		int	clampedMinX = D::Clamp( minX, 0, (int)mDestBuff.mWd-1 );
-		int	clampedMinY = D::Clamp( minY, 0, (int)mDestBuff.mHe-1 );
+		//int	clampedMinX = D::Clamp( minX, 0, (int)mDestBuff.mWd-1 );
+		//int	clampedMinY = D::Clamp( minY, 0, (int)mDestBuff.mHe-1 );
 
 		for (size_t i=0; i < mpBuckets.size(); ++i)
 		{
-			if ( mpBuckets[i]->Contains( clampedMinX, clampedMinY ) )
+			//if ( mpBuckets[i]->Contains( clampedMinX, clampedMinY ) )
+			if ( mpBuckets[i]->Intersects( minX, minY, maxX, maxY ) )
 			{
 				mpBuckets[i]->mpPrims.push_back( pPrim );
 				break;

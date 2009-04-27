@@ -18,6 +18,7 @@
 #ifdef _MSC_VER
 	#include <GL/glut.h>
 	#include <direct.h>
+	#include <io.h>
 #else
 	#include <GLUT/glut.h>
 #endif
@@ -27,6 +28,7 @@
 //==================================================================
 RibRendTool	*RibRendTool::mspThis;
 
+/*
 //==================================================================
 char *RibRendTool::msTestRibFiles[] =
 {
@@ -43,6 +45,7 @@ char *RibRendTool::msTestRibFiles[] =
 	//"WarBird.rib",
 	NULL
 };
+*/
 
 //==================================================================
 RibRendTool::RibRendTool() :
@@ -111,8 +114,26 @@ void RibRendTool::RebuildMenu()
 
 	addBoolMenuItem( "Pick Bucket Mode", mDbgPickBucket, MENUID_DBGMARKBUCKETS );
 	glutAddMenuEntry( "", -1 );
-	for (int i=0; msTestRibFiles[i]; ++i)
-		glutAddMenuEntry( msTestRibFiles[i], MENUID_FILES + i );
+
+	mTestRibFiles.clear();
+	_finddatai64_t	findData;
+	intptr_t	handle = _findfirst64( "../../Tests/*.rib", &findData );
+	if ( handle != -1 )
+	{
+		int	ret = 0;
+		do
+		{
+			mTestRibFiles.push_back( findData.name );
+
+			glutAddMenuEntry(
+				mTestRibFiles.back().c_str(),
+				MENUID_FILES + mTestRibFiles.size()-1 );
+
+			ret = _findnext64( handle, &findData );
+		} while ( ret == 0 );
+
+		_findclose( handle );
+	}
 }
 
 //==================================================================
@@ -132,7 +153,7 @@ void RibRendTool::MenuFunc( int id )
 	{
 		strcpy( mFileToRender, mStartDir );
 		strcat( mFileToRender, "/../../Tests/" );
-		strcat( mFileToRender, msTestRibFiles[id - MENUID_FILES] );
+		strcat( mFileToRender, mTestRibFiles[id - MENUID_FILES].c_str() );
 
 		printf( "Render File: %s\n", mFileToRender );
 	}

@@ -55,6 +55,12 @@ public:
 		return x >= mX1 && y >= mY1 && x < mX2 && y < mY2;
 	}
 
+	bool Intersects( int minX, int minY, int maxX, int maxY )
+	{
+		return
+			minX < mX2 && maxX >= mX1 &&	// >= just to be sure.. ummm
+			minY < mY2 && maxY >= mY1;
+	}
 
 	DVec<Primitive *>	&GetPrimList()	{ return mpPrims;	}
 };
