@@ -13,7 +13,7 @@
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
 #include "RI_Primitive_Patch.h"
-#include "RI_FrameworkBase.h"
+#include "RI_FrameworkREYES.h"
 
 //==================================================================
 namespace RI
@@ -23,23 +23,22 @@ namespace RI
 PatchMesh::PatchMesh( RtToken type,
 					  ParamList &params,
 					  const SymbolList &staticSymbols ) :
-	Primitive(PATCHMESH),
+	ComplexPrimitiveBase(PATCHMESH),
 	mParams(params)
 {
-
 	mpyPatchType = staticSymbols.FindVoid( type );
 }
 
 //==================================================================
-void PatchMesh::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
+void PatchMesh::Simplify( HiderREYES &hider )
 {
 	// PatchMesh "bilinear" 2 "nonperiodic" 5 "nonperiodic" "P"  [ -0.995625 2 -0.495465 ...
 	//               0      1       2       3       4        5     6
 
 	int			nu		= mParams[1];
-	CPSymVoid	pyUWrap = fwork.mpStatics->FindVoid( mParams[2] );
+	CPSymVoid	pyUWrap = hider.mpStatics->FindVoid( mParams[2] );
 	int			nv		= mParams[3];
-	CPSymVoid	pyVWrap = fwork.mpStatics->FindVoid( mParams[4] );
+	CPSymVoid	pyVWrap = hider.mpStatics->FindVoid( mParams[4] );
 
 	bool	uPeriodic = pyUWrap->IsNameI( RI_PERIODIC );
 	bool	vPeriodic = pyVWrap->IsNameI( RI_PERIODIC );
@@ -71,7 +70,7 @@ void PatchMesh::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 				hullv3[2] = Vector3( &pMeshHull[(i +nu*jj)*3] );
 				hullv3[3] = Vector3( &pMeshHull[(ii+nu*jj)*3] );
 
-				fwork.InsertSplitted(
+				hider.InsertSimple(
 						new RI::PatchBilinear( mParams, hullv3 ),
 						*this
 						);
@@ -113,8 +112,8 @@ void PatchMesh::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 					}
 				}
 
-				fwork.InsertSplitted(
-						new RI::PatchBicubic( mParams, hullv3, attr, *fwork.mpStatics ),
+				hider.InsertSimple(
+						new RI::PatchBicubic( mParams, hullv3, attr, *hider.mpStatics ),
 						*this
 						);
 			}
@@ -129,7 +128,7 @@ void PatchMesh::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 
 //==================================================================
 PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols ) :
-	DiceablePrim(PATCHBILINEAR),
+	SimplePrimitiveBase(PATCHBILINEAR),
 	mParams(params)
 {
 	bool	gotP = ParamsFindP( params, staticSymbols, mHullPos, 4 );
@@ -139,7 +138,7 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols
 
 //==================================================================
 PatchBilinear::PatchBilinear( ParamList &params, const Vector3 hull[4] ) :
-	DiceablePrim(PATCHBILINEAR),
+	SimplePrimitiveBase(PATCHBILINEAR),
 	mParams(params)
 {
 	for (int i=0; i < 4; ++i)
@@ -184,7 +183,7 @@ bool PatchBilinear::MakeBound( Bound &out_bound ) const
 
 //==================================================================
 PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
-	DiceablePrim(PATCHBICUBIC),
+	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
 {
 	mpUBasis = &attr.GetUBasis();
@@ -202,7 +201,7 @@ PatchBicubic::PatchBicubic( ParamList &params,
 							const Vector3 hull[16],
 						    const Attributes &attr,
 							const SymbolList &staticSymbols ) :
-	DiceablePrim(PATCHBICUBIC),
+	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
 {
 	mpUBasis = &attr.GetUBasis();

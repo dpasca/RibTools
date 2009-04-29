@@ -13,17 +13,17 @@
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
 #include "RI_Primitive.h"
-#include "RI_HiderBase.h"
-#include "RI_FrameworkBase.h"
+#include "RI_HiderREYES.h"
+#include "RI_FrameworkREYES.h"
 
 //==================================================================
 namespace RI
 {
 
 //==================================================================
-void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
+void SimplePrimitiveBase::Split( HiderREYES &hider, bool uSplit, bool vSplit )
 {
-	if ( mSplitCnt > 8 )
+	if ( mSplitCnt > 10 )
 	{
 		// $$$ too many splits !!!
 		mSplitCnt = mSplitCnt;
@@ -33,7 +33,7 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 	if ( uSplit )
 	{
 		// U split
-		Primitive *pPrimsSU[2] =
+		SimplePrimitiveBase *pPrimsSU[2] =
 		{
 			Clone(),
 			Clone()
@@ -41,9 +41,8 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 		float	uMid = (mURange[0] + mURange[1]) * 0.5f;
 		pPrimsSU[0]->mURange[1] = uMid;
 		pPrimsSU[1]->mURange[0] = uMid;
-		fwork.InsertSplitted( pPrimsSU[0], *this );
-		fwork.InsertSplitted( pPrimsSU[1], *this );
-		this->MarkUnusable();
+		hider.InsertSplitted( pPrimsSU[0], *this );
+		hider.InsertSplitted( pPrimsSU[1], *this );
 
 		if ( vSplit )
 		{
@@ -54,12 +53,12 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 			// at insertion time
 			for (size_t i=0; i < 2; ++i)
 			{
-				if ( pPrimsSU[i]->IsUsable() )
+				if ( pPrimsSU[i]->IsUsed() )
 				{
-					Primitive *pNewPrim = pPrimsSU[i]->Clone();
+					SimplePrimitiveBase *pNewPrim = pPrimsSU[i]->Clone();
 					pPrimsSU[i]->mVRange[1] = vMid;
 					pNewPrim->mVRange[0] = vMid;
-					fwork.InsertSplitted( pNewPrim, *pPrimsSU[i] );
+					hider.InsertSplitted( pNewPrim, *pPrimsSU[i] );
 				}
 			}
 		}
@@ -69,22 +68,21 @@ void Primitive::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 		// exclusive V split
 		if ( vSplit )
 		{
-			Primitive *pPrim1 = Clone();
-			Primitive *pPrim2 = Clone();
+			SimplePrimitiveBase *pPrim1 = Clone();
+			SimplePrimitiveBase *pPrim2 = Clone();
 			
 			float	vMid = (mVRange[0] + mVRange[1]) * 0.5f;
 			pPrim1->mVRange[1] = vMid;
 			pPrim2->mVRange[0] = vMid;
 
-			fwork.InsertSplitted( pPrim1, *this );
-			fwork.InsertSplitted( pPrim2, *this );
-			this->MarkUnusable();
+			hider.InsertSplitted( pPrim1, *this );
+			hider.InsertSplitted( pPrim2, *this );
 		}
 	}
 }
 
 //==================================================================
-void Primitive::Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera )
+void SimplePrimitiveBase::Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera, bool doColorCoded )
 {
 	Point3	*pPointsWS = g.mpPointsWS;
 
@@ -105,6 +103,31 @@ void Primitive::Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera )
 		mtxLocalCameraNorm = mtxLocalCameraNorm * Matrix44::Scale( -1, -1, -1 );
 
 	Vector3	camPosCS = mtxWorldCamera.GetTranslation();
+
+	Color	useColor;
+
+	if ( doColorCoded )
+	{
+		const static float l = 0.3f;
+		const static float m = 0.6f;
+		const static float h = 1.0f;
+		static Color palette[8] =
+		{
+			Color( l, l, l ),
+			Color( l, l, h ),
+			Color( l, h, l ),
+			Color( l, h, h ),
+			Color( h, l, l ),
+			Color( h, l, h ),
+			Color( h, h, l ),
+			Color( h, h, h ),
+		};
+		static int cnt;
+
+		useColor = palette[ cnt++ & 7 ];
+	}
+	else
+		useColor = mpAttribs->mColor;
 
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
@@ -136,7 +159,7 @@ void Primitive::Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera )
 			*pN++		= norCS;
 			*pNg++		= norCS;
 			*pOs++		= mpAttribs->mOpacity;
-			*pCs++		= mpAttribs->mColor;
+			*pCs++		= useColor;
 
 			//*pOs++ = Color( 1, 0, 0 );
 			//*pCs++ = Color( 0, 1, 0 );
@@ -218,9 +241,46 @@ bool ParamsFindP(	ParamList &params,
 }
 
 //==================================================================
-bool DiceablePrim::IsDiceable(
+bool SimplePrimitiveBase::SetupForDiceOrSplit(
+							const HiderREYES &hider,
+							bool &out_uSplit,
+							bool &out_vSplit )
+{
+	const Matrix44 &mtxLocalWorld = mpTransform->GetMatrix();
+
+	DASSERT( mDiceGridWd == -1 && mDiceGridHe == -1 );
+	
+	Bound	bound;
+	MakeBound( bound );
+
+	float pixelArea = hider.RasterEstimate( bound, mtxLocalWorld );
+	
+	if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
+	{
+		float	dim = sqrtf( pixelArea );
+
+		mDiceGridWd = (int)ceilf( dim );
+		mDiceGridHe = (int)ceilf( dim );
+
+		out_uSplit = false;
+		out_vSplit = false;
+
+		return true;	// will dice
+	}
+	else
+	{
+		out_uSplit = true;
+		out_vSplit = true;
+
+		return false;	// will split
+	}
+}
+
+/*
+//==================================================================
+bool SimplePrimitiveBase::IsDiceable(
 						MicroPolygonGrid &g,
-						HiderBase *pHider,
+						HiderREYES *pHider,
 						bool &out_uSplit,
 						bool &out_vSplit )
 {
@@ -260,6 +320,7 @@ bool DiceablePrim::IsDiceable(
 	out_vSplit = true;
 	return false;
 }
+*/
 
 //==================================================================
 }

@@ -19,10 +19,13 @@ namespace RI
 //==================================================================
 /// FrameworkREYES
 //==================================================================
-FrameworkREYES::FrameworkREYES( RenderOutputBase *pRenderOutput ) :
-	FrameworkBase( pRenderOutput )
+FrameworkREYES::FrameworkREYES(
+						RenderOutputBase *pRenderOutput,
+						const HiderREYES &hiderParams ) :
+	mpRenderOutput(pRenderOutput),
+	mpStatics(NULL),
+	mHider(hiderParams)
 {
-	mpHider = &mHiderREYES;
 }
 
 //==================================================================
@@ -31,12 +34,12 @@ void FrameworkREYES::WorldBegin(
 						const Matrix44 &mtxWorldCamera )
 {
 	mOptions = opt;
-	mpHider->WorldBegin( opt, mtxWorldCamera );
+	mHider.WorldBegin( opt, mtxWorldCamera );
 }
 
 //==================================================================
 void FrameworkREYES::Insert(
-						Primitive			*pPrim,
+						PrimitiveBase		*pPrim,
 						const Attributes	&attr,
 						const Transform		&xform )
 {
@@ -54,21 +57,7 @@ void FrameworkREYES::Insert(
 	//printf( "Prim xform rev %i\n",
 	//		mpUniqueTransform.back()->mpRevision->mRTrackRevisionCount );
 
-	mpHider->Insert( pPrim );
-}
-
-//==================================================================
-void FrameworkREYES::InsertSplitted(	
-						Primitive			*pSplitPrim,
-						Primitive			&srcPrim
-						)
-{
-	mpHider->InsertSplitted( pSplitPrim, srcPrim );
-}
-
-//==================================================================
-void FrameworkREYES::Remove( Primitive *pPrim )
-{
+	mHider.Insert( pPrim );
 }
 
 //==================================================================
@@ -77,44 +66,83 @@ void FrameworkREYES::WorldEnd()
 #if 0
 	Point3	camPosWS =
 		MultiplyV3M(
-			-mpHider->mMtxWorldCamera.GetTranslation(),
-				mpHider->mMtxWorldCamera.GetAs33().GetInverse()
+			-mHider.mMtxWorldCamera.GetTranslation(),
+				mHider.mMtxWorldCamera.GetAs33().GetInverse()
 		);
 #else
 
-	Point3	camPosWS = mpHider->mMtxWorldCamera.GetTranslation();
+	Point3	camPosWS = mHider.mMtxWorldCamera.GetTranslation();
 
 #endif
 
-	for (size_t bi=0; bi < mHiderREYES.mpBuckets.size(); ++bi)
+	// --- convert complex primitives into simple ones
+	for (size_t i=0; i < mHider.mpPrims.size(); ++i)
 	{
-		DVec<Primitive *>	&pPrimList = mHiderREYES.mpBuckets[bi]->GetPrimList();
+		PrimitiveBase	*pPrim = mHider.mpPrims[i];
+
+		if ( pPrim->IsComplex() )
+		{
+			((ComplexPrimitiveBase *)pPrim)->Simplify( mHider );
+			pPrim->Release();
+			mHider.mpPrims[i] = NULL;
+			// could compact mHider.mpPrims as it goes..
+		}
+	}
+
+	// --- split primitives until necessary
+	for (size_t i=0; i < mHider.mpPrims.size(); ++i)
+	{
+		if NOT( mHider.mpPrims[i] )
+			continue;
+
+		SimplePrimitiveBase	*pPrim = (SimplePrimitiveBase *)mHider.mpPrims[i];
+
+		bool	uSplit;
+		bool	vSplit;
+		bool	willDice = pPrim->SetupForDiceOrSplit( mHider, uSplit, vSplit );
+
+		if ( willDice )
+		{
+			mHider.InsertForDicing( (SimplePrimitiveBase *)pPrim->Borrow() );
+		}
+		else
+		{
+			pPrim->Split( mHider, uSplit, vSplit );
+		}
+
+		pPrim->Release();
+		mHider.mpPrims[i] = NULL;
+	}
+	mHider.mpPrims.clear();
+
+	// --- dice primitives accumulated in the buckets
+	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
+	{
+		DVec<SimplePrimitiveBase *>	&pPrimList = mHider.mpBuckets[bi]->GetPrimList();
 
 		for (size_t i=0; i < pPrimList.size(); ++i)
 		{
-			Primitive	*pPrim = pPrimList[i];
-
-			if NOT( pPrim->IsUsable() )
-				continue;
+			SimplePrimitiveBase	*pPrim = (SimplePrimitiveBase *)pPrimList[i];
 
 			MicroPolygonGrid	grid;
 
-			bool	uSplit = false;
-			bool	vSplit = false;
+			grid.Setup(
+				pPrim->mDiceGridWd,
+				pPrim->mDiceGridHe,
+				pPrim->mURange,
+				pPrim->mVRange,
+				pPrim->mpTransform->GetMatrix() );
 
-			if ( pPrim->IsDiceable( grid, mpHider, uSplit, vSplit ) )
-			{
-				pPrim->Dice( grid, mpHider->mMtxWorldCamera );
+			pPrim->Dice( grid, mHider.mMtxWorldCamera, mHider.mParams.mDbgColorCodedGrids );
 
-				// should check backface and trim
-				// grid.displace();
-				grid.Shade( *pPrim->mpAttribs );
+			// should check backface and trim
+			// grid.displace();
+			grid.Shade( *pPrim->mpAttribs );
 
-				mpHider->Hide( grid );
-			}
-			else
-			if ( pPrim->IsSplitable() )
-				pPrim->Split( *this, uSplit, vSplit );
+			mHider.Hide( grid );
+
+			pPrim->Release();
+			pPrimList[i] = NULL;
 		}
 	}
 
@@ -123,16 +151,16 @@ void FrameworkREYES::WorldEnd()
 	mpUniqueAttribs.clear();
 	mpUniqueTransform.clear();
 
-	mpHider->WorldEnd();
+	mHider.WorldEnd();
 
-	DASSERT( mpHider->GetOutputDataWd() == (u_int)mOptions.mXRes );
-	DASSERT( mpHider->GetOutputDataHe() == (u_int)mOptions.mYRes );
+	DASSERT( mHider.GetOutputDataWd() == (u_int)mOptions.mXRes );
+	DASSERT( mHider.GetOutputDataHe() == (u_int)mOptions.mYRes );
 
 	//glutReshapeWindow( mOptions.mXRes, mOptions.mYRes );
 	mpRenderOutput->Update(
 				mOptions.mXRes,
 				mOptions.mYRes,
-				mpHider->GetOutputData()
+				mHider.GetOutputData()
 				);
 }
 

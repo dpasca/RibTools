@@ -18,7 +18,7 @@ namespace RI
 //==================================================================
 /// State
 //==================================================================
-State::State( FrameworkBase *pFramework, const char *pDefaultShadersDir ) :
+State::State( FrameworkREYES *pFramework, const char *pDefaultShadersDir ) :
 	mpFramework(pFramework)
 {
 	mModeStack.push( MD_UNDEFINED );

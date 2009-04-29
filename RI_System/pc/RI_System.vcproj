@@ -180,19 +180,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_FrameworkBase.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RI_FrameworkREYES.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\include\RI_FrameworkREYES.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_HiderBase.h"
 				>
 			</File>
 			<File

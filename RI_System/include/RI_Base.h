@@ -138,6 +138,40 @@ public:
 };
 
 //==================================================================
+class RefCount
+{
+	int		mRefCount;
+	
+public:
+	RefCount() :
+		mRefCount(0)
+	{
+	}
+	
+	~RefCount()
+	{
+		DASSERT( mRefCount == 0 );
+	}
+
+	void AddRef()
+	{
+		mRefCount += 1;
+	}
+
+	int SubRef()
+	{
+		DASSERT( mRefCount >= 1 );
+		mRefCount -= 1;
+		return mRefCount;
+	}
+
+	int GetCount() const
+	{
+		return mRefCount;
+	}
+};
+
+//==================================================================
 /// ResourceManager
 //==================================================================
 class ResourceManager

@@ -49,9 +49,6 @@ char *RibRendTool::msTestRibFiles[] =
 
 //==================================================================
 RibRendTool::RibRendTool() :
-	mDbgPickBucket(false),
-	mDbgDrawOnlyBucketAtX(-1),
-	mDbgDrawOnlyBucketAtY(-1),
 	mpRenderOutput(NULL),
 	mLastUsedWd(0),
 	mLastUsedHe(0),
@@ -112,8 +109,12 @@ void RibRendTool::RebuildMenu()
 	mMainMenuID = glutCreateMenu( sMenuFunc );
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
-	addBoolMenuItem( "Pick Bucket Mode", mDbgPickBucket, MENUID_DBGMARKBUCKETS );
+	glutAddMenuEntry( "-- Debug --", -1 );
+	addBoolMenuItem( "Pick Bucket Mode", mREYESParams.mDbgShowBuckets, MENUID_DBG_PICK_BUCKET );
+	addBoolMenuItem( "Color Coded Grids", mREYESParams.mDbgColorCodedGrids, MENUID_DBG_COLOR_CODE_GRIDS );
 	glutAddMenuEntry( "", -1 );
+
+	glutAddMenuEntry( "-- Test Files --", -1 );
 
 	mTestRibFiles.clear();
 	_finddatai64_t	findData;
@@ -141,8 +142,15 @@ void RibRendTool::MenuFunc( int id )
 {
 	switch ( id )
 	{
-	case MENUID_DBGMARKBUCKETS:
-		mDbgPickBucket = !mDbgPickBucket;
+	case MENUID_DBG_PICK_BUCKET:
+		mREYESParams.mDbgShowBuckets = !mREYESParams.mDbgShowBuckets;
+		RenderFile( true );
+		glutPostRedisplay();
+		RebuildMenu();
+		return;
+
+	case MENUID_DBG_COLOR_CODE_GRIDS:
+		mREYESParams.mDbgColorCodedGrids = !mREYESParams.mDbgColorCodedGrids;
 		RenderFile( true );
 		glutPostRedisplay();
 		RebuildMenu();
@@ -210,19 +218,10 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	sprintf( defaultShadersDir, "%s/Shaders", mDefaultResDir );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
+	RI::FrameworkREYES	framework( mpRenderOutput, mREYESParams );
+	RI::Machine			machine( &framework, defaultShadersDir, forcedWd, forcedHe );
+
 	RI::Parser			parser;
-	RI::FrameworkREYES	frameworkREYES( mpRenderOutput );
-	RI::Machine			machine( &frameworkREYES, defaultShadersDir, forcedWd, forcedHe );
-
-	if ( mDbgPickBucket )
-	{
-		frameworkREYES.mHiderREYES.DbgDrawOnlyBucketAt(
-			mDbgDrawOnlyBucketAtX,
-			mDbgDrawOnlyBucketAtY );
-
-		frameworkREYES.mHiderREYES.DbgShowBuckets( true );
-	}
-
 	for (size_t i=0; i <= dataSize; ++i)
 	{
 		if ( i == dataSize )
@@ -315,14 +314,14 @@ void RibRendTool::MouseFunc( int button, int butState, int mx, int my )
 	{
 		if ( butState == GLUT_DOWN )
 		{
-			if ( mDbgPickBucket )
+			if ( mREYESParams.mDbgShowBuckets )
 			{
-				mDbgDrawOnlyBucketAtX = mx;
-				mDbgDrawOnlyBucketAtY = my;
+				mREYESParams.mDbgOnlyBucketAtX = mx;
+				mREYESParams.mDbgOnlyBucketAtY = my;
 				RenderFile( true );
 				glutPostRedisplay();
-				mDbgDrawOnlyBucketAtX = -1;
-				mDbgDrawOnlyBucketAtY = -1;
+				mREYESParams.mDbgOnlyBucketAtX = -1;
+				mREYESParams.mDbgOnlyBucketAtY = -1;
 			}
 		}
 	}

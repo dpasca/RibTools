@@ -37,10 +37,11 @@ static bool renderFile(
 	sprintf_s( defaultShadersDir, "%s/Shaders", pDefaultResourcesDir );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
-	RI::Parser			parser;
-	RI::FrameworkREYES	frameworkREYES( pRenderOutput );
-	RI::Machine			machine( &frameworkREYES, defaultShadersDir, forcedWd, forcedHe );
-	
+	RI::HiderREYES::Params	hiderParams;
+	RI::FrameworkREYES		framework( pRenderOutput, hiderParams );
+	RI::Machine				machine( &framework, defaultShadersDir, forcedWd, forcedHe );
+
+	RI::Parser				parser;
 	for (size_t i=0; i <= dataSize; ++i)
 	{
 		if ( i == dataSize )

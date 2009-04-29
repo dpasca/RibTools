@@ -19,7 +19,7 @@ namespace RI
 //==================================================================
 /// Cylinder
 //==================================================================
-class Cylinder : public DiceablePrim
+class Cylinder : public SimplePrimitiveBase
 {
 public:
 	float	mRadius;
@@ -29,7 +29,7 @@ public:
 
 public:
 	Cylinder( float radius, float zmin, float zmax, float thetamax ) :
-		DiceablePrim(CYLINDER),
+		SimplePrimitiveBase(CYLINDER),
 		mRadius(radius),
 		mZMin(zmin),
 		mZMax(zmax),
@@ -52,7 +52,7 @@ public:
 //==================================================================
 /// Cone
 //==================================================================
-class Cone : public DiceablePrim
+class Cone : public SimplePrimitiveBase
 {
 public:
 	float	mHeight;
@@ -61,7 +61,7 @@ public:
 
 public:
 	Cone( float height, float radius, float thetamax ) :
-		DiceablePrim(CONE),
+		SimplePrimitiveBase(CONE),
 		mHeight(height),
 		mRadius(radius),
 		mThetamaxRad(thetamax*DEG2RAD)
@@ -83,7 +83,7 @@ public:
 //==================================================================
 /// Sphere
 //==================================================================
-class Sphere : public DiceablePrim
+class Sphere : public SimplePrimitiveBase
 {
 public:
 	float	mRadius;
@@ -93,7 +93,7 @@ public:
 
 public:
 	Sphere( float radius, float zmin, float zmax, float thetamax ) :
-		DiceablePrim(SPHERE),
+		SimplePrimitiveBase(SPHERE),
 		mRadius(radius),
 		mZMin(zmin),
 		mZMax(zmax),
@@ -116,7 +116,7 @@ public:
 //==================================================================
 /// Hyperboloid
 //==================================================================
-class Hyperboloid : public DiceablePrim
+class Hyperboloid : public SimplePrimitiveBase
 {
 public:
 	Vector3	mP1;
@@ -125,7 +125,7 @@ public:
 
 public:
 	Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax ) :
-		DiceablePrim(HYPERBOLOID),
+		SimplePrimitiveBase(HYPERBOLOID),
 		mP1(p1),
 		mP2(p2),
 		mThetamaxRad(thetamax*DEG2RAD)
@@ -147,7 +147,7 @@ public:
 //==================================================================
 /// Paraboloid
 //==================================================================
-class Paraboloid : public DiceablePrim
+class Paraboloid : public SimplePrimitiveBase
 {
 public:
 	float	mRmax;
@@ -157,7 +157,7 @@ public:
 
 public:
 	Paraboloid( float rmax, float zmin, float zmax, float thetamax ) :
-		DiceablePrim(PARABOLOID),
+		SimplePrimitiveBase(PARABOLOID),
 		mRmax(rmax),
 		mZmin(zmin),
 		mZmax(zmax),
@@ -180,7 +180,7 @@ public:
 //==================================================================
 /// Torus
 //==================================================================
-class Torus : public DiceablePrim
+class Torus : public SimplePrimitiveBase
 {
 public:
 	float	mMinRadius;
@@ -193,7 +193,7 @@ public:
 	Torus( float maxRadius, float minRadius,
 		   float phimin, float phimax,
 		   float thetamax ) :
-		DiceablePrim(TORUS),
+		SimplePrimitiveBase(TORUS),
 		mMaxRadius(maxRadius),
 		mMinRadius(minRadius),
 		mPhiminRad(phimin*DEG2RAD),

@@ -9,6 +9,8 @@
 #ifndef RIBRENDERTOOL_H
 #define RIBRENDERTOOL_H
 
+#include "RI_System/include/RI_HiderREYES.h"
+
 //==================================================================
 class RibRendTool
 {
@@ -21,9 +23,7 @@ public:
 	char				mStartDir[2048];
 	DVec<DStr>			mTestRibFiles;
 
-	bool				mDbgPickBucket;
-	int					mDbgDrawOnlyBucketAtX;
-	int					mDbgDrawOnlyBucketAtY;
+	RI::HiderREYES::Params	mREYESParams;
 
 	std::string			mLastFileName;
 	int					mLastUsedWd;
@@ -33,7 +33,8 @@ public:
 
 	enum
 	{
-		MENUID_DBGMARKBUCKETS,
+		MENUID_DBG_PICK_BUCKET,
+		MENUID_DBG_COLOR_CODE_GRIDS,
 		MENUID_FILES = 200
 	};
 

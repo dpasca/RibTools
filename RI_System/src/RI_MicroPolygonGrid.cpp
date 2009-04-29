@@ -110,6 +110,11 @@ void MicroPolygonGrid::Setup(
 //==================================================================
 MicroPolygonGrid::~MicroPolygonGrid()
 {
+	for (size_t i=0; i < mSymbols.size(); ++i)
+	{
+		mSymbols[i].FreeData();
+	}
+	
 }
 
 //==================================================================

@@ -1,11 +1,10 @@
-/*
- *  RI_Primitive_Poly.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/27.
- *  Copyright 2009 __MyCompanyName__. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Primitive_Poly.cpp
+///
+/// Created by Davide Pasca - 2009/4/30
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "DMath.h"
@@ -14,7 +13,7 @@
 #include "RI_Transform.h"
 #include "RI_Primitive_Poly.h"
 #include "RI_Primitive_Patch.h"
-#include "RI_FrameworkBase.h"
+#include "RI_HiderREYES.h"
 
 //==================================================================
 namespace RI
@@ -24,14 +23,14 @@ namespace RI
 /// Polygon
 //==================================================================
 Polygon::Polygon( ParamList &params, const SymbolList &staticSymbols ) :
-	Primitive(POLYGON)
-	, mParams(params)
+	ComplexPrimitiveBase(POLYGON),
+	mParams(params)
 {
 }
 
 //==================================================================
-void Polygon::splitAddTriangle(
-				FrameworkBase &fwork,
+void Polygon::simplifyAddTriangle(
+				HiderREYES &hider,
 				const Vector3 &v1,
 				const Vector3 &v2,
 				const Vector3 &v3
@@ -47,21 +46,21 @@ void Polygon::splitAddTriangle(
 	patchVerts[1] = a;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	fwork.InsertSplitted( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
 	patchVerts[0] = v2;
 	patchVerts[1] = a;
 	patchVerts[2] = b;
 	patchVerts[3] = mid;
-	fwork.InsertSplitted( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
 	patchVerts[0] = v3;
 	patchVerts[1] = b;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	fwork.InsertSplitted( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
 }
 
 //==================================================================
-void Polygon::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
+void Polygon::Simplify( HiderREYES &hider )
 {
 	int	PValuesParIdx = findParam( "P", Param::FLT_ARR, 0, mParams );
 	if ( PValuesParIdx == -1 )
@@ -85,7 +84,7 @@ void Polygon::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 		patchVerts[2].Set( &paramP[3 * end] );
 		patchVerts[3].Set( &paramP[3 * (start+1)] );
 
-		fwork.InsertSplitted(
+		hider.InsertSimple(
 				new PatchBilinear( mParams, patchVerts ),
 				*this );
 		
@@ -95,8 +94,8 @@ void Polygon::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 
 	if ( (end - start) == 1 )
 	{	
-		splitAddTriangle(
-						fwork,
+		simplifyAddTriangle(
+						hider,
 						Vector3( &paramP[3 * 0] ),
 						Vector3( &paramP[3 * start] ),
 						Vector3( &paramP[3 * end] )
@@ -108,14 +107,14 @@ void Polygon::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
 /// 
 //==================================================================
 PointsGeneralPolygons::PointsGeneralPolygons( ParamList &params, const SymbolList &staticSymbols ) :
-	Primitive(POINTSGENERALPOLYGONS)
-	, mParams(params)
+	ComplexPrimitiveBase(POINTSGENERALPOLYGONS),
+	mParams(params)
 {
 }
 
 //==================================================================
-void PointsGeneralPolygons::splitAddTriangle(
-				FrameworkBase &fwork,
+void PointsGeneralPolygons::simplifyAddTriangle(
+				HiderREYES &hider,
 				const Vector3 &v1,
 				const Vector3 &v2,
 				const Vector3 &v3
@@ -131,17 +130,17 @@ void PointsGeneralPolygons::splitAddTriangle(
 	patchVerts[1] = a;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	fwork.InsertSplitted( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
 	patchVerts[0] = v2;
 	patchVerts[1] = a;
 	patchVerts[2] = b;
 	patchVerts[3] = mid;
-	fwork.InsertSplitted( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
 	patchVerts[0] = v3;
 	patchVerts[1] = b;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	fwork.InsertSplitted( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
 }
 
 //==================================================================
@@ -153,7 +152,7 @@ struct VertInfo
 };
 
 //==================================================================
-void PointsGeneralPolygons::Split( FrameworkBase &fwork, bool uSplit, bool vSplit )
+void PointsGeneralPolygons::Simplify( HiderREYES &hider )
 {
 	size_t		nloopsN = mParams[0].IntArrSize();
 	const int	*pNLoops = mParams[0].PInt();
@@ -210,7 +209,7 @@ void PointsGeneralPolygons::Split( FrameworkBase &fwork, bool uSplit, bool vSpli
 		patchVerts[2].Set( &paramP[3 * end] );
 		patchVerts[3].Set( &paramP[3 * (start+1)] );
 
-		fwork.InsertSplitted(
+		hider.InsertSimple(
 				new PatchBilinear( mParams, patchVerts ),
 				*this );
 		
@@ -220,8 +219,8 @@ void PointsGeneralPolygons::Split( FrameworkBase &fwork, bool uSplit, bool vSpli
 
 	if ( (end - start) == 1 )
 	{	
-		splitAddTriangle(
-						fwork,
+		simplifyAddTriangle(
+						hider,
 						Vector3( &paramP[3 * 0] ),
 						Vector3( &paramP[3 * start] ),
 						Vector3( &paramP[3 * end] )

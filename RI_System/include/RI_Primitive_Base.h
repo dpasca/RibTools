@@ -1,11 +1,10 @@
-/*
- *  RI_Primitive_Base.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/18.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Primitive_Base.h
+///
+/// Created by Davide Pasca - 2009/4/30
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_PRIMITIVE_BASE_H
 #define RI_PRIMITIVE_BASE_H
@@ -15,9 +14,6 @@
 #include "RI_Symbol.h"
 #include "RI_MicroPolygonGrid.h"
 
-const static int NSUBDIVS = 16;
-#define PUTPRIMNAME	//puts
-
 //==================================================================
 namespace RI
 {
@@ -25,30 +21,15 @@ namespace RI
 class Options;
 class Attributes;
 class Transform;
-class FrameworkBase;
+class HiderREYES;
 class MicroPolygonGrid;
 
 //==================================================================
-/// GVert
+/// PrimitiveBase
 //==================================================================
-struct GVert
+class PrimitiveBase
 {
-	union 
-	{
-		struct {
-			float	x, y, z;
-			float	u, v;
-		};
-		
-		float	vec[5];
-	};
-};
-
-//==================================================================
-/// Primitive
-//==================================================================
-class Primitive
-{
+	RefCount			mRefCnt;
 public:
 	enum Type
 	{
@@ -71,46 +52,115 @@ public:
 	Type				mType;
 	Attributes			*mpAttribs;
 	Transform			*mpTransform;
-	
-	// some prims may no need these.. like for the polygons
-	// ..but for now we add them anyway !
-	float				mURange[2];
-	float				mVRange[2];
-	u_int				mSplitCnt;
 
 public:
-	Primitive( Type type ) :
+	PrimitiveBase( Type type ) :
 		mType(type),
 		mpAttribs(NULL),
-		mpTransform(NULL),
-		mSplitCnt(0)
+		mpTransform(NULL)
+	{
+	}
+
+	virtual ~PrimitiveBase()
+	{
+	}
+
+	PrimitiveBase *Borrow()
+	{
+		mRefCnt.AddRef();
+		return this;
+	}
+
+	void Release()
+	{
+		if ( 0 == mRefCnt.SubRef() )
+			delete this;
+	}
+	
+	virtual bool	IsComplex() const = 0;
+	virtual bool	IsSplitable() const = 0;
+
+	void SetStates(
+		Attributes	*pAttribs,
+		Transform	*pTransform
+	)
+	{
+		mpAttribs	= pAttribs	;
+		mpTransform	= pTransform;
+	}
+
+	void CopyStates( PrimitiveBase &fromPrim )
+	{
+		mpAttribs	= fromPrim.mpAttribs	;
+		mpTransform	= fromPrim.mpTransform;
+	}
+	
+	bool IsUsed() const
+	{
+		return mRefCnt.GetCount() != 0;
+	}
+};
+
+//==================================================================
+/// ComplexPrimitiveBase
+//==================================================================
+class ComplexPrimitiveBase : public PrimitiveBase
+{
+
+public:
+	ComplexPrimitiveBase( PrimitiveBase::Type type ) :
+		PrimitiveBase(type)
+	{
+	}
+
+	virtual ~ComplexPrimitiveBase() {}
+
+		bool	IsComplex() const		{ return true;	}
+		bool	IsSplitable() const		{ return false;	}
+
+	virtual void	Simplify( HiderREYES &hider ) = 0;
+};
+
+//==================================================================
+/// SimplePrimitiveBase
+//==================================================================
+class SimplePrimitiveBase : public PrimitiveBase
+{
+public:
+	float	mURange[2];
+	float	mVRange[2];
+	u_int	mSplitCnt;
+	int		mDiceGridWd;
+	int		mDiceGridHe;
+
+public:
+	SimplePrimitiveBase( PrimitiveBase::Type type ) :
+		PrimitiveBase(type),
+		mSplitCnt(0),
+		mDiceGridWd(-1),
+		mDiceGridHe(-1)
 	{
 		mURange[0] = 0;
 		mURange[1] = 1;
 		mVRange[0] = 0;
 		mVRange[1] = 1;
 	}
-/*
-	Primitive( const Primitive *pSrc ) :
-		mType(		pSrc->mType),
-		mpAttribs(	pSrc->mpAttribs),
-		mpTransform(pSrc->mpTransform),
-		mURange(	pSrc->mURange),
-		mVRange(	pSrc->mVRange)
-	{
-	}
-*/
-	virtual ~Primitive()
-	{
-	}
-	
-	virtual Primitive	*Clone() const = 0;
-	
+
+	virtual ~SimplePrimitiveBase() {}
+
+		bool	IsComplex() const		{ return false;	}
+		bool	IsSplitable() const		{ return true;	}
+
+	virtual SimplePrimitiveBase	*Clone() const = 0;
+
+	bool SetupForDiceOrSplit(	const HiderREYES &hider,
+								bool &out_uSplit,
+								bool &out_vSplit );
+
+	void	Split( HiderREYES &hider, bool uSplit, bool vSplit );
+
 	// make a 3D bound, return false if the bound cannot be made
 	virtual bool	MakeBound( Bound &out_bound ) const = 0;
-
-	virtual bool	IsSplitable() const			{ return true;	}
-	virtual void	Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
 
 	inline Point3	&EvalP(
 						float u,
@@ -127,18 +177,8 @@ public:
 						Point3 &out_pt,
 						Vector3 *out_dPdu,
 						Vector3 *out_dPdv ) const = 0;
-	//{ out_pt->SetZero(); out_dPdu->SetZero(); out_dPdv->SetZero(); }
 
-	virtual bool	IsDiceable(
-						MicroPolygonGrid &g,
-						class HiderBase *pHider,
-						bool &out_uSplit,
-						bool &out_vSplit )
-					{
-						return false;
-					}
-
-	virtual void	Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera );
+	virtual void	Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera, bool doColorCoded );
 
 	Vector2 CalcLocalUV( const Vector2 &gridUV )
 	{
@@ -149,52 +189,6 @@ public:
 			);
 	}
 
-	void SetStates(
-		Attributes	*pAttribs,
-		Transform	*pTransform
-	)
-	{
-		mpAttribs	= pAttribs	;
-		mpTransform	= pTransform;
-	}
-
-	void CopyStates( Primitive &fromPrim )
-	{
-		mpAttribs	= fromPrim.mpAttribs	;
-		mpTransform	= fromPrim.mpTransform;
-	}
-	
-	bool IsUsable() const
-	{
-		return mpAttribs != 0 && mpTransform != 0;
-	}
-
-	void MarkUnusable()
-	{
-		mpAttribs	= 0;
-		mpTransform	= 0;
-	}
-/*
-	virtual void Render( GState &gstate )
-	{
-	}
-*/
-};
-
-//==================================================================
-class DiceablePrim : public Primitive
-{
-public:
-	DiceablePrim( Type type ) :
-		Primitive(type)
-	{
-	}
-
-		bool	IsDiceable(
-						MicroPolygonGrid &g,
-						HiderBase *pHider,
-						bool &out_uSplit,
-						bool &out_vSplit );
 };
 
 //==================================================================

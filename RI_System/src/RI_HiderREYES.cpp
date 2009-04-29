@@ -34,7 +34,9 @@ static void MakeCube( const Bound &b, Vector3 out_box[8] )
 //==================================================================
 /// HiderREYES
 //==================================================================
-HiderREYES::HiderREYES()
+HiderREYES::HiderREYES( const Params &params ) :
+	mParams(params),
+	mpStatics(NULL)
 {
 }
 
@@ -61,6 +63,10 @@ void HiderREYES::WorldBegin(
 	mZBuff.Setup( opt.mXRes, opt.mYRes );
 	mZBuff.Fill( FLT_MAX );
 
+#if 0
+	mpBuckets.push_back(
+			new Bucket( 0, 0, opt.mXRes, opt.mYRes ) );
+#else
 	for (int y=0; y < opt.mYRes; y += BUCKET_SIZE)
 	{
 		int	y2 = y + BUCKET_SIZE;
@@ -71,98 +77,87 @@ void HiderREYES::WorldBegin(
 			int	x2 = x + BUCKET_SIZE;
 			x2 = DMIN( x2, opt.mXRes );
 
-			if ( mDbg.mOnlyBucketAtX == -1 ||
-				 mDbg.mOnlyBucketAtX >= x &&
-				 mDbg.mOnlyBucketAtY >= y &&
-				 mDbg.mOnlyBucketAtX < x2 &&
-				 mDbg.mOnlyBucketAtY < y2 )
+			if ( mParams.mDbgOnlyBucketAtX == -1 ||
+				 mParams.mDbgOnlyBucketAtX >= x &&
+				 mParams.mDbgOnlyBucketAtY >= y &&
+				 mParams.mDbgOnlyBucketAtX < x2 &&
+				 mParams.mDbgOnlyBucketAtY < y2 )
 			{
 				mpBuckets.push_back(
 						new Bucket( x, y, x2, y2 ) );
 			}
 		}
 	}
+#endif
 }
 
 //==================================================================
-void HiderREYES::Insert( Primitive *pPrim )
+void HiderREYES::Insert( PrimitiveBase *pPrim )
 {
-	Bound	bound;
-	if NOT( pPrim->MakeBound( bound ) )
-	{
-		// not boundable.. needs split !
-		mpBuckets[0]->mpPrims.push_back( pPrim );
-	}
-	else
-	{
-		const Matrix44 &mtxLocalWorld = pPrim->mpTransform->GetMatrix();
+	mpPrims.push_back( pPrim->Borrow() );
+}
 
-		float bound2df[4];
+//==================================================================
+void HiderREYES::InsertSimple(	
+					SimplePrimitiveBase		*pSimplePrim,
+					ComplexPrimitiveBase	&srcPrim
+					)
+{
+	pSimplePrim->CopyStates( srcPrim );
 
-		if NOT( makeRasterBound( bound, mtxLocalWorld, bound2df ) )
-		{
-			// delete what we can't understand 8)
-			pPrim->MarkUnusable();
-			//DSAFE_DELETE( pPrim );
-			return;
-		}
-
-		int minX = (int)floorf( bound2df[0] );
-		int minY = (int)floorf( bound2df[1] );
-		int maxX =  (int)ceilf( bound2df[2] );
-		int maxY =  (int)ceilf( bound2df[3] );
-
-		if ( minX >= (int)mDestBuff.mWd ||
-			 minY >= (int)mDestBuff.mHe ||
-			 maxX <	0 ||
-			 maxY <	0 )
-		{
-			// completely outside
-			pPrim->MarkUnusable();
-			//DSAFE_DELETE( pPrim );
-			return;
-		}
-
-		//int	clampedMinX = D::Clamp( minX, 0, (int)mDestBuff.mWd-1 );
-		//int	clampedMinY = D::Clamp( minY, 0, (int)mDestBuff.mHe-1 );
-
-		for (size_t i=0; i < mpBuckets.size(); ++i)
-		{
-			//if ( mpBuckets[i]->Contains( clampedMinX, clampedMinY ) )
-			if ( mpBuckets[i]->Intersects( minX, minY, maxX, maxY ) )
-			{
-				mpBuckets[i]->mpPrims.push_back( pPrim );
-				break;
-			}
-		}
-	}
+	mpPrims.push_back( pSimplePrim->Borrow() );
 }
 
 //==================================================================
 void HiderREYES::InsertSplitted(	
-					Primitive	*pSplitPrim,
-					Primitive	&srcPrim
-					)
+				SimplePrimitiveBase	*pDesPrim,
+				SimplePrimitiveBase	&srcPrim
+				)
 {
-	// $$$ mark splitted stuff to never be used again !
-	DASSERT( srcPrim.IsUsable() );
+	pDesPrim->CopyStates( srcPrim );
 
-	pSplitPrim->CopyStates( srcPrim );
+	pDesPrim->mSplitCnt += 1;
 
-	pSplitPrim->mSplitCnt += 1;
-
-	Insert( pSplitPrim );
+	mpPrims.push_back( pDesPrim->Borrow() );
 }
 
 //==================================================================
-void HiderREYES::Remove( Primitive *pPrim )
+void HiderREYES::InsertForDicing( SimplePrimitiveBase *pPrim )
 {
+	Bound	bound;
+	if NOT( pPrim->MakeBound( bound ) )
+	{
+		DASSERT( 0 );
+		return;
+	}
+
+	const Matrix44 &mtxLocalWorld = pPrim->mpTransform->GetMatrix();
+
+	float bound2df[4];
+	if NOT( makeRasterBound( bound, mtxLocalWorld, bound2df ) )
+	{
+		return;
+	}
+
+	int minX = (int)floorf( bound2df[0] );
+	int minY = (int)floorf( bound2df[1] );
+	int maxX =  (int)ceilf( bound2df[2] );
+	int maxY =  (int)ceilf( bound2df[3] );
+
+	for (size_t i=0; i < mpBuckets.size(); ++i)
+	{
+		if ( mpBuckets[i]->Intersects( minX, minY, maxX, maxY ) )
+		{
+			mpBuckets[i]->mpPrims.push_back( (SimplePrimitiveBase *)pPrim->Borrow() );
+		}
+	}
+
 }
 
 //==================================================================
 void HiderREYES::WorldEnd()
 {
-	if ( mDbg.mShowBuckets )
+	if ( mParams.mDbgShowBuckets )
 	{
 		float borderCol[] = { 1, 0, 0 };
 		for (size_t bi=0; bi < mpBuckets.size(); ++bi)
@@ -309,33 +304,35 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 			int	winX = (int)(destHalfWd + destHalfWd * Pproj.x * oow);
 			int	winY = (int)(destHalfHe - destHalfHe * Pproj.y * oow);
 			
-			if ( (u_int)winX >= destWd || (u_int)winY >= destHe )
-				continue;
+			if ( (u_int)winX < destWd && (u_int)winY < destHe )
+			{
+			#if 0
+				float	destCol[3] =
+				{
+					u,
+					v,
+					0
+				};
+			#else
+				float	destCol[3] =
+				{
+					pCi->x,
+					pCi->y,
+					pCi->z
+				};
+			#endif
 
-#if 0
-			float	destCol[3] =
-			{
-				u,
-				v,
-				0
-			};
-#else
-			float	destCol[3] =
-			{
-				pCi->x,
-				pCi->y,
-				pCi->z
-			};
-#endif
+				float	*pZSample = mZBuff.GetSamplePtr( winX, winY );
+				if ( Pproj.z < *pZSample )
+				{
+					*pZSample = Pproj.z;
+					mDestBuff.SetSample( winX, winY, destCol );
+				}
+			}
+
+			// advance anyway...
 			++pCi;
 			++pOi;
-
-			float	*pZSample = mZBuff.GetSamplePtr( winX, winY );
-			if ( Pproj.z < *pZSample )
-			{
-				*pZSample = Pproj.z;
-				mDestBuff.SetSample( winX, winY, destCol );
-			}
 		}
 	}
 

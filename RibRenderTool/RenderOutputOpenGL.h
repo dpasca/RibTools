@@ -10,7 +10,7 @@
 #ifndef RENDEROUTPUTOPENGL_H
 #define RENDEROUTPUTOPENGL_H
 
-#include "RI_System/include/RI_FrameworkBase.h"
+#include "RI_System/include/RI_FrameworkREYES.h"
 
 //==================================================================
 // RenderOutputOpenGL

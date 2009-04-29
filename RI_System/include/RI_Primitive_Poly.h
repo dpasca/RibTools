@@ -16,10 +16,12 @@
 namespace RI
 {
 
+class HiderREYES;
+
 //==================================================================
 /// Polygon
 //==================================================================
-class Polygon : public Primitive
+class Polygon : public ComplexPrimitiveBase
 {
 public:
 	ParamList		mParams;
@@ -27,22 +29,11 @@ public:
 public:
 	Polygon( ParamList &params, const SymbolList &staticSymbols );
 
-		Polygon *Clone() const {	DASSERT( 0 ); return NULL; }
-
-		bool MakeBound( Bound &out_bound ) const { out_bound.Reset(); return false; }
-		bool IsSplitable() const	{	return true; }
-		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
-
-		void	Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vector3 *out_dPdu,
-			Vector3 *out_dPdv ) const {}
+		void Simplify( HiderREYES &hider );
 
 private:
-	void splitAddTriangle(
-				FrameworkBase &fwork,
+	void simplifyAddTriangle(
+				HiderREYES &fwork,
 				const Vector3 &v1,
 				const Vector3 &v2,
 				const Vector3 &v3
@@ -53,7 +44,7 @@ private:
 //==================================================================
 /// PointsGeneralPolygons
 //==================================================================
-class PointsGeneralPolygons : public Primitive
+class PointsGeneralPolygons : public ComplexPrimitiveBase
 {
 public:
 	ParamList		mParams;
@@ -61,22 +52,11 @@ public:
 public:
 	PointsGeneralPolygons( ParamList &params, const SymbolList &staticSymbols );
 
-		PointsGeneralPolygons *Clone() const {	DASSERT( 0 ); return NULL; }
-
-		bool MakeBound( Bound &out_bound ) const { out_bound.Reset(); return false; }
-		bool IsSplitable() const	{	return true; }
-		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
-
-		void	Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vector3 *out_dPdu,
-			Vector3 *out_dPdv ) const {}
+		void Simplify( HiderREYES &hider );
 
 private:
-	void splitAddTriangle(
-				FrameworkBase &fwork,
+	void simplifyAddTriangle(
+				HiderREYES &hider,
 				const Vector3 &v1,
 				const Vector3 &v2,
 				const Vector3 &v3

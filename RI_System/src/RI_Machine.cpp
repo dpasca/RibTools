@@ -18,7 +18,7 @@ namespace RI
 /// 
 //==================================================================
 Machine::Machine(
-			FrameworkBase *pFramework,
+			FrameworkREYES *pFramework,
 			const char *pDefaultShadersDir,
 			int forcedWd,
 			int forcedHe ) :

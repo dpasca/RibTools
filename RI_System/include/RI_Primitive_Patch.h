@@ -19,7 +19,7 @@ namespace RI
 //==================================================================
 /// PatchBilinear
 //==================================================================
-class PatchBilinear : public DiceablePrim
+class PatchBilinear : public SimplePrimitiveBase
 {
 private:
 	ParamList		mParams;
@@ -83,7 +83,7 @@ public:
 //==================================================================
 /// PatchBicubic
 //==================================================================
-class PatchBicubic : public DiceablePrim
+class PatchBicubic : public SimplePrimitiveBase
 {
 private:
 	ParamList		mParams;
@@ -118,7 +118,7 @@ private:
 //==================================================================
 /// PatchMesh
 //==================================================================
-class PatchMesh : public Primitive
+class PatchMesh : public ComplexPrimitiveBase
 {
 public:
 	CPSymVoid		mpyPatchType;
@@ -129,18 +129,7 @@ public:
 			  ParamList &params,
 			  const SymbolList &staticSymbols );
 
-		PatchMesh *Clone() const {	DASSERT( 0 ); return NULL; }
-
-		bool MakeBound( Bound &out_bound ) const { out_bound.Reset(); return false; }
-		bool IsSplitable() const	{	return true; }
-		void Split( FrameworkBase &fwork, bool uSplit, bool vSplit );
-
-		void	Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vector3 *out_dPdu,
-			Vector3 *out_dPdv ) const {}
+		void Simplify( HiderREYES &hider );
 };
 
 	

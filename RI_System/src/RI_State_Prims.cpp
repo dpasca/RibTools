@@ -16,7 +16,7 @@ namespace RI
 {
 
 //==================================================================
-inline void State::insertPrimitive( Primitive *pPrim )
+inline void State::insertPrimitive( PrimitiveBase *pPrim )
 {
 	mpFramework->Insert( pPrim,
 					  mAttributesStack.top(),

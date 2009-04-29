@@ -28,7 +28,7 @@ class Machine
 	int		mForcedHe;
 
 public:
-	Machine(FrameworkBase *pFramework,
+	Machine(FrameworkREYES *pFramework,
 			const char *pDefaultShadersDir,
 			int forcedWd=-1,
 			int forcedHe=-1 );

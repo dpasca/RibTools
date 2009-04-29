@@ -15,7 +15,7 @@
 #include "RI_Options.h"
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
-#include "RI_FrameworkBase.h"
+#include "RI_FrameworkREYES.h"
 #include "RI_Primitive.h"
 #include "RI_LightSource.h"
 
@@ -69,7 +69,7 @@ class State
 
 	Matrix44				mMtxWorldCamera;
 
-	FrameworkBase			*mpFramework;
+	FrameworkREYES			*mpFramework;
 	
 	ResourceManager			mResManager;
 
@@ -82,7 +82,7 @@ class State
 	};
 
 public:
-	State( FrameworkBase *pFramework, const char *pDefaultShadersDir );
+	State( FrameworkREYES *pFramework, const char *pDefaultShadersDir );
 	~State();
 
 	void	Begin( RtToken name );
@@ -190,7 +190,7 @@ private:
 	inline void pushStacks( const u_int flags );
 	inline void popStacks( const u_int flags );
 	
-	inline void insertPrimitive( Primitive *pPrim );
+	inline void insertPrimitive( PrimitiveBase *pPrim );
 	
 	void makeDefaultShaders( const char *pBasePath );
 };
