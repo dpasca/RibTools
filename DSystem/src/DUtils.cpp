@@ -1,12 +1,12 @@
-/*
- *  DUtils.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 08/12/31.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// DUtils.cpp
+///
+/// Created by Davide Pasca - 2009/5/1
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
+#include <Windows.h>
 #include <stdio.h>
 #include <stdexcept>
 #include <stdarg.h>
@@ -207,6 +207,30 @@ void StrStripBeginEndWhite( char *pStr )
 		}
 	}
 	pStr[di] = 0;
+}
+
+//==================================================================
+I64 GetTimeTicks()
+{
+	__int64	val;
+	QueryPerformanceCounter( (LARGE_INTEGER *)&val );
+
+	return val;
+}
+
+//==================================================================
+double TimeTicksToMS( I64 ticks )
+{
+	static __int64	freq;
+	static double	coe;
+	
+	if ( freq == 0 )
+	{
+		QueryPerformanceFrequency( (LARGE_INTEGER *)&freq );
+		coe = 1.0 / freq;
+	}
+
+	return ticks * coe; 
 }
 
 //==================================================================

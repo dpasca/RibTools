@@ -57,12 +57,9 @@ void HiderREYES::WorldBegin(
 	mMtxWorldCamera	= mtxWorldCamera;
 	mMtxWorldProj	= mMtxWorldCamera * opt.mMtxCamProj;
 	
-	mDestBuff.Setup( opt.mXRes, opt.mYRes );
-	mDestBuff.Clear();
+	mFinalBuff.Setup( opt.mXRes, opt.mYRes );
+	mFinalBuff.Clear();
 	
-	mZBuff.Setup( opt.mXRes, opt.mYRes );
-	mZBuff.Fill( FLT_MAX );
-
 #if 0
 	mpBuckets.push_back(
 			new Bucket( 0, 0, opt.mXRes, opt.mYRes ) );
@@ -164,11 +161,11 @@ void HiderREYES::WorldEnd()
 		{
 			const Bucket	*pBucket = mpBuckets[bi];
 
-			mDestBuff.DrawHLine( pBucket->mX1, pBucket->mY1, pBucket->mX2, borderCol );
-			mDestBuff.DrawHLine( pBucket->mX1, pBucket->mY2, pBucket->mX2, borderCol );
+			mFinalBuff.DrawHLine( pBucket->mX1, pBucket->mY1, pBucket->mX2, borderCol );
+			mFinalBuff.DrawHLine( pBucket->mX1, pBucket->mY2, pBucket->mX2, borderCol );
 
-			mDestBuff.DrawVLine( pBucket->mX1, pBucket->mY1, pBucket->mY2, borderCol );
-			mDestBuff.DrawVLine( pBucket->mX2, pBucket->mY1, pBucket->mY2, borderCol );
+			mFinalBuff.DrawVLine( pBucket->mX1, pBucket->mY1, pBucket->mY2, borderCol );
+			mFinalBuff.DrawVLine( pBucket->mX2, pBucket->mY1, pBucket->mY2, borderCol );
 		}
 	}
 
@@ -187,8 +184,8 @@ bool HiderREYES::makeRasterBound(
 	Vector3	boxVerts[8];
 	MakeCube( b, boxVerts );
 
-	float destHalfWd	= (float)mDestBuff.mWd * 0.5f;
-	float destHalfHe	= (float)mDestBuff.mHe * 0.5f;
+	float destHalfWd	= (float)mFinalBuff.mWd * 0.5f;
+	float destHalfHe	= (float)mFinalBuff.mHe * 0.5f;
 
 	float minX =  FLT_MAX;
 	float minY =  FLT_MAX;
@@ -272,22 +269,30 @@ void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 */
 
 //==================================================================
-void HiderREYES::Hide( MicroPolygonGrid &g )
+void HiderREYES::Hide(
+				MicroPolygonGrid	&g,
+				float				destOffX,
+				float				destOffY,
+				u_int				screenWd,
+				u_int				screenHe,
+				Buffer2D<3>			&destBuff,
+				Buffer2D<1>			&zBuff ) const
 {
 	float du = (g.mURange[1] - g.mURange[0]) / g.mXDim;
 	float dv = (g.mVRange[1] - g.mVRange[0]) / g.mYDim;
-	
-	float destHalfWd	= (float)mDestBuff.mWd * 0.5f;
-	float destHalfHe	= (float)mDestBuff.mHe * 0.5f;
+
+	float screenCx =	(float)screenWd * 0.5f + destOffX;
+	float screenCy =	(float)screenHe * 0.5f + destOffY;
+	float screenHWd =	(float)screenWd * 0.5f;
+	float screenHHe =	(float)screenHe * 0.5f;
+
+	u_int	destWd = destBuff.mWd;
+	u_int	destHe = destBuff.mHe;
 
 	const Point3	*pRunsWS	= g.mpPointsWS;
 
 	const Color	*pOi = (const Color *)g.mSymbols.LookupVariableData( "Oi", SlSymbol::COLOR, true );
 	const Color	*pCi = (const Color *)g.mSymbols.LookupVariableData( "Ci", SlSymbol::COLOR, true );
-
-	u_int destWd	= mDestBuff.mWd;
-	u_int destHe	= mDestBuff.mHe;
-
 
 	for (u_int iv=0; iv < g.mYDim; ++iv)
 	{
@@ -301,8 +306,8 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 			
 			float	oow = 1.0f / Pproj.w;
 
-			int	winX = (int)(destHalfWd + destHalfWd * Pproj.x * oow);
-			int	winY = (int)(destHalfHe - destHalfHe * Pproj.y * oow);
+			int	winX = (int)(screenCx + screenHWd * Pproj.x * oow);
+			int	winY = (int)(screenCy - screenHHe * Pproj.y * oow);
 			
 			if ( (u_int)winX < destWd && (u_int)winY < destHe )
 			{
@@ -322,11 +327,11 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 				};
 			#endif
 
-				float	*pZSample = mZBuff.GetSamplePtr( winX, winY );
+				float	*pZSample = zBuff.GetSamplePtr( winX, winY );
 				if ( Pproj.z < *pZSample )
 				{
 					*pZSample = Pproj.z;
-					mDestBuff.SetSample( winX, winY, destCol );
+					destBuff.SetSample( winX, winY, destCol );
 				}
 			}
 
@@ -335,7 +340,6 @@ void HiderREYES::Hide( MicroPolygonGrid &g )
 			++pOi;
 		}
 	}
-
 }
 
 //==================================================================

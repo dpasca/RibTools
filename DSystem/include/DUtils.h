@@ -66,6 +66,9 @@ public:
 //==================================================================
 void StrStripBeginEndWhite( char *pStr );
 
+I64 GetTimeTicks();
+double TimeTicksToMS( I64 ticks );
+
 //==================================================================
 }
 

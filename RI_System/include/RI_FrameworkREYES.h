@@ -74,6 +74,13 @@ public:
 					const Transform		&xform );
 
 	void WorldEnd();
+
+private:
+	static void renderBucket_s( HiderREYES &hider, Bucket *pBuckets );
+
+	void	worldEnd_simplify();
+	void	worldEnd_splitAndAddToBuckets();
+	void	worldEnd_renderBuckets();
 };
 
 //==================================================================

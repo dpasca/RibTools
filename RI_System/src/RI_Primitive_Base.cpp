@@ -82,7 +82,10 @@ void SimplePrimitiveBase::Split( HiderREYES &hider, bool uSplit, bool vSplit )
 }
 
 //==================================================================
-void SimplePrimitiveBase::Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera, bool doColorCoded )
+void SimplePrimitiveBase::Dice(
+					MicroPolygonGrid &g,
+					const Matrix44 &mtxWorldCamera,
+					bool doColorCoded ) const
 {
 	Point3	*pPointsWS = g.mpPointsWS;
 

@@ -16,41 +16,24 @@ namespace RI
 {
 
 //==================================================================
-static void fillColArray( Color *pCol, size_t n, float r, float g, float b )
+MicroPolygonGrid::MicroPolygonGrid() :
+	mXDim(0),
+	mYDim(0),
+	mpPointsWS(0),
+	mPointsN(0),
+	mpDataCi(0),
+	mpDataOi(0),
+	mpDataCs(0),
+	mpDataOs(0)
 {
-	for (size_t i=0; i < n; ++i)
-	{
-		pCol[i].Set( r, g, b );
-	}
-}
-
-//==================================================================
-void MicroPolygonGrid::Setup(
-						u_int xdim,
-						u_int ydim,
-						const float uRange[2],
-						const float vRange[2],
-						const Matrix44 &mtxLocalWorld )
-{
-	mXDim = xdim;
-	mYDim = ydim;
-	mPointsN = mXDim * mYDim;
-	mMtxLocalWorld = mtxLocalWorld;
-	mURange[0] = uRange[0];
-	mURange[1] = uRange[1];
-	mVRange[0] = vRange[0];
-	mVRange[1] = vRange[1];
-
-	// $$$ why +1 ? For derivatives ?
-	//mpPoints = new Point3[ (xdim+1) * (ydim+1) ];
+	static const size_t allocN = MAX_SIZE;
 
 	SlSymbol	symbol;
-
 	symbol.Reset();
 
 	// allocate some standard varying params
 	symbol.mIsVarying = true;
-	symbol.mArraySize = mPointsN;
+	symbol.mArraySize = allocN;
 	symbol.mStorage = SlSymbol::PARAMETER;
 
 	symbol.mName = "P";
@@ -82,28 +65,28 @@ void MicroPolygonGrid::Setup(
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, mPointsN, 1.0f, 0.0f, 0.0f );
+	mpDataCi = (Color *)symbol.mpDefaultVal;
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Oi";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, mPointsN, 0.0f, 1.0f, 0.0f );
+	mpDataOi = (Color *)symbol.mpDefaultVal;
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Cs";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, mPointsN, 1.0f, 1.0f, 1.0f );
+	mpDataCs = (Color *)symbol.mpDefaultVal;
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Os";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	fillColArray( (Color *)symbol.mpDefaultVal, mPointsN, 1.0f, 1.0f, 1.0f );
+	mpDataOs = (Color *)symbol.mpDefaultVal;
 	mSymbols.push_back( symbol );
 }
 
@@ -114,7 +97,43 @@ MicroPolygonGrid::~MicroPolygonGrid()
 	{
 		mSymbols[i].FreeData();
 	}
-	
+}
+
+//==================================================================
+static void fillColArray( Color *pCol, size_t n, float r, float g, float b )
+{
+	for (size_t i=0; i < n; ++i)
+	{
+		pCol[i].Set( r, g, b );
+	}
+}
+
+//==================================================================
+void MicroPolygonGrid::Setup(
+						u_int xdim,
+						u_int ydim,
+						const float uRange[2],
+						const float vRange[2],
+						const Matrix44 &mtxLocalWorld )
+{
+	mXDim = xdim;
+	mYDim = ydim;
+	mPointsN = mXDim * mYDim;
+	mMtxLocalWorld = mtxLocalWorld;
+	mURange[0] = uRange[0];
+	mURange[1] = uRange[1];
+	mVRange[0] = vRange[0];
+	mVRange[1] = vRange[1];
+
+	DASSERT( mPointsN <= MAX_SIZE );
+
+	// $$$ why +1 ? For derivatives ?
+	//mpPoints = new Point3[ (xdim+1) * (ydim+1) ];
+
+	fillColArray( mpDataCi, mPointsN, 1.0f, 0.0f, 0.0f );
+	fillColArray( mpDataOi, mPointsN, 0.0f, 1.0f, 0.0f );
+	fillColArray( mpDataCs, mPointsN, 1.0f, 1.0f, 1.0f );
+	fillColArray( mpDataOs, mPointsN, 1.0f, 1.0f, 1.0f );
 }
 
 //==================================================================

@@ -26,11 +26,12 @@ class PrimitiveBase;
 class Bucket
 {
 public:
-	int	mX1;
-	int	mY1;
-	int	mX2;
-	int	mY2;
-
+	int							mX1;
+	int							mY1;
+	int							mX2;
+	int							mY2;
+	Buffer2D<3>					mCBuff;
+	Buffer2D<1>					mZBuff;
 	DVec<SimplePrimitiveBase *>	mpPrims;
 
 public:
@@ -47,6 +48,26 @@ public:
 		for (size_t i=0; i < mpPrims.size(); ++i)
 			if ( mpPrims[i] )
 				mpPrims[i]->Release();
+	}
+
+	void BeginRender()
+	{
+		u_int wd = (u_int)(mX2 - mX1);
+		u_int he = (u_int)(mY2 - mY1);
+
+		mCBuff.Setup( wd, he );
+		mCBuff.Clear();
+
+		mZBuff.Setup( wd, he );
+		mZBuff.Fill( FLT_MAX );
+	}
+
+	void EndRender( Buffer2D<3> &outCBuff )
+	{
+		mZBuff.Free();
+
+		outCBuff.CopyRect( mX1, mY1, mCBuff );
+		mCBuff.Free();
 	}
 
 	bool Contains( int x, int y ) const
@@ -99,8 +120,7 @@ private:
 	friend class FrameworkREYES;
 
 	Options				mOptions;
-	Buffer2D<3>			mDestBuff;
-	Buffer2D<1>			mZBuff;
+	Buffer2D<3>			mFinalBuff;
 	DVec<Bucket *>		mpBuckets;
 	Params				mParams;
 	DVec<PrimitiveBase *>	mpPrims;
@@ -131,11 +151,18 @@ public:
 	
 	float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const;
 
-	void Hide( MicroPolygonGrid &g );
-	
-	u_int		GetOutputDataWd() const	{ return mDestBuff.GetWd();	}
-	u_int		GetOutputDataHe() const	{ return mDestBuff.GetHe();	}
-	const float *GetOutputData() const { return mDestBuff.GetData(); }
+	void Hide(
+			MicroPolygonGrid	&g,
+			float				destOffX,
+			float				destOffY,
+			u_int				destWd,
+			u_int				destHe,
+			Buffer2D<3>			&destBuff,
+			Buffer2D<1>			&zBuff ) const;
+
+	u_int		GetOutputDataWd() const	{ return mFinalBuff.GetWd();	}
+	u_int		GetOutputDataHe() const	{ return mFinalBuff.GetHe();	}
+	const float *GetOutputData() const { return mFinalBuff.GetData(); }
 
 private:
 	bool	makeRasterBound(

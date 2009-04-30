@@ -21,11 +21,11 @@ namespace RI
 template <u_int NCHANS>
 class Buffer2D
 {
-	float				*mpData;
+	float	*mpData;
 
 public:
-	u_int				mWd;
-	u_int				mHe;
+	u_int	mWd;
+	u_int	mHe;
 
 public:
 	Buffer2D() :
@@ -45,6 +45,11 @@ public:
 		mWd	= wd;
 		mHe	= he;
 		mpData = new float [ mWd * NCHANS * mHe ];
+	}
+
+	void Free()
+	{
+		DSAFE_DELETE_ARRAY( mpData );
 	}
 	
 	void Clear()
@@ -89,6 +94,44 @@ public:
 	{
 		for (int y=y1; y <= y2; ++y)
 			SetSample( x, y, pVal );
+	}
+
+	void CopyRect( int dx1, int dy1, const Buffer2D<NCHANS> &fromBuff )
+	{
+		int	w = (int)fromBuff.mWd;
+		int	h = (int)fromBuff.mHe;
+
+		int	sx1 = 0;
+		int	sy1 = 0;
+
+		if ( dx1 < 0 )				{ sx1 -= dx1; w += dx1; dx1 = 0; }
+		if ( dy1 < 0 )				{ sy1 -= dy1; h += dy1; dy1 = 0; }
+
+		if ( dx1 + w > (int)mWd )	{ w = (int)mWd - dx1; }
+		if ( dy1 + h > (int)mHe )	{ h = (int)mHe - dy1; }
+
+		const	float *pSrc = fromBuff.mpData;
+				float *pDes = mpData;
+
+		int	sPitch = fromBuff.mWd * NCHANS;
+		int	dPitch = mWd * NCHANS;
+
+		pSrc += sx1 * NCHANS + sy1 * sPitch;
+		pDes += dx1 * NCHANS + dy1 * dPitch;
+
+		float	*pDesEnd = pDes + mWd * mHe * NCHANS;
+
+		w *= NCHANS;
+		for (int i=0; i < h; ++i)
+		{
+			for (int j=0; j < w; ++j)
+			{
+				DASSERT( (pDes + j) < pDesEnd );
+				pDes[j] = pSrc[j];
+			}
+			pSrc += sPitch;
+			pDes += dPitch;
+		}
 	}
 
 	const float *GetData() const { return mpData;	}

@@ -178,9 +178,12 @@ public:
 						Vector3 *out_dPdu,
 						Vector3 *out_dPdv ) const = 0;
 
-	virtual void	Dice( MicroPolygonGrid &g, const Matrix44 &mtxWorldCamera, bool doColorCoded );
+	virtual void	Dice(
+						MicroPolygonGrid &g,
+						const Matrix44 &mtxWorldCamera,
+						bool doColorCoded ) const;
 
-	Vector2 CalcLocalUV( const Vector2 &gridUV )
+	Vector2 CalcLocalUV( const Vector2 &gridUV ) const
 	{
 		return
 			Vector2(

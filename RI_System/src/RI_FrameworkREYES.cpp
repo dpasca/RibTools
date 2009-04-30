@@ -11,6 +11,7 @@
 #include "RI_Base.h"
 #include "RI_State.h"
 #include "RI_FrameworkREYES.h"
+#include <omp.h>
 
 //==================================================================
 namespace RI
@@ -61,19 +62,74 @@ void FrameworkREYES::Insert(
 }
 
 //==================================================================
-void FrameworkREYES::WorldEnd()
+void FrameworkREYES::renderBucket_s( HiderREYES &hider, Bucket *pBuckets )
 {
-#if 0
-	Point3	camPosWS =
-		MultiplyV3M(
-			-mHider.mMtxWorldCamera.GetTranslation(),
-				mHider.mMtxWorldCamera.GetAs33().GetInverse()
-		);
-#else
+	DVec<SimplePrimitiveBase *>	&pPrimList = pBuckets->GetPrimList();
 
-	Point3	camPosWS = mHider.mMtxWorldCamera.GetTranslation();
+	pBuckets->BeginRender();
 
-#endif
+	MicroPolygonGrid	grid;
+
+	for (size_t i=0; i < pPrimList.size(); ++i)
+	{
+		const SimplePrimitiveBase	*pPrim = (const SimplePrimitiveBase *)pPrimList[i];
+
+		grid.Setup(
+			pPrim->mDiceGridWd,
+			pPrim->mDiceGridHe,
+			pPrim->mURange,
+			pPrim->mVRange,
+			pPrim->mpTransform->GetMatrix() );
+
+		pPrim->Dice( grid, hider.mMtxWorldCamera, hider.mParams.mDbgColorCodedGrids );
+
+		// should check backface and trim
+		// grid.displace();
+		grid.Shade( *pPrim->mpAttribs );
+
+		hider.Hide(
+				grid,
+				(float)-pBuckets->mX1,
+				(float)-pBuckets->mY1,
+				hider.mFinalBuff.mWd,
+				hider.mFinalBuff.mHe,
+				pBuckets->mCBuff,
+				pBuckets->mZBuff );
+
+		// not thread safe to release here...
+		// pPrim->Release();
+		// pPrimList[i] = NULL;
+	}
+
+	pBuckets->EndRender( hider.mFinalBuff );
+}
+
+//==================================================================
+/// QuickProf
+//==================================================================
+class QuickProf
+{
+	const char *mpMsg;
+	I64			mStart;
+
+public:
+	QuickProf( const char *pMsg ) :
+		mpMsg(pMsg)
+	{
+		mStart = DUT::GetTimeTicks();
+	}
+
+	~QuickProf()
+	{
+		I64	elapsed = DUT::GetTimeTicks() - mStart;
+		printf( "%s: %4.2lf ms\n", mpMsg, DUT::TimeTicksToMS( elapsed ) );
+	}
+};
+
+//==================================================================
+void FrameworkREYES::worldEnd_simplify()
+{
+	QuickProf	prof( __FUNCTION__ );
 
 	// --- convert complex primitives into simple ones
 	for (size_t i=0; i < mHider.mpPrims.size(); ++i)
@@ -88,8 +144,14 @@ void FrameworkREYES::WorldEnd()
 			// could compact mHider.mpPrims as it goes..
 		}
 	}
+}
 
-	// --- split primitives until necessary
+//==================================================================
+void FrameworkREYES::worldEnd_splitAndAddToBuckets()
+{
+	QuickProf	prof( __FUNCTION__ );
+
+	// --- split primitives and assing to buckets for dicing
 	for (size_t i=0; i < mHider.mpPrims.size(); ++i)
 	{
 		if NOT( mHider.mpPrims[i] )
@@ -114,35 +176,55 @@ void FrameworkREYES::WorldEnd()
 		mHider.mpPrims[i] = NULL;
 	}
 	mHider.mpPrims.clear();
+}
+
+//==================================================================
+void FrameworkREYES::worldEnd_renderBuckets()
+{
+	QuickProf	prof( __FUNCTION__ );
+
+	int	bucketsN = (int)mHider.mpBuckets.size();
 
 	// --- dice primitives accumulated in the buckets
+	#pragma omp parallel for
+	for (int bi=0; bi < bucketsN; ++bi)
+	{
+		renderBucket_s( mHider, mHider.mpBuckets[ bi ] );
+	}
+}
+
+//==================================================================
+void FrameworkREYES::WorldEnd()
+{
+#if 0
+	Point3	camPosWS =
+		MultiplyV3M(
+			-mHider.mMtxWorldCamera.GetTranslation(),
+				mHider.mMtxWorldCamera.GetAs33().GetInverse()
+		);
+#else
+
+	Point3	camPosWS = mHider.mMtxWorldCamera.GetTranslation();
+
+#endif
+
+	worldEnd_simplify();
+
+	worldEnd_splitAndAddToBuckets();
+
+	worldEnd_renderBuckets();
+
+	// --- release the primitives in all the buckets
 	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
 	{
-		DVec<SimplePrimitiveBase *>	&pPrimList = mHider.mpBuckets[bi]->GetPrimList();
-
+		DVec<SimplePrimitiveBase *>	&pPrimList = mHider.mpBuckets[ bi ]->GetPrimList();
 		for (size_t i=0; i < pPrimList.size(); ++i)
 		{
-			SimplePrimitiveBase	*pPrim = (SimplePrimitiveBase *)pPrimList[i];
-
-			MicroPolygonGrid	grid;
-
-			grid.Setup(
-				pPrim->mDiceGridWd,
-				pPrim->mDiceGridHe,
-				pPrim->mURange,
-				pPrim->mVRange,
-				pPrim->mpTransform->GetMatrix() );
-
-			pPrim->Dice( grid, mHider.mMtxWorldCamera, mHider.mParams.mDbgColorCodedGrids );
-
-			// should check backface and trim
-			// grid.displace();
-			grid.Shade( *pPrim->mpAttribs );
-
-			mHider.Hide( grid );
-
-			pPrim->Release();
-			pPrimList[i] = NULL;
+			if ( pPrimList[i] )
+			{
+				pPrimList[i]->Release();
+				pPrimList[i] = NULL;
+			}
 		}
 	}
 

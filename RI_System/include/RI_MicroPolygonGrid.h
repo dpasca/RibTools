@@ -25,6 +25,10 @@ class Attributes;
 //==================================================================
 class MicroPolygonGrid
 {
+	Color		*mpDataCi;
+	Color		*mpDataOi;
+	Color		*mpDataCs;
+	Color		*mpDataOs;
 public:
 	static const u_int	MAX_SIZE = 48 * 48;
 
@@ -37,10 +41,7 @@ public:
 	float			mVRange[2];
 	SlSymbolList	mSymbols;
 	
-	MicroPolygonGrid() : mXDim(0), mYDim(0), mpPointsWS(0), mPointsN(0)
-	{
-	}
-
+	MicroPolygonGrid();
 	~MicroPolygonGrid();
 
 	void Setup(u_int xdim,

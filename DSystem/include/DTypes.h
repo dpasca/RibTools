@@ -55,9 +55,12 @@ T Clamp( const T& val, const T& left, const T& right )
 
 typedef std::string	DStr;
 
-typedef unsigned char	U8;
-typedef unsigned short	U16;
-typedef unsigned int	U32;
+typedef unsigned char		U8;
+typedef unsigned short		U16;
+typedef unsigned int		U32;
+
+typedef unsigned __int64	U64;
+typedef	__int64				I64;
 
 //===============================================================
 #ifdef _MSC_VER
