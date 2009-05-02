@@ -1,11 +1,10 @@
-/*
- *  RI_SlRunContext.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/20.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_SlRunContext.cpp
+///
+/// Created by Davide Pasca - 2009/2/20
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_SlRunContext.h"

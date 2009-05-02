@@ -214,7 +214,7 @@ typedef void		*LightHandle;
 
 struct Bound
 {
-	Vector3	mBox[2];
+	Vec3	mBox[2];
 
 	Bound()
 	{
@@ -244,7 +244,7 @@ struct Bound
 		mBox[1].Set( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 	}
 
-	void Expand( const Vector3 &p )
+	void Expand( const Vec3 &p )
 	{
 		mBox[0].x = DMIN( mBox[0].x, p.x );
 		mBox[0].y = DMIN( mBox[0].y, p.y );

@@ -89,9 +89,9 @@ void SimplePrimitiveBase::Dice(
 {
 	Point3	*pPointsWS = g.mpPointsWS;
 
-	Vector3	*pI	 = (Vector3	*)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
-	Vector3	*pN  = (Vector3	*)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
-	Vector3	*pNg = (Vector3	*)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
+	Vec3	*pI	 = (Vec3	*)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
+	Vec3	*pN  = (Vec3	*)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
+	Vec3	*pNg = (Vec3	*)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
 	Color	*pOs = (Color	*)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
 	Color	*pCs = (Color	*)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
 
@@ -105,9 +105,10 @@ void SimplePrimitiveBase::Dice(
 	if ( mpAttribs->mOrientationFlipped )
 		mtxLocalCameraNorm = mtxLocalCameraNorm * Matrix44::Scale( -1, -1, -1 );
 
-	Vector3	camPosCS = mtxWorldCamera.GetTranslation();
+	Vec3	camPosCS = mtxWorldCamera.GetTranslation();
 
 	Color	useColor;
+	Color	useOpa;
 
 	if ( doColorCoded )
 	{
@@ -128,9 +129,13 @@ void SimplePrimitiveBase::Dice(
 		static int cnt;
 
 		useColor = palette[ cnt++ & 7 ];
+		useOpa	 = Color( 1, 1, 1 );
 	}
 	else
+	{
 		useColor = mpAttribs->mColor;
+		useOpa	 = mpAttribs->mOpacity;
+	}
 
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
@@ -138,22 +143,22 @@ void SimplePrimitiveBase::Dice(
 		float	u = 0.0f;
 		for (int j=0; j < (int)g.mXDim; ++j, u += du)
 		{
-			Vector2	locUV = CalcLocalUV( Vector2( u, v ) );
-			Vector3	dPdu;
-			Vector3	dPdv;
-			Vector3	posLS;
+			Vec2	locUV = CalcLocalUV( Vec2( u, v ) );
+			Vec3	dPdu;
+			Vec3	dPdv;
+			Vec3	posLS;
 			Eval_dPdu_dPdv( locUV.x, locUV.y, posLS, &dPdu, &dPdv );
 
-			Vector3 norLS = dPdu.GetCross( dPdv ).GetNormalized();
+			Vec3 norLS = dPdu.GetCross( dPdv ).GetNormalized();
 
-			//norLS = Vector3( 0, 0, 1 );
+			//norLS = Vec3( 0, 0, 1 );
 
-			Vector3	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
+			Vec3	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
 
-			Vector3	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
+			Vec3	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
 
-			Vector3	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
-			//Vector3	norWS = V3__M44_Mul_V3W1( mtxLocalWorldNorm, norLS ).GetNormalized();
+			Vec3	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
+			//Vec3	norWS = V3__M44_Mul_V3W1( mtxLocalWorldNorm, norLS ).GetNormalized();
 
 			*pPointsWS++	= posWS;
 			//*pI++		= pos - camWorldPos;
@@ -161,7 +166,7 @@ void SimplePrimitiveBase::Dice(
 			*pI++		= (posCS - -camPosCS).GetNormalized();
 			*pN++		= norCS;
 			*pNg++		= norCS;
-			*pOs++		= mpAttribs->mOpacity;
+			*pOs++		= useOpa;
 			*pCs++		= useColor;
 
 			//*pOs++ = Color( 1, 0, 0 );
@@ -173,7 +178,7 @@ void SimplePrimitiveBase::Dice(
 //==================================================================
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &staticSymbols,
-					DVec<Vector3> &out_vectorP,
+					DVec<Vec3> &out_vectorP,
 					int fromIdx )
 {
 	bool	gotP = false;
@@ -194,7 +199,7 @@ bool ParamsFindP(	ParamList &params,
 			out_vectorP.resize( fltVec.size() / 3 );
 
 			for (size_t iv=0, id=0; iv < fltVec.size(); iv += 3)
-				out_vectorP[id++] = Vector3( &fltVec[ iv ] );
+				out_vectorP[id++] = Vec3( &fltVec[ iv ] );
 
 			return true;
 		}
@@ -206,7 +211,7 @@ bool ParamsFindP(	ParamList &params,
 //==================================================================
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &staticSymbols,
-					Vector3	*pOut_vectorP,
+					Vec3	*pOut_vectorP,
 					int	expectedN,
 					int fromIdx )
 {
@@ -234,7 +239,7 @@ bool ParamsFindP(	ParamList &params,
 			size_t	srcN = fltVec.size();
 
 			for (size_t si=0, di=0; si < srcN; si += 3, di += 1)
-				pOut_vectorP[ di ] = Vector3( &fltVec[ si ] );
+				pOut_vectorP[ di ] = Vec3( &fltVec[ si ] );
 			
 			return true;
 		}

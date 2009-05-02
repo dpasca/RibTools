@@ -111,7 +111,7 @@ static u_int getNextPow2( u_int val )
 
 	for (u_int i=1; i < 32; ++i)
 	{
-		u_int	l = 1 << i-1;
+		u_int	l = 1 << (i-1);
 		u_int	r = 1 << i;
 		if ( val >= l && val <= r )
 		{

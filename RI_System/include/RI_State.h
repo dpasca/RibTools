@@ -148,7 +148,7 @@ public:
 	void Cylinder( float radius, float zmin, float zmax, float thetamax );
 	void Cone( float height, float radius, float thetamax );
 	void Sphere( float radius, float zmin, float zmax, float thetamax );
-	void Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax );
+	void Hyperboloid( const Vec3 &p1, const Vec3 &p2, float thetamax );
 	void Paraboloid( float rmax, float zmin, float zmax, float thetamax );
 	void Torus( float maxRadius, float minRadius,
 			   float phimin, float phimax,

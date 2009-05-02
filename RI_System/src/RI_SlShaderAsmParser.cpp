@@ -237,7 +237,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 		
 		case SlSymbol::VECTOR:
 		case SlSymbol::NORMAL:
-						symbol.mpDefaultVal = new Vector3();
+						symbol.mpDefaultVal = new Vec3();
 						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 3 );
 						break;
 		

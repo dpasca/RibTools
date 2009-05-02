@@ -28,8 +28,8 @@ void *SlSymbol::AllocClone( size_t size )
 	case SlSymbol::POINT:	pOutData = new Point3	[ size ]; break;
 	case SlSymbol::COLOR:	pOutData = new Color	[ size ]; break;
 	case SlSymbol::STRING:	pOutData = new char		[ size ]; break;
-	case SlSymbol::VECTOR:	pOutData = new Vector3	[ size ]; break;
-	case SlSymbol::NORMAL:	pOutData = new Vector3	[ size ]; break;
+	case SlSymbol::VECTOR:	pOutData = new Vec3	[ size ]; break;
+	case SlSymbol::NORMAL:	pOutData = new Vec3	[ size ]; break;
 	case SlSymbol::MATRIX:	pOutData = new Matrix44 [ size ]; break;
 	}
 	
@@ -56,8 +56,8 @@ void SlSymbol::FreeClone( void *pData )
 	case SlSymbol::POINT:	delete [] ((Point3 *)pData ); break;
 	case SlSymbol::COLOR:	delete [] ((Color *)pData ); break;
 	case SlSymbol::STRING:	delete [] ((char *)pData ); break;
-	case SlSymbol::VECTOR:	delete [] ((Vector3 *)pData ); break;
-	case SlSymbol::NORMAL:	delete [] ((Vector3 *)pData ); break;
+	case SlSymbol::VECTOR:	delete [] ((Vec3 *)pData ); break;
+	case SlSymbol::NORMAL:	delete [] ((Vec3 *)pData ); break;
 	case SlSymbol::MATRIX:	delete [] ((Matrix44 *)pData ); break;
 	}
 }

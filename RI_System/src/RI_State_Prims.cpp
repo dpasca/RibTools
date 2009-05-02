@@ -42,7 +42,7 @@ void State::Sphere( float radius, float zmin, float zmax, float thetamax )
 }
 
 //==================================================================
-void State::Hyperboloid( const Vector3 &p1, const Vector3 &p2, float thetamax )
+void State::Hyperboloid( const Vec3 &p1, const Vec3 &p2, float thetamax )
 {
 	insertPrimitive( new RI::Hyperboloid( p1, p2, thetamax ) );
 }

@@ -43,8 +43,8 @@ public:
 	{
 		struct 
 		{
-			Vector3	mDirWS;
-			Vector3	mDirCS;
+			Vec3	mDirWS;
+			Vec3	mDirCS;
 		} mDistant;
 
 		struct  

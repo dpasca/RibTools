@@ -38,9 +38,9 @@ void LightSourceT::UpdateRend( const Transform &xform, const Matrix44 &mtxWorldC
 
 		const Matrix44 &mtxLocalWorld = xform.GetMatrix();
 
-		Vector3	diffLS = mLocToPos - mLocFromPos;
-		Vector3	diffWS = V3__V3W1_Mul_M44( diffLS, mtxLocalWorld );
-		Vector3	diffCS = V3__V3W1_Mul_M44( diffWS, mtxWorldCam );
+		Vec3	diffLS = mLocToPos - mLocFromPos;
+		Vec3	diffWS = V3__V3W1_Mul_M44( diffLS, mtxLocalWorld );
+		Vec3	diffCS = V3__V3W1_Mul_M44( diffWS, mtxWorldCam );
 
 		mRend.mDistant.mDirWS = -diffWS.GetNormalized();
 		mRend.mDistant.mDirCS = -diffCS.GetNormalized();

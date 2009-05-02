@@ -19,16 +19,16 @@ namespace RI
 {
 
 //==================================================================
-static void MakeCube( const Bound &b, Vector3 out_box[8] )
+static void MakeCube( const Bound &b, Vec3 out_box[8] )
 {
-	out_box[0] = Vector3( b.mBox[0].x, b.mBox[0].y, b.mBox[0].z );
-	out_box[1] = Vector3( b.mBox[1].x, b.mBox[0].y, b.mBox[0].z );
-	out_box[2] = Vector3( b.mBox[0].x, b.mBox[1].y, b.mBox[0].z );
-	out_box[3] = Vector3( b.mBox[1].x, b.mBox[1].y, b.mBox[0].z );
-	out_box[4] = Vector3( b.mBox[0].x, b.mBox[0].y, b.mBox[1].z );
-	out_box[5] = Vector3( b.mBox[1].x, b.mBox[0].y, b.mBox[1].z );
-	out_box[6] = Vector3( b.mBox[0].x, b.mBox[1].y, b.mBox[1].z );
-	out_box[7] = Vector3( b.mBox[1].x, b.mBox[1].y, b.mBox[1].z );
+	out_box[0] = Vec3( b.mBox[0].x, b.mBox[0].y, b.mBox[0].z );
+	out_box[1] = Vec3( b.mBox[1].x, b.mBox[0].y, b.mBox[0].z );
+	out_box[2] = Vec3( b.mBox[0].x, b.mBox[1].y, b.mBox[0].z );
+	out_box[3] = Vec3( b.mBox[1].x, b.mBox[1].y, b.mBox[0].z );
+	out_box[4] = Vec3( b.mBox[0].x, b.mBox[0].y, b.mBox[1].z );
+	out_box[5] = Vec3( b.mBox[1].x, b.mBox[0].y, b.mBox[1].z );
+	out_box[6] = Vec3( b.mBox[0].x, b.mBox[1].y, b.mBox[1].z );
+	out_box[7] = Vec3( b.mBox[1].x, b.mBox[1].y, b.mBox[1].z );
 }
 
 //==================================================================
@@ -181,7 +181,7 @@ bool HiderREYES::makeRasterBound(
 						const Matrix44 &mtxLocalWorld,
 						float out_bound2d[4] ) const
 {
-	Vector3	boxVerts[8];
+	Vec3	boxVerts[8];
 	MakeCube( b, boxVerts );
 
 	float destHalfWd	= (float)mFinalBuff.mWd * 0.5f;
@@ -196,7 +196,7 @@ bool HiderREYES::makeRasterBound(
 
 	for (size_t i=0; i < 8; ++i)
 	{
-		Vector4	Pproj = V4__V3W1_Mul_M44( boxVerts[i], mtxLocalProj );
+		Vec4	Pproj = V4__V3W1_Mul_M44( boxVerts[i], mtxLocalProj );
 		
 		if ( Pproj.w > 0 )
 		{
@@ -256,7 +256,7 @@ void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 
 	for (size_t i=0; i < n; ++i)
 	{
-		Vector4	Pproj = MultiplyV3W1M( pSrc[i], mMtxCamProj );
+		Vec4	Pproj = MultiplyV3W1M( pSrc[i], mMtxCamProj );
 		
 		float	oow = 1.0f / Pproj.w;
 		
@@ -302,7 +302,7 @@ void HiderREYES::Hide(
 		{
 			float	u = g.mURange[0] + iu * du;
 			
-			Vector4	Pproj = V4__V3W1_Mul_M44( *pRunsWS++, mMtxWorldProj );
+			Vec4	Pproj = V4__V3W1_Mul_M44( *pRunsWS++, mMtxWorldProj );
 			
 			float	oow = 1.0f / Pproj.w;
 

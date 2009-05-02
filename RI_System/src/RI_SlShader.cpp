@@ -248,8 +248,8 @@ void Inst_AlOp( SlRunContext &ctx )
 //==================================================================
 static void Inst_Normalize( SlRunContext &ctx )
 {
-		  Vector3*	lhs	= (		 Vector3*)ctx.GetVoid( 1 );
-	const Vector3*	op1	= (const Vector3*)ctx.GetVoid( 2 );
+		  Vec3*	lhs	= (		 Vec3*)ctx.GetVoid( 1 );
+	const Vec3*	op1	= (const Vec3*)ctx.GetVoid( 2 );
 	
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -270,7 +270,7 @@ static void Inst_Normalize( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		Vector3	tmp = op1[0].GetNormalized();
+		Vec3	tmp = op1[0].GetNormalized();
 
 		for (u_int i=0; i < ctx.mSIMDCount; ++i)
 			if ( ctx.IsProcessorActive( i ) )
@@ -291,12 +291,12 @@ inline float sign( float val )
 //==================================================================
 static void Inst_Faceforward( SlRunContext &ctx )
 {
-		  Vector3*	lhs	= (		 Vector3*)ctx.GetVoid( 1 );
-	const Vector3*	pN	= (const Vector3*)ctx.GetVoid( 2 );
-	const Vector3*	pI	= (const Vector3*)ctx.GetVoid( 3 );
+		  Vec3*	lhs	= (		 Vec3*)ctx.GetVoid( 1 );
+	const Vec3*	pN	= (const Vec3*)ctx.GetVoid( 2 );
+	const Vec3*	pI	= (const Vec3*)ctx.GetVoid( 3 );
 	
 	const SlSymbol*	pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", SlSymbol::NORMAL );
-	const Vector3*	pNg = (const Vector3 *)pNgSymbol->GetData();
+	const Vec3*	pNg = (const Vec3 *)pNgSymbol->GetData();
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	bool	N_varying	= ctx.IsSymbolVarying( 2 );
@@ -325,7 +325,7 @@ static void Inst_Faceforward( SlRunContext &ctx )
 		DASSERT( !I_varying		);
 		DASSERT( !Ng_varying	);
 
-		Vector3	tmp = pN[0] * sign( -pI[0].GetDot( pNg[0] ) );
+		Vec3	tmp = pN[0] * sign( -pI[0].GetDot( pNg[0] ) );
 
 		for (u_int i=0; i < ctx.mSIMDCount; ++i)
 			if ( ctx.IsProcessorActive( i ) )
@@ -341,7 +341,7 @@ static inline void illuminate(
 				const DVec<LightSourceT *>	&pLights,
 				const DVec<U16>				&activeLights,
 				const Point3 &pos,
-				const Vector3 &Nn,
+				const Vec3 &Nn,
 				float illConeCosA )
 {
 	for (size_t i=0; i < activeLights.size(); ++i)
@@ -363,13 +363,13 @@ static inline void illuminate(
 
 //==================================================================
 static inline Color specularbrdf(
-						 const Vector3 &L,
-						 const Vector3 &V,
-						 const Vector3 &N,
+						 const Vec3 &L,
+						 const Vec3 &V,
+						 const Vec3 &N,
 						 float ooRoughness
 						)
 {
-	Vector3	H = (L + V).GetNormalized();
+	Vec3	H = (L + V).GetNormalized();
 	float	nh = N.GetDot( H );
 	float	a = powf( DMAX( 0, nh ), ooRoughness );
 	
@@ -388,8 +388,8 @@ return C;
 
 static void Inst_Diffuse( SlRunContext &ctx )
 {
-		  Color*	lhs	= (		 Vector3*)ctx.GetVoid( 1 );
-	const Vector3*	op1	= (const Vector3*)ctx.GetVoid( 2 );
+		  Color*	lhs	= (		 Vec3*)ctx.GetVoid( 1 );
+	const Vec3*		op1	= (const Vec3*)ctx.GetVoid( 2 );
 
 	const SlSymbol*	pPSymbol = ctx.mpSymbols->LookupVariable( "P", SlSymbol::POINT );
 	const Point3*	pP = (const Point3 *)pPSymbol->GetData();
@@ -410,7 +410,7 @@ static void Inst_Diffuse( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				Vector3	Nn = op1[op1_offset].GetNormalized();
+				Vec3	Nn = op1[op1_offset].GetNormalized();
 
 				Color	col( 0, 0, 0 );
 
@@ -428,7 +428,7 @@ static void Inst_Diffuse( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		Vector3	Nn = op1[0].GetNormalized();
+		Vec3	Nn = op1[0].GetNormalized();
 
 		Color	col( 0, 0, 0 );
 		illuminate( col, pLights, actLights, *pP, Nn, illConeCosA );
@@ -475,7 +475,7 @@ static void Inst_Ambient( SlRunContext &ctx )
 
 //==================================================================
 #define SINGLE	float
-#define VECTOR	Vector3
+#define VECTOR	Vec3
 #define MATRIX	Matrix44
 
 //==================================================================

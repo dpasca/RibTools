@@ -55,7 +55,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 		int	nUPatches = nu - 1 + uPeriodic ? 1 : 0;
 		int	nVPatches = nv - 1 + vPeriodic ? 1 : 0;
 
-		Vector3	hullv3[4];
+		Vec3	hullv3[4];
 
 		for (int i=0; i < nUPatches; ++i)
 		{
@@ -65,10 +65,10 @@ void PatchMesh::Simplify( HiderREYES &hider )
 			{
 				int	jj = (j+1) % nv;
 
-				hullv3[0] = Vector3( &pMeshHull[(i +nu*j )*3] );
-				hullv3[1] = Vector3( &pMeshHull[(ii+nu*j )*3] );
-				hullv3[2] = Vector3( &pMeshHull[(i +nu*jj)*3] );
-				hullv3[3] = Vector3( &pMeshHull[(ii+nu*jj)*3] );
+				hullv3[0] = Vec3( &pMeshHull[(i +nu*j )*3] );
+				hullv3[1] = Vec3( &pMeshHull[(ii+nu*j )*3] );
+				hullv3[2] = Vec3( &pMeshHull[(i +nu*jj)*3] );
+				hullv3[3] = Vec3( &pMeshHull[(ii+nu*jj)*3] );
 
 				hider.InsertSimple(
 						new RI::PatchBilinear( mParams, hullv3 ),
@@ -91,7 +91,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 		int	nUPatches = uPeriodic ? nu / uSteps : (nu-4) / uSteps + 1;
 		int	nVPatches = vPeriodic ? nv / vSteps : (nv-4) / vSteps + 1;
 
-		Vector3	hullv3[16];
+		Vec3	hullv3[16];
 		
 		for (int j0=0; j0 < nVPatches; ++j0)
 		{
@@ -108,7 +108,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 
 						DASSERT( srcIdx >= 0 && (srcIdx*3) < meshHullSize );
 
-						hullv3[hidx++] = Vector3( &pMeshHull[ srcIdx * 3 ]);
+						hullv3[hidx++] = Vec3( &pMeshHull[ srcIdx * 3 ]);
 					}
 				}
 
@@ -137,7 +137,7 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols
 }
 
 //==================================================================
-PatchBilinear::PatchBilinear( ParamList &params, const Vector3 hull[4] ) :
+PatchBilinear::PatchBilinear( ParamList &params, const Vec3 hull[4] ) :
 	SimplePrimitiveBase(PATCHBILINEAR),
 	mParams(params)
 {
@@ -150,21 +150,21 @@ void PatchBilinear::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vector3 *out_dPdu,
-			Vector3 *out_dPdv ) const
+			Vec3 *out_dPdu,
+			Vec3 *out_dPdv ) const
 {
-	Vector3	left	= DMix( mHullPos[0], mHullPos[2], v );
-	Vector3	right	= DMix( mHullPos[1], mHullPos[3], v );
+	Vec3	left	= DMix( mHullPos[0], mHullPos[2], v );
+	Vec3	right	= DMix( mHullPos[1], mHullPos[3], v );
 	out_pt			= DMix( left, right, u );
 
 	if ( out_dPdu )
 	{
-		Vector3	left	= mHullPos[2] - mHullPos[0];
-		Vector3	right	= mHullPos[3] - mHullPos[1];
+		Vec3	left	= mHullPos[2] - mHullPos[0];
+		Vec3	right	= mHullPos[3] - mHullPos[1];
 		*out_dPdv		= DMix( left, right, u );
 
-		Vector3	bottom	= mHullPos[1] - mHullPos[0];
-		Vector3	top		= mHullPos[3] - mHullPos[2];
+		Vec3	bottom	= mHullPos[1] - mHullPos[0];
+		Vec3	top		= mHullPos[3] - mHullPos[2];
 		*out_dPdu		= DMix( bottom, top, v );
 	}
 }
@@ -198,7 +198,7 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 
 //==================================================================
 PatchBicubic::PatchBicubic( ParamList &params,
-							const Vector3 hull[16],
+							const Vec3 hull[16],
 						    const Attributes &attr,
 							const SymbolList &staticSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
@@ -229,17 +229,17 @@ void PatchBicubic::setupEvalCalc()
 }
 
 //==================================================================
-static inline Vector3 spline( float t,
+static inline Vec3 spline( float t,
 					const RtBasis &b,
-					const Vector3 &p0,
-					const Vector3 &p1,
-					const Vector3 &p2,
-					const Vector3 &p3 )
+					const Vec3 &p0,
+					const Vec3 &p1,
+					const Vec3 &p2,
+					const Vec3 &p3 )
 {
-	Vector3 v0(b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3);
-	Vector3 v1(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3);
-	Vector3 v2(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3);
-	Vector3 v3(b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3);
+	Vec3 v0(b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3);
+	Vec3 v1(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3);
+	Vec3 v2(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3);
+	Vec3 v3(b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3);
 
 	return	v0 *t*t*t +
 			v1 *t*t +
@@ -248,16 +248,16 @@ static inline Vector3 spline( float t,
 }
 
 //==================================================================
-static inline Vector3 splineDeriv( float t,
+static inline Vec3 splineDeriv( float t,
 					const RtBasis &b,
-					const Vector3 &p0,
-					const Vector3 &p1,
-					const Vector3 &p2,
-					const Vector3 &p3 )
+					const Vec3 &p0,
+					const Vec3 &p1,
+					const Vec3 &p2,
+					const Vec3 &p3 )
 {
-	Vector3 v0(b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3);
-	Vector3 v1(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3);
-	Vector3 v2(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3);
+	Vec3 v0(b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3);
+	Vec3 v1(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3);
+	Vec3 v2(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3);
 
 	return	v0 *3*t*t +
 			v1 *2*t +
@@ -269,8 +269,8 @@ void PatchBicubic::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vector3 *out_dPdu,
-			Vector3 *out_dPdv ) const
+			Vec3 *out_dPdu,
+			Vec3 *out_dPdv ) const
 {
 	const RtBasis	&uBasis = *mpUBasis;
 	const RtBasis	&vBasis = *mpVBasis;

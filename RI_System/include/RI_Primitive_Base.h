@@ -175,18 +175,18 @@ public:
 						float u,
 						float v,
 						Point3 &out_pt,
-						Vector3 *out_dPdu,
-						Vector3 *out_dPdv ) const = 0;
+						Vec3 *out_dPdu,
+						Vec3 *out_dPdv ) const = 0;
 
 	virtual void	Dice(
 						MicroPolygonGrid &g,
 						const Matrix44 &mtxWorldCamera,
 						bool doColorCoded ) const;
 
-	Vector2 CalcLocalUV( const Vector2 &gridUV ) const
+	Vec2 CalcLocalUV( const Vec2 &gridUV ) const
 	{
 		return
-			Vector2(
+			Vec2(
 				DMix( mURange[0], mURange[1], gridUV.x ),
 				DMix( mVRange[0], mVRange[1], gridUV.y )
 			);
@@ -197,12 +197,12 @@ public:
 //==================================================================
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &staticSymbols,
-					DVec<Vector3> &out_vectorP,
+					DVec<Vec3> &out_vectorP,
 					int fromIdx=1 );
 
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &staticSymbols,
-					Vector3	*pOut_vectorP,
+					Vec3	*pOut_vectorP,
 					int		expectedN,
 					int		fromIdx=1 );
 

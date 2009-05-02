@@ -62,9 +62,9 @@ public:
 	{
 		float		*pFloatValue;
 		Point3		*pPointValue;
-		Vector3		*pVectorValue;
-		Vector3		*pNormalValue;
-		Vector3		*pColorValue;
+		Vec3		*pVectorValue;
+		Vec3		*pNormalValue;
+		Vec3		*pColorValue;
 		Matrix44	*pMatrixValue;
 		const char	*pStringValue;
 		void		*pVoidValue;

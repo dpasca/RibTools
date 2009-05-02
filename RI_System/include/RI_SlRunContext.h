@@ -1,11 +1,10 @@
-/*
- *  RI_SlRunContext.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/20.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_SlRunContext.h
+///
+/// Created by Davide Pasca - 2009/2/20
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_SLRUNCONTEXT_H
 #define RI_SLRUNCONTEXT_H
@@ -79,18 +78,18 @@ public:
 
 	float		*GetFloat ( u_int argc ) { return GetValue(argc).Data.pFloatValue;	}
 	Point3		*GetPoint ( u_int argc ) { return GetValue(argc).Data.pPointValue;	}
-	Vector3		*GetVector( u_int argc ) { return GetValue(argc).Data.pVectorValue;	}
-	Vector3		*GetNormal( u_int argc ) { return GetValue(argc).Data.pNormalValue;	}
-	Vector3		*GetColor ( u_int argc ) { return GetValue(argc).Data.pColorValue;	}
+	Vec3		*GetVector( u_int argc ) { return GetValue(argc).Data.pVectorValue;	}
+	Vec3		*GetNormal( u_int argc ) { return GetValue(argc).Data.pNormalValue;	}
+	Vec3		*GetColor ( u_int argc ) { return GetValue(argc).Data.pColorValue;	}
 	Matrix44	*GetMatrix( u_int argc ) { return GetValue(argc).Data.pMatrixValue;	}
 	// no non-constant string
 	void		*GetVoid  ( u_int argc ) { return GetValue(argc).Data.pVoidValue;	}
 
 	const float		*GetFloat ( u_int argc ) const { return GetValue(argc).Data.pFloatValue;	}
 	const Point3	*GetPoint ( u_int argc ) const { return GetValue(argc).Data.pPointValue;	}
-	const Vector3	*GetVector( u_int argc ) const { return GetValue(argc).Data.pVectorValue;	}
-	const Vector3	*GetNormal( u_int argc ) const { return GetValue(argc).Data.pNormalValue;	}
-	const Vector3	*GetColor ( u_int argc ) const { return GetValue(argc).Data.pColorValue;	}
+	const Vec3		*GetVector( u_int argc ) const { return GetValue(argc).Data.pVectorValue;	}
+	const Vec3		*GetNormal( u_int argc ) const { return GetValue(argc).Data.pNormalValue;	}
+	const Vec3		*GetColor ( u_int argc ) const { return GetValue(argc).Data.pColorValue;	}
 	const Matrix44	*GetMatrix( u_int argc ) const { return GetValue(argc).Data.pMatrixValue;	}
 	const char		*GetString( u_int argc ) const { return GetValue(argc).Data.pStringValue;	}
 	const void		*GetVoid  ( u_int argc ) const { return GetValue(argc).Data.pVoidValue;	}
