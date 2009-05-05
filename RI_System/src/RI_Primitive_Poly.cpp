@@ -31,17 +31,17 @@ Polygon::Polygon( ParamList &params, const SymbolList &staticSymbols ) :
 //==================================================================
 void Polygon::simplifyAddTriangle(
 				HiderREYES &hider,
-				const Vec3 &v1,
-				const Vec3 &v2,
-				const Vec3 &v3
+				const Vec3f &v1,
+				const Vec3f &v2,
+				const Vec3f &v3
 				)
 {
-	Vec3	mid = (v1 + v2 + v3) * (1.0f/3);
-	Vec3	a	= (v1 + v2) * 0.5f;
-	Vec3	b	= (v2 + v3) * 0.5f;
-	Vec3	c	= (v1 + v3) * 0.5f;
+	Vec3f	mid = (v1 + v2 + v3) * (1.0f/3);
+	Vec3f	a	= (v1 + v2) * 0.5f;
+	Vec3f	b	= (v2 + v3) * 0.5f;
+	Vec3f	c	= (v1 + v3) * 0.5f;
 
-	Vec3	patchVerts[4];
+	Vec3f	patchVerts[4];
 	patchVerts[0] = v1;
 	patchVerts[1] = a;
 	patchVerts[2] = c;
@@ -75,7 +75,7 @@ void Polygon::Simplify( HiderREYES &hider )
 	int	start	= 1;
 	int	end		= DMIN( (int)3, last );
 	
-	Vec3	patchVerts[4];
+	Vec3f	patchVerts[4];
 	
 	while ( (end - start) == 2 )
 	{
@@ -96,9 +96,9 @@ void Polygon::Simplify( HiderREYES &hider )
 	{	
 		simplifyAddTriangle(
 						hider,
-						Vec3( &paramP[3 * 0] ),
-						Vec3( &paramP[3 * start] ),
-						Vec3( &paramP[3 * end] )
+						Vec3f( &paramP[3 * 0] ),
+						Vec3f( &paramP[3 * start] ),
+						Vec3f( &paramP[3 * end] )
 					);
 	}
 }
@@ -115,17 +115,17 @@ PointsGeneralPolygons::PointsGeneralPolygons( ParamList &params, const SymbolLis
 //==================================================================
 void PointsGeneralPolygons::simplifyAddTriangle(
 				HiderREYES &hider,
-				const Vec3 &v1,
-				const Vec3 &v2,
-				const Vec3 &v3
+				const Vec3f &v1,
+				const Vec3f &v2,
+				const Vec3f &v3
 				)
 {
-	Vec3	mid = (v1 + v2 + v3) * (1.0f/3);
-	Vec3	a	= (v1 + v2) * 0.5f;
-	Vec3	b	= (v2 + v3) * 0.5f;
-	Vec3	c	= (v1 + v3) * 0.5f;
+	Vec3f	mid = (v1 + v2 + v3) * (1.0f/3);
+	Vec3f	a	= (v1 + v2) * 0.5f;
+	Vec3f	b	= (v2 + v3) * 0.5f;
+	Vec3f	c	= (v1 + v3) * 0.5f;
 
-	Vec3	patchVerts[4];
+	Vec3f	patchVerts[4];
 	patchVerts[0] = v1;
 	patchVerts[1] = a;
 	patchVerts[2] = c;
@@ -200,7 +200,7 @@ void PointsGeneralPolygons::Simplify( HiderREYES &hider )
 	int	start	= 1;
 	int	end		= DMIN( (int)3, last );
 	
-	Vec3	patchVerts[4];
+	Vec3f	patchVerts[4];
 	
 	while ( (end - start) == 2 )
 	{
@@ -221,9 +221,9 @@ void PointsGeneralPolygons::Simplify( HiderREYES &hider )
 	{	
 		simplifyAddTriangle(
 						hider,
-						Vec3( &paramP[3 * 0] ),
-						Vec3( &paramP[3 * start] ),
-						Vec3( &paramP[3 * end] )
+						Vec3f( &paramP[3 * 0] ),
+						Vec3f( &paramP[3 * start] ),
+						Vec3f( &paramP[3 * end] )
 					);
 	}
 }

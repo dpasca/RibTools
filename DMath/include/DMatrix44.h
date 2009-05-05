@@ -1,11 +1,10 @@
-/*
- *  DMatrix44.h
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/22.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// DMatrix44.h
+///
+/// Created by Davide Pasca - 2008/12/22
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef DMATRIX44_H
 #define DMATRIX44_H
@@ -56,16 +55,16 @@ public:
 		u.m44[3][0] = m30_; u.m44[3][1] = m31_; u.m44[3][2] = m32_; u.m44[3][3] = m33_;
 	}
 
-	Vec3 GetV3( size_t idx ) const
+	Vec3f GetV3( size_t idx ) const
 	{
-		return Vec3( u.m44[idx] );
+		return Vec3f( u.m44[idx] );
 	}
 
-	void SetV3( size_t idx, const Vec3 &v )
+	void SetV3( size_t idx, const Vec3f &v )
 	{
-		u.m44[idx][0] = v.x;
-		u.m44[idx][1] = v.y;
-		u.m44[idx][2] = v.z;
+		u.m44[idx][0] = v.v3[0];
+		u.m44[idx][1] = v.v3[1];
+		u.m44[idx][2] = v.v3[2];
 	}
 
 	void Identity()
@@ -91,9 +90,9 @@ public:
 		memcpy( u.m16, pSrcMtx, sizeof(float) * 16 );
 	}
 	
-	Vec3 GetTranslation() const
+	Vec3f GetTranslation() const
 	{
-		return Vec3(
+		return Vec3f(
 			u.m44[3][0],
 			u.m44[3][1],
 			u.m44[3][2]
@@ -141,9 +140,9 @@ inline Matrix44 Matrix44::GetOrthonormal() const
 	// TODO: verify that this actually works !!
 	Matrix44	out( true );
 
-	Vec3	v0 = GetV3(0);
-	Vec3	v1 = GetV3(1);
-	Vec3	v2 = GetV3(2);
+	Vec3f	v0 = GetV3(0);
+	Vec3f	v1 = GetV3(1);
+	Vec3f	v2 = GetV3(2);
 
 	v0 = v0.GetNormalized(); 
 	v1 = v2.GetCross( v0 );
@@ -257,11 +256,11 @@ inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 }
 
 //==================================================================
-inline Vec4 V4__M44_Mul_V3W1( const Matrix44 &a, const Vec3 &v )
+inline Vec4f V4__M44_Mul_V3W1( const Matrix44 &a, const Vec3f &v )
 {
-	float	x = v.x, y = v.y, z = v.z;
+	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
-	return Vec4(
+	return Vec4f(
 #ifdef DMATRIX44_ROWMTX_MODE
 		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
 		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
@@ -277,11 +276,11 @@ inline Vec4 V4__M44_Mul_V3W1( const Matrix44 &a, const Vec3 &v )
 }
 
 //==================================================================
-inline Vec3 V3__M44_Mul_V3W1( const Matrix44 &a, const Vec3 &v )
+inline Vec3f V3__M44_Mul_V3W1( const Matrix44 &a, const Vec3f &v )
 {
-	float	x = v.x, y = v.y, z = v.z;
+	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
-	return Vec3(
+	return Vec3f(
 #ifdef DMATRIX44_ROWMTX_MODE
 		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
 		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
@@ -295,11 +294,11 @@ inline Vec3 V3__M44_Mul_V3W1( const Matrix44 &a, const Vec3 &v )
 }
 
 //==================================================================
-inline Vec4 V4__V3W1_Mul_M44( const Vec3 &v, const Matrix44 &a )
+inline Vec4f V4__V3W1_Mul_M44( const Vec3f &v, const Matrix44 &a )
 {
-	float	x = v.x, y = v.y, z = v.z;
+	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
-	return Vec4(
+	return Vec4f(
 #ifdef DMATRIX44_ROWMTX_MODE
 		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
 		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
@@ -315,11 +314,11 @@ inline Vec4 V4__V3W1_Mul_M44( const Vec3 &v, const Matrix44 &a )
 }
 
 //==================================================================
-inline Vec3 V3__V3W1_Mul_M44( const Vec3 &v, const Matrix44 &a )
+inline Vec3f V3__V3W1_Mul_M44( const Vec3f &v, const Matrix44 &a )
 {
-	float	x = v.x, y = v.y, z = v.z;
+	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
-	return Vec3(
+	return Vec3f(
 #ifdef DMATRIX44_ROWMTX_MODE
 		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
 		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],

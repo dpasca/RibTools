@@ -19,16 +19,16 @@ namespace RI
 {
 
 //==================================================================
-static void MakeCube( const Bound &b, Vec3 out_box[8] )
+static void MakeCube( const Bound &b, Vec3f out_box[8] )
 {
-	out_box[0] = Vec3( b.mBox[0].x, b.mBox[0].y, b.mBox[0].z );
-	out_box[1] = Vec3( b.mBox[1].x, b.mBox[0].y, b.mBox[0].z );
-	out_box[2] = Vec3( b.mBox[0].x, b.mBox[1].y, b.mBox[0].z );
-	out_box[3] = Vec3( b.mBox[1].x, b.mBox[1].y, b.mBox[0].z );
-	out_box[4] = Vec3( b.mBox[0].x, b.mBox[0].y, b.mBox[1].z );
-	out_box[5] = Vec3( b.mBox[1].x, b.mBox[0].y, b.mBox[1].z );
-	out_box[6] = Vec3( b.mBox[0].x, b.mBox[1].y, b.mBox[1].z );
-	out_box[7] = Vec3( b.mBox[1].x, b.mBox[1].y, b.mBox[1].z );
+	out_box[0] = Vec3f( b.mBox[0][0], b.mBox[0][1], b.mBox[0][2] );
+	out_box[1] = Vec3f( b.mBox[1][0], b.mBox[0][1], b.mBox[0][2] );
+	out_box[2] = Vec3f( b.mBox[0][0], b.mBox[1][1], b.mBox[0][2] );
+	out_box[3] = Vec3f( b.mBox[1][0], b.mBox[1][1], b.mBox[0][2] );
+	out_box[4] = Vec3f( b.mBox[0][0], b.mBox[0][1], b.mBox[1][2] );
+	out_box[5] = Vec3f( b.mBox[1][0], b.mBox[0][1], b.mBox[1][2] );
+	out_box[6] = Vec3f( b.mBox[0][0], b.mBox[1][1], b.mBox[1][2] );
+	out_box[7] = Vec3f( b.mBox[1][0], b.mBox[1][1], b.mBox[1][2] );
 }
 
 //==================================================================
@@ -181,7 +181,7 @@ bool HiderREYES::makeRasterBound(
 						const Matrix44 &mtxLocalWorld,
 						float out_bound2d[4] ) const
 {
-	Vec3	boxVerts[8];
+	Vec3f	boxVerts[8];
 	MakeCube( b, boxVerts );
 
 	float destHalfWd	= (float)mFinalBuff.mWd * 0.5f;
@@ -196,14 +196,14 @@ bool HiderREYES::makeRasterBound(
 
 	for (size_t i=0; i < 8; ++i)
 	{
-		Vec4	Pproj = V4__V3W1_Mul_M44( boxVerts[i], mtxLocalProj );
+		Vec4f	Pproj = V4__V3W1_Mul_M44( boxVerts[i], mtxLocalProj );
 		
-		if ( Pproj.w > 0 )
+		if ( Pproj.w() > 0 )
 		{
-			float	oow = 1.0f / Pproj.w;
+			float	oow = 1.0f / Pproj.w();
 
-			float	winX = destHalfWd + destHalfWd * Pproj.x * oow;
-			float	winY = destHalfHe - destHalfHe * Pproj.y * oow;
+			float	winX = destHalfWd + destHalfWd * Pproj.x() * oow;
+			float	winY = destHalfHe - destHalfHe * Pproj.y() * oow;
 
 			minX = DMIN( minX, winX );
 			minY = DMIN( minY, winY );
@@ -256,7 +256,7 @@ void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 
 	for (size_t i=0; i < n; ++i)
 	{
-		Vec4	Pproj = MultiplyV3W1M( pSrc[i], mMtxCamProj );
+		Vec4f	Pproj = MultiplyV3W1M( pSrc[i], mMtxCamProj );
 		
 		float	oow = 1.0f / Pproj.w;
 		
@@ -291,53 +291,49 @@ void HiderREYES::Hide(
 
 	const Point3	*pRunsWS	= g.mpPointsWS;
 
-	const Color	*pOi = (const Color *)g.mSymbols.LookupVariableData( "Oi", SlSymbol::COLOR, true );
-	const Color	*pCi = (const Color *)g.mSymbols.LookupVariableData( "Ci", SlSymbol::COLOR, true );
+	const SlColor	*pOi = (const SlColor *)g.mSymbols.LookupVariableData( "Oi", SlSymbol::COLOR, true );
+	const SlColor	*pCi = (const SlColor *)g.mSymbols.LookupVariableData( "Ci", SlSymbol::COLOR, true );
+
+	size_t	sampleIdx = 0;
 
 	for (u_int iv=0; iv < g.mYDim; ++iv)
 	{
 		float	v = g.mVRange[0] + iv * dv;
 		
-		for (u_int iu=0; iu < g.mXDim; ++iu)
+		for (u_int iu=0; iu < g.mXDim; ++iu, ++sampleIdx)
 		{
 			float	u = g.mURange[0] + iu * du;
 			
-			Vec4	Pproj = V4__V3W1_Mul_M44( *pRunsWS++, mMtxWorldProj );
+			Vec4f	Pproj = V4__V3W1_Mul_M44( pRunsWS[ sampleIdx ], mMtxWorldProj );
 			
-			float	oow = 1.0f / Pproj.w;
+			float	oow = 1.0f / Pproj.w();
 
-			int	winX = (int)(screenCx + screenHWd * Pproj.x * oow);
-			int	winY = (int)(screenCy - screenHHe * Pproj.y * oow);
-			
+			int	winX = (int)(screenCx + screenHWd * Pproj.x() * oow);
+			int	winY = (int)(screenCy - screenHHe * Pproj.y() * oow);
+
+			size_t	blkIdx = sampleIdx / RI_SIMD_BLK_LEN;
+			size_t	itmIdx = sampleIdx & (RI_SIMD_BLK_LEN-1);
+
 			if ( (u_int)winX < destWd && (u_int)winY < destHe )
 			{
-			#if 0
-				float	destCol[3] =
-				{
-					u,
-					v,
-					0
-				};
-			#else
-				float	destCol[3] =
-				{
-					pCi->x,
-					pCi->y,
-					pCi->z
-				};
-			#endif
+				const SlColor	&blkCi = pCi[ blkIdx ];
+				const SlColor	&blkOi = pOi[ blkIdx ];
+
+				Color	ci(	blkCi.v3[ 0 ][ itmIdx ],
+							blkCi.v3[ 1 ][ itmIdx ],
+							blkCi.v3[ 2 ][ itmIdx ] );
+
+				Color	oi(	blkOi.v3[ 0 ][ itmIdx ],
+							blkOi.v3[ 1 ][ itmIdx ],
+							blkOi.v3[ 2 ][ itmIdx ] );
 
 				float	*pZSample = zBuff.GetSamplePtr( winX, winY );
-				if ( Pproj.z < *pZSample )
+				if ( Pproj.z() < *pZSample )
 				{
-					*pZSample = Pproj.z;
-					destBuff.SetSample( winX, winY, destCol );
+					*pZSample = Pproj.z();
+					destBuff.SetSample( winX, winY, &ci.x() );
 				}
 			}
-
-			// advance anyway...
-			++pCi;
-			++pOi;
 		}
 	}
 }

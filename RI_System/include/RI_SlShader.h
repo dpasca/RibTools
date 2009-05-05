@@ -1,11 +1,10 @@
-/*
- *  RI_SlShader.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/19.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_SlShader.h
+///
+/// Created by Davide Pasca - 2009/2/19
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_SLSHADER_H
 #define RI_SLSHADER_H
@@ -62,12 +61,12 @@ public:
 	{
 		float		*pFloatValue;
 		Point3		*pPointValue;
-		Vec3		*pVectorValue;
-		Vec3		*pNormalValue;
-		Vec3		*pColorValue;
-		Matrix44	*pMatrixValue;
-		const char	*pStringValue;
+		Vec3f		*pVectorValue;
+		Vec3f		*pNormalValue;
+		Vec3f		*pColorValue;
 		void		*pVoidValue;
+		//Matrix44	*pMatrixValue;
+		//const char	*pStringValue;
 	} Data;
 };
 

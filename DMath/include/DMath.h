@@ -1,20 +1,16 @@
-/*
- *  DMath.h
- *  RibTools
- *
- *  Created by Davide Pasca on 08/12/31.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
- *
- */
+//==================================================================
+/// DMath.h
+///
+/// Created by Davide Pasca - 2008/12/31
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef DMATH_H
 #define DMATH_H
 
-#include <math.h>
-#include <float.h>
-
-#define DEG2RAD	(3.14159265f/180)
-
+#include "DMathBase.h"
+#include "DVector.h"
 #include "DMatrix44.h"
 
 #endif

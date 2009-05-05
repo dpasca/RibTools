@@ -11,7 +11,7 @@
 
 	Nf		temporary varying normal
 
-	Koe		constant uniform normal 2 2 2
+	Koe		constant uniform normal 1 0 0
 
 .code
 	normalize	$v0		N
@@ -20,7 +20,8 @@
 	;movvv		Ci	$v0
 	;mulvv		Ci	I	$v0
 	;movvv		Ci	I 
-	;faceforward	Nf	$v0	I
-	;movvv		Ci	Nf		// 
-	movvv		Ci	I		// 
+	faceforward	Nf	$v0	I
+	movvv		Ci	Nf		// 
+	;movvv		Ci	I		// 
+	;addvv		Ci	Ci	Koe
 	movvv		Oi	Os		// Oi = Os

@@ -162,6 +162,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\DMathBase.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DMatrix44.cpp"
 				>
 			</File>

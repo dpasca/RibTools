@@ -1,13 +1,13 @@
-/*
- *  RI_Base.h
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- *  Portions from the official RI.h
- *    See: https://renderman.pixar.com/products/rispec/rispec_3_1/appendix.C.html
- */
+//==================================================================
+/// RI_Base.h
+///
+/// Created by Davide Pasca - 208/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+///
+/// Portions from the official RI.h
+///   See: https://renderman.pixar.com/products/rispec/rispec_3_1/appendix.C.html
+//==================================================================
 
 #ifndef RI_BASE_H
 #define RI_BASE_H
@@ -19,7 +19,11 @@
 //==================================================================
 namespace RI
 {
-	
+
+#define RI_SIMD_FLT_LEN			16
+#define RI_SIMD_BLK_LEN			16
+#define	RI_GET_SIMD_BLOCKS(_X_)	(((unsigned)(_X_) + (RI_SIMD_FLT_LEN-1)) / RI_SIMD_FLT_LEN)
+
 //==================================================================
 enum Mode
 {
@@ -214,7 +218,7 @@ typedef void		*LightHandle;
 
 struct Bound
 {
-	Vec3	mBox[2];
+	Vec3f	mBox[2];
 
 	Bound()
 	{
@@ -244,23 +248,23 @@ struct Bound
 		mBox[1].Set( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 	}
 
-	void Expand( const Vec3 &p )
+	void Expand( const Vec3f &p )
 	{
-		mBox[0].x = DMIN( mBox[0].x, p.x );
-		mBox[0].y = DMIN( mBox[0].y, p.y );
-		mBox[0].z = DMIN( mBox[0].z, p.z );
+		mBox[0].x() = DMIN( mBox[0].x(), p.x() );
+		mBox[0].y() = DMIN( mBox[0].y(), p.y() );
+		mBox[0].z() = DMIN( mBox[0].z(), p.z() );
 
-		mBox[1].x = DMAX( mBox[1].x, p.x );
-		mBox[1].y = DMAX( mBox[1].y, p.y );
-		mBox[1].z = DMAX( mBox[1].z, p.z );
+		mBox[1].x() = DMAX( mBox[1].x(), p.x() );
+		mBox[1].y() = DMAX( mBox[1].y(), p.y() );
+		mBox[1].z() = DMAX( mBox[1].z(), p.z() );
 	}
 	
 	bool IsValid() const
 	{
 		return
-			mBox[0].x <= mBox[1].x &&
-			mBox[0].y <= mBox[1].y &&
-			mBox[0].z <= mBox[1].z;
+			mBox[0].x() <= mBox[1].x() &&
+			mBox[0].y() <= mBox[1].y() &&
+			mBox[0].z() <= mBox[1].z();
 	}
 };
 

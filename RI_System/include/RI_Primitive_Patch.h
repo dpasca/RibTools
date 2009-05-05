@@ -23,11 +23,11 @@ class PatchBilinear : public SimplePrimitiveBase
 {
 private:
 	ParamList		mParams;
-	Vec3			mHullPos[4];
+	Vec3f			mHullPos[4];
 
 public:
 	PatchBilinear( ParamList &params, const SymbolList &staticSymbols );
-	PatchBilinear( ParamList &params, const Vec3 hull[4] );
+	PatchBilinear( ParamList &params, const Vec3f hull[4] );
 
 		PatchBilinear *Clone() const {	return new PatchBilinear( *this ); }
 
@@ -37,8 +37,8 @@ public:
 					float u,
 					float v,
 					Point3 &out_pt,
-					Vec3 *out_dPdu,
-					Vec3 *out_dPdv ) const;
+					Vec3f *out_dPdu,
+					Vec3f *out_dPdv ) const;
 };
 
 //==================================================================
@@ -46,17 +46,17 @@ public:
 //==================================================================
 class SplinePatchCalc
 {
-	Vec3 v0;
-	Vec3 v1;
-	Vec3 v2;
-	Vec3 v3;
+	Vec3f v0;
+	Vec3f v1;
+	Vec3f v2;
+	Vec3f v3;
 
 public:
 	void Setup( const RtBasis &b,
-				const Vec3 &p0,
-				const Vec3 &p1,
-				const Vec3 &p2,
-				const Vec3 &p3 )
+				const Vec3f &p0,
+				const Vec3f &p1,
+				const Vec3f &p2,
+				const Vec3f &p3 )
 	{
 		v0 = b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3;
 		v1 = b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3;
@@ -64,7 +64,7 @@ public:
 		v3 = b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3;
 	}
 
-	inline Vec3	Eval( float t ) const
+	inline Vec3f	Eval( float t ) const
 	{
 		return	v0 *t*t*t +
 				v1 *t*t +
@@ -72,7 +72,7 @@ public:
 				v3 ;
 	}
 
-	inline Vec3	EvalDeriv( float t ) const
+	inline Vec3f	EvalDeriv( float t ) const
 	{
 		return	v0 *3*t*t +
 				v1 *2*t +
@@ -89,14 +89,14 @@ private:
 	ParamList		mParams;
 	const RtBasis	*mpUBasis;
 	const RtBasis	*mpVBasis;
-	Vec3			mHullPos[16];
+	Vec3f			mHullPos[16];
 	SplinePatchCalc	mCalcU[4];
 	SplinePatchCalc	mCalcV[4];
 
 public:
 	PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols );
 	PatchBicubic( ParamList &params,
-							const Vec3 hull[16],
+							const Vec3f hull[16],
 						    const Attributes &attr,
 							const SymbolList &staticSymbols );
 
@@ -108,8 +108,8 @@ public:
 					float u,
 					float v,
 					Point3 &out_pt,
-					Vec3 *out_dPdu,
-					Vec3 *out_dPdv ) const;
+					Vec3f *out_dPdu,
+					Vec3f *out_dPdv ) const;
 
 private:
 	void setupEvalCalc();

@@ -1,11 +1,10 @@
-/*
- *  RI_Primitive_Quadric.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/18.
- *  Copyright 2009 __MyCompanyName__. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Primitive_Quadric.cpp
+///
+/// Created by Davide Pasca - 2009/1/18
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "DMath.h"
@@ -24,26 +23,29 @@ void Cylinder::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vec3 *out_dPdu,
-			Vec3 *out_dPdv ) const
+			Vec3f *out_dPdu,
+			Vec3f *out_dPdv ) const
 {
 	float	theta = u * mThetamaxRad;
 
-	out_pt.x = mRadius * cosf( theta );
-	out_pt.y = mRadius * sinf( theta );
-	out_pt.z = mZMin + v * (mZMax - mZMin);
+	out_pt.Set(
+			mRadius * DCos( theta ),
+			mRadius * DSin( theta ),
+			mZMin + v * (mZMax - mZMin) );
 
 	if ( out_dPdu )
 	{
 		float	tmp = mThetamaxRad * mRadius;
 
-		out_dPdu->x = tmp * -sinf( theta );
-		out_dPdu->y = tmp *  cosf( theta );
-		out_dPdu->z = 0;
+		out_dPdu->Set(
+					tmp * -DSin( theta ),
+					tmp *  DCos( theta ),
+					0 );
 
-		out_dPdv->x = 0;
-		out_dPdv->y = 0;
-		out_dPdv->z = mZMax - mZMin;
+		out_dPdv->Set(
+					0,
+					0,
+					mZMax - mZMin );
 	}
 }
 
@@ -52,30 +54,33 @@ void Cone::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vec3 *out_dPdu,
-			Vec3 *out_dPdv ) const
+			Vec3f *out_dPdu,
+			Vec3f *out_dPdv ) const
 {
 	float	theta = u * mThetamaxRad;
-	float	cosUTheta = cosf( theta );
-	float	sinUTheta = sinf( theta );
+	float	cosUTheta = DCos( theta );
+	float	sinUTheta = DSin( theta );
 
 	float	rad1V = mRadius * (1 - v);
 	
-	out_pt.x = rad1V * cosUTheta;
-	out_pt.y = rad1V * sinUTheta;
-	out_pt.z = v * mHeight;
+	out_pt.Set(
+		rad1V * cosUTheta,
+		rad1V * sinUTheta,
+		v * mHeight );
 
 	if ( out_dPdu )
 	{
 		float	tmp = mThetamaxRad * rad1V;
 
-		out_dPdu->x = tmp * -sinUTheta;
-		out_dPdu->y = tmp *  cosUTheta;
-		out_dPdu->z = 0;
+		out_dPdu->Set(
+			tmp * -sinUTheta,
+			tmp *  cosUTheta,
+			0 );
 
-		out_dPdv->x = mRadius * -cosUTheta;
-		out_dPdv->y = mRadius * -sinUTheta;
-		out_dPdv->z = mHeight;
+		out_dPdv->Set(
+			mRadius * -cosUTheta,
+			mRadius * -sinUTheta,
+			mHeight );
 	}
 }
 
@@ -84,36 +89,39 @@ void Sphere::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vec3 *out_dPdu,
-			Vec3 *out_dPdv ) const
+			Vec3f *out_dPdu,
+			Vec3f *out_dPdv ) const
 {
 	// $$$ following 2 are "uniform"
-	float	alphamin	= asinf( mZMin / mRadius );
-	float	alphadelta	= asinf( mZMax / mRadius ) - alphamin;
+	float	alphamin	= DASin( mZMin / mRadius );
+	float	alphadelta	= DASin( mZMax / mRadius ) - alphamin;
 
 	float	theta = u * mThetamaxRad;
 	float	alpha = alphamin + v * alphadelta;
 
-	out_pt.x = mRadius * cosf( alpha ) * cosf( theta );
-	out_pt.y = mRadius * cosf( alpha ) * sinf( theta );
-	out_pt.z = mRadius * sinf( alpha );
+	out_pt.Set(
+		mRadius * DCos( alpha ) * DCos( theta ),
+		mRadius * DCos( alpha ) * DSin( theta ),
+		mRadius * DSin( alpha ) );
 	
 	if ( out_dPdu )
 	{
-		float	cosAlpha = cosf( alpha );
-		float	cosUTheta = cosf( theta );
-		float	sinUTheta = sinf( theta );
+		float	cosAlpha = DCos( alpha );
+		float	cosUTheta = DCos( theta );
+		float	sinUTheta = DSin( theta );
 
 		float	tmp1 = mThetamaxRad * mRadius;
-		out_dPdu->x = tmp1 * -sinUTheta * cosAlpha;
-		out_dPdu->y = tmp1 *  cosUTheta * cosAlpha;
-		out_dPdu->z = 0;
+		out_dPdu->Set(
+			tmp1 * -sinUTheta * cosAlpha,
+			tmp1 *  cosUTheta * cosAlpha,
+			0 );
 
 		float	tmp2 = alphadelta * mRadius;
-		float	tmp3 = tmp2 * -sinf( alpha );
-		out_dPdv->x = tmp3 * cosUTheta;
-		out_dPdv->y = tmp3 * sinUTheta;
-		out_dPdv->z = tmp2 * cosAlpha;
+		float	tmp3 = tmp2 * -DSin( alpha );
+		out_dPdv->Set(
+			tmp3 * cosUTheta,
+			tmp3 * sinUTheta,
+			tmp2 * cosAlpha );
 	}
 }
 
@@ -122,30 +130,33 @@ void Hyperboloid::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vec3 *out_dPdu,
-			Vec3 *out_dPdv ) const
+			Vec3f *out_dPdu,
+			Vec3f *out_dPdv ) const
 {
 	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = cosf( uTheta );
-	float	sinUTheta = sinf( uTheta );
+	float	cosUTheta = DCos( uTheta );
+	float	sinUTheta = DSin( uTheta );
 
-	Vec3	p1p2v = DMix( mP1, mP2, v );
+	Vec3f	p1p2v = DMix( mP1, mP2, v );
 
-	out_pt.x = p1p2v.x * cosUTheta - p1p2v.y * sinUTheta;
-	out_pt.y = p1p2v.x * sinUTheta + p1p2v.y * cosUTheta;
-	out_pt.z = p1p2v.z;
+	out_pt.Set(
+		p1p2v.x() * cosUTheta - p1p2v.y() * sinUTheta,
+		p1p2v.x() * sinUTheta + p1p2v.y() * cosUTheta,
+		p1p2v.z() );
 
 	if ( out_dPdu )
 	{
-		out_dPdu->x = mThetamaxRad * (p1p2v.x * -sinUTheta - p1p2v.y *  cosUTheta);
-		out_dPdu->y = mThetamaxRad * (p1p2v.x *  cosUTheta + p1p2v.y * -sinUTheta);
-		out_dPdu->z = 0;
+		out_dPdu->Set(
+			mThetamaxRad * (p1p2v.x() * -sinUTheta - p1p2v.y() *  cosUTheta),
+			mThetamaxRad * (p1p2v.x() *  cosUTheta + p1p2v.y() * -sinUTheta),
+			0 );
 
-		Vec3	dp = mP2 - mP1;
+		Vec3f	dp = mP2 - mP1;
 
-		out_dPdv->x = dp.x * cosUTheta - dp.y * sinUTheta;
-		out_dPdv->y = dp.y * sinUTheta + dp.y * cosUTheta;
-		out_dPdv->z = dp.z;
+		out_dPdv->Set(
+			dp.x() * cosUTheta - dp.y() * sinUTheta,
+			dp.x() * sinUTheta + dp.y() * cosUTheta,
+			dp.z() );
 	}
 }
 
@@ -154,33 +165,36 @@ void Paraboloid::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vec3 *out_dPdu,
-			Vec3 *out_dPdv ) const
+			Vec3f *out_dPdu,
+			Vec3f *out_dPdv ) const
 {
 	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = cosf( uTheta );
-	float	sinUTheta = sinf( uTheta );
-	float	scale = mRmax / sqrtf( mZmax );
+	float	cosUTheta = DCos( uTheta );
+	float	sinUTheta = DSin( uTheta );
+	float	scale = mRmax / DSqrt( mZmax );
 	float	z = DMix( mZmin, mZmax, v );
-	float	r = scale * sqrtf( z );
+	float	r = scale * DSqrt( z );
 
-	out_pt.x = r * cosUTheta;
-	out_pt.y = r * sinUTheta;
-	out_pt.z = z;
+	out_pt.Set(
+			r * cosUTheta,
+			r * sinUTheta,
+			z );
 
 	if ( out_dPdu )
 	{
 		float	tmp1 = r * mThetamaxRad;
-		out_dPdu->x = tmp1 * -sinUTheta;
-		out_dPdu->y = tmp1 *  cosUTheta;
-		out_dPdu->z = 0;
+		out_dPdu->Set(
+			tmp1 * -sinUTheta,
+			tmp1 *  cosUTheta,
+			0 );
 
 		float	dz = mZmax - mZmin;
-		float	dx = 0.5f * dz / sqrtf( z ) * scale;
+		float	dx = 0.5f * dz / DSqrt( z ) * scale;
 
-		out_dPdv->x = dx * cosUTheta;
-		out_dPdv->y = dx * sinUTheta;
-		out_dPdv->z = dz;
+		out_dPdv->Set(
+			dx * cosUTheta,
+			dx * sinUTheta,
+			dz );
 	}
 }
 
@@ -189,38 +203,41 @@ void Torus::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vec3 *out_dPdu,
-			Vec3 *out_dPdv ) const
+			Vec3f *out_dPdu,
+			Vec3f *out_dPdv ) const
 {
 	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = cosf( uTheta );
-	float	sinUTheta = sinf( uTheta );
+	float	cosUTheta = DCos( uTheta );
+	float	sinUTheta = DSin( uTheta );
 	float	phi = DMix( mPhiminRad, mPhimaxRad, v );
-	float	sx = cosf( phi ) * mMinRadius + mMaxRadius;
+	float	sx = DCos( phi ) * mMinRadius + mMaxRadius;
 
-	out_pt.x = sx * cosUTheta;
-	out_pt.y = sx * sinUTheta;
-	out_pt.z = mMinRadius * sinf( phi );
+	out_pt.Set(
+			sx * cosUTheta,
+			sx * sinUTheta,
+			mMinRadius * DSin( phi ) );
 
 	if ( out_dPdu )
 	{
-		out_dPdu->x = sx * mThetamaxRad * -sinUTheta;
-		out_dPdu->y = sx * mThetamaxRad *  cosUTheta;
-		out_dPdu->z = 0;
+		out_dPdu->Set(
+			sx * mThetamaxRad * -sinUTheta,
+			sx * mThetamaxRad *  cosUTheta,
+			0 );
 
 		float dphi	= mPhimaxRad - mPhiminRad;
-		float dsx	= dphi * -sinf( phi ) * mMinRadius;
+		float dsx	= dphi * -DSin( phi ) * mMinRadius;
 
-		out_dPdv->x = dsx * cosUTheta;
-		out_dPdv->y = dsx * sinUTheta;
-		out_dPdv->z = dphi * cosf( phi ) * mMinRadius;
+		out_dPdv->Set(
+			dsx * cosUTheta,
+			dsx * sinUTheta,
+			dphi * DCos( phi ) * mMinRadius );
 	}
 }
 
 //==================================================================
 inline Point3 polar( float radius, float theta )
 {
-	return Point3( cosf(theta)*radius, sinf(theta)*radius, 0 );
+	return Point3( DCos(theta)*radius, DSin(theta)*radius, 0 );
 }
 
 //==================================================================
@@ -236,14 +253,14 @@ inline void bounds2DSweepL(
 	out_bound.Expand( polar(rmin,tmax) );
 	out_bound.Expand( polar(rmax,tmax) );
 	
-	if ( tmin < (float)M_PI_2 && tmax > (float)M_PI_2 )
-		out_bound.Expand( polar( rmax, (float)M_PI_2 ) );
+	if ( tmin < FM_PI_2 && tmax > FM_PI_2 )
+		out_bound.Expand( polar( rmax, FM_PI_2 ) );
 
-	if ( tmin < (float)M_PI && tmax > (float)M_PI )
-		out_bound.Expand( polar( rmax, (float)M_PI ) );
+	if ( tmin < FM_PI && tmax > FM_PI )
+		out_bound.Expand( polar( rmax, FM_PI ) );
 
-	if ( tmin < (float)(M_PI+M_PI_2) && tmax > (float)(M_PI+M_PI_2) )
-		out_bound.Expand( polar( rmax, (float)(M_PI+M_PI_2) ) );
+	if ( tmin < (FM_PI+FM_PI_2) && tmax > (FM_PI+FM_PI_2) )
+		out_bound.Expand( polar( rmax, (FM_PI+FM_PI_2) ) );
 }
 
 //==================================================================
@@ -258,7 +275,7 @@ inline void bounds2DSweepR(
 
 	for (int i=-3; i < 4; ++i)
 	{
-		float	phi = i * (float)M_PI_2;
+		float	phi = i * FM_PI_2;
 		if ( phiMin < phi && phiMax > phi )
 			out_bound.Expand( polar( r, phi ) );
 	}
@@ -271,9 +288,9 @@ inline void bounds2DSweepP(
 					float theMin,
 					float theMax )
 {
-	float	r = sqrtf( p.x * p.x + p.y * p.y );
-	float	delta = atan2f( p.y, p.x );
-	
+	float	r = DSqrt( p.x() * p.x() + p.y() * p.y() );
+	float	delta = atan2f( p.y(), p.x() );
+
 	theMin += delta;
 	theMax += delta;
 	
@@ -282,7 +299,7 @@ inline void bounds2DSweepP(
 
 	for (int i=-1; i < 6; ++i)
 	{
-		float	the = i * (float)M_PI_2;
+		float	the = i * FM_PI_2;
 		if ( theMin < the && theMax > the )
 			out_bound.Expand( polar( r, the ) );
 	}
@@ -295,8 +312,8 @@ bool Cylinder::MakeBound( Bound &out_bound ) const
 	float	tuMax = mThetamaxRad * mURange[1];
 	out_bound.Reset();
 	bounds2DSweepL( out_bound, mRadius, mRadius, tuMin, tuMax );
-	out_bound.mBox[0].z = DMix( mZMin, mZMax, mVRange[0] );
-	out_bound.mBox[1].z = DMix( mZMin, mZMax, mVRange[1] );
+	out_bound.mBox[0].z() = DMix( mZMin, mZMax, mVRange[0] );
+	out_bound.mBox[1].z() = DMix( mZMin, mZMax, mVRange[1] );
 	return true;
 }
 
@@ -309,8 +326,8 @@ bool Cone::MakeBound( Bound &out_bound ) const
 	float	rMax = mRadius * (1 - mVRange[0]);
 	out_bound.Reset();
 	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
-	out_bound.mBox[0].z = mVRange[0] * mHeight;
-	out_bound.mBox[1].z = mVRange[1] * mHeight;
+	out_bound.mBox[0].z() = mVRange[0] * mHeight;
+	out_bound.mBox[1].z() = mVRange[1] * mHeight;
 	return true;
 }
 
@@ -319,14 +336,14 @@ bool Sphere::MakeBound( Bound &out_bound ) const
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
 
-	float	alphaMin = asinf( mZMin / mRadius );
-	float	alphaMax = asinf( mZMax / mRadius );
+	float	alphaMin = DASin( mZMin / mRadius );
+	float	alphaMax = DASin( mZMax / mRadius );
 
 	float	aVMin = DMix( alphaMin, alphaMax, mVRange[0] );
 	float	aVMax = DMix( alphaMin, alphaMax, mVRange[1] );
 
-	float	rVMin = cosf( aVMin ) * mRadius;
-	float	rVMax = cosf( aVMax ) * mRadius;
+	float	rVMin = DCos( aVMin ) * mRadius;
+	float	rVMax = DCos( aVMax ) * mRadius;
 	float	rMin = DMIN( rVMin, rVMax );
 	
 	float	rMax;
@@ -339,8 +356,8 @@ bool Sphere::MakeBound( Bound &out_bound ) const
 	out_bound.Reset();
 	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
 
-	out_bound.mBox[0].z = sinf( aVMin ) * mRadius;
-	out_bound.mBox[1].z = sinf( aVMax ) * mRadius;
+	out_bound.mBox[0].z() = DSin( aVMin ) * mRadius;
+	out_bound.mBox[1].z() = DSin( aVMax ) * mRadius;
 	return true;
 }
 
@@ -355,25 +372,25 @@ bool Hyperboloid::MakeBound( Bound &out_bound ) const
 	bounds2DSweepP( out_bound, pMin, tuMin, tuMax );
 	bounds2DSweepP( out_bound, pMax, tuMin, tuMax );
 	
-	out_bound.mBox[0].z = DMIN( pMin.z, pMax.z );
-	out_bound.mBox[1].z = DMAX( pMin.z, pMax.z );
+	out_bound.mBox[0].z() = DMIN( pMin.z(), pMax.z() );
+	out_bound.mBox[1].z() = DMAX( pMin.z(), pMax.z() );
 	return true;
 }
 
 bool Paraboloid::MakeBound( Bound &out_bound ) const
 {
-	float	scale = mRmax / sqrtf( mZmax );
+	float	scale = mRmax / DSqrt( mZmax );
 
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
 	float	zVMin = mZmin + mVRange[0] * (mZmax-mZmin);
 	float	zVMax = mZmin + mVRange[1] * (mZmax-mZmin);
-	float	rMin = sqrtf( zVMin ) * scale;
-	float	rMax = sqrtf( zVMax ) * scale;
+	float	rMin = DSqrt( zVMin ) * scale;
+	float	rMax = DSqrt( zVMax ) * scale;
 	out_bound.Reset();
 	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
-	out_bound.mBox[0].z = zVMin;
-	out_bound.mBox[1].z = zVMax;
+	out_bound.mBox[0].z() = zVMin;
+	out_bound.mBox[1].z() = zVMax;
 	return true;
 }
 
@@ -388,13 +405,13 @@ bool Torus::MakeBound( Bound &out_bound ) const
 	Bound	a;
 	a.Reset();
 	bounds2DSweepR( a, mMinRadius, phiVMin, phiVMax );
-	float	rMin = a.mBox[0].x + mMaxRadius;
-	float	rMax = a.mBox[1].x + mMaxRadius;
+	float	rMin = a.mBox[0].x() + mMaxRadius;
+	float	rMax = a.mBox[1].x() + mMaxRadius;
 
 	out_bound.Reset();
 	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
-	out_bound.mBox[0].z = a.mBox[0].y;
-	out_bound.mBox[1].z = a.mBox[1].y;
+	out_bound.mBox[0].z() = a.mBox[0].y();
+	out_bound.mBox[1].z() = a.mBox[1].y();
 	return true;
 }
 

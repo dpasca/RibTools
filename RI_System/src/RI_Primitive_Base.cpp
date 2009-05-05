@@ -89,11 +89,11 @@ void SimplePrimitiveBase::Dice(
 {
 	Point3	*pPointsWS = g.mpPointsWS;
 
-	Vec3	*pI	 = (Vec3	*)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
-	Vec3	*pN  = (Vec3	*)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
-	Vec3	*pNg = (Vec3	*)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
-	Color	*pOs = (Color	*)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
-	Color	*pCs = (Color	*)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
+	SlVector	*pI	 = (SlVector *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
+	SlVector	*pN  = (SlVector *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
+	SlVector	*pNg = (SlVector *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
+	SlColor	*pOs = (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
+	SlColor	*pCs = (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
 
 	float	du = 1.0f / g.mXDim;
 	float	dv = 1.0f / g.mYDim;
@@ -105,7 +105,7 @@ void SimplePrimitiveBase::Dice(
 	if ( mpAttribs->mOrientationFlipped )
 		mtxLocalCameraNorm = mtxLocalCameraNorm * Matrix44::Scale( -1, -1, -1 );
 
-	Vec3	camPosCS = mtxWorldCamera.GetTranslation();
+	Vec3f	camPosCS = mtxWorldCamera.GetTranslation();
 
 	Color	useColor;
 	Color	useOpa;
@@ -137,48 +137,68 @@ void SimplePrimitiveBase::Dice(
 		useOpa	 = mpAttribs->mOpacity;
 	}
 
+	// build the UVs
+	Vec2f	locUV[ MicroPolygonGrid::MAX_SIZE ];
+
+	size_t	sampleIdx = 0;
 	float	v = 0.0f;
 	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
 	{
 		float	u = 0.0f;
-		for (int j=0; j < (int)g.mXDim; ++j, u += du)
+		for (int j=0; j < (int)g.mXDim; ++j, u += du, ++sampleIdx)
 		{
-			Vec2	locUV = CalcLocalUV( Vec2( u, v ) );
-			Vec3	dPdu;
-			Vec3	dPdv;
-			Vec3	posLS;
-			Eval_dPdu_dPdv( locUV.x, locUV.y, posLS, &dPdu, &dPdv );
-
-			Vec3 norLS = dPdu.GetCross( dPdv ).GetNormalized();
-
-			//norLS = Vec3( 0, 0, 1 );
-
-			Vec3	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
-
-			Vec3	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
-
-			Vec3	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
-			//Vec3	norWS = V3__M44_Mul_V3W1( mtxLocalWorldNorm, norLS ).GetNormalized();
-
-			*pPointsWS++	= posWS;
-			//*pI++		= pos - camWorldPos;
-			//*pI++		= (posCS - -camPosCS).GetNormalized();
-			*pI++		= (posCS - -camPosCS).GetNormalized();
-			*pN++		= norCS;
-			*pNg++		= norCS;
-			*pOs++		= useOpa;
-			*pCs++		= useColor;
-
-			//*pOs++ = Color( 1, 0, 0 );
-			//*pCs++ = Color( 0, 1, 0 );
+			locUV[ sampleIdx ] = CalcLocalUV( Vec2f( u, v ) );
 		}
+	}
+
+	DASSERT( sampleIdx == g.mPointsN );
+
+	for (sampleIdx=0; sampleIdx < g.mPointsN; ++sampleIdx)
+	{
+		size_t	blkIdx = sampleIdx / RI_SIMD_BLK_LEN;
+		size_t	itmIdx = sampleIdx & (RI_SIMD_BLK_LEN-1);
+
+		Vec3f	dPdu;
+		Vec3f	dPdv;
+		Vec3f	posLS;
+		Eval_dPdu_dPdv( locUV[sampleIdx].x(), locUV[sampleIdx].y(), posLS, &dPdu, &dPdv );
+
+		Vec3f	norLS = dPdu.GetCross( dPdv ).GetNormalized();
+		Vec3f	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
+		Vec3f	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
+		Vec3f	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
+
+		*pPointsWS++	= posWS;
+
+		// store in blocked SOA format
+
+		Vec3f	tmpI = (posCS - -camPosCS).GetNormalized();
+		pI[blkIdx][0][itmIdx] = tmpI[0];
+		pI[blkIdx][1][itmIdx] = tmpI[1];
+		pI[blkIdx][2][itmIdx] = tmpI[2];
+
+		pN[blkIdx][0][itmIdx] = norCS[0];
+		pN[blkIdx][1][itmIdx] = norCS[1];
+		pN[blkIdx][2][itmIdx] = norCS[2];
+
+		pNg[blkIdx][0][itmIdx] = norCS[0];
+		pNg[blkIdx][1][itmIdx] = norCS[1];
+		pNg[blkIdx][2][itmIdx] = norCS[2];
+
+		pOs[blkIdx][0][itmIdx] = useOpa[0];
+		pOs[blkIdx][1][itmIdx] = useOpa[1];
+		pOs[blkIdx][2][itmIdx] = useOpa[2];
+
+		pCs[blkIdx][0][itmIdx] = useColor[0];
+		pCs[blkIdx][1][itmIdx] = useColor[1];
+		pCs[blkIdx][2][itmIdx] = useColor[2];
 	}
 }
 
 //==================================================================
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &staticSymbols,
-					DVec<Vec3> &out_vectorP,
+					DVec<Vec3f> &out_vectorP,
 					int fromIdx )
 {
 	bool	gotP = false;
@@ -199,7 +219,7 @@ bool ParamsFindP(	ParamList &params,
 			out_vectorP.resize( fltVec.size() / 3 );
 
 			for (size_t iv=0, id=0; iv < fltVec.size(); iv += 3)
-				out_vectorP[id++] = Vec3( &fltVec[ iv ] );
+				out_vectorP[id++] = Vec3f( &fltVec[ iv ] );
 
 			return true;
 		}
@@ -211,7 +231,7 @@ bool ParamsFindP(	ParamList &params,
 //==================================================================
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &staticSymbols,
-					Vec3	*pOut_vectorP,
+					Vec3f	*pOut_vectorP,
 					int	expectedN,
 					int fromIdx )
 {
@@ -239,7 +259,7 @@ bool ParamsFindP(	ParamList &params,
 			size_t	srcN = fltVec.size();
 
 			for (size_t si=0, di=0; si < srcN; si += 3, di += 1)
-				pOut_vectorP[ di ] = Vec3( &fltVec[ si ] );
+				pOut_vectorP[ di ] = Vec3f( &fltVec[ si ] );
 			
 			return true;
 		}

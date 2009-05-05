@@ -1,11 +1,10 @@
-/*
- *  RI_MicroPolygonGrid.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/08.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_MicroPolygonGrid.cpp
+///
+/// Created by Davide Pasca - 2009/2/8
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_Attributes.h"
@@ -65,28 +64,28 @@ MicroPolygonGrid::MicroPolygonGrid() :
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	mpDataCi = (Color *)symbol.mpDefaultVal;
+	mpDataCi = (SlColor *)symbol.mpDefaultVal;
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Oi";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	mpDataOi = (Color *)symbol.mpDefaultVal;
+	mpDataOi = (SlColor *)symbol.mpDefaultVal;
 	mSymbols.push_back( symbol );
 	
 	symbol.mName = "Cs";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	mpDataCs = (Color *)symbol.mpDefaultVal;
+	mpDataCs = (SlColor *)symbol.mpDefaultVal;
 	mSymbols.push_back( symbol );
-	
+
 	symbol.mName = "Os";
 	symbol.mType = SlSymbol::COLOR;
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
-	mpDataOs = (Color *)symbol.mpDefaultVal;
+	mpDataOs = (SlColor *)symbol.mpDefaultVal;
 	mSymbols.push_back( symbol );
 }
 
@@ -100,9 +99,11 @@ MicroPolygonGrid::~MicroPolygonGrid()
 }
 
 //==================================================================
-static void fillColArray( Color *pCol, size_t n, float r, float g, float b )
+static void fillColArray( SlColor *pCol, size_t n, float r, float g, float b )
 {
-	for (size_t i=0; i < n; ++i)
+	size_t	blocksN = RI_GET_SIMD_BLOCKS( n );
+
+	for (size_t i=0; i < blocksN; ++i)
 	{
 		pCol[i].Set( r, g, b );
 	}

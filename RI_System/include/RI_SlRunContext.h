@@ -23,6 +23,7 @@ class SlRunContext
 public:
 	u_int				mProgramCounter;
 	u_int				mSIMDCount;
+	u_int				mSIMDBlocksN;
 	int					*mpSIMDFlags;
 	SlValue				*mpDataSegment;
 	SlShaderInstance	*mpShaderInst;
@@ -33,6 +34,7 @@ public:
 	{
 		mProgramCounter = 0;
 		mSIMDCount		= 0;
+		mSIMDBlocksN	= 0;
 		mpSIMDFlags		= 0;
 		mpDataSegment	= 0;
 		mpShaderInst	= 0;
@@ -76,27 +78,27 @@ public:
 		return GetOp(argc)->mSymbol.mIsVarying;
 	}
 
-	float		*GetFloat ( u_int argc ) { return GetValue(argc).Data.pFloatValue;	}
-	Point3		*GetPoint ( u_int argc ) { return GetValue(argc).Data.pPointValue;	}
-	Vec3		*GetVector( u_int argc ) { return GetValue(argc).Data.pVectorValue;	}
-	Vec3		*GetNormal( u_int argc ) { return GetValue(argc).Data.pNormalValue;	}
-	Vec3		*GetColor ( u_int argc ) { return GetValue(argc).Data.pColorValue;	}
-	Matrix44	*GetMatrix( u_int argc ) { return GetValue(argc).Data.pMatrixValue;	}
-	// no non-constant string
-	void		*GetVoid  ( u_int argc ) { return GetValue(argc).Data.pVoidValue;	}
+	int GetSymbolVaryingStep( u_int argc ) const
+	{
+		return GetOp(argc)->mSymbol.mIsVarying ? 1 : 0;
+	}
 
-	const float		*GetFloat ( u_int argc ) const { return GetValue(argc).Data.pFloatValue;	}
-	const Point3	*GetPoint ( u_int argc ) const { return GetValue(argc).Data.pPointValue;	}
-	const Vec3		*GetVector( u_int argc ) const { return GetValue(argc).Data.pVectorValue;	}
-	const Vec3		*GetNormal( u_int argc ) const { return GetValue(argc).Data.pNormalValue;	}
-	const Vec3		*GetColor ( u_int argc ) const { return GetValue(argc).Data.pColorValue;	}
-	const Matrix44	*GetMatrix( u_int argc ) const { return GetValue(argc).Data.pMatrixValue;	}
-	const char		*GetString( u_int argc ) const { return GetValue(argc).Data.pStringValue;	}
+	void		*GetVoid  ( u_int argc ) { return GetValue(argc).Data.pVoidValue;	}
+	//float		*GetFloat ( u_int argc ) { return GetValue(argc).Data.pFloatValue;	}
+	//Vec3f		*GetColor ( u_int argc ) { return GetValue(argc).Data.pColorValue;	}
+	//Matrix44	*GetMatrix( u_int argc ) { return GetValue(argc).Data.pMatrixValue;	}
+	// no non-constant string
+
 	const void		*GetVoid  ( u_int argc ) const { return GetValue(argc).Data.pVoidValue;	}
-	
+	//const float		*GetFloat ( u_int argc ) const { return GetValue(argc).Data.pFloatValue;	}
+	//const Vec3f		*GetColor ( u_int argc ) const { return GetValue(argc).Data.pColorValue;	}
+	//const Matrix44	*GetMatrix( u_int argc ) const { return GetValue(argc).Data.pMatrixValue;	}
+	//const char		*GetString( u_int argc ) const { return GetValue(argc).Data.pStringValue;	}
+
 	void InitializeSIMD( MicroPolygonGrid &g );
 	
-	bool IsProcessorActive( u_int i ) const { return mpSIMDFlags[i] == 0; }
+	//bool IsProcessorActive( u_int i ) const { return mpSIMDFlags[i] == 0; }
+	bool IsProcessorActive( u_int i ) const { return true; }
 	void EnableProcessor( u_int i )			{ mpSIMDFlags[i] -= 1; }
 	void DisableProcessor( u_int i )		{ mpSIMDFlags[i] += 1; }
 	u_int GetProcessorsN() const			{ return mSIMDCount; }

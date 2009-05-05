@@ -20,6 +20,8 @@ namespace RI
 void SlRunContext::InitializeSIMD( MicroPolygonGrid &g )
 {
 	mSIMDCount = g.GetPointsN();
+	mSIMDBlocksN = RI_GET_SIMD_BLOCKS( mSIMDCount );
+
 	mpSIMDFlags = new int [ mSIMDCount ];
 	for (u_int i=0; i < mSIMDCount; ++i)
 		mpSIMDFlags[i] = 0;

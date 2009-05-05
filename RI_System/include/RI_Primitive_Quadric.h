@@ -45,8 +45,8 @@ public:
 					float u,
 					float v,
 					Point3 &out_pt,
-					Vec3 *out_dPdu,
-					Vec3 *out_dPdv ) const;
+					Vec3f *out_dPdu,
+					Vec3f *out_dPdv ) const;
 };
 
 //==================================================================
@@ -76,8 +76,8 @@ public:
 					float u,
 					float v,
 					Point3 &out_pt,
-					Vec3 *out_dPdu,
-					Vec3 *out_dPdv ) const;
+					Vec3f *out_dPdu,
+					Vec3f *out_dPdv ) const;
 };
 
 //==================================================================
@@ -109,8 +109,8 @@ public:
 					float u,
 					float v,
 					Point3 &out_pt,
-					Vec3 *out_dPdu,
-					Vec3 *out_dPdv ) const;
+					Vec3f *out_dPdu,
+					Vec3f *out_dPdv ) const;
 };
 
 //==================================================================
@@ -119,12 +119,12 @@ public:
 class Hyperboloid : public SimplePrimitiveBase
 {
 public:
-	Vec3	mP1;
-	Vec3	mP2;
+	Vec3f	mP1;
+	Vec3f	mP2;
 	float	mThetamaxRad;
 
 public:
-	Hyperboloid( const Vec3 &p1, const Vec3 &p2, float thetamax ) :
+	Hyperboloid( const Vec3f &p1, const Vec3f &p2, float thetamax ) :
 		SimplePrimitiveBase(HYPERBOLOID),
 		mP1(p1),
 		mP2(p2),
@@ -140,8 +140,8 @@ public:
 					float u,
 					float v,
 					Point3 &out_pt,
-					Vec3 *out_dPdu,
-					Vec3 *out_dPdv ) const;
+					Vec3f *out_dPdu,
+					Vec3f *out_dPdv ) const;
 };
 
 //==================================================================
@@ -173,8 +173,8 @@ public:
 					float u,
 					float v,
 					Point3 &out_pt,
-					Vec3 *out_dPdu,
-					Vec3 *out_dPdv ) const;
+					Vec3f *out_dPdu,
+					Vec3f *out_dPdv ) const;
 };
 
 //==================================================================
@@ -210,8 +210,8 @@ public:
 					float u,
 					float v,
 					Point3 &out_pt,
-					Vec3 *out_dPdu,
-					Vec3 *out_dPdv ) const;
+					Vec3f *out_dPdu,
+					Vec3f *out_dPdv ) const;
 };
 
 //==================================================================

@@ -1,11 +1,10 @@
-/*
- *  RI_SlShaderAsmParser.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/03/04.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_SlShaderAsmParser.cpp
+///
+/// Created by Davide Pasca - 2009/3/4
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include <stdarg.h>
@@ -218,27 +217,38 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 		if ( symbol.mIsVarying )
 			onError( "No default values possible for varying variables !" );
 
+		symbol.mArraySize = 1;
+		symbol.AllocData();
+
+		float	tmp[64];
+
 		switch ( symbol.mType )
 		{
 		case SlSymbol::FLOAT :
-						symbol.mpDefaultVal = new float;
-						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 1 );
+						getVector( pDefaultValueStr, tmp, 1 );
+						((SlScalar *)symbol.mpDefaultVal)[0] = tmp[0];
 						break;
 
 		case SlSymbol::POINT :
-						symbol.mpDefaultVal = new Point3();
-						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 3 );
+						getVector( pDefaultValueStr, tmp, 3 );
+						((SlVector *)symbol.mpDefaultVal)[0][0] = tmp[0];
+						((SlVector *)symbol.mpDefaultVal)[0][1] = tmp[1];
+						((SlVector *)symbol.mpDefaultVal)[0][2] = tmp[2];
 						break;
 
 		case SlSymbol::COLOR :
-						symbol.mpDefaultVal = new Color();
-						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 3 );
+						getVector( pDefaultValueStr, tmp, 3 );
+						((SlColor *)symbol.mpDefaultVal)[0][0] = tmp[0];
+						((SlColor *)symbol.mpDefaultVal)[0][1] = tmp[1];
+						((SlColor *)symbol.mpDefaultVal)[0][2] = tmp[2];
 						break;
 		
 		case SlSymbol::VECTOR:
 		case SlSymbol::NORMAL:
-						symbol.mpDefaultVal = new Vec3();
-						getVector( pDefaultValueStr, (float *)symbol.mpDefaultVal, 3 );
+						getVector( pDefaultValueStr, tmp, 3 );
+						((SlVector *)symbol.mpDefaultVal)[0][0] = tmp[0];
+						((SlVector *)symbol.mpDefaultVal)[0][1] = tmp[1];
+						((SlVector *)symbol.mpDefaultVal)[0][2] = tmp[2];
 						break;
 		
 		case SlSymbol::STRING:

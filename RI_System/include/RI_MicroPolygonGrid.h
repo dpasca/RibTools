@@ -1,11 +1,10 @@
-/*
- *  RI_MicroPolygonGrid.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/08.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_MicroPolygonGrid.h
+///
+/// Created by Davide Pasca - 2009/2/8
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_MICROPOLYGONGRID_H
 #define RI_MICROPOLYGONGRID_H
@@ -25,10 +24,11 @@ class Attributes;
 //==================================================================
 class MicroPolygonGrid
 {
-	Color		*mpDataCi;
-	Color		*mpDataOi;
-	Color		*mpDataCs;
-	Color		*mpDataOs;
+	SlColor	*mpDataCi;
+	SlColor	*mpDataOi;
+	SlColor	*mpDataCs;
+	SlColor	*mpDataOs;
+
 public:
 	static const u_int	MAX_SIZE = 48 * 48;
 

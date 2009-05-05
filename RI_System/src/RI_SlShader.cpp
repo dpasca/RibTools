@@ -175,7 +175,7 @@ void Inst_Copy( SlRunContext &ctx )
 		bool	op1_varying = ctx.IsSymbolVarying( 2 );
 		int		op1_offset = 0;
 		
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
 				lhs[i] = op1[op1_offset];
@@ -187,7 +187,7 @@ void Inst_Copy( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 				 
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 			if ( ctx.IsProcessorActive( i ) )
 				lhs[i] = op1[0];
 	}
@@ -199,9 +199,9 @@ void Inst_Copy( SlRunContext &ctx )
 template <class TA, class TB, const char OPNAME>
 void Inst_AlOp( SlRunContext &ctx )
 {
-		  TA*	lhs	= (		 TA*)ctx.GetFloat( 1 );
-	const TA*	op1	= (const TA*)ctx.GetFloat( 2 );
-	const TB*	op2	= (const TB*)ctx.GetFloat( 3 );
+		  TA*	lhs	= (		 TA*)ctx.GetVoid( 1 );
+	const TA*	op1	= (const TA*)ctx.GetVoid( 2 );
+	const TB*	op2	= (const TB*)ctx.GetVoid( 3 );
 	
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -212,7 +212,7 @@ void Inst_AlOp( SlRunContext &ctx )
 		int		op1_offset = 0;
 		int		op2_offset = 0;
 		
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
@@ -237,7 +237,7 @@ void Inst_AlOp( SlRunContext &ctx )
 		if ( OPNAME == '*' ) tmp = op1[0] * op2[0]; else
 		if ( OPNAME == '/' ) tmp = op1[0] / op2[0];
 
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 			if ( ctx.IsProcessorActive( i ) )
 				lhs[i] = tmp;
 	}
@@ -248,31 +248,31 @@ void Inst_AlOp( SlRunContext &ctx )
 //==================================================================
 static void Inst_Normalize( SlRunContext &ctx )
 {
-		  Vec3*	lhs	= (		 Vec3*)ctx.GetVoid( 1 );
-	const Vec3*	op1	= (const Vec3*)ctx.GetVoid( 2 );
+		  SlVector*	lhs	= (		 SlVector*)ctx.GetVoid( 1 );
+	const SlVector*	op1	= (const SlVector*)ctx.GetVoid( 2 );
 	
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
 	if ( lhs_varying )
 	{
-		bool	op1_varying = ctx.IsSymbolVarying( 2 );
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
 		int		op1_offset = 0;
 		
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
 				lhs[i] = op1[op1_offset].GetNormalized();
 
-			if ( op1_varying )	++op1_offset;
+			op1_offset += op1_step;
 		}
 	}
 	else
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		Vec3	tmp = op1[0].GetNormalized();
+		SlVector	tmp = op1[0].GetNormalized();
 
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 			if ( ctx.IsProcessorActive( i ) )
 				lhs[i] = tmp;
 	}
@@ -281,53 +281,45 @@ static void Inst_Normalize( SlRunContext &ctx )
 }
 
 //==================================================================
-inline float sign( float val )
-{
-	if ( val < 0 )	return -1; else
-	if ( val > 0 )	return 1; else
-					return 0;
-}
-
-//==================================================================
 static void Inst_Faceforward( SlRunContext &ctx )
 {
-		  Vec3*	lhs	= (		 Vec3*)ctx.GetVoid( 1 );
-	const Vec3*	pN	= (const Vec3*)ctx.GetVoid( 2 );
-	const Vec3*	pI	= (const Vec3*)ctx.GetVoid( 3 );
-	
-	const SlSymbol*	pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", SlSymbol::NORMAL );
-	const Vec3*	pNg = (const Vec3 *)pNgSymbol->GetData();
+		  SlVector* lhs =	(		SlVector*)ctx.GetVoid( 1 );
+	const SlVector* pN	 =	(const	SlVector*)ctx.GetVoid( 2 );
+	const SlVector* pI	 =	(const	SlVector*)ctx.GetVoid( 3 );
+
+	const SlSymbol*	 pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", SlSymbol::NORMAL );
+	const SlVector* pNg = (const SlVector *)pNgSymbol->GetData();
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-	bool	N_varying	= ctx.IsSymbolVarying( 2 );
-	bool	I_varying	= ctx.IsSymbolVarying( 3 );
-	bool	Ng_varying	= pNgSymbol->mIsVarying;
-	
+	bool	N_step	= ctx.IsSymbolVarying( 2 );
+	bool	I_step	= ctx.IsSymbolVarying( 3 );
+	bool	Ng_step	= pNgSymbol->mIsVarying ? 1 : 0;
+
 	if ( lhs_varying )
 	{
 		int		N_offset	= 0;
 		int		I_offset	= 0;
 		int		Ng_offset	= 0;
 		
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = pN[N_offset] * sign( -pI[I_offset].GetDot( pNg[Ng_offset] ) );
+				lhs[i] = pN[N_offset] * DSign( -pI[I_offset].GetDot( pNg[Ng_offset] ) );
 
-			if ( N_varying )	++N_offset;
-			if ( I_varying )	++I_offset;
-			if ( Ng_varying )	++Ng_offset;
+			N_offset	+= N_step	;
+			I_offset	+= I_step	;
+			Ng_offset	+= Ng_step	;
 		}
 	}
 	else
 	{
-		DASSERT( !N_varying		);
-		DASSERT( !I_varying		);
-		DASSERT( !Ng_varying	);
+		DASSERT( !N_step		);
+		DASSERT( !I_step		);
+		DASSERT( !Ng_step	);
 
-		Vec3	tmp = pN[0] * sign( -pI[0].GetDot( pNg[0] ) );
+		SlVector	tmp = pN[0] * DSign( -pI[0].GetDot( pNg[0] ) );
 
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 			if ( ctx.IsProcessorActive( i ) )
 				lhs[i] = tmp;
 	}
@@ -337,11 +329,11 @@ static void Inst_Faceforward( SlRunContext &ctx )
 
 //==================================================================
 static inline void illuminate(
-				Color &accCol,
+				SlColor &accCol,
 				const DVec<LightSourceT *>	&pLights,
 				const DVec<U16>				&activeLights,
 				const Point3 &pos,
-				const Vec3 &Nn,
+				const SlVector &Nn,
 				float illConeCosA )
 {
 	for (size_t i=0; i < activeLights.size(); ++i)
@@ -352,9 +344,12 @@ static inline void illuminate(
 
 		if ( light.mType == LightSourceT::TYPE_DISTANT )
 		{
-			float	norLightCosA = Nn.GetDot( light.mRend.mDistant.mDirCS );
+			SlColor	lightCol( light.mColor.x(), light.mColor.y(), light.mColor.z() );
+			SlVector	lightDir( light.mRend.mDistant.mDirCS.x(), light.mRend.mDistant.mDirCS.y(), light.mRend.mDistant.mDirCS.z() );
+
+			SlScalar	norLightCosA = Nn.GetDot( lightDir );
 			//if ( norLightCosA < illConeCosA )
-				accCol += light.mColor * norLightCosA;
+				accCol += lightCol * norLightCosA;
 		}
 	}
 
@@ -363,13 +358,13 @@ static inline void illuminate(
 
 //==================================================================
 static inline Color specularbrdf(
-						 const Vec3 &L,
-						 const Vec3 &V,
-						 const Vec3 &N,
+						 const Vec3f &L,
+						 const Vec3f &V,
+						 const Vec3f &N,
 						 float ooRoughness
 						)
 {
-	Vec3	H = (L + V).GetNormalized();
+	Vec3f	H = (L + V).GetNormalized();
 	float	nh = N.GetDot( H );
 	float	a = powf( DMAX( 0, nh ), ooRoughness );
 	
@@ -388,8 +383,8 @@ return C;
 
 static void Inst_Diffuse( SlRunContext &ctx )
 {
-		  Color*	lhs	= (		 Vec3*)ctx.GetVoid( 1 );
-	const Vec3*		op1	= (const Vec3*)ctx.GetVoid( 2 );
+		  SlColor* lhs	= (		 SlColor*)ctx.GetVoid( 1 );
+	const SlVector* op1	= (const SlVector*)ctx.GetVoid( 2 );
 
 	const SlSymbol*	pPSymbol = ctx.mpSymbols->LookupVariable( "P", SlSymbol::POINT );
 	const Point3*	pP = (const Point3 *)pPSymbol->GetData();
@@ -399,20 +394,20 @@ static void Inst_Diffuse( SlRunContext &ctx )
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
-	float	illConeCosA = cosf( (float)M_PI_2 );
+	float	illConeCosA = cosf( FM_PI_2 );
 	
 	if ( lhs_varying )
 	{
-		bool	op1_varying = ctx.IsSymbolVarying( 2 );
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
 		int		op1_offset = 0;
 
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				Vec3	Nn = op1[op1_offset].GetNormalized();
+				SlVector	Nn = op1[op1_offset].GetNormalized();
 
-				Color	col( 0, 0, 0 );
+				SlColor	col( 0.0f );
 
 				illuminate( col, pLights, actLights, *pP, Nn, illConeCosA );
 
@@ -421,19 +416,19 @@ static void Inst_Diffuse( SlRunContext &ctx )
 
 			++pP;
 
-			if ( op1_varying )	++op1_offset;
+			op1_offset += op1_step;
 		}
 	}
 	else
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		Vec3	Nn = op1[0].GetNormalized();
+		SlVector	Nn = op1[0].GetNormalized();
 
-		Color	col( 0, 0, 0 );
+		SlColor	col( 0.0f );
 		illuminate( col, pLights, actLights, *pP, Nn, illConeCosA );
 
-		for (u_int i=0; i < ctx.mSIMDCount; ++i)
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 			if ( ctx.IsProcessorActive( i ) )
 				lhs[i] = col;
 	}
@@ -445,9 +440,9 @@ static void Inst_Diffuse( SlRunContext &ctx )
 // this is a simplified version.. until lights become available 8)
 static void Inst_Ambient( SlRunContext &ctx )
 {
-	Color*	lhs	= (		 Color*)ctx.GetVoid( 1 );
+	SlColor*	lhs	= (SlColor*)ctx.GetVoid( 1 );
 
-	Color	ambCol( 0, 0, 0 );
+	SlColor	ambCol( 0.f );
 
 	const DVec<LightSourceT *>	&pLights	= ctx.mpAttribs->mpState->GetLightSources();
 	const DVec<U16>				&actLights	= ctx.mpAttribs->mActiveLights;
@@ -458,13 +453,16 @@ static void Inst_Ambient( SlRunContext &ctx )
 
 		const LightSourceT	&light = *pLights[ li ];
 
+		SlColor	lightCol( light.mColor.x(), light.mColor.y(), light.mColor.z() );
+		SlScalar	lightInt( light.mIntesity );
+
 		if ( light.mType == LightSourceT::TYPE_AMBIENT )
-			ambCol += light.mColor * light.mIntesity;
+			ambCol += lightCol * lightInt;
 	}
 
 	//DASSERT( ambCol.x >= 0 && ambCol.y >= 0 && ambCol.z >= 0 );
 
-	for (u_int i=0; i < ctx.mSIMDCount; ++i)
+	for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 	{
 		if ( ctx.IsProcessorActive( i ) )
 			lhs[i] = ambCol;
@@ -474,9 +472,9 @@ static void Inst_Ambient( SlRunContext &ctx )
 }
 
 //==================================================================
-#define SINGLE	float
-#define VECTOR	Vec3
-#define MATRIX	Matrix44
+#define SINGLE	SlScalar
+#define VECTOR	SlVector
+//#define MATRIX	Matrix44
 
 //==================================================================
 static ShaderInstruction	sInstructionTable[OP_N] =

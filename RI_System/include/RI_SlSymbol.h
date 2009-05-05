@@ -1,11 +1,10 @@
-/*
- *  RI_SlSymbol.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/19.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_SlSymbol.h
+///
+/// Created by Davide Pasca - 2009/2/19
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_SLSYMBOL_H
 #define RI_SLSYMBOL_H
@@ -15,6 +14,11 @@
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+typedef Vec16f		SlScalar;
+typedef Vec3x16f	SlColor;
+typedef Vec3x16f	SlVector;
 
 //==================================================================
 class SlSymbol

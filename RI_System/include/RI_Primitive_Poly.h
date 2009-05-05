@@ -34,9 +34,9 @@ public:
 private:
 	void simplifyAddTriangle(
 				HiderREYES &fwork,
-				const Vec3 &v1,
-				const Vec3 &v2,
-				const Vec3 &v3
+				const Vec3f &v1,
+				const Vec3f &v2,
+				const Vec3f &v3
 				);
 
 };
@@ -57,9 +57,9 @@ public:
 private:
 	void simplifyAddTriangle(
 				HiderREYES &hider,
-				const Vec3 &v1,
-				const Vec3 &v2,
-				const Vec3 &v3
+				const Vec3f &v1,
+				const Vec3f &v2,
+				const Vec3f &v3
 				);
 
 };
