@@ -87,11 +87,11 @@ void SimplePrimitiveBase::Dice(
 					const Matrix44 &mtxWorldCamera,
 					bool doColorCoded ) const
 {
-	Point3	*pPointsWS = g.mpPointsWS;
+	SlVec3	*pPointsWS = g.mpPointsWS;
 
-	SlVector	*pI	 = (SlVector *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
-	SlVector	*pN  = (SlVector *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
-	SlVector	*pNg = (SlVector *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
+	SlVec3	*pI	 = (SlVec3 *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
+	SlVec3	*pN  = (SlVec3 *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
+	SlVec3	*pNg = (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
 	SlColor		*pOs = (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
 	SlColor		*pCs = (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
 
@@ -138,7 +138,7 @@ void SimplePrimitiveBase::Dice(
 	}
 
 	// build the UVs
-	SlVector2	locUV[ RI_GET_SIMD_BLOCKS( MicroPolygonGrid::MAX_SIZE ) ];
+	SlVec2	locUV[ RI_GET_SIMD_BLOCKS( MicroPolygonGrid::MAX_SIZE ) ];
 
 	size_t	sampleIdx = 0;
 	float	v = 0.0f;
@@ -149,7 +149,7 @@ void SimplePrimitiveBase::Dice(
 		{
 			Vec2f	tmpv2 = CalcLocalUV( Vec2f( u, v ) );
 
-			SlVector2	&tmpvblk = locUV[ sampleIdx / RI_SIMD_BLK_LEN ];
+			SlVec2	&tmpvblk = locUV[ sampleIdx / RI_SIMD_BLK_LEN ];
 			tmpvblk[0][ sampleIdx & (RI_SIMD_BLK_LEN-1) ] = tmpv2[0];
 			tmpvblk[1][ sampleIdx & (RI_SIMD_BLK_LEN-1) ] = tmpv2[1];
 		}
@@ -162,20 +162,25 @@ void SimplePrimitiveBase::Dice(
 	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
 #if 0
-		SlVector	dPdu;
-		SlVector	dPdv;
-		SlVector	posLS;
+		SlVec3	dPdu;
+		SlVec3	dPdv;
+		SlVec3	posLS;
 
 		Eval_dPdu_dPdv( locUV[blkIdx], posLS, &dPdu, &dPdv );
 
 		if ( posLS[0][0] == 0 && posLS[0][1] == 0 && posLS[0][2] == 0 )
 			continue;
 
+		SlVec3	norLS = dPdu.GetCross( dPdv ).GetNormalized();
+		SlVec3	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
+		SlVec3	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
+		SlVec3	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
+
 #else
 		//size_t	blkIdx = sampleIdx / RI_SIMD_BLK_LEN;
 		//size_t	itmIdx = sampleIdx & (RI_SIMD_BLK_LEN-1);
 
-		SlVector2	&tmpvblk = locUV[ blkIdx ];
+		SlVec2	&tmpvblk = locUV[ blkIdx ];
 
 		for (size_t	itmIdx=0; itmIdx < RI_SIMD_BLK_LEN; ++itmIdx)
 		{
@@ -193,9 +198,11 @@ void SimplePrimitiveBase::Dice(
 			Vec3f	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
 			Vec3f	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
 
-			*pPointsWS++	= posWS;
-
 			// store in blocked SOA format
+
+			pPointsWS[blkIdx][0][itmIdx] = posWS[0];
+			pPointsWS[blkIdx][1][itmIdx] = posWS[1];
+			pPointsWS[blkIdx][2][itmIdx] = posWS[2];
 
 			Vec3f	tmpI = (posCS - -camPosCS).GetNormalized();
 			pI[blkIdx][0][itmIdx] = tmpI[0];

@@ -44,7 +44,7 @@ public:
 //==================================================================
 /// SplinePatchCalc
 //==================================================================
-template <class _S>
+template <class _S, class _T>
 class SplinePatchCalc
 {
 	_S v0;
@@ -59,21 +59,23 @@ public:
 				const _S &p2,
 				const _S &p3 )
 	{
-		v0 = b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3;
-		v1 = b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3;
-		v2 = b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3;
-		v3 = b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3;
+		v0 = p0*b.u.m44[0][0] + p1*b.u.m44[0][1] + p2*b.u.m44[0][2] + p3*b.u.m44[0][3];
+		v1 = p0*b.u.m44[1][0] + p1*b.u.m44[1][1] + p2*b.u.m44[1][2] + p3*b.u.m44[1][3];
+		v2 = p0*b.u.m44[2][0] + p1*b.u.m44[2][1] + p2*b.u.m44[2][2] + p3*b.u.m44[2][3];
+		v3 = p0*b.u.m44[3][0] + p1*b.u.m44[3][1] + p2*b.u.m44[3][2] + p3*b.u.m44[3][3];
 	}
 
-	inline _S	Eval( float t ) const
+	inline _S	Eval( const _T &t ) const
 	{
-		return	v0 *t*t*t +
-				v1 *t*t +
-				v2 *t +
+		const _T	t2 = t * t;
+
+		return	v0 * t2 * t +
+				v1 * t2 +
+				v2 * t +
 				v3 ;
 	}
 
-	inline _S	EvalDeriv( float t ) const
+	inline _S	EvalDeriv( const _T &t ) const
 	{
 		return	v0 *3*t*t +
 				v1 *2*t +
@@ -91,8 +93,11 @@ private:
 	const RtBasis			*mpUBasis;
 	const RtBasis			*mpVBasis;
 	Vec3f					mHullPos[16];
-	SplinePatchCalc<Vec3f>	mCalcU_sca[4];
-	SplinePatchCalc<Vec3f>	mCalcV_sca[4];
+	SplinePatchCalc<Vec3f,float>	mCalcU_sca[4];
+	SplinePatchCalc<Vec3f,float>	mCalcV_sca[4];
+
+	SplinePatchCalc<SlVec3,SlScalar>	mCalcU[4];
+	SplinePatchCalc<SlVec3,SlScalar>	mCalcV[4];
 
 public:
 	PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols );
@@ -113,10 +118,10 @@ public:
 					Vec3f *out_dPdv ) const;
 
 		void Eval_dPdu_dPdv(
-						const SlVector2 &uv,
-						SlVector &out_pt,
-						SlVector *out_dPdu,
-						SlVector *out_dPdv ) const;
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const;
 
 private:
 	void setupEvalCalc();

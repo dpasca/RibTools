@@ -18,8 +18,9 @@ namespace RI
 //==================================================================
 typedef Vec16f		SlScalar;
 typedef Vec3x16f	SlColor;
-typedef Vec3x16f	SlVector;
-typedef Vec3x16f	SlVector2;
+typedef Vec2x16f	SlVec2;
+typedef Vec3x16f	SlVec3;
+typedef Vec4x16f	SlVec4;
 
 //==================================================================
 class SlSymbol
@@ -36,7 +37,7 @@ public:
 		MATRIX,
 		TYPES_N
 	};
-	
+
 	enum Storage
 	{
 		CONSTANT,

@@ -35,7 +35,7 @@ public:
 	u_int			mXDim;
 	u_int			mYDim;
 	u_int			mPointsN;
-	Point3			*mpPointsWS;
+	SlVec3			*mpPointsWS;
 	Matrix44		mMtxLocalWorld;
 	float			mURange[2];
 	float			mVRange[2];

@@ -226,20 +226,32 @@ void PatchBicubic::setupEvalCalc()
 	mCalcV_sca[1].Setup( *mpVBasis, mHullPos[ 1], mHullPos[ 5], mHullPos[ 9], mHullPos[13] );
 	mCalcV_sca[2].Setup( *mpVBasis, mHullPos[ 2], mHullPos[ 6], mHullPos[10], mHullPos[14] );
 	mCalcV_sca[3].Setup( *mpVBasis, mHullPos[ 3], mHullPos[ 7], mHullPos[11], mHullPos[15] );
+
+	mCalcU[0].Setup( *mpUBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3] );
+	mCalcU[1].Setup( *mpUBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7] );
+	mCalcU[2].Setup( *mpUBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11] );
+	mCalcU[3].Setup( *mpUBasis, mHullPos[12], mHullPos[13], mHullPos[14], mHullPos[15] );
+
+	mCalcV[0].Setup( *mpVBasis, mHullPos[ 0], mHullPos[ 4], mHullPos[ 8], mHullPos[12] );
+	mCalcV[1].Setup( *mpVBasis, mHullPos[ 1], mHullPos[ 5], mHullPos[ 9], mHullPos[13] );
+	mCalcV[2].Setup( *mpVBasis, mHullPos[ 2], mHullPos[ 6], mHullPos[10], mHullPos[14] );
+	mCalcV[3].Setup( *mpVBasis, mHullPos[ 3], mHullPos[ 7], mHullPos[11], mHullPos[15] );
 }
 
 //==================================================================
-static inline Vec3f spline( float t,
-					const RtBasis &b,
-					const Vec3f &p0,
-					const Vec3f &p1,
-					const Vec3f &p2,
-					const Vec3f &p3 )
+template <class _S, class _T>
+inline _S spline(
+				const _T &t,
+				const RtBasis &b,
+				const _S &p0,
+				const _S &p1,
+				const _S &p2,
+				const _S &p3 )
 {
-	Vec3f v0(b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3);
-	Vec3f v1(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3);
-	Vec3f v2(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3);
-	Vec3f v3(b.u.m44[3][0]*p0 + b.u.m44[3][1]*p1 + b.u.m44[3][2]*p2 + b.u.m44[3][3]*p3);
+	_S v0(p0*b.u.m44[0][0] + p1*b.u.m44[0][1] + p2*b.u.m44[0][2] + p3*b.u.m44[0][3]);
+	_S v1(p0*b.u.m44[1][0] + p1*b.u.m44[1][1] + p2*b.u.m44[1][2] + p3*b.u.m44[1][3]);
+	_S v2(p0*b.u.m44[2][0] + p1*b.u.m44[2][1] + p2*b.u.m44[2][2] + p3*b.u.m44[2][3]);
+	_S v3(p0*b.u.m44[3][0] + p1*b.u.m44[3][1] + p2*b.u.m44[3][2] + p3*b.u.m44[3][3]);
 
 	return	v0 *t*t*t +
 			v1 *t*t +
@@ -248,16 +260,18 @@ static inline Vec3f spline( float t,
 }
 
 //==================================================================
-static inline Vec3f splineDeriv( float t,
+template <class _S, class _T>
+inline _S splineDeriv(
+					const _T &t,
 					const RtBasis &b,
-					const Vec3f &p0,
-					const Vec3f &p1,
-					const Vec3f &p2,
-					const Vec3f &p3 )
+					const _S &p0,
+					const _S &p1,
+					const _S &p2,
+					const _S &p3 )
 {
-	Vec3f v0(b.u.m44[0][0]*p0 + b.u.m44[0][1]*p1 + b.u.m44[0][2]*p2 + b.u.m44[0][3]*p3);
-	Vec3f v1(b.u.m44[1][0]*p0 + b.u.m44[1][1]*p1 + b.u.m44[1][2]*p2 + b.u.m44[1][3]*p3);
-	Vec3f v2(b.u.m44[2][0]*p0 + b.u.m44[2][1]*p1 + b.u.m44[2][2]*p2 + b.u.m44[2][3]*p3);
+	_S v0(p0*b.u.m44[0][0] + p1*b.u.m44[0][1] + p2*b.u.m44[0][2] + p3*b.u.m44[0][3]);
+	_S v1(p0*b.u.m44[1][0] + p1*b.u.m44[1][1] + p2*b.u.m44[1][2] + p3*b.u.m44[1][3]);
+	_S v2(p0*b.u.m44[2][0] + p1*b.u.m44[2][1] + p2*b.u.m44[2][2] + p3*b.u.m44[2][3]);
 
 	return	v0 *3*t*t +
 			v1 *2*t +
@@ -280,51 +294,49 @@ void PatchBicubic::Eval_dPdu_dPdv(
 	Point3	uMid2	= mCalcU_sca[2].Eval( u );
 	Point3	uTop	= mCalcU_sca[3].Eval( u );
 
-	out_pt = spline( v, vBasis, uBottom, uMid1, uMid2, uTop );
+	out_pt = spline<Vec3f, float>( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
 	if ( out_dPdu )
 	{
-		*out_dPdv = splineDeriv( v, vBasis, uBottom, uMid1, uMid2, uTop );
+		*out_dPdv = splineDeriv<Vec3f, float>( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
 		Point3	vBottom	= mCalcV_sca[0].Eval( v );
 		Point3	vMid1	= mCalcV_sca[1].Eval( v );
 		Point3	vMid2	= mCalcV_sca[2].Eval( v );
 		Point3	vTop	= mCalcV_sca[3].Eval( v );
 
-		*out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
+		*out_dPdu = splineDeriv<Vec3f, float>( u, uBasis, vBottom, vMid1, vMid2, vTop );
 	}
 }
 
 //==================================================================
 void PatchBicubic::Eval_dPdu_dPdv(
-				const SlVector2 &uv,
-				SlVector &out_pt,
-				SlVector *out_dPdu,
-				SlVector *out_dPdv ) const
+				const SlVec2 &uv,
+				SlVec3 &out_pt,
+				SlVec3 *out_dPdu,
+				SlVec3 *out_dPdv ) const
 {
-/*
 	const RtBasis	&uBasis = *mpUBasis;
 	const RtBasis	&vBasis = *mpVBasis;
 
-	Point3	uBottom	= mCalcU_sca[0].Eval( u );
-	Point3	uMid1	= mCalcU_sca[1].Eval( u );
-	Point3	uMid2	= mCalcU_sca[2].Eval( u );
-	Point3	uTop	= mCalcU_sca[3].Eval( u );
+	SlVec3 uBottom	= mCalcU[0].Eval( uv[0] );
+	SlVec3 uMid1	= mCalcU[1].Eval( uv[0] );
+	SlVec3 uMid2	= mCalcU[2].Eval( uv[0] );
+	SlVec3 uTop		= mCalcU[3].Eval( uv[0] );
 
-	out_pt = spline( v, vBasis, uBottom, uMid1, uMid2, uTop );
+	out_pt = spline<SlVec3, SlScalar>( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
 
 	if ( out_dPdu )
 	{
-		*out_dPdv = splineDeriv( v, vBasis, uBottom, uMid1, uMid2, uTop );
+		*out_dPdv = splineDeriv<SlVec3, SlScalar>( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
 
-		Point3	vBottom	= mCalcV_sca[0].Eval( v );
-		Point3	vMid1	= mCalcV_sca[1].Eval( v );
-		Point3	vMid2	= mCalcV_sca[2].Eval( v );
-		Point3	vTop	= mCalcV_sca[3].Eval( v );
+		SlVec3 vBottom	= mCalcV[0].Eval( uv[1] );
+		SlVec3 vMid1	= mCalcV[1].Eval( uv[1] );
+		SlVec3 vMid2	= mCalcV[2].Eval( uv[1] );
+		SlVec3 vTop		= mCalcV[3].Eval( uv[1] );
 
-		*out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
+		*out_dPdu = splineDeriv<SlVec3, SlScalar>( uv[0], uBasis, vBottom, vMid1, vMid2, vTop );
 	}
-*/
 }
 
 //==================================================================

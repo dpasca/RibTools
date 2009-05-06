@@ -40,7 +40,7 @@ MicroPolygonGrid::MicroPolygonGrid() :
 	symbol.mpDefaultVal = NULL;
 	symbol.AllocData();
 	mSymbols.push_back( symbol );
-	mpPointsWS = (Point3 *)symbol.mpDefaultVal;
+	mpPointsWS = (SlVec3 *)symbol.mpDefaultVal;
 
 	symbol.mName = "I";
 	symbol.mType = SlSymbol::VECTOR;

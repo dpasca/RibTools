@@ -179,12 +179,12 @@ public:
 						Vec3f *out_dPdv ) const = 0;
 
 	virtual void	Eval_dPdu_dPdv(
-						const SlVector2 &uv,
-						SlVector &out_pt,
-						SlVector *out_dPdu,
-						SlVector *out_dPdv ) const
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const
 					{
-						out_pt = SlVector( 0 );
+						out_pt = SlVec3( 0 );
 					}
 
 	virtual void	Dice(

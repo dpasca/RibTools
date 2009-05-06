@@ -77,7 +77,11 @@ public:
 
 	//==================================================================
 	Vec3()											{}
-	Vec3( const Vec3 &v )							{ v3[0] = v[0]; v3[1] = v[1]; v3[2] = v[2];		}
+	Vec3( const Vec3 &v_ )							{ v3[0] = v_[0]; v3[1] = v_[1]; v3[2] = v_[2]; }
+
+	template <class _T>
+	Vec3( const Vec3<_T> &v_ )						{ v3[0] = v_[0]; v3[1] = v_[1]; v3[2] = v_[2]; }
+
 	Vec3( const _S& a_ )							{ v3[0] = a_; v3[1] = a_; v3[2] = a_; }
 	Vec3( const _S& x_, const _S& y_, const _S& z_ ){ v3[0] = x_; v3[1] = y_; v3[2] = z_; }
 	Vec3( const _S *p_ )							{ v3[0] = p_[0]; v3[1] = p_[1]; v3[2] = p_[2]; }
@@ -159,7 +163,11 @@ public:
 
 	//==================================================================
 	Vec4()												{}
-	Vec4( const Vec4 &v )								{ v4[0] = v[0]; v4[1] = v[1]; v4[2] = v[2]; v4[3] = v[3];	  }
+	Vec4( const Vec4 &v_ )								{ v4[0] = v_[0]; v4[1] = v_[1]; v4[2] = v_[2]; v4[3] = v_[3]; }
+
+	template <class _T>
+	Vec4( const Vec4<_T> &v_ )							{ v4[0] = v_[0]; v4[1] = v_[1]; v4[2] = v_[2]; v4[3] = v_[3]; }
+
 	Vec4( const _S& a_ )								{ v4[0] = a_; v4[1] = a_; v4[2] = a_; v4[3] = a_;			  }
 	Vec4( const _S& x_, const _S& y_, const _S& z_, const _S& w_ )	{ v4[0] = x_; v4[1] = y_; v4[2] = z_; v4[3] = w_; }
 	Vec4( const _S *p_ )								{ v4[0] = p_[0]; v4[1] = p_[1]; v4[2] = p_[2]; v4[3] = p_[3]; }
@@ -186,7 +194,6 @@ public:
 	const _S &y() const { return v4[1];	}
 	const _S &z() const { return v4[2];	}
 	const _S &w() const { return v4[3];	}
-
 	_S &x() { return v4[0];	}
 	_S &y() { return v4[1];	}
 	_S &z() { return v4[2];	}
@@ -285,8 +292,9 @@ typedef	Vec3<float>				Vec3f;
 typedef	Vec4<float>				Vec4f;
 typedef	VecN<float,16>			Vec16f;
 
-typedef	Vec3< VecN<float,16> >	Vec3x16f;
 typedef	Vec2< VecN<float,16> >	Vec2x16f;
+typedef	Vec3< VecN<float,16> >	Vec3x16f;
+typedef	Vec4< VecN<float,16> >	Vec4x16f;
 
 //==================================================================
 typedef	Vec2f		Point2;

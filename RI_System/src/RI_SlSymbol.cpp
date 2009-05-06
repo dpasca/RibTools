@@ -43,10 +43,10 @@ void *SlSymbol::AllocClone( size_t size )
 	switch ( mType )
 	{
 	case SlSymbol::FLOAT:	pOutData = allocStream( sizeof(SlScalar)*blocksN ); break;
-	case SlSymbol::POINT:	pOutData = allocStream( sizeof(SlVector)*blocksN ); break;
+	case SlSymbol::POINT:	pOutData = allocStream( sizeof(SlVec3)*blocksN ); break;
 	case SlSymbol::COLOR:	pOutData = allocStream( sizeof(SlColor)*blocksN ); break;
-	case SlSymbol::VECTOR:	pOutData = allocStream( sizeof(SlVector)*blocksN ); break;
-	case SlSymbol::NORMAL:	pOutData = allocStream( sizeof(SlVector)*blocksN ); break;
+	case SlSymbol::VECTOR:	pOutData = allocStream( sizeof(SlVec3)*blocksN ); break;
+	case SlSymbol::NORMAL:	pOutData = allocStream( sizeof(SlVec3)*blocksN ); break;
 	//case SlSymbol::STRING:	pOutData = new char		[ size ]; break;
 	//case SlSymbol::MATRIX:	pOutData = new Matrix44 [ size ]; break;
 	default:

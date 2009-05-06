@@ -196,8 +196,8 @@ bool HiderREYES::makeRasterBound(
 
 	for (size_t i=0; i < 8; ++i)
 	{
-		Vec4f	Pproj = V4__V3W1_Mul_M44( boxVerts[i], mtxLocalProj );
-		
+		Vec4f	Pproj = V4__V3W1_Mul_M44<Vec4f,Vec3f,float>( boxVerts[i], mtxLocalProj );
+
 		if ( Pproj.w() > 0 )
 		{
 			float	oow = 1.0f / Pproj.w();
@@ -278,47 +278,43 @@ void HiderREYES::Hide(
 				Buffer2D<3>			&destBuff,
 				Buffer2D<1>			&zBuff ) const
 {
-	float du = (g.mURange[1] - g.mURange[0]) / g.mXDim;
-	float dv = (g.mVRange[1] - g.mVRange[0]) / g.mYDim;
-
-	float screenCx =	(float)screenWd * 0.5f + destOffX;
-	float screenCy =	(float)screenHe * 0.5f + destOffY;
-	float screenHWd =	(float)screenWd * 0.5f;
-	float screenHHe =	(float)screenHe * 0.5f;
+	SlScalar screenCx  = SlScalar( screenWd * 0.5f + destOffX);
+	SlScalar screenCy  = SlScalar( screenHe * 0.5f + destOffY);
+	SlScalar screenHWd = SlScalar( screenWd * 0.5f			 );
+	SlScalar screenHHe = SlScalar( screenHe * 0.5f			 );
 
 	u_int	destWd = destBuff.mWd;
 	u_int	destHe = destBuff.mHe;
 
-	const Point3	*pRunsWS	= g.mpPointsWS;
+	const SlVec3	*pPointsWS	= (const SlVec3 *)g.mpPointsWS;
 
 	const SlColor	*pOi = (const SlColor *)g.mSymbols.LookupVariableData( "Oi", SlSymbol::COLOR, true );
 	const SlColor	*pCi = (const SlColor *)g.mSymbols.LookupVariableData( "Ci", SlSymbol::COLOR, true );
 
+	size_t	blocksN = RI_GET_SIMD_BLOCKS( g.mPointsN );
+
 	size_t	sampleIdx = 0;
 
-	for (u_int iv=0; iv < g.mYDim; ++iv)
+	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
-		float	v = g.mVRange[0] + iv * dv;
-		
-		for (u_int iu=0; iu < g.mXDim; ++iu, ++sampleIdx)
+		const SlColor	&blkCi = pCi[ blkIdx ];
+		const SlColor	&blkOi = pOi[ blkIdx ];
+
+		static const SlScalar	one( 1 );
+
+		SlVec4		Pproj = V4__V3W1_Mul_M44<SlVec4,SlVec3,SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
+		SlScalar	oow = one / Pproj.w();
+
+		SlScalar	vWinX =  Pproj.x() * screenHWd * oow + screenCx;
+		SlScalar	vWinY = -Pproj.y() * screenHHe * oow + screenCy;
+
+		for (size_t	itmIdx=0; itmIdx < RI_SIMD_BLK_LEN; ++itmIdx)
 		{
-			float	u = g.mURange[0] + iu * du;
-			
-			Vec4f	Pproj = V4__V3W1_Mul_M44( pRunsWS[ sampleIdx ], mMtxWorldProj );
-			
-			float	oow = 1.0f / Pproj.w();
-
-			int	winX = (int)(screenCx + screenHWd * Pproj.x() * oow);
-			int	winY = (int)(screenCy - screenHHe * Pproj.y() * oow);
-
-			size_t	blkIdx = sampleIdx / RI_SIMD_BLK_LEN;
-			size_t	itmIdx = sampleIdx & (RI_SIMD_BLK_LEN-1);
+			int winX = (int)(vWinX[itmIdx]);
+			int winY = (int)(vWinY[itmIdx]);
 
 			if ( (u_int)winX < destWd && (u_int)winY < destHe )
 			{
-				const SlColor	&blkCi = pCi[ blkIdx ];
-				const SlColor	&blkOi = pOi[ blkIdx ];
-
 				Color	ci(	blkCi.v3[ 0 ][ itmIdx ],
 							blkCi.v3[ 1 ][ itmIdx ],
 							blkCi.v3[ 2 ][ itmIdx ] );
@@ -328,11 +324,20 @@ void HiderREYES::Hide(
 							blkOi.v3[ 2 ][ itmIdx ] );
 
 				float	*pZSample = zBuff.GetSamplePtr( winX, winY );
-				if ( Pproj.z() < *pZSample )
+				float	posProjZ = Pproj.z()[itmIdx];
+
+				if ( posProjZ < *pZSample )
 				{
-					*pZSample = Pproj.z();
+					*pZSample = posProjZ;
 					destBuff.SetSample( winX, winY, &ci.x() );
 				}
+			}
+
+			if ( ++sampleIdx >= g.mPointsN )
+			{
+				// avoid processing non-samples resulting from padding !
+				DASSERT( blkIdx == blocksN-1 );
+				break;	// assume next loop is at the last iteration as well..
 			}
 		}
 	}

@@ -231,9 +231,9 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 
 		case SlSymbol::POINT :
 						getVector( pDefaultValueStr, tmp, 3 );
-						((SlVector *)symbol.mpDefaultVal)[0][0] = tmp[0];
-						((SlVector *)symbol.mpDefaultVal)[0][1] = tmp[1];
-						((SlVector *)symbol.mpDefaultVal)[0][2] = tmp[2];
+						((SlVec3 *)symbol.mpDefaultVal)[0][0] = tmp[0];
+						((SlVec3 *)symbol.mpDefaultVal)[0][1] = tmp[1];
+						((SlVec3 *)symbol.mpDefaultVal)[0][2] = tmp[2];
 						break;
 
 		case SlSymbol::COLOR :
@@ -246,9 +246,9 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 		case SlSymbol::VECTOR:
 		case SlSymbol::NORMAL:
 						getVector( pDefaultValueStr, tmp, 3 );
-						((SlVector *)symbol.mpDefaultVal)[0][0] = tmp[0];
-						((SlVector *)symbol.mpDefaultVal)[0][1] = tmp[1];
-						((SlVector *)symbol.mpDefaultVal)[0][2] = tmp[2];
+						((SlVec3 *)symbol.mpDefaultVal)[0][0] = tmp[0];
+						((SlVec3 *)symbol.mpDefaultVal)[0][1] = tmp[1];
+						((SlVec3 *)symbol.mpDefaultVal)[0][2] = tmp[2];
 						break;
 		
 		case SlSymbol::STRING:

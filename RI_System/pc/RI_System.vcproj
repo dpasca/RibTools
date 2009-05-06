@@ -196,6 +196,14 @@
 			<File
 				RelativePath="..\src\RI_HiderREYES.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerOutput="4"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\include\RI_HiderREYES.h"
