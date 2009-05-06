@@ -39,6 +39,11 @@ public:
 		y = p_[1];
 	}
 
+	void SetZero()
+	{
+		v2[0] = v2[1] = 0.f;
+	}
+
 	Vec2 operator + (const _S& rval) const { return Vec2( x + rval, y + rval ); }
 	Vec2 operator - (const _S& rval) const { return Vec2( x - rval, y - rval ); }
 	Vec2 operator * (const _S& rval) const { return Vec2( x * rval, y * rval ); }
@@ -281,6 +286,7 @@ typedef	Vec4<float>				Vec4f;
 typedef	VecN<float,16>			Vec16f;
 
 typedef	Vec3< VecN<float,16> >	Vec3x16f;
+typedef	Vec2< VecN<float,16> >	Vec2x16f;
 
 //==================================================================
 typedef	Vec2f		Point2;

@@ -92,8 +92,8 @@ void SimplePrimitiveBase::Dice(
 	SlVector	*pI	 = (SlVector *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
 	SlVector	*pN  = (SlVector *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
 	SlVector	*pNg = (SlVector *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
-	SlColor	*pOs = (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
-	SlColor	*pCs = (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
+	SlColor		*pOs = (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
+	SlColor		*pCs = (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
 
 	float	du = 1.0f / g.mXDim;
 	float	dv = 1.0f / g.mYDim;
@@ -138,7 +138,7 @@ void SimplePrimitiveBase::Dice(
 	}
 
 	// build the UVs
-	Vec2f	locUV[ MicroPolygonGrid::MAX_SIZE ];
+	SlVector2	locUV[ RI_GET_SIMD_BLOCKS( MicroPolygonGrid::MAX_SIZE ) ];
 
 	size_t	sampleIdx = 0;
 	float	v = 0.0f;
@@ -147,51 +147,78 @@ void SimplePrimitiveBase::Dice(
 		float	u = 0.0f;
 		for (int j=0; j < (int)g.mXDim; ++j, u += du, ++sampleIdx)
 		{
-			locUV[ sampleIdx ] = CalcLocalUV( Vec2f( u, v ) );
+			Vec2f	tmpv2 = CalcLocalUV( Vec2f( u, v ) );
+
+			SlVector2	&tmpvblk = locUV[ sampleIdx / RI_SIMD_BLK_LEN ];
+			tmpvblk[0][ sampleIdx & (RI_SIMD_BLK_LEN-1) ] = tmpv2[0];
+			tmpvblk[1][ sampleIdx & (RI_SIMD_BLK_LEN-1) ] = tmpv2[1];
 		}
 	}
 
 	DASSERT( sampleIdx == g.mPointsN );
 
-	for (sampleIdx=0; sampleIdx < g.mPointsN; ++sampleIdx)
+	size_t	blocksN = RI_GET_SIMD_BLOCKS( g.mPointsN );
+
+	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
-		size_t	blkIdx = sampleIdx / RI_SIMD_BLK_LEN;
-		size_t	itmIdx = sampleIdx & (RI_SIMD_BLK_LEN-1);
+#if 0
+		SlVector	dPdu;
+		SlVector	dPdv;
+		SlVector	posLS;
 
-		Vec3f	dPdu;
-		Vec3f	dPdv;
-		Vec3f	posLS;
-		Eval_dPdu_dPdv( locUV[sampleIdx].x(), locUV[sampleIdx].y(), posLS, &dPdu, &dPdv );
+		Eval_dPdu_dPdv( locUV[blkIdx], posLS, &dPdu, &dPdv );
 
-		Vec3f	norLS = dPdu.GetCross( dPdv ).GetNormalized();
-		Vec3f	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
-		Vec3f	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
-		Vec3f	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
+		if ( posLS[0][0] == 0 && posLS[0][1] == 0 && posLS[0][2] == 0 )
+			continue;
 
-		*pPointsWS++	= posWS;
+#else
+		//size_t	blkIdx = sampleIdx / RI_SIMD_BLK_LEN;
+		//size_t	itmIdx = sampleIdx & (RI_SIMD_BLK_LEN-1);
 
-		// store in blocked SOA format
+		SlVector2	&tmpvblk = locUV[ blkIdx ];
 
-		Vec3f	tmpI = (posCS - -camPosCS).GetNormalized();
-		pI[blkIdx][0][itmIdx] = tmpI[0];
-		pI[blkIdx][1][itmIdx] = tmpI[1];
-		pI[blkIdx][2][itmIdx] = tmpI[2];
+		for (size_t	itmIdx=0; itmIdx < RI_SIMD_BLK_LEN; ++itmIdx)
+		{
+			Vec3f	dPdu;
+			Vec3f	dPdv;
+			Vec3f	posLS;
+			Eval_dPdu_dPdv(	locUV[ blkIdx ][0][ itmIdx ],
+							locUV[ blkIdx ][1][ itmIdx ],
+							posLS,
+							&dPdu,
+							&dPdv );
 
-		pN[blkIdx][0][itmIdx] = norCS[0];
-		pN[blkIdx][1][itmIdx] = norCS[1];
-		pN[blkIdx][2][itmIdx] = norCS[2];
+			Vec3f	norLS = dPdu.GetCross( dPdv ).GetNormalized();
+			Vec3f	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
+			Vec3f	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
+			Vec3f	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
 
-		pNg[blkIdx][0][itmIdx] = norCS[0];
-		pNg[blkIdx][1][itmIdx] = norCS[1];
-		pNg[blkIdx][2][itmIdx] = norCS[2];
+			*pPointsWS++	= posWS;
 
-		pOs[blkIdx][0][itmIdx] = useOpa[0];
-		pOs[blkIdx][1][itmIdx] = useOpa[1];
-		pOs[blkIdx][2][itmIdx] = useOpa[2];
+			// store in blocked SOA format
 
-		pCs[blkIdx][0][itmIdx] = useColor[0];
-		pCs[blkIdx][1][itmIdx] = useColor[1];
-		pCs[blkIdx][2][itmIdx] = useColor[2];
+			Vec3f	tmpI = (posCS - -camPosCS).GetNormalized();
+			pI[blkIdx][0][itmIdx] = tmpI[0];
+			pI[blkIdx][1][itmIdx] = tmpI[1];
+			pI[blkIdx][2][itmIdx] = tmpI[2];
+
+			pN[blkIdx][0][itmIdx] = norCS[0];
+			pN[blkIdx][1][itmIdx] = norCS[1];
+			pN[blkIdx][2][itmIdx] = norCS[2];
+
+			pNg[blkIdx][0][itmIdx] = norCS[0];
+			pNg[blkIdx][1][itmIdx] = norCS[1];
+			pNg[blkIdx][2][itmIdx] = norCS[2];
+
+			pOs[blkIdx][0][itmIdx] = useOpa[0];
+			pOs[blkIdx][1][itmIdx] = useOpa[1];
+			pOs[blkIdx][2][itmIdx] = useOpa[2];
+
+			pCs[blkIdx][0][itmIdx] = useColor[0];
+			pCs[blkIdx][1][itmIdx] = useColor[1];
+			pCs[blkIdx][2][itmIdx] = useColor[2];
+		}
+#endif
 	}
 }
 

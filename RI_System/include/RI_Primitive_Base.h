@@ -178,6 +178,15 @@ public:
 						Vec3f *out_dPdu,
 						Vec3f *out_dPdv ) const = 0;
 
+	virtual void	Eval_dPdu_dPdv(
+						const SlVector2 &uv,
+						SlVector &out_pt,
+						SlVector *out_dPdu,
+						SlVector *out_dPdv ) const
+					{
+						out_pt = SlVector( 0 );
+					}
+
 	virtual void	Dice(
 						MicroPolygonGrid &g,
 						const Matrix44 &mtxWorldCamera,

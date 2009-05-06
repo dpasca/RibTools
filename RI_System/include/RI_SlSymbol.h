@@ -19,6 +19,7 @@ namespace RI
 typedef Vec16f		SlScalar;
 typedef Vec3x16f	SlColor;
 typedef Vec3x16f	SlVector;
+typedef Vec3x16f	SlVector2;
 
 //==================================================================
 class SlSymbol
