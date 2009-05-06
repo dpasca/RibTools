@@ -185,9 +185,6 @@ void SimplePrimitiveBase::Dice(
 		pCs[blkIdx]	= useColor;
 
 #else
-		//size_t	blkIdx = sampleIdx / RI_SIMD_BLK_LEN;
-		//size_t	itmIdx = sampleIdx & (RI_SIMD_BLK_LEN-1);
-
 		SlVec2	&tmpvblk = locUV[ blkIdx ];
 
 		for (size_t	itmIdx=0; itmIdx < RI_SIMD_BLK_LEN; ++itmIdx)

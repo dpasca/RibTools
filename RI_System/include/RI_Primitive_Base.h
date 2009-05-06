@@ -184,7 +184,39 @@ public:
 						SlVec3 *out_dPdu,
 						SlVec3 *out_dPdv ) const
 					{
-						out_pt = SlVec3( 0 );
+						//out_pt = SlVec3( 0.0f );
+
+						Vec3f dPdu;
+						Vec3f dPdv;
+						Vec3f pt;
+
+						for (int i=0; i < RI_SIMD_BLK_LEN; ++i)
+						{
+							Eval_dPdu_dPdv(
+								uv[0][i],
+								uv[1][i],
+								pt,
+								&dPdu,
+								&dPdv );
+
+							out_pt[0][i] = pt[0];
+							out_pt[1][i] = pt[1];
+							out_pt[2][i] = pt[2];
+
+							if ( out_dPdu )
+							{
+								out_dPdu[0][i] = dPdu[0];
+								out_dPdu[1][i] = dPdu[1];
+								out_dPdu[2][i] = dPdu[2];
+							}
+
+							if ( out_dPdv )
+							{
+								out_dPdv[0][i] = dPdv[0];
+								out_dPdv[1][i] = dPdv[1];
+								out_dPdv[2][i] = dPdv[2];
+							}
+						}
 					}
 
 	virtual void	Dice(
