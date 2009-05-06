@@ -16,11 +16,11 @@ namespace RI
 {
 
 //==================================================================
-typedef Vec16f		SlScalar;
-typedef Vec3x16f	SlColor;
-typedef Vec2x16f	SlVec2;
-typedef Vec3x16f	SlVec3;
-typedef Vec4x16f	SlVec4;
+typedef __declspec(align(64)) Vec16f	SlScalar;
+typedef __declspec(align(64)) Vec3x16f	SlColor;
+typedef __declspec(align(64)) Vec2x16f	SlVec2;
+typedef __declspec(align(64)) Vec3x16f	SlVec3;
+typedef __declspec(align(64)) Vec4x16f	SlVec4;
 
 //==================================================================
 class SlSymbol

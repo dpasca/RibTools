@@ -107,8 +107,8 @@ void SimplePrimitiveBase::Dice(
 
 	Vec3f	camPosCS = mtxWorldCamera.GetTranslation();
 
-	Color	useColor;
-	Color	useOpa;
+	SlColor	useColor;
+	SlColor	useOpa;
 
 	if ( doColorCoded )
 	{
@@ -129,7 +129,7 @@ void SimplePrimitiveBase::Dice(
 		static int cnt;
 
 		useColor = palette[ cnt++ & 7 ];
-		useOpa	 = Color( 1, 1, 1 );
+		useOpa	 = SlColor( 1, 1, 1 );
 	}
 	else
 	{
@@ -172,9 +172,17 @@ void SimplePrimitiveBase::Dice(
 			continue;
 
 		SlVec3	norLS = dPdu.GetCross( dPdv ).GetNormalized();
-		SlVec3	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
-		SlVec3	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
-		SlVec3	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
+		SlVec3	posWS = V3__V3W1_Mul_M44<SlScalar>( posLS, g.mMtxLocalWorld );
+		SlVec3	posCS = V3__V3W1_Mul_M44<SlScalar>( posLS, mtxLocalCamera );
+		SlVec3	norCS = V3__V3W1_Mul_M44<SlScalar>( norLS, mtxLocalCameraNorm ).GetNormalized();
+
+		pPointsWS[blkIdx]	= posWS;
+
+		pI[blkIdx]	= (posCS - -camPosCS).GetNormalized();
+		pN[blkIdx]	= norCS;
+		pNg[blkIdx]	= norCS;
+		pOs[blkIdx]	= useOpa;
+		pCs[blkIdx]	= useColor;
 
 #else
 		//size_t	blkIdx = sampleIdx / RI_SIMD_BLK_LEN;
@@ -194,9 +202,9 @@ void SimplePrimitiveBase::Dice(
 							&dPdv );
 
 			Vec3f	norLS = dPdu.GetCross( dPdv ).GetNormalized();
-			Vec3f	posWS = V3__V3W1_Mul_M44( posLS, g.mMtxLocalWorld );
-			Vec3f	posCS = V3__V3W1_Mul_M44( posLS, mtxLocalCamera );
-			Vec3f	norCS = V3__V3W1_Mul_M44( norLS, mtxLocalCameraNorm ).GetNormalized();
+			Vec3f	posWS = V3__V3W1_Mul_M44<float>( posLS, g.mMtxLocalWorld );
+			Vec3f	posCS = V3__V3W1_Mul_M44<float>( posLS, mtxLocalCamera );
+			Vec3f	norCS = V3__V3W1_Mul_M44<float>( norLS, mtxLocalCameraNorm ).GetNormalized();
 
 			// store in blocked SOA format
 
@@ -216,15 +224,10 @@ void SimplePrimitiveBase::Dice(
 			pNg[blkIdx][0][itmIdx] = norCS[0];
 			pNg[blkIdx][1][itmIdx] = norCS[1];
 			pNg[blkIdx][2][itmIdx] = norCS[2];
-
-			pOs[blkIdx][0][itmIdx] = useOpa[0];
-			pOs[blkIdx][1][itmIdx] = useOpa[1];
-			pOs[blkIdx][2][itmIdx] = useOpa[2];
-
-			pCs[blkIdx][0][itmIdx] = useColor[0];
-			pCs[blkIdx][1][itmIdx] = useColor[1];
-			pCs[blkIdx][2][itmIdx] = useColor[2];
 		}
+
+		pOs[blkIdx]	= useOpa;
+		pCs[blkIdx]	= useColor;
 #endif
 	}
 }
