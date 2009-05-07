@@ -257,32 +257,40 @@ public:
 //==================================================================
 template <class _S, size_t _N>	inline VecN<_S,_N>	DSqrt( const VecN<_S,_N> &a )
 {
-	VecN<_S,_N> tmp;
-	FOR_I_N tmp[i] = DSqrt( a[i] );
-	return tmp;
+	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp;
 }
 
 //==================================================================
 template <class _S, size_t _N>	inline VecN<_S,_N>	DRSqrt( const VecN<_S,_N> &a )
 {
-	VecN<_S,_N> tmp;
-	FOR_I_N tmp[i] = DRSqrt( a[i] );
-	return tmp;
+	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp;
 }
 
 //==================================================================
 template <class _S, size_t _N>	inline VecN<_S,_N>	DSign( const VecN<_S,_N> &a )
 {
-	VecN<_S,_N> tmp;
-	FOR_I_N tmp[i] = DSign( a[i] );
-	return tmp;
+	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp;
 }
+
+//==================================================================
+template <class _S, size_t _N>	inline VecN<_S,_N>	DSin( const VecN<_S,_N> &a )
+{
+	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp;
+}
+
+//==================================================================
+template <class _S, size_t _N>	inline VecN<_S,_N>	DCos( const VecN<_S,_N> &a )
+{
+	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp;
+}
+
 #undef FOR_I_N
 
 //==================================================================
 template<class _S> Vec2<_S> operator * (const _S &lval, const Vec2<_S> &rval) { return rval * lval; }
 template<class _S> Vec3<_S> operator * (const _S &lval, const Vec3<_S> &rval) { return rval * lval; }
 template<class _S> Vec4<_S> operator * (const _S &lval, const Vec4<_S> &rval) { return rval * lval; }
+template<class _S,size_t _N> VecN<_S,_N> operator * (const _S &lval, const VecN<_S,_N> &rval) { return rval * lval; }
 
 //==================================================================
 /// float implementations

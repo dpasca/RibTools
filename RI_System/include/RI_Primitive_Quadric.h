@@ -47,6 +47,12 @@ public:
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+
+		void Eval_dPdu_dPdv(
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -78,6 +84,12 @@ public:
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+
+		void Eval_dPdu_dPdv(
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -111,6 +123,12 @@ public:
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+
+		void Eval_dPdu_dPdv(
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -142,6 +160,12 @@ public:
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+
+		void Eval_dPdu_dPdv(
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -175,6 +199,12 @@ public:
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+
+		void Eval_dPdu_dPdv(
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const;
 };
 
 //==================================================================
@@ -212,6 +242,12 @@ public:
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+
+		void Eval_dPdu_dPdv(
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const;
 };
 
 //==================================================================

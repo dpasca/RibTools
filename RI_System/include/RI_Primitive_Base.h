@@ -182,10 +182,10 @@ public:
 						const SlVec2 &uv,
 						SlVec3 &out_pt,
 						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const
+						SlVec3 *out_dPdv ) const = 0;
+					/*
 					{
 						//out_pt = SlVec3( 0.0f );
-
 						Vec3f dPdu;
 						Vec3f dPdv;
 						Vec3f pt;
@@ -218,6 +218,7 @@ public:
 							}
 						}
 					}
+					*/
 
 	virtual void	Dice(
 						MicroPolygonGrid &g,

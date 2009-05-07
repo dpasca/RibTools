@@ -1,11 +1,10 @@
-/*
- *  RI_Primitive_Patch.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/18.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Primitive_Patch.h
+///
+/// Created by Davide Pasca - 2009/1/18
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_PRIMITIVE_PATCH_H
 #define RI_PRIMITIVE_PATCH_H
@@ -23,7 +22,8 @@ class PatchBilinear : public SimplePrimitiveBase
 {
 private:
 	ParamList		mParams;
-	Vec3f			mHullPos[4];
+	Vec3f			mHullPos_sca[4];
+	SlVec3			mHullPos[4];
 
 public:
 	PatchBilinear( ParamList &params, const SymbolList &staticSymbols );
@@ -39,6 +39,12 @@ public:
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+
+		void Eval_dPdu_dPdv(
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const;
 };
 
 //==================================================================

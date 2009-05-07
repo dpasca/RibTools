@@ -1,11 +1,10 @@
-/*
- *  RI_Primitive.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/04.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Primitive.h
+///
+/// Created by Davide Pasca - 2009/1/4
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_PRIMITIVE_H
 #define RI_PRIMITIVE_H

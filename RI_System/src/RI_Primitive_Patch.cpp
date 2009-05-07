@@ -1,11 +1,10 @@
-/*
- *  RI_Primitive_Poly.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/04.
- *  Copyright 2009 __MyCompanyName__. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Primitive_Patch.cpp
+///
+/// Created by Davide Pasca - 2009/1/4
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "DMath.h"
@@ -131,8 +130,16 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols
 	SimplePrimitiveBase(PATCHBILINEAR),
 	mParams(params)
 {
-	bool	gotP = ParamsFindP( params, staticSymbols, mHullPos, 4 );
-	
+	Vec3f	pos[4];
+
+	bool	gotP = ParamsFindP( params, staticSymbols, pos, 4 );
+
+	for (int i=0; i < 4; ++i)
+	{
+		mHullPos_sca[i] = pos[i];
+		mHullPos[i] = pos[i];
+	}
+
 	DASSTHROW( gotP, ("Missing hull parameter") );
 }
 
@@ -142,7 +149,10 @@ PatchBilinear::PatchBilinear( ParamList &params, const Vec3f hull[4] ) :
 	mParams(params)
 {
 	for (int i=0; i < 4; ++i)
+	{
+		mHullPos_sca[i] = hull[i];
 		mHullPos[i] = hull[i];
+	}
 }
 
 //==================================================================
@@ -153,19 +163,42 @@ void PatchBilinear::Eval_dPdu_dPdv(
 			Vec3f *out_dPdu,
 			Vec3f *out_dPdv ) const
 {
-	Vec3f	left	= DMix( mHullPos[0], mHullPos[2], v );
-	Vec3f	right	= DMix( mHullPos[1], mHullPos[3], v );
+	Vec3f	left	= DMix( mHullPos_sca[0], mHullPos_sca[2], v );
+	Vec3f	right	= DMix( mHullPos_sca[1], mHullPos_sca[3], v );
 	out_pt			= DMix( left, right, u );
 
 	if ( out_dPdu )
 	{
-		Vec3f	left	= mHullPos[2] - mHullPos[0];
-		Vec3f	right	= mHullPos[3] - mHullPos[1];
+		Vec3f	left	= mHullPos_sca[2] - mHullPos_sca[0];
+		Vec3f	right	= mHullPos_sca[3] - mHullPos_sca[1];
 		*out_dPdv		= DMix( left, right, u );
 
-		Vec3f	bottom	= mHullPos[1] - mHullPos[0];
-		Vec3f	top		= mHullPos[3] - mHullPos[2];
+		Vec3f	bottom	= mHullPos_sca[1] - mHullPos_sca[0];
+		Vec3f	top		= mHullPos_sca[3] - mHullPos_sca[2];
 		*out_dPdu		= DMix( bottom, top, v );
+	}
+}
+
+//==================================================================
+void PatchBilinear::Eval_dPdu_dPdv(
+				const SlVec2 &uv,
+				SlVec3 &out_pt,
+				SlVec3 *out_dPdu,
+				SlVec3 *out_dPdv ) const
+{
+	SlVec3	left	= DMix( mHullPos[0], mHullPos[2], uv[1] );
+	SlVec3	right	= DMix( mHullPos[1], mHullPos[3], uv[1] );
+	out_pt			= DMix( left, right, uv[0] );
+
+	if ( out_dPdu )
+	{
+		SlVec3	left	= mHullPos[2] - mHullPos[0];
+		SlVec3	right	= mHullPos[3] - mHullPos[1];
+		*out_dPdv		= DMix( left, right, uv[0] );
+
+		SlVec3	bottom	= mHullPos[1] - mHullPos[0];
+		SlVec3	top		= mHullPos[3] - mHullPos[2];
+		*out_dPdu		= DMix( bottom, top, uv[1] );
 	}
 }
 
@@ -294,18 +327,18 @@ void PatchBicubic::Eval_dPdu_dPdv(
 	Point3	uMid2	= mCalcU_sca[2].Eval( u );
 	Point3	uTop	= mCalcU_sca[3].Eval( u );
 
-	out_pt = spline<Vec3f, float>( v, vBasis, uBottom, uMid1, uMid2, uTop );
+	out_pt = spline( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
 	if ( out_dPdu )
 	{
-		*out_dPdv = splineDeriv<Vec3f, float>( v, vBasis, uBottom, uMid1, uMid2, uTop );
+		*out_dPdv = splineDeriv( v, vBasis, uBottom, uMid1, uMid2, uTop );
 
 		Point3	vBottom	= mCalcV_sca[0].Eval( v );
 		Point3	vMid1	= mCalcV_sca[1].Eval( v );
 		Point3	vMid2	= mCalcV_sca[2].Eval( v );
 		Point3	vTop	= mCalcV_sca[3].Eval( v );
 
-		*out_dPdu = splineDeriv<Vec3f, float>( u, uBasis, vBottom, vMid1, vMid2, vTop );
+		*out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
 	}
 }
 
@@ -324,18 +357,18 @@ void PatchBicubic::Eval_dPdu_dPdv(
 	SlVec3 uMid2	= mCalcU[2].Eval( uv[0] );
 	SlVec3 uTop		= mCalcU[3].Eval( uv[0] );
 
-	out_pt = spline<SlVec3, SlScalar>( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
+	out_pt = spline( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
 
 	if ( out_dPdu )
 	{
-		*out_dPdv = splineDeriv<SlVec3, SlScalar>( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
+		*out_dPdv = splineDeriv( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
 
 		SlVec3 vBottom	= mCalcV[0].Eval( uv[1] );
 		SlVec3 vMid1	= mCalcV[1].Eval( uv[1] );
 		SlVec3 vMid2	= mCalcV[2].Eval( uv[1] );
 		SlVec3 vTop		= mCalcV[3].Eval( uv[1] );
 
-		*out_dPdu = splineDeriv<SlVec3, SlScalar>( uv[0], uBasis, vBottom, vMid1, vMid2, vTop );
+		*out_dPdu = splineDeriv( uv[0], uBasis, vBottom, vMid1, vMid2, vTop );
 	}
 }
 

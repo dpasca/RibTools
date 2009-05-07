@@ -161,7 +161,7 @@ void SimplePrimitiveBase::Dice(
 
 	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
-#if 0
+#if 1
 		SlVec3	dPdu;
 		SlVec3	dPdv;
 		SlVec3	posLS;
