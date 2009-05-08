@@ -45,10 +45,10 @@ void FrameworkREYES::Insert(
 						const Transform		&xform )
 {
 	if ( mAttrsRev.Sync( *attr.mpRevision ) )
-		mpUniqueAttribs.push_back( new Attributes( attr ) );
+		mpUniqueAttribs.push_back( DNEW Attributes( attr ) );
 
 	if ( mTransRev.Sync( *xform.mpRevision ) )
-		mpUniqueTransform.push_back( new Transform( xform ) );
+		mpUniqueTransform.push_back( DNEW Transform( xform ) );
 
 	pPrim->SetStates(
 				mpUniqueAttribs.back(),
@@ -228,8 +228,8 @@ void FrameworkREYES::WorldEnd()
 		}
 	}
 
-	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	delete mpUniqueAttribs[i];
-	for (size_t i=0; i < mpUniqueTransform.size(); ++i)	delete mpUniqueTransform[i];
+	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	DDELETE( mpUniqueAttribs[i] );
+	for (size_t i=0; i < mpUniqueTransform.size(); ++i)	DDELETE( mpUniqueTransform[i] );
 	mpUniqueAttribs.clear();
 	mpUniqueTransform.clear();
 

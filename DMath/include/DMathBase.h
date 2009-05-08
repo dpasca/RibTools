@@ -9,6 +9,14 @@
 #ifndef DMATHBASE_H
 #define DMATHBASE_H
 
+#define DMATH_USE_M128
+
+#ifdef DMATH_USE_M128
+	#include <xmmintrin.h>
+
+	#define DMT_SIMD_LEN	4
+#endif
+
 #include <math.h>
 #include <float.h>
 #include <assert.h>

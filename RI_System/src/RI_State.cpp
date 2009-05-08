@@ -136,22 +136,22 @@ void State::makeDefaultShaders( const char *pBasePath )
 	params.pName			= "constant";
 	params.pSourceFileName	= buff;	
 	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
+	pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
 
 	params.pName			= "matte";
 	params.pSourceFileName	= buff;	
 	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
+	pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
 
 	params.pName			= "dbg_normal_col";
 	params.pSourceFileName	= buff;	
 	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
+	pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
 
 	params.pName			= "test";
 	params.pSourceFileName	= buff;	
 	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	pShader = (SlShader *)mResManager.AddResource( new SlShader( params ) );
+	pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
 }
 
 //==================================================================

@@ -1,15 +1,15 @@
-/*
- *  RI_Primitive_Quadric.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/18.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Primitive_Quadric.h
+///
+/// Created by Davide Pasca - 2009/01/18
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_PRIMITIVE_QUADRIC_H
 #define RI_PRIMITIVE_QUADRIC_H
 
+#include "DSystem/include/DMemory.h"
 #include "RI_Primitive_Base.h"
 
 //==================================================================
@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-		Cylinder *Clone() const {	return new Cylinder( *this ); }
+		Cylinder *Clone() const {	return DNEW Cylinder( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
 
@@ -74,7 +74,7 @@ public:
 	{
 	}
 
-		Cone *Clone() const {	return new Cone( *this ); }
+		Cone *Clone() const {	return DNEW Cone( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
 
@@ -113,7 +113,7 @@ public:
 	{
 	}
 
-		Sphere *Clone() const {	return new Sphere( *this ); }
+		Sphere *Clone() const {	return DNEW Sphere( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
 
@@ -150,7 +150,7 @@ public:
 	{
 	}
 
-		Hyperboloid *Clone() const { return new Hyperboloid( *this ); }
+		Hyperboloid *Clone() const { return DNEW Hyperboloid( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
 
@@ -189,7 +189,7 @@ public:
 	{
 	}
 
-		Paraboloid *Clone() const {	return new Paraboloid( *this ); }
+		Paraboloid *Clone() const {	return DNEW Paraboloid( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
 
@@ -232,7 +232,7 @@ public:
 	{
 	}
 	
-		Torus *Clone() const {	return new Torus( *this ); }
+		Torus *Clone() const {	return DNEW Torus( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
 

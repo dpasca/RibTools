@@ -100,7 +100,7 @@ void ResourceManager::Collect()
 	{
 		if ( mpList[ri]->mRefCount == 0 )
 		{
-			delete mpList[ri];
+			DDELETE( mpList[ri] );
 			mpList[ri] = NULL;
 		}
 		else

@@ -1,17 +1,17 @@
-/*
- *  DContainers.h
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// DContainers.h
+///
+/// Created by Davide Pasca - 2008/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef DCONTAINERS_H
 #define DCONTAINERS_H
 
 #include "DTypes.h"
 #include "DUtils.h"
+#include "DMemory.h"
 
 //==================================================================
 static const size_t	NPOS = (size_t)-1;
@@ -73,7 +73,7 @@ private:
 	{
 		mSizeAlloc = 0;
 		if ( mpData )
-			delete [] (u_char *)mpData;
+			DDELETE_ARRAY( (u_char *)mpData );
 		mpData = NULL;
 	}
 
@@ -99,19 +99,20 @@ public:
 
 			if ( newSizeAlloc == 0 )
 			{
+				size_t dude = sizeof(T);
 				newSizeAlloc = (sizeof(T) < 128 ? 128 : sizeof(T)) / sizeof(T);
 			}
 
 			if ( newSizeAlloc < newSize )
 				newSizeAlloc = newSize;
 
-			T *newPData = (T *)new u_char [ sizeof(T) * newSizeAlloc ];
+			T *newPData = (T *)DNEW u_char [ sizeof(T) * newSizeAlloc ];
 
 			if ( mpData )
 			{
 				memcpy( newPData, mpData, mSize * sizeof(T) );
 
-				delete [] (u_char *)mpData;
+				DDELETE_ARRAY( (u_char *)mpData );
 			}
 			
 			mpData = newPData;
@@ -279,7 +280,7 @@ public:
 	CopyStackMax()
 	{
 		T	*p = (T *)&mVec[0];
-		new ( p ) T;
+		DNEW ( p ) T;
 		mSize = 1;
 	}
 

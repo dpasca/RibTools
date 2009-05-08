@@ -26,31 +26,31 @@ inline void State::insertPrimitive( PrimitiveBase *pPrim )
 //==================================================================
 void State::Cylinder( float radius, float zmin, float zmax, float thetamax )
 {
-	insertPrimitive( new RI::Cylinder( radius, zmin, zmax, thetamax ) );
+	insertPrimitive( DNEW RI::Cylinder( radius, zmin, zmax, thetamax ) );
 }
 
 //==================================================================
 void State::Cone( float height, float radius, float thetamax )
 {
-	insertPrimitive( new RI::Cone( height, radius, thetamax ) );
+	insertPrimitive( DNEW RI::Cone( height, radius, thetamax ) );
 }
 
 //==================================================================
 void State::Sphere( float radius, float zmin, float zmax, float thetamax )
 {
-	insertPrimitive( new RI::Sphere( radius, zmin, zmax, thetamax ) );
+	insertPrimitive( DNEW RI::Sphere( radius, zmin, zmax, thetamax ) );
 }
 
 //==================================================================
 void State::Hyperboloid( const Vec3f &p1, const Vec3f &p2, float thetamax )
 {
-	insertPrimitive( new RI::Hyperboloid( p1, p2, thetamax ) );
+	insertPrimitive( DNEW RI::Hyperboloid( p1, p2, thetamax ) );
 }
 
 //==================================================================
 void State::Paraboloid( float rmax, float zmin, float zmax, float thetamax )
 {
-	insertPrimitive( new RI::Paraboloid( rmax, zmin, zmax, thetamax ) );
+	insertPrimitive( DNEW RI::Paraboloid( rmax, zmin, zmax, thetamax ) );
 }
 
 //==================================================================
@@ -58,7 +58,7 @@ void State::Torus( float maxRadius, float minRadius,
 				   float phimin, float phimax,
 				   float thetamax )
 {
-	insertPrimitive( new RI::Torus( maxRadius, minRadius, phimin, phimax, thetamax ) );
+	insertPrimitive( DNEW RI::Torus( maxRadius, minRadius, phimin, phimax, thetamax ) );
 }
 
 //==================================================================
@@ -67,28 +67,28 @@ void State::Patch( RtToken type, ParamList &params )
 	CPSymVoid	pyPatchType = mStatics.FindVoid( type );
 	
 	if ( pyPatchType->IsNameI( RI_BICUBIC ) )
-		insertPrimitive( new RI::PatchBicubic( params, mAttributesStack.top(), mStatics ) );
+		insertPrimitive( DNEW RI::PatchBicubic( params, mAttributesStack.top(), mStatics ) );
 	else
 	if ( pyPatchType->IsNameI( RI_BILINEAR ) )
-		insertPrimitive( new RI::PatchBilinear( params, mStatics ) );
+		insertPrimitive( DNEW RI::PatchBilinear( params, mStatics ) );
 }
 
 //==================================================================
 void State::PatchMesh( RtToken type, ParamList &params )
 {
-	insertPrimitive( new RI::PatchMesh( type, params, mStatics ) );
+	insertPrimitive( DNEW RI::PatchMesh( type, params, mStatics ) );
 }
 
 //==================================================================
 void State::Polygon( ParamList &params )
 {
-	insertPrimitive( new RI::Polygon( params, mStatics ) );
+	insertPrimitive( DNEW RI::Polygon( params, mStatics ) );
 }
 
 //==================================================================
 void State::PointsGeneralPolygons( ParamList &params )
 {
-	insertPrimitive( new RI::PointsGeneralPolygons( params, mStatics ) );
+	insertPrimitive( DNEW RI::PointsGeneralPolygons( params, mStatics ) );
 }
 	
 //==================================================================

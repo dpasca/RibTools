@@ -32,9 +32,6 @@ inline int strcasecmp( const char *a, const char *b )
 #define _countof(_X_)			(sizeof(_X_)/sizeof((_X_)[0]))
 #endif
 
-#define DSAFE_DELETE(_X_)		{ if ( _X_ ) { delete (_X_); (_X_) = 0; } }
-#define DSAFE_DELETE_ARRAY(_X_)	{ if ( _X_ ) { delete [] (_X_); (_X_) = 0; } }
-
 #define DNPOS					((size_t)-1)
 
 #define	DMIN(_A_,_B_)			((_A_) < (_B_) ? (_A_) : (_B_))

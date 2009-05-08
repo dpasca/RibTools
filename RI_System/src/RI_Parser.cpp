@@ -41,14 +41,14 @@ Parser::Parser() :
 	mNextCommandLine(0),
 	mCurCommandLine(0)
 {
-	mpTokenizer = new Tokenizer();
+	mpTokenizer = DNEW Tokenizer();
 }
 
 //==================================================================
 Parser::~Parser()
 {
 	if ( mpTokenizer )
-		delete mpTokenizer;
+		DDELETE( mpTokenizer );
 }
 
 //==================================================================

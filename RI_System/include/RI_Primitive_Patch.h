@@ -29,7 +29,7 @@ public:
 	PatchBilinear( ParamList &params, const SymbolList &staticSymbols );
 	PatchBilinear( ParamList &params, const Vec3f hull[4] );
 
-		PatchBilinear *Clone() const {	return new PatchBilinear( *this ); }
+		PatchBilinear *Clone() const {	return DNEW PatchBilinear( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
 
@@ -112,7 +112,7 @@ public:
 						    const Attributes &attr,
 							const SymbolList &staticSymbols );
 
-		PatchBicubic *Clone() const {	return new PatchBicubic( *this ); }
+		PatchBicubic *Clone() const {	return DNEW PatchBicubic( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
 

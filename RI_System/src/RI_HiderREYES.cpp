@@ -44,7 +44,7 @@ HiderREYES::HiderREYES( const Params &params ) :
 HiderREYES::~HiderREYES()
 {
 	for (size_t i=0; i < mpBuckets.size(); ++i)
-		delete mpBuckets[i];
+		DDELETE( mpBuckets[i] );
 }
 
 //==================================================================
@@ -81,7 +81,7 @@ void HiderREYES::WorldBegin(
 				 mParams.mDbgOnlyBucketAtY < y2 )
 			{
 				mpBuckets.push_back(
-						new Bucket( x, y, x2, y2 ) );
+						DNEW Bucket( x, y, x2, y2 ) );
 			}
 		}
 	}
@@ -170,7 +170,7 @@ void HiderREYES::WorldEnd()
 	}
 
 	for (size_t i=0; i < mpBuckets.size(); ++i)
-		delete mpBuckets[i];
+		DDELETE( mpBuckets[i] );
 
 	mpBuckets.clear();
 }

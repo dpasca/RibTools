@@ -168,6 +168,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\DMemory.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DMemory.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DTypes.cpp"
 				>
 			</File>

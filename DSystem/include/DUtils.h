@@ -1,11 +1,10 @@
-/*
- *  DUtils.h
- *  RibTools
- *
- *  Created by Davide Pasca on 08/12/31.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// DUtils.h
+///
+/// Created by Davide Pasca - 2008/12/31
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef DUTILS_H
 #define DUTILS_H

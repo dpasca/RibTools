@@ -68,10 +68,10 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mpCustomVBasis = NULL;
 
 	if ( rhs.mpCustomUBasis )
-		mpCustomUBasis = new Matrix44( *rhs.mpCustomUBasis );
+		mpCustomUBasis = DNEW Matrix44( *rhs.mpCustomUBasis );
 
 	if ( rhs.mpCustomVBasis )
-		mpCustomVBasis = new Matrix44( *rhs.mpCustomVBasis );	
+		mpCustomVBasis = DNEW Matrix44( *rhs.mpCustomVBasis );	
 
 	
 	mUSteps				= rhs.mUSteps				;
@@ -215,7 +215,7 @@ void Attributes::cmdBasis(
 	else
 	{
 		DSAFE_DELETE( mpCustomUBasis );
-		mpCustomUBasis = new Matrix44( pCustomUBasis );
+		mpCustomUBasis = DNEW Matrix44( pCustomUBasis );
 	}
 
 	if ( vbasis )
@@ -223,7 +223,7 @@ void Attributes::cmdBasis(
 	else
 	{
 		DSAFE_DELETE( mpCustomVBasis );
-		mpCustomVBasis = new Matrix44( pCustomVBasis );
+		mpCustomVBasis = DNEW Matrix44( pCustomVBasis );
 	}
 
 	mUSteps	= ustep;
@@ -257,7 +257,7 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		return false;
 	}
 
-	LightSourceT	*pLight = new LightSourceT();
+	LightSourceT	*pLight = DNEW LightSourceT();
 
 	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
 	{

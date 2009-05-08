@@ -70,7 +70,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 				hullv3[3] = Vec3f( &pMeshHull[(ii+nu*jj)*3] );
 
 				hider.InsertSimple(
-						new RI::PatchBilinear( mParams, hullv3 ),
+						DNEW RI::PatchBilinear( mParams, hullv3 ),
 						*this
 						);
 			}
@@ -112,7 +112,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 				}
 
 				hider.InsertSimple(
-						new RI::PatchBicubic( mParams, hullv3, attr, *hider.mpStatics ),
+						DNEW RI::PatchBicubic( mParams, hullv3, attr, *hider.mpStatics ),
 						*this
 						);
 			}

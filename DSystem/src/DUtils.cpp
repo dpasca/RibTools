@@ -12,7 +12,7 @@
 #include <stdarg.h>
 #include "DTypes.h"
 #include "DUtils.h"
-
+#include "DMemory.h"
 
 //==================================================================
 namespace DUT
@@ -54,7 +54,7 @@ char *SSPrintF( const char *pFmt, ... )
 
 	va_end( vl );
 
-	char *p = new char [ strlen(buff)+1 ];
+	char *p = DNEW char [ strlen(buff)+1 ];
 	strcpy( p, buff );
 	
 	return p;
@@ -72,7 +72,7 @@ void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 	{
 		sprintf( buff, "ASSERT: %s - %s %i\n", pNewCharMsg, pFile, line );
 
-		delete [] pNewCharMsg;
+		DSAFE_DELETE_ARRAY( pNewCharMsg );
 	}
 	else
 	{

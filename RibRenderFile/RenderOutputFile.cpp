@@ -102,7 +102,7 @@ void RenderOutputFile::alloc( u_int w, u_int h )
 	mWd = w;
 	mHe = h;
 
-	mpBuffer = new u_char [ w * h * 3 ];
+	mpBuffer = DNEW u_char [ w * h * 3 ];
 }
 
 //==================================================================

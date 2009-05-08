@@ -74,7 +74,7 @@ public:
 	void Release()
 	{
 		if ( 0 == mRefCnt.SubRef() )
-			delete this;
+			DDELETE( this );
 	}
 	
 	virtual bool	IsComplex() const = 0;

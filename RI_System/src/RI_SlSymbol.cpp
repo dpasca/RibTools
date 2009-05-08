@@ -18,17 +18,13 @@ namespace RI
 //==================================================================
 static void *allocStream( size_t size )
 {
-	void *p = _aligned_malloc( size, RI_SIMD_FLT_LEN * sizeof(float) );
-	if NOT( p )
-		throw std::bad_alloc();
-
-	return p;
+	return (void *)DNEW char [ size ];
 }
 
 //==================================================================
 static void freeStream( void *p )
 {
-	_aligned_free( p );
+	DSAFE_DELETE_ARRAY( p );
 }
 
 //==================================================================

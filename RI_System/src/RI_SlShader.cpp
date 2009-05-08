@@ -68,7 +68,7 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 {
 	size_t	symbolsN = mpShader->mSymbols.size();
 
-	SlValue	*pDataSegment = new SlValue [ symbolsN ];
+	SlValue	*pDataSegment = DNEW SlValue [ symbolsN ];
 	
 	for (size_t i=0; i < symbolsN; ++i)
 	{
@@ -153,8 +153,7 @@ void SlShaderInstance::Unbind( SlValue * &pDataSegment )
 		}
 	}
 	
-	delete [] pDataSegment;
-	pDataSegment = NULL;
+	DSAFE_DELETE_ARRAY( pDataSegment );
 }
 
 

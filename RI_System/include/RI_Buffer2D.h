@@ -44,7 +44,7 @@ public:
 	{
 		mWd	= wd;
 		mHe	= he;
-		mpData = new float [ mWd * NCHANS * mHe ];
+		mpData = DNEW float [ mWd * NCHANS * mHe ];
 	}
 
 	void Free()

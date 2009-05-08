@@ -212,7 +212,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	}
 
 	DSAFE_DELETE( mpRenderOutput );
-	mpRenderOutput = new RenderOutputOpenGL();
+	mpRenderOutput = DNEW RenderOutputOpenGL();
 
 	char	defaultShadersDir[4096];
 	sprintf( defaultShadersDir, "%s/Shaders", mDefaultResDir );

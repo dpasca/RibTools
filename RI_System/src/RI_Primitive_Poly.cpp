@@ -46,17 +46,17 @@ void Polygon::simplifyAddTriangle(
 	patchVerts[1] = a;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
 	patchVerts[0] = v2;
 	patchVerts[1] = a;
 	patchVerts[2] = b;
 	patchVerts[3] = mid;
-	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
 	patchVerts[0] = v3;
 	patchVerts[1] = b;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
 }
 
 //==================================================================
@@ -85,7 +85,7 @@ void Polygon::Simplify( HiderREYES &hider )
 		patchVerts[3].Set( &paramP[3 * (start+1)] );
 
 		hider.InsertSimple(
-				new PatchBilinear( mParams, patchVerts ),
+				DNEW PatchBilinear( mParams, patchVerts ),
 				*this );
 		
 		start	= end;
@@ -130,17 +130,17 @@ void PointsGeneralPolygons::simplifyAddTriangle(
 	patchVerts[1] = a;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
 	patchVerts[0] = v2;
 	patchVerts[1] = a;
 	patchVerts[2] = b;
 	patchVerts[3] = mid;
-	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
 	patchVerts[0] = v3;
 	patchVerts[1] = b;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	hider.InsertSimple( new PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
 }
 
 //==================================================================
@@ -210,7 +210,7 @@ void PointsGeneralPolygons::Simplify( HiderREYES &hider )
 		patchVerts[3].Set( &paramP[3 * (start+1)] );
 
 		hider.InsertSimple(
-				new PatchBilinear( mParams, patchVerts ),
+				DNEW PatchBilinear( mParams, patchVerts ),
 				*this );
 		
 		start	= end;
