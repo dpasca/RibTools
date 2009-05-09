@@ -12,12 +12,21 @@
 #define DMATH_USE_M128
 //#define DMATH_USE_M512
 
-#ifdef DMATH_USE_M128
+#if defined(DMATH_USE_M128)
 	#include <xmmintrin.h>
 
 	#define DMT_SIMD_FLEN	4
 
+#elif defined(DMATH_USE_M512)
+
+	#define USE_C_PROTOTYPE_PRIMITIVES 0
+
+	#include "external/lrb/lrb_prototype_primitives.inl"
+
+	#define DMT_SIMD_FLEN	16
+
 #else
+
 	#define DMT_SIMD_FLEN	4
 
 #endif
