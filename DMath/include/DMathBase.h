@@ -10,11 +10,16 @@
 #define DMATHBASE_H
 
 #define DMATH_USE_M128
+//#define DMATH_USE_M512
 
 #ifdef DMATH_USE_M128
 	#include <xmmintrin.h>
 
-	#define DMT_SIMD_LEN	4
+	#define DMT_SIMD_FLEN	4
+
+#else
+	#define DMT_SIMD_FLEN	4
+
 #endif
 
 #include <math.h>
@@ -27,27 +32,27 @@
 template <class _S,class _T> inline _S DMix( const _S &a, const _S &b, const _T &t ){ return a + (b - a) * t; }
 
 //==================================================================
-template <class T>	inline T		DCos( const T &a )				{ assert( 0 );	return 0;	}
+template <class T>	inline T		DCos( const T &a )				{ assert( 0 );	return T();	}
 template <>			inline float	DCos<float>( const float &a )	{ return cosf( a );	}
 template <>			inline double	DCos<double>( const double &a )	{ return cos( a );	}
 
 //==================================================================
-template <class T>	inline T		DSin( const T &a )				{ assert( 0 );	return 0;	}
+template <class T>	inline T		DSin( const T &a )				{ assert( 0 );	return T();	}
 template <>			inline float	DSin<float>( const float &a )	{ return sinf( a );	}
 template <>			inline double	DSin<double>( const double &a )	{ return sin( a );	}
 
 //==================================================================
-template <class T>	inline T		DASin( const T &a )				{ assert( 0 );	return 0;	}
+template <class T>	inline T		DASin( const T &a )				{ assert( 0 );	return T();	}
 template <>			inline float	DASin<float>( const float &a )	{ return asinf( a );	}
 template <>			inline double	DASin<double>( const double &a ){ return asin( a );	}
 
 //==================================================================
-template <class T>	inline T		DSqrt( const T &a )				{ assert( 0 );	return 0;	}
+template <class T>	inline T		DSqrt( const T &a )				{ assert( 0 );	return T();	}
 template <>			inline float	DSqrt<float>( const float &a )	{ return sqrtf( a );	}
 template <>			inline double	DSqrt<double>( const double &a ){ return sqrt( a );	}
 
 //==================================================================
-template <class T>	inline T		DRSqrt( const T &a )			 { assert( 0 );	return 0;	}
+template <class T>	inline T		DRSqrt( const T &a )			 { assert( 0 );	return T();	}
 template <>			inline float	DRSqrt<float>( const float &a )	 { return 1.0f / sqrtf( a );	}
 template <>			inline double	DRSqrt<double>( const double &a ){ return 1.0 / sqrt( a );	}
 

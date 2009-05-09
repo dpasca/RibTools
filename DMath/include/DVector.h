@@ -10,6 +10,7 @@
 #define DVECTOR_H
 
 #include "DMathBase.h"
+#include "DMT_VecN.h"
 
 //==================================================================
 /// Vec2
@@ -120,11 +121,7 @@ public:
 
 	Vec3 GetNormalized() const
 	{
-		static const _S	one( 1.0f );
-
-		_S	oom = one / DSqrt( v3[0] * v3[0] + v3[1] * v3[1] + v3[2] * v3[2] );
-
-		return *this * oom;
+		return *this * DRSqrt( v3[0] * v3[0] + v3[1] * v3[1] + v3[2] * v3[2] );
 	}
 
 	Vec3 GetCross( const Vec3 &r_ ) const
@@ -204,184 +201,6 @@ public:
 };
 
 //==================================================================
-/// VecN
-//==================================================================
-
-//==================================================================
-#ifdef DMATH_USE_M128
-
-//==================================================================
-#define FOR_I_N	for (int i=0; i<_N; ++i)
-
-template<class _S, size_t _N>
-class VecN
-{
-public:
-	_S	v[_N];
-
-	//==================================================================
-	VecN()						{}
-	VecN( const VecN &v_ )		{ FOR_I_N v[i] = v_.v[i]; }
-	VecN( const _S& a_ )		{ FOR_I_N v[i] = a_;		}
-	VecN( const _S *p_ )		{ FOR_I_N v[i] = p_[i];	}
-
-	void Set( const _S *p_ )	{ FOR_I_N v[i] = p_[i];	}
-	void SetZero()				{ FOR_I_N v[i] = 0;		}
-
-	VecN operator + (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval; return tmp; }
-	VecN operator - (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval; return tmp; }
-	VecN operator * (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval; return tmp; }
-	VecN operator / (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] / rval; return tmp; }
-	VecN operator + (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval.v[i]; return tmp; }
-	VecN operator - (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval.v[i]; return tmp; }
-	VecN operator * (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval.v[i]; return tmp; }
-	VecN operator / (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] / rval.v[i]; return tmp; }
-
-	VecN operator -() const	{ VecN tmp; FOR_I_N tmp.v[i] = -v[i]; return tmp; }
-
-	VecN operator +=(const VecN &rval)	{ *this = *this + rval; return *this; }
-
-	_S GetDot( const VecN &r_ ) const
-	{
-		_S tmp=0; FOR_I_N tmp += v[i] * r_.v[i];
-
-		return tmp;
-	}
-
-	VecN GetRSqrt() const
-	{
-		VecN	tmp;
-		FOR_I_N tmp.v[i] = DRSqrt( v[i] );
-		return tmp;
-	}
-
-	const _S &operator [] (size_t i) const	{ return v[i]; }
-		  _S &operator [] (size_t i)		{ return v[i]; }
-};
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DSqrt( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp;
-}
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DRSqrt( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp;
-}
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DSign( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp;
-}
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DSin( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp;
-}
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DCos( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp;
-}
-
-template<class _S,size_t _N> VecN<_S,_N> operator * (const _S &lval, const VecN<_S,_N> &rval) { return rval * lval; }
-
-#undef FOR_I_N
-
-//==================================================================
-#else
-
-//==================================================================
-#define FOR_I_N	for (int i=0; i<_N; ++i)
-
-template<class _S, size_t _N>
-class VecN
-{
-public:
-	_S	v[_N];
-
-	//==================================================================
-	VecN()						{}
-	VecN( const VecN &v_ )		{ FOR_I_N v[i] = v_.v[i]; }
-	VecN( const _S& a_ )		{ FOR_I_N v[i] = a_;		}
-	VecN( const _S *p_ )		{ FOR_I_N v[i] = p_[i];	}
-
-	void Set( const _S *p_ )	{ FOR_I_N v[i] = p_[i];	}
-	void SetZero()				{ FOR_I_N v[i] = 0;		}
-
-	VecN operator + (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval; return tmp; }
-	VecN operator - (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval; return tmp; }
-	VecN operator * (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval; return tmp; }
-	VecN operator / (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] / rval; return tmp; }
-	VecN operator + (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval.v[i]; return tmp; }
-	VecN operator - (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval.v[i]; return tmp; }
-	VecN operator * (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval.v[i]; return tmp; }
-	VecN operator / (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] / rval.v[i]; return tmp; }
-
-	VecN operator -() const	{ VecN tmp; FOR_I_N tmp.v[i] = -v[i]; return tmp; }
-
-	VecN operator +=(const VecN &rval)	{ *this = *this + rval; return *this; }
-
-	_S GetDot( const VecN &r_ ) const
-	{
-		_S tmp=0; FOR_I_N tmp += v[i] * r_.v[i];
-
-		return tmp;
-	}
-
-	VecN GetRSqrt() const
-	{
-		VecN	tmp;
-		FOR_I_N tmp.v[i] = DRSqrt( v[i] );
-		return tmp;
-	}
-
-	const _S &operator [] (size_t i) const	{ return v[i]; }
-		  _S &operator [] (size_t i)		{ return v[i]; }
-};
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DSqrt( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp;
-}
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DRSqrt( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp;
-}
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DSign( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp;
-}
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DSin( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp;
-}
-
-//==================================================================
-template <class _S, size_t _N>	inline VecN<_S,_N>	DCos( const VecN<_S,_N> &a )
-{
-	VecN<_S,_N> tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp;
-}
-
-template<class _S,size_t _N> VecN<_S,_N> operator * (const _S &lval, const VecN<_S,_N> &rval) { return rval * lval; }
-
-#undef FOR_I_N
-
-#endif	// DMATH_USE_M128
-
-//==================================================================
 template<class _S> Vec2<_S> operator * (const _S &lval, const Vec2<_S> &rval) { return rval * lval; }
 template<class _S> Vec3<_S> operator * (const _S &lval, const Vec3<_S> &rval) { return rval * lval; }
 template<class _S> Vec4<_S> operator * (const _S &lval, const Vec4<_S> &rval) { return rval * lval; }
@@ -392,18 +211,16 @@ template<class _S> Vec4<_S> operator * (const _S &lval, const Vec4<_S> &rval) { 
 typedef	Vec2<float>							Vec2f;
 typedef	Vec3<float>							Vec3f;
 typedef	Vec4<float>							Vec4f;
-typedef	VecN<float,DMT_SIMD_LEN>			VecSIMDf;
+typedef	VecN<float,DMT_SIMD_FLEN>			VecSIMDf;
 
-typedef	Vec2< VecN<float,DMT_SIMD_LEN> >	Vec2xSIMDf;
-typedef	Vec3< VecN<float,DMT_SIMD_LEN> >	Vec3xSIMDf;
-typedef	Vec4< VecN<float,DMT_SIMD_LEN> >	Vec4xSIMDf;
+typedef	Vec2< VecN<float,DMT_SIMD_FLEN> >	Vec2xSIMDf;
+typedef	Vec3< VecN<float,DMT_SIMD_FLEN> >	Vec3xSIMDf;
+typedef	Vec4< VecN<float,DMT_SIMD_FLEN> >	Vec4xSIMDf;
 
 //==================================================================
 typedef	Vec2f		Point2;
 typedef	Vec3f		Point3;
 typedef	Vec4f		Point4;
 typedef	Vec3f		Color;
-
-typedef	Vec3xSIMDf	Color16f;
 
 #endif

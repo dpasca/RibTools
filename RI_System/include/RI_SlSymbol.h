@@ -16,7 +16,7 @@ namespace RI
 {
 
 //==================================================================
-typedef __declspec(align(64)) VecSIMDf	SlScalar;
+typedef __declspec(align(64)) VecSIMDf		SlScalar;
 typedef __declspec(align(64)) Vec3xSIMDf	SlColor;
 typedef __declspec(align(64)) Vec2xSIMDf	SlVec2;
 typedef __declspec(align(64)) Vec3xSIMDf	SlVec3;

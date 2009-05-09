@@ -319,7 +319,7 @@ bool SimplePrimitiveBase::SetupForDiceOrSplit(
 	
 	if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
 	{
-		float	dim = sqrtf( pixelArea );
+		float	dim = DSqrt( pixelArea );
 
 		mDiceGridWd = (int)ceilf( dim );
 		mDiceGridHe = (int)ceilf( dim );

@@ -20,7 +20,7 @@
 namespace RI
 {
 
-#define RI_SIMD_BLK_LEN			DMT_SIMD_LEN
+#define RI_SIMD_BLK_LEN			DMT_SIMD_FLEN
 #define	RI_GET_SIMD_BLOCKS(_X_)	(((unsigned)(_X_) + (RI_SIMD_BLK_LEN-1)) / RI_SIMD_BLK_LEN)
 
 //==================================================================
