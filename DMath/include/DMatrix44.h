@@ -19,7 +19,7 @@
 //#define DMATRIX44_ROWMTX_MODE
 
 //==================================================================
-//__declspec(align(16))
+//__declspec(align(64))
 class Matrix44
 {
 public:
@@ -297,7 +297,9 @@ inline Vec3f V3__M44_Mul_V3W1( const Matrix44 &a, const Vec3f &v )
 template <class _S4, class _S3, class _T>
 inline _S4 V4__V3W1_Mul_M44( const _S3 &v, const Matrix44 &a )
 {
-	_T	x = v.v3[0], y = v.v3[1], z = v.v3[2];
+	const _T	&x = v.v3[0];
+	const _T	&y = v.v3[1];
+	const _T	&z = v.v3[2];
 
 	return _S4(
 #ifdef DMATRIX44_ROWMTX_MODE
@@ -318,7 +320,9 @@ inline _S4 V4__V3W1_Mul_M44( const _S3 &v, const Matrix44 &a )
 template <class _S>
 inline Vec3<_S> V3__V3W1_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
 {
-	_S	x = v.v3[0], y = v.v3[1], z = v.v3[2];
+	const _S	&x = v.v3[0];
+	const _S	&y = v.v3[1];
+	const _S	&z = v.v3[2];
 
 	return Vec3<_S>(
 #ifdef DMATRIX44_ROWMTX_MODE
