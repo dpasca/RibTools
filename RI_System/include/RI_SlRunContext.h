@@ -30,6 +30,18 @@ public:
 	SlSymbolList		*mpSymbols;
 	const Attributes	*mpAttribs;
 
+	class Cache
+	{
+	public:
+		bool	mAmbientColDone;
+		SlColor	mAmbientCol;
+
+		Cache()
+		{
+			mAmbientColDone = false;
+		}
+	} mCache;
+
 	SlRunContext()
 	{
 		mProgramCounter = 0;

@@ -441,22 +441,29 @@ static void Inst_Ambient( SlRunContext &ctx )
 {
 	SlColor*	lhs	= (SlColor*)ctx.GetVoid( 1 );
 
-	SlColor	ambCol( 0.f );
-
-	const DVec<LightSourceT *>	&pLights	= ctx.mpAttribs->mpState->GetLightSources();
-	const DVec<U16>				&actLights	= ctx.mpAttribs->mActiveLights;
-
-	for (size_t i=0; i < actLights.size(); ++i)
+	if NOT( ctx.mCache.mAmbientColDone )
 	{
-		size_t		li	= actLights[i];
+		ctx.mCache.mAmbientColDone = true;
 
-		const LightSourceT	&light = *pLights[ li ];
+		SlColor	ambCol( 0.f );
 
-		SlColor	lightCol( light.mColor.x(), light.mColor.y(), light.mColor.z() );
-		SlScalar	lightInt( light.mIntesity );
+		const DVec<LightSourceT *>	&pLights	= ctx.mpAttribs->mpState->GetLightSources();
+		const DVec<U16>				&actLights	= ctx.mpAttribs->mActiveLights;
 
-		if ( light.mType == LightSourceT::TYPE_AMBIENT )
-			ambCol += lightCol * lightInt;
+		for (size_t i=0; i < actLights.size(); ++i)
+		{
+			size_t		li	= actLights[i];
+
+			const LightSourceT	&light = *pLights[ li ];
+
+			SlColor	lightCol( light.mColor.x(), light.mColor.y(), light.mColor.z() );
+			SlScalar	lightInt( light.mIntesity );
+
+			if ( light.mType == LightSourceT::TYPE_AMBIENT )
+				ambCol += lightCol * lightInt;
+		}
+
+		ctx.mCache.mAmbientCol = ambCol;
 	}
 
 	//DASSERT( ambCol.x >= 0 && ambCol.y >= 0 && ambCol.z >= 0 );
@@ -464,7 +471,7 @@ static void Inst_Ambient( SlRunContext &ctx )
 	for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 	{
 		if ( ctx.IsProcessorActive( i ) )
-			lhs[i] = ambCol;
+			lhs[i] = ctx.mCache.mAmbientCol;
 	}
 
 	ctx.NextInstruction();
