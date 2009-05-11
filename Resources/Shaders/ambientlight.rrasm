@@ -5,7 +5,9 @@
 ;	{
 ;		Cl = intensity * lightcolor;
 ;	}
-	
+
+light
+
 .data
 	Cl			parameter varying color
 

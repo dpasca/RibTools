@@ -193,6 +193,7 @@ private:
 	inline void insertPrimitive( PrimitiveBase *pPrim );
 	
 	void makeDefaultShaders( const char *pBasePath );
+	void addDefShader( const char *pBasePath, const char *pSName );
 };
 
 }

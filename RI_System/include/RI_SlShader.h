@@ -11,6 +11,7 @@
 
 #include "RI_Base.h"
 #include "RI_SlSymbol.h"
+#include "RI_Resource.h"
 #include "RI_MicroPolygonGrid.h"
 
 //==================================================================
@@ -105,10 +106,19 @@ union SlCPUWord
 class SlShader : public ResourceBase
 {
 public:
+	enum Type
+	{
+		TYPE_UNKNOWN,
+		TYPE_SURFACE,
+		TYPE_LIGHT,
+		TYPE_DISPLACEMENT
+	};
+public:
+	Type			mType;
 	DStr			mShaderName;
 	DVec<SlSymbol>	mSymbols;
 	DVec<SlCPUWord>	mCode;
-	
+
 	struct CtorParams
 	{
 		const char	*pName;
@@ -131,15 +141,32 @@ public:
 //==================================================================
 class SlShaderInstance
 {
+	friend class SlRunContext;
+
+	ResOwn<SlShader>	moShader;
+	SlShader			*mpShader;	// direct pointer for convenience
+
 public:
-	SlShader			*mpShader;
 	//DVec<SlParameter>	mCallingParams;
 	SlSymbolList		mCallingParams;
 
 public:
 	SlShaderInstance();
 	~SlShaderInstance() {}
-	
+
+	void Set( SlShader *pShader )
+	{
+		moShader.Borrow( pShader );
+		mpShader = pShader;
+	}
+
+	void operator = ( const SlShaderInstance &right )
+	{
+		moShader.Borrow( moShader.Use() );
+		mpShader		= right.mpShader;
+		mCallingParams	= right.mCallingParams;
+	}
+
 	void SetParameter(
 				const char		*pParamName,
 				SlSymbol::Type	type,

@@ -10,6 +10,7 @@
 #define RI_LIGHTSOURCE_H
 
 #include "RI_Base.h"
+#include "RI_SlShader.h"
 
 //==================================================================
 namespace RI
@@ -24,6 +25,9 @@ class Transform;
 //==================================================================
 class LightSourceT
 {
+public:
+	SlShaderInstance	mpShaderInst;
+
 public:
 	enum Type
 	{
@@ -56,6 +60,10 @@ public:
 	} mRend;
 
 	LightSourceT();
+	~LightSourceT()
+	{
+		//if ( mpShaderInst
+	}
 
 	void UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam );
 };

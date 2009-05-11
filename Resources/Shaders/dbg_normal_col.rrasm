@@ -1,3 +1,6 @@
+
+surface
+
 .data
 	Ci		parameter varying color
 	Oi		parameter varying color

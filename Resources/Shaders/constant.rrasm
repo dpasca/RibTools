@@ -5,6 +5,8 @@
 ;		Ci = Os * Cs;
 ;	}
 
+surface
+
 .data
 	Cs		parameter varying color
 	Os		parameter varying color

@@ -29,7 +29,8 @@ class MicroPolygonGrid;
 //==================================================================
 class PrimitiveBase
 {
-	RefCount			mRefCnt;
+	RefCount	mRefCnt;
+
 public:
 	enum Type
 	{

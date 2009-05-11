@@ -79,11 +79,7 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mColor				= rhs.mColor				;
 	mOpacity			= rhs.mOpacity				;
 	mShaderInstance		= rhs.mShaderInstance		;
-		
-	if ( mShaderInstance.mpShader )
-		mShaderInstance.mpShader->AddRef();
-
-	mActiveLights		= rhs.mActiveLights;
+	mActiveLights		= rhs.mActiveLights			;
 }
 
 //==================================================================
@@ -91,12 +87,6 @@ Attributes::~Attributes()
 {
 	DSAFE_DELETE( mpCustomUBasis );
 	DSAFE_DELETE( mpCustomVBasis );
-
-	if ( mShaderInstance.mpShader )
-	{
-		mShaderInstance.mpShader->SubRef();
-		mShaderInstance.mpShader = NULL;
-	}
 }
 
 //==================================================================
@@ -129,11 +119,10 @@ void Attributes::Init(
 	
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
-	
-	DASSERT( mShaderInstance.mpShader == NULL );
-	
-	mShaderInstance.mpShader = (SlShader *)pResManager->FindResource( "dbg_normal_col" );
-	mShaderInstance.mpShader->AddRef();
+
+	mShaderInstance.Set(
+		(SlShader *)pResManager->FindResource( "dbg_normal_col",
+													ResourceBase::TYPE_SHADER ) );
 }
 
 //==================================================================
@@ -259,6 +248,18 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 
 	LightSourceT	*pLight = DNEW LightSourceT();
 
+	SlShader *pShader =
+		(SlShader *)mpResManager->FindResource( params[0].PChar(),
+													ResourceBase::TYPE_SHADER );
+
+	if NOT( pShader )
+	{
+		printf( "Could not find the light shader '%s' !", params[0].PChar() );
+		return false;
+	}
+
+	pLight->mpShaderInst.Set( pShader );
+
 	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
 	{
 		pLight->mType = LightSourceT::TYPE_AMBIENT;
@@ -325,12 +326,9 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 //==================================================================
 void Attributes::cmdSurface( ParamList &params )
 {
-	if ( mShaderInstance.mpShader )
-	{
-		mShaderInstance.mpShader->SubRef();
-	}
-	mShaderInstance.mpShader = (SlShader *)mpResManager->FindResource( "matte" );
-	mShaderInstance.mpShader->AddRef();
+	mShaderInstance.Set(
+		(SlShader *)mpResManager->FindResource( "matte",
+											ResourceBase::TYPE_SHADER ) );
 
 	mpRevision->BumpRevision();
 }

@@ -1,11 +1,10 @@
-/*
- *  RI_Base.cpp
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Base.cpp
+///
+/// Created by Davide Pasca - 2008/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_Base.h"
@@ -89,28 +88,6 @@ RtBasis	PowerBasis
 	0,	0,	1,	0,
 	0,	0,	0,	1
 );
-
-//==================================================================
-/// ResourceManager
-//==================================================================
-void ResourceManager::Collect()
-{
-	size_t	wi = 0;
-	for (size_t ri=0; ri < mpList.size(); ++ri)
-	{
-		if ( mpList[ri]->mRefCount == 0 )
-		{
-			DDELETE( mpList[ri] );
-			mpList[ri] = NULL;
-		}
-		else
-		{
-			if ( wi != ri )
-				mpList[wi++] = mpList[ri];
-		}
-	}
-	mpList.resize( wi );
-}
 
 //==================================================================
 }

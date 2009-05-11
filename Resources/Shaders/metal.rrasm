@@ -10,6 +10,8 @@
 ;		Ci = Os * Cs * (Ka*ambient()+Ks*specular(Nf, V, roughness));
 ;	}
 
+surface
+
 .data
 	Cs		parameter varying color
 	Os		parameter varying color

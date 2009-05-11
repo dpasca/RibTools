@@ -302,6 +302,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_Resource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_Resource.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_SlRunContext.cpp"
 				>
 			</File>

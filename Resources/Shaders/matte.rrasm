@@ -8,6 +8,8 @@
 ;		Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
 ;	}
 
+surface
+
 .data
 	Cs		parameter varying color
 	Os		parameter varying color

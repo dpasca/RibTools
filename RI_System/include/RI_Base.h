@@ -1,7 +1,7 @@
 //==================================================================
 /// RI_Base.h
 ///
-/// Created by Davide Pasca - 208/12/17
+/// Created by Davide Pasca - 2008/12/17
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 ///
@@ -73,73 +73,7 @@ enum Error
 const char *ErrorToString( Error errCode );
 
 //==================================================================
-class RevisionTracker
-{
-public:
-	int	mRTrackRevisionCount;
-	
-	RevisionTracker() : mRTrackRevisionCount(0) {}
-
-	void BumpRevision()
-	{
-		mRTrackRevisionCount += 1;
-	}
-};
-
-//==================================================================
-class RevisionChecker
-{
-public:
-	int	mCurRevisionCount;
-	
-	RevisionChecker() : mCurRevisionCount(-1) {}
-
-	bool Sync( const RevisionTracker &tracker )
-	{
-		if ( tracker.mRTrackRevisionCount != mCurRevisionCount )
-		{
-			mCurRevisionCount = tracker.mRTrackRevisionCount;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-};
-
-//==================================================================
-class ResourceBase
-{
-	std::string	mName;
-	size_t		mRefCount;
-	
-	friend class ResourceManager;
-
-public:
-	ResourceBase( const char *pName ) :
-		mName(pName),
-		mRefCount(0)
-	{
-	}
-	
-	virtual ~ResourceBase()
-	{
-		DASSERT( mRefCount == 0 );
-	}
-	
-	void AddRef()
-	{
-		mRefCount += 1;
-	}
-
-	void SubRef()
-	{
-		DASSERT( mRefCount >= 1 );
-		mRefCount -= 1;
-	}
-};
-
+/// RefCount
 //==================================================================
 class RefCount
 {
@@ -175,37 +109,39 @@ public:
 };
 
 //==================================================================
-/// ResourceManager
-//==================================================================
-class ResourceManager
+class RevisionTracker
 {
-	DVec<ResourceBase *>	mpList;
 public:
-	ResourceManager()
-	{
-	}
+	int	mRTrackRevisionCount;
 	
-	~ResourceManager()
-	{
-		Collect();
-	}
-	
-	ResourceBase *AddResource( ResourceBase *pRes )
-	{
-		mpList.push_back( pRes );
-		return pRes;
-	}
-	
-	ResourceBase *FindResource( const char *pName )
-	{
-		for (size_t i=0; i < mpList.size(); ++i)
-			if ( 0 == strcasecmp( pName, mpList[i]->mName.c_str() ) )
-				return mpList[i];
+	RevisionTracker() : mRTrackRevisionCount(0) {}
 
-		return NULL;
+	void BumpRevision()
+	{
+		mRTrackRevisionCount += 1;
 	}
+};
 
-	void Collect();
+//==================================================================
+class RevisionChecker
+{
+public:
+	int	mCurRevisionCount;
+	
+	RevisionChecker() : mCurRevisionCount(-1) {}
+
+	bool Sync( const RevisionTracker &tracker )
+	{
+		if ( tracker.mRTrackRevisionCount != mCurRevisionCount )
+		{
+			mCurRevisionCount = tracker.mRTrackRevisionCount;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 };
 
 //==================================================================

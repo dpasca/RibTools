@@ -125,33 +125,26 @@ State::State( FrameworkREYES *pFramework, const char *pDefaultShadersDir ) :
 }
 
 //==================================================================
+void State::addDefShader( const char *pBasePath, const char *pSName )
+{
+	char	buff[1024];
+
+	SlShader::CtorParams	params;
+	params.pName			= pSName;
+	params.pSourceFileName	= buff;	
+	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+	SlShader *pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
+}
+
+//==================================================================
 void State::makeDefaultShaders( const char *pBasePath )
 {
-	SlShader *pShader;
-
-	char	buff[1024];
-	
-	SlShader::CtorParams	params;
-
-	params.pName			= "constant";
-	params.pSourceFileName	= buff;	
-	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
-
-	params.pName			= "matte";
-	params.pSourceFileName	= buff;	
-	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
-
-	params.pName			= "dbg_normal_col";
-	params.pSourceFileName	= buff;	
-	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
-
-	params.pName			= "test";
-	params.pSourceFileName	= buff;	
-	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
+	addDefShader( pBasePath, "constant"			);
+	addDefShader( pBasePath, "matte"			);
+	addDefShader( pBasePath, "dbg_normal_col"	);
+	addDefShader( pBasePath, "test"				);
+	addDefShader( pBasePath, "ambientlight"		);
+	addDefShader( pBasePath, "distantlight"		);
 }
 
 //==================================================================
@@ -216,7 +209,7 @@ void State::WorldBegin()
 
 	pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 
-	// initalize the world transformation
+	// initialize the world transformation
 	mTransformOpenStack.top().SetIdentity();
 	mTransformCloseStack.top().SetIdentity();
 

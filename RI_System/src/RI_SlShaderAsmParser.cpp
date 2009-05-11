@@ -87,6 +87,7 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 	char		lineBuff[1024];
 	Section		curSection = CODE;
 	int			lineCnt = 0;
+
 	
 	while ( file.ReadTextLine( lineBuff, sizeof(lineBuff) ) )
 	{
@@ -98,21 +99,45 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 	
 		DUT::StrStripBeginEndWhite( lineWork );
 
+		if NOT( lineWork[0] )
+		{
+			++lineCnt;
+			continue;
+		}
+
 		try 
 		{
-			if ( 0 == strcasecmp( lineWork, ".data" ) )
-				curSection = DATA;
-			else
-			if ( 0 == strcasecmp( lineWork, ".code" ) )
-				curSection = CODE;
-			else
-			if ( curSection == DATA )
+			if ( mpShader->mType == SlShader::TYPE_UNKNOWN )
 			{
-				parseDataLine( lineWork, lineCnt );
+				if ( 0 == strcasecmp( lineWork, "surface" ) )
+					mpShader->mType = SlShader::TYPE_SURFACE;
+				else
+				if ( 0 == strcasecmp( lineWork, "light" ) )
+					mpShader->mType = SlShader::TYPE_LIGHT;
+				else
+				if ( 0 == strcasecmp( lineWork, "displacement" ) )
+					mpShader->mType = SlShader::TYPE_DISPLACEMENT;
+				else
+				{
+					onError( "Shader type undefined !" );
+				}
 			}
 			else
 			{
-				parseCodeLine( lineWork, lineCnt );
+				if ( 0 == strcasecmp( lineWork, ".data" ) )
+					curSection = DATA;
+				else
+				if ( 0 == strcasecmp( lineWork, ".code" ) )
+					curSection = CODE;
+				else
+				if ( curSection == DATA )
+				{
+					parseDataLine( lineWork, lineCnt );
+				}
+				else
+				{
+					parseCodeLine( lineWork, lineCnt );
+				}
 			}
 		}
 		catch ( ... )

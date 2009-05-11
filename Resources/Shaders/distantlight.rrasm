@@ -8,7 +8,9 @@
 ;		solar(to-from, 0.0)
 ;			Cl = intensity * lightcolor;
 ;	}
-	
+
+light
+
 .data
 	Cl			parameter varying color
 
