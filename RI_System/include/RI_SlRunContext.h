@@ -15,20 +15,25 @@
 namespace RI
 {
 
+class Attributes;
+class SymbolList;
+
 //==================================================================
 /// SlRunContext
 //==================================================================
 class SlRunContext
 {
+	size_t					mMaxPointsN;
+
 public:
-	u_int				mProgramCounter;
-	u_int				mSIMDCount;
-	u_int				mSIMDBlocksN;
-	int					*mpSIMDFlags;
-	SlValue				*mpDataSegment;
-	SlShaderInstance	*mpShaderInst;
-	SlSymbolList		*mpSymbols;
-	const Attributes	*mpAttribs;
+	u_int					mProgramCounter;
+	u_int					mSIMDCount;
+	u_int					mSIMDBlocksN;
+	int						*mpSIMDFlags;
+	SlValue					*mpDataSegment;
+	const SlShaderInstance	*mpShaderInst;
+	const SlSymbolList		*mpSymbols;
+	const Attributes		*mpAttribs;
 
 	class Cache
 	{
@@ -42,17 +47,10 @@ public:
 		}
 	} mCache;
 
-	SlRunContext()
-	{
-		mProgramCounter = 0;
-		mSIMDCount		= 0;
-		mSIMDBlocksN	= 0;
-		mpSIMDFlags		= 0;
-		mpDataSegment	= 0;
-		mpShaderInst	= 0;
-		mpSymbols		= 0;
-		mpAttribs		= 0;
-	}
+	SlRunContext( const SlSymbolList &symbols, size_t maxPointsN );
+	~SlRunContext();
+
+	void Setup( const Attributes &attribs, size_t pointsN );
 
 	SlCPUWord *GetOp( u_int argc )
 	{
@@ -107,7 +105,7 @@ public:
 	//const Matrix44	*GetMatrix( u_int argc ) const { return GetValue(argc).Data.pMatrixValue;	}
 	//const char		*GetString( u_int argc ) const { return GetValue(argc).Data.pStringValue;	}
 
-	void InitializeSIMD( MicroPolygonGrid &g );
+	void InitializeSIMD( size_t samplesN );
 	
 	//bool IsProcessorActive( u_int i ) const { return mpSIMDFlags[i] == 0; }
 	bool IsProcessorActive( u_int i ) const { return true; }

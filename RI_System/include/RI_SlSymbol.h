@@ -80,65 +80,24 @@ public:
 	SlSymbol *LookupVariable(
 			const char		*pName,
 			SlSymbol::Type	type,
-			bool			isVarying )
-	{
-		for (size_t i=0; i < size(); ++i)
-		{
-			SlSymbol	&symbol = (*this)[i];
+			bool			isVarying );
 
-			if (symbol.mType == type &&
-				symbol.mIsVarying == isVarying && 
-				0 == strcmp( symbol.mName.c_str(), pName ) )
-			{
-				// found !!!
-				return &symbol;
-			}
-		}
-
-		return NULL;
-	}
-
-	SlSymbol *LookupVariable(
+	const SlSymbol *LookupVariable(
 			const char		*pName,
-			SlSymbol::Type	type )
-	{
-		for (size_t i=0; i < size(); ++i)
-		{
-			SlSymbol	&symbol = (*this)[i];
+			SlSymbol::Type	type,
+			bool			isVarying ) const;
 
-			if (symbol.mType == type &&
-				0 == strcmp( symbol.mName.c_str(), pName ) )
-			{
-				// found !!!
-				return &symbol;
-			}
-		}
-
-		return NULL;
-	}
+	SlSymbol *LookupVariable( const char *pName, SlSymbol::Type type );
+	const SlSymbol *LookupVariable( const char *pName, SlSymbol::Type type ) const ;
 
 	void *LookupVariableData(
 			const char		*pName,
 			SlSymbol::Type	type,
-			bool			isVarying )
-	{
-		SlSymbol	*pSym = LookupVariable( pName, type, isVarying );
-		if NOT( pSym )
-			return NULL;
-		else
-			return pSym->mpDefaultVal;
-	}
+			bool			isVarying );
 
 	void *LookupVariableData(
 			const char		*pName,
-			SlSymbol::Type	type )
-	{
-		SlSymbol	*pSym = LookupVariable( pName, type );
-		if NOT( pSym )
-			return NULL;
-		else
-			return pSym->mpDefaultVal;
-	}
+			SlSymbol::Type	type );
 };
 
 //==================================================================

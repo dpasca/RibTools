@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "RI_Attributes.h"
 #include "RI_MicroPolygonGrid.h"
+#include "RI_SlRunContext.h"
 
 //==================================================================
 namespace RI
@@ -23,7 +24,8 @@ MicroPolygonGrid::MicroPolygonGrid() :
 	mpDataCi(0),
 	mpDataOi(0),
 	mpDataCs(0),
-	mpDataOs(0)
+	mpDataOs(0),
+	mSlRunCtx(mSymbols, MAX_SIZE)
 {
 	static const size_t allocN = MAX_SIZE;
 
@@ -138,9 +140,11 @@ void MicroPolygonGrid::Setup(
 }
 
 //==================================================================
-void MicroPolygonGrid::Shade( Attributes &attribs )
+void MicroPolygonGrid::Shade( const Attributes &attribs )
 {
-	attribs.mShaderInstance.Run( *this, &attribs );
+	mSlRunCtx.Setup( attribs, mPointsN );
+
+	mSlRunCtx.mpShaderInst->Run( mSlRunCtx );
 }
 
 //==================================================================

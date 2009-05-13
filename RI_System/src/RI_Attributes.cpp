@@ -1,11 +1,10 @@
-/*
- *  RI_Attribute.cpp
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Attributes.cpp
+///
+/// Created by Davide Pasca - 2008/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_State.h"
@@ -18,7 +17,8 @@ namespace RI
 //==================================================================
 /// Attributes
 //==================================================================
-Attributes::Attributes()
+Attributes::Attributes() :
+	mShaderInstance(MicroPolygonGrid::MAX_SIZE)
 {
 	mpCustomUBasis	= NULL;
 	mpCustomVBasis	= NULL;
@@ -26,7 +26,8 @@ Attributes::Attributes()
 }
 
 //==================================================================
-Attributes::Attributes( const Attributes &attributes )
+Attributes::Attributes( const Attributes &attributes ) :
+	mShaderInstance(MicroPolygonGrid::MAX_SIZE)
 {
 	copyFrom( attributes );
 }
@@ -73,7 +74,6 @@ void Attributes::copyFrom(const Attributes& rhs)
 	if ( rhs.mpCustomVBasis )
 		mpCustomVBasis = DNEW Matrix44( *rhs.mpCustomVBasis );	
 
-	
 	mUSteps				= rhs.mUSteps				;
 	mVSteps				= rhs.mVSteps				;
 	mColor				= rhs.mColor				;
@@ -258,7 +258,7 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		return false;
 	}
 
-	pLight->mpShaderInst.Set( pShader );
+	pLight->mShaderInst.Set( pShader );
 
 	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
 	{

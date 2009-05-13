@@ -13,6 +13,7 @@
 #include "DSystem/include/DContainers.h"
 #include "DMath/include/DMath.h"
 #include "RI_SlSymbol.h"
+#include "RI_SlRunContext.h"
 
 //==================================================================
 namespace RI
@@ -20,14 +21,16 @@ namespace RI
 
 //==================================================================
 class Attributes;
+class SlRunContext;
 
 //==================================================================
 class MicroPolygonGrid
 {
-	SlColor	*mpDataCi;
-	SlColor	*mpDataOi;
-	SlColor	*mpDataCs;
-	SlColor	*mpDataOs;
+	SlColor			*mpDataCi;
+	SlColor			*mpDataOi;
+	SlColor			*mpDataCs;
+	SlColor			*mpDataOs;
+	SlRunContext	mSlRunCtx;
 
 public:
 	static const u_int	MAX_SIZE = 48 * 48;
@@ -52,7 +55,7 @@ public:
 			   
 	u_int GetPointsN() const { return mPointsN; }
 	
-	void Shade( Attributes &attribs );
+	void Shade( const Attributes &attribs );
 };
 
 //==================================================================

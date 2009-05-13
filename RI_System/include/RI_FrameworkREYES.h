@@ -76,7 +76,7 @@ public:
 	void WorldEnd();
 
 private:
-	static void renderBucket_s( HiderREYES &hider, Bucket *pBuckets );
+	static void renderBucket_s( HiderREYES &hider, Bucket &bucket );
 
 	void	worldEnd_simplify();
 	void	worldEnd_splitAndAddToBuckets();

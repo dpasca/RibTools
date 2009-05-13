@@ -9,13 +9,15 @@
 #include "stdafx.h"
 #include "RI_Transform.h"
 #include "RI_LightSource.h"
+#include "RI_MicroPolygonGrid.h"
 
 //==================================================================
 namespace RI
 {
 
 //==================================================================
-LightSourceT::LightSourceT()
+LightSourceT::LightSourceT() :
+	mShaderInst(MicroPolygonGrid::MAX_SIZE)
 {
 	mIntesity	= 1;
 	mColor		= Color( 1 );

@@ -62,11 +62,11 @@ void FrameworkREYES::Insert(
 }
 
 //==================================================================
-void FrameworkREYES::renderBucket_s( HiderREYES &hider, Bucket *pBuckets )
+void FrameworkREYES::renderBucket_s( HiderREYES &hider, Bucket &bucket )
 {
-	DVec<SimplePrimitiveBase *>	&pPrimList = pBuckets->GetPrimList();
+	DVec<SimplePrimitiveBase *>	&pPrimList = bucket.GetPrimList();
 
-	pBuckets->BeginRender();
+	bucket.BeginRender();
 
 	MicroPolygonGrid	grid;
 
@@ -89,19 +89,19 @@ void FrameworkREYES::renderBucket_s( HiderREYES &hider, Bucket *pBuckets )
 
 		hider.Hide(
 				grid,
-				(float)-pBuckets->mX1,
-				(float)-pBuckets->mY1,
+				(float)-bucket.mX1,
+				(float)-bucket.mY1,
 				hider.mFinalBuff.mWd,
 				hider.mFinalBuff.mHe,
-				pBuckets->mCBuff,
-				pBuckets->mZBuff );
+				bucket.mCBuff,
+				bucket.mZBuff );
 
 		// not thread safe to release here...
 		// pPrim->Release();
 		// pPrimList[i] = NULL;
 	}
 
-	pBuckets->EndRender( hider.mFinalBuff );
+	bucket.EndRender( hider.mFinalBuff );
 }
 
 //==================================================================
@@ -189,7 +189,7 @@ void FrameworkREYES::worldEnd_renderBuckets()
 	#pragma omp parallel for
 	for (int bi=0; bi < bucketsN; ++bi)
 	{
-		renderBucket_s( mHider, mHider.mpBuckets[ bi ] );
+		renderBucket_s( mHider, *mHider.mpBuckets[ bi ] );
 	}
 }
 

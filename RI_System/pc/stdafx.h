@@ -13,5 +13,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "DSystem/include/DTypes.h"
+#include "DSystem/include/DMemory.h"
 #include "RI_Base.h"
 #include "RI_Resource.h"

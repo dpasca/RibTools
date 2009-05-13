@@ -48,8 +48,14 @@ SlShader::SlShader( const CtorParams &params ) :
 //==================================================================
 /// SlShaderInstance
 //==================================================================
-SlShaderInstance::SlShaderInstance() :
-	mpShader(NULL)
+SlShaderInstance::SlShaderInstance( size_t maxPointsN ) :
+	mpShader(NULL),
+	mMaxPointsN(maxPointsN)
+{
+}
+
+//==================================================================
+SlShaderInstance::~SlShaderInstance()
 {
 }
 
@@ -64,7 +70,7 @@ void SlShaderInstance::SetParameter(
 }
 
 //==================================================================
-SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
+SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 {
 	size_t	symbolsN = mpShader->mSymbols.size();
 
@@ -83,16 +89,18 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 
 		case SlSymbol::PARAMETER:
 			{
-				SlSymbol	*pFoundSymbol = NULL;
+				const SlSymbol	*pFoundSymbol = NULL;
 
 				pFoundSymbol =
-					g.mSymbols.LookupVariable(
+					gridSymbols.LookupVariable(
 									symbol.mName.c_str(),
 									symbol.mType,
 									symbol.mIsVarying );
 
 				if NOT( pFoundSymbol )
 				{
+					// calling params should really just point to attributes
+					// I guess..
 					pFoundSymbol =
 						mCallingParams.LookupVariable(
 											symbol.mName.c_str(),
@@ -114,7 +122,7 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 			break;
 
 		case SlSymbol::TEMPORARY:			
-			pDataSegment[i].Data.pVoidValue = symbol.AllocClone( g.mPointsN );
+			pDataSegment[i].Data.pVoidValue = symbol.AllocClone( mMaxPointsN );
 			break;
 
 		case SlSymbol::GLOBAL:
@@ -126,7 +134,7 @@ SlValue	*SlShaderInstance::Bind( MicroPolygonGrid &g )
 }
 
 //==================================================================
-void SlShaderInstance::Unbind( SlValue * &pDataSegment )
+void SlShaderInstance::Unbind( SlValue * &pDataSegment ) const
 {
 	size_t	symbolsN = mpShader->mSymbols.size();
 
@@ -512,16 +520,8 @@ Inst_Ambient,
 };
 
 //==================================================================
-void SlShaderInstance::Run( MicroPolygonGrid &g, const Attributes *pAttribs )
+void SlShaderInstance::Run( SlRunContext &ctx ) const
 {
-	SlRunContext	ctx;
-	
-	ctx.mProgramCounter = 0;
-	ctx.mpDataSegment	= Bind( g );
-	ctx.InitializeSIMD( g );
-	ctx.mpShaderInst	= this;
-	ctx.mpAttribs		= pAttribs;
-
 	while ( ctx.mProgramCounter < mpShader->mCode.size() )
 	{
 		const SlCPUWord	*pWord = ctx.GetOp( 0 );
@@ -529,8 +529,6 @@ void SlShaderInstance::Run( MicroPolygonGrid &g, const Attributes *pAttribs )
 		// [pWord->mOpCode.mDestOpType]
 		sInstructionTable[pWord->mOpCode.mTableOffset]( ctx );
 	}
-	
-	Unbind( ctx.mpDataSegment );
 }
 
 //==================================================================

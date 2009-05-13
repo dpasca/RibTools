@@ -102,4 +102,99 @@ SlSymbolList::~SlSymbolList()
 }
 
 //==================================================================
+SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type, bool isVarying )
+{
+	for (size_t i=0; i < size(); ++i)
+	{
+		SlSymbol	&symbol = (*this)[i];
+
+		if (symbol.mType == type &&
+			symbol.mIsVarying == isVarying && 
+			0 == strcmp( symbol.mName.c_str(), pName ) )
+		{
+			// found !!!
+			return &symbol;
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
+const SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type, bool isVarying ) const
+{
+	for (size_t i=0; i < size(); ++i)
+	{
+		const SlSymbol	&symbol = (*this)[i];
+
+		if (symbol.mType == type &&
+			symbol.mIsVarying == isVarying && 
+			0 == strcmp( symbol.mName.c_str(), pName ) )
+		{
+			// found !!!
+			return &symbol;
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
+SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type )
+{
+	for (size_t i=0; i < size(); ++i)
+	{
+		SlSymbol	&symbol = (*this)[i];
+
+		if (symbol.mType == type &&
+			0 == strcmp( symbol.mName.c_str(), pName ) )
+		{
+			// found !!!
+			return &symbol;
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
+const SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type ) const
+{
+	for (size_t i=0; i < size(); ++i)
+	{
+		const SlSymbol	&symbol = (*this)[i];
+
+		if (symbol.mType == type &&
+			0 == strcmp( symbol.mName.c_str(), pName ) )
+		{
+			// found !!!
+			return &symbol;
+		}
+	}
+
+	return NULL;
+}
+
+
+//==================================================================
+void * SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type, bool isVarying )
+{
+	SlSymbol	*pSym = LookupVariable( pName, type, isVarying );
+	if NOT( pSym )
+		return NULL;
+	else
+		return pSym->mpDefaultVal;
+}
+
+//==================================================================
+void * SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type )
+{
+	SlSymbol	*pSym = LookupVariable( pName, type );
+	if NOT( pSym )
+		return NULL;
+	else
+		return pSym->mpDefaultVal;
+}
+
+//==================================================================
 }

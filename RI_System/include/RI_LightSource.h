@@ -26,7 +26,7 @@ class Transform;
 class LightSourceT
 {
 public:
-	SlShaderInstance	mpShaderInst;
+	SlShaderInstance	mShaderInst;
 
 public:
 	enum Type
@@ -62,7 +62,7 @@ public:
 	LightSourceT();
 	~LightSourceT()
 	{
-		//if ( mpShaderInst
+		//if ( mShaderInst
 	}
 
 	void UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam );

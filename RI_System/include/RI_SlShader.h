@@ -12,7 +12,6 @@
 #include "RI_Base.h"
 #include "RI_SlSymbol.h"
 #include "RI_Resource.h"
-#include "RI_MicroPolygonGrid.h"
 
 //==================================================================
 namespace RI
@@ -145,14 +144,15 @@ class SlShaderInstance
 
 	ResOwn<SlShader>	moShader;
 	SlShader			*mpShader;	// direct pointer for convenience
+	size_t				mMaxPointsN;
 
 public:
 	//DVec<SlParameter>	mCallingParams;
-	SlSymbolList		mCallingParams;
+	SlSymbolList		mCallingParams;	// $$$ should get these from attributes at some point !!
 
 public:
-	SlShaderInstance();
-	~SlShaderInstance() {}
+	SlShaderInstance( size_t maxPointsN );
+	~SlShaderInstance();
 
 	void Set( SlShader *pShader )
 	{
@@ -173,10 +173,10 @@ public:
 				bool			isVarying,
 				void			*pValue );
 
-	SlValue	*Bind( MicroPolygonGrid &g );
-	void Unbind( SlValue * &pDataSegment );
-	
-	void Run( MicroPolygonGrid &g, const Attributes *pAttribs );
+	SlValue	*Bind( const SlSymbolList &gridSymbols ) const;
+	void Unbind( SlValue * &pDataSegment ) const;
+
+	void Run( SlRunContext &ctx ) const;
 };
 
 //==================================================================
