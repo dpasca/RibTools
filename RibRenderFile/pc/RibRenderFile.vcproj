@@ -86,6 +86,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="mkdir ..\..\Distrib\$(ProjectName)&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;xcopy /E /Y $(TargetPath) ..\..\Distrib\$(ProjectName)\&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -161,6 +162,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="mkdir ..\..\Distrib\$(ProjectName)&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;xcopy /E /Y $(TargetPath) ..\..\Distrib\$(ProjectName)\&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

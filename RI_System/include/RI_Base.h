@@ -20,8 +20,11 @@
 namespace RI
 {
 
-#define RI_SIMD_BLK_LEN			DMT_SIMD_FLEN
-#define	RI_GET_SIMD_BLOCKS(_X_)	(((unsigned)(_X_) + (RI_SIMD_BLK_LEN-1)) / RI_SIMD_BLK_LEN)
+#define RI_SIMD_BLK_LEN				DMT_SIMD_FLEN
+#define	RI_GET_SIMD_BLOCKS(_X_)		(((unsigned)(_X_) + (RI_SIMD_BLK_LEN-1)) / RI_SIMD_BLK_LEN)
+#define	RI_GET_SIMD_BLK_IDX(_X_)	(((unsigned)(_X_)) / RI_SIMD_BLK_LEN)
+#define	RI_GET_SIMD_SUB_IDX(_X_)	(((unsigned)(_X_)) & (RI_SIMD_BLK_LEN-1))
+#define	RI_GET_SIMD_PAD_SUBS(_X_)	(((unsigned)(_X_) + (RI_SIMD_BLK_LEN-1)) & ~(RI_SIMD_BLK_LEN-1))
 
 //==================================================================
 enum Mode

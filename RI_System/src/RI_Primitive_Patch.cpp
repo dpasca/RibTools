@@ -203,18 +203,6 @@ void PatchBilinear::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-bool PatchBilinear::MakeBound( Bound &out_bound ) const
-{
-	Point3	Po;
-	out_bound.Reset();
-	out_bound.Expand( EvalP( mURange[0], mVRange[0], Po ) );
-	out_bound.Expand( EvalP( mURange[1], mVRange[0], Po ) );
-	out_bound.Expand( EvalP( mURange[0], mVRange[1], Po ) );
-	out_bound.Expand( EvalP( mURange[1], mVRange[1], Po ) );
-	return true;
-}
-
-//==================================================================
 PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
@@ -249,7 +237,8 @@ PatchBicubic::PatchBicubic( ParamList &params,
 //==================================================================
 void PatchBicubic::setupEvalCalc()
 {
-	// only needed for diceing and for evals for bbox and other estimators
+	// only needed for dicing and for evals for bbox and other estimators
+/*
 	mCalcU_sca[0].Setup( *mpUBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3] );
 	mCalcU_sca[1].Setup( *mpUBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7] );
 	mCalcU_sca[2].Setup( *mpUBasis, mHullPos[ 8], mHullPos[ 9], mHullPos[10], mHullPos[11] );
@@ -259,6 +248,7 @@ void PatchBicubic::setupEvalCalc()
 	mCalcV_sca[1].Setup( *mpVBasis, mHullPos[ 1], mHullPos[ 5], mHullPos[ 9], mHullPos[13] );
 	mCalcV_sca[2].Setup( *mpVBasis, mHullPos[ 2], mHullPos[ 6], mHullPos[10], mHullPos[14] );
 	mCalcV_sca[3].Setup( *mpVBasis, mHullPos[ 3], mHullPos[ 7], mHullPos[11], mHullPos[15] );
+*/
 
 	mCalcU[0].Setup( *mpUBasis, mHullPos[ 0], mHullPos[ 1], mHullPos[ 2], mHullPos[ 3] );
 	mCalcU[1].Setup( *mpUBasis, mHullPos[ 4], mHullPos[ 5], mHullPos[ 6], mHullPos[ 7] );
@@ -312,6 +302,7 @@ inline _S splineDeriv(
 }
 
 //==================================================================
+/*
 void PatchBicubic::Eval_dPdu_dPdv(
 			float u,
 			float v,
@@ -341,6 +332,7 @@ void PatchBicubic::Eval_dPdu_dPdv(
 		*out_dPdu = splineDeriv( u, uBasis, vBottom, vMid1, vMid2, vTop );
 	}
 }
+*/
 
 //==================================================================
 void PatchBicubic::Eval_dPdu_dPdv(
@@ -373,15 +365,23 @@ void PatchBicubic::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-bool PatchBicubic::MakeBound( Bound &out_bound ) const
+/// NuPatch
+//==================================================================
+NuPatch::NuPatch(
+			int		nu		,
+			int		uorder	,
+			const float	*pUknot	,
+			float	umin	,
+			float	umax	,
+			int		nv		,
+			int		vorder	,
+			const float	*pVknot	,
+			float	vmin	,
+			float	vmax	,
+			ParamList &params
+			) :
+		SimplePrimitiveBase(PrimitiveBase::NUPATCH)
 {
-	Point3	Po;
-	out_bound.Reset();
-	out_bound.Expand( EvalP( mURange[0], mVRange[0], Po ) );
-	out_bound.Expand( EvalP( mURange[1], mVRange[0], Po ) );
-	out_bound.Expand( EvalP( mURange[0], mVRange[1], Po ) );
-	out_bound.Expand( EvalP( mURange[1], mVRange[1], Po ) );
-	return true;
 }
 
 //==================================================================

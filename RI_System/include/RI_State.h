@@ -156,6 +156,20 @@ public:
 
 	void Patch( RtToken type, ParamList &params );
 	void PatchMesh( RtToken type, ParamList &params );
+	void NuPatch(
+			int		nu		,
+			int		uorder	,
+			const float	*pUknot	,
+			float	umin	,
+			float	umax	,
+			int		nv		,
+			int		vorder	,
+			const float	*pVknot	,
+			float	vmin	,
+			float	vmax	,
+			ParamList &params
+		);
+
 	void Polygon( ParamList &params );
 	void PointsGeneralPolygons( ParamList &params );
 

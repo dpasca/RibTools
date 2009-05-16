@@ -63,7 +63,7 @@ RibRendTool::RibRendTool() :
 	getcwd( mStartDir, sizeof(mStartDir) );
 	printf( "mStartDir: %s\n", mStartDir );
 
-	sprintf( mDefaultResDir, "%s/../../Resources", mStartDir );
+	sprintf( mDefaultResDir, "%s/Resources", mStartDir );
 	printf( "mDefaultResDir: %s\n", mStartDir );
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
@@ -118,7 +118,7 @@ void RibRendTool::RebuildMenu()
 
 	mTestRibFiles.clear();
 	_finddatai64_t	findData;
-	intptr_t	handle = _findfirst64( "../../Tests/*.rib", &findData );
+	intptr_t	handle = _findfirst64( "Tests/*.rib", &findData );
 	if ( handle != -1 )
 	{
 		int	ret = 0;
@@ -160,7 +160,7 @@ void RibRendTool::MenuFunc( int id )
 	if ( id >= MENUID_FILES )
 	{
 		strcpy( mFileToRender, mStartDir );
-		strcat( mFileToRender, "/../../Tests/" );
+		strcat( mFileToRender, "/Tests/" );
 		strcat( mFileToRender, mTestRibFiles[id - MENUID_FILES].c_str() );
 
 		printf( "Render File: %s\n", mFileToRender );

@@ -233,6 +233,36 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Patch" )			{ geN( 3, p ); mState.Patch(		matchToken( p[0], tlPatch0 ), p ); }	else
 	if ( nm == "PatchMesh" )		{ geN( 5, p ); mState.PatchMesh(	matchToken( p[0], tlPatch0 ), p ); }	else
 
+	if ( nm == "NuPatch" )			{
+										geN( 11, p );
+										int		nu		= (int)p[0];
+										int		uorder	= (int)p[1];
+										const float	*pUknot	= p[2].PFlt();
+										float	umin	= (float)p[3];
+										float	umax	= (float)p[4];
+										int		nv		= (int)p[5];
+										int		vorder	= (int)p[6];
+										const float	*pVknot	= p[7].PFlt();
+										float	vmin	= (float)p[8];
+										float	vmax	= (float)p[9];
+
+/*
+										mState.NuPatch(
+												nu		,
+												uorder	,
+												pUknot	,
+												umin	,
+												umax	,
+												nv		,
+												vorder	,
+												pVknot	,
+												vmin	,
+												vmax	,
+												p
+											);
+*/
+									}	else
+
 	if ( nm == "Polygon" )				{ geN( 2, p ); mState.Polygon( p ); }	else
 	if ( nm == "PointsGeneralPolygons" ){ geN( 5, p ); mState.PointsGeneralPolygons( p ); }	else
 	// unknown

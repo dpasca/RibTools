@@ -16,6 +16,58 @@ namespace RI
 {
 
 //==================================================================
+template <class _S>
+bool MakeBoundFromUVRange( const _S &This, Bound &out_bound )
+{
+#if 1
+
+	const float srcUVs[RI_GET_SIMD_PAD_SUBS(4)][2] = {
+		This.mURange[0], This.mVRange[0],
+		This.mURange[1], This.mVRange[0],
+		This.mURange[0], This.mVRange[1],
+		This.mURange[1], This.mVRange[1]
+	};
+
+	out_bound.Reset();
+
+	for (size_t blkIdx=0; blkIdx < RI_GET_SIMD_BLOCKS( 4 ); ++blkIdx)
+	{
+		SlVec2	uvs;
+
+		for (size_t subIdx=0; subIdx < RI_SIMD_BLK_LEN; ++subIdx)
+		{
+			uvs[0][subIdx] = srcUVs[blkIdx * RI_SIMD_BLK_LEN + subIdx][0];
+			uvs[1][subIdx] = srcUVs[blkIdx * RI_SIMD_BLK_LEN + subIdx][1];
+		}
+
+		SlVec3	Po;
+		This.EvalP( uvs, Po );
+
+		for (size_t subIdx=0; subIdx < RI_SIMD_BLK_LEN; ++subIdx)
+		{
+			out_bound.Expand( Vec3f(
+									Po[0][subIdx],
+									Po[1][subIdx],
+									Po[2][subIdx]
+								) );
+		}
+	}
+
+#else
+
+	Point3	Po;
+	out_bound.Reset();
+	out_bound.Expand( This.EvalP( This.mURange[0], This.mVRange[0], Po ) );
+	out_bound.Expand( This.EvalP( This.mURange[1], This.mVRange[0], Po ) );
+	out_bound.Expand( This.EvalP( This.mURange[0], This.mVRange[1], Po ) );
+	out_bound.Expand( This.EvalP( This.mURange[1], This.mVRange[1], Po ) );
+
+#endif
+
+	return true;
+}
+
+//==================================================================
 /// PatchBilinear
 //==================================================================
 class PatchBilinear : public SimplePrimitiveBase
@@ -31,7 +83,10 @@ public:
 
 		PatchBilinear *Clone() const {	return DNEW PatchBilinear( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		bool MakeBound( Bound &out_bound ) const
+		{
+			return MakeBoundFromUVRange( *this, out_bound );
+		}
 
 		void Eval_dPdu_dPdv(
 					float u,
@@ -99,8 +154,8 @@ private:
 	const RtBasis			*mpUBasis;
 	const RtBasis			*mpVBasis;
 	Vec3f					mHullPos[16];
-	SplinePatchCalc<Vec3f,float>	mCalcU_sca[4];
-	SplinePatchCalc<Vec3f,float>	mCalcV_sca[4];
+	//SplinePatchCalc<Vec3f,float>	mCalcU_sca[4];
+	//SplinePatchCalc<Vec3f,float>	mCalcV_sca[4];
 
 	SplinePatchCalc<SlVec3,SlScalar>	mCalcU[4];
 	SplinePatchCalc<SlVec3,SlScalar>	mCalcV[4];
@@ -114,14 +169,19 @@ public:
 
 		PatchBicubic *Clone() const {	return DNEW PatchBicubic( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		bool MakeBound( Bound &out_bound ) const
+		{
+			return MakeBoundFromUVRange( *this, out_bound );
+		}
 
+/*
 		void Eval_dPdu_dPdv(
 					float u,
 					float v,
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+*/
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -150,6 +210,41 @@ public:
 		void Simplify( HiderREYES &hider );
 };
 
+//==================================================================
+/// NuPatch
+//==================================================================
+class NuPatch : public SimplePrimitiveBase
+{
+public:
+	NuPatch(
+			int		nu		,
+			int		uorder	,
+			const float	*pUknot	,
+			float	umin	,
+			float	umax	,
+			int		nv		,
+			int		vorder	,
+			const float	*pVknot	,
+			float	vmin	,
+			float	vmax	,
+			ParamList &params
+			);
+
+		NuPatch	*Clone() const {	return DNEW NuPatch( *this ); }
+
+		bool MakeBound( Bound &out_bound ) const
+		{
+			return MakeBoundFromUVRange( *this, out_bound );
+		}
+
+		void Eval_dPdu_dPdv(
+						const SlVec2 &uv,
+						SlVec3 &out_pt,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv ) const
+		{
+		}
+};
 	
 //==================================================================
 }

@@ -45,6 +45,8 @@ public:
 		PATCHBICUBIC,
 		PATCHMESH,
 
+		NUPATCH,
+
 		POLYGON,
 
 		POINTSGENERALPOLYGONS,
@@ -172,12 +174,23 @@ public:
 		return out_pt;
 	}
 
+	inline SlVec3	&EvalP(
+						const SlVec2 &uv,
+						SlVec3 &out_pt ) const
+	{
+		Eval_dPdu_dPdv( uv, out_pt, NULL, NULL );
+		return out_pt;
+	}
+
 	virtual void	Eval_dPdu_dPdv(
 						float u,
 						float v,
 						Point3 &out_pt,
 						Vec3f *out_dPdu,
-						Vec3f *out_dPdv ) const = 0;
+						Vec3f *out_dPdv ) const
+	{
+		DASSERT( 0 );
+	}
 
 	virtual void	Eval_dPdu_dPdv(
 						const SlVec2 &uv,

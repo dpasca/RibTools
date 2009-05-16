@@ -80,6 +80,35 @@ void State::PatchMesh( RtToken type, ParamList &params )
 }
 
 //==================================================================
+void State::NuPatch(
+			int		nu		,
+			int		uorder	,
+			const float	*pUknot	,
+			float	umin	,
+			float	umax	,
+			int		nv		,
+			int		vorder	,
+			const float	*pVknot	,
+			float	vmin	,
+			float	vmax	,
+			ParamList &params )
+{
+	insertPrimitive( DNEW RI::NuPatch(
+								nu		,
+								uorder	,
+								pUknot	,
+								umin	,
+								umax	,
+								nv		,
+								vorder	,
+								pVknot	,
+								vmin	,
+								vmax	,
+								params
+							) );
+}
+
+//==================================================================
 void State::Polygon( ParamList &params )
 {
 	insertPrimitive( DNEW RI::Polygon( params, mStatics ) );
