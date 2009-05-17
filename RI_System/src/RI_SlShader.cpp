@@ -13,6 +13,7 @@
 #include "RI_Attributes.h"
 #include "RI_State.h"
 #include "DUtils.h"
+#include "RI_Noise.h"
 
 //==================================================================
 namespace RI
@@ -162,6 +163,7 @@ void SlShaderInstance::Unbind( SlValue * &pDataSegment ) const
 	}
 	
 	DSAFE_DELETE_ARRAY( pDataSegment );
+	pDataSegment = NULL;
 }
 
 
@@ -492,6 +494,76 @@ static void Inst_Normalize( SlRunContext &ctx )
 }
 
 //==================================================================
+template <class TB>
+inline void Inst_Noise1( SlRunContext &ctx )
+{
+		  SlScalar*	lhs	= (SlScalar*)ctx.GetVoid( 1 );
+	const TB*		op1	= (const TB*)ctx.GetVoid( 2 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	
+	if ( lhs_varying )
+	{
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+		int		op1_offset = 0;
+
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = Noise::unoise1( op1[op1_offset] );
+
+			op1_offset += op1_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0] = Noise::unoise1( op1[0] );
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
+template <class TB>
+inline void Inst_Noise3( SlRunContext &ctx )
+{
+		  SlVec3*	lhs	= (	 SlVec3*)ctx.GetVoid( 1 );
+	const TB*		op1	= (const TB*)ctx.GetVoid( 2 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	
+	if ( lhs_varying )
+	{
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+		int		op1_offset = 0;
+
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = Noise::unoise3( op1[op1_offset] );
+
+			op1_offset += op1_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0] = Noise::unoise3( op1[0] );
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 #define SINGLE	SlScalar
 #define VECTOR	SlVec3
 //#define MATRIX	Matrix44
@@ -533,6 +605,14 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	Inst_Faceforward,
 	Inst_Diffuse,
 	Inst_Ambient,
+
+	Inst_Noise1<SlScalar>,
+	Inst_Noise1<SlVec2>,
+	Inst_Noise1<SlVec3>,
+
+	Inst_Noise3<SlScalar>,
+	Inst_Noise3<SlVec2>,
+	Inst_Noise3<SlVec3>,
 };
 
 //==================================================================

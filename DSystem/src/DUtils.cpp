@@ -44,6 +44,37 @@ bool GrabFile( const char *pFileName, void * &out_pData, size_t &out_dataSize )
 }
 
 //==================================================================
+const char *GetFileNameOnly( const char *pPathFileName )
+{
+	int	idx = 0;
+	int	len = strlen( pPathFileName );
+	
+	for (int i=len-1; i >= 0; --i)
+		if ( pPathFileName[i] == '/' || pPathFileName[i] == '\\' )
+			return pPathFileName + i + 1;
+			
+	return pPathFileName + len;
+}
+
+//==================================================================
+DStr GetDirNameFromFPathName( const char *pInFPathname )
+{
+	const char *pFNamePtr = GetFileNameOnly( pInFPathname );
+
+	if ( pFNamePtr <= pInFPathname )
+		return DStr();	// and empty string after all..
+	else
+	{
+		size_t	len = pFNamePtr - pInFPathname - 1;
+		
+		DStr	tmp( pInFPathname );
+		tmp.resize( len );
+
+		return tmp;
+	}
+}
+
+//==================================================================
 char *SSPrintF( const char *pFmt, ... )
 {
 	va_list	vl;
@@ -84,19 +115,6 @@ void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 #if !defined(NDEBUG)
 #endif
 	throw std::runtime_error( buff );
-}
-
-//==================================================================
-const char *GetFileNameOnly( const char *pPathFileName )
-{
-	int	idx = 0;
-	int	len = strlen( pPathFileName );
-	
-	for (int i=len-1; i >= 0; --i)
-		if ( pPathFileName[i] == '/' || pPathFileName[i] == '\\' )
-			return pPathFileName + i + 1;
-			
-	return pPathFileName + len;
 }
 
 //==================================================================

@@ -24,20 +24,24 @@ public:
 	//==================================================================
 	Vec2()								{}
 	Vec2( const Vec2 &v )				{ v2[0] = v[0]; v2[1] = v[1];	}
+
+	template <class _T>
+	Vec2( const Vec2<_T> &v_ )			{ v2[0] = v_[0]; v2[1] = v_[1]; }
+
 	Vec2( const _S& a_ )				{ v2[0] = a_; v2[1] = a_;		}
 	Vec2( const _S& x_, const _S& y_ )	{ v2[0] = x_; v2[1] = y_;		}
 	Vec2( const _S *p_ )				{ v2[0] = p_[0]; v2[1] = p_[1]; }
 
 	void Set( const _S& x_, const _S& y_ )
 	{
-		x = x_;
-		y = y_;
+		v2[0] = x_;
+		v2[1] = y_;
 	}
 	
 	void Set( const _S *p_ )
 	{
-		x = p_[0];
-		y = p_[1];
+		v2[0] = p_[0];
+		v2[1] = p_[1];
 	}
 
 	void SetZero()
@@ -45,16 +49,16 @@ public:
 		v2[0] = v2[1] = 0.f;
 	}
 
-	Vec2 operator + (const _S& rval) const { return Vec2( x + rval, y + rval ); }
-	Vec2 operator - (const _S& rval) const { return Vec2( x - rval, y - rval ); }
-	Vec2 operator * (const _S& rval) const { return Vec2( x * rval, y * rval ); }
-	Vec2 operator / (const _S& rval) const { return Vec2( x / rval, y / rval ); }
-	Vec2 operator + (const Vec2 &rval) const { return Vec2( x + rval.x, y + rval.y ); }
-	Vec2 operator - (const Vec2 &rval) const { return Vec2( x - rval.x, y - rval.y ); }
-	Vec2 operator * (const Vec2 &rval) const { return Vec2( x * rval.x, y * rval.y ); }
-	Vec2 operator / (const Vec2 &rval) const { return Vec2( x / rval.x, y / rval.y ); }
+	Vec2 operator + (const _S& rval) const { return Vec2( v2[0] + rval, v2[1] + rval ); }
+	Vec2 operator - (const _S& rval) const { return Vec2( v2[0] - rval, v2[1] - rval ); }
+	Vec2 operator * (const _S& rval) const { return Vec2( v2[0] * rval, v2[1] * rval ); }
+	Vec2 operator / (const _S& rval) const { return Vec2( v2[0] / rval, v2[1] / rval ); }
+	Vec2 operator + (const Vec2 &rval) const { return Vec2( v2[0] + rval[0], v2[1] + rval[1] ); }
+	Vec2 operator - (const Vec2 &rval) const { return Vec2( v2[0] - rval[0], v2[1] - rval[1] ); }
+	Vec2 operator * (const Vec2 &rval) const { return Vec2( v2[0] * rval[0], v2[1] * rval[1] ); }
+	Vec2 operator / (const Vec2 &rval) const { return Vec2( v2[0] / rval[0], v2[1] / rval[1] ); }
 
-	Vec2 operator -() const	{ return Vec2( -x, -y ); }
+	Vec2 operator -() const	{ return Vec2( -v2[0], -v2[1] ); }
 
 	Vec2 operator +=(const Vec2 &rval)	{ *this = *this + rval; return *this; }
 
@@ -183,16 +187,16 @@ public:
 		return Vec3<_S>( v4 );
 	}
 
-	Vec4 operator + (const _S& rval) const { return Vec4( x + rval, y + rval, z + rval, w + rval ); }
-	Vec4 operator - (const _S& rval) const { return Vec4( x - rval, y - rval, z - rval, w - rval ); }
-	Vec4 operator * (const _S& rval) const { return Vec4( x * rval, y * rval, z * rval, w * rval ); }
-	Vec4 operator / (const _S& rval) const { return Vec4( x / rval, y / rval, z / rval, w / rval ); }
-	Vec4 operator + (const Vec4 &rval) const { return Vec4( x + rval.x, y + rval.y, z + rval.z, w + rval.w ); }
-	Vec4 operator - (const Vec4 &rval) const { return Vec4( x - rval.x, y - rval.y, z - rval.z, w - rval.w ); }
-	Vec4 operator * (const Vec4 &rval) const { return Vec4( x * rval.x, y * rval.y, z * rval.z, w * rval.w ); }
-	Vec4 operator / (const Vec4 &rval) const { return Vec4( x / rval.x, y / rval.y, z / rval.z, w / rval.w ); }
+	Vec4 operator + (const _S& rval) const { return Vec4( v4[0] + rval, v4[1] + rval, v4[2] + rval, v4[3] + rval ); }
+	Vec4 operator - (const _S& rval) const { return Vec4( v4[0] - rval, v4[1] - rval, v4[2] - rval, v4[3] - rval ); }
+	Vec4 operator * (const _S& rval) const { return Vec4( v4[0] * rval, v4[1] * rval, v4[2] * rval, v4[3] * rval ); }
+	Vec4 operator / (const _S& rval) const { return Vec4( v4[0] / rval, v4[1] / rval, v4[2] / rval, v4[3] / rval ); }
+	Vec4 operator + (const Vec4 &rval) const { return Vec4( v4[0] + rval.v4[0], v4[1] + rval.v4[1], v4[2] + rval.v4[2], v4[3] + rval.v4[3] ); }
+	Vec4 operator - (const Vec4 &rval) const { return Vec4( v4[0] - rval.v4[0], v4[1] - rval.v4[1], v4[2] - rval.v4[2], v4[3] - rval.v4[3] ); }
+	Vec4 operator * (const Vec4 &rval) const { return Vec4( v4[0] * rval.v4[0], v4[1] * rval.v4[1], v4[2] * rval.v4[2], v4[3] * rval.v4[3] ); }
+	Vec4 operator / (const Vec4 &rval) const { return Vec4( v4[0] / rval.v4[0], v4[1] / rval.v4[1], v4[2] / rval.v4[2], v4[3] / rval.v4[3] ); }
 
-	Vec4 operator -() const	{ return Vec4( -x, -y, -z, -w ); }
+	Vec4 operator -() const	{ return Vec4( -v4[0], -v4[1], -v4[2], -v4[3] ); }
 
 	Vec4 operator +=(const Vec4 &rval)	{ *this = *this + rval; return *this; }
 

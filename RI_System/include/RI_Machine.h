@@ -29,6 +29,7 @@ class Machine
 
 public:
 	Machine(FrameworkREYES *pFramework,
+			const char *pBaseDir,
 			const char *pDefaultShadersDir,
 			int forcedWd=-1,
 			int forcedHe=-1 );

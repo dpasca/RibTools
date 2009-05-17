@@ -234,6 +234,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Tests\noisecol.rrasm"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Tests\Pixar.rib"
 				>
 			</File>
@@ -243,6 +247,14 @@
 			</File>
 			<File
 				RelativePath="..\..\Tests\SimpleMug.rib"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Tests\SphereNoise.rib"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Tests\SphereNoiseShader.rrasm"
 				>
 			</File>
 			<File

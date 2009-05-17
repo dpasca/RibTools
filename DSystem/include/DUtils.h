@@ -36,6 +36,8 @@ namespace DUT
 //==================================================================
 bool GrabFile( const char *pFileName, void * &out_pData, size_t &out_dataSize );
 
+DStr GetDirNameFromFPathName( const char *pInFPathname );
+
 char *SSPrintF( const char *pFmt, ... );
 
 void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg );

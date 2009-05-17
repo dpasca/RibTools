@@ -18,8 +18,13 @@ namespace RI
 //==================================================================
 /// State
 //==================================================================
-State::State( FrameworkREYES *pFramework, const char *pDefaultShadersDir ) :
-	mpFramework(pFramework)
+State::State(
+		FrameworkREYES *pFramework,
+		const char *pBaseDir,
+		const char *pDefaultShadersDir ) :
+	mpFramework(pFramework),
+	mBaseDir(pBaseDir),
+	mDefaultShadersDir(pDefaultShadersDir)
 {
 	mModeStack.push( MD_UNDEFINED );
 	Begin( "dummy" );
@@ -114,7 +119,7 @@ State::State( FrameworkREYES *pFramework, const char *pDefaultShadersDir ) :
 	mStatics.FindOrAdd(	RI_HERMITEBASIS				, HermiteBasis		);
 	mStatics.FindOrAdd(	RI_POWERBASIS				, PowerBasis		);	
 	
-	makeDefaultShaders( pDefaultShadersDir );
+	makeDefaultShaders( mDefaultShadersDir.c_str() );
 
 	mOptionsStack.top().Init( &mStatics, &mOptionsRevTrack );
 	mAttributesStack.top().Init( this, &mStatics, &mResManager, &mAttribsRevTrack );

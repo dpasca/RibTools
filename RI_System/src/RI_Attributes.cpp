@@ -7,6 +7,7 @@
 //==================================================================
 
 #include "stdafx.h"
+#include <stdarg.h>
 #include "RI_State.h"
 #include "RI_Attributes.h"
 
@@ -324,12 +325,73 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 }
 
 //==================================================================
+static void onError( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	puts( buff );
+
+	throw std::runtime_error( buff );
+}
+
+//==================================================================
+SlShader *Attributes::loadShader( const char *pBasePath, const char *pSName )
+{
+	char	buff[1024];
+
+	SlShader::CtorParams	params;
+	params.pName			= pSName;
+	params.pSourceFileName	= buff;	
+	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+
+	SlShader *pShader = NULL;
+
+	try {
+		pShader = DNEW SlShader( params );
+	} catch ( ... )
+	{
+		return NULL;
+	}
+
+	mpResManager->AddResource( pShader );
+
+	return pShader;
+}
+
+//==================================================================
 void Attributes::cmdSurface( ParamList &params )
 {
-	mShaderInstance.Set(
-		(SlShader *)mpResManager->FindResource( "matte",
-											ResourceBase::TYPE_SHADER ) );
+	if ( params.size() < 1 )
+	{
+		onError( "Missing parameters for 'surface' command !" );
+	}
 
+	const char *pShaderName = params[0].PChar();
+	
+	SlShader	*pShader =
+			(SlShader *)mpResManager->FindResource( pShaderName,
+													ResourceBase::TYPE_SHADER );
+
+	if NOT( pShader )
+	{
+		if NOT( pShader = loadShader( mpState->GetBaseDir(), pShaderName ) )
+			if NOT( pShader = loadShader( mpState->GetDefShadersDir(), pShaderName ) )
+			{
+				pShader = (SlShader *)mpResManager->FindResource( "matte",
+															ResourceBase::TYPE_SHADER );
+			}
+
+	}
+
+	mShaderInstance.Set( pShader );
+
+	// $$$ should really check if the shader or any params really changed
 	mpRevision->BumpRevision();
 }
 

@@ -238,6 +238,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_Noise.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_Noise.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_Options.cpp"
 				>
 			</File>

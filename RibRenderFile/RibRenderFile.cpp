@@ -32,14 +32,17 @@ static bool renderFile(
 		printf( "Could not open the file in input. Quitting !\n" );
 		return false;
 	}
-	
+
+	DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
+
 	char	defaultShadersDir[4096];
 	sprintf_s( defaultShadersDir, "%s/Shaders", pDefaultResourcesDir );
+	printf( "Base Dir: %s\n", baseDir.c_str() );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
 	RI::HiderREYES::Params	hiderParams;
 	RI::FrameworkREYES		framework( pRenderOutput, hiderParams );
-	RI::Machine				machine( &framework, defaultShadersDir, forcedWd, forcedHe );
+	RI::Machine				machine( &framework, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
 
 	RI::Parser				parser;
 	for (size_t i=0; i <= dataSize; ++i)

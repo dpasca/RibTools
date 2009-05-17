@@ -48,14 +48,14 @@ void SlRunContext::Setup( const Attributes &attribs, size_t pointsN )
 	// only do a new bind if the attributes have changed
 	if ( &attribs != mpAttribs )
 	{
-		mpShaderInst	= &attribs.mShaderInstance;
-		mpAttribs		= &attribs;
-
 		// unbind the previous data segment
 		if ( mpDataSegment )
 			mpAttribs->mShaderInstance.Unbind( mpDataSegment );
 
-		mpDataSegment	= attribs.mShaderInstance.Bind( *mpSymbols );
+		mpShaderInst	= &attribs.mShaderInstance;
+		mpAttribs		= &attribs;
+
+		mpDataSegment	= mpAttribs->mShaderInstance.Bind( *mpSymbols );
 	}
 
 	// reset the program counter

@@ -69,6 +69,14 @@ enum OpCodeID
 	OP_DIFS	,
 	OP_AMB	,
 
+	OP_VV_NOISE11	,
+	OP_VV_NOISE12	,
+	OP_VV_NOISE13	,
+
+	OP_VV_NOISE31	,
+	OP_VV_NOISE32	,
+	OP_VV_NOISE33	,
+
 	OP_N
 };
 

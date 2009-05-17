@@ -19,10 +19,11 @@ namespace RI
 //==================================================================
 Machine::Machine(
 			FrameworkREYES *pFramework,
+			const char *pBaseDir,
 			const char *pDefaultShadersDir,
 			int forcedWd,
 			int forcedHe ) :
-	mState(pFramework, pDefaultShadersDir),
+	mState(pFramework, pBaseDir, pDefaultShadersDir),
 	mForcedWd(forcedWd),
 	mForcedHe(forcedHe)
 {
@@ -175,6 +176,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	else
 	if ( nm == "Surface" )
 	{
+		geN( 1, p );
 		mState.Surface( p );
 	}
 	else

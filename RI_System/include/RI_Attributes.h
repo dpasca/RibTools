@@ -110,6 +110,9 @@ public:
 	void cmdOpacity( const Color &color );
 	bool cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam );
 	void cmdSurface( ParamList &params );
+
+private:
+	SlShader *loadShader( const char *pBasePath, const char *pSName );
 };
 
 //==================================================================

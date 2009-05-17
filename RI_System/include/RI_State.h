@@ -71,6 +71,9 @@ class State
 
 	FrameworkREYES			*mpFramework;
 	
+	DStr					mDefaultShadersDir;
+	DStr					mBaseDir;
+
 	ResourceManager			mResManager;
 
 	enum OpType
@@ -82,8 +85,14 @@ class State
 	};
 
 public:
-	State( FrameworkREYES *pFramework, const char *pDefaultShadersDir );
+	State(
+		FrameworkREYES *pFramework,
+		const char *pBaseDir,
+		const char *pDefaultShadersDir );
 	~State();
+
+	const char *GetBaseDir()		const	{	return mBaseDir.c_str();	}
+	const char *GetDefShadersDir() const	{	return mDefaultShadersDir.c_str();	}
 
 	void	Begin( RtToken name );
 	void	End();

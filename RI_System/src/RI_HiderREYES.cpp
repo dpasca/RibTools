@@ -329,6 +329,7 @@ void HiderREYES::Hide(
 				if ( posProjZ < *pZSample )
 				{
 					*pZSample = posProjZ;
+					//destBuff.SetSample( winX, winY, (const float *)&Color( 1, 0, 0 ) );
 					destBuff.SetSample( winX, winY, &ci.x() );
 				}
 			}

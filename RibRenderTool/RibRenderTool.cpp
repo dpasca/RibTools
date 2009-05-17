@@ -211,15 +211,18 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 		return false;
 	}
 
+	DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
+
 	DSAFE_DELETE( mpRenderOutput );
 	mpRenderOutput = DNEW RenderOutputOpenGL();
 
 	char	defaultShadersDir[4096];
 	sprintf( defaultShadersDir, "%s/Shaders", mDefaultResDir );
+	printf( "Base Dir: %s\n", baseDir.c_str() );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
 	RI::FrameworkREYES	framework( mpRenderOutput, mREYESParams );
-	RI::Machine			machine( &framework, defaultShadersDir, forcedWd, forcedHe );
+	RI::Machine			machine( &framework, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
 
 	RI::Parser			parser;
 	for (size_t i=0; i <= dataSize; ++i)

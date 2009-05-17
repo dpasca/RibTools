@@ -61,6 +61,14 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"diffuse"		,	2,
 	"ambient"		,	1,
 
+	"noise11"		,	2,
+	"noise12"		,	2,
+	"noise13"		,	2,
+
+	"noise31"		,	2,
+	"noise32"		,	2,
+	"noise33"		,	2,
+
 	NULL
 };
 

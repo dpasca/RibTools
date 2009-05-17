@@ -87,13 +87,16 @@ void SimplePrimitiveBase::Dice(
 					const Matrix44 &mtxWorldCamera,
 					bool doColorCoded ) const
 {
-	SlVec3	*pPointsWS = g.mpPointsWS;
+	//SlVec3	*pPointsWS = g.mpPointsWS;
 
+	SlVec3	*pPointsWS = (SlVec3 *)g.mSymbols.LookupVariableData( "P", SlSymbol::POINT, true );
 	SlVec3	*pI	 = (SlVec3 *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
 	SlVec3	*pN  = (SlVec3 *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
 	SlVec3	*pNg = (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
-	SlColor		*pOs = (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
-	SlColor		*pCs = (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
+	SlColor	*pOs = (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
+	SlColor	*pCs = (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
+
+	DASSERT( pPointsWS == g.mpPointsWS );
 
 	float	du = 1.0f / g.mXDim;
 	float	dv = 1.0f / g.mYDim;
