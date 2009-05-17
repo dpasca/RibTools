@@ -73,6 +73,13 @@ template <class T>	inline T		DSign( const T &a )
 					return T(  0 );
 }
 
+//==================================================================
+template <class T>	inline T		DAbs( const T &a )
+{
+	if ( a < T(0) )	return -a;	else
+					return  a;
+}
+
 #define FM_E        ((float)M_E       )
 #define FM_LOG2E    ((float)M_LOG2E   )
 #define FM_LOG10E   ((float)M_LOG10E  )

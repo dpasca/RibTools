@@ -169,68 +169,31 @@ void SlShaderInstance::Unbind( SlValue * &pDataSegment ) const
 typedef void (*ShaderInstruction)( SlRunContext &ctx );
 
 //==================================================================
-template <class TA, class TB>
-void Inst_Copy( SlRunContext &ctx )
-{
-		  TA*	lhs	= (		 TA*)ctx.GetVoid( 1 );
-	const TB*	op1	= (const TB*)ctx.GetVoid( 2 );
-	
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-	
-	if ( lhs_varying )
-	{
-		bool	op1_varying = ctx.IsSymbolVarying( 2 );
-		int		op1_offset = 0;
-		
-		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
-		{
-			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = op1[op1_offset];
-
-			if ( op1_varying )	++op1_offset;
-		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) );
-				 
-		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
-			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = op1[0];
-	}
-
-	ctx.NextInstruction();
-}
-
-//==================================================================
-template <class TA, class TB, const char OPNAME>
-void Inst_AlOp( SlRunContext &ctx )
+template <class TA, class TB, const OpCodeID opCodeID>
+void Inst_1Op( SlRunContext &ctx )
 {
 		  TA*	lhs	= (		 TA*)ctx.GetVoid( 1 );
 	const TA*	op1	= (const TA*)ctx.GetVoid( 2 );
-	const TB*	op2	= (const TB*)ctx.GetVoid( 3 );
-	
+
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-	
+
+	const u_int opCodeMsk = opCodeID & ~OPERANDS_VEC_MSK;
+
 	if ( lhs_varying )
 	{
-		bool	op1_varying = ctx.IsSymbolVarying( 2 );
-		bool	op2_varying = ctx.IsSymbolVarying( 3 );
 		int		op1_offset = 0;
-		int		op2_offset = 0;
-		
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+
 		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				if ( OPNAME == '+' ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
-				if ( OPNAME == '-' ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
-				if ( OPNAME == '*' ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
-				if ( OPNAME == '/' ) lhs[i] = op1[op1_offset] / op2[op2_offset];
+				if ( opCodeMsk == OP_SS_MOV	) lhs[i] = op1[op1_offset]; else
+				if ( opCodeMsk == OP_SS_ABS	) lhs[i] = DAbs( op1[op1_offset] );
+					else { DASSERT( 0 ); }
 			}
-			
-			if ( op1_varying )	++op1_offset;
-			if ( op2_varying )	++op2_offset;
+
+			op1_offset	+= op1_step;
 		}
 	}
 	else
@@ -238,50 +201,64 @@ void Inst_AlOp( SlRunContext &ctx )
 		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
 				 !ctx.IsSymbolVarying( 3 ) );
 
-		TA	tmp;
-		if ( OPNAME == '+' ) tmp = op1[0] + op2[0]; else
-		if ( OPNAME == '-' ) tmp = op1[0] - op2[0]; else
-		if ( OPNAME == '*' ) tmp = op1[0] * op2[0]; else
-		if ( OPNAME == '/' ) tmp = op1[0] / op2[0];
-
-		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
-			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = tmp;
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			if ( opCodeMsk == OP_SS_MOV	) lhs[0] = op1[0]; else
+			if ( opCodeMsk == OP_SS_ABS	) lhs[0] = DAbs( op1[0] );
+				else { DASSERT( 0 ); }
+		}
 	}
 
 	ctx.NextInstruction();
 }
 
 //==================================================================
-static void Inst_Normalize( SlRunContext &ctx )
+template <class TA, class TB, const OpCodeID opCodeID>
+void Inst_2Op( SlRunContext &ctx )
 {
-		  SlVec3*	lhs	= (		 SlVec3*)ctx.GetVoid( 1 );
-	const SlVec3*	op1	= (const SlVec3*)ctx.GetVoid( 2 );
+		  TA*	lhs	= (		 TA*)ctx.GetVoid( 1 );
+	const TA*	op1	= (const TA*)ctx.GetVoid( 2 );
+	const TB*	op2	= (const TB*)ctx.GetVoid( 3 );
 	
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
+	const u_int opCodeMsk = opCodeID & ~OPERANDS_VEC_MSK;
+
 	if ( lhs_varying )
 	{
-		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
 		int		op1_offset = 0;
-		
+		int		op2_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+		int		op2_step = ctx.GetSymbolVaryingStep( 3 );
+
 		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = op1[op1_offset].GetNormalized();
-
-			op1_offset += op1_step;
+			{
+				if ( opCodeMsk == OP_SS_ADD ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
+				if ( opCodeMsk == OP_SS_SUB ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
+				if ( opCodeMsk == OP_SS_MUL ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
+				if ( opCodeMsk == OP_SS_DIV ) lhs[i] = op1[op1_offset] / op2[op2_offset];
+					else { DASSERT( 0 ); }
+			}
+			
+			op1_offset	+= op1_step;
+			op2_offset	+= op2_step;
 		}
 	}
 	else
 	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
+				 !ctx.IsSymbolVarying( 3 ) );
 
-		SlVec3	tmp = op1[0].GetNormalized();
-
-		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
-			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = tmp;
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			if ( opCodeMsk == OP_SS_ADD ) lhs[0] = op1[0] + op2[0]; else
+			if ( opCodeMsk == OP_SS_SUB ) lhs[0] = op1[0] - op2[0]; else
+			if ( opCodeMsk == OP_SS_MUL ) lhs[0] = op1[0] * op2[0]; else
+			if ( opCodeMsk == OP_SS_DIV ) lhs[0] = op1[0] / op2[0];
+				else { DASSERT( 0 ); }
+		}
 	}
 
 	ctx.NextInstruction();
@@ -290,9 +267,9 @@ static void Inst_Normalize( SlRunContext &ctx )
 //==================================================================
 static void Inst_Faceforward( SlRunContext &ctx )
 {
-		  SlVec3* lhs =	(		SlVec3*)ctx.GetVoid( 1 );
-	const SlVec3* pN	 =	(const	SlVec3*)ctx.GetVoid( 2 );
-	const SlVec3* pI	 =	(const	SlVec3*)ctx.GetVoid( 3 );
+		  SlVec3* lhs	=	(		SlVec3*)ctx.GetVoid( 1 );
+	const SlVec3* pN	=	(const	SlVec3*)ctx.GetVoid( 2 );
+	const SlVec3* pI	=	(const	SlVec3*)ctx.GetVoid( 3 );
 
 	const SlSymbol*	 pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", SlSymbol::NORMAL );
 	const SlVec3* pNg = (const SlVec3 *)pNgSymbol->GetData();
@@ -324,11 +301,8 @@ static void Inst_Faceforward( SlRunContext &ctx )
 		DASSERT( !I_step		);
 		DASSERT( !Ng_step	);
 
-		SlVec3	tmp = pN[0] * DSign( -pI[0].GetDot( pNg[0] ) );
-
-		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
-			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = tmp;
+		if ( ctx.IsProcessorActive( 0 ) )
+			lhs[0] = pN[0] * DSign( -pI[0].GetDot( pNg[0] ) );
 	}
 
 	ctx.NextInstruction();
@@ -430,14 +404,14 @@ static void Inst_Diffuse( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		SlVec3	Nn = op1[0].GetNormalized();
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			SlVec3	Nn = op1[0].GetNormalized();
+			SlColor	col( 0.0f );
+			illuminate( col, pLights, actLights, *pP, Nn, illConeCosA );
 
-		SlColor	col( 0.0f );
-		illuminate( col, pLights, actLights, *pP, Nn, illConeCosA );
-
-		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
-			if ( ctx.IsProcessorActive( i ) )
-				lhs[i] = col;
+			lhs[0] = col;
+		}
 	}
 
 	ctx.NextInstruction();
@@ -486,6 +460,38 @@ static void Inst_Ambient( SlRunContext &ctx )
 }
 
 //==================================================================
+static void Inst_Normalize( SlRunContext &ctx )
+{
+		  SlVec3*	lhs	= (		 SlVec3*)ctx.GetVoid( 1 );
+	const SlVec3*	op1	= (const SlVec3*)ctx.GetVoid( 2 );
+	
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	
+	if ( lhs_varying )
+	{
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+		int		op1_offset = 0;
+		
+		for (u_int i=0; i < ctx.mSIMDBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+				lhs[i] = op1[op1_offset].GetNormalized();
+
+			op1_offset += op1_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+			lhs[0] = op1[0].GetNormalized();
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 #define SINGLE	SlScalar
 #define VECTOR	SlVec3
 //#define MATRIX	Matrix44
@@ -493,30 +499,40 @@ static void Inst_Ambient( SlRunContext &ctx )
 //==================================================================
 static ShaderInstruction	sInstructionTable[OP_N] =
 {
-Inst_Copy<SINGLE,SINGLE>,
-Inst_Copy<VECTOR,SINGLE>,
-Inst_Copy<VECTOR,VECTOR>,
+	Inst_1Op<SINGLE,SINGLE,OP_SS_MOV>,
+	0,//Inst_1Op<SINGLE,VECTOR,OP_SV_MOV>,
+	Inst_1Op<VECTOR,SINGLE,OP_VS_MOV>,
+	Inst_1Op<VECTOR,VECTOR,OP_VV_MOV>,
 
-Inst_AlOp<SINGLE,SINGLE,'+'>,
-Inst_AlOp<VECTOR,SINGLE,'+'>,
-Inst_AlOp<VECTOR,VECTOR,'+'>,
+	Inst_1Op<SINGLE,SINGLE,OP_SS_ABS>,
+	0,//Inst_1Op<SINGLE,VECTOR,OP_SV_ABS>,
+	Inst_1Op<VECTOR,SINGLE,OP_VS_ABS>,
+	Inst_1Op<VECTOR,VECTOR,OP_VV_ABS>,
 
-Inst_AlOp<SINGLE,SINGLE,'-'>,
-Inst_AlOp<VECTOR,SINGLE,'-'>,
-Inst_AlOp<VECTOR,VECTOR,'-'>,
+	Inst_2Op<SINGLE,SINGLE,OP_SS_ADD>,
+	0,//Inst_2Op<SINGLE,VECTOR,OP_SV_ADD>,
+	Inst_2Op<VECTOR,SINGLE,OP_VS_ADD>,
+	Inst_2Op<VECTOR,VECTOR,OP_VV_ADD>,
 
-Inst_AlOp<SINGLE,SINGLE,'*'>,
-Inst_AlOp<VECTOR,SINGLE,'*'>,
-Inst_AlOp<VECTOR,VECTOR,'*'>,
+	Inst_2Op<SINGLE,SINGLE,OP_SS_SUB>,
+	0,//Inst_2Op<SINGLE,VECTOR,OP_SV_SUB>,
+	Inst_2Op<VECTOR,SINGLE,OP_VS_SUB>,
+	Inst_2Op<VECTOR,VECTOR,OP_VV_SUB>,
 
-Inst_AlOp<SINGLE,SINGLE,'/'>,
-Inst_AlOp<VECTOR,SINGLE,'/'>,
-Inst_AlOp<VECTOR,VECTOR,'/'>,
+	Inst_2Op<SINGLE,SINGLE,OP_SS_MUL>,
+	0,//Inst_2Op<SINGLE,VECTOR,OP_SV_MUL>,
+	Inst_2Op<VECTOR,SINGLE,OP_VS_MUL>,
+	Inst_2Op<VECTOR,VECTOR,OP_VV_MUL>,
 
-Inst_Normalize,
-Inst_Faceforward,
-Inst_Diffuse,
-Inst_Ambient,
+	Inst_2Op<SINGLE,SINGLE,OP_SS_DIV>,
+	0,//Inst_2Op<SINGLE,VECTOR,OP_SV_DIV>,
+	Inst_2Op<VECTOR,SINGLE,OP_VS_DIV>,
+	Inst_2Op<VECTOR,VECTOR,OP_VV_DIV>,
+
+	Inst_Normalize,
+	Inst_Faceforward,
+	Inst_Diffuse,
+	Inst_Ambient,
 };
 
 //==================================================================

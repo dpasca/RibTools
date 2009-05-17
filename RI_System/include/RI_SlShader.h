@@ -29,27 +29,46 @@ enum OperTypeID
 };
 
 //==================================================================
+static const u_int OPERANDS_VEC_MSK	= 0x00000003;
+
+//==================================================================
 enum OpCodeID
 {
-	OP_MOVSS,
-	OP_MOVVS,
-	OP_MOVVV,
-	OP_ADDSS,
-	OP_ADDVS,
-	OP_ADDVV,
-	OP_SUBSS,
-	OP_SUBVS,
-	OP_SUBVV,
-	OP_MULSS,
-	OP_MULVS,
-	OP_MULVV,
-	OP_DIVSS,
-	OP_DIVVS,
-	OP_DIVVV,
-	OP_NORMALIZE,
-	OP_FACEFORWARD,
-	OP_DIFFUSE,
-	OP_AMBIENT,
+	OP_SS_MOV	,
+	OP_SV_MOV	,
+	OP_VS_MOV	,
+	OP_VV_MOV	,
+
+	OP_SS_ABS	,
+	OP_SV_ABS	,
+	OP_VS_ABS	,
+	OP_VV_ABS	,
+
+	OP_SS_ADD	,
+	OP_SV_ADD	,
+	OP_VS_ADD	,
+	OP_VV_ADD	,
+
+	OP_SS_SUB	,
+	OP_SV_SUB	,
+	OP_VS_SUB	,
+	OP_VV_SUB	,
+
+	OP_SS_MUL	,
+	OP_SV_MUL	,
+	OP_VS_MUL	,
+	OP_VV_MUL	,
+
+	OP_SS_DIV	,
+	OP_SV_DIV	,
+	OP_VS_DIV	,
+	OP_VV_DIV	,
+
+	OP_NRM	,
+	OP_FCFWD	,
+	OP_DIFS	,
+	OP_AMB	,
+
 	OP_N
 };
 

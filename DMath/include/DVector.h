@@ -138,6 +138,15 @@ public:
 		return  v3[0] * r_[0] + v3[1] * r_[1] + v3[2] * r_[2];
 	}
 
+	friend Vec3	DAbs( const Vec3 &a )
+	{
+		return Vec3(
+					DAbs( a.v3[0] ),
+					DAbs( a.v3[1] ),
+					DAbs( a.v3[2] )
+				);
+	}
+
 	const _S &x() const { return v3[0];	}
 	const _S &y() const { return v3[1];	}
 	const _S &z() const { return v3[2];	}

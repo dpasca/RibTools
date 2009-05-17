@@ -246,6 +246,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Tests\turb.rrasm"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Tests\uteapot.rib"
 				>
 			</File>

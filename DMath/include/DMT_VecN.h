@@ -52,6 +52,7 @@ public:
 	friend VecN	DSqrt( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
 	friend VecN	DRSqrt( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
 	friend VecN	DSign( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp; }
+	friend VecN	DAbs( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
 	friend VecN	DSin( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
 	friend VecN	DCos( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
 };
@@ -118,6 +119,12 @@ public:
 		return res;
 	}
 
+	friend VecN	DAbs( const VecN &a )
+	{
+		static const U32 notSignBitMask = ~0x80000000;
+		return _mm_and_ps( a.v, _mm_set_ps1( *(float *)&notSignBitMask ) );
+	}
+
 	friend VecN	DSin( const VecN &a ) { VecN tmp; for (size_t i=0; i<4; ++i) tmp.v.m128_f32[i] = DSin( a[i] ); return tmp; }
 	friend VecN	DCos( const VecN &a ) { VecN tmp; for (size_t i=0; i<4; ++i) tmp.v.m128_f32[i] = DCos( a[i] ); return tmp; }
 	//friend VecN operator * (const _S &lval, const VecN &rval) { return rval * lval; }
@@ -180,6 +187,11 @@ public:
 				res = _mm512_mask_movd( res , selectNeg, _mm512_set_1to16_ps( -1.0f ) );
 
 		return res;
+	}
+
+	friend VecN	DAbs( const VecN &a )
+	{
+		return _mm512_maxabs_ps( a.v, a.v );
 	}
 
 	friend VecN	DSin( const VecN &a ) { VecN tmp; for (size_t i=0; i<16; ++i) tmp.v.v[i] = DSin( a[i] ); return tmp; }

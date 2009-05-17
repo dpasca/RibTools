@@ -34,16 +34,22 @@ bool MakeBoundFromUVRange( const _S &This, Bound &out_bound )
 	{
 		SlVec2	uvs;
 
-		for (size_t subIdx=0; subIdx < RI_SIMD_BLK_LEN; ++subIdx)
+		size_t	iStart	= (blkIdx + 0) * RI_SIMD_BLK_LEN + 0;
+		size_t	iEnd	= (blkIdx + 1) * RI_SIMD_BLK_LEN + 0;
+		iEnd = DMIN( 4, iEnd );
+		size_t	n = iEnd - iStart;
+
+		for (size_t subIdx=0; subIdx < n; ++subIdx)
 		{
-			uvs[0][subIdx] = srcUVs[blkIdx * RI_SIMD_BLK_LEN + subIdx][0];
-			uvs[1][subIdx] = srcUVs[blkIdx * RI_SIMD_BLK_LEN + subIdx][1];
+			uvs[0][subIdx] = srcUVs[(blkIdx + 0) * RI_SIMD_BLK_LEN + subIdx][0];
+			uvs[1][subIdx] = srcUVs[(blkIdx + 0) * RI_SIMD_BLK_LEN + subIdx][1];
 		}
 
 		SlVec3	Po;
 		This.EvalP( uvs, Po );
 
-		for (size_t subIdx=0; subIdx < RI_SIMD_BLK_LEN; ++subIdx)
+
+		for (size_t subIdx=0; subIdx < n; ++subIdx)
 		{
 			out_bound.Expand( Vec3f(
 									Po[0][subIdx],

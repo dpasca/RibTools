@@ -26,25 +26,41 @@ struct OpCodeDef
 //==================================================================
 static OpCodeDef	gsOpCodeDefs[] =
 {
-	"movss",		2,
-	"movvs",		2,
-	"movvv",		2,
-	"addss",		3,
-	"addvs",		3,
-	"addvv",		3,
-	"subss",		3,
-	"subvs",		3,
-	"subvv",		3,
-	"mulss",		3,
-	"mulvs",		3,
-	"mulvv",		3,
-	"divss",		3,
-	"divvs",		3,
-	"divvv",		3,
-	"normalize",	2,
-	"faceforward",	3,
-	"diffuse",		2,
-	"ambient",		1,
+	"movss"	,	2,
+	"movsv"	,	2,
+	"movvs"	,	2,
+	"movvv"	,	2,
+		
+	"absss"	,	2,
+	"abssv"	,	2,
+	"absvs"	,	2,
+	"absvv"	,	2,
+		
+	"addss"	,	3,
+	"addsv"	,	3,
+	"addvs"	,	3,
+	"addvv"	,	3,
+		
+	"subss"	,	3,
+	"subsv"	,	3,
+	"subvs"	,	3,
+	"subvv"	,	3,
+		
+	"mulss"	,	3,
+	"mulsv"	,	3,
+	"mulvs"	,	3,
+	"mulvv"	,	3,
+		
+	"divss"	,	3,
+	"divsv"	,	3,
+	"divvs"	,	3,
+	"divvv"	,	3,
+		
+	"normalize"		,	2,
+	"faceforward"	,	3,
+	"diffuse"		,	2,
+	"ambient"		,	1,
+
 	NULL
 };
 
