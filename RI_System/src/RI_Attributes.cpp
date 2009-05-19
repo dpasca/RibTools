@@ -19,7 +19,8 @@ namespace RI
 /// Attributes
 //==================================================================
 Attributes::Attributes() :
-	mShaderInstance(MicroPolygonGrid::MAX_SIZE)
+	mSurfaceSHI(MicroPolygonGrid::MAX_SIZE),
+	mDisplaceSHI(MicroPolygonGrid::MAX_SIZE)
 {
 	mpCustomUBasis	= NULL;
 	mpCustomVBasis	= NULL;
@@ -28,7 +29,8 @@ Attributes::Attributes() :
 
 //==================================================================
 Attributes::Attributes( const Attributes &attributes ) :
-	mShaderInstance(MicroPolygonGrid::MAX_SIZE)
+	mSurfaceSHI(MicroPolygonGrid::MAX_SIZE),
+	mDisplaceSHI(MicroPolygonGrid::MAX_SIZE)
 {
 	copyFrom( attributes );
 }
@@ -38,9 +40,9 @@ Attributes& Attributes::operator=(const Attributes& rhs)
 {
 	DSAFE_DELETE( mpCustomUBasis );
 	DSAFE_DELETE( mpCustomVBasis );
-	
+
 	copyFrom( rhs );
-	
+
 	return *this;
 }
 
@@ -79,7 +81,8 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mVSteps				= rhs.mVSteps				;
 	mColor				= rhs.mColor				;
 	mOpacity			= rhs.mOpacity				;
-	mShaderInstance		= rhs.mShaderInstance		;
+	mSurfaceSHI			= rhs.mSurfaceSHI			;
+	mDisplaceSHI		= rhs.mDisplaceSHI			;
 	mActiveLights		= rhs.mActiveLights			;
 }
 
@@ -121,7 +124,7 @@ void Attributes::Init(
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
 
-	mShaderInstance.Set(
+	mSurfaceSHI.Set(
 		(SlShader *)pResManager->FindResource( "dbg_normal_col",
 													ResourceBase::TYPE_SHADER ) );
 }
@@ -365,6 +368,32 @@ SlShader *Attributes::loadShader( const char *pBasePath, const char *pSName )
 }
 
 //==================================================================
+SlShader *Attributes::getShader( const char *pShaderName, const char *pAlternateName )
+{
+
+	SlShader	*pShader =
+			(SlShader *)mpResManager->FindResource( pShaderName,
+													ResourceBase::TYPE_SHADER );
+
+	if ( pShader )
+		return pShader;
+
+	if ( pShader = loadShader( mpState->GetBaseDir(), pShaderName ) )
+		return pShader;
+
+	if ( pShader = loadShader( mpState->GetDefShadersDir(), pShaderName ) )
+		return pShader;
+
+	if ( pAlternateName )
+		if ( pShader =
+				(SlShader *)mpResManager->FindResource( pAlternateName,
+														ResourceBase::TYPE_SHADER ) )
+			return pShader;
+
+	return NULL;
+}
+
+//==================================================================
 void Attributes::cmdSurface( ParamList &params )
 {
 	if ( params.size() < 1 )
@@ -374,22 +403,29 @@ void Attributes::cmdSurface( ParamList &params )
 
 	const char *pShaderName = params[0].PChar();
 	
-	SlShader	*pShader =
-			(SlShader *)mpResManager->FindResource( pShaderName,
-													ResourceBase::TYPE_SHADER );
+	SlShader	*pShader = getShader( pShaderName, "matte" );
 
-	if NOT( pShader )
+	if ( pShader )
+		mSurfaceSHI.Set( pShader );
+
+	// $$$ should really check if the shader or any params really changed
+	mpRevision->BumpRevision();
+}
+
+//==================================================================
+void Attributes::cmdDisplacement( ParamList &params )
+{
+	if ( params.size() < 1 )
 	{
-		if NOT( pShader = loadShader( mpState->GetBaseDir(), pShaderName ) )
-			if NOT( pShader = loadShader( mpState->GetDefShadersDir(), pShaderName ) )
-			{
-				pShader = (SlShader *)mpResManager->FindResource( "matte",
-															ResourceBase::TYPE_SHADER );
-			}
-
+		onError( "Missing parameters for 'displacement' command !" );
 	}
 
-	mShaderInstance.Set( pShader );
+	const char *pShaderName = params[0].PChar();
+	
+	SlShader	*pShader = getShader( pShaderName, NULL );
+
+	if ( pShader )
+		mDisplaceSHI.Set( pShader );
 
 	// $$$ should really check if the shader or any params really changed
 	mpRevision->BumpRevision();

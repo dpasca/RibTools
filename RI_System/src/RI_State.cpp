@@ -412,6 +412,15 @@ void State::Surface( ParamList &params )
 	mAttributesStack.top().cmdSurface( params );
 }
 
+//==================================================================
+void State::Displacement( ParamList &params )
+{
+	if NOT( verifyOpType( OPTYPE_ATRB ) )
+		return;
+
+	mAttributesStack.top().cmdDisplacement( params );
+}
+
 // options
 //==================================================================
 void State::Format( int xRes, int yRes, float pixelRatio )

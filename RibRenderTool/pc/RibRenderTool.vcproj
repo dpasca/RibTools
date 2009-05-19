@@ -222,6 +222,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Tests\DisplaceTest.rib"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Tests\DisplaceTest_turb.rrasm"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Tests\dragonhead.rib"
 				>
 			</File>

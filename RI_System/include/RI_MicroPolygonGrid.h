@@ -23,6 +23,32 @@ namespace RI
 class Attributes;
 class SlRunContext;
 
+/*
+//==================================================================
+template <class _T, size_t _MAX>
+class DumbPool
+{
+	_T		mStorage[_MAX];
+	size_t	mStorageN;
+
+public:
+	DumbPool() :
+		mStorageN(0)
+	{
+	}
+
+	~DumbPool()
+	{
+	}
+
+	_T	*Alloc()
+	{
+		DASSERT( mStorageN < _MAX );
+		return &mStorage[ mStorageN++ ];
+	}
+};
+*/
+
 //==================================================================
 class MicroPolygonGrid
 {
@@ -30,12 +56,15 @@ class MicroPolygonGrid
 	SlColor			*mpDataOi;
 	SlColor			*mpDataCs;
 	SlColor			*mpDataOs;
-	SlRunContext	mSlRunCtx;
+	SlRunContext	mSurfRunCtx;
+	SlRunContext	mDispRunCtx;
 
 public:
-	static const u_int	MAX_SIZE = 48 * 48;
+	static const u_int	MAX_SIZE = RI_GET_SIMD_PAD_SUBS( 48 ) * 48;
+	static const u_int	MAX_SIMD_BLKS = RI_GET_SIMD_BLOCKS( MAX_SIZE );
 
 	u_int			mXDim;
+	u_int			mXBlocks;
 	u_int			mYDim;
 	u_int			mPointsN;
 	SlVec3			*mpPointsWS;
@@ -55,6 +84,7 @@ public:
 			   
 	u_int GetPointsN() const { return mPointsN; }
 	
+	void Displace( const Attributes &attribs );
 	void Shade( const Attributes &attribs );
 };
 

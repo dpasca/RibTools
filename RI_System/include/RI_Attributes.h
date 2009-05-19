@@ -67,7 +67,8 @@ public:
 
 	Color				mColor;
 	Color				mOpacity;
-	SlShaderInstance	mShaderInstance;
+	SlShaderInstance	mSurfaceSHI;
+	SlShaderInstance	mDisplaceSHI;
 
 	DVec<U16>			mActiveLights;
 
@@ -110,9 +111,11 @@ public:
 	void cmdOpacity( const Color &color );
 	bool cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam );
 	void cmdSurface( ParamList &params );
+	void cmdDisplacement( ParamList &params );
 
 private:
 	SlShader *loadShader( const char *pBasePath, const char *pSName );
+	SlShader *getShader( const char *pShaderName, const char *pAlternateName );
 };
 
 //==================================================================

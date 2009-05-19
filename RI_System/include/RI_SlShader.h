@@ -20,6 +20,7 @@ namespace RI
 //==================================================================
 enum OperTypeID
 {
+	OPRTYPE_NA,
 	OPRTYPE_F1 ,
 	OPRTYPE_F2 ,
 	OPRTYPE_F3 ,
@@ -64,11 +65,6 @@ enum OpCodeID
 	OP_VS_DIV	,
 	OP_VV_DIV	,
 
-	OP_NRM	,
-	OP_FCFWD	,
-	OP_DIFS	,
-	OP_AMB	,
-
 	OP_VV_NOISE11	,
 	OP_VV_NOISE12	,
 	OP_VV_NOISE13	,
@@ -77,6 +73,12 @@ enum OpCodeID
 	OP_VV_NOISE32	,
 	OP_VV_NOISE33	,
 
+	OP_NRM		,
+	OP_FCFWD	,
+	OP_DIFS		,
+	OP_AMB		,
+	OP_CALCNORM	,
+
 	OP_N
 };
 
@@ -84,17 +86,41 @@ enum OpCodeID
 class SlValue
 {
 public:
+	struct
+	{
+	   unsigned mOwnData	: 1;
+	   unsigned mCanChange	: 1;
+	} Flags;
+
 	union
 	{
-		float		*pFloatValue;
-		Point3		*pPointValue;
-		Vec3f		*pVectorValue;
-		Vec3f		*pNormalValue;
-		Vec3f		*pColorValue;
 		void		*pVoidValue;
-		//Matrix44	*pMatrixValue;
-		//const char	*pStringValue;
+		const void	*pConstVoidValue;
 	} Data;
+
+	const SlSymbol	*mpSrcSymbol;
+
+	SlValue()
+	{
+		Flags.mOwnData = 0;
+		Flags.mCanChange = 0;
+		Data.pVoidValue = NULL;
+		mpSrcSymbol = NULL;
+	}
+
+	void SetDataR( const void *pData, const SlSymbol *pSrcSymbol )
+	{
+		Flags.mCanChange		= 0;
+		Data.pConstVoidValue	= pData;
+		mpSrcSymbol				= pSrcSymbol;
+	}
+
+	void SetDataRW( void *pData, const SlSymbol *pSrcSymbol )
+	{
+		Flags.mCanChange	= 1;
+		Data.pVoidValue		= pData;
+		mpSrcSymbol			= pSrcSymbol;
+	}
 };
 
 //==================================================================
@@ -103,13 +129,15 @@ struct SlOpCode
 	u_int	mTableOffset;
 	u_short	mOperandCount;
 	u_short	mDestOpType;
+	u_int	mDbgLineNum;
 };
 
 //==================================================================
 struct SlSymbolWord
 {
-	u_int	mTableOffset;
-	bool	mIsVarying;
+	u_int		mTableOffset;
+	bool		mIsVarying;
+	SlSymbol	*mpOrigSymbol;
 };
 
 //==================================================================
@@ -142,7 +170,7 @@ public:
 public:
 	Type			mType;
 	DStr			mShaderName;
-	DVec<SlSymbol>	mSymbols;
+	DVec<SlSymbol*>	mSymbols;
 	DVec<SlCPUWord>	mCode;
 
 	struct CtorParams
@@ -175,7 +203,7 @@ class SlShaderInstance
 
 public:
 	//DVec<SlParameter>	mCallingParams;
-	SlSymbolList		mCallingParams;	// $$$ should get these from attributes at some point !!
+	SlSymbolList		mCallingParams;	// $$$ should get these from attributes and Surface params at some point !!
 
 public:
 	SlShaderInstance( size_t maxPointsN );
@@ -187,9 +215,22 @@ public:
 		mpShader = pShader;
 	}
 
+	bool IsSet() const
+	{
+		return mpShader != NULL;
+	}
+
+	SlShaderInstance( const SlShaderInstance &right ) :
+		mCallingParams(32)
+	{
+		moShader.Borrow( right.moShader.Use() );
+		mpShader		= right.mpShader;
+		mCallingParams	= right.mCallingParams;
+	}
+
 	void operator = ( const SlShaderInstance &right )
 	{
-		moShader.Borrow( moShader.Use() );
+		moShader.Borrow( right.moShader.Use() );
 		mpShader		= right.mpShader;
 		mCallingParams	= right.mCallingParams;
 	}

@@ -1,11 +1,10 @@
-/*
- *  RI_State.h
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_State.h
+///
+/// Created by Davide Pasca - 2008/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_STATE_H
 #define RI_STATE_H
@@ -25,8 +24,6 @@ namespace RI
 
 //==================================================================
 /*
-
-
 Options
 *	WorldBegin/End
 *	FrameBegin/End
@@ -45,7 +42,6 @@ Transform
 *	FrameBegin/End
 *	SolidBegin/End
 *	ObjectBegin/End
-
 */
 
 //==================================================================
@@ -134,6 +130,7 @@ public:
 	void Opacity( const Color &col );
 	void LightSource( ParamList &params );
 	void Surface( ParamList &params );
+	void Displacement( ParamList &params );
 
 	// options
 	void Format( int xRes, int yRes, float pixelRatio );

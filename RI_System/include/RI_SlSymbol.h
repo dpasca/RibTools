@@ -51,8 +51,9 @@ public:
 	Storage	mStorage;
 	bool	mIsVarying;
 	u_int	mArraySize;
+	void	*mpValArray;
 	void	*mpDefaultVal;
-	
+
 	void Reset()
 	{
 		mName.clear();
@@ -60,44 +61,93 @@ public:
 		mStorage = CONSTANT;
 		mIsVarying = false;
 		mArraySize = 0;
+		mpValArray = NULL;
 		mpDefaultVal = NULL;
 	}
-	
-	void AllocData();
-	void FreeData();
-	void *AllocClone( size_t size );
-	void FreeClone( void *pData );
-	
-	const void *GetData() const { return mpDefaultVal; }
+
+	SlSymbol()
+	{
+		mType = FLOAT;
+		mStorage = CONSTANT;
+		mIsVarying = false;
+		mArraySize = 0;
+		mpValArray = NULL;
+		mpDefaultVal = NULL;
+	}
+
+	~SlSymbol()
+	{
+		FreeClone( mpValArray );
+		FreeClone( mpDefaultVal );
+	}
+
+	void *AllocData( size_t size );
+	void AllocDefault( const void *pSrcData );
+
+	void *AllocClone( size_t size ) const;
+	void FreeClone( void *pData ) const;
+
+	void FillDataWithDefault( void *pDestData, size_t size ) const;
+	//void FillOwnDataWithDefault();
+
+	const void *GetData() const { return mpValArray; }
+
+	const void *GetConstantData() const
+	{
+		DASSERT( mStorage == CONSTANT && mIsVarying == false && mpDefaultVal != NULL );
+		return mpDefaultVal;
+	}
+
+	const void *GetUniformParamData() const
+	{
+		DASSERT( mStorage == PARAMETER && mIsVarying == false && mpDefaultVal != NULL );
+		return mpDefaultVal;
+	}
+
+	void *GetChangeableParamData()
+	{
+		DASSERT( mStorage == PARAMETER && mIsVarying == true && mpValArray != NULL );
+		return mpValArray;
+	}
 };
 
 //==================================================================
-class SlSymbolList : public DVec<SlSymbol>
+class SlSymbolList
 {
+	SlSymbol	*mpSymbols;
+	size_t		mSymbolsN;
+	size_t		mMaxSymbols;
+
 public:
+	SlSymbolList( size_t maxSymbols );
 	~SlSymbolList();
 
-	SlSymbol *LookupVariable(
-			const char		*pName,
-			SlSymbol::Type	type,
-			bool			isVarying );
+	SlSymbolList( const SlSymbolList &from );
+	void operator = ( const SlSymbolList &from );
 
-	const SlSymbol *LookupVariable(
-			const char		*pName,
-			SlSymbol::Type	type,
-			bool			isVarying ) const;
+		  SlSymbol *LookupVariable( const char *pName );
+	const SlSymbol *LookupVariable( const char *pName ) const;
 
-	SlSymbol *LookupVariable( const char *pName, SlSymbol::Type type );
+		  SlSymbol *LookupVariable( const char *pName, SlSymbol::Type type );
 	const SlSymbol *LookupVariable( const char *pName, SlSymbol::Type type ) const ;
 
-	void *LookupVariableData(
-			const char		*pName,
-			SlSymbol::Type	type,
-			bool			isVarying );
+	void *LookupVariableData( const char *pName, SlSymbol::Type type );
+	const void *LookupVariableData( const char *pName, SlSymbol::Type type ) const;
 
-	void *LookupVariableData(
-			const char		*pName,
-			SlSymbol::Type	type );
+	SlSymbol *Grow()
+	{
+		DASSTHROW( mSymbolsN < mMaxSymbols, ("Out of bounds !") );
+
+		return &mpSymbols[ mSymbolsN++ ];
+	}
+
+	size_t size() const
+	{
+		return mSymbolsN;
+	}
+
+	const SlSymbol &operator [] (size_t i) const{ DASSERT( i < mSymbolsN ); return mpSymbols[i]; }
+		  SlSymbol &operator [] (size_t i)		{ DASSERT( i < mSymbolsN ); return mpSymbols[i]; }
 };
 
 //==================================================================

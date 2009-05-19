@@ -1,11 +1,10 @@
-/*
- *  RI_Machine.cpp
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Machine.cpp
+///
+/// Created by Davide Pasca - 2008/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_Machine.h"
@@ -178,6 +177,12 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	{
 		geN( 1, p );
 		mState.Surface( p );
+	}
+	else
+	if ( nm == "Displacement" )
+	{
+		geN( 1, p );
+		mState.Displacement( p );
 	}
 	else
 	// options

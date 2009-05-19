@@ -1,11 +1,10 @@
-/*
- *  RI_FrameworkREYES.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/08.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_FrameworkREYES.cpp
+///
+/// Created by Davide Pasca - 2009/2/8
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_Base.h"
@@ -84,7 +83,8 @@ void FrameworkREYES::renderBucket_s( HiderREYES &hider, Bucket &bucket )
 		pPrim->Dice( grid, hider.mMtxWorldCamera, hider.mParams.mDbgColorCodedGrids );
 
 		// should check backface and trim
-		// grid.displace();
+		grid.Displace( *pPrim->mpAttribs );
+
 		grid.Shade( *pPrim->mpAttribs );
 
 		hider.Hide(
@@ -105,31 +105,9 @@ void FrameworkREYES::renderBucket_s( HiderREYES &hider, Bucket &bucket )
 }
 
 //==================================================================
-/// QuickProf
-//==================================================================
-class QuickProf
-{
-	const char *mpMsg;
-	I64			mStart;
-
-public:
-	QuickProf( const char *pMsg ) :
-		mpMsg(pMsg)
-	{
-		mStart = DUT::GetTimeTicks();
-	}
-
-	~QuickProf()
-	{
-		I64	elapsed = DUT::GetTimeTicks() - mStart;
-		printf( "%s: %4.2lf ms\n", mpMsg, DUT::TimeTicksToMS( elapsed ) );
-	}
-};
-
-//==================================================================
 void FrameworkREYES::worldEnd_simplify()
 {
-	QuickProf	prof( __FUNCTION__ );
+	DUT::QuickProf	prof( __FUNCTION__ );
 
 	// --- convert complex primitives into simple ones
 	for (size_t i=0; i < mHider.mpPrims.size(); ++i)
@@ -149,9 +127,9 @@ void FrameworkREYES::worldEnd_simplify()
 //==================================================================
 void FrameworkREYES::worldEnd_splitAndAddToBuckets()
 {
-	QuickProf	prof( __FUNCTION__ );
+	DUT::QuickProf	prof( __FUNCTION__ );
 
-	// --- split primitives and assing to buckets for dicing
+	// --- split primitives and assign to buckets for dicing
 	for (size_t i=0; i < mHider.mpPrims.size(); ++i)
 	{
 		if NOT( mHider.mpPrims[i] )
@@ -181,7 +159,7 @@ void FrameworkREYES::worldEnd_splitAndAddToBuckets()
 //==================================================================
 void FrameworkREYES::worldEnd_renderBuckets()
 {
-	QuickProf	prof( __FUNCTION__ );
+	DUT::QuickProf	prof( __FUNCTION__ );
 
 	int	bucketsN = (int)mHider.mpBuckets.size();
 

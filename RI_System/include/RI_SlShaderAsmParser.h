@@ -1,11 +1,10 @@
-/*
- *  RI_SlShaderAsmParser.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/03/04.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_SlShaderAsmParser.h
+///
+/// Created by Davide Pasca - 2009/3/4
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_SLSHADERASMPARSER_H
 #define RI_SLSHADERASMPARSER_H
@@ -49,6 +48,11 @@ private:
 	void getVector( const char *pStr, float out_val[], int n );
 
 	void onError( const char *pFmt, ... );
+
+	void verifySymbolType(	SlSymbol::Type slSymType,
+							OperTypeID otExpected,
+							int reportOpIdx,
+							const char *pReportOpName );
 };
 
 //==================================================================

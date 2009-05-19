@@ -88,6 +88,26 @@ public:
 		resize( 0 );
 	}
 
+	void force_reserve( size_t reserveSize )
+	{
+		size_t newSizeAlloc = mSize + reserveSize;
+
+		if ( newSizeAlloc <= mSizeAlloc )
+			return;
+
+		T *newPData = (T *)DNEW u_char [ sizeof(T) * newSizeAlloc ];
+
+		if ( mpData )
+		{
+			memcpy( newPData, mpData, mSize * sizeof(T) );
+
+			DDELETE_ARRAY( (u_char *)mpData );
+		}
+		
+		mpData = newPData;
+		mSizeAlloc = newSizeAlloc;
+	}
+
 	void resize( size_t newSize )
 	{
 		if ( newSize == mSize )

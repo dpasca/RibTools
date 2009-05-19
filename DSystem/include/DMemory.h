@@ -10,9 +10,9 @@
 #define DMEMORY_H
 
 //==================================================================
-#define DNEW				new		(__FILE__, __LINE__)
-#define DDELETE(_X_)		delete	(__FILE__, __LINE__, (_X_))
-#define DDELETE_ARRAY(_X_)	delete	(__FILE__, __LINE__, (_X_))
+#define DNEW				new			(__FILE__, __LINE__)
+#define DDELETE(_X_)		delete		(__FILE__, __LINE__, (_X_))
+#define DDELETE_ARRAY(_X_)	delete []	(__FILE__, __LINE__, (_X_))
 
 #define DSAFE_DELETE(_X_)		{ if ( _X_ ) { DDELETE		(_X_); (_X_) = 0; } }
 #define DSAFE_DELETE_ARRAY(_X_)	{ if ( _X_ ) { DDELETE_ARRAY(_X_); (_X_) = 0; } }

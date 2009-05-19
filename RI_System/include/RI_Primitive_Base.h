@@ -239,7 +239,7 @@ public:
 						const Matrix44 &mtxWorldCamera,
 						bool doColorCoded ) const;
 
-	Vec2f CalcLocalUV( const Vec2f &gridUV ) const
+	inline Vec2f CalcLocalUV( const Vec2f &gridUV ) const
 	{
 		return
 			Vec2f(
@@ -248,6 +248,19 @@ public:
 			);
 	}
 
+	inline float CalcLocalU( const float t ) const
+	{
+		return DMix( mURange[0], mURange[1], t );
+	}
+
+private:
+	void fillUVsArray(
+				SlVec2 locUV[],
+				SlVec2 locDUDV[],
+				float du,
+				float dv,
+				u_int xDim,
+				u_int yDim ) const;
 };
 
 //==================================================================

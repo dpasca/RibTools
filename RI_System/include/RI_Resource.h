@@ -88,6 +88,15 @@ public:
 			mPtr->AddRef();
 	}
 
+	void Borrow( const T *ptr )
+	{
+		if ( mPtr )
+			mPtr->SubRef();
+
+		if ( mPtr = (T *)ptr )
+			mPtr->AddRef();
+	}
+
 	const T *Use() const
 	{
 	#ifdef _DEBUG

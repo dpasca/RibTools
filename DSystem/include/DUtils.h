@@ -18,7 +18,7 @@
 			{\
 				bool ok=(_X_);\
 				if ( !ok ) {\
-					DUT::DAssThrow( ok, __FILE__, __LINE__, NULL );\
+					DUT::DAssert( ok, __FILE__, __LINE__ );\
 			} }
 #endif
 
@@ -40,6 +40,8 @@ DStr GetDirNameFromFPathName( const char *pInFPathname );
 
 char *SSPrintF( const char *pFmt, ... );
 
+
+void DAssert( bool ok, const char *pFile, int line );
 void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg );
 
 //==================================================================
@@ -69,6 +71,28 @@ void StrStripBeginEndWhite( char *pStr );
 
 I64 GetTimeTicks();
 double TimeTicksToMS( I64 ticks );
+
+//==================================================================
+/// QuickProf
+//==================================================================
+class QuickProf
+{
+	const char *mpMsg;
+	I64			mStart;
+
+public:
+	QuickProf( const char *pMsg ) :
+		mpMsg(pMsg)
+	{
+		mStart = DUT::GetTimeTicks();
+	}
+
+	~QuickProf()
+	{
+		I64	elapsed = DUT::GetTimeTicks() - mStart;
+		printf( "%s: %4.2lf ms\n", mpMsg, DUT::TimeTicksToMS( elapsed ) );
+	}
+};
 
 //==================================================================
 }

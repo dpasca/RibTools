@@ -24,13 +24,15 @@ static void *allocStream( size_t size )
 //==================================================================
 static void freeStream( void *p )
 {
-	DSAFE_DELETE_ARRAY( p );
+	char *pp = (char *)p;
+
+	DSAFE_DELETE_ARRAY( pp );
 }
 
 //==================================================================
-void *SlSymbol::AllocClone( size_t size )
+void *SlSymbol::AllocClone( size_t size ) const
 {
-	DASSTHROW( mpDefaultVal == NULL, ("Shouldn't have a defualt value !!!") );
+	//DASSTHROW( mpDefaultVal == NULL, ("Shouldn't have a default value !!!") );
 
 	void	*pOutData = NULL;
 
@@ -54,65 +56,142 @@ void *SlSymbol::AllocClone( size_t size )
 }
 
 //==================================================================
-void SlSymbol::AllocData()
+void SlSymbol::FillDataWithDefault( void *pDestData, size_t size ) const
 {
-	DASSTHROW( mpDefaultVal == NULL, ("Shouldn't have a defualt value !!!") );
-
-	mpDefaultVal = AllocClone( mArraySize );
-}
-
-//==================================================================
-void SlSymbol::FreeClone( void *pData )
-{
-	if NOT( pData )
-		return;
+	size_t	blocksN = RI_GET_SIMD_BLOCKS( size );
 
 	switch ( mType )
 	{
-	case SlSymbol::FLOAT:	freeStream( pData ); break;
-	case SlSymbol::POINT:	freeStream( pData ); break;
-	case SlSymbol::COLOR:	freeStream( pData ); break;
-	case SlSymbol::VECTOR:	freeStream( pData ); break;
-	case SlSymbol::NORMAL:	freeStream( pData ); break;
-	//case SlSymbol::STRING:	freeStream( pData ); break;
-	//case SlSymbol::MATRIX:	freeStream( pData ); break;
+	case SlSymbol::FLOAT:	for (size_t i=0; i < blocksN; ++i) ((SlScalar *)pDestData)[i] = ((const SlScalar *)mpDefaultVal)[0]; break;
+	case SlSymbol::POINT:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
+	case SlSymbol::COLOR:	for (size_t i=0; i < blocksN; ++i) ((SlColor  *)pDestData)[i] = ((const SlColor  *)mpDefaultVal)[0]; break;
+	case SlSymbol::VECTOR:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
+	case SlSymbol::NORMAL:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
+	//case SlSymbol::STRING: break;
+	//case SlSymbol::MATRIX: break;
 	default:
 		DASSERT( 0 );
 		break;
 	}
 }
 
+/*
 //==================================================================
-void SlSymbol::FreeData()
+void SlSymbol::FillOwnDataWithDefault()
 {
-	if NOT( mpDefaultVal )
-		return;
+	DASSERT( mStorage != CONSTANT && mIsVarying == true && mpValArray != NULL );
+	FillDataWithDefault( mpValArray, mArraySize );
+}
+*/
 
-	FreeClone( mpDefaultVal );
-	mpDefaultVal = NULL;
+//==================================================================
+void *SlSymbol::AllocData( size_t size )
+{
+	DASSTHROW( mpValArray == NULL && mpDefaultVal == NULL, ("Already allocated !!!") );
+
+	mArraySize = size;
+	mpValArray = AllocClone( mArraySize );
+	return mpValArray;
+}
+
+//==================================================================
+void SlSymbol::AllocDefault( const void *pSrcData )
+{
+	DASSTHROW( mpValArray == NULL && mpDefaultVal == NULL, ("Already allocated !!!") );
+
+	mpDefaultVal = AllocClone( 1 );
+
+	switch ( mType )
+	{
+	case SlSymbol::FLOAT :
+			((SlScalar *)mpDefaultVal)[0] = ((const float *)pSrcData)[0];
+			break;
+
+	case SlSymbol::POINT :
+			((SlVec3 *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
+			((SlVec3 *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
+			((SlVec3 *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
+			break;
+
+	case SlSymbol::COLOR :
+			((SlColor *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
+			((SlColor *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
+			((SlColor *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
+			break;
+	
+	case SlSymbol::VECTOR:
+	case SlSymbol::NORMAL:
+			((SlVec3 *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
+			((SlVec3 *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
+			((SlVec3 *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
+			break;
+	
+	case SlSymbol::STRING:
+	case SlSymbol::MATRIX:
+			DASSTHROW( mpValArray == NULL, ("Currently unsupported type !") );
+			break;
+	}
+}
+
+//==================================================================
+void SlSymbol::FreeClone( void *pData ) const
+{
+	if ( pData )
+		freeStream( pData );
+}
+
+//==================================================================
+/// SlSymbolList
+//==================================================================
+SlSymbolList::SlSymbolList( size_t maxSymbols ) :
+	mSymbolsN(0),
+	mMaxSymbols(maxSymbols)
+{
+	mpSymbols = DNEW SlSymbol [ mMaxSymbols ];
+}
+
+//==================================================================
+SlSymbolList::SlSymbolList( const SlSymbolList &from )
+{
+	mSymbolsN = from.mSymbolsN;
+	mMaxSymbols = from.mMaxSymbols;
+
+	mpSymbols = DNEW SlSymbol [ mMaxSymbols ];
+
+	memcpy( mpSymbols, from.mpSymbols, mSymbolsN * sizeof(SlSymbol) );
+}
+
+//==================================================================
+void SlSymbolList::operator=( const SlSymbolList &from )
+{
+	if ( mMaxSymbols != from.mMaxSymbols )
+	{
+		DSAFE_DELETE_ARRAY( mpSymbols );
+
+		mMaxSymbols = from.mMaxSymbols;
+		mpSymbols = DNEW SlSymbol [ mMaxSymbols ];
+	}
+
+	mSymbolsN = from.mSymbolsN;
+
+	memcpy( mpSymbols, from.mpSymbols, mSymbolsN * sizeof(SlSymbol) );
 }
 
 //==================================================================
 SlSymbolList::~SlSymbolList()
 {
-	for (size_t i=0; i < size(); ++i)
-	{
-		(*this)[i].FreeData();
-	}
+	DSAFE_DELETE_ARRAY( mpSymbols );
 }
 
 //==================================================================
-SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type, bool isVarying )
+SlSymbol * SlSymbolList::LookupVariable( const char *pName )
 {
 	for (size_t i=0; i < size(); ++i)
 	{
 		SlSymbol	&symbol = (*this)[i];
 
-		if (symbol.mType == type &&
-			symbol.mIsVarying == isVarying && 
-			0 == strcmp( symbol.mName.c_str(), pName ) )
+		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
-			// found !!!
 			return &symbol;
 		}
 	}
@@ -121,17 +200,14 @@ SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type,
 }
 
 //==================================================================
-const SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type, bool isVarying ) const
+const SlSymbol * SlSymbolList::LookupVariable( const char *pName ) const
 {
 	for (size_t i=0; i < size(); ++i)
 	{
 		const SlSymbol	&symbol = (*this)[i];
 
-		if (symbol.mType == type &&
-			symbol.mIsVarying == isVarying && 
-			0 == strcmp( symbol.mName.c_str(), pName ) )
+		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
-			// found !!!
 			return &symbol;
 		}
 	}
@@ -146,10 +222,12 @@ SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type 
 	{
 		SlSymbol	&symbol = (*this)[i];
 
-		if (symbol.mType == type &&
-			0 == strcmp( symbol.mName.c_str(), pName ) )
+		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
-			// found !!!
+			DASSTHROW( symbol.mType == type,
+						(__FUNCTION__" %s type not matching ! It's %i, but expecting %i",
+								symbol.mType, type ) );
+
 			return &symbol;
 		}
 	}
@@ -164,10 +242,12 @@ const SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type
 	{
 		const SlSymbol	&symbol = (*this)[i];
 
-		if (symbol.mType == type &&
-			0 == strcmp( symbol.mName.c_str(), pName ) )
+		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
-			// found !!!
+			DASSTHROW( symbol.mType == type,
+						(__FUNCTION__" %s type not matching ! It's %i, but expecting %i",
+								symbol.mType, type ) );
+
 			return &symbol;
 		}
 	}
@@ -175,25 +255,24 @@ const SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type
 	return NULL;
 }
 
-
 //==================================================================
-void * SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type, bool isVarying )
-{
-	SlSymbol	*pSym = LookupVariable( pName, type, isVarying );
-	if NOT( pSym )
-		return NULL;
-	else
-		return pSym->mpDefaultVal;
-}
-
-//==================================================================
-void * SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type )
+void *SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type )
 {
 	SlSymbol	*pSym = LookupVariable( pName, type );
 	if NOT( pSym )
 		return NULL;
 	else
-		return pSym->mpDefaultVal;
+		return pSym->mpValArray;
+}
+
+//==================================================================
+const void *SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type ) const
+{
+	const SlSymbol	*pSym = LookupVariable( pName, type );
+	if NOT( pSym )
+		return NULL;
+	else
+		return pSym->mpValArray;
 }
 
 //==================================================================

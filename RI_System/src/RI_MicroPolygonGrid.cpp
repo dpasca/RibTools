@@ -7,9 +7,13 @@
 //==================================================================
 
 #include "stdafx.h"
+#include <memory>
 #include "RI_Attributes.h"
 #include "RI_MicroPolygonGrid.h"
 #include "RI_SlRunContext.h"
+
+//==================================================================
+using std::auto_ptr;
 
 //==================================================================
 namespace RI
@@ -25,79 +29,89 @@ MicroPolygonGrid::MicroPolygonGrid() :
 	mpDataOi(0),
 	mpDataCs(0),
 	mpDataOs(0),
-	mSlRunCtx(mSymbols, MAX_SIZE)
+	mSurfRunCtx(mSymbols, MAX_SIZE),
+	mDispRunCtx(mSymbols, MAX_SIZE),
+	mSymbols(16)
 {
 	static const size_t allocN = MAX_SIZE;
 
-	SlSymbol	symbol;
-	symbol.Reset();
+	SlSymbol *pSymbol;
 
 	// allocate some standard varying params
-	symbol.mIsVarying = true;
-	symbol.mArraySize = allocN;
-	symbol.mStorage = SlSymbol::PARAMETER;
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "P";
+	pSymbol->mType = SlSymbol::POINT;
+	mpPointsWS = (SlVec3 *)pSymbol->AllocData( MAX_SIZE );
 
-	symbol.mName = "P";
-	symbol.mType = SlSymbol::POINT;
-	symbol.mpDefaultVal = NULL;
-	symbol.AllocData();
-	mSymbols.push_back( symbol );
-	mpPointsWS = (SlVec3 *)symbol.mpDefaultVal;
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "oodu";
+	pSymbol->mType = SlSymbol::FLOAT;
+	pSymbol->AllocData( MAX_SIZE );
 
-	symbol.mName = "I";
-	symbol.mType = SlSymbol::VECTOR;
-	symbol.mpDefaultVal = NULL;
-	symbol.AllocData();
-	mSymbols.push_back( symbol );
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "oodv";
+	pSymbol->mType = SlSymbol::FLOAT;
+	pSymbol->AllocData( MAX_SIZE );
 
-	symbol.mName = "N";
-	symbol.mType = SlSymbol::NORMAL;
-	symbol.mpDefaultVal = NULL;
-	symbol.AllocData();
-	mSymbols.push_back( symbol );
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "I";
+	pSymbol->mType = SlSymbol::VECTOR;
+	pSymbol->AllocData( MAX_SIZE );
 
-	symbol.mName = "Ng";
-	symbol.mType = SlSymbol::NORMAL;
-	symbol.mpDefaultVal = NULL;
-	symbol.AllocData();
-	mSymbols.push_back( symbol );
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "N";
+	pSymbol->mType = SlSymbol::NORMAL;
+	pSymbol->AllocData( MAX_SIZE );
 
-	symbol.mName = "Ci";
-	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = NULL;
-	symbol.AllocData();
-	mpDataCi = (SlColor *)symbol.mpDefaultVal;
-	mSymbols.push_back( symbol );
-	
-	symbol.mName = "Oi";
-	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = NULL;
-	symbol.AllocData();
-	mpDataOi = (SlColor *)symbol.mpDefaultVal;
-	mSymbols.push_back( symbol );
-	
-	symbol.mName = "Cs";
-	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = NULL;
-	symbol.AllocData();
-	mpDataCs = (SlColor *)symbol.mpDefaultVal;
-	mSymbols.push_back( symbol );
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "Ng";
+	pSymbol->mType = SlSymbol::NORMAL;
+	pSymbol->AllocData( MAX_SIZE );
 
-	symbol.mName = "Os";
-	symbol.mType = SlSymbol::COLOR;
-	symbol.mpDefaultVal = NULL;
-	symbol.AllocData();
-	mpDataOs = (SlColor *)symbol.mpDefaultVal;
-	mSymbols.push_back( symbol );
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "Ci";
+	pSymbol->mType = SlSymbol::COLOR;
+	mpDataCi = (SlColor *)pSymbol->AllocData( MAX_SIZE );
+
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "Oi";
+	pSymbol->mType = SlSymbol::COLOR;
+	mpDataOi = (SlColor *)pSymbol->AllocData( MAX_SIZE );
+
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "Cs";
+	pSymbol->mType = SlSymbol::COLOR;
+	mpDataCs = (SlColor *)pSymbol->AllocData( MAX_SIZE );
+
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = true;
+	pSymbol->mStorage = SlSymbol::PARAMETER;
+	pSymbol->mName = "Os";
+	pSymbol->mType = SlSymbol::COLOR;
+	mpDataOs = (SlColor *)pSymbol->AllocData( MAX_SIZE );
 }
 
 //==================================================================
 MicroPolygonGrid::~MicroPolygonGrid()
 {
-	for (size_t i=0; i < mSymbols.size(); ++i)
-	{
-		mSymbols[i].FreeData();
-	}
 }
 
 //==================================================================
@@ -120,6 +134,11 @@ void MicroPolygonGrid::Setup(
 						const Matrix44 &mtxLocalWorld )
 {
 	mXDim = xdim;
+	mXBlocks = RI_GET_SIMD_BLOCKS( xdim );
+
+	// ensure that the width is multiple of the SIMD width
+	DASSERT( (mXBlocks * RI_SIMD_BLK_LEN) == mXDim );
+
 	mYDim = ydim;
 	mPointsN = mXDim * mYDim;
 	mMtxLocalWorld = mtxLocalWorld;
@@ -140,11 +159,32 @@ void MicroPolygonGrid::Setup(
 }
 
 //==================================================================
+void MicroPolygonGrid::Displace( const Attributes &attribs )
+{
+	if ( attribs.mDisplaceSHI.IsSet() )
+	{
+		mDispRunCtx.Setup(
+						attribs,
+						&attribs.mDisplaceSHI,
+						RI_GET_SIMD_BLOCKS( mYDim ),
+						mYDim,
+						mPointsN );
+
+		mDispRunCtx.mpShaderInst->Run( mDispRunCtx );
+	}
+}
+
+//==================================================================
 void MicroPolygonGrid::Shade( const Attributes &attribs )
 {
-	mSlRunCtx.Setup( attribs, mPointsN );
+	mSurfRunCtx.Setup(
+					attribs,
+					&attribs.mSurfaceSHI,
+					RI_GET_SIMD_BLOCKS( mYDim ),
+					mYDim,
+					mPointsN );
 
-	mSlRunCtx.mpShaderInst->Run( mSlRunCtx );
+	mSurfRunCtx.mpShaderInst->Run( mSurfRunCtx );
 }
 
 //==================================================================

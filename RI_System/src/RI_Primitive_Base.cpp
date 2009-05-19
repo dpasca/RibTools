@@ -82,6 +82,69 @@ void SimplePrimitiveBase::Split( HiderREYES &hider, bool uSplit, bool vSplit )
 }
 
 //==================================================================
+void SimplePrimitiveBase::fillUVsArray(
+									SlVec2 locUV[],
+									SlVec2 locDUDV[],
+									float du,
+									float dv,
+									u_int xDim,
+									u_int yDim ) const
+{
+	size_t	sampleIdx = 0;
+
+	Vec2f	prevUV( 0, 0 );
+
+	float	v = 0.0f;
+	for (u_int i=0; i < yDim; ++i, v += dv)
+	{
+		float	u = 0.0f;
+		for (u_int j=0; j < xDim; ++j, u += du, ++sampleIdx)
+		{
+			Vec2f	tmpUV = CalcLocalUV( Vec2f( u, v ) );
+
+			size_t	blk = sampleIdx / RI_SIMD_BLK_LEN;
+			size_t	sub = sampleIdx & (RI_SIMD_BLK_LEN-1);
+
+			SlVec2	&blkLocUV = locUV[ blk ];
+			SlVec2	&blkLocDUDV = locDUDV[ blk ];
+
+			blkLocUV[0][ sub ] = tmpUV[0];
+			blkLocUV[1][ sub ] = tmpUV[1];
+
+			if ( j > 0 )
+			{
+				blkLocDUDV[0][ sub ] = tmpUV[0] - prevUV[0];
+			}
+
+			prevUV = tmpUV;
+		}
+	}
+
+	u_int xBlkN = RI_GET_SIMD_BLOCKS( xDim );
+
+	// -- calc du edge (replicates col 1 into col 0..)
+	u_int	blk = 0;
+	for (u_int i=0; i < yDim; ++i, blk += xBlkN)
+	{
+		SlVec2	&blkLocDUDV = locDUDV[ blk ];
+
+		float	locDU = CalcLocalU( du ) - CalcLocalU( 0 );
+
+		blkLocDUDV[0][0] = locDU;
+	}
+
+	// -- calc dv
+	size_t	blkIdx = xBlkN;
+	for (u_int i=1; i < yDim; ++i)
+		for (u_int j=0; j < xBlkN; ++j, ++blkIdx)
+			locDUDV[ blkIdx ][1] = locUV[blkIdx][1] - locUV[blkIdx - xBlkN][1];
+
+	// row 0 dv = row 1 dv (coarse approximation !)
+	for (u_int i=0; i < xBlkN; ++i)
+		locDUDV[i][1] = locDUDV[i + xBlkN][1];
+}
+
+//==================================================================
 void SimplePrimitiveBase::Dice(
 					MicroPolygonGrid &g,
 					const Matrix44 &mtxWorldCamera,
@@ -89,12 +152,14 @@ void SimplePrimitiveBase::Dice(
 {
 	//SlVec3	*pPointsWS = g.mpPointsWS;
 
-	SlVec3	*pPointsWS = (SlVec3 *)g.mSymbols.LookupVariableData( "P", SlSymbol::POINT, true );
-	SlVec3	*pI	 = (SlVec3 *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR, true );
-	SlVec3	*pN  = (SlVec3 *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL, true );
-	SlVec3	*pNg = (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL, true );
-	SlColor	*pOs = (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR, true );
-	SlColor	*pCs = (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR, true );
+	SlVec3	 *pPointsWS = (SlVec3 *)g.mSymbols.LookupVariableData( "P", SlSymbol::POINT );
+	SlScalar *pOODu	= (SlScalar *)g.mSymbols.LookupVariableData( "oodu", SlSymbol::FLOAT );
+	SlScalar *pOODv	= (SlScalar *)g.mSymbols.LookupVariableData( "oodv", SlSymbol::FLOAT );
+	SlVec3	 *pI	= (SlVec3 *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR );
+	SlVec3	 *pN	= (SlVec3 *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL );
+	SlVec3	 *pNg	= (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL );
+	SlColor	 *pOs	= (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR );
+	SlColor	 *pCs	= (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR );
 
 	DASSERT( pPointsWS == g.mpPointsWS );
 
@@ -141,26 +206,16 @@ void SimplePrimitiveBase::Dice(
 	}
 
 	// build the UVs
-	SlVec2	locUV[ RI_GET_SIMD_BLOCKS( MicroPolygonGrid::MAX_SIZE ) ];
+	SlVec2	locUV[ MicroPolygonGrid::MAX_SIMD_BLKS ];
+	SlVec2	locDUDV[ MicroPolygonGrid::MAX_SIMD_BLKS ];
 
-	size_t	sampleIdx = 0;
-	float	v = 0.0f;
-	for (int i=0; i < (int)g.mYDim; ++i, v += dv)
-	{
-		float	u = 0.0f;
-		for (int j=0; j < (int)g.mXDim; ++j, u += du, ++sampleIdx)
-		{
-			Vec2f	tmpv2 = CalcLocalUV( Vec2f( u, v ) );
+	fillUVsArray( locUV, locDUDV, du, dv, g.mXDim, g.mYDim );
 
-			SlVec2	&tmpvblk = locUV[ sampleIdx / RI_SIMD_BLK_LEN ];
-			tmpvblk[0][ sampleIdx & (RI_SIMD_BLK_LEN-1) ] = tmpv2[0];
-			tmpvblk[1][ sampleIdx & (RI_SIMD_BLK_LEN-1) ] = tmpv2[1];
-		}
-	}
-
-	DASSERT( sampleIdx == g.mPointsN );
+	//DASSERT( sampleIdx == g.mPointsN );
 
 	size_t	blocksN = RI_GET_SIMD_BLOCKS( g.mPointsN );
+
+	SlScalar	one( 1.0f );
 
 	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
@@ -181,11 +236,13 @@ void SimplePrimitiveBase::Dice(
 
 		pPointsWS[blkIdx]	= posWS;
 
-		pI[blkIdx]	= (posCS - -camPosCS).GetNormalized();
-		pN[blkIdx]	= norCS;
-		pNg[blkIdx]	= norCS;
-		pOs[blkIdx]	= useOpa;
-		pCs[blkIdx]	= useColor;
+		pI[blkIdx]		= (posCS - -camPosCS).GetNormalized();
+		pOODu[blkIdx]	= one / locDUDV[blkIdx][0];
+		pOODv[blkIdx]	= one / locDUDV[blkIdx][1];
+		pN[blkIdx]		= norCS;
+		pNg[blkIdx]		= norCS;
+		pOs[blkIdx]		= useOpa;
+		pCs[blkIdx]		= useColor;
 
 #else
 		SlVec2	&tmpvblk = locUV[ blkIdx ];
@@ -324,7 +381,7 @@ bool SimplePrimitiveBase::SetupForDiceOrSplit(
 	{
 		float	dim = DSqrt( pixelArea );
 
-		mDiceGridWd = (int)ceilf( dim );
+		mDiceGridWd = RI_GET_SIMD_PAD_SUBS( (int)ceilf( dim ) );
 		mDiceGridHe = (int)ceilf( dim );
 
 		out_uSplit = false;

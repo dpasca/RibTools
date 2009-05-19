@@ -7,10 +7,15 @@
 //==================================================================
 
 #include "stdafx.h"
+#include <memory>
 #include <stdarg.h>
 #include "DUtils.h"
 #include "RI_SlRunContext.h"
 #include "RI_SlShaderAsmParser.h"
+#include "RI_MicroPolygonGrid.h"
+
+//==================================================================
+using std::auto_ptr;
 
 //==================================================================
 namespace RI
@@ -21,53 +26,55 @@ struct OpCodeDef
 {
 	const char	*pName;
 	u_int		OperCnt;
+	OperTypeID	Types[3];
 };
 
 //==================================================================
 static OpCodeDef	gsOpCodeDefs[] =
 {
-	"movss"	,	2,
-	"movsv"	,	2,
-	"movvs"	,	2,
-	"movvv"	,	2,
+	"movss"	,		2,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
+	"movsv"	,		2,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
+	"movvs"	,		2,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
+	"movvv"	,		2,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
 		
-	"absss"	,	2,
-	"abssv"	,	2,
-	"absvs"	,	2,
-	"absvv"	,	2,
+	"absss"	,		2,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
+	"abssv"	,		2,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
+	"absvs"	,		2,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
+	"absvv"	,		2,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
 		
-	"addss"	,	3,
-	"addsv"	,	3,
-	"addvs"	,	3,
-	"addvv"	,	3,
+	"addss"	,		3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"addsv"	,		3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
+	"addvs"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
+	"addvv"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
 		
-	"subss"	,	3,
-	"subsv"	,	3,
-	"subvs"	,	3,
-	"subvv"	,	3,
+	"subss"	,		3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"subsv"	,		3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
+	"subvs"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
+	"subvv"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
 		
-	"mulss"	,	3,
-	"mulsv"	,	3,
-	"mulvs"	,	3,
-	"mulvv"	,	3,
+	"mulss"	,		3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"mulsv"	,		3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
+	"mulvs"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
+	"mulvv"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
 		
-	"divss"	,	3,
-	"divsv"	,	3,
-	"divvs"	,	3,
-	"divvv"	,	3,
+	"divss"	,		3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"divsv"	,		3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
+	"divvs"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
+	"divvv"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
 		
-	"normalize"		,	2,
-	"faceforward"	,	3,
-	"diffuse"		,	2,
-	"ambient"		,	1,
+	"noise11"	,	2,	OPRTYPE_F1,	OPRTYPE_F1, OPRTYPE_NA,
+	"noise12"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+	"noise13"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
 
-	"noise11"		,	2,
-	"noise12"		,	2,
-	"noise13"		,	2,
+	"noise31"	,	2,	OPRTYPE_F3,	OPRTYPE_F1, OPRTYPE_NA,
+	"noise32"	,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
+	"noise33"	,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
 
-	"noise31"		,	2,
-	"noise32"		,	2,
-	"noise33"		,	2,
+	"normalize"		,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
+	"faceforward"	,	3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
+	"diffuse"		,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
+	"ambient"		,	1,	OPRTYPE_F3,	OPRTYPE_NA, OPRTYPE_NA,
+	"calculatenormal",	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
 
 	NULL
 };
@@ -205,23 +212,23 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	char *pTokCtx;
 	char *pTok;
 	
-	SlSymbol	symbol;		
-	symbol.Reset();
+	auto_ptr<SlSymbol>	pSymbol( DNEW SlSymbol() );
+	pSymbol->Reset();
 
 	if NOT( pTok = strtok_r( lineBuff, " \t", &pTokCtx ) )
 		return;
 
-	symbol.mName = pTok;
+	pSymbol->mName = pTok;
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
 		onError( "ERROR: Expecting storage definition" );
 	}
 		
-	if ( 0 == strcmp( pTok, "constant"  ) ) symbol.mStorage = SlSymbol::CONSTANT ; else
-	if ( 0 == strcmp( pTok, "parameter" ) ) symbol.mStorage = SlSymbol::PARAMETER; else
-	if ( 0 == strcmp( pTok, "temporary" ) ) symbol.mStorage = SlSymbol::TEMPORARY; else
-	if ( 0 == strcmp( pTok, "global"	) ) symbol.mStorage = SlSymbol::GLOBAL   ; else
+	if ( 0 == strcmp( pTok, "constant"  ) ) pSymbol->mStorage = SlSymbol::CONSTANT ; else
+	if ( 0 == strcmp( pTok, "parameter" ) ) pSymbol->mStorage = SlSymbol::PARAMETER; else
+	if ( 0 == strcmp( pTok, "temporary" ) ) pSymbol->mStorage = SlSymbol::TEMPORARY; else
+	if ( 0 == strcmp( pTok, "global"	) ) pSymbol->mStorage = SlSymbol::GLOBAL   ; else
 	{
 		onError( "ERROR: Invalid storage definition: '%s'", pTok );
 	}
@@ -231,29 +238,43 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 		onError( "ERROR: Expecting variability definition" );
 	}
 
-	if ( 0 == strcmp( pTok, "varying"	) ) symbol.mIsVarying = true ; else
-	if ( 0 == strcmp( pTok, "uniform"	) ) symbol.mIsVarying = false; else
+	if ( 0 == strcmp( pTok, "varying"	) )
+	{
+		pSymbol->mIsVarying = true;
+
+		if ( pSymbol->mStorage == SlSymbol::CONSTANT )
+		{
+			onError( "ERROR: constant variables cannot be varying: '%s'", pTok );
+		}
+	}
+	else
+	if ( 0 == strcmp( pTok, "uniform"	) )
+	{
+		pSymbol->mIsVarying = false;
+	}
+	else
 	{
 		onError( "ERROR: Invalid variability definition: '%s'", pTok );
 	}
 
-	if NOT( symbol.mIsVarying )
-		if ( symbol.mStorage == SlSymbol::TEMPORARY )
+/*
+	if NOT( pSymbol->mIsVarying )
+		if ( pSymbol->mStorage == SlSymbol::TEMPORARY )
 			onError( "Use 'temporary' only for varying values !" );
-
+*/
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
 		onError( "ERROR: Expecting type definition" );
 	}
 
-	if ( 0 == strcmp( pTok, "float"  ) ) symbol.mType = SlSymbol::FLOAT ; else
-	if ( 0 == strcmp( pTok, "point"  ) ) symbol.mType = SlSymbol::POINT ; else
-	if ( 0 == strcmp( pTok, "color"  ) ) symbol.mType = SlSymbol::COLOR ; else
-	if ( 0 == strcmp( pTok, "string" ) ) symbol.mType = SlSymbol::STRING; else
-	if ( 0 == strcmp( pTok, "vector" ) ) symbol.mType = SlSymbol::VECTOR; else
-	if ( 0 == strcmp( pTok, "normal" ) ) symbol.mType = SlSymbol::NORMAL; else
-	if ( 0 == strcmp( pTok, "matrix" ) ) symbol.mType = SlSymbol::MATRIX; else
+	if ( 0 == strcmp( pTok, "float"  ) ) pSymbol->mType = SlSymbol::FLOAT ; else
+	if ( 0 == strcmp( pTok, "point"  ) ) pSymbol->mType = SlSymbol::POINT ; else
+	if ( 0 == strcmp( pTok, "color"  ) ) pSymbol->mType = SlSymbol::COLOR ; else
+	if ( 0 == strcmp( pTok, "string" ) ) pSymbol->mType = SlSymbol::STRING; else
+	if ( 0 == strcmp( pTok, "vector" ) ) pSymbol->mType = SlSymbol::VECTOR; else
+	if ( 0 == strcmp( pTok, "normal" ) ) pSymbol->mType = SlSymbol::NORMAL; else
+	if ( 0 == strcmp( pTok, "matrix" ) ) pSymbol->mType = SlSymbol::MATRIX; else
 	{
 		onError( "ERROR: Invalid type definition: '%s'", pTok );
 	}
@@ -263,54 +284,32 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	const char *pDefaultValueStr = pTok + strlen(pTok) + 1;
 	if ( pDefaultValueStr < pLineEnd )
 	{
-		if ( symbol.mIsVarying )
-			onError( "No default values possible for varying variables !" );
-
-		symbol.mArraySize = 1;
-		symbol.AllocData();
-
 		float	tmp[64];
 
-		switch ( symbol.mType )
+		switch ( pSymbol->mType )
 		{
-		case SlSymbol::FLOAT :
-						getVector( pDefaultValueStr, tmp, 1 );
-						((SlScalar *)symbol.mpDefaultVal)[0] = tmp[0];
-						break;
-
-		case SlSymbol::POINT :
-						getVector( pDefaultValueStr, tmp, 3 );
-						((SlVec3 *)symbol.mpDefaultVal)[0][0] = tmp[0];
-						((SlVec3 *)symbol.mpDefaultVal)[0][1] = tmp[1];
-						((SlVec3 *)symbol.mpDefaultVal)[0][2] = tmp[2];
-						break;
-
-		case SlSymbol::COLOR :
-						getVector( pDefaultValueStr, tmp, 3 );
-						((SlColor *)symbol.mpDefaultVal)[0][0] = tmp[0];
-						((SlColor *)symbol.mpDefaultVal)[0][1] = tmp[1];
-						((SlColor *)symbol.mpDefaultVal)[0][2] = tmp[2];
-						break;
-		
+		case SlSymbol::FLOAT : getVector( pDefaultValueStr, tmp, 1 ); break;
+		case SlSymbol::POINT : getVector( pDefaultValueStr, tmp, 3 ); break;
+		case SlSymbol::COLOR : getVector( pDefaultValueStr, tmp, 3 ); break;
 		case SlSymbol::VECTOR:
-		case SlSymbol::NORMAL:
-						getVector( pDefaultValueStr, tmp, 3 );
-						((SlVec3 *)symbol.mpDefaultVal)[0][0] = tmp[0];
-						((SlVec3 *)symbol.mpDefaultVal)[0][1] = tmp[1];
-						((SlVec3 *)symbol.mpDefaultVal)[0][2] = tmp[2];
-						break;
-		
+		case SlSymbol::NORMAL: getVector( pDefaultValueStr, tmp, 3 ); break;
 		case SlSymbol::STRING:
 		case SlSymbol::MATRIX:
-			{
 				onError( "Currently unsupported default value (^^;> '%s'", pTok );
-			}
+				break;
 		}
-	
+
+		pSymbol->AllocDefault( tmp );
+
 		printf( "Default value '%s'\n", pDefaultValueStr );
 	}
-		
-	mpShader->mSymbols.push_back( symbol );
+	else
+	{
+		if ( pSymbol->mStorage == SlSymbol::CONSTANT )
+			onError( "ERROR: Missing constant value for '%s'", pTok );
+	}
+
+	mpShader->mSymbols.push_back( pSymbol.release() );
 }
 
 //==================================================================
@@ -331,7 +330,7 @@ int ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
 {
 	for (size_t i=0; i < mpShader->mSymbols.size(); ++i)
 	{
-		const char *pShaderSymName = mpShader->mSymbols[i].mName.c_str();
+		const char *pShaderSymName = mpShader->mSymbols[i]->mName.c_str();
 		
 		if ( ignoreCase )
 		{
@@ -358,34 +357,34 @@ int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 	size_t	len = strlen( pName );
 	if ( len < 3 )
 		return -1;
-		
-	SlSymbol	symbol;		
-	symbol.Reset();
-	symbol.mName	= pName;
-	symbol.mStorage	= SlSymbol::TEMPORARY;
-	symbol.mIsVarying	= true;
-	symbol.mArraySize	= 0;
-	symbol.mpDefaultVal	= NULL;
+
+	if NOT(	pName[1] == 's' || pName[1] == 'S' ||
+			pName[1] == 'v' || pName[1] == 'V' )
+		return -1;
 
 	int	retIdx = (int)mpShader->mSymbols.size();
+
+	auto_ptr<SlSymbol>	pSymbol( DNEW SlSymbol() );
+	pSymbol->mName		= pName;
+	pSymbol->mStorage	= SlSymbol::TEMPORARY;
+	pSymbol->mIsVarying	= true;
+	pSymbol->mArraySize	= 0;
+	pSymbol->mpValArray	= NULL;
 
 	if ( pName[1] == 's' || pName[1] == 'S' )
 	{
 		// scalar base
-		symbol.mType	= SlSymbol::FLOAT;
-		mpShader->mSymbols.push_back( symbol );
-		return retIdx;
+		pSymbol->mType	= SlSymbol::FLOAT;
 	}
 	else
-	if ( pName[1] == 'v' || pName[1] == 'V' )
 	{
 		// vector base
-		symbol.mType	= SlSymbol::VECTOR;
-		mpShader->mSymbols.push_back( symbol );
-		return retIdx;
+		pSymbol->mType	= SlSymbol::VECTOR;
 	}
-	else
-		return -1;
+
+	mpShader->mSymbols.push_back( pSymbol.release() );
+
+	return retIdx;
 }
 
 
@@ -419,6 +418,23 @@ static bool isTempSymbol( const char *pTok )
 }
 
 //==================================================================
+void ShaderAsmParser::verifySymbolType(
+								SlSymbol::Type slSymType,
+								OperTypeID otExpected,
+								int reportOpIdx,
+								const char *pReportOpName )
+{
+	bool	success;
+	OperTypeID	otSolved = getOperTypeFromSlSymbolType( slSymType, success );
+
+	if ( !success || otSolved != otExpected )
+	{
+		// following should except really..
+		onError( "ERROR: Invalid operand type at position %i (%s)", reportOpIdx+1, pReportOpName );
+	}
+}
+
+//==================================================================
 void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 {
 	//printf( "CODE: %s\n", lineBuff );
@@ -443,6 +459,8 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 	instruction.mOpCode.mTableOffset	= opCodeIdx;
 	instruction.mOpCode.mOperandCount	= pOpDef->OperCnt;
 	instruction.mOpCode.mDestOpType		= 0;
+	instruction.mOpCode.mDbgLineNum		= lineCnt;
+
 	size_t	instrIdx = mpShader->mCode.size();
 	mpShader->mCode.push_back( instruction );
 
@@ -453,7 +471,7 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 		{
 			onError( "ERROR: missing operand #%i, "
-					"expecting %i operands\n",
+					"expecting %i operands",
 					i+1,
 					pOpDef->OperCnt );
 		}
@@ -472,25 +490,26 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 		if ( symbolIdx == -1 )
 		{
-			onError( "ERROR: Symbol '%s' unknown !\n", pTok );
+			onError( "ERROR: Symbol '%s' unknown !", pTok );
 		}
 
-		word.mSymbol.mTableOffset = (u_int)symbolIdx;
-		word.mSymbol.mIsVarying	  = mpShader->mSymbols[symbolIdx].mIsVarying;
+		word.mSymbol.mTableOffset	= (u_int)symbolIdx;
+		word.mSymbol.mIsVarying		= mpShader->mSymbols[symbolIdx]->mIsVarying;
+		word.mSymbol.mpOrigSymbol	= mpShader->mSymbols[symbolIdx];
 
 		mpShader->mCode.push_back( word );
-		
+
+		// verify that the symbol type matches with the operator type
+		verifySymbolType(
+					mpShader->mSymbols[symbolIdx]->mType,
+					pOpDef->Types[i],
+					i,
+					pTok );
+
 		// copy the type of the first operator into the opcode
 		if ( i == 0 )
 		{
-			bool success;
-			instruction.mOpCode.mDestOpType =
-				getOperTypeFromSlSymbolType( mpShader->mSymbols[symbolIdx].mType, success );
-				
-			if NOT( success )
-			{
-				onError( "ERROR: Invalid operand type for '%s' !\n", pTok );
-			}
+			instruction.mOpCode.mDestOpType = pOpDef->Types[i];
 		}
 	}
 

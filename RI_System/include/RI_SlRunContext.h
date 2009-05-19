@@ -26,9 +26,13 @@ class SlRunContext
 	size_t					mMaxPointsN;
 
 public:
+	u_int					mBlocksXN;
+	u_int					mPointsYN;
+
+public:
 	u_int					mProgramCounter;
-	u_int					mSIMDCount;
-	u_int					mSIMDBlocksN;
+	u_int					mPointsN;
+	u_int					mBlocksN;
 	int						*mpSIMDFlags;
 	SlValue					*mpDataSegment;
 	const SlShaderInstance	*mpShaderInst;
@@ -48,9 +52,15 @@ public:
 	} mCache;
 
 	SlRunContext( const SlSymbolList &symbols, size_t maxPointsN );
+
 	~SlRunContext();
 
-	void Setup( const Attributes &attribs, size_t pointsN );
+	void Setup(
+			const Attributes &attribs,
+			const SlShaderInstance *pShaderInst,
+			u_int blocksXN,
+			u_int pointsYN,
+			size_t pointsN );
 
 	SlCPUWord *GetOp( u_int argc )
 	{
@@ -80,7 +90,7 @@ public:
 	SlSymbol &GetSymbol( u_int argc )
 	{
 		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
-		return mpShaderInst->mpShader->mSymbols[tableOff ];
+		return *mpShaderInst->mpShader->mSymbols[tableOff ];
 	}
 
 	bool IsSymbolVarying( u_int argc ) const
@@ -93,17 +103,65 @@ public:
 		return GetOp(argc)->mSymbol.mIsVarying ? 1 : 0;
 	}
 
-	void		*GetVoid  ( u_int argc ) { return GetValue(argc).Data.pVoidValue;	}
-	//float		*GetFloat ( u_int argc ) { return GetValue(argc).Data.pFloatValue;	}
-	//Vec3f		*GetColor ( u_int argc ) { return GetValue(argc).Data.pColorValue;	}
-	//Matrix44	*GetMatrix( u_int argc ) { return GetValue(argc).Data.pMatrixValue;	}
-	// no non-constant string
+	template <class _T>
+	_T *GetVoidRW( u_int argc )
+	{
+		return 0;
+	}
 
-	const void		*GetVoid  ( u_int argc ) const { return GetValue(argc).Data.pVoidValue;	}
-	//const float		*GetFloat ( u_int argc ) const { return GetValue(argc).Data.pFloatValue;	}
-	//const Vec3f		*GetColor ( u_int argc ) const { return GetValue(argc).Data.pColorValue;	}
-	//const Matrix44	*GetMatrix( u_int argc ) const { return GetValue(argc).Data.pMatrixValue;	}
-	//const char		*GetString( u_int argc ) const { return GetValue(argc).Data.pStringValue;	}
+	template <class _T>
+	const _T *GetVoidRO( u_int argc ) const
+	{
+		return 0;
+	}
+
+	template <>
+	SlScalar *GetVoidRW( u_int argc )
+	{
+		SlValue	&value = GetValue(argc);
+
+		DASSERT( value.mpSrcSymbol->mType == SlSymbol::FLOAT &&
+				 value.Flags.mCanChange != 0 );
+
+		return (SlScalar *)value.Data.pVoidValue;
+	}
+
+	template <>
+	const SlScalar *GetVoidRO( u_int argc ) const
+	{
+		const SlValue	&value = GetValue(argc);
+		DASSERT( value.mpSrcSymbol->mType == SlSymbol::FLOAT );
+		return (const SlScalar *)value.Data.pVoidValue;
+	}
+
+	template <>
+	SlVec3 *GetVoidRW( u_int argc )
+	{
+		SlValue	&value = GetValue(argc);
+
+		DASSERT(
+			(value.mpSrcSymbol->mType == SlSymbol::POINT ||
+			 value.mpSrcSymbol->mType == SlSymbol::COLOR ||
+			 value.mpSrcSymbol->mType == SlSymbol::VECTOR ||
+			 value.mpSrcSymbol->mType == SlSymbol::NORMAL) &&
+			 value.Flags.mCanChange != 0 );
+
+		return (SlVec3 *)value.Data.pVoidValue;
+	}
+
+	template <>
+	const SlVec3 *GetVoidRO( u_int argc ) const
+	{
+		const SlValue	&value = GetValue(argc);
+
+		DASSERT(
+			(value.mpSrcSymbol->mType == SlSymbol::POINT ||
+			 value.mpSrcSymbol->mType == SlSymbol::COLOR ||
+			 value.mpSrcSymbol->mType == SlSymbol::VECTOR ||
+			 value.mpSrcSymbol->mType == SlSymbol::NORMAL) );
+
+		return (const SlVec3 *)value.Data.pVoidValue;
+	}
 
 	void InitializeSIMD( size_t samplesN );
 	
@@ -111,7 +169,7 @@ public:
 	bool IsProcessorActive( u_int i ) const { return true; }
 	void EnableProcessor( u_int i )			{ mpSIMDFlags[i] -= 1; }
 	void DisableProcessor( u_int i )		{ mpSIMDFlags[i] += 1; }
-	u_int GetProcessorsN() const			{ return mSIMDCount; }
+	u_int GetProcessorsN() const			{ return mPointsN; }
 	void NextInstruction()					{ mProgramCounter += GetOpCount() + 1; }
 };
 

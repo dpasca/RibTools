@@ -92,6 +92,23 @@ char *SSPrintF( const char *pFmt, ... )
 }
 
 //===============================================================
+void DAssert( bool ok, const char *pFile, int line )
+{
+	if ( ok )
+		return;
+
+	char	buff[1024];
+	
+	sprintf( buff, "ASSERT: %s %i\n", pFile, line );
+	
+	puts( buff );
+	
+#if defined(_DEBUG)
+	DebugBreak();
+#endif
+}
+
+//===============================================================
 void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 {
 	if ( ok )
@@ -101,13 +118,13 @@ void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 	
 	if ( pNewCharMsg )
 	{
-		sprintf( buff, "ASSERT: %s - %s %i\n", pNewCharMsg, pFile, line );
+		sprintf( buff, "ASSERT EXCEPT: %s - %s %i\n", pNewCharMsg, pFile, line );
 
 		DSAFE_DELETE_ARRAY( pNewCharMsg );
 	}
 	else
 	{
-		sprintf( buff, "ASSERT: %s %i\n", pFile, line );
+		sprintf( buff, "ASSERT EXCEPT: %s %i\n", pFile, line );
 	}
 	
 	puts( buff );
