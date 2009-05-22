@@ -16,7 +16,7 @@ class RSLCompiler
 {
 
 public:
-	RSLCompiler();
+	RSLCompiler( const char *pSource, size_t sourceSize );
 
 	~RSLCompiler();
 };
