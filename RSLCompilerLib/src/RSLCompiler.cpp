@@ -23,7 +23,11 @@ RSLCompiler::RSLCompiler( const char *pSource, size_t sourceSize )
 
 	for (size_t i=0; i < tokens.size(); ++i)
 	{
-		printf( "%3i) %i - %s\n", i, tokens[i].isPrecededByWS, tokens[i].str.c_str() );
+		printf( "%3i) %i - %-12s - %s\n",
+				i,
+				tokens[i].isPrecededByWS,
+				GetTokenTypeStr( tokens[i].idType ),
+				tokens[i].str.c_str() );
 	}
 }
 
