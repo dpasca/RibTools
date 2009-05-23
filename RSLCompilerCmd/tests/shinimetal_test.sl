@@ -1,3 +1,6 @@
+/* Test file for shader parsing
+   ..this comment is part of the test 8)*/
+
 surface
 shinymetal(
 	float Ka = 1;

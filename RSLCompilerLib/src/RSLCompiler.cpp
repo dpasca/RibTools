@@ -26,6 +26,8 @@ enum TokenType
 	T_MINUS		,
 	T_MUL		,
 	T_DIV		,
+	T_POW		,
+	T_DOT		,
 	T_COLON		,
 	T_COMMA		,
 	T_SEMICOL	,
@@ -61,6 +63,8 @@ static TokenDef _sTokenDefs[T_N] =
 	"-"		,	T_MINUS		,
 	"*"		,	T_MUL		,
 	"/"		,	T_DIV		,
+	"^"		,	T_POW		,
+	"."		,	T_DOT		,
 	":"		,	T_COLON		,
 	","		,	T_COMMA		,
 	";"		,	T_SEMICOL	,
@@ -77,8 +81,9 @@ struct Token
 {
 	std::string	str;
 	TokenType	id;
+	bool		isPrecededByWS;
 
-	Token() : id(T_UNKNOWN) {}
+	Token() : id(T_UNKNOWN), isPrecededByWS(false) {}
 };
 
 //==================================================================
@@ -116,7 +121,7 @@ static void newToken( DVec<Token> &tokens )
 }
 
 //==================================================================
-static bool matchTokenDef( DVec<Token> &tokens, const char *pSource, size_t &i, size_t sourceSize )
+static bool matchTokenDef( DVec<Token> &tokens, const char *pSource, size_t &i, size_t sourceSize, bool wasPrecededByWS )
 {
 	for (size_t j=1; j < T_N; ++j)
 	{
@@ -126,9 +131,45 @@ static bool matchTokenDef( DVec<Token> &tokens, const char *pSource, size_t &i, 
 			tokens.back().str	= _sTokenDefs[j].pStr;
 			tokens.back().id	= _sTokenDefs[j].id;
 			i += strlen( _sTokenDefs[j].pStr );
+			if ( wasPrecededByWS )
+			{
+				tokens.back().isPrecededByWS = wasPrecededByWS;
+			}
 			newToken( tokens );
 			return true;
 		}
+	}
+
+	return false;
+}
+
+//==================================================================
+static bool handleComment(
+					const char	*pSource,
+					size_t		&i,
+					size_t		sourceSize,
+					bool		&isInComment )
+{
+	if ( isInComment )
+	{
+		if ( matches( pSource, i, sourceSize, "*/" ) )
+		{
+			isInComment = false;
+			i += 2;
+		}
+		else
+		{
+			i += 1;
+		}
+
+		return true;
+	}
+	else
+	if ( matches( pSource, i, sourceSize, "/*" ) )
+	{
+		isInComment = true;
+		i += 2;
+		return true;
 	}
 
 	return false;
@@ -139,17 +180,25 @@ static void tokenize( DVec<Token> &tokens, const char *pSource, size_t sourceSiz
 {
 	bool	isEscape	= false;
 	bool	isInString	= false;
+	bool	isInComment	= false;
 
 	tokens.grow();
 
 	TokenDef	*pCurTDef = NULL;
 
+	bool wasPrecededByWS = false;
+
 	for (size_t i=0; i < sourceSize; )
 	{
+		if ( handleComment( pSource, i, sourceSize, isInComment ) )
+			continue;
+
 		char	ch = pSource[i];
 
 		if ( ch == '"' )
 		{
+			wasPrecededByWS = false;
+
 			if ( isInString )
 			{
 				if ( isEscape )
@@ -177,15 +226,18 @@ static void tokenize( DVec<Token> &tokens, const char *pSource, size_t sourceSiz
 		{
 			if ( findSkipWhites( pSource, i, sourceSize ) )
 			{
-				// create a new token if the current one has any
-				// content at all
+				wasPrecededByWS = true;
 				newToken( tokens );
 			}
 			else
-			if NOT( matchTokenDef( tokens, pSource, i, sourceSize ) )
 			{
-				tokens.back().str += ch;
-				++i;
+				if NOT( matchTokenDef( tokens, pSource, i, sourceSize, wasPrecededByWS ) )
+				{
+					tokens.back().str += ch;
+					++i;
+				}
+
+				wasPrecededByWS = false;
 			}
 		}
 	}
@@ -200,7 +252,7 @@ RSLCompiler::RSLCompiler( const char *pSource, size_t sourceSize )
 
 	for (size_t i=0; i < tokens.size(); ++i)
 	{
-		printf( "%3i) %s\n", i, tokens[i].str.c_str() );
+		printf( "%3i) %i - %s\n", i, tokens[i].isPrecededByWS, tokens[i].str.c_str() );
 	}
 }
 
