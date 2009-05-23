@@ -159,6 +159,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_Tree.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Tree.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLCompiler.cpp"
 				>
 			</File>

@@ -9,6 +9,7 @@
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DContainers.h"
 #include "RSLC_Token.h"
+#include "RSLC_Tree.h"
 #include "RSLCompiler.h"
 
 //==================================================================
@@ -29,6 +30,10 @@ RSLCompiler::RSLCompiler( const char *pSource, size_t sourceSize )
 				GetTokenTypeStr( tokens[i].idType ),
 				tokens[i].str.c_str() );
 	}
+
+	TokNode *pRoot = MakeTree( tokens );
+
+	TraverseTree( pRoot, 0 );
 }
 
 //==================================================================
