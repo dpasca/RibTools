@@ -22,41 +22,47 @@ struct TokenDef
 };
 
 //==================================================================
-#define DT_DEF(_X_)	#_X_, T_TYPE_DATATYPE,	T_DT_##_X_
-#define KW_DEF(_X_)	#_X_, T_TYPE_KEYWORD,	T_KW_##_X_
-#define SF_DEF(_X_)	#_X_, T_TYPE_STDFUNC,	T_SF_##_X_
+#define OP_DEF(_STR_,_X_)	_STR_, T_TYPE_OPERATOR,	T_OP_##_X_
+#define DT_DEF(_X_)			#_X_, T_TYPE_DATATYPE,	T_DT_##_X_
+#define KW_DEF(_X_)			#_X_, T_TYPE_KEYWORD,	T_KW_##_X_
+#define SF_DEF(_X_)			#_X_, T_TYPE_STDFUNC,	T_SF_##_X_
 
 //==================================================================
 static TokenDef _sTokenDefs[TOKEN_N] =
 {
-	"UNKNOWN"	,	T_TYPE_UNKNOWN	,	T_UNKNOWN		,
+	NULL	,	T_TYPE_UNKNOWN	,	T_UNKNOWN	,
 
-	"<="		,	T_TYPE_OPERATOR	,	T_OP_LSEQ		,
-	">="		,	T_TYPE_OPERATOR	,	T_OP_GEEQ		,
-	"<"			,	T_TYPE_OPERATOR	,	T_OP_LSTH		,
-	">"			,	T_TYPE_OPERATOR	,	T_OP_GRTH		,
-	"+="		,	T_TYPE_OPERATOR	,	T_OP_PLUSEQ		,
-	"-="		,	T_TYPE_OPERATOR	,	T_OP_MINUSEQ	,
-	"*="		,	T_TYPE_OPERATOR	,	T_OP_MULEQ		,
-	"/="		,	T_TYPE_OPERATOR	,	T_OP_DIVEQ		,
-	"+"			,	T_TYPE_OPERATOR	,	T_OP_PLUS		,
-	"-"			,	T_TYPE_OPERATOR	,	T_OP_MINUS		,
-	"*"			,	T_TYPE_OPERATOR	,	T_OP_MUL		,
-	"/"			,	T_TYPE_OPERATOR	,	T_OP_DIV		,
-	"=="		,	T_TYPE_OPERATOR	,	T_OP_EQ			,
-	"!="		,	T_TYPE_OPERATOR	,	T_OP_NEQ		,
-	"="			,	T_TYPE_OPERATOR	,	T_OP_ASSIGN		,
-	"^"			,	T_TYPE_OPERATOR	,	T_OP_POW		,
-	"."			,	T_TYPE_OPERATOR	,	T_OP_DOT		,
-	":"			,	T_TYPE_OPERATOR	,	T_OP_COLON		,
-	","			,	T_TYPE_OPERATOR	,	T_OP_COMMA		,
-	";"			,	T_TYPE_OPERATOR	,	T_OP_SEMICOL	,
-	"("			,	T_TYPE_OPERATOR	,	T_OP_LBRARND	,
-	")"			,	T_TYPE_OPERATOR	,	T_OP_RBRARND	,
-	"["			,	T_TYPE_OPERATOR	,	T_OP_LBRASQA	,
-	"]"			,	T_TYPE_OPERATOR	,	T_OP_RBRASQA	,
-	"{"			,	T_TYPE_OPERATOR	,	T_OP_LBRACRL	,
-	"}"			,	T_TYPE_OPERATOR	,	T_OP_RBRACRL	,
+	NULL	,	T_TYPE_VALUE	,	T_VL_NUMBER	,
+	NULL	,	T_TYPE_VALUE	,	T_VL_STRING	,
+
+	OP_DEF(	"<="	,	LSEQ		)	,
+	OP_DEF(	">="	,	GEEQ		)	,
+	OP_DEF(	"<"		,	LSTH		)	,
+	OP_DEF(	">"		,	GRTH		)	,
+	OP_DEF(	"&&"	,	LOGIC_AND	)	,
+	OP_DEF(	"||"	,	LOGIC_OR	)	,
+	OP_DEF(	"=="	,	EQ			)	,
+	OP_DEF(	"!="	,	NEQ			)	,
+	OP_DEF(	"+="	,	PLUSEQ		)	,
+	OP_DEF(	"-="	,	MINUSEQ		)	,
+	OP_DEF(	"*="	,	MULEQ		)	,
+	OP_DEF(	"/="	,	DIVEQ		)	,
+	OP_DEF(	"+"		,	PLUS		)	,
+	OP_DEF(	"-"		,	MINUS		)	,
+	OP_DEF(	"*"		,	MUL			)	,
+	OP_DEF(	"/"		,	DIV			)	,
+	OP_DEF(	"="		,	ASSIGN		)	,
+	OP_DEF(	"^"		,	POW			)	,
+	OP_DEF(	"."		,	DOT			)	,
+	OP_DEF(	":"		,	COLON		)	,
+	OP_DEF(	","		,	COMMA		)	,
+	OP_DEF(	";"		,	SEMICOL		)	,
+	OP_DEF(	"("		,	LBRARND		)	,
+	OP_DEF(	")"		,	RBRARND		)	,
+	OP_DEF(	"["		,	LBRASQA		)	,
+	OP_DEF(	"]"		,	RBRASQA		)	,
+	OP_DEF(	"{"		,	LBRACRL		)	,
+	OP_DEF(	"}"		,	RBRACRL		)	,
 
 	DT_DEF( float			)	,
 	DT_DEF( vector			)	,
@@ -134,6 +140,7 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 static size_t _sTokenDefsIdxInvSortLen[TOKEN_N];
 
 //==================================================================
+#undef OP_DEF
 #undef DT_DEF
 #undef KW_DEF
 #undef SF_DEF
@@ -178,6 +185,9 @@ static bool matchTokenDef( DVec<Token> &tokens, const char *pSource, size_t &i, 
 	for (size_t j=1; j < TOKEN_N; ++j)
 	{
 		const TokenDef &tokDef = _sTokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
+
+		if NOT( tokDef.pStr )
+			continue;
 
 		if ( matches( pSource, i, sourceSize, tokDef.pStr ) )
 		{
@@ -231,11 +241,113 @@ static bool handleComment(
 }
 
 //==================================================================
+static bool isDigit( char ch )
+{
+	return ch >= '0' && ch <= '9';
+}
+
+//==================================================================
+static bool handleNumber(
+					const char	*pSource,
+					size_t		&i,
+					size_t		sourceSize,
+					DVec<Token> &tokens )
+{
+	char ch		= pSource[i];
+
+	// not the beginning of a number.. ?
+	if ( (ch < '0' || ch > '9') && ch != '.' )
+		return false;
+
+	char nextCh = (i+1) < sourceSize ? pSource[i+1] : 0;
+
+	// starts with a dot ?
+	if ( ch == '.' )	// next must be a digit
+		if NOT( isDigit( nextCh ) )
+			return false;
+
+	newToken( tokens );
+
+	tokens.back().idType = T_TYPE_VALUE;
+	tokens.back().id	 = T_VL_NUMBER;
+
+	char	prevCh = 0;
+
+	bool	gotDot = false;
+
+	for (; i < sourceSize;)
+	{
+		ch		= pSource[i];
+		nextCh	= (i+1) < sourceSize ? pSource[i+1] : 0;
+
+		if ( isDigit( ch ) )
+		{
+			tokens.back().str += ch;
+			++i;
+		}
+		else
+		if ( ch == '.' )
+		{
+			if ( gotDot )
+			{
+				// 2+ decimal dots means bad number !
+				tokens.back().isBadNumber = true;
+				newToken( tokens );
+				return true;
+			}
+
+			gotDot = true;
+			tokens.back().str += ch;
+			++i;
+		}
+		else
+		if ( ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D' )	// end of a float or double ?
+		{
+			tokens.back().str += ch;
+			++i;
+			newToken( tokens );
+			return true;
+		}
+		else
+		if ( ch == 'e' || ch == 'E' )
+		{
+			tokens.back().str += ch;
+			++i;	// take it
+
+			if ( nextCh != 0 )
+			{
+				tokens.back().str += nextCh;
+				++i;	// take the next character if there is any
+			}
+
+			// must be +, - or a digit
+			if NOT( nextCh == '+' || nextCh == '-' || isDigit( nextCh ) )
+			{
+				// if not, then it's a bad number !
+				tokens.back().isBadNumber = true;
+				newToken( tokens );
+				return true;
+			}
+		}
+		else
+		{
+			break;
+		}
+
+		prevCh = ch;
+	}
+
+	newToken( tokens );
+	return true;
+}
+
+//==================================================================
 const char *GetTokenTypeStr( TokenIDType tokidtype )
 {
 	switch ( tokidtype )
 	{
 	case T_TYPE_UNKNOWN:	return "Unknown";
+	case T_TYPE_VALUE:		return "Value";
 	case T_TYPE_OPERATOR:	return "Operator";
 	case T_TYPE_DATATYPE:	return "Data Type";
 	case T_TYPE_KEYWORD:	return "Keyword";
@@ -252,7 +364,7 @@ const char *GetTokenIDStr( TokenID tokid )
 	for (size_t i=0; i < TOKEN_N; ++i)
 	{
 		if ( _sTokenDefs[i].id == tokid )
-			return _sTokenDefs[i].pStr;
+			return _sTokenDefs[i].pStr ? _sTokenDefs[i].pStr : "N/A";
 	}
 
 	return "SYMBOL NOT FOUND ?!!";
@@ -284,7 +396,7 @@ static void initSortedTable()
 
 	for (size_t i=0; i < TOKEN_N; ++i)
 	{
-		sortItems[i].strLen = strlen( _sTokenDefs[i].pStr );
+		sortItems[i].strLen = _sTokenDefs[i].pStr ? strlen( _sTokenDefs[i].pStr ) : 0;
 		sortItems[i].idx	= i;
 	}
 
@@ -316,6 +428,9 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 		if ( handleComment( pSource, i, sourceSize, isInComment ) )
 			continue;
 
+		if ( handleNumber( pSource, i, sourceSize, tokens ) )
+			continue;
+
 		char	ch = pSource[i];
 
 		if ( ch == '"' )
@@ -342,6 +457,8 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 				isInString = true;
 				newToken( tokens );
 				tokens.back().str += ch;
+				tokens.back().idType = T_TYPE_VALUE;
+				tokens.back().id	 = T_VL_STRING;
 				++i;
 			}
 		}

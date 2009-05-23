@@ -21,6 +21,8 @@ enum TokenIDType
 {
 	T_TYPE_UNKNOWN		,
 
+	T_TYPE_VALUE		,
+
 	T_TYPE_OPERATOR		,
 	T_TYPE_DATATYPE		,
 	T_TYPE_KEYWORD		,
@@ -30,41 +32,47 @@ enum TokenIDType
 };
 
 //==================================================================
-#define DT_DEF(_X_)	T_DT_##_X_
-#define KW_DEF(_X_)	T_KW_##_X_
-#define SF_DEF(_X_)	T_SF_##_X_
+#define OP_DEF(_DUMMY_,_X_)	T_OP_##_X_
+#define DT_DEF(_X_)			T_DT_##_X_
+#define KW_DEF(_X_)			T_KW_##_X_
+#define SF_DEF(_X_)			T_SF_##_X_
 
 //==================================================================
 enum TokenID
 {
 	T_UNKNOWN		,
 
-	T_OP_LSEQ		,
-	T_OP_GEEQ		,
-	T_OP_LSTH		,
-	T_OP_GRTH		,
-	T_OP_PLUSEQ		,
-	T_OP_MINUSEQ	,
-	T_OP_MULEQ		,
-	T_OP_DIVEQ		,
-	T_OP_PLUS		,
-	T_OP_MINUS		,
-	T_OP_MUL		,
-	T_OP_DIV		,
-	T_OP_EQ			,
-	T_OP_NEQ		,
-	T_OP_ASSIGN		,
-	T_OP_POW		,
-	T_OP_DOT		,
-	T_OP_COLON		,
-	T_OP_COMMA		,
-	T_OP_SEMICOL	,
-	T_OP_LBRARND	,
-	T_OP_RBRARND	,
-	T_OP_LBRASQA	,
-	T_OP_RBRASQA	,
-	T_OP_LBRACRL	,
-	T_OP_RBRACRL	,
+	T_VL_NUMBER,
+	T_VL_STRING,
+
+	OP_DEF(	"<="	,	LSEQ		)	,
+	OP_DEF(	">="	,	GEEQ		)	,
+	OP_DEF(	"<"		,	LSTH		)	,
+	OP_DEF(	">"		,	GRTH		)	,
+	OP_DEF(	"&&"	,	LOGIC_AND	)	,
+	OP_DEF(	"||"	,	LOGIC_OR	)	,
+	OP_DEF(	"=="	,	EQ			)	,
+	OP_DEF(	"!="	,	NEQ			)	,
+	OP_DEF(	"+="	,	PLUSEQ		)	,
+	OP_DEF(	"-="	,	MINUSEQ		)	,
+	OP_DEF(	"*="	,	MULEQ		)	,
+	OP_DEF(	"/="	,	DIVEQ		)	,
+	OP_DEF(	"+"		,	PLUS		)	,
+	OP_DEF(	"-"		,	MINUS		)	,
+	OP_DEF(	"*"		,	MUL			)	,
+	OP_DEF(	"/"		,	DIV			)	,
+	OP_DEF(	"="		,	ASSIGN		)	,
+	OP_DEF(	"^"		,	POW			)	,
+	OP_DEF(	"."		,	DOT			)	,
+	OP_DEF(	":"		,	COLON		)	,
+	OP_DEF(	","		,	COMMA		)	,
+	OP_DEF(	";"		,	SEMICOL		)	,
+	OP_DEF(	"("		,	LBRARND		)	,
+	OP_DEF(	")"		,	RBRARND		)	,
+	OP_DEF(	"["		,	LBRASQA		)	,
+	OP_DEF(	"]"		,	RBRASQA		)	,
+	OP_DEF(	"{"		,	LBRACRL		)	,
+	OP_DEF(	"}"		,	RBRACRL		)	,
 
 	DT_DEF( float			)	,
 	DT_DEF( vector			)	,
@@ -140,6 +148,7 @@ enum TokenID
 };
 
 //==================================================================
+#undef OP_DEF
 #undef DT_DEF
 #undef KW_DEF
 #undef SF_DEF
@@ -151,8 +160,14 @@ struct Token
 	TokenID		id;
 	TokenIDType	idType;
 	bool		isPrecededByWS;
+	bool		isBadNumber;
 
-	Token() : id(T_UNKNOWN), idType(T_TYPE_UNKNOWN), isPrecededByWS(false) {}
+	Token() :
+		id(T_UNKNOWN),
+		idType(T_TYPE_UNKNOWN),
+		isPrecededByWS(false),
+		isBadNumber(false)
+		{}
 };
 
 //==================================================================
