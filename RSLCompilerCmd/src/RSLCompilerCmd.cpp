@@ -42,8 +42,9 @@ int main( int argc, char *argv[] )
 
 	RSLCompiler	compiler( (const char *)pInData, inDataSize );
 
-
 	printf( "Generating %s...\n", pRRFName );
+
+	compiler.SaveASM( pRRFName );
 
 	printf( "Done !\n", pRRFName );
 

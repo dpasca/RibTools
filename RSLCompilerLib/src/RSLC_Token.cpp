@@ -24,6 +24,8 @@ struct TokenDef
 //==================================================================
 #define OP_DEF(_STR_,_X_)	_STR_, T_TYPE_OPERATOR,	T_OP_##_X_
 #define DT_DEF(_X_)			#_X_, T_TYPE_DATATYPE,	T_DT_##_X_
+#define ST_DEF(_X_)			#_X_, T_TYPE_SHADERTYPE,T_ST_##_X_
+#define DE_DEF(_X_)			#_X_, T_TYPE_DETAIL,	T_DE_##_X_
 #define KW_DEF(_X_)			#_X_, T_TYPE_KEYWORD,	T_KW_##_X_
 #define SF_DEF(_X_)			#_X_, T_TYPE_STDFUNC,	T_SF_##_X_
 
@@ -71,8 +73,8 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	DT_DEF( color			)	,
 	DT_DEF( string			)	,
 
-	KW_DEF( varying			)	,
-	KW_DEF( uniform			)	,
+	DE_DEF( varying			)	,
+	DE_DEF( uniform			)	,
 
 	KW_DEF( if				)	,
 	KW_DEF( for				)	,
@@ -89,12 +91,13 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	KW_DEF( environment		)	,
 	KW_DEF( bump			)	,
 	KW_DEF( shadow			)	,
-	KW_DEF( light			)	,	// shader types
-	KW_DEF( surface			)	,
-	KW_DEF( volume			)	,
-	KW_DEF( displacement	)	,
-	KW_DEF( transformation	)	,
-	KW_DEF( imager			)	,
+
+	ST_DEF( light			)	,	// shader types
+	ST_DEF( surface			)	,
+	ST_DEF( volume			)	,
+	ST_DEF( displacement	)	,
+	ST_DEF( transformation	)	,
+	ST_DEF( imager			)	,
 
 	SF_DEF( abs				)	,
 	SF_DEF( ambient			)	,
@@ -142,6 +145,8 @@ static size_t _sTokenDefsIdxInvSortLen[TOKEN_N];
 //==================================================================
 #undef OP_DEF
 #undef DT_DEF
+#undef ST_DEF
+#undef DE_DEF
 #undef KW_DEF
 #undef SF_DEF
 
@@ -156,14 +161,21 @@ static bool matches( const char *pStr, size_t i, size_t strSize, const char *pFi
 }
 
 //==================================================================
-static bool findSkipWhites( const char *pStr, size_t &i, size_t strSize )
+static bool findSkipWhites( const char *pStr, size_t &i, size_t strSize, int &io_lineCnt )
 {
 	char	ch = pStr[i];
 
 	if ( ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f' )
 	{
+		if ( ch == '\n' )
+			++io_lineCnt;
+
 		do {
 			ch = pStr[ ++i ];
+
+			if ( ch == '\n' )
+				++io_lineCnt;
+
 		} while ( ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f' );
 
 		return true;
@@ -173,14 +185,42 @@ static bool findSkipWhites( const char *pStr, size_t &i, size_t strSize )
 }
 
 //==================================================================
-static void newToken( DVec<Token> &tokens )
+static void newToken( DVec<Token> &tokens, int lineCnt )
 {
 	if ( tokens.back().str.size() )
+	{
 		tokens.grow();
+		tokens.back().sourceLine = lineCnt;
+	}
 }
 
 //==================================================================
-static bool matchTokenDef( DVec<Token> &tokens, const char *pSource, size_t &i, size_t sourceSize, bool wasPrecededByWS )
+static bool isAlphaNum( char ch )
+{
+	return
+		(ch >= 'a' && ch <= 'z') ||
+		(ch >= 'A' && ch <= 'Z') ||
+		(ch >= '0' && ch <= '9') ||
+		ch == '_';
+}
+
+//==================================================================
+static bool isAlphaNumStrFirstChar( char ch )
+{
+	return
+		(ch >= 'a' && ch <= 'z') ||
+		(ch >= 'A' && ch <= 'Z')||
+		ch == '_';
+}
+
+//==================================================================
+static bool matchTokenDef(
+					DVec<Token> &tokens,
+					const char *pSource,
+					size_t &i,
+					size_t sourceSize,
+					bool wasPrecededByWS,
+					int lineCnt )
 {
 	for (size_t j=1; j < TOKEN_N; ++j)
 	{
@@ -191,16 +231,33 @@ static bool matchTokenDef( DVec<Token> &tokens, const char *pSource, size_t &i, 
 
 		if ( matches( pSource, i, sourceSize, tokDef.pStr ) )
 		{
-			newToken( tokens );
+			size_t	findStrLen = strlen( tokDef.pStr );
+
+			// did we match an alphanumerical string ?
+			if ( isAlphaNumStrFirstChar( tokDef.pStr[0] ) )
+			{
+				// have some more on the right ?
+				if ( (i+findStrLen) < sourceSize )
+				{
+					// is that alphanumeric ?
+					if ( isAlphaNum( pSource[ i+findStrLen ] ) )
+					{
+						// ..if yes, then it's a bad match
+						continue;
+					}
+				}
+			}
+
+			newToken( tokens, lineCnt );
 			tokens.back().str		= tokDef.pStr;
 			tokens.back().idType	= tokDef.idType;
 			tokens.back().id		= tokDef.id;
-			i += strlen( tokDef.pStr );
+			i += findStrLen;
 			if ( wasPrecededByWS )
 			{
 				tokens.back().isPrecededByWS = wasPrecededByWS;
 			}
-			newToken( tokens );
+			newToken( tokens, lineCnt );
 			return true;
 		}
 	}
@@ -251,7 +308,8 @@ static bool handleNumber(
 					const char	*pSource,
 					size_t		&i,
 					size_t		sourceSize,
-					DVec<Token> &tokens )
+					DVec<Token> &tokens,
+					int			lineCnt )
 {
 	char ch		= pSource[i];
 
@@ -266,7 +324,7 @@ static bool handleNumber(
 		if NOT( isDigit( nextCh ) )
 			return false;
 
-	newToken( tokens );
+	newToken( tokens, lineCnt );
 
 	tokens.back().idType = T_TYPE_VALUE;
 	tokens.back().id	 = T_VL_NUMBER;
@@ -292,7 +350,7 @@ static bool handleNumber(
 			{
 				// 2+ decimal dots means bad number !
 				tokens.back().isBadNumber = true;
-				newToken( tokens );
+				newToken( tokens, lineCnt );
 				return true;
 			}
 
@@ -305,7 +363,7 @@ static bool handleNumber(
 		{
 			tokens.back().str += ch;
 			++i;
-			newToken( tokens );
+			newToken( tokens, lineCnt );
 			return true;
 		}
 		else
@@ -325,7 +383,7 @@ static bool handleNumber(
 			{
 				// if not, then it's a bad number !
 				tokens.back().isBadNumber = true;
-				newToken( tokens );
+				newToken( tokens, lineCnt );
 				return true;
 			}
 		}
@@ -337,7 +395,7 @@ static bool handleNumber(
 		prevCh = ch;
 	}
 
-	newToken( tokens );
+	newToken( tokens, lineCnt );
 	return true;
 }
 
@@ -350,6 +408,7 @@ const char *GetTokenTypeStr( TokenIDType tokidtype )
 	case T_TYPE_VALUE:		return "Value";
 	case T_TYPE_OPERATOR:	return "Operator";
 	case T_TYPE_DATATYPE:	return "Data Type";
+	case T_TYPE_SHADERTYPE:	return "Shader Type";
 	case T_TYPE_KEYWORD:	return "Keyword";
 	case T_TYPE_STDFUNC:	return "Std Func";
 
@@ -423,12 +482,14 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 
 	bool wasPrecededByWS = false;
 
+	int	lineCnt = 1;
+
 	for (size_t i=0; i < sourceSize; )
 	{
 		if ( handleComment( pSource, i, sourceSize, isInComment ) )
 			continue;
 
-		if ( handleNumber( pSource, i, sourceSize, tokens ) )
+		if ( handleNumber( pSource, i, sourceSize, tokens, lineCnt ) )
 			continue;
 
 		char	ch = pSource[i];
@@ -449,13 +510,13 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 					isInString = false;
 					tokens.back().str += ch;
 					++i;
-					newToken( tokens );
+					newToken( tokens, lineCnt );
 				}
 			}
 			else
 			{
 				isInString = true;
-				newToken( tokens );
+				newToken( tokens, lineCnt );
 				tokens.back().str += ch;
 				tokens.back().idType = T_TYPE_VALUE;
 				tokens.back().id	 = T_VL_STRING;
@@ -464,14 +525,14 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 		}
 		else
 		{
-			if ( findSkipWhites( pSource, i, sourceSize ) )
+			if ( findSkipWhites( pSource, i, sourceSize, lineCnt ) )
 			{
 				wasPrecededByWS = true;
-				newToken( tokens );
+				newToken( tokens, lineCnt );
 			}
 			else
 			{
-				if NOT( matchTokenDef( tokens, pSource, i, sourceSize, wasPrecededByWS ) )
+				if NOT( matchTokenDef( tokens, pSource, i, sourceSize, wasPrecededByWS, lineCnt ) )
 				{
 					tokens.back().str += ch;
 					++i;

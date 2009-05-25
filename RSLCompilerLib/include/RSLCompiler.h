@@ -9,16 +9,23 @@
 #ifndef RSLCOMPILER_H
 #define RSLCOMPILER_H
 
+#include "RSLC_Token.h"
+#include "RSLC_Tree.h"
+
 //==================================================================
 /// RSLCompiler
 //==================================================================
 class RSLCompiler
 {
+	DVec<RSLC::Token>	mTokens;
+	RSLC::TokNode		*mpRoot;
 
 public:
 	RSLCompiler( const char *pSource, size_t sourceSize );
 
 	~RSLCompiler();
+
+	void SaveASM( const char *pFName );
 };
 
 #endif

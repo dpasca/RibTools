@@ -17,40 +17,77 @@ namespace RSLC
 {
 
 //==================================================================
-template <class _T>
-class Node
+class Variable
 {
 public:
-	_T			*mpObj;
-	Node		*mpParent;
-	DVec<Node*>	mpChilds;
+	Token		*mpDTypeTok;
+	Token		*mpDetailTok;
+	Token		*mpSpaceCastTok;
+	Token		*mpNameTok;
+	std::string	mInternalName;
 
-public:
-	Node( _T *pObj ) : mpObj(pObj), mpParent(NULL)
+	Variable() :
+		mpDTypeTok(NULL),
+		mpDetailTok(NULL),
+		mpSpaceCastTok(NULL),
+		mpNameTok(NULL)
 	{
 	}
 
-	~Node()
+	~Variable()
+	{
+	}
+};
+
+//==================================================================
+class NodeData
+{
+public:
+	DVec<Variable>	mVariables;
+};
+
+
+//==================================================================
+class TokNode
+{
+public:
+	Token			*mpToken;
+private:
+	NodeData		mData;
+public:
+	TokNode			*mpParent;
+	AreaType		mAreaType;
+	DVec<TokNode*>	mpChilds;
+
+public:
+	TokNode( Token *pObj ) : mpToken(pObj), mpParent(NULL), mAreaType(AT_UNKNOWN)
+	{
+	}
+
+	~TokNode()
 	{
 		for (size_t i=0; i < mpChilds.size(); ++i)
 			DSAFE_DELETE( mpChilds[i] );
 	}
 
-	Node *AddChild( Node *pNode )
+	TokNode *AddChild( TokNode *pNode )
 	{
 		pNode->mpParent = this;
 		mpChilds.push_back( pNode );
 		return pNode;
 	}
 
-	Node *AddNewChild( _T *pObj )
+	TokNode *AddNewChild( Token *pObj )
 	{
-		return AddChild( DNEW Node( pObj ) );
+		return AddChild( DNEW TokNode( pObj ) );
 	}
-};
 
-//==================================================================
-typedef Node<Token>	TokNode;
+		  NodeData &GetData()		{ return mData;	}
+	const NodeData &GetData() const	{ return mData;	}
+
+		  DVec<Variable> &GetVars()			{ return mData.mVariables;	}
+	const DVec<Variable> &GetVars() const	{ return mData.mVariables;	}
+};
 
 //==================================================================
 TokNode *MakeTree( DVec<Token> &tokens );

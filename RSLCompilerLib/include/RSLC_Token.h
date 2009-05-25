@@ -25,6 +25,8 @@ enum TokenIDType
 
 	T_TYPE_OPERATOR		,
 	T_TYPE_DATATYPE		,
+	T_TYPE_SHADERTYPE	,
+	T_TYPE_DETAIL		,
 	T_TYPE_KEYWORD		,
 	T_TYPE_STDFUNC		,
 
@@ -32,8 +34,20 @@ enum TokenIDType
 };
 
 //==================================================================
+enum AreaType
+{
+	AT_UNKNOWN,
+	AT_SHPARAMS,
+	AT_CODEBLOCK,
+	AT_EXPRESSION,
+	AT_N
+};
+
+//==================================================================
 #define OP_DEF(_DUMMY_,_X_)	T_OP_##_X_
 #define DT_DEF(_X_)			T_DT_##_X_
+#define ST_DEF(_X_)			T_ST_##_X_
+#define DE_DEF(_X_)			T_DE_##_X_
 #define KW_DEF(_X_)			T_KW_##_X_
 #define SF_DEF(_X_)			T_SF_##_X_
 
@@ -81,8 +95,8 @@ enum TokenID
 	DT_DEF( color			)	,
 	DT_DEF( string			)	,
 
-	KW_DEF( varying			)	,
-	KW_DEF( uniform			)	,
+	DE_DEF( varying			)	,
+	DE_DEF( uniform			)	,
 
 	KW_DEF( if				)	,
 	KW_DEF( for				)	,
@@ -98,12 +112,13 @@ enum TokenID
 	KW_DEF( environment		)	,
 	KW_DEF( bump			)	,
 	KW_DEF( shadow			)	,
-	KW_DEF( light			)	,	// shader types
-	KW_DEF( surface			)	,
-	KW_DEF( volume			)	,
-	KW_DEF( displacement	)	,
-	KW_DEF( transformation	)	,
-	KW_DEF( imager			)	,
+
+	ST_DEF( light			)	,	// shader types
+	ST_DEF( surface			)	,
+	ST_DEF( volume			)	,
+	ST_DEF( displacement	)	,
+	ST_DEF( transformation	)	,
+	ST_DEF( imager			)	,
 
 	SF_DEF( abs				)	,
 	SF_DEF( ambient			)	,
@@ -150,6 +165,8 @@ enum TokenID
 //==================================================================
 #undef OP_DEF
 #undef DT_DEF
+#undef ST_DEF
+#undef DE_DEF
 #undef KW_DEF
 #undef SF_DEF
 
@@ -161,12 +178,14 @@ struct Token
 	TokenIDType	idType;
 	bool		isPrecededByWS;
 	bool		isBadNumber;
+	int			sourceLine;
 
 	Token() :
 		id(T_UNKNOWN),
 		idType(T_TYPE_UNKNOWN),
 		isPrecededByWS(false),
-		isBadNumber(false)
+		isBadNumber(false),
+		sourceLine(0)
 		{}
 };
 

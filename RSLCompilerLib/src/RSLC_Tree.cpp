@@ -13,9 +13,66 @@ namespace RSLC
 {
 
 //==================================================================
+static TokNode *findPrev( TokNode *pNode )
+{
+	TokNode *pParent = pNode->mpParent;
+
+	if NOT( pParent )
+		return NULL;
+
+	for (size_t i=1; i < pParent->mpChilds.size(); ++i)
+	{
+		if ( pParent->mpChilds[i] == pNode )
+		{
+			return pParent->mpChilds[i-1];
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
+static void determineAreaType( TokNode *pNode )
+{
+	if ( pNode->mpToken )
+	{
+		if ( pNode->mpToken->id == T_OP_LFT_BRACKET )
+		{
+			pNode->mAreaType = AT_EXPRESSION;
+
+			// are we at root level ?
+			if ( pNode->mpParent && pNode->mpParent->mpParent == NULL )
+			{
+				TokNode	*pShName = findPrev( pNode );
+				if ( pShName )
+				{
+					TokNode	*pShType = findPrev( pShName );
+					if ( pShType && pShType->mpToken->idType == T_TYPE_SHADERTYPE )
+					{
+						pNode->mAreaType = AT_SHPARAMS;
+					}
+				}
+			}
+		}
+		else
+		if ( pNode->mpToken->id == T_OP_LFT_CRL_BRACKET )
+		{
+			pNode->mAreaType = AT_CODEBLOCK;
+		}
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		determineAreaType( pNode->mpChilds[i] );
+	}
+}
+
+//==================================================================
 TokNode *MakeTree( DVec<Token> &tokens )
 {
 	TokNode	*pRoot = DNEW TokNode( NULL );
+
+	//pRoot->mAreaType = AT_ROOT;
 
 	TokNode	*pCurNode = pRoot;
 
@@ -42,6 +99,8 @@ TokNode *MakeTree( DVec<Token> &tokens )
 		}
 	}
 
+	determineAreaType( pRoot );
+
 	return pRoot;
 }
 
@@ -53,10 +112,40 @@ void TraverseTree( TokNode *pNode, int depth )
 		putchar( '\t' );
 	}
 
-	if NOT( pNode->mpObj )
-		printf( "ROOT\n" );
+	if NOT( pNode->mpToken )
+		printf( "ROOT" );
 	else
-		printf( "%s\n", pNode->mpObj->str.c_str() );
+		printf( "%s", pNode->mpToken->str.c_str() );
+
+	switch ( pNode->mAreaType )
+	{
+	case AT_UNKNOWN:	break;
+	case AT_SHPARAMS:	printf( " .. PARAMS " );	break;
+	case AT_CODEBLOCK:	printf( " .. BLOCK " );		break;
+	case AT_EXPRESSION:	printf( " .. EXPR " );		break;
+	}
+
+	const DVec<Variable> &vars = pNode->GetVars();
+
+	if ( vars.size() )
+	{
+		printf( " .. vars: " );
+
+		for (size_t i=0; i < vars.size(); ++i)
+		{
+			printf( " (%s, %s) %s,",
+						vars[i].mpDetailTok ? 
+							vars[i].mpDetailTok->str.c_str() :
+							"N/A",
+						vars[i].mpDTypeTok->str.c_str(),
+						vars[i].mpNameTok ?
+							vars[i].mpNameTok->str.c_str() :
+							"NONAME"
+					);
+		}
+	}
+
+	printf( "\n" );
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
