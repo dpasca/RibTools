@@ -9,6 +9,7 @@
 #ifndef RSLCOMPILER_H
 #define RSLCOMPILER_H
 
+#include "RSLC_Exceptions.h"
 #include "RSLC_Token.h"
 #include "RSLC_Tree.h"
 

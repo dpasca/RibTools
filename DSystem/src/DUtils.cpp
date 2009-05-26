@@ -91,6 +91,20 @@ char *SSPrintF( const char *pFmt, ... )
 	return p;
 }
 
+//==================================================================
+std::string SSPrintFS( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+	
+	return std::string( buff );
+}
+
 //===============================================================
 void DAssert( bool ok, const char *pFile, int line )
 {

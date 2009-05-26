@@ -242,10 +242,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Tests\noisecol.rrasm"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Tests\Pixar.rib"
 				>
 			</File>

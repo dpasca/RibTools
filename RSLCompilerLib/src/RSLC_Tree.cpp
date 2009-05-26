@@ -32,13 +32,13 @@ static TokNode *findPrev( TokNode *pNode )
 }
 
 //==================================================================
-static void determineAreaType( TokNode *pNode )
+static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 {
 	if ( pNode->mpToken )
 	{
 		if ( pNode->mpToken->id == T_OP_LFT_BRACKET )
 		{
-			pNode->mAreaType = AT_EXPRESSION;
+			pNode->mBlockType = BLKT_EXPRESSION;
 
 			// are we at root level ?
 			if ( pNode->mpParent && pNode->mpParent->mpParent == NULL )
@@ -49,7 +49,7 @@ static void determineAreaType( TokNode *pNode )
 					TokNode	*pShType = findPrev( pShName );
 					if ( pShType && pShType->mpToken->idType == T_TYPE_SHADERTYPE )
 					{
-						pNode->mAreaType = AT_SHPARAMS;
+						pNode->mBlockType = BLKT_SHPARAMS;
 					}
 				}
 			}
@@ -57,13 +57,20 @@ static void determineAreaType( TokNode *pNode )
 		else
 		if ( pNode->mpToken->id == T_OP_LFT_CRL_BRACKET )
 		{
-			pNode->mAreaType = AT_CODEBLOCK;
+			pNode->mBlockType = BLKT_CODEBLOCK;
+		}
+
+		// are we in a block ?
+		if ( pNode->mBlockType != BLKT_UNKNOWN )
+		{
+			// assign the ID and increment the counter
+			pNode->mBlockID = blockCnt++;
 		}
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		determineAreaType( pNode->mpChilds[i] );
+		defineBlockTypeAndID( pNode->mpChilds[i], blockCnt );
 	}
 }
 
@@ -72,7 +79,7 @@ TokNode *MakeTree( DVec<Token> &tokens )
 {
 	TokNode	*pRoot = DNEW TokNode( NULL );
 
-	//pRoot->mAreaType = AT_ROOT;
+	//pRoot->mBlockType = AT_ROOT;
 
 	TokNode	*pCurNode = pRoot;
 
@@ -99,7 +106,8 @@ TokNode *MakeTree( DVec<Token> &tokens )
 		}
 	}
 
-	determineAreaType( pRoot );
+	u_int	blockCnt = 0;
+	defineBlockTypeAndID( pRoot, blockCnt );
 
 	return pRoot;
 }
@@ -117,12 +125,12 @@ void TraverseTree( TokNode *pNode, int depth )
 	else
 		printf( "%s", pNode->mpToken->str.c_str() );
 
-	switch ( pNode->mAreaType )
+	switch ( pNode->mBlockType )
 	{
-	case AT_UNKNOWN:	break;
-	case AT_SHPARAMS:	printf( " .. PARAMS " );	break;
-	case AT_CODEBLOCK:	printf( " .. BLOCK " );		break;
-	case AT_EXPRESSION:	printf( " .. EXPR " );		break;
+	case BLKT_UNKNOWN:	break;
+	case BLKT_SHPARAMS:	printf( " .. PARAMS " );	break;
+	case BLKT_CODEBLOCK:	printf( " .. BLOCK " );		break;
+	case BLKT_EXPRESSION:	printf( " .. EXPR " );		break;
 	}
 
 	const DVec<Variable> &vars = pNode->GetVars();

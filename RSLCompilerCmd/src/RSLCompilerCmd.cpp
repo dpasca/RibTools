@@ -40,11 +40,22 @@ int main( int argc, char *argv[] )
 		exit( -1 );
 	}
 
-	RSLCompiler	compiler( (const char *)pInData, inDataSize );
+	try 
+	{
+		RSLCompiler	compiler( (const char *)pInData, inDataSize );
 
-	printf( "Generating %s...\n", pRRFName );
+		printf( "Generating %s...\n", pRRFName );
 
-	compiler.SaveASM( pRRFName, pSLFName );
+		compiler.SaveASM( pRRFName, pSLFName );
+	}
+	catch ( RSLC::Exception &e )
+	{
+		printf( "ERROR: %s !\n", e.GetMessage().c_str() );
+	}
+	catch ( ... )
+	{
+		printf( "ERROR while compiling !\n" );
+	}
 
 	printf( "Done !\n", pRRFName );
 

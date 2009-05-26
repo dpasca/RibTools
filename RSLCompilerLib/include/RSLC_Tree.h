@@ -34,11 +34,16 @@ private:
 	NodeData		mData;
 public:
 	TokNode			*mpParent;
-	AreaType		mAreaType;
+	BlockType		mBlockType;
+	u_int			mBlockID;
 	DVec<TokNode*>	mpChilds;
 
 public:
-	TokNode( Token *pObj ) : mpToken(pObj), mpParent(NULL), mAreaType(AT_UNKNOWN)
+	TokNode( Token *pObj ) :
+		mpToken(pObj),
+		mpParent(NULL),
+		mBlockType(BLKT_UNKNOWN),
+		mBlockID(0)
 	{
 	}
 

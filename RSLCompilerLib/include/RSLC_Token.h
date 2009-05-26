@@ -34,13 +34,13 @@ enum TokenIDType
 };
 
 //==================================================================
-enum AreaType
+enum BlockType
 {
-	AT_UNKNOWN,
-	AT_SHPARAMS,
-	AT_CODEBLOCK,
-	AT_EXPRESSION,
-	AT_N
+	BLKT_UNKNOWN,
+	BLKT_SHPARAMS,
+	BLKT_CODEBLOCK,
+	BLKT_EXPRESSION,
+	BLKT_N
 };
 
 //==================================================================
@@ -171,8 +171,9 @@ enum TokenID
 #undef SF_DEF
 
 //==================================================================
-struct Token
+class Token
 {
+public:
 	std::string	str;
 	TokenID		id;
 	TokenIDType	idType;

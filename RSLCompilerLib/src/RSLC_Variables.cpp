@@ -8,6 +8,7 @@
 
 #include "RSLC_Tree.h"
 #include "RSLC_Variables.h"
+#include "RSLC_Exceptions.h"
 
 //==================================================================
 namespace RSLC
@@ -27,6 +28,40 @@ static void AddVariable(
 	pVar->mpDetailTok		= pDetailNode ? pDetailNode->mpToken : NULL;
 	pVar->mpSpaceCastTok	= pSpaceCastTok ? pSpaceCastTok->mpToken : NULL;
 	pVar->mpNameTok			= pNameNode ? pNameNode->mpToken : NULL;
+
+	if ( pVar->mpNameTok )
+	{
+		pVar->mInternalName =
+				DUT::SSPrintFS( "_%i@_%s",
+							pNode->mBlockID,
+								pVar->mpNameTok->str.c_str() );
+	}
+	else
+	{
+		u_int	tmpID = pNode->GetData().mVariables.size() - 1;
+
+		pVar->mInternalName =
+				DUT::SSPrintFS( "_%i@_tmp%0", pNode->mBlockID, tmpID );
+	}
+
+	if ( pVar->mpDetailTok )
+	{
+		if ( pVar->mpDetailTok )
+		{
+			if ( pVar->mpDetailTok->idType != T_TYPE_DETAIL )
+				throw Exception( "Bad detail type !", pVar->mpDetailTok );
+
+			if ( pVar->mpDetailTok->id == T_DE_varying )
+				pVar->mIsVarying = true;
+			else
+				pVar->mIsVarying = false;
+		}
+		else
+		{
+			// varying until disproved !
+			pVar->mIsVarying = true;
+		}
+	}
 }
 
 //==================================================================
@@ -42,9 +77,9 @@ static bool fndVarInBlock(
 		 pChild0->mpToken->idType == T_TYPE_DETAIL )
 	{
 		// 3 possible cases
-		// 1) DT UN
-		// 2) DT DE UN
-		// 3) DE DT UN
+		// 1) TYPE UNK
+		// 2) TYPE DETAIL UNK
+		// 3) DETAIL TYPE UNK
 
 		TokNode	*pDTypeNode = NULL;
 		TokNode	*pDetailNode = NULL;
@@ -80,7 +115,7 @@ static bool fndVarInBlock(
 		}
 		else
 		{
-			DASSTHROW( 0, ("Broken variable declaration at line %i", pChild0->mpToken->sourceLine ) );
+			throw Exception( "Broken variable declaration", pChild0->mpToken );
 		}
 
 		// no "space cast" in the declaration in the curl braces
@@ -141,9 +176,9 @@ void DiscoverVariables( TokNode *pNode )
 	if ( pNode->mpToken )
 	{
 		DASSERT(
-			pNode->mAreaType == AT_SHPARAMS ||
-			pNode->mAreaType == AT_CODEBLOCK ||
-			pNode->mAreaType == AT_EXPRESSION
+			pNode->mBlockType == BLKT_SHPARAMS ||
+			pNode->mBlockType == BLKT_CODEBLOCK ||
+			pNode->mBlockType == BLKT_EXPRESSION
 			);
 
 		for (size_t i=0; i < pNode->mpChilds.size();)
@@ -155,8 +190,8 @@ void DiscoverVariables( TokNode *pNode )
 			if ( (i+1) < pNode->mpChilds.size() ) pChild1 = pNode->mpChilds[i + 1];
 			if ( (i+2) < pNode->mpChilds.size() ) pChild2 = pNode->mpChilds[i + 2];
 
-			if ( pNode->mAreaType == AT_CODEBLOCK ||
-				 pNode->mAreaType == AT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+			if ( pNode->mBlockType == BLKT_CODEBLOCK ||
+				 pNode->mBlockType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
 				 )
 			{
 				if NOT( fndVarInBlock( i, pNode, pChild0, pChild1, pChild2 ) )
@@ -166,7 +201,7 @@ void DiscoverVariables( TokNode *pNode )
 				}
 			}
 			else
-			if ( pNode->mAreaType == AT_EXPRESSION )
+			if ( pNode->mBlockType == BLKT_EXPRESSION )
 			{
 				if NOT( fndVarInExpr( i, pNode, pChild0, pChild1, pChild2 ) )
 				{

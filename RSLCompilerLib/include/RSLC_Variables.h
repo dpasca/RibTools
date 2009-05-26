@@ -22,17 +22,20 @@ class TokNode;
 class Variable
 {
 public:
-	Token		*mpDTypeTok;
-	Token		*mpDetailTok;
-	Token		*mpSpaceCastTok;
-	Token		*mpNameTok;
-	std::string	mInternalName;
+	std::string		mInternalName;
+	Token			*mpDTypeTok;
+	Token			*mpDetailTok;
+	Token			*mpSpaceCastTok;
+	Token			*mpNameTok;
+	DVec<Token*>	mpDefValToks;		
+	bool			mIsVarying;
 
 	Variable() :
 		mpDTypeTok(NULL),
 		mpDetailTok(NULL),
 		mpSpaceCastTok(NULL),
-		mpNameTok(NULL)
+		mpNameTok(NULL),
+		mIsVarying(false)
 	{
 	}
 

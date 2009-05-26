@@ -54,33 +54,31 @@ static void scanSaveVars( FILE *pFile, TokNode *pNode, size_t &blockCnt )
 
 	if ( vars.size() )
 	{
-		fprintf_s( pFile, "; -- vars for block %i\n", blockCnt );
+		fprintf_s( pFile, "\t; -- vars for block %i\n", blockCnt );
 
 		for (size_t i=0; i < vars.size(); ++i)
 		{
 			const Variable	&var = vars[i];
 
-			switch ( pNode->mAreaType )
+			fprintf_s( pFile, "\t" );
+
+			fprintf_s( pFile, "%-18s", var.mInternalName.c_str() );
+
+			fprintf_s( pFile, "\t" );
+
+			switch ( pNode->mBlockType )
 			{
-			case AT_SHPARAMS:	fprintf_s( pFile, "parameter" );	break;
-			case AT_CODEBLOCK:	fprintf_s( pFile, "temporary" );	break;
-			case AT_EXPRESSION:	fprintf_s( pFile, "temporary" );	break;
+			case BLKT_SHPARAMS:		fprintf_s( pFile, "parameter" );	break;
+			case BLKT_CODEBLOCK:	fprintf_s( pFile, "temporary" );	break;
+			case BLKT_EXPRESSION:	fprintf_s( pFile, "temporary" );	break;
 			}
 
-			if ( var.mpDetailTok )
-			{
-				fprintf_s( pFile, "\t" );
-				switch ( var.mpDetailTok->id )
-				{
-				case T_DE_varying:	fprintf_s( pFile, "varying" );	break;
-				case T_DE_uniform:	fprintf_s( pFile, "uniform" );	break;
-				case T_UNKNOWN:										break;
+			fprintf_s( pFile, "\t" );
 
-				default:
-					DASSTHROW( 0, ("Bad detail ?!") );
-					break;
-				}
-			}
+			if ( var.mIsVarying )
+				fprintf_s( pFile, "varying" );
+			else
+				fprintf_s( pFile, "uniform" );
 
 			if ( var.mpDTypeTok )
 			{
@@ -95,14 +93,9 @@ static void scanSaveVars( FILE *pFile, TokNode *pNode, size_t &blockCnt )
 				case T_DT_string:	fprintf_s( pFile, "string" );	break;
 
 				default:
-					DASSTHROW( 0, ("Bad type ?!") );
+					throw Exception( "Bad type ?!", var.mpDTypeTok );
 					break;
 				}
-			}
-			
-			if ( var.mpNameTok )
-			{
-				fprintf_s( pFile, "\t%s", var.mpNameTok->str.c_str() );
 			}
 
 			fprintf_s( pFile, "\n" );

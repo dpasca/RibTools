@@ -39,7 +39,7 @@ bool GrabFile( const char *pFileName, void * &out_pData, size_t &out_dataSize );
 DStr GetDirNameFromFPathName( const char *pInFPathname );
 
 char *SSPrintF( const char *pFmt, ... );
-
+std::string SSPrintFS( const char *pFmt, ... );
 
 void DAssert( bool ok, const char *pFile, int line );
 void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg );
