@@ -11,33 +11,11 @@
 
 #include "DSystem/include/DContainers.h"
 #include "RSLC_Token.h"
+#include "RSLC_Variables.h"
 
 //==================================================================
 namespace RSLC
 {
-
-//==================================================================
-class Variable
-{
-public:
-	Token		*mpDTypeTok;
-	Token		*mpDetailTok;
-	Token		*mpSpaceCastTok;
-	Token		*mpNameTok;
-	std::string	mInternalName;
-
-	Variable() :
-		mpDTypeTok(NULL),
-		mpDetailTok(NULL),
-		mpSpaceCastTok(NULL),
-		mpNameTok(NULL)
-	{
-	}
-
-	~Variable()
-	{
-	}
-};
 
 //==================================================================
 class NodeData

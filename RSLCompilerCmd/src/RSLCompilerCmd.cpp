@@ -44,7 +44,7 @@ int main( int argc, char *argv[] )
 
 	printf( "Generating %s...\n", pRRFName );
 
-	compiler.SaveASM( pRRFName );
+	compiler.SaveASM( pRRFName, pSLFName );
 
 	printf( "Done !\n", pRRFName );
 

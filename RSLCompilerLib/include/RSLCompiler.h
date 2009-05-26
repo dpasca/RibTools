@@ -20,12 +20,14 @@ class RSLCompiler
 	DVec<RSLC::Token>	mTokens;
 	RSLC::TokNode		*mpRoot;
 
+	static const char	*mpsVersionString;
+
 public:
 	RSLCompiler( const char *pSource, size_t sourceSize );
 
 	~RSLCompiler();
 
-	void SaveASM( const char *pFName );
+	void SaveASM( const char *pFName, const char *pRefSourceName );
 };
 
 #endif

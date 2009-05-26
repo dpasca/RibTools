@@ -167,6 +167,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_Variables.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Variables.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLCompiler.cpp"
 				>
 			</File>
