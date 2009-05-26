@@ -86,7 +86,7 @@ static bool fndVarInBlock(
 		TokNode	*pNameNode = NULL;
 
 		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) &&
-			(pChild1 && pChild1->mpToken->idType == T_TYPE_UNKNOWN) )
+			(pChild1 && pChild1->mpToken->idType == T_TYPE_NONTERM) )
 		{
 			pDTypeNode	= pChild0;
 			pDetailNode	= NULL;
@@ -96,7 +96,7 @@ static bool fndVarInBlock(
 		else
 		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) &&
 			(pChild1 && pChild1->mpToken->idType == T_TYPE_DETAIL) &&
-			(pChild2 && pChild2->mpToken->idType == T_TYPE_UNKNOWN) )
+			(pChild2 && pChild2->mpToken->idType == T_TYPE_NONTERM) )
 		{
 			pDTypeNode	= pChild0;
 			pDetailNode	= pChild1;
@@ -106,7 +106,7 @@ static bool fndVarInBlock(
 		else
 		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DETAIL) &&
 			(pChild1 && pChild1->mpToken->idType == T_TYPE_DATATYPE) &&
-			(pChild2 && pChild2->mpToken->idType == T_TYPE_UNKNOWN) )
+			(pChild2 && pChild2->mpToken->idType == T_TYPE_NONTERM) )
 		{
 			pDTypeNode	= pChild0;
 			pDetailNode	= pChild2;

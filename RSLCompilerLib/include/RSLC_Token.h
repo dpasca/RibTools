@@ -19,7 +19,7 @@ namespace RSLC
 //==================================================================
 enum TokenIDType
 {
-	T_TYPE_UNKNOWN		,
+	T_TYPE_NONTERM		,
 
 	T_TYPE_VALUE		,
 
@@ -54,7 +54,7 @@ enum BlockType
 //==================================================================
 enum TokenID
 {
-	T_UNKNOWN		,
+	T_NONTERM		,
 
 	T_VL_NUMBER,
 	T_VL_STRING,
@@ -182,8 +182,8 @@ public:
 	int			sourceLine;
 
 	Token() :
-		id(T_UNKNOWN),
-		idType(T_TYPE_UNKNOWN),
+		id(T_NONTERM),
+		idType(T_TYPE_NONTERM),
 		isPrecededByWS(false),
 		isBadNumber(false),
 		sourceLine(0)

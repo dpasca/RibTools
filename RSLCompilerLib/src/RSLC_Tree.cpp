@@ -127,10 +127,10 @@ void TraverseTree( TokNode *pNode, int depth )
 
 	switch ( pNode->mBlockType )
 	{
-	case BLKT_UNKNOWN:	break;
-	case BLKT_SHPARAMS:	printf( " .. PARAMS " );	break;
-	case BLKT_CODEBLOCK:	printf( " .. BLOCK " );		break;
-	case BLKT_EXPRESSION:	printf( " .. EXPR " );		break;
+	case BLKT_UNKNOWN:		break;
+	case BLKT_SHPARAMS:		printf( " $PARAMS$ " );	break;
+	case BLKT_CODEBLOCK:	printf( " $CODEBLK$ " );		break;
+	case BLKT_EXPRESSION:	printf( " $EXPR$ " );		break;
 	}
 
 	const DVec<Variable> &vars = pNode->GetVars();

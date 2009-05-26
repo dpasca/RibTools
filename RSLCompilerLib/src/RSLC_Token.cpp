@@ -32,7 +32,7 @@ struct TokenDef
 //==================================================================
 static TokenDef _sTokenDefs[TOKEN_N] =
 {
-	NULL	,	T_TYPE_UNKNOWN	,	T_UNKNOWN	,
+	NULL	,	T_TYPE_NONTERM	,	T_NONTERM	,
 
 	NULL	,	T_TYPE_VALUE	,	T_VL_NUMBER	,
 	NULL	,	T_TYPE_VALUE	,	T_VL_STRING	,
@@ -404,7 +404,7 @@ const char *GetTokenTypeStr( TokenIDType tokidtype )
 {
 	switch ( tokidtype )
 	{
-	case T_TYPE_UNKNOWN:	return "Unknown";
+	case T_TYPE_NONTERM:	return "Non Terminal";
 	case T_TYPE_VALUE:		return "Value";
 	case T_TYPE_OPERATOR:	return "Operator";
 	case T_TYPE_DATATYPE:	return "Data Type";
