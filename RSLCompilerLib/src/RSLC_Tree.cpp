@@ -13,23 +13,135 @@ namespace RSLC
 {
 
 //==================================================================
-static TokNode *findPrev( TokNode *pNode )
+TokNode *TokNode::GetLeft()
 {
-	TokNode *pParent = pNode->mpParent;
-
-	if NOT( pParent )
+	if NOT( mpParent )
 		return NULL;
 
-	for (size_t i=1; i < pParent->mpChilds.size(); ++i)
+	for (size_t i=0; i < mpParent->mpChilds.size(); ++i)
 	{
-		if ( pParent->mpChilds[i] == pNode )
+		if ( mpParent->mpChilds[i] == this )
 		{
-			return pParent->mpChilds[i-1];
+			if ( i > 0 )
+				return mpParent->mpChilds[i-1];
+			else
+				return NULL;
 		}
+	}
+
+	DASSTHROW( 0, ("Bad tree ?!") );
+	return NULL;
+}
+
+//==================================================================
+TokNode *TokNode::GetRight()
+{
+	if NOT( mpParent )
+		return NULL;
+
+	for (size_t i=0; i < mpParent->mpChilds.size(); ++i)
+	{
+		if ( mpParent->mpChilds[i] == this )
+		{
+			if ( (i+1) < mpParent->mpChilds.size() )
+				return mpParent->mpChilds[i+1];
+			else
+				return NULL;
+		}
+	}
+
+	DASSTHROW( 0, ("Bad tree ?!") );
+	return NULL;
+}
+
+//==================================================================
+TokNode *TokNode::GetPrev()
+{
+	if NOT( mpParent )
+		return NULL;
+
+	for (size_t i=0; i < mpParent->mpChilds.size(); ++i)
+	{
+		if ( mpParent->mpChilds[i] == this )
+		{
+			// return the sibling on the left if exists...
+			if ( i > 0 )
+				return mpParent->mpChilds[i-1];
+			else	// ..otherwise return the parent
+				return mpParent;
+		}
+	}
+
+	DASSTHROW( 0, ("Bad tree ?!") );
+	return NULL;
+}
+
+//==================================================================
+TokNode *TokNode::GetNext()
+{
+	if NOT( mpParent )
+	{
+		if ( mpChilds.size() && mpChilds[0] )
+			return mpChilds[0];
+		else
+			return NULL;
+	}
+
+	for (size_t i=0; i < mpParent->mpChilds.size(); ++i)
+	{
+		if ( mpParent->mpChilds[i] == this )
+		{
+			// return a sibling if any...
+			if ( (i+1) < mpParent->mpChilds.size() )
+				return mpParent->mpChilds[i+1];
+			else	// ..return the first child if exists..
+			if ( mpChilds.size() && mpChilds[0] )
+				return mpChilds[0];
+			else	// otherwise just give up (it's a leaf)
+				return NULL;
+		}
+	}
+
+	DASSTHROW( 0, ("Bad tree ?!") );
+	return NULL;
+}
+
+//==================================================================
+Variable *TokNode::FindVariableByDefName( const char *pName )
+{
+	for (size_t i=0; i < mData.mVariables.size(); ++i)
+	{
+		Variable	*pVar = &mData.mVariables[i];
+		if ( pVar->HasDefName() )
+			if ( 0 == strcmp( pVar->GetDefName(), pName ) )
+			{
+				return pVar;
+			}
 	}
 
 	return NULL;
 }
+
+//==================================================================
+/*
+a = b + c * d;
+
+a
+	=
+		b
+			+
+				c
+					*
+						d
+
+		a
+	=
+			b
+		+
+				c
+			*
+				d
+*/
 
 //==================================================================
 static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
@@ -43,10 +155,10 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 			// are we at root level ?
 			if ( pNode->mpParent && pNode->mpParent->mpParent == NULL )
 			{
-				TokNode	*pShName = findPrev( pNode );
+				TokNode	*pShName = pNode->GetLeft();
 				if ( pShName )
 				{
-					TokNode	*pShType = findPrev( pShName );
+					TokNode	*pShType = pShName->GetLeft();
 					if ( pShType && pShType->mpToken->idType == T_TYPE_SHADERTYPE )
 					{
 						pNode->mBlockType = BLKT_SHPARAMS;
@@ -123,7 +235,14 @@ void TraverseTree( TokNode *pNode, int depth )
 	if NOT( pNode->mpToken )
 		printf( "ROOT" );
 	else
+	{
 		printf( "%s", pNode->mpToken->str.c_str() );
+		
+		if ( pNode->mpVarDef )
+		{
+			printf( " <<VARIABLE: %s>>", pNode->mpVarDef->mInternalName.c_str() );
+		}
+	}
 
 	switch ( pNode->mBlockType )
 	{
@@ -137,20 +256,27 @@ void TraverseTree( TokNode *pNode, int depth )
 
 	if ( vars.size() )
 	{
-		printf( " .. vars: " );
+		printf( " <<VAR_DEFS: " );
 
 		for (size_t i=0; i < vars.size(); ++i)
 		{
-			printf( " (%s, %s) %s,",
+			printf( " %s %s %s,",
 						vars[i].mpDetailTok ? 
 							vars[i].mpDetailTok->str.c_str() :
-							"N/A",
+							"",
+/*
+						vars[i].mIsVarying ? 
+							"varying" :
+							"uniform",
+*/
 						vars[i].mpDTypeTok->str.c_str(),
-						vars[i].mpNameTok ?
-							vars[i].mpNameTok->str.c_str() :
+						vars[i].mpDefNameTok ?
+							vars[i].mpDefNameTok->str.c_str() :
 							"NONAME"
 					);
 		}
+
+		printf( ">>" );
 	}
 
 	printf( "\n" );

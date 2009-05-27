@@ -11,6 +11,12 @@ shinymetal(
 {
 	normal Nf = faceforward(N, I);
 	point D;
+	
+	float	one, two=1;
+	
+	{
+		float one;
+	}
 
 	D = reflect(I, normalize(Nf));
 	D = transform("world", point "world" (0, 0, 0) + D);

@@ -22,19 +22,20 @@ static void AddVariable(
 					TokNode *pSpaceCastTok,
 					TokNode *pNameNode )
 {
-	Variable	*pVar = pNode->GetData().mVariables.grow();
+	Variable	*pVar = pNode->GetVars().grow();
 
 	pVar->mpDTypeTok		= pDTypeNode->mpToken;
+	pVar->mpOwnerNode		= pNode;
 	pVar->mpDetailTok		= pDetailNode ? pDetailNode->mpToken : NULL;
 	pVar->mpSpaceCastTok	= pSpaceCastTok ? pSpaceCastTok->mpToken : NULL;
-	pVar->mpNameTok			= pNameNode ? pNameNode->mpToken : NULL;
+	pVar->mpDefNameTok		= pNameNode ? pNameNode->mpToken : NULL;
 
-	if ( pVar->mpNameTok )
+	if ( pVar->mpDefNameTok )
 	{
 		pVar->mInternalName =
 				DUT::SSPrintFS( "_%i@_%s",
 							pNode->mBlockID,
-								pVar->mpNameTok->str.c_str() );
+								pVar->mpDefNameTok->str.c_str() );
 	}
 	else
 	{
@@ -76,15 +77,13 @@ static bool fndVarInBlock(
 	if ( pChild0->mpToken->idType == T_TYPE_DATATYPE ||
 		 pChild0->mpToken->idType == T_TYPE_DETAIL )
 	{
-		// 3 possible cases
-		// 1) TYPE UNK
-		// 2) TYPE DETAIL UNK
-		// 3) DETAIL TYPE UNK
-
 		TokNode	*pDTypeNode = NULL;
 		TokNode	*pDetailNode = NULL;
 		TokNode	*pNameNode = NULL;
 
+		// 3 possible cases
+
+		// 1) TYPE NTERM
 		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) &&
 			(pChild1 && pChild1->mpToken->idType == T_TYPE_NONTERM) )
 		{
@@ -93,7 +92,7 @@ static bool fndVarInBlock(
 			pNameNode	= pChild1;
 			i += 2;
 		}
-		else
+		else	// 2) TYPE DETAIL NTERM
 		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) &&
 			(pChild1 && pChild1->mpToken->idType == T_TYPE_DETAIL) &&
 			(pChild2 && pChild2->mpToken->idType == T_TYPE_NONTERM) )
@@ -103,14 +102,14 @@ static bool fndVarInBlock(
 			pNameNode	= pChild2;
 			i += 3;
 		}
-		else
+		else	// 3) DETAIL TYPE NTERM
 		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DETAIL) &&
 			(pChild1 && pChild1->mpToken->idType == T_TYPE_DATATYPE) &&
 			(pChild2 && pChild2->mpToken->idType == T_TYPE_NONTERM) )
 		{
 			pDTypeNode	= pChild0;
-			pDetailNode	= pChild2;
-			pNameNode	= pChild1;
+			pDetailNode	= pChild1;
+			pNameNode	= pChild2;
 			i += 3;
 		}
 		else
@@ -163,7 +162,7 @@ static bool fndVarInExpr(
 }
 
 //==================================================================
-void DiscoverVariables( TokNode *pNode )
+static void discoverVariablesDeclarations( TokNode *pNode )
 {
 	// $$$ Note: should assume root to be one big curl bracket..
 	if ( pNode->mpToken &&
@@ -214,8 +213,59 @@ void DiscoverVariables( TokNode *pNode )
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		DiscoverVariables( pNode->mpChilds[i] );
+		discoverVariablesDeclarations( pNode->mpChilds[i] );
 	}
+}
+
+/*
+//==================================================================
+static bool isVarUsedAsLValue( const char *pVarName, TokNode *pNode )
+{
+	for (TokNode *pNode2 = pNode; pNode2; pNode2 = pNode2->GetNext())
+	{
+	}
+
+	// recurse on all children that are NOT code blocks (because
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		isVarUsedAsLValue( pVarName, pNode->mpChilds[i] );
+	}
+}
+*/
+
+//==================================================================
+void discoverVariablesUsage( TokNode *pNode )
+{
+	// for every non-terminal
+	if ( pNode->IsNonTerminal() )
+	{
+		// scan backward and up, looking for a variable definition matching the name
+		for (TokNode *pVarDefBlock = pNode->mpParent; pVarDefBlock; pVarDefBlock = pVarDefBlock->mpParent)
+		{
+			// do we have variables declaration ?
+			if ( pVarDefBlock->GetVars().size() )
+			{
+				Variable *pVar = pVarDefBlock->FindVariableByDefName( pNode->GetTokStr() );
+
+				if ( pVar )
+				{
+					pNode->mpVarDef = pVar;
+				}
+			}
+		}
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		discoverVariablesUsage( pNode->mpChilds[i] );
+	}
+}
+
+//==================================================================
+void DiscoverVariables( TokNode *pNode )
+{
+	discoverVariablesDeclarations( pNode );
+	discoverVariablesUsage( pNode );
 }
 
 //==================================================================

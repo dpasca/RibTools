@@ -23,24 +23,38 @@ class Variable
 {
 public:
 	std::string		mInternalName;
+	TokNode			*mpOwnerNode;
 	Token			*mpDTypeTok;
 	Token			*mpDetailTok;
 	Token			*mpSpaceCastTok;
-	Token			*mpNameTok;
-	DVec<Token*>	mpDefValToks;		
+	Token			*mpDefNameTok;
+	DVec<Token*>	mpDefValToks;
 	bool			mIsVarying;
+	bool			mIsLValue;
 
 	Variable() :
+		mpOwnerNode(NULL),
 		mpDTypeTok(NULL),
 		mpDetailTok(NULL),
 		mpSpaceCastTok(NULL),
-		mpNameTok(NULL),
-		mIsVarying(false)
+		mpDefNameTok(NULL),
+		mIsVarying(true),
+		mIsLValue(false)
 	{
 	}
 
 	~Variable()
 	{
+	}
+
+	bool HasDefName() const { return mpDefNameTok != NULL;	}
+
+	const char *GetDefName() const
+	{
+		if ( mpDefNameTok )
+			return mpDefNameTok->str.c_str();
+		else
+			return NULL;
 	}
 };
 

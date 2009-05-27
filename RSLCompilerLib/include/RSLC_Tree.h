@@ -37,13 +37,16 @@ public:
 	BlockType		mBlockType;
 	u_int			mBlockID;
 	DVec<TokNode*>	mpChilds;
+	Variable		*mpVarDef;	// this is the variable definition
+								// in case this node is variable usage
 
 public:
 	TokNode( Token *pObj ) :
 		mpToken(pObj),
 		mpParent(NULL),
 		mBlockType(BLKT_UNKNOWN),
-		mBlockID(0)
+		mBlockID(0),
+		mpVarDef(NULL)
 	{
 	}
 
@@ -65,11 +68,29 @@ public:
 		return AddChild( DNEW TokNode( pObj ) );
 	}
 
+	const char *GetTokStr() const { return mpToken->str.c_str(); }
+
+	TokNode	*GetLeft();
+	TokNode	*GetRight();
+	TokNode	*GetPrev();
+	TokNode	*GetNext();
+
+	const TokNode *GetLeft()	const {	return ((const TokNode *)this)->GetLeft();	}
+	const TokNode *GetRight()	const {	return ((const TokNode *)this)->GetRight();	}
+	const TokNode *GetPrev()	const {	return ((const TokNode *)this)->GetPrev();	}
+	const TokNode *GetNext()	const {	return ((const TokNode *)this)->GetNext();	}
+
 		  NodeData &GetData()		{ return mData;	}
 	const NodeData &GetData() const	{ return mData;	}
 
 		  DVec<Variable> &GetVars()			{ return mData.mVariables;	}
 	const DVec<Variable> &GetVars() const	{ return mData.mVariables;	}
+
+	Variable *FindVariableByDefName( const char *pName );
+
+	bool IsCodeBlock() const		{ return mBlockType == BLKT_CODEBLOCK; }
+	bool IsExpressionBlock() const	{ return mBlockType == BLKT_EXPRESSION; }
+	bool IsNonTerminal() const		{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : NULL; }
 };
 
 //==================================================================
