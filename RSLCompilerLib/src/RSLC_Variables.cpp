@@ -250,6 +250,7 @@ void discoverVariablesUsage( TokNode *pNode )
 				if ( pVar )
 				{
 					pNode->mpVarDef = pVar;
+					break;
 				}
 			}
 		}
