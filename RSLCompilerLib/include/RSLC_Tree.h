@@ -80,6 +80,8 @@ public:
 	const TokNode *GetPrev()	const {	return ((const TokNode *)this)->GetPrev();	}
 	const TokNode *GetNext()	const {	return ((const TokNode *)this)->GetNext();	}
 
+	TokNode *GetChildTry( size_t i ) const { return i < mpChilds.size() ? mpChilds[i] : NULL; }
+
 		  NodeData &GetData()		{ return mData;	}
 	const NodeData &GetData() const	{ return mData;	}
 
@@ -88,9 +90,10 @@ public:
 
 	Variable *FindVariableByDefName( const char *pName );
 
-	bool IsCodeBlock() const		{ return mBlockType == BLKT_CODEBLOCK; }
-	bool IsExpressionBlock() const	{ return mBlockType == BLKT_EXPRESSION; }
-	bool IsNonTerminal() const		{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : NULL; }
+	bool IsCodeBlock() const			{ return mBlockType == BLKT_CODEBLOCK; }
+	bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
+	bool IsNonTerminal() const			{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : NULL; }
+	bool IsTokenID( TokenID id ) const	{ return mpToken ? mpToken->id == id : false; }
 };
 
 //==================================================================

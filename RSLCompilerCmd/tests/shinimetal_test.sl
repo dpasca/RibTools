@@ -9,10 +9,11 @@ shinymetal(
 	float roughness = .1;
 	string texturename = ""; )
 {
+	float	one, two=1;
+
 	normal Nf = faceforward(N, I);
 	point D;
 	
-	float	one, two=1;
 	
 	{
 		float one;
@@ -20,6 +21,8 @@ shinymetal(
 
 	D = reflect(I, normalize(Nf));
 	D = transform("world", point "world" (0, 0, 0) + D);
+	
+	D += reflect( point "world" (0, 1, 0), point "object" (0, 0, 1) );
 
 	Oi = Os;
 	Ci = Os * Cs * (Ka*ambient() + Ks*specular(Nf, -I, roughness)

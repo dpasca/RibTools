@@ -42,7 +42,7 @@ static void AddVariable(
 		u_int	tmpID = pNode->GetData().mVariables.size() - 1;
 
 		pVar->mInternalName =
-				DUT::SSPrintFS( "_%i@_tmp%0", pNode->mBlockID, tmpID );
+				DUT::SSPrintFS( "_%i@_tmp%i", pNode->mBlockID, tmpID );
 	}
 
 	if ( pVar->mpDetailTok )
@@ -66,59 +66,47 @@ static void AddVariable(
 }
 
 //==================================================================
-static bool fndVarInBlock(
+static bool fndVarDefBeginInBlock(
 		size_t &i,
 		TokNode *pNode,
 		TokNode	*pChild0,
 		TokNode	*pChild1,
-		TokNode	*pChild2
+		TokNode	* &out_pDTypeNode,
+		TokNode	* &out_pDetailNode
 		)
 {
 	if ( pChild0->mpToken->idType == T_TYPE_DATATYPE ||
 		 pChild0->mpToken->idType == T_TYPE_DETAIL )
 	{
-		TokNode	*pDTypeNode = NULL;
-		TokNode	*pDetailNode = NULL;
-		TokNode	*pNameNode = NULL;
-
 		// 3 possible cases
 
 		// 1) TYPE NTERM
-		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) &&
-			(pChild1 && pChild1->mpToken->idType == T_TYPE_NONTERM) )
+		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) )
 		{
-			pDTypeNode	= pChild0;
-			pDetailNode	= NULL;
-			pNameNode	= pChild1;
-			i += 2;
+			out_pDTypeNode	= pChild0;
+			out_pDetailNode	= NULL;
+			i += 1;
 		}
 		else	// 2) TYPE DETAIL NTERM
 		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) &&
-			(pChild1 && pChild1->mpToken->idType == T_TYPE_DETAIL) &&
-			(pChild2 && pChild2->mpToken->idType == T_TYPE_NONTERM) )
+			(pChild1 && pChild1->mpToken->idType == T_TYPE_DETAIL) )
 		{
-			pDTypeNode	= pChild0;
-			pDetailNode	= pChild1;
-			pNameNode	= pChild2;
-			i += 3;
+			out_pDTypeNode	= pChild0;
+			out_pDetailNode	= pChild1;
+			i += 2;
 		}
 		else	// 3) DETAIL TYPE NTERM
 		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DETAIL) &&
-			(pChild1 && pChild1->mpToken->idType == T_TYPE_DATATYPE) &&
-			(pChild2 && pChild2->mpToken->idType == T_TYPE_NONTERM) )
+			(pChild1 && pChild1->mpToken->idType == T_TYPE_DATATYPE) )
 		{
-			pDTypeNode	= pChild0;
-			pDetailNode	= pChild1;
-			pNameNode	= pChild2;
-			i += 3;
+			out_pDTypeNode	= pChild1;
+			out_pDetailNode	= pChild0;
+			i += 2;
 		}
 		else
 		{
 			throw Exception( "Broken variable declaration", pChild0->mpToken );
 		}
-
-		// no "space cast" in the declaration in the curl braces
-		AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pNameNode );
 
 		return true;
 	}
@@ -162,16 +150,31 @@ static bool fndVarInExpr(
 }
 
 //==================================================================
-static void discoverVariablesDeclarations( TokNode *pNode )
+static bool iterateNextExpression( size_t &i, TokNode *pNode )
 {
-	// $$$ Note: should assume root to be one big curl bracket..
-	if ( pNode->mpToken &&
-		 pNode->mpToken->id != T_OP_LFT_CRL_BRACKET &&
-		 pNode->mpToken->id != T_OP_LFT_BRACKET )
+	for (++i; i < pNode->mpChilds.size(); ++i)
 	{
-		return;
+		if ( pNode->mpChilds[i]->IsTokenID( T_OP_COMMA ) )
+		{
+			++i;
+			return true;
+		}
+		else
+		if ( pNode->mpChilds[i]->IsTokenID( T_OP_SEMICOL ) )
+		{
+			++i;
+			return false;
+		}
 	}
 
+	throw Exception( "Missing a ; ?" );
+
+	return false;
+}
+
+//==================================================================
+static void discoverVariablesDeclarations( TokNode *pNode )
+{
 	if ( pNode->mpToken )
 	{
 		DASSERT(
@@ -180,28 +183,14 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 			pNode->mBlockType == BLKT_EXPRESSION
 			);
 
-		for (size_t i=0; i < pNode->mpChilds.size();)
+		if ( pNode->mBlockType == BLKT_EXPRESSION )
 		{
-			TokNode	*pChild0 = pNode->mpChilds[i];
-			TokNode	*pChild1 = NULL;
-			TokNode	*pChild2 = NULL;
-
-			if ( (i+1) < pNode->mpChilds.size() ) pChild1 = pNode->mpChilds[i + 1];
-			if ( (i+2) < pNode->mpChilds.size() ) pChild2 = pNode->mpChilds[i + 2];
-
-			if ( pNode->mBlockType == BLKT_CODEBLOCK ||
-				 pNode->mBlockType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
-				 )
+			for (size_t i=0; i < pNode->mpChilds.size();)
 			{
-				if NOT( fndVarInBlock( i, pNode, pChild0, pChild1, pChild2 ) )
-				{
-					++i;
-					continue;
-				}
-			}
-			else
-			if ( pNode->mBlockType == BLKT_EXPRESSION )
-			{
+				TokNode	*pChild0 = pNode->GetChildTry( i + 0 );
+				TokNode	*pChild1 = pNode->GetChildTry( i + 1 );
+				TokNode	*pChild2 = pNode->GetChildTry( i + 2 );
+
 				if NOT( fndVarInExpr( i, pNode, pChild0, pChild1, pChild2 ) )
 				{
 					++i;
@@ -209,11 +198,48 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 				}
 			}
 		}
+		else
+		if ( pNode->mBlockType == BLKT_CODEBLOCK ||
+			 pNode->mBlockType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+			 )
+		{
+			TokNode	*pDTypeNode;
+			TokNode	*pDetailNode;
+
+			size_t i=0;
+			if ( fndVarDefBeginInBlock(
+							i,
+							pNode,
+							pNode->GetChildTry( 0 ),
+							pNode->GetChildTry( 1 ),
+							pDTypeNode,
+							pDetailNode ) )
+			{
+				for (; i < pNode->mpChilds.size();)
+				{
+					TokNode	*pVarName = pNode->GetChildTry( i );
+
+					if NOT( pVarName->IsNonTerminal() )
+						throw Exception( "Expecting a variable name !" );
+					
+					// no "space cast" in the declaration in the curl braces
+					AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
+
+					if NOT( iterateNextExpression( i, pNode ) )
+						break;
+				}
+
+			}
+		}
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		discoverVariablesDeclarations( pNode->mpChilds[i] );
+		if ( pNode->mpChilds[i]->mpToken->id == T_OP_LFT_CRL_BRACKET ||
+			 pNode->mpChilds[i]->mpToken->id == T_OP_LFT_BRACKET )
+		{
+			discoverVariablesDeclarations( pNode->mpChilds[i] );
+		}
 	}
 }
 
