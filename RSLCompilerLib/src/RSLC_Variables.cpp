@@ -39,7 +39,7 @@ static void AddVariable(
 	}
 	else
 	{
-		u_int	tmpID = pNode->GetData().mVariables.size() - 1;
+		u_int	tmpID = pNode->GetVars().size() - 1;
 
 		pVar->mInternalName =
 				DUT::SSPrintFS( "_%i@_tmp%i", pNode->mBlockID, tmpID );
@@ -293,6 +293,79 @@ void DiscoverVariables( TokNode *pNode )
 {
 	discoverVariablesDeclarations( pNode );
 	discoverVariablesUsage( pNode );
+}
+
+//==================================================================
+static void scanWriteVars( FILE *pFile, TokNode *pNode, size_t &blockCnt )
+{
+	const DVec<Variable> &vars = pNode->GetVars();
+
+	if ( vars.size() )
+	{
+		fprintf_s( pFile, "\t; -- vars for block %i\n", blockCnt );
+
+		for (size_t i=0; i < vars.size(); ++i)
+		{
+			const Variable	&var = vars[i];
+
+			fprintf_s( pFile, "\t" );
+
+			fprintf_s( pFile, "%-18s", var.mInternalName.c_str() );
+
+			fprintf_s( pFile, "\t" );
+
+			switch ( pNode->mBlockType )
+			{
+			case BLKT_SHPARAMS:		fprintf_s( pFile, "parameter" );	break;
+			case BLKT_CODEBLOCK:	fprintf_s( pFile, "temporary" );	break;
+			case BLKT_EXPRESSION:	fprintf_s( pFile, "temporary" );	break;
+			}
+
+			fprintf_s( pFile, "\t" );
+
+			if ( var.mIsVarying )
+				fprintf_s( pFile, "varying" );
+			else
+				fprintf_s( pFile, "uniform" );
+
+			if ( var.mpDTypeTok )
+			{
+				fprintf_s( pFile, "\t" );
+				switch ( var.mpDTypeTok->id )
+				{
+				case T_DT_float:	fprintf_s( pFile, "float" );	break;
+				case T_DT_vector:	fprintf_s( pFile, "vector" );	break;
+				case T_DT_point:	fprintf_s( pFile, "point" );	break;
+				case T_DT_normal:	fprintf_s( pFile, "normal" );	break;
+				case T_DT_color:	fprintf_s( pFile, "color" );	break;
+				case T_DT_string:	fprintf_s( pFile, "string" );	break;
+
+				default:
+					throw Exception( "Bad type ?!", var.mpDTypeTok );
+					break;
+				}
+			}
+
+			fprintf_s( pFile, "\n" );
+		}
+
+		blockCnt += 1;
+		fprintf_s( pFile, "\n" );
+	}
+
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		scanWriteVars( pFile, pNode->mpChilds[i], blockCnt );
+	}
+}
+
+//==================================================================
+void WriteVariables( FILE *pFile, TokNode *pNode )
+{
+	size_t	blockCnt = 0;
+
+	scanWriteVars( pFile, pNode, blockCnt );
 }
 
 //==================================================================

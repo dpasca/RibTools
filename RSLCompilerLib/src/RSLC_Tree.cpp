@@ -109,9 +109,9 @@ TokNode *TokNode::GetNext()
 //==================================================================
 Variable *TokNode::FindVariableByDefName( const char *pName )
 {
-	for (size_t i=0; i < mData.mVariables.size(); ++i)
+	for (size_t i=0; i < mVariables.size(); ++i)
 	{
-		Variable	*pVar = &mData.mVariables[i];
+		Variable	*pVar = &mVariables[i];
 		if ( pVar->HasDefName() )
 			if ( 0 == strcmp( pVar->GetDefName(), pName ) )
 			{

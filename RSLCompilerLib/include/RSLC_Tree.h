@@ -12,26 +12,22 @@
 #include "DSystem/include/DContainers.h"
 #include "RSLC_Token.h"
 #include "RSLC_Variables.h"
+#include "RSLC_Functions.h"
 
 //==================================================================
 namespace RSLC
 {
 
 //==================================================================
-class NodeData
-{
-public:
-	DVec<Variable>	mVariables;
-};
-
-
-//==================================================================
 class TokNode
 {
 public:
 	Token			*mpToken;
+
 private:
-	NodeData		mData;
+	DVec<Variable>	mVariables;
+	DVec<Function>	mFunctions;
+
 public:
 	TokNode			*mpParent;
 	BlockType		mBlockType;
@@ -82,11 +78,11 @@ public:
 
 	TokNode *GetChildTry( size_t i ) const { return i < mpChilds.size() ? mpChilds[i] : NULL; }
 
-		  NodeData &GetData()		{ return mData;	}
-	const NodeData &GetData() const	{ return mData;	}
+		  DVec<Variable> &GetVars()			{ return mVariables;	}
+	const DVec<Variable> &GetVars() const	{ return mVariables;	}
 
-		  DVec<Variable> &GetVars()			{ return mData.mVariables;	}
-	const DVec<Variable> &GetVars() const	{ return mData.mVariables;	}
+		  DVec<Function> &GetFuncs()		{ return mFunctions;	}
+	const DVec<Function> &GetFuncs() const	{ return mFunctions;	}
 
 	Variable *FindVariableByDefName( const char *pName );
 

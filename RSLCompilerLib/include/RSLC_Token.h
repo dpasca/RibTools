@@ -188,6 +188,11 @@ public:
 		isBadNumber(false),
 		sourceLine(0)
 		{}
+
+	const char *GetStrChar() const
+	{
+		return str.c_str();
+	}
 };
 
 //==================================================================

@@ -1,6 +1,12 @@
 /* Test file for shader parsing
    ..this comment is part of the test 8)*/
 
+
+float func( vector a )
+{
+	return 1;
+}
+
 surface
 shinymetal(
 	float Ka = 1;
@@ -23,6 +29,8 @@ shinymetal(
 	D = transform("world", point "world" (0, 0, 0) + D);
 	
 	D += reflect( point "world" (0, 1, 0), point "object" (0, 0, 1) );
+	
+	D += func1( vector(2,0,0) );
 
 	Oi = Os;
 	Ci = Os * Cs * (Ka*ambient() + Ks*specular(Nf, -I, roughness)
