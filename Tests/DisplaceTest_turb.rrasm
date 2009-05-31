@@ -16,8 +16,6 @@
 //	N = calculatenormal(P);
 //}
 
-displacement
-
 .data
 	P				parameter varying point
 	N				parameter varying normal
@@ -34,6 +32,8 @@ displacement
 	_const2			constant uniform float	1.2
 
 .code
+
+displacement
 	normalize	n		N
 
 	mulvs		$v0		P	totalFrequency	// $v0 = (P * totalFrequency

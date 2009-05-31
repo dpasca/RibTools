@@ -9,8 +9,6 @@
 ;			Cl = intensity * lightcolor;
 ;	}
 
-light
-
 .data
 	Cl			parameter varying color
 
@@ -22,6 +20,10 @@ light
 
 
 .code
+
+light
 	; temporary
 
 	movvv		Cl lightcolor
+
+	ret

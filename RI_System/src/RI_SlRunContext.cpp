@@ -23,7 +23,7 @@ SlRunContext::SlRunContext( const SlSymbolList &symbols, size_t maxPointsN )
 	mBlocksXN;
 	mPointsYN;
 
-	mProgramCounter = 0;
+	mProgramCounterIdx = 0;
 	mPointsN		= 0;
 	mBlocksN	= 0;
 	mpDataSegment	= 0;
@@ -74,7 +74,8 @@ void SlRunContext::Setup(
 	}
 
 	// reset the program counter
-	mProgramCounter = 0;
+	mProgramCounterIdx = 0;
+	mProgramCounter[ mProgramCounterIdx ] = 0;
 
 	// initialize the SIMD state
 	InitializeSIMD( mMaxPointsN );

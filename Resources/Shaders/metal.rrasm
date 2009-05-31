@@ -10,8 +10,6 @@
 ;		Ci = Os * Cs * (Ka*ambient()+Ks*specular(Nf, V, roughness));
 ;	}
 
-surface
-
 .data
 	Cs		parameter varying color
 	Os		parameter varying color
@@ -28,6 +26,8 @@ surface
 	V		temporary varying vector
 
 .code
+
+surface
 	normalize	$v0		N
 	faceforward	Nf	$v0	I
 
@@ -46,3 +46,5 @@ surface
 
 	mulvv		$v0	$v0	Cs	// * Cs
 	mulvv		Ci	$v0	Os	// * Os -> Ci
+
+	ret

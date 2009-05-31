@@ -79,6 +79,8 @@ enum OpCodeID
 	OP_AMB		,
 	OP_CALCNORM	,
 
+	OP_RET		,
+
 	OP_N
 };
 
@@ -163,14 +165,19 @@ public:
 	enum Type
 	{
 		TYPE_UNKNOWN,
-		TYPE_SURFACE,
 		TYPE_LIGHT,
-		TYPE_DISPLACEMENT
+		TYPE_SURFACE,
+		TYPE_VOLUME,
+		TYPE_DISPLACEMENT,
+		TYPE_TRANSFORMATION,
+		TYPE_IMAGER,
+		TYPE_N
 	};
 public:
 	Type			mType;
 	DStr			mShaderName;
 	DVec<SlSymbol*>	mSymbols;
+	u_int			mStartPC;
 	DVec<SlCPUWord>	mCode;
 
 	struct CtorParams

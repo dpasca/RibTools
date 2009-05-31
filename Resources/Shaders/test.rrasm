@@ -1,5 +1,3 @@
-surface
-
 .data
 	Cs		parameter varying color
 	Os		parameter varying color
@@ -16,6 +14,8 @@ surface
 	Koe		constant uniform normal 1 0 0
 
 .code
+
+surface
 	normalize	$v0		N
 	;faceforward	$v0	$v0	I
 	;mulvv		$v0	$v0	Koe
@@ -27,3 +27,5 @@ surface
 	;movvv		Ci	I		// 
 	;addvv		Ci	Ci	Koe
 	movvv		Oi	Os		// Oi = Os
+
+	ret

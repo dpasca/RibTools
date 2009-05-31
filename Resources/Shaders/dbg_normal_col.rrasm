@@ -1,11 +1,13 @@
 
-surface
-
 .data
 	Ci		parameter varying color
 	Oi		parameter varying color
 	N		parameter varying normal
 
 .code
+
+surface
 	movvv	Ci	N
 	movvv	Oi	N
+
+	ret

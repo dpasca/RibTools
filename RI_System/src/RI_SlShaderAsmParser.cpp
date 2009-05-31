@@ -76,6 +76,8 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"ambient"		,	1,	OPRTYPE_F3,	OPRTYPE_NA, OPRTYPE_NA,
 	"calculatenormal",	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
 
+	"ret"			,	0,	OPRTYPE_NA,	OPRTYPE_NA, OPRTYPE_NA,
+
 	NULL
 };
 
@@ -113,10 +115,39 @@ static void stripComments( char *pTxt )
 }
 
 //==================================================================
+bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSection )
+{
+	SlShader::Type	type = SlShader::TYPE_UNKNOWN;
+
+	if ( !strcasecmp( pLineWork, "light" ) )		type = SlShader::TYPE_LIGHT;	else
+	if ( !strcasecmp( pLineWork, "surface" ) )		type = SlShader::TYPE_SURFACE;	else
+	if ( !strcasecmp( pLineWork, "volume" ) )		type = SlShader::TYPE_VOLUME;	else
+	if ( !strcasecmp( pLineWork, "displacement" ) )	type = SlShader::TYPE_DISPLACEMENT;	else
+	if ( !strcasecmp( pLineWork, "transformation" ) )type = SlShader::TYPE_TRANSFORMATION;	else
+	if ( !strcasecmp( pLineWork, "imager" ) )		type = SlShader::TYPE_IMAGER;
+
+	if ( type == SlShader::TYPE_UNKNOWN )
+		return false;
+
+	if ( mpShader->mType != SlShader::TYPE_UNKNOWN )
+		onError( "Shader start/type already defined !" );
+	else
+	{
+		if ( curSection != SEC_CODE )
+			onError( "Shader type must be defined in the .code block" );
+		
+		mpShader->mType = type;
+		mpShader->mStartPC = mpShader->mCode.size();
+	}
+
+	return true;
+}
+
+//==================================================================
 void ShaderAsmParser::doParse( DUT::MemFile &file )
 {
 	char		lineBuff[1024];
-	Section		curSection = CODE;
+	Section		curSection = SEC_UNDEF;
 	int			lineCnt = 0;
 
 	
@@ -138,37 +169,23 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 
 		try 
 		{
-			if ( mpShader->mType == SlShader::TYPE_UNKNOWN )
+			if ( handleShaderTypeDef( lineWork, curSection ) )
+				continue;
+
+			if ( 0 == strcasecmp( lineWork, ".data" ) )
+				curSection = SEC_DATA;
+			else
+			if ( 0 == strcasecmp( lineWork, ".code" ) )
+				curSection = SEC_CODE;
+			else
+			if ( curSection == SEC_DATA )
 			{
-				if ( 0 == strcasecmp( lineWork, "surface" ) )
-					mpShader->mType = SlShader::TYPE_SURFACE;
-				else
-				if ( 0 == strcasecmp( lineWork, "light" ) )
-					mpShader->mType = SlShader::TYPE_LIGHT;
-				else
-				if ( 0 == strcasecmp( lineWork, "displacement" ) )
-					mpShader->mType = SlShader::TYPE_DISPLACEMENT;
-				else
-				{
-					onError( "Shader type undefined !" );
-				}
+				parseDataLine( lineWork, lineCnt );
 			}
 			else
+			if ( curSection == SEC_CODE )
 			{
-				if ( 0 == strcasecmp( lineWork, ".data" ) )
-					curSection = DATA;
-				else
-				if ( 0 == strcasecmp( lineWork, ".code" ) )
-					curSection = CODE;
-				else
-				if ( curSection == DATA )
-				{
-					parseDataLine( lineWork, lineCnt );
-				}
-				else
-				{
-					parseCodeLine( lineWork, lineCnt );
-				}
+				parseCodeLine( lineWork, lineCnt );
 			}
 		}
 		catch ( ... )
@@ -179,6 +196,9 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 
 		++lineCnt;
 	}
+
+	if ( mpShader->mType == SlShader::TYPE_UNKNOWN )
+		onError( "Shader type undefined !" );
 }
 
 //==================================================================
@@ -205,7 +225,7 @@ void ShaderAsmParser::getVector( const char *pStr, float out_val[], int n )
 //==================================================================
 void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 {
-	//printf( "DATA: %s\n", lineBuff );
+	//printf( "SEC_DATA: %s\n", lineBuff );
 	
 	const char *pLineEnd = lineBuff + strlen( lineBuff );
 	
@@ -437,7 +457,7 @@ void ShaderAsmParser::verifySymbolType(
 //==================================================================
 void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 {
-	//printf( "CODE: %s\n", lineBuff );
+	//printf( "SEC_CODE: %s\n", lineBuff );
 	
 	char *pTokCtx;
 	char *pTok;

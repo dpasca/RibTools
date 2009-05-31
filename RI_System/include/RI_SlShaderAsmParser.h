@@ -26,10 +26,11 @@ class ShaderAsmParser
 {
 	enum Section
 	{
-		DATA,
-		CODE,
+		SEC_UNDEF,
+		SEC_DATA,
+		SEC_CODE,
 	};
-	
+
 	SlShader		*mpShader;
 	DUT::MemFile	*mpFile;
 	const char		*mpName;
@@ -40,6 +41,8 @@ public:
 
 private:
 	void doParse( DUT::MemFile &file );
+	bool handleShaderTypeDef( const char *pLineWork, Section curSection );
+
 	void parseDataLine( char lineBuff[], int lineCnt );
 	const OpCodeDef	*findOpDef( const char *pOpName, u_int &opCodeIdx );
 	int findSymbol( const char *pName, bool ignoreCase ) const;

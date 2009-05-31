@@ -1,5 +1,3 @@
-surface
-
 .data
 	P		parameter varying point
 	Cs		parameter varying color
@@ -10,6 +8,8 @@ surface
 	_const1	constant uniform float 10
 
 .code
+
+surface
 	mulvs		$v0	P	_const1
 	noise33		Ci	$v0
 	movvv		Oi	Os

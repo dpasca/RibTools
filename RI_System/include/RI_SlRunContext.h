@@ -23,14 +23,17 @@ class SymbolList;
 //==================================================================
 class SlRunContext
 {
+	static const u_int		MAX_PROG_STACK = 32;
+
 	size_t					mMaxPointsN;
+
+public:
+	u_int					mProgramCounterIdx;
+	u_int					mProgramCounter[MAX_PROG_STACK];
 
 public:
 	u_int					mBlocksXN;
 	u_int					mPointsYN;
-
-public:
-	u_int					mProgramCounter;
 	u_int					mPointsN;
 	u_int					mBlocksN;
 	int						*mpSIMDFlags;
@@ -64,11 +67,11 @@ public:
 
 	SlCPUWord *GetOp( u_int argc )
 	{
-		return &mpShaderInst->mpShader->mCode[mProgramCounter + argc];
+		return &mpShaderInst->mpShader->mCode[mProgramCounter[mProgramCounterIdx] + argc];
 	}
 	const SlCPUWord *GetOp( u_int argc ) const
 	{
-		return &mpShaderInst->mpShader->mCode[mProgramCounter + argc];
+		return &mpShaderInst->mpShader->mCode[mProgramCounter[mProgramCounterIdx] + argc];
 	}
 	
 	u_int	GetOpCount() const
@@ -170,7 +173,7 @@ public:
 	void EnableProcessor( u_int i )			{ mpSIMDFlags[i] -= 1; }
 	void DisableProcessor( u_int i )		{ mpSIMDFlags[i] += 1; }
 	u_int GetProcessorsN() const			{ return mPointsN; }
-	void NextInstruction()					{ mProgramCounter += GetOpCount() + 1; }
+	void NextInstruction()					{ mProgramCounter[mProgramCounterIdx] += GetOpCount() + 1; }
 };
 
 //==================================================================

@@ -19,7 +19,7 @@
 #include "RI_SlShader_Ops_Noise.h"
 
 //==================================================================
-#define FORCE_MEM_CORRUPTION_CHECK
+//#define FORCE_MEM_CORRUPTION_CHECK
 
 //==================================================================
 namespace RI
@@ -30,7 +30,8 @@ namespace RI
 //==================================================================
 SlShader::SlShader( const CtorParams &params ) :
 	ResourceBase(params.pName, ResourceBase::TYPE_SHADER),
-	mType(TYPE_UNKNOWN)
+	mType(TYPE_UNKNOWN),
+	mStartPC(0)
 {
 	if ( params.pSource )
 	{
@@ -389,6 +390,7 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	SOP::Inst_Ambient,
 	Inst_CalculateNormal,
 
+	NULL,	// ret
 };
 
 //==================================================================
@@ -397,9 +399,20 @@ void SlShaderInstance::Run( SlRunContext &ctx ) const
 	const SlCPUWord	*pWord = NULL;
 
 	try {
-		while ( ctx.mProgramCounter < mpShader->mCode.size() )
+		while ( true )
 		{
+			if ( ctx.mProgramCounter[ctx.mProgramCounterIdx] >= mpShader->mCode.size() )
+				return;
+
 			pWord = ctx.GetOp( 0 );
+
+			if ( pWord->mOpCode.mTableOffset == OP_RET )
+			{
+				if ( ctx.mProgramCounterIdx == 0 )
+					return;
+
+				ctx.mProgramCounterIdx -= 1;
+			}
 
 			// [pWord->mOpCode.mDestOpType]
 			sInstructionTable[pWord->mOpCode.mTableOffset]( ctx );
