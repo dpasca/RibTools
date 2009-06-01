@@ -7,6 +7,7 @@
 //==================================================================
 
 #include <stdlib.h>
+#include "RSLC_Exceptions.h"
 #include "RSLC_Token.h"
 
 //==================================================================
@@ -304,6 +305,33 @@ static bool isDigit( char ch )
 }
 
 //==================================================================
+static bool handleAlphanum(
+					const char	*pSource,
+					size_t		&i,
+					size_t		sourceSize,
+					DVec<Token> &tokens,
+					int			lineCnt )
+{
+	if NOT( isAlphaNumStrFirstChar( pSource[i] ) )
+		return false;
+
+	newToken( tokens, lineCnt );
+	tokens.back().idType = T_TYPE_NONTERM;
+	tokens.back().id	 = T_NONTERM;
+	tokens.back().str = pSource[i++];
+
+	for (; i < sourceSize; ++i)
+	{
+		if ( !isAlphaNum( pSource[i] ) )
+			break;
+
+		tokens.back().str += pSource[i];
+	}
+
+	return true;
+}
+
+//==================================================================
 static bool handleNumber(
 					const char	*pSource,
 					size_t		&i,
@@ -400,6 +428,37 @@ static bool handleNumber(
 }
 
 //==================================================================
+static bool handleString(
+					const char	*pSource,
+					size_t		&i,
+					size_t		sourceSize,
+					DVec<Token> &tokens,
+					int			lineCnt )
+{
+	if ( pSource[i] == '"' )
+	{
+		newToken( tokens, lineCnt );
+		tokens.back().idType = T_TYPE_VALUE;
+		tokens.back().id	 = T_VL_STRING;
+
+		tokens.back().str = pSource[i++];
+		for (; i < sourceSize; ++i)
+		{
+			tokens.back().str += pSource[i];
+			if ( pSource[i] == '"' )
+			{
+				++i;
+				return true;
+			}
+		}
+
+		throw Exception( "String not closing !", &tokens.back() );
+	}
+
+	return false;
+}
+
+//==================================================================
 const char *GetTokenTypeStr( TokenIDType tokidtype )
 {
 	switch ( tokidtype )
@@ -472,8 +531,6 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 {
 	initSortedTable();
 
-	bool	isEscape	= false;
-	bool	isInString	= false;
 	bool	isInComment	= false;
 
 	tokens.grow();
@@ -489,61 +546,27 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 		if ( handleComment( pSource, i, sourceSize, isInComment ) )
 			continue;
 
+		if ( findSkipWhites( pSource, i, sourceSize, lineCnt ) )
+		{
+			wasPrecededByWS = true;
+			continue;
+		}
+		else
+			wasPrecededByWS = false;
+
+		if ( matchTokenDef( tokens, pSource, i, sourceSize, wasPrecededByWS, lineCnt ) )
+			continue;
+
+		if ( handleAlphanum( pSource, i, sourceSize, tokens, lineCnt ) )
+			continue;
+
 		if ( handleNumber( pSource, i, sourceSize, tokens, lineCnt ) )
 			continue;
 
-		char	ch = pSource[i];
-
-		if ( ch == '"' )
-		{
-			wasPrecededByWS = false;
-
-			if ( isInString )
-			{
-				if ( isEscape )
-				{
-					tokens.back().str += ch;
-					++i;
-				}
-				else
-				{
-					isInString = false;
-					tokens.back().str += ch;
-					++i;
-					newToken( tokens, lineCnt );
-				}
-			}
-			else
-			{
-				isInString = true;
-				newToken( tokens, lineCnt );
-				tokens.back().str += ch;
-				tokens.back().idType = T_TYPE_VALUE;
-				tokens.back().id	 = T_VL_STRING;
-				++i;
-			}
-		}
-		else
-		{
-			if ( findSkipWhites( pSource, i, sourceSize, lineCnt ) )
-			{
-				wasPrecededByWS = true;
-				newToken( tokens, lineCnt );
-			}
-			else
-			{
-				if NOT( matchTokenDef( tokens, pSource, i, sourceSize, wasPrecededByWS, lineCnt ) )
-				{
-					tokens.back().str += ch;
-					++i;
-				}
-
-				wasPrecededByWS = false;
-			}
-		}
+		if ( handleString( pSource, i, sourceSize, tokens, lineCnt ) )
+			continue;
 	}
 }
-
 
 //==================================================================
 }

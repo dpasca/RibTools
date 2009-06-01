@@ -2,7 +2,7 @@
    ..this comment is part of the test 8)*/
 
 
-float func( vector a )
+float func1( vector a )
 {
 	return 1;
 }

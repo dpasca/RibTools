@@ -47,21 +47,25 @@ static void AddVariable(
 
 	if ( pVar->mpDetailTok )
 	{
-		if ( pVar->mpDetailTok )
-		{
-			if ( pVar->mpDetailTok->idType != T_TYPE_DETAIL )
-				throw Exception( "Bad detail type !", pVar->mpDetailTok );
+		if ( pVar->mpDetailTok->idType != T_TYPE_DETAIL )
+			throw Exception( "Bad detail type !", pVar->mpDetailTok );
 
-			if ( pVar->mpDetailTok->id == T_DE_varying )
-				pVar->mIsVarying = true;
-			else
-				pVar->mIsVarying = false;
-		}
-		else
-		{
-			// varying until disproved !
+		if ( pVar->mpDetailTok->id == T_DE_varying )
 			pVar->mIsVarying = true;
-		}
+		else
+			pVar->mIsVarying = false;
+	}
+	else
+	{
+		// local variables are varying by default, params uniform by default
+		// ..see RenderMan Companion p.297
+		if ( pNode->mBlockType == BLKT_CODEBLOCK || pNode->mBlockType == BLKT_EXPRESSION )
+			pVar->mIsVarying = true;
+		else
+		if ( pNode->mBlockType == BLKT_SHPARAMS )
+			pVar->mIsVarying = false;
+		else
+			pVar->mIsVarying = true;
 	}
 }
 
