@@ -104,9 +104,9 @@ public:
 		return mpDefaultVal;
 	}
 
-	void *GetChangeableParamData()
+	void *GetRWData()
 	{
-		DASSERT( mStorage == PARAMETER && mIsVarying == true && mpValArray != NULL );
+		DASSERT( mIsVarying == true && mpValArray != NULL );
 		return mpValArray;
 	}
 };

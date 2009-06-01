@@ -7,7 +7,7 @@
 ;	}
 
 .data
-	Cl			parameter varying color
+	Cl			global varying color
 
 	intensity	parameter uniform float 1
 	lightcolor	parameter uniform color 1

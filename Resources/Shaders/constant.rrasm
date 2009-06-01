@@ -6,10 +6,10 @@
 ;	}
 
 .data
-	Cs		parameter varying color
-	Os		parameter varying color
-	Ci		parameter varying color
-	Oi		parameter varying color
+	Cs		global varying color
+	Os		global varying color
+	Ci		global varying color
+	Oi		global varying color
 
 .code
 

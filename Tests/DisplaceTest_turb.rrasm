@@ -17,8 +17,8 @@
 //}
 
 .data
-	P				parameter varying point
-	N				parameter varying normal
+	P				global varying point
+	N				global varying normal
 
 	Km				parameter uniform float 0.1
 

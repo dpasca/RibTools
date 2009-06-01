@@ -1,10 +1,10 @@
 .data
-	Cs		parameter varying color
-	Os		parameter varying color
-	Ci		parameter varying color
-	Oi		parameter varying color
-	N		parameter varying normal
-	I		parameter varying vector
+	Cs		global varying color
+	Os		global varying color
+	Ci		global varying color
+	Oi		global varying color
+	N		global varying normal
+	I		global varying vector
 
 	Ka		parameter uniform float 1
 	Kd		parameter uniform float 1

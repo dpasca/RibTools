@@ -87,13 +87,13 @@ static void matchSymbols( const SlSymbol &a, const SlSymbol &b )
 	}
 
 	DASSTHROW( a.mType == b.mType,
-				("Type is %i but expecing %i for '%s'",
+				("Type is %i but expecting %i for '%s'",
 					a.mType,
 					b.mType,
 					a.mName.c_str()) );
 
 	DASSTHROW( a.mIsVarying == b.mIsVarying,
-				("Detail is %s but expecing %s for '%s'",
+				("Detail is %s but expecting %s for '%s'",
 					a.mIsVarying ? "varying" : "not-varying",
 					b.mIsVarying ? "varying" : "not-varying",
 					a.mName.c_str()) );
@@ -110,6 +110,8 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 	{
 		const SlSymbol	&symbol = *mpShader->mSymbols[i];
 
+		const char		*pFindName = symbol.mName.c_str();
+
 		switch ( symbol.mStorage )
 		{
 		case SlSymbol::CONSTANT:
@@ -118,31 +120,40 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 			pDataSegment[i].SetDataR( symbol.GetConstantData(), &symbol );
 			break;
 
+		case SlSymbol::GLOBAL:
+			{
+				const SlSymbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
+
+				DASSTHROW( pFoundSymbol != NULL, ("Could not find the global %s !", pFindName) );
+
+				matchSymbols( symbol, *pFoundSymbol );
+
+				pDataSegment[i].Flags.mOwnData = 0;
+				pDataSegment[i].SetDataRW( ((SlSymbol *)pFoundSymbol)->GetRWData(), pFoundSymbol );
+			}
+			break;
+
 		case SlSymbol::PARAMETER:
 			{
-				const SlSymbol	*pFoundSymbol = NULL;
-
-				pFoundSymbol =
-					gridSymbols.LookupVariable( symbol.mName.c_str() );
+				const SlSymbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
 
 				if ( pFoundSymbol )
 				{
 					matchSymbols( symbol, *pFoundSymbol );
 
 					pDataSegment[i].Flags.mOwnData = 0;
-					pDataSegment[i].SetDataRW( ((SlSymbol *)pFoundSymbol)->GetChangeableParamData(), pFoundSymbol );
+					pDataSegment[i].SetDataRW( ((SlSymbol *)pFoundSymbol)->GetRWData(), pFoundSymbol );
 				}
 				else
 				{
 					DASSTHROW( symbol.mIsVarying == false,
-								("Currently not supporting varying parameters %s", symbol.mName.c_str()) );
+								("Currently not supporting varying parameters %s", pFindName) );
 
 					// $$$ when supporting varying, will have to allocate data here and fill with default
 					// at setup time.. like for temporaries with default values..
 
 					// calling params should come from "surface" ?
-					pFoundSymbol =
-						mCallingParams.LookupVariable( symbol.mName.c_str() );
+					pFoundSymbol = mCallingParams.LookupVariable( pFindName );
 
 					// additionally look into params in attributes ?
 
@@ -158,7 +169,7 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 						pDataSegment[i].Flags.mOwnData = 0;
 						pDataSegment[i].SetDataR( symbol.GetUniformParamData(), &symbol );
 
-						//DASSTHROW( 0, ("Could not find symbol %s", symbol.mName.c_str()) );
+						//DASSTHROW( 0, ("Could not find symbol %s", pFindName) );
 					}
 				}
 			}
@@ -171,7 +182,6 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 			break;
 
 		default:
-		case SlSymbol::GLOBAL:
 			DASSTHROW( 0, ("Unsupported data type !") );
 			break;
 		}
