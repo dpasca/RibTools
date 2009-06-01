@@ -211,11 +211,11 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 			TokNode	*pDetailNode;
 
 			size_t i=0;
-			if ( fndVarDefBeginInBlock(
+			while ( fndVarDefBeginInBlock(
 							i,
 							pNode,
-							pNode->GetChildTry( 0 ),
-							pNode->GetChildTry( 1 ),
+							pNode->GetChildTry( i + 0 ),
+							pNode->GetChildTry( i + 1 ),
 							pDTypeNode,
 							pDetailNode ) )
 			{
@@ -233,6 +233,8 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 						break;
 				}
 
+				if NOT( i < pNode->mpChilds.size() )
+					break;
 			}
 		}
 	}
