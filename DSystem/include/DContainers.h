@@ -172,6 +172,17 @@ public:
 		mSize -= 1;
 	}
 	
+	void push_front( const T &val )
+	{
+		grow();
+		for (size_t i=mSize; i > 1; --i)
+		{
+			mpData[i-1] = mpData[i-2];
+		}
+		
+		mpData[0] = val;
+	}
+
 	void push_back( const T &val )
 	{
 		T	tmp = val;	// TODO: why needs this ?!

@@ -26,6 +26,7 @@ shinymetal(
 	}
 
 	D = reflect(I, normalize(Nf));
+	D = D + 0;
 	D = transform("world", point "world" (0, 0, 0) + D);
 	
 	D += reflect( point "world" (0, 1, 0), point "object" (0, 0, 1) );

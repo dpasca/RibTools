@@ -19,6 +19,72 @@
 using namespace	RSLC;
 
 //==================================================================
+namespace RSLC
+{
+
+//==================================================================
+static void unlinkNodeFromParent( TokNode *pNode )
+{
+	if NOT( pNode->mpParent )
+		return;
+
+	for (size_t i=0; i < pNode->mpParent->mpChilds.size(); ++i)
+	{
+		if ( pNode->mpParent->mpChilds[i] == pNode )
+		{
+			pNode->mpParent->mpChilds.erase( pNode->mpParent->mpChilds.begin()+i );
+			return;
+		}
+	}
+
+	DASSERT( 0 );
+}
+
+//==================================================================
+static void reparentNode( TokNode *pNode, TokNode *pNewParent )
+{
+	unlinkNodeFromParent( pNode );
+	pNode->mpParent = pNewParent;
+}
+
+//==================================================================
+static bool expandExpressions( TokNode *pNode )
+{
+	if ( pNode->mpToken && pNode->mpToken->id == T_OP_ASSIGN )
+	{
+		TokNode	*pLValue = pNode->GetLeft();
+		//if NOT( pLValue )
+		//	throw Exception( "Missing left value in expression assignment.", pNode->mpToken );
+
+		/*
+		{
+			a	=	b
+
+
+		{
+				=
+			a		b
+		*/
+
+		if ( pLValue )
+		{
+			reparentNode( pLValue, pNode );
+			pNode->mpChilds.push_front( pLValue );
+		}
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		expandExpressions( pNode->mpChilds[i] );
+	}
+
+	return true;
+}
+
+//==================================================================
+}
+
+//==================================================================
 const char	*RSLCompiler::mpsVersionString = "0.1a";
 
 //==================================================================
@@ -41,13 +107,14 @@ RSLCompiler::RSLCompiler( const char *pSource, size_t sourceSize )
 
 	DiscoverFunctions( mpRoot );
 
+	expandExpressions( mpRoot );
+
 	TraverseTree( mpRoot, 0 );
 }
 
 //==================================================================
 RSLCompiler::~RSLCompiler()
 {
-
 }
 
 //==================================================================
