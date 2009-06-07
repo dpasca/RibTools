@@ -37,6 +37,7 @@ enum TokenIDType
 enum BlockType
 {
 	BLKT_UNKNOWN,
+	BLKT_ROOT,
 	BLKT_SHPARAMS,
 	BLKT_CODEBLOCK,
 	BLKT_EXPRESSION,
@@ -67,10 +68,10 @@ enum TokenID
 	OP_DEF(	"||"	,	LOGIC_OR	)	,
 	OP_DEF(	"=="	,	EQ			)	,
 	OP_DEF(	"!="	,	NEQ			)	,
-	OP_DEF(	"+="	,	PLUSEQ		)	,
-	OP_DEF(	"-="	,	MINUSEQ		)	,
-	OP_DEF(	"*="	,	MULEQ		)	,
-	OP_DEF(	"/="	,	DIVEQ		)	,
+	OP_DEF(	"+="	,	PLUSASS		)	,
+	OP_DEF(	"-="	,	MINUSASS		)	,
+	OP_DEF(	"*="	,	MULASS		)	,
+	OP_DEF(	"/="	,	DIVASS		)	,
 	OP_DEF(	"+"		,	PLUS		)	,
 	OP_DEF(	"-"		,	MINUS		)	,
 	OP_DEF(	"*"		,	MUL			)	,

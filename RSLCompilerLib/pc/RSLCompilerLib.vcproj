@@ -167,6 +167,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_Operators.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Operators.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Token.cpp"
 				>
 			</File>

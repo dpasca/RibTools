@@ -164,14 +164,15 @@ static bool iterateNextExpression( size_t &i, TokNode *pNode )
 			return true;
 		}
 		else
-		if ( pNode->mpChilds[i]->IsTokenID( T_OP_SEMICOL ) )
+		if ( pNode->mpChilds[i]->IsTokenID( T_OP_SEMICOL ) ||
+			 pNode->mpChilds[i]->IsTokenID( T_OP_RGT_BRACKET ) )
 		{
 			++i;
 			return false;
 		}
 	}
 
-	throw Exception( "Missing a ; ?" );
+	//throw Exception( "Missing a ; ?" );
 
 	return false;
 }

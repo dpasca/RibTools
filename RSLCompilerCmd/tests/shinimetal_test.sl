@@ -2,9 +2,11 @@
    ..this comment is part of the test 8)*/
 
 
-float func1( vector a )
+vector func1( vector a )
 {
-	return 1;
+	float	b = 1 + 2 * 3;
+	float	c = 1 + 2 + 3;
+	return vector( 1, 2, 3 );
 }
 
 surface

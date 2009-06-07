@@ -123,27 +123,6 @@ Variable *TokNode::FindVariableByDefName( const char *pName )
 }
 
 //==================================================================
-/*
-a = b + c * d;
-
-a
-	=
-		b
-			+
-				c
-					*
-						d
-
-		a
-	=
-			b
-		+
-				c
-			*
-				d
-*/
-
-//==================================================================
 static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 {
 	if ( pNode->mpToken )
@@ -155,13 +134,22 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 			// are we at root level ?
 			if ( pNode->mpParent && pNode->mpParent->mpParent == NULL )
 			{
-				TokNode	*pShName = pNode->GetLeft();
-				if ( pShName )
+				TokNode	*pFnName = pNode->GetLeft();
+				if ( pFnName )
 				{
-					TokNode	*pShType = pShName->GetLeft();
-					if ( pShType && pShType->mpToken->idType == T_TYPE_SHADERTYPE )
+					TokNode	*pFnType = pFnName->GetLeft();
+					if ( pFnType )
 					{
-						pNode->mBlockType = BLKT_SHPARAMS;
+						// shader
+						if ( pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
+							pNode->mBlockType = BLKT_SHPARAMS;
+						else	// function
+						if ( pFnType->mpToken->idType == T_TYPE_DATATYPE )
+							pNode->mBlockType = BLKT_SHPARAMS;
+						else
+						{
+							DASSERT( 0 );
+						}
 					}
 				}
 			}
@@ -178,6 +166,11 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 			// assign the ID and increment the counter
 			pNode->mBlockID = blockCnt++;
 		}
+	}
+	else
+	{
+		// block for root
+		pNode->mBlockType = BLKT_ROOT;
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -247,6 +240,7 @@ void TraverseTree( TokNode *pNode, int depth )
 	switch ( pNode->mBlockType )
 	{
 	case BLKT_UNKNOWN:		break;
+	case BLKT_ROOT:			printf( " <ROOT %i> ", pNode->mBlockID );	break;
 	case BLKT_SHPARAMS:		printf( " <PARAMS %i> ", pNode->mBlockID );	break;
 	case BLKT_CODEBLOCK:	printf( " <CODEBLK %i> ", pNode->mBlockID );	break;
 	case BLKT_EXPRESSION:	printf( " <EXPR %i> ", pNode->mBlockID );		break;

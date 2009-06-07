@@ -21,6 +21,8 @@ Exception::Exception( const std::string &msg, const Token *pTok/*=NULL */ )
 	{
 		mMsg = DUT::SSPrintFS( "%s at line %i", msg.c_str(), pTok->sourceLine );
 	}
+	else
+		mMsg = msg;
 }
 
 //==================================================================
