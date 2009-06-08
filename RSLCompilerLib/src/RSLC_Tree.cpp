@@ -123,14 +123,30 @@ Variable *TokNode::FindVariableByDefName( const char *pName )
 }
 
 //==================================================================
+void TokNode::UnlinkFromParent()
+{
+	if NOT( mpParent )
+		return;
+
+	for (size_t i=0; i < mpParent->mpChilds.size(); ++i)
+	{
+		if ( mpParent->mpChilds[i] == this )
+		{
+			mpParent->mpChilds.erase( mpParent->mpChilds.begin()+i );
+			return;
+		}
+	}
+
+	DASSERT( 0 );
+}
+
+//==================================================================
 static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 {
 	if ( pNode->mpToken )
 	{
 		if ( pNode->mpToken->id == T_OP_LFT_BRACKET )
 		{
-			pNode->mBlockType = BLKT_EXPRESSION;
-
 			// are we at root level ?
 			if ( pNode->mpParent && pNode->mpParent->mpParent == NULL )
 			{
@@ -142,10 +158,10 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 					{
 						// shader
 						if ( pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
-							pNode->mBlockType = BLKT_SHPARAMS;
+							pNode->SetBlockType( BLKT_SHPARAMS );
 						else	// function
 						if ( pFnType->mpToken->idType == T_TYPE_DATATYPE )
-							pNode->mBlockType = BLKT_SHPARAMS;
+							pNode->SetBlockType( BLKT_SHPARAMS );
 						else
 						{
 							DASSERT( 0 );
@@ -153,15 +169,21 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 					}
 				}
 			}
+
+			if ( pNode->GetBlockType() == BLKT_UNKNOWN )
+			{
+				// set as a plain expression otherwise
+				pNode->SetBlockType( BLKT_EXPRESSION );
+			}
 		}
 		else
 		if ( pNode->mpToken->id == T_OP_LFT_CRL_BRACKET )
 		{
-			pNode->mBlockType = BLKT_CODEBLOCK;
+			pNode->SetBlockType( BLKT_CODEBLOCK );
 		}
 
 		// are we in a block ?
-		if ( pNode->mBlockType != BLKT_UNKNOWN )
+		if ( pNode->GetBlockType() != BLKT_UNKNOWN )
 		{
 			// assign the ID and increment the counter
 			pNode->mBlockID = blockCnt++;
@@ -170,7 +192,7 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 	else
 	{
 		// block for root
-		pNode->mBlockType = BLKT_ROOT;
+		pNode->SetBlockType( BLKT_ROOT );
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -237,7 +259,7 @@ void TraverseTree( TokNode *pNode, int depth )
 		}
 	}
 
-	switch ( pNode->mBlockType )
+	switch ( pNode->GetBlockType() )
 	{
 	case BLKT_UNKNOWN:		break;
 	case BLKT_ROOT:			printf( " <ROOT %i> ", pNode->mBlockID );	break;

@@ -1,6 +1,10 @@
 /* Test file for shader parsing
    ..this comment is part of the test 8)*/
 
+float func0()
+{
+	return xcomp( vector( 6, 7, 8 ) );
+}
 
 vector func1( vector a )
 {

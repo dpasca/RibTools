@@ -59,10 +59,10 @@ static void AddVariable(
 	{
 		// local variables are varying by default, params uniform by default
 		// ..see RenderMan Companion p.297
-		if ( pNode->mBlockType == BLKT_CODEBLOCK || pNode->mBlockType == BLKT_EXPRESSION )
+		if ( pNode->GetBlockType() == BLKT_CODEBLOCK || pNode->GetBlockType() == BLKT_EXPRESSION )
 			pVar->mIsVarying = true;
 		else
-		if ( pNode->mBlockType == BLKT_SHPARAMS )
+		if ( pNode->GetBlockType() == BLKT_SHPARAMS )
 			pVar->mIsVarying = false;
 		else
 			pVar->mIsVarying = true;
@@ -79,8 +79,9 @@ static bool fndVarDefBeginInBlock(
 		TokNode	* &out_pDetailNode
 		)
 {
-	if ( pChild0->mpToken->idType == T_TYPE_DATATYPE ||
-		 pChild0->mpToken->idType == T_TYPE_DETAIL )
+	if ( pChild0 &&
+		 (pChild0->mpToken->idType == T_TYPE_DATATYPE ||
+		  pChild0->mpToken->idType == T_TYPE_DETAIL ) )
 	{
 		// 3 possible cases
 
@@ -182,13 +183,15 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 {
 	if ( pNode->mpToken )
 	{
+		BlockType	blkType = pNode->GetBlockType();
+
 		DASSERT(
-			pNode->mBlockType == BLKT_SHPARAMS ||
-			pNode->mBlockType == BLKT_CODEBLOCK ||
-			pNode->mBlockType == BLKT_EXPRESSION
+			blkType == BLKT_SHPARAMS ||
+			blkType == BLKT_CODEBLOCK ||
+			blkType == BLKT_EXPRESSION
 			);
 
-		if ( pNode->mBlockType == BLKT_EXPRESSION )
+		if ( blkType == BLKT_EXPRESSION )
 		{
 			for (size_t i=0; i < pNode->mpChilds.size();)
 			{
@@ -204,8 +207,8 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 			}
 		}
 		else
-		if ( pNode->mBlockType == BLKT_CODEBLOCK ||
-			 pNode->mBlockType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+		if ( blkType == BLKT_CODEBLOCK ||
+			 blkType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
 			 )
 		{
 			TokNode	*pDTypeNode;
@@ -321,7 +324,7 @@ static void scanWriteVars( FILE *pFile, TokNode *pNode, size_t &blockCnt )
 
 			fprintf_s( pFile, "\t" );
 
-			switch ( pNode->mBlockType )
+			switch ( pNode->GetBlockType() )
 			{
 			case BLKT_SHPARAMS:		fprintf_s( pFile, "parameter" );	break;
 			case BLKT_CODEBLOCK:	fprintf_s( pFile, "temporary" );	break;

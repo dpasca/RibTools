@@ -42,13 +42,93 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 		pFunc->mpCodeBlkNode	= pNode;
 		pFunc->mpNameTok		= pFuncName->mpToken;
 		pFunc->mpRetTypeTok		= pRetType->mpToken;
+
+		pFuncName->mNodeType = TokNode::TYPE_FUNCDEF;	// mark the node as a function definition
 	}
 }
+
+//==================================================================
+static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int &out_parentIdx )
+{
+	if ( (pNode->IsNonTerminal() ||
+		  pNode->IsStdFunction()) &&
+			pNode->mNodeType == TokNode::TYPE_STANDARD )
+	{
+		TokNode *pFuncCallNode = pNode;
+
+		const char *pStr = pFuncCallNode->GetTokStr();
+
+/*
+		for (size_t i=0; i < funcs.size(); ++i)
+		{
+			if ( strcmp( pStr, funcs[i].mpNameTok->GetStrChar() ) )
+				continue;
+*/
+
+			TokNode *pLeftBracket = pFuncCallNode->GetRight();
+
+			if ( pLeftBracket && pLeftBracket->mpToken->id == T_OP_LFT_BRACKET )
+			{
+				//if ( pLeftBracket->mpToken->id == T_OP_LFT_BRACKET )
+				{
+					/*
+						b
+						(
+						)
+
+						..becomes..
+
+						b
+							(
+							)
+
+						..the loop above will skip one, so we need to backpedal..
+					*/
+
+					out_parentIdx -= 1;
+
+					pLeftBracket->Reparent( pFuncCallNode );
+					pFuncCallNode->mpChilds.push_back( pLeftBracket );
+
+					pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
+				}
+/*
+				else
+				{
+					throw Exception( "Expecting a left bracket !", pLeftBracket->mpToken );
+				}
+*/
+			}
+//		}
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		discoverFuncsUsage( pNode->mpChilds[i], funcs, i );
+	}
+}
+
+/*
+
+	a( b( 1 ), 2 )
+
+	$p0 = 1
+	$t0 = b
+
+	$p0 = $t0
+	$p1 = 2
+
+	call a
+
+*/
 
 //==================================================================
 void DiscoverFunctions( TokNode *pRoot )
 {
 	discoverFuncsDeclarations( pRoot );
+
+	int	idx = 0;
+	discoverFuncsUsage( pRoot, pRoot->GetFuncs(), idx );
 }
 
 //==================================================================
@@ -115,7 +195,6 @@ static void buildExpression( FILE *pFile, const TokNode *pNode )
 	{
 		fprintf_s( pFile, "\nWEIRDDD !! ( %s )\n", pNode->GetTokStr() );
 	}
-
 }
 
 //==================================================================

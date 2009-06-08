@@ -14,31 +14,6 @@ namespace RSLC
 {
 
 //==================================================================
-static void unlinkNodeFromParent( TokNode *pNode )
-{
-	if NOT( pNode->mpParent )
-		return;
-
-	for (size_t i=0; i < pNode->mpParent->mpChilds.size(); ++i)
-	{
-		if ( pNode->mpParent->mpChilds[i] == pNode )
-		{
-			pNode->mpParent->mpChilds.erase( pNode->mpParent->mpChilds.begin()+i );
-			return;
-		}
-	}
-
-	DASSERT( 0 );
-}
-
-//==================================================================
-static void reparentNode( TokNode *pNode, TokNode *pNewParent )
-{
-	unlinkNodeFromParent( pNode );
-	pNode->mpParent = pNewParent;
-}
-
-//==================================================================
 static void reparentBiOperators( TokNode *pNode, const TokenID *pMatchingIDs, size_t matchIDsN, size_t &out_parentIdx )
 {
 	if ( pNode->mpToken )
@@ -53,34 +28,36 @@ static void reparentBiOperators( TokNode *pNode, const TokenID *pMatchingIDs, si
 				//if NOT( pLValue )
 				//	throw Exception( "Missing left value in expression assignment.", pNode->mpToken );
 
-				DASSERT( out_parentIdx > 0 );
-
-				//	L	=	R
-
-				if ( pRValue )
+				if ( pRValue && pLValue )
 				{
-					reparentNode( pRValue, pNode );
-					pNode->mpChilds.push_front( pRValue );
-				}
-				//	L	=
-				//			R
+					//	L	=	R
 
-				if ( pLValue )
-				{
-					reparentNode( pLValue, pNode );
-					pNode->mpChilds.push_front( pLValue );
-				}
-				//		=
-				//	L		R
+					if ( pRValue )
+					{
+						pRValue->Reparent( pNode );
+						pNode->mpChilds.push_front( pRValue );
+					}
+					//	L	=
+					//			R
 
-				out_parentIdx -= 1;
+					if ( pLValue )
+					{
+						pLValue->Reparent( pNode );
+						pNode->mpChilds.push_front( pLValue );
+					}
+					//		=
+					//	L		R
+
+					DASSERT( out_parentIdx > 0 );
+					out_parentIdx -= 1;
+				}
 
 				break;
 			}
 		}
 	}
 
-	if ( pNode->mBlockType != BLKT_UNKNOWN )
+	//if ( pNode->GetBlockType() != BLKT_UNKNOWN )
 		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 		{
 			reparentBiOperators( pNode->mpChilds[i], pMatchingIDs, matchIDsN, i );

@@ -22,6 +22,15 @@ namespace RSLC
 class TokNode
 {
 public:
+	enum Type
+	{
+		TYPE_STANDARD,
+		TYPE_BLOCK,
+		TYPE_FUNCDEF,
+		TYPE_FUNCCALL,
+		TYPE_N
+	};
+public:
 	Token			*mpToken;
 
 private:
@@ -30,7 +39,12 @@ private:
 
 public:
 	TokNode			*mpParent;
+	Type			mNodeType;
+
+private:
 	BlockType		mBlockType;
+
+public:
 	u_int			mBlockID;
 	DVec<TokNode*>	mpChilds;
 	Variable		*mpVarDef;	// this is the variable definition
@@ -40,6 +54,7 @@ public:
 	TokNode( Token *pObj ) :
 		mpToken(pObj),
 		mpParent(NULL),
+		mNodeType(TYPE_STANDARD),
 		mBlockType(BLKT_UNKNOWN),
 		mBlockID(0),
 		mpVarDef(NULL)
@@ -50,6 +65,19 @@ public:
 	{
 		for (size_t i=0; i < mpChilds.size(); ++i)
 			DSAFE_DELETE( mpChilds[i] );
+	}
+
+	void SetBlockType( BlockType blockType )
+	{
+		DASSERT( mBlockType == BLKT_UNKNOWN && mNodeType == TYPE_STANDARD );
+
+		mBlockType	= blockType;
+		mNodeType	= TYPE_BLOCK;
+	}
+
+	BlockType GetBlockType() const
+	{
+		return mBlockType;
 	}
 
 	TokNode *AddChild( TokNode *pNode )
@@ -88,8 +116,17 @@ public:
 
 	bool IsCodeBlock() const			{ return mBlockType == BLKT_CODEBLOCK; }
 	bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
-	bool IsNonTerminal() const			{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : NULL; }
+	bool IsNonTerminal() const			{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : false; }
+	bool IsStdFunction() const			{ return mpToken ? mpToken->idType == T_TYPE_STDFUNC : false; }
 	bool IsTokenID( TokenID id ) const	{ return mpToken ? mpToken->id == id : false; }
+
+	void UnlinkFromParent();
+
+	void Reparent( TokNode *pNewParent )
+	{
+		UnlinkFromParent();
+		mpParent = pNewParent;
+	}
 };
 
 //==================================================================
