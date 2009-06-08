@@ -194,6 +194,16 @@ public:
 	{
 		return str.c_str();
 	}
+
+	bool IsAssignOp() const
+	{
+		return
+			id == T_OP_ASSIGN	||
+			id == T_OP_PLUSASS	||
+			id == T_OP_MINUSASS	||
+			id == T_OP_MULASS	||
+			id == T_OP_DIVASS	;
+	}
 };
 
 //==================================================================

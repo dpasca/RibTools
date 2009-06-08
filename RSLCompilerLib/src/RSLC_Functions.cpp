@@ -52,6 +52,86 @@ void DiscoverFunctions( TokNode *pRoot )
 }
 
 //==================================================================
+static const char *getOper( TokNode *pOperand )
+{
+	if ( pOperand->mpToken->idType == T_TYPE_OPERATOR )
+		return "$t0";
+	else
+	{
+		if ( pOperand->mpVarDef )
+			return pOperand->mpVarDef->mInternalName.c_str();
+		else
+			return pOperand->GetTokStr();
+	}
+}
+
+//==================================================================
+static void buildExpression( FILE *pFile, const TokNode *pNode )
+{
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		if ( pNode->mpChilds[i]->mpToken->idType == T_TYPE_OPERATOR )
+			buildExpression( pFile, pNode->mpChilds[i] );
+	}
+
+	if NOT( pNode->mpToken->idType == T_TYPE_OPERATOR )
+		return;
+
+	TokNode *pOperand1 = pNode->GetChildTry( 0 );
+	TokNode *pOperand2 = pNode->GetChildTry( 1 );
+
+	if ( pOperand1 && pOperand2 )
+	{
+		const char	*pO1Str = getOper( pOperand1 );
+		const char	*pO2Str = getOper( pOperand2 );
+
+		if ( pNode->mpToken->IsAssignOp() )
+		{
+			if ( pNode->mpToken->id == T_OP_ASSIGN )
+				fprintf_s( pFile, "\tmov\t%s\t%s\n", pO1Str, pO2Str );
+			else
+				fprintf_s( pFile, "\t%s\t%s\t%s\t%s\n",
+							pNode->GetTokStr(),
+								pO1Str,
+									pO1Str,
+										pO2Str );
+
+			fprintf_s( pFile, "\n" );
+		}
+		else
+		if ( pNode->mpToken->id == T_OP_ASSIGN )
+		{
+			fprintf_s( pFile, "\tmov\t%s\t%s\n", pO1Str, pO2Str );
+		}
+		else
+		{
+			fprintf_s( pFile, "\t%s\t$t0\t%s\t%s\n",
+							pNode->GetTokStr(),
+								pO1Str,
+									pO2Str );
+		}
+	}
+	else
+	{
+		fprintf_s( pFile, "\nWEIRDDD !! ( %s )\n", pNode->GetTokStr() );
+	}
+
+}
+
+//==================================================================
+static void generateExpressions( FILE *pFile, const TokNode *pCodeBlkNode )
+{
+	for (size_t i=0; i < pCodeBlkNode->mpChilds.size(); ++i)
+	{
+		const TokNode	*pNode = pCodeBlkNode->mpChilds[i];
+
+		// are we assigning something 
+		if ( pNode->mpToken->IsAssignOp() )
+			buildExpression( pFile, pNode );
+	}
+}
+
+//==================================================================
 void WriteFunctions( FILE *pFile, TokNode *pNode )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
@@ -72,6 +152,8 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 		{
 			fprintf_s( pFile, "function %s\n", func.mpNameTok->GetStrChar() );
 		}
+
+		generateExpressions( pFile, func.mpCodeBlkNode );
 
 		fprintf_s( pFile, "\n\tret\n" );
 	}

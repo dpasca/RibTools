@@ -6,6 +6,7 @@ vector func1( vector a )
 {
 	float	b = 1 + 2 * 3;
 	float	c = 1 + 2 + 3;
+	c += 14;
 	return vector( 1, 2, 3 );
 }
 
