@@ -17,6 +17,7 @@ namespace RSLC
 
 //==================================================================
 class Token;
+class TokNode;
 
 //==================================================================
 class Exception
@@ -25,6 +26,7 @@ class Exception
 
 public:
 	Exception( const std::string &msg, const Token *pTok=NULL );
+	Exception( const std::string &msg, const TokNode *pTokNode );
 		
 	~Exception()
 	{

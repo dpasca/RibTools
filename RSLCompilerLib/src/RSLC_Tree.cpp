@@ -7,6 +7,7 @@
 //==================================================================
 
 #include "RSLC_Tree.h"
+#include "RSLC_Exceptions.h"
 
 //==================================================================
 namespace RSLC
@@ -202,6 +203,17 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 }
 
 //==================================================================
+static bool doBracketsMatch( TokenID lastOpenBraket, TokenID thisCloseBracket )
+{
+	if ((lastOpenBraket == RSLC::T_OP_LFT_BRACKET && thisCloseBracket == RSLC::T_OP_RGT_BRACKET) ||
+		(lastOpenBraket == RSLC::T_OP_LFT_SQ_BRACKET && thisCloseBracket == RSLC::T_OP_RGT_SQ_BRACKET) ||
+		(lastOpenBraket == RSLC::T_OP_LFT_CRL_BRACKET && thisCloseBracket == RSLC::T_OP_RGT_CRL_BRACKET) )
+		return true;
+	else
+		return false;
+}
+
+//==================================================================
 TokNode *MakeTree( DVec<Token> &tokens )
 {
 	TokNode	*pRoot = DNEW TokNode( NULL );
@@ -210,6 +222,8 @@ TokNode *MakeTree( DVec<Token> &tokens )
 
 	TokNode	*pCurNode = pRoot;
 
+	DVec<TokenID>	bracketsMemory;
+
 	for (size_t i=0; i < tokens.size(); ++i)
 	{
 		switch ( tokens[i].id )
@@ -217,12 +231,21 @@ TokNode *MakeTree( DVec<Token> &tokens )
 		case RSLC::T_OP_LFT_BRACKET		:
 		case RSLC::T_OP_LFT_SQ_BRACKET	:
 		case RSLC::T_OP_LFT_CRL_BRACKET	:
+			bracketsMemory.push_back( tokens[i].id );
 			pCurNode = pCurNode->AddNewChild( &tokens[i] );
 			break;
 
 		case RSLC::T_OP_RGT_BRACKET		:
 		case RSLC::T_OP_RGT_SQ_BRACKET	:
 		case RSLC::T_OP_RGT_CRL_BRACKET	:
+			if (!pCurNode->mpParent ||
+				!bracketsMemory.size() ||
+				!doBracketsMatch( bracketsMemory.back(), tokens[i].id ) )
+			{
+				throw Exception( "Mismatched brackets ?", &tokens[i] );
+			}
+			bracketsMemory.pop_back();
+
 			pCurNode = pCurNode->mpParent;
 			pCurNode->AddNewChild( &tokens[i] );
 			break;

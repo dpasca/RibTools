@@ -27,7 +27,6 @@ shinymetal(
 	normal Nf = faceforward(N, I);
 	point D;
 	
-	
 	{
 		float one;
 	}
