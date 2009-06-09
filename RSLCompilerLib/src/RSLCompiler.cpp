@@ -36,20 +36,33 @@ RSLCompiler::RSLCompiler( const char *pSource, size_t sourceSize )
 				mTokens[i].str.c_str() );
 	}
 
+	// make the basic tree with nested blocks based on brackets
 	mpRoot = MakeTree( mTokens );
 
+	// discover variables declarations and usage
 	DiscoverVariables( mpRoot );
 
+	// discover functions declarations and usage
 	DiscoverFunctions( mpRoot );
 
+	// remove closing brackets as they serve no additional purpose
+	// ..since the tree has already been defined at this point
+	RemoveClosingBrackets( mpRoot );
+
+	// remove semicolons as they serve no additional purpose
+	RemoveSemicolons( mpRoot );
+
+	// develop the tree based on operators with the proper precedence
 	ReparentOperators( mpRoot );
 
+	// produce some debug info in the output file
 	TraverseTree( mpRoot, 0 );
 }
 
 //==================================================================
 RSLCompiler::~RSLCompiler()
 {
+	DSAFE_DELETE( mpRoot );
 }
 
 //==================================================================

@@ -6,7 +6,19 @@ float func0()
 	return xcomp( vector( 6, 7, 8 ) );
 }
 
-vector func1( vector a )
+float func1()
+{
+	float	a = 1;
+	float	b = 2;
+	float	c = 3;
+	float	s = 4;
+	float	t = 5;
+	float	q = 6;
+
+	return (a + b * c) + (s + t * q);
+}
+
+vector func2( vector a )
 {
 	float	b = 1 + 2 * 3;
 	float	c = 1 + 2 + 3;

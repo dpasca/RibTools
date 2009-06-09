@@ -263,6 +263,59 @@ TokNode *MakeTree( DVec<Token> &tokens )
 }
 
 //==================================================================
+void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx )
+{
+	if ( pNode->mpToken )
+	{
+		switch ( pNode->mpToken->id )
+		{
+		case RSLC::T_OP_RGT_BRACKET		:
+		case RSLC::T_OP_RGT_SQ_BRACKET	:
+		case RSLC::T_OP_RGT_CRL_BRACKET	:
+			
+			// right brackets should have no children !
+			DASSERT( pNode->mpChilds.size() == 0 );
+
+			pNode->UnlinkFromParent();
+			DSAFE_DELETE( pNode );
+
+			if ( pParentScanIdx )
+				*pParentScanIdx -= 1;
+			
+			return;
+		}
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		RemoveClosingBrackets( pNode->mpChilds[i], &i );
+	}
+}
+
+//==================================================================
+void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx )
+{
+	if ( pNode->mpToken && pNode->mpToken->id == RSLC::T_OP_SEMICOL )
+	{
+		// right brackets should have no children !
+		DASSERT( pNode->mpChilds.size() == 0 );
+
+		pNode->UnlinkFromParent();
+		DSAFE_DELETE( pNode );
+
+		if ( pParentScanIdx )
+			*pParentScanIdx -= 1;
+		
+		return;
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		RemoveSemicolons( pNode->mpChilds[i], &i );
+	}
+}
+
+//==================================================================
 void TraverseTree( TokNode *pNode, int depth )
 {
 	for (int i=0; i < depth; ++i)

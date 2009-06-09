@@ -138,6 +138,9 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	SF_DEF( transform		)	,
 	SF_DEF( translate		)	,
 	SF_DEF( vtransform		)	,
+	SF_DEF( xcomp			)	,
+	SF_DEF( ycomp			)	,
+	SF_DEF( zcomp			)	,
 };
 
 //==================================================================
@@ -566,6 +569,28 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 		if ( handleString( pSource, i, sourceSize, tokens, lineCnt ) )
 			continue;
 	}
+}
+
+//==================================================================
+bool Token::IsBiOp() const
+{
+	return
+		IsAssignOp()			||
+		id == T_OP_PLUS			||
+		id == T_OP_MINUS		||
+		id == T_OP_MUL			||
+		id == T_OP_DIV			||
+		id == T_OP_ASSIGN		||
+		id == T_OP_POW			||
+		id == T_OP_DOT			||
+		id == T_OP_LSEQ			||
+		id == T_OP_GEEQ			||
+		id == T_OP_LSTH			||
+		id == T_OP_GRTH			||
+		id == T_OP_LOGIC_AND	||
+		id == T_OP_LOGIC_OR		||
+		id == T_OP_EQ			||
+		id == T_OP_NEQ			;
 }
 
 //==================================================================

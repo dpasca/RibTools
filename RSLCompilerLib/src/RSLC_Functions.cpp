@@ -132,10 +132,25 @@ void DiscoverFunctions( TokNode *pRoot )
 }
 
 //==================================================================
-static const char *getOper( TokNode *pOperand )
+static const char *getOper( TokNode *pOperand, char *pOutBuff, size_t maxOutSize )
 {
 	if ( pOperand->mpToken->idType == T_TYPE_OPERATOR )
-		return "$t0";
+	{
+		// drill down if necessary
+		while ( pOperand->mTempRegIdx == -1 )
+		{
+			if ( pOperand->mpChilds.size() == 0 )
+				return "BADDDD";
+
+			// expect at least one children
+			DASSERT( pOperand->mpChilds.size() > 0 );
+			pOperand = pOperand->mpChilds[0];
+		}
+
+		sprintf_s( pOutBuff, maxOutSize, "$t%i", pOperand->mTempRegIdx );
+
+		return pOutBuff;
+	}
 	else
 	{
 		if ( pOperand->mpVarDef )
@@ -145,16 +160,36 @@ static const char *getOper( TokNode *pOperand )
 	}
 }
 
+/*
+
+*
+	+
+		a
+		b
+
+	+
+		c
+		d
+
+	$t0 = + a b
+	$t1 = + c d
+
+$t2 = +	$t0	$t1
+
+*/
+
 //==================================================================
-static void buildExpression( FILE *pFile, const TokNode *pNode )
+static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
 		if ( pNode->mpChilds[i]->mpToken->idType == T_TYPE_OPERATOR )
-			buildExpression( pFile, pNode->mpChilds[i] );
+		{
+			buildExpression( pFile, pNode->mpChilds[i], io_tempIdx );
+		}
 	}
 
-	if NOT( pNode->mpToken->idType == T_TYPE_OPERATOR )
+	if NOT( pNode->mpToken->IsBiOp() )
 		return;
 
 	TokNode *pOperand1 = pNode->GetChildTry( 0 );
@@ -162,8 +197,11 @@ static void buildExpression( FILE *pFile, const TokNode *pNode )
 
 	if ( pOperand1 && pOperand2 )
 	{
-		const char	*pO1Str = getOper( pOperand1 );
-		const char	*pO2Str = getOper( pOperand2 );
+		char	op1NameBuff[32];
+		char	op2NameBuff[32];
+
+		const char	*pO1Str = getOper( pOperand1, op1NameBuff, _countof(op1NameBuff) );
+		const char	*pO2Str = getOper( pOperand2, op2NameBuff, _countof(op2NameBuff) );
 
 		if ( pNode->mpToken->IsAssignOp() )
 		{
@@ -185,28 +223,34 @@ static void buildExpression( FILE *pFile, const TokNode *pNode )
 		}
 		else
 		{
-			fprintf_s( pFile, "\t%s\t$t0\t%s\t%s\n",
+			// a one time assignment only..
+			DASSERT( pNode->mTempRegIdx == -1 );
+			pNode->mTempRegIdx = io_tempIdx++;
+
+			fprintf_s( pFile, "\t%s\t$t%i\t%s\t%s\n",
 							pNode->GetTokStr(),
-								pO1Str,
-									pO2Str );
+								pNode->mTempRegIdx,
+									pO1Str,
+										pO2Str );
 		}
 	}
 	else
 	{
-		fprintf_s( pFile, "\nWEIRDDD !! ( %s )\n", pNode->GetTokStr() );
+		//fprintf_s( pFile, "\nWEIRDDD !! ( %s )\n", pNode->GetTokStr() );
 	}
 }
 
 //==================================================================
-static void generateExpressions( FILE *pFile, const TokNode *pCodeBlkNode )
+static void generateExpressions( FILE *pFile, TokNode *pCodeBlkNode )
 {
 	for (size_t i=0; i < pCodeBlkNode->mpChilds.size(); ++i)
 	{
-		const TokNode	*pNode = pCodeBlkNode->mpChilds[i];
+		TokNode	*pNode = pCodeBlkNode->mpChilds[i];
 
+		size_t	tempIdx = 0;
 		// are we assigning something 
-		if ( pNode->mpToken->IsAssignOp() )
-			buildExpression( pFile, pNode );
+		//if ( pNode->mpToken->IsAssignOp() )
+			buildExpression( pFile, pNode, tempIdx );
 	}
 }
 

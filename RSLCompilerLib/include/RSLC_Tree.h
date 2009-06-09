@@ -50,6 +50,8 @@ public:
 	Variable		*mpVarDef;	// this is the variable definition
 								// in case this node is variable usage
 
+	int				mTempRegIdx;// using while building code
+
 public:
 	TokNode( Token *pObj ) :
 		mpToken(pObj),
@@ -57,7 +59,8 @@ public:
 		mNodeType(TYPE_STANDARD),
 		mBlockType(BLKT_UNKNOWN),
 		mBlockID(0),
-		mpVarDef(NULL)
+		mpVarDef(NULL),
+		mTempRegIdx(-1)
 	{
 	}
 
@@ -131,6 +134,8 @@ public:
 
 //==================================================================
 TokNode *MakeTree( DVec<Token> &tokens );
+void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx=NULL );
+void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx=NULL );
 void TraverseTree( TokNode *pNode, int depth );
 
 //==================================================================

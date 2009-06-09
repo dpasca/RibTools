@@ -159,6 +159,9 @@ enum TokenID
 	SF_DEF( transform		)	,
 	SF_DEF( translate		)	,
 	SF_DEF( vtransform		)	,
+	SF_DEF( xcomp			)	,
+	SF_DEF( ycomp			)	,
+	SF_DEF( zcomp			)	,
 
 	TOKEN_N
 };
@@ -204,6 +207,8 @@ public:
 			id == T_OP_MULASS	||
 			id == T_OP_DIVASS	;
 	}
+
+	bool IsBiOp() const;
 };
 
 //==================================================================
