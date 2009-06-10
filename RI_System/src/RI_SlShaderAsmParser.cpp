@@ -70,6 +70,13 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"noise32"	,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
 	"noise33"	,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
 
+	"xcompsv"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+	"ycompsv"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+	"zcompsv"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+	"setxcompvs",	2,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
+	"setycompvs",	2,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
+	"setzcompvs",	2,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
+
 	"normalize"		,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
 	"faceforward"	,	3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
 	"diffuse"		,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,

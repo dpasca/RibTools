@@ -394,6 +394,13 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	SOP::Inst_Noise3<SlVec2>,
 	SOP::Inst_Noise3<SlVec3>,
 
+	SOP::Inst_GetVComp<0>,
+	SOP::Inst_GetVComp<1>,
+	SOP::Inst_GetVComp<2>,
+	SOP::Inst_SetVComp<0>,
+	SOP::Inst_SetVComp<1>,
+	SOP::Inst_SetVComp<2>,
+
 	Inst_Normalize,
 	Inst_Faceforward,
 	SOP::Inst_Diffuse,

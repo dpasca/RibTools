@@ -114,6 +114,80 @@ void Inst_2Op( SlRunContext &ctx )
 }
 
 //==================================================================
+template <const size_t COMP_IDX>
+void Inst_GetVComp( SlRunContext &ctx )
+{
+		  SlScalar*	lhs	= ctx.GetVoidRW<SlScalar>( 1 );
+	const SlVec3*	op1	= ctx.GetVoidRO<SlVec3>( 2 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				lhs[i] = op1[COMP_IDX][op1_offset];
+			}
+			
+			op1_offset	+= op1_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0] = op1[COMP_IDX][0];
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
+template <const size_t COMP_IDX>
+void Inst_SetVComp( SlRunContext &ctx )
+{
+		  SlVec3*	lhs	= ctx.GetVoidRW<SlVec3>( 1 );
+	const SlScalar*	op1	= ctx.GetVoidRO<SlScalar>( 2 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				lhs[COMP_IDX][i] = op1[op1_offset];
+			}
+			
+			op1_offset	+= op1_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[COMP_IDX][0] = op1[0];
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 }
 
 //==================================================================
