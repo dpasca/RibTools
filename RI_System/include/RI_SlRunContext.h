@@ -96,6 +96,11 @@ public:
 		return *mpShaderInst->mpShader->mSymbols[tableOff ];
 	}
 
+	float	GetImmFloat( u_int argc )
+	{
+		return GetOp(argc)->mImmFloat.mValue;
+	}
+
 	bool IsSymbolVarying( u_int argc ) const
 	{
 		return GetOp(argc)->mSymbol.mIsVarying;

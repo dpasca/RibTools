@@ -26,64 +26,68 @@ struct OpCodeDef
 {
 	const char	*pName;
 	u_int		OperCnt;
+	bool		RightIsImmediate;
 	OperTypeID	Types[3];
 };
 
 //==================================================================
 static OpCodeDef	gsOpCodeDefs[] =
 {
-	"movss"	,		2,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
-	"movsv"	,		2,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
-	"movvs"	,		2,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
-	"movvv"	,		2,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
-		
-	"absss"	,		2,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
-	"abssv"	,		2,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
-	"absvs"	,		2,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
-	"absvv"	,		2,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
-		
-	"addss"	,		3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
-	"addsv"	,		3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
-	"addvs"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
-	"addvv"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
-		
-	"subss"	,		3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
-	"subsv"	,		3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
-	"subvs"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
-	"subvv"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
-		
-	"mulss"	,		3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
-	"mulsv"	,		3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
-	"mulvs"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
-	"mulvv"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
-		
-	"divss"	,		3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
-	"divsv"	,		3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
-	"divvs"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
-	"divvv"	,		3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
-		
-	"noise11"	,	2,	OPRTYPE_F1,	OPRTYPE_F1, OPRTYPE_NA,
-	"noise12"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
-	"noise13"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
-
-	"noise31"	,	2,	OPRTYPE_F3,	OPRTYPE_F1, OPRTYPE_NA,
-	"noise32"	,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
-	"noise33"	,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
-
-	"xcompsv"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
-	"ycompsv"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
-	"zcompsv"	,	2,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
-	"setxcompvs",	2,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
-	"setycompvs",	2,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
-	"setzcompvs",	2,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
-
-	"normalize"		,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
-	"faceforward"	,	3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
-	"diffuse"		,	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
-	"ambient"		,	1,	OPRTYPE_F3,	OPRTYPE_NA, OPRTYPE_NA,
-	"calculatenormal",	2,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
-
-	"ret"			,	0,	OPRTYPE_NA,	OPRTYPE_NA, OPRTYPE_NA,
+	"movss"		,		2,	0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
+	"movsv"		,		2,	0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
+	"movvs"		,		2,	0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
+	"movvv"		,		2,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
+							
+	"absss"		,		2,	0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
+	"abssv"		,		2,	0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
+	"absvs"		,		2,	0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
+	"absvv"		,		2,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
+							
+	"addss"		,		3,	0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"addsv"		,		3,	0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
+	"addvs"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
+	"addvv"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
+							
+	"subss"		,		3,	0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"subsv"		,		3,	0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
+	"subvs"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
+	"subvv"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
+							
+	"mulss"		,		3,	0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"mulsv"		,		3,	0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
+	"mulvs"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
+	"mulvv"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
+							
+	"divss"		,		3,	0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"divsv"		,		3,	0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,
+	"divvs"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
+	"divvv"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
+							
+	"lds"		,		2,	1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"ldv"		,		4,	1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+							
+	"noise11"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F1, OPRTYPE_NA,
+	"noise12"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+	"noise13"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+							
+	"noise31"		,	2,	0,	OPRTYPE_F3,	OPRTYPE_F1, OPRTYPE_NA,
+	"noise32"		,	2,	0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
+	"noise33"		,	2,	0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
+							
+	"xcompsv"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+	"ycompsv"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+	"zcompsv"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
+	"setxcompvs"	,	2,	0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
+	"setycompvs"	,	2,	0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
+	"setzcompvs"	,	2,	0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,
+							
+	"normalize"		,	2,	0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
+	"faceforward"	,	3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
+	"diffuse"		,	2,	0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
+	"ambient"		,	1,	0,	OPRTYPE_F3,	OPRTYPE_NA, OPRTYPE_NA,
+	"calculatenormal",	2,	0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
+							
+	"ret"			,	0,	0,	OPRTYPE_NA,	OPRTYPE_NA, OPRTYPE_NA,
 
 	NULL
 };
@@ -462,6 +466,54 @@ void ShaderAsmParser::verifySymbolType(
 }
 
 //==================================================================
+void ShaderAsmParser::parseCode_handleOperImmediate( const char *pTok )
+{
+	SlCPUWord	word;
+
+	float	val;
+	if ( 1 != sscanf( pTok, "%f" , &val ) )
+		onError( "ERROR: Invalid immediate value %s", pTok );
+
+	word.mImmFloat.mValue = val;
+
+	mpShader->mCode.push_back( word );
+}
+
+//==================================================================
+void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx )
+{
+	SlCPUWord	word;
+
+	int	symbolIdx;
+	if ( isTempSymbol( pTok ) )
+	{
+		symbolIdx = findOrAddTempSymbol( pTok );
+	}
+	else
+	{
+		symbolIdx = findSymbol( pTok, false );
+	}
+
+	if ( symbolIdx == -1 )
+	{
+		onError( "ERROR: Symbol '%s' unknown !", pTok );
+	}
+
+	word.mSymbol.mTableOffset	= (u_int)symbolIdx;
+	word.mSymbol.mIsVarying		= mpShader->mSymbols[symbolIdx]->mIsVarying;
+	word.mSymbol.mpOrigSymbol	= mpShader->mSymbols[symbolIdx];
+
+	mpShader->mCode.push_back( word );
+
+	// verify that the symbol type matches with the operator type
+	verifySymbolType(
+				mpShader->mSymbols[symbolIdx]->mType,
+				pOpDef->Types[operIdx],
+				operIdx,
+				pTok );
+}
+
+//==================================================================
 void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 {
 	//printf( "SEC_CODE: %s\n", lineBuff );
@@ -493,8 +545,6 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 	for (u_int i=0; i < pOpDef->OperCnt; ++i)
 	{
-		SlCPUWord	word;
-		
 		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 		{
 			onError( "ERROR: missing operand #%i, "
@@ -505,33 +555,10 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 		DUT::StrStripBeginEndWhite( pTok );
 
-		int	symbolIdx;
-		if ( isTempSymbol( pTok ) )
-		{
-			symbolIdx = findOrAddTempSymbol( pTok );
-		}
+		if ( i > 0 && pOpDef->RightIsImmediate )
+			parseCode_handleOperImmediate( pTok );
 		else
-		{
-			symbolIdx = findSymbol( pTok, false );
-		}
-
-		if ( symbolIdx == -1 )
-		{
-			onError( "ERROR: Symbol '%s' unknown !", pTok );
-		}
-
-		word.mSymbol.mTableOffset	= (u_int)symbolIdx;
-		word.mSymbol.mIsVarying		= mpShader->mSymbols[symbolIdx]->mIsVarying;
-		word.mSymbol.mpOrigSymbol	= mpShader->mSymbols[symbolIdx];
-
-		mpShader->mCode.push_back( word );
-
-		// verify that the symbol type matches with the operator type
-		verifySymbolType(
-					mpShader->mSymbols[symbolIdx]->mType,
-					pOpDef->Types[i],
-					i,
-					pTok );
+			parseCode_handleOperSymbol( pTok, pOpDef, i );
 
 		// copy the type of the first operator into the opcode
 		if ( i == 0 )

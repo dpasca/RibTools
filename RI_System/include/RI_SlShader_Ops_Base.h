@@ -18,6 +18,66 @@ namespace SOP
 {
 
 //==================================================================
+template <class TA>
+void Inst_LD1( SlRunContext &ctx )
+{
+	TA		*lhs		= ctx.GetVoidRW<TA>( 1 );
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	TA		tmp = TA( ctx.GetImmFloat( 2 ) );
+
+	if ( lhs_varying )
+	{
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				lhs[i] = tmp;
+			}
+		}
+	}
+	else
+	{
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0] = tmp;
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
+template <class TA>
+void Inst_LD3( SlRunContext &ctx )
+{
+	TA		*lhs		= ctx.GetVoidRW<TA>( 1 );
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	TA		tmp = TA( ctx.GetImmFloat( 2 ), ctx.GetImmFloat( 3 ), ctx.GetImmFloat( 4 ) );
+
+	if ( lhs_varying )
+	{
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				lhs[i] = tmp;
+			}
+		}
+	}
+	else
+	{
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0] = tmp;
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 template <class TA, class TB, const OpCodeID opCodeID>
 void Inst_1Op( SlRunContext &ctx )
 {

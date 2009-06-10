@@ -35,6 +35,7 @@ static const u_int OPERANDS_VEC_MSK	= 0x00000003;
 //==================================================================
 enum OpCodeID
 {
+	// following need to be multiple of 4 and start from 0
 	OP_SS_MOV	,
 	OP_SV_MOV	,
 	OP_VS_MOV	,
@@ -64,6 +65,10 @@ enum OpCodeID
 	OP_SV_DIV	,
 	OP_VS_DIV	,
 	OP_VV_DIV	,
+
+	// no need for index alignment from here on
+	OP_LDS	,
+	OP_LDV	,
 
 	OP_VV_NOISE11	,
 	OP_VV_NOISE12	,
@@ -156,11 +161,18 @@ struct SlAddress
 };
 
 //==================================================================
+struct SlImmFloat
+{
+	float	mValue;
+};
+
+//==================================================================
 union SlCPUWord
 {
 	SlOpCode		mOpCode;
 	SlSymbolWord	mSymbol;
 	SlAddress		mAddress;
+	SlImmFloat		mImmFloat;
 };
 
 //==================================================================

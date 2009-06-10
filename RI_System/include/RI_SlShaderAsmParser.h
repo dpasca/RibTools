@@ -48,6 +48,8 @@ private:
 	int findSymbol( const char *pName, bool ignoreCase ) const;
 	int findOrAddTempSymbol( const char *pName );
 	void parseCodeLine( char lineBuff[], int lineCnt );
+	void parseCode_handleOperImmediate( const char *pTok );
+	void parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx );
 	void getVector( const char *pStr, float out_val[], int n );
 
 	void onError( const char *pFmt, ... );
