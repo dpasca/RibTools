@@ -35,7 +35,12 @@
 
 displacement
 	normalize	n		N
+	
+	lds			$su1		0
+	lds			$su2		2
+	lds			$su3		1
 
+loop1:
 	mulvs		$v0		P	totalFrequency	// $v0 = (P * totalFrequency
 	mulvs		$v0		$v0	crinckle		//  * crinckle
 	noise13		$s0		$v0					//  ).noise
@@ -43,14 +48,9 @@ displacement
 	absss		$s0		$s0					//  ).abs
 	addss		hump	hump	$s0	
 	mulss		totalFrequency	totalFrequency	_const2
-
-	mulvs		$v0		P	totalFrequency	// $v0 = (P * totalFrequency
-	mulvs		$v0		$v0	crinckle		//  * crinckle
-	noise13		$s0		$v0					//  ).noise
-	subss		$s0		_const1	$s0			// (0.5 - $v0
-	absss		$s0		$s0					//  ).abs
-	addss		hump	hump	$s0	
-	mulss		totalFrequency	totalFrequency	_const2
+	
+	addss		$su1	$su1	$su3
+	cmplt		$su1	$su2	loop1
 
 	mulss		$s0		hump	Km			// hump * Km
 	mulvs		$v0		n		$s0			// * n

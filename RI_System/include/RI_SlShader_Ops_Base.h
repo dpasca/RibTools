@@ -19,6 +19,27 @@ namespace SOP
 
 //==================================================================
 template <class TA>
+void Inst_CMPLT( SlRunContext &ctx )
+{
+	const TA	*lhs	= ctx.GetVoidRO<TA>( 1 );
+	const TA	*rhs	= ctx.GetVoidRO<TA>( 2 );
+
+	DASSERT( !ctx.IsSymbolVarying( 1 ) );
+	DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+	// emm.. not truly uniform for now !!
+	if ( lhs[0][0] < rhs[0][0] )
+	{
+		u_int	addr = ctx.GetOp( 3 )->mAddress.mOffset;
+
+		ctx.GotoInstruction( addr );
+	}
+	else
+		ctx.NextInstruction();
+}
+
+//==================================================================
+template <class TA>
 void Inst_LD1( SlRunContext &ctx )
 {
 	TA		*lhs		= ctx.GetVoidRW<TA>( 1 );

@@ -22,11 +22,15 @@ namespace RI
 {
 
 //==================================================================
+#define OPC_FLG_RIGHTISIMM		1
+#define OPC_FLG_UNIFORMOPERS	2
+
+//==================================================================
 struct OpCodeDef
 {
 	const char	*pName;
 	u_int		OperCnt;
-	bool		RightIsImmediate;
+	u_int		Flags;
 	OperTypeID	Types[3];
 };
 
@@ -63,9 +67,11 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"divvs"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,
 	"divvv"		,		3,	0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,
 							
-	"lds"		,		2,	1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"ldv"		,		4,	1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-							
+	"lds"		,		2,	OPC_FLG_RIGHTISIMM,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"ldv"		,		4,	OPC_FLG_RIGHTISIMM,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+
+	"cmplt"		,		3,	OPC_FLG_UNIFORMOPERS,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_ADDR,
+
 	"noise11"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F1, OPRTYPE_NA,
 	"noise12"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
 	"noise13"		,	2,	0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,
@@ -101,6 +107,8 @@ ShaderAsmParser::ShaderAsmParser( DUT::MemFile &file, SlShader *pShader, const c
 	mpName(pName)
 {
 	doParse( file );
+
+	resolveLabels();
 }
 
 //==================================================================
@@ -161,7 +169,6 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 	Section		curSection = SEC_UNDEF;
 	int			lineCnt = 0;
 
-	
 	while ( file.ReadTextLine( lineBuff, sizeof(lineBuff) ) )
 	{
 		char	lineWork[1024];
@@ -181,7 +188,10 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 		try 
 		{
 			if ( handleShaderTypeDef( lineWork, curSection ) )
+			{
+				++lineCnt;
 				continue;
+			}
 
 			if ( 0 == strcasecmp( lineWork, ".data" ) )
 				curSection = SEC_DATA;
@@ -210,6 +220,30 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 
 	if ( mpShader->mType == SlShader::TYPE_UNKNOWN )
 		onError( "Shader type undefined !" );
+}
+
+//==================================================================
+void ShaderAsmParser::resolveLabels()
+{
+	for (size_t i=0; i < mLabelRefs.size(); ++i)
+	{
+		const Label	&ref = mLabelRefs[i];
+
+		bool	found = false;
+		for (size_t j=0; j < mLabelDefs.size(); ++j)
+		{
+			if ( 0 == strcmp( ref.mName.c_str(), mLabelDefs[j].mName.c_str() ) )
+			{
+				mpShader->mCode[ref.mAddress].mAddress.mOffset = mLabelDefs[j].mAddress;
+				found = true;
+			}
+		}
+
+		if NOT( found )
+		{
+			onError( "Undefined label %s", ref.mName.c_str() );
+		}
+	}
 }
 
 //==================================================================
@@ -395,10 +429,21 @@ int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 
 	int	retIdx = (int)mpShader->mSymbols.size();
 
+	bool	isVarying = true;
+
+	// uniform register ?
+	if ( pName[2] == 'u' || pName[2] == 'U' )
+	{
+		if ( len < 4 )
+			return -1;
+
+		isVarying = false;
+	}
+
 	auto_ptr<SlSymbol>	pSymbol( DNEW SlSymbol() );
 	pSymbol->mName		= pName;
 	pSymbol->mStorage	= SlSymbol::TEMPORARY;
-	pSymbol->mIsVarying	= true;
+	pSymbol->mIsVarying	= isVarying;
 	pSymbol->mArraySize	= 0;
 	pSymbol->mpValArray	= NULL;
 
@@ -482,35 +527,79 @@ void ShaderAsmParser::parseCode_handleOperImmediate( const char *pTok )
 //==================================================================
 void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx )
 {
+	OperTypeID	expectedOperType = pOpDef->Types[operIdx];
+
 	SlCPUWord	word;
 
-	int	symbolIdx;
-	if ( isTempSymbol( pTok ) )
+	if ( expectedOperType == OPRTYPE_ADDR )
 	{
-		symbolIdx = findOrAddTempSymbol( pTok );
+		// look for a label
+		Label	*pLabel = mLabelRefs.grow();
+		pLabel->mAddress = mpShader->mCode.size();	// pointer to the CPU word that needs to be resolved later
+		pLabel->mName	 = pTok;
+		word.mAddress.mOffset = 0xcfcfcfcf;	// dummy value for now..
 	}
 	else
 	{
-		symbolIdx = findSymbol( pTok, false );
-	}
+		int	symbolIdx;
+		if ( isTempSymbol( pTok ) )
+		{
+			symbolIdx = findOrAddTempSymbol( pTok );
+		}
+		else
+		{
+			symbolIdx = findSymbol( pTok, false );
+		}
 
-	if ( symbolIdx == -1 )
-	{
-		onError( "ERROR: Symbol '%s' unknown !", pTok );
-	}
+		if ( symbolIdx == -1 )
+		{
+			onError( "ERROR: Symbol '%s' unknown !", pTok );
+		}
 
-	word.mSymbol.mTableOffset	= (u_int)symbolIdx;
-	word.mSymbol.mIsVarying		= mpShader->mSymbols[symbolIdx]->mIsVarying;
-	word.mSymbol.mpOrigSymbol	= mpShader->mSymbols[symbolIdx];
+		word.mSymbol.mTableOffset	= (u_int)symbolIdx;
+		word.mSymbol.mIsVarying		= mpShader->mSymbols[symbolIdx]->mIsVarying;
+		word.mSymbol.mpOrigSymbol	= mpShader->mSymbols[symbolIdx];
+
+		if ( pOpDef->Flags & OPC_FLG_UNIFORMOPERS )
+		{
+			if ( word.mSymbol.mIsVarying )
+			{
+				onError( "All operators must be uniform !", pTok );
+			}
+		}
+
+		// verify that the symbol type matches with the operator type
+		verifySymbolType(
+					mpShader->mSymbols[symbolIdx]->mType,
+					expectedOperType,
+					operIdx,
+					pTok );
+	}
 
 	mpShader->mCode.push_back( word );
+}
 
-	// verify that the symbol type matches with the operator type
-	verifySymbolType(
-				mpShader->mSymbols[symbolIdx]->mType,
-				pOpDef->Types[operIdx],
-				operIdx,
-				pTok );
+//==================================================================
+bool ShaderAsmParser::parseLabelDef( const char *pTok )
+{
+	size_t	len = strlen( pTok );
+	
+	if ( len && pTok[len-1] == ':' )
+	{
+		if ( len < 2 )
+			onError( "Label has no name ?!\n" );
+
+		Label *pLabel = mLabelDefs.grow();
+
+		pLabel->mName = pTok;	// copy without the colon..
+		pLabel->mName.resize( len - 1 );
+
+		pLabel->mAddress = mpShader->mCode.size();	// pointer to the CPU word of this label
+
+		return true;
+	}
+	else
+		return false;
 }
 
 //==================================================================
@@ -525,6 +614,9 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 		return;
 		
 	DUT::StrStripBeginEndWhite( pTok );
+
+	if ( parseLabelDef( pTok ) )
+		return;
 	
 	u_int	opCodeIdx;
 	const OpCodeDef	*pOpDef = findOpDef( pTok, opCodeIdx );
@@ -555,7 +647,7 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 		DUT::StrStripBeginEndWhite( pTok );
 
-		if ( i > 0 && pOpDef->RightIsImmediate )
+		if ( i > 0 && (pOpDef->Flags & OPC_FLG_RIGHTISIMM) )
 			parseCode_handleOperImmediate( pTok );
 		else
 			parseCode_handleOperSymbol( pTok, pOpDef, i );
@@ -589,4 +681,3 @@ void ShaderAsmParser::onError( const char *pFmt, ... )
 
 //==================================================================
 }
-

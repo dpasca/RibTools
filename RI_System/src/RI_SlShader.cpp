@@ -176,9 +176,12 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 			break;
 
 		case SlSymbol::TEMPORARY:
-			DASSERT( symbol.mIsVarying == true );
+			//DASSERT( symbol.mIsVarying == true );
 			pDataSegment[i].Flags.mOwnData = 1;
-			pDataSegment[i].SetDataRW( symbol.AllocClone( mMaxPointsN ), &symbol );
+			if ( symbol.mIsVarying )
+				pDataSegment[i].SetDataRW( symbol.AllocClone( mMaxPointsN ), &symbol );
+			else
+				pDataSegment[i].SetDataRW( symbol.AllocClone( 1 ), &symbol );
 			break;
 
 		default:
@@ -388,6 +391,8 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 
 	SOP::Inst_LD1<SINGLE>,
 	SOP::Inst_LD3<VECTOR>,
+
+	SOP::Inst_CMPLT<SINGLE>,	// cmplt
 
 	SOP::Inst_Noise1<SlScalar>,
 	SOP::Inst_Noise1<SlVec2>,

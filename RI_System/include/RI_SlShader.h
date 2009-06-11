@@ -26,6 +26,7 @@ enum OperTypeID
 	OPRTYPE_F3 ,
 	OPRTYPE_F4 ,
 	OPRTYPE_M44,
+	OPRTYPE_ADDR,
 	OPRTYPE_N
 };
 
@@ -69,6 +70,8 @@ enum OpCodeID
 	// no need for index alignment from here on
 	OP_LDS	,
 	OP_LDV	,
+
+	OP_CMPLT	,
 
 	OP_VV_NOISE11	,
 	OP_VV_NOISE12	,

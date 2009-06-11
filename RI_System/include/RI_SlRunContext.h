@@ -179,6 +179,12 @@ public:
 	void DisableProcessor( u_int i )		{ mpSIMDFlags[i] += 1; }
 	u_int GetProcessorsN() const			{ return mPointsN; }
 	void NextInstruction()					{ mProgramCounter[mProgramCounterIdx] += GetOpCount() + 1; }
+	
+	void GotoInstruction( u_int address )
+	{
+		DASSERT( address < mpShaderInst->mpShader->mCode.size() );
+		mProgramCounter[mProgramCounterIdx] = address;
+	}
 };
 
 //==================================================================

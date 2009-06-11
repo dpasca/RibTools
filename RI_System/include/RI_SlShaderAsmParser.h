@@ -31,9 +31,17 @@ class ShaderAsmParser
 		SEC_CODE,
 	};
 
+	struct Label
+	{
+		DStr	mName;
+		u_int	mAddress;
+	};
+
 	SlShader		*mpShader;
 	DUT::MemFile	*mpFile;
 	const char		*mpName;
+	DVec<Label>		mLabelDefs;
+	DVec<Label>		mLabelRefs;
 	
 public:
 	//==================================================================
@@ -41,6 +49,7 @@ public:
 
 private:
 	void doParse( DUT::MemFile &file );
+	void resolveLabels();
 	bool handleShaderTypeDef( const char *pLineWork, Section curSection );
 
 	void parseDataLine( char lineBuff[], int lineCnt );
@@ -50,6 +59,7 @@ private:
 	void parseCodeLine( char lineBuff[], int lineCnt );
 	void parseCode_handleOperImmediate( const char *pTok );
 	void parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx );
+	bool parseLabelDef( const char *pTok );
 	void getVector( const char *pStr, float out_val[], int n );
 
 	void onError( const char *pFmt, ... );
