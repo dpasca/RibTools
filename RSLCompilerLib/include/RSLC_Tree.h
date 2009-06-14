@@ -78,6 +78,13 @@ public:
 		mNodeType	= TYPE_BLOCK;
 	}
 
+	void UpdateBlockTypeToFuncCall()
+	{
+		DASSERT( mBlockType == BLKT_EXPRESSION && mNodeType == TYPE_BLOCK );
+
+		mBlockType	= BLKT_FUNCCALL;
+	}
+
 	BlockType GetBlockType() const
 	{
 		return mBlockType;
@@ -121,6 +128,7 @@ public:
 	bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
 	bool IsNonTerminal() const			{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : false; }
 	bool IsStdFunction() const			{ return mpToken ? mpToken->idType == T_TYPE_STDFUNC : false; }
+	bool IsDataType() const			{ return mpToken ? mpToken->idType == T_TYPE_DATATYPE : false; }
 	bool IsTokenID( TokenID id ) const	{ return mpToken ? mpToken->id == id : false; }
 
 	void UnlinkFromParent();

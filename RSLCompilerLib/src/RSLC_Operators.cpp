@@ -21,17 +21,14 @@ static void reparentBiOperators(
 						size_t &out_parentIdx,
 						bool excludeIfFuncParam=false )
 {
-	if ( pNode->mpToken )
+	if ( pNode->mpToken &&
+			(	!excludeIfFuncParam ||
+				!pNode->mpParent ||
+				pNode->mpParent->GetBlockType() != BLKT_FUNCCALL )
+		)
 	{
 		for (size_t i=0; i < matchIDsN; ++i)
 		{
-/*
-			if ( excludeIfFuncParam )
-			{
-				if ( pNode->mBlockType == BLKT_EXPRESSION
-			}
-*/
-
 			if ( pMatchingIDs[i] == pNode->mpToken->id )
 			{
 				TokNode	*pLValue = pNode->GetLeft();
@@ -72,7 +69,7 @@ static void reparentBiOperators(
 	//if ( pNode->GetBlockType() != BLKT_UNKNOWN )
 		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 		{
-			reparentBiOperators( pNode->mpChilds[i], pMatchingIDs, matchIDsN, i );
+			reparentBiOperators( pNode->mpChilds[i], pMatchingIDs, matchIDsN, i, excludeIfFuncParam );
 		}
 }
 

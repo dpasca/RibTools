@@ -50,8 +50,11 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 //==================================================================
 static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int &out_parentIdx )
 {
+	bool	isDataType = pNode->IsDataType();
+
 	if ( (pNode->IsNonTerminal() ||
-		  pNode->IsStdFunction()) &&
+		  pNode->IsStdFunction() ||
+		  isDataType) &&
 			pNode->mNodeType == TokNode::TYPE_STANDARD )
 	{
 		TokNode *pFuncCallNode = pNode;
@@ -67,8 +70,24 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 
 			TokNode *pLeftBracket = pFuncCallNode->GetRight();
 
+			if ( pLeftBracket && pLeftBracket->mpToken->id == T_VL_STRING )
+			{
+				if ( isDataType )
+				{
+					// ok, it's just a space specifier ..next should be a bracket
+					pLeftBracket = pLeftBracket->GetRight();
+				}
+				else
+				{
+					throw Exception( "Unknown usage, why a string ?",  pNode );
+				}
+			}
+
 			if ( pLeftBracket && pLeftBracket->mpToken->id == T_OP_LFT_BRACKET )
 			{
+				// set the block type as a function call
+				pLeftBracket->UpdateBlockTypeToFuncCall();
+
 				//if ( pLeftBracket->mpToken->id == T_OP_LFT_BRACKET )
 				{
 					/*
