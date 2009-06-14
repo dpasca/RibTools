@@ -261,7 +261,6 @@ static bool matchTokenDef(
 			{
 				tokens.back().isPrecededByWS = wasPrecededByWS;
 			}
-			newToken( tokens, lineCnt );
 			return true;
 		}
 	}
@@ -557,13 +556,13 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 		else
 			wasPrecededByWS = false;
 
+		if ( handleNumber( pSource, i, sourceSize, tokens, lineCnt ) )
+			continue;
+
 		if ( matchTokenDef( tokens, pSource, i, sourceSize, wasPrecededByWS, lineCnt ) )
 			continue;
 
 		if ( handleAlphanum( pSource, i, sourceSize, tokens, lineCnt ) )
-			continue;
-
-		if ( handleNumber( pSource, i, sourceSize, tokens, lineCnt ) )
 			continue;
 
 		if ( handleString( pSource, i, sourceSize, tokens, lineCnt ) )

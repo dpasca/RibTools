@@ -68,14 +68,22 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 				continue;
 */
 
-			TokNode *pLeftBracket = pFuncCallNode->GetRight();
+			TokNode *pRightNode = pFuncCallNode->GetRight();
 
-			if ( pLeftBracket && pLeftBracket->mpToken->id == T_VL_STRING )
+			if ( pRightNode && pRightNode->mpToken->id == T_VL_STRING )
 			{
 				if ( isDataType )
 				{
-					// ok, it's just a space specifier ..next should be a bracket
-					pLeftBracket = pLeftBracket->GetRight();
+					// ok, it's just a space cast..
+					
+					// ..reparent the cast string as child of the function call node
+					out_parentIdx -= 1;
+
+					pRightNode->Reparent( pFuncCallNode );
+					pFuncCallNode->mpChilds.push_back( pRightNode );
+
+					// ..next should be a bracket
+					pRightNode = pRightNode->GetRight();
 				}
 				else
 				{
@@ -83,12 +91,12 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 				}
 			}
 
-			if ( pLeftBracket && pLeftBracket->mpToken->id == T_OP_LFT_BRACKET )
+			if ( pRightNode && pRightNode->mpToken->id == T_OP_LFT_BRACKET )
 			{
 				// set the block type as a function call
-				pLeftBracket->UpdateBlockTypeToFuncCall();
+				pRightNode->UpdateBlockTypeToFuncCall();
 
-				//if ( pLeftBracket->mpToken->id == T_OP_LFT_BRACKET )
+				//if ( pRightNode->mpToken->id == T_OP_LFT_BRACKET )
 				{
 					/*
 						b
@@ -106,15 +114,15 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 
 					out_parentIdx -= 1;
 
-					pLeftBracket->Reparent( pFuncCallNode );
-					pFuncCallNode->mpChilds.push_back( pLeftBracket );
+					pRightNode->Reparent( pFuncCallNode );
+					pFuncCallNode->mpChilds.push_back( pRightNode );
 
 					pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
 				}
 /*
 				else
 				{
-					throw Exception( "Expecting a left bracket !", pLeftBracket->mpToken );
+					throw Exception( "Expecting a left bracket !", pRightNode->mpToken );
 				}
 */
 			}
