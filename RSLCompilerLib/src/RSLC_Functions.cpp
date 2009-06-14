@@ -217,11 +217,6 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 			fprintf_s( pFile, "\n" );
 		}
 		else
-		if ( pNode->mpToken->id == T_OP_ASSIGN )
-		{
-			fprintf_s( pFile, "\tmov\t%s\t%s\n", pO1Str, pO2Str );
-		}
-		else
 		{
 			// a one time assignment only..
 			DASSERT( pNode->mTempRegIdx == -1 );

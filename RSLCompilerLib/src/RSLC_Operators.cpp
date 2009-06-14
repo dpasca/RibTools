@@ -14,12 +14,24 @@ namespace RSLC
 {
 
 //==================================================================
-static void reparentBiOperators( TokNode *pNode, const TokenID *pMatchingIDs, size_t matchIDsN, size_t &out_parentIdx )
+static void reparentBiOperators(
+						TokNode *pNode,
+						const TokenID *pMatchingIDs,
+						size_t matchIDsN,
+						size_t &out_parentIdx,
+						bool excludeIfFuncParam=false )
 {
 	if ( pNode->mpToken )
 	{
 		for (size_t i=0; i < matchIDsN; ++i)
 		{
+/*
+			if ( excludeIfFuncParam )
+			{
+				if ( pNode->mBlockType == BLKT_EXPRESSION
+			}
+*/
+
 			if ( pMatchingIDs[i] == pNode->mpToken->id )
 			{
 				TokNode	*pLValue = pNode->GetLeft();
@@ -171,7 +183,7 @@ void ReparentOperators( TokNode *pNode )
 
 	size_t	idx;
 
-	reparentBiOperators( pNode, priority0, _countof(priority0),	idx );
+	reparentBiOperators( pNode, priority0, _countof(priority0),	idx, true );
 
 	reparentBiOperators( pNode, priority1, _countof(priority1),	idx );
 	reparentBiOperators( pNode, priority2, _countof(priority2),	idx );
