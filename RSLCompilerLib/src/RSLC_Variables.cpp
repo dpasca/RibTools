@@ -119,6 +119,7 @@ static bool fndVarDefBeginInBlock(
 	return false;
 }
 
+/*
 //==================================================================
 static bool fndVarInExpr(
 		size_t &i,
@@ -153,6 +154,7 @@ static bool fndVarInExpr(
 
 	return false;
 }
+*/
 
 //==================================================================
 static bool iterateNextExpression( size_t &i, TokNode *pNode )
@@ -191,6 +193,7 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 			blkType == BLKT_EXPRESSION
 			);
 
+/*
 		if ( blkType == BLKT_EXPRESSION )
 		{
 			for (size_t i=0; i < pNode->mpChilds.size();)
@@ -207,6 +210,7 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 			}
 		}
 		else
+*/
 		if ( blkType == BLKT_CODEBLOCK ||
 			 blkType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
 			 )
@@ -306,13 +310,13 @@ void DiscoverVariables( TokNode *pNode )
 }
 
 //==================================================================
-static void scanWriteVars( FILE *pFile, TokNode *pNode, size_t &blockCnt )
+static void scanWriteVars( FILE *pFile, TokNode *pNode )
 {
 	const DVec<Variable> &vars = pNode->GetVars();
 
 	if ( vars.size() )
 	{
-		fprintf_s( pFile, "\t; -- vars for block %i\n", blockCnt );
+		fprintf_s( pFile, "\t; -- vars for block %i\n", pNode->GetBlockID() );
 
 		for (size_t i=0; i < vars.size(); ++i)
 		{
@@ -359,23 +363,20 @@ static void scanWriteVars( FILE *pFile, TokNode *pNode, size_t &blockCnt )
 			fprintf_s( pFile, "\n" );
 		}
 
-		blockCnt += 1;
 		fprintf_s( pFile, "\n" );
 	}
 
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		scanWriteVars( pFile, pNode->mpChilds[i], blockCnt );
+		scanWriteVars( pFile, pNode->mpChilds[i] );
 	}
 }
 
 //==================================================================
 void WriteVariables( FILE *pFile, TokNode *pNode )
 {
-	size_t	blockCnt = 0;
-
-	scanWriteVars( pFile, pNode, blockCnt );
+	scanWriteVars( pFile, pNode );
 }
 
 //==================================================================

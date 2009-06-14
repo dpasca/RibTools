@@ -90,6 +90,11 @@ public:
 		return mBlockType;
 	}
 
+	u_int GetBlockID() const
+	{
+		return mBlockID;
+	}
+
 	TokNode *AddChild( TokNode *pNode )
 	{
 		pNode->mpParent = this;
