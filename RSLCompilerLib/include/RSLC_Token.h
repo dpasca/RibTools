@@ -21,6 +21,8 @@ enum TokenIDType
 {
 	T_TYPE_NONTERM		,
 
+	T_TYPE_TEMPDEST		,
+
 	T_TYPE_VALUE		,
 
 	T_TYPE_OPERATOR		,
@@ -57,6 +59,8 @@ enum BlockType
 enum TokenID
 {
 	T_NONTERM		,
+
+	T_TD_TEMPDEST	,
 
 	T_VL_NUMBER,
 	T_VL_STRING,

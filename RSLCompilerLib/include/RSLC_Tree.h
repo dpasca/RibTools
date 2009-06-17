@@ -102,9 +102,21 @@ public:
 		return pNode;
 	}
 
+	TokNode *AddChildFront( TokNode *pNode )
+	{
+		pNode->mpParent = this;
+		mpChilds.push_front( pNode );
+		return pNode;
+	}
+
 	TokNode *AddNewChild( Token *pObj )
 	{
 		return AddChild( DNEW TokNode( pObj ) );
+	}
+
+	TokNode *AddNewChildFront( Token *pObj )
+	{
+		return AddChildFront( DNEW TokNode( pObj ) );
 	}
 
 	const char *GetTokStr() const { return mpToken->str.c_str(); }

@@ -48,6 +48,73 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 }
 
 //==================================================================
+static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
+{
+	bool	isDataType = pFuncCallNode->IsDataType();
+
+	const char *pStr = pFuncCallNode->GetTokStr();
+
+	TokNode *pRightNode = pFuncCallNode->GetRight();
+
+	if ( pRightNode && pRightNode->mpToken->id == T_VL_STRING )
+	{
+		if ( isDataType )
+		{
+			// ok, it's just a space cast..
+			
+			// ..reparent the cast string as child of the function call node
+			out_parentIdx -= 1;
+
+			pRightNode->Reparent( pFuncCallNode );
+			pFuncCallNode->mpChilds.push_back( pRightNode );
+
+			// ..next should be a bracket
+			pRightNode = pRightNode->GetRight();
+		}
+		else
+		{
+			throw Exception( "Unknown usage, why a string ?",  pFuncCallNode );
+		}
+	}
+
+	if ( pRightNode && pRightNode->mpToken->id == T_OP_LFT_BRACKET )
+	{
+		// set the block type as a function call
+		pRightNode->UpdateBlockTypeToFuncCall();
+
+		//if ( pRightNode->mpToken->id == T_OP_LFT_BRACKET )
+		{
+			/*
+				b
+				(
+				)
+
+				..becomes..
+
+				b
+					(
+					)
+
+				..the loop above will skip one, so we need to backpedal..
+			*/
+
+			out_parentIdx -= 1;
+
+			pRightNode->Reparent( pFuncCallNode );
+			pFuncCallNode->mpChilds.push_back( pRightNode );
+
+			pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
+		}
+/*
+		else
+		{
+			throw Exception( "Expecting a left bracket !", pRightNode->mpToken );
+		}
+*/
+	}
+}
+
+//==================================================================
 static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int &out_parentIdx )
 {
 	bool	isDataType = pNode->IsDataType();
@@ -57,76 +124,7 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 		  isDataType) &&
 			pNode->mNodeType == TokNode::TYPE_STANDARD )
 	{
-		TokNode *pFuncCallNode = pNode;
-
-		const char *pStr = pFuncCallNode->GetTokStr();
-
-/*
-		for (size_t i=0; i < funcs.size(); ++i)
-		{
-			if ( strcmp( pStr, funcs[i].mpNameTok->GetStrChar() ) )
-				continue;
-*/
-
-			TokNode *pRightNode = pFuncCallNode->GetRight();
-
-			if ( pRightNode && pRightNode->mpToken->id == T_VL_STRING )
-			{
-				if ( isDataType )
-				{
-					// ok, it's just a space cast..
-					
-					// ..reparent the cast string as child of the function call node
-					out_parentIdx -= 1;
-
-					pRightNode->Reparent( pFuncCallNode );
-					pFuncCallNode->mpChilds.push_back( pRightNode );
-
-					// ..next should be a bracket
-					pRightNode = pRightNode->GetRight();
-				}
-				else
-				{
-					throw Exception( "Unknown usage, why a string ?",  pNode );
-				}
-			}
-
-			if ( pRightNode && pRightNode->mpToken->id == T_OP_LFT_BRACKET )
-			{
-				// set the block type as a function call
-				pRightNode->UpdateBlockTypeToFuncCall();
-
-				//if ( pRightNode->mpToken->id == T_OP_LFT_BRACKET )
-				{
-					/*
-						b
-						(
-						)
-
-						..becomes..
-
-						b
-							(
-							)
-
-						..the loop above will skip one, so we need to backpedal..
-					*/
-
-					out_parentIdx -= 1;
-
-					pRightNode->Reparent( pFuncCallNode );
-					pFuncCallNode->mpChilds.push_back( pRightNode );
-
-					pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
-				}
-/*
-				else
-				{
-					throw Exception( "Expecting a left bracket !", pRightNode->mpToken );
-				}
-*/
-			}
-//		}
+		discoverFuncsUsageSub( pNode, out_parentIdx );
 	}
 
 	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
@@ -134,20 +132,6 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 		discoverFuncsUsage( pNode->mpChilds[i], funcs, i );
 	}
 }
-
-/*
-
-	a( b( 1 ), 2 )
-
-	$p0 = 1
-	$t0 = b
-
-	$p0 = $t0
-	$p1 = 2
-
-	call a
-
-*/
 
 //==================================================================
 void DiscoverFunctions( TokNode *pRoot )
@@ -159,13 +143,88 @@ void DiscoverFunctions( TokNode *pRoot )
 }
 
 //==================================================================
-static const char *getOper( TokNode *pOperand, char *pOutBuff, size_t maxOutSize )
+static void instrumentFuncsParams( TokNode *pNode, int &out_parentIdx )
 {
-	if ( pOperand->mpToken->idType == T_TYPE_OPERATOR )
+	bool	isDataType = pNode->IsDataType();
+
+	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
+	{
+		TokNode	*pParamsNode = pNode->GetChildTry( 0 );
+
+		// skip eventual space-cast string
+		if ( pParamsNode && pParamsNode->mpToken->id == T_VL_STRING )
+		{
+			pParamsNode = pNode->GetChildTry( 1 );
+		}
+
+		// do we have params ?
+		if ( pParamsNode )
+		{
+			for (size_t i=0; i < pParamsNode->mpChilds.size(); ++i)
+			{
+				if ( pParamsNode->mpChilds[i]->mpToken->id == T_OP_COMMA )
+					continue;
+
+				Token	*pDestRegTok = DNEW Token();
+				Token	*pAssgnOpTok = DNEW Token();
+
+				pDestRegTok->idType	= T_TYPE_TEMPDEST;
+				pDestRegTok->id		= T_TD_TEMPDEST;
+				pDestRegTok->str	= "TEMP_DEST_REG";
+
+				pAssgnOpTok->idType = T_TYPE_OPERATOR;
+				pAssgnOpTok->id		= T_OP_ASSIGN;
+				pAssgnOpTok->str	= "=";
+
+				TokNode	*pAssgnNode = DNEW TokNode( pAssgnOpTok );
+
+				TokNode	*pParam = pParamsNode->mpChilds[i];
+				pParamsNode->mpChilds[i] = pAssgnNode;
+
+				pAssgnNode->AddNewChild( pDestRegTok );
+
+				pAssgnNode->AddChild( pParam );
+
+				//i += 2;
+			}
+		}
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		instrumentFuncsParams( pNode->mpChilds[i], i );
+	}
+}
+
+//==================================================================
+void InstrumentFunctionCalls( TokNode *pRoot )
+{
+	int	parentIdx = 0;
+
+	instrumentFuncsParams( pRoot, parentIdx );
+}
+
+//==================================================================
+static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutSize, size_t &io_tempIdx )
+{
+	if ( pOperand->mpVarDef )
+		return pOperand->mpVarDef->mInternalName.c_str();
+	else
+	if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
+		return pOperand->GetTokStr();
+	else
+//	if ( pOperand->mpToken->idType == T_TYPE_OPERATOR )
 	{
 		// drill down if necessary
 		while ( pOperand->mTempRegIdx == -1 )
 		{
+			if ( pOperand->mpToken->idType == T_TYPE_TEMPDEST )
+			{
+				// assign a temporary and get out
+				pOperand->mTempRegIdx = io_tempIdx++;
+				break;
+			}
+
 			if ( pOperand->mpChilds.size() == 0 )
 				return "BADDDD";
 
@@ -178,13 +237,9 @@ static const char *getOper( TokNode *pOperand, char *pOutBuff, size_t maxOutSize
 
 		return pOutBuff;
 	}
-	else
-	{
-		if ( pOperand->mpVarDef )
-			return pOperand->mpVarDef->mInternalName.c_str();
-		else
-			return pOperand->GetTokStr();
-	}
+//	else
+//	{
+//	}
 }
 
 /*
@@ -210,7 +265,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		if ( pNode->mpChilds[i]->mpToken->idType == T_TYPE_OPERATOR )
+		//if ( pNode->mpChilds[i]->mpToken->idType == T_TYPE_OPERATOR )
 		{
 			buildExpression( pFile, pNode->mpChilds[i], io_tempIdx );
 		}
@@ -227,10 +282,23 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 		char	op1NameBuff[32];
 		char	op2NameBuff[32];
 
-		const char	*pO1Str = getOper( pOperand1, op1NameBuff, _countof(op1NameBuff) );
-		const char	*pO2Str = getOper( pOperand2, op2NameBuff, _countof(op2NameBuff) );
+		const char	*pO1Str = getOperand( pOperand1, op1NameBuff, _countof(op1NameBuff), io_tempIdx );
+		const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff), io_tempIdx );
 
-		if ( pNode->mpToken->IsAssignOp() )
+		bool	doAssign = pNode->mpToken->IsAssignOp();
+
+/*
+		if NOT( doAssign )
+		{
+			TokNode	*pParent = pNode->mpParent;
+			if ( pParent && pParent->GetBlockType() == BLKT_FUNCCALL )
+			{
+				doAssign = true;
+			}
+		}
+*/
+
+		if ( doAssign )
 		{
 			if ( pNode->mpToken->id == T_OP_ASSIGN )
 				fprintf_s( pFile, "\tmov\t%s\t%s\n", pO1Str, pO2Str );

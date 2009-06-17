@@ -3,7 +3,7 @@
 
 float func0()
 {
-	return xcomp( vector( 6, 7, 8 ) );
+	return xcomp( vector( 6+1, 7, 8 ) );
 }
 
 float func1()

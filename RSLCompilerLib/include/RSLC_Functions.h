@@ -39,6 +39,7 @@ public:
 
 //==================================================================
 void DiscoverFunctions( TokNode *pRoot );
+void InstrumentFunctionCalls( TokNode *pRoot );
 void WriteFunctions( FILE *pFile, TokNode *pNode );
 
 //==================================================================

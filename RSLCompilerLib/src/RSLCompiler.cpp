@@ -55,6 +55,8 @@ RSLCompiler::RSLCompiler( const char *pSource, size_t sourceSize )
 	// develop the tree based on operators with the proper precedence
 	ReparentOperators( mpRoot );
 
+	InstrumentFunctionCalls( mpRoot );
+
 	// produce some debug info in the output file
 	TraverseTree( mpRoot, 0 );
 }
