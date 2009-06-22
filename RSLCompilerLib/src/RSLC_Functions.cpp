@@ -271,62 +271,71 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 		}
 	}
 
-	if NOT( pNode->mpToken->IsBiOp() )
-		return;
-
-	TokNode *pOperand1 = pNode->GetChildTry( 0 );
-	TokNode *pOperand2 = pNode->GetChildTry( 1 );
-
-	if ( pOperand1 && pOperand2 )
+	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
-		char	op1NameBuff[32];
-		char	op2NameBuff[32];
+		TokNode *pChild = pNode->GetChildTry( 0 );
+		if ( pChild && pChild->mpToken->id == T_VL_STRING )
+			fprintf_s( pFile, "\tcall\t%s\t%s\t[ADD PARAMS HERE]\n\n", pNode->GetTokStr(), pChild->GetTokStr() );
+		else
+			fprintf_s( pFile, "\tcall\t%s\t[ADD PARAMS HERE]\n\n", pNode->GetTokStr() );
+	}
+	else
+	if ( pNode->mpToken->IsBiOp() )
+	{
+		TokNode *pOperand1 = pNode->GetChildTry( 0 );
+		TokNode *pOperand2 = pNode->GetChildTry( 1 );
 
-		const char	*pO1Str = getOperand( pOperand1, op1NameBuff, _countof(op1NameBuff), io_tempIdx );
-		const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff), io_tempIdx );
-
-		bool	doAssign = pNode->mpToken->IsAssignOp();
-
-/*
-		if NOT( doAssign )
+		if ( pOperand1 && pOperand2 )
 		{
-			TokNode	*pParent = pNode->mpParent;
-			if ( pParent && pParent->GetBlockType() == BLKT_FUNCCALL )
+			char	op1NameBuff[32];
+			char	op2NameBuff[32];
+
+			const char	*pO1Str = getOperand( pOperand1, op1NameBuff, _countof(op1NameBuff), io_tempIdx );
+			const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff), io_tempIdx );
+
+			bool	doAssign = pNode->mpToken->IsAssignOp();
+
+	/*
+			if NOT( doAssign )
 			{
-				doAssign = true;
+				TokNode	*pParent = pNode->mpParent;
+				if ( pParent && pParent->GetBlockType() == BLKT_FUNCCALL )
+				{
+					doAssign = true;
+				}
 			}
-		}
-*/
+	*/
 
-		if ( doAssign )
-		{
-			if ( pNode->mpToken->id == T_OP_ASSIGN )
-				fprintf_s( pFile, "\tmov\t%s\t%s\n", pO1Str, pO2Str );
-			else
-				fprintf_s( pFile, "\t%s\t%s\t%s\t%s\n",
-							pNode->GetTokStr(),
-								pO1Str,
+			if ( doAssign )
+			{
+				if ( pNode->mpToken->id == T_OP_ASSIGN )
+					fprintf_s( pFile, "\tmov\t%s\t%s\n", pO1Str, pO2Str );
+				else
+					fprintf_s( pFile, "\t%s\t%s\t%s\t%s\n",
+								pNode->GetTokStr(),
 									pO1Str,
-										pO2Str );
+										pO1Str,
+											pO2Str );
 
-			fprintf_s( pFile, "\n" );
+				//fprintf_s( pFile, "\n" );
+			}
+			else
+			{
+				// a one time assignment only..
+				DASSERT( pNode->mTempRegIdx == -1 );
+				pNode->mTempRegIdx = io_tempIdx++;
+
+				fprintf_s( pFile, "\t%s\t$t%i\t%s\t%s\n",
+								pNode->GetTokStr(),
+									pNode->mTempRegIdx,
+										pO1Str,
+											pO2Str );
+			}
 		}
 		else
 		{
-			// a one time assignment only..
-			DASSERT( pNode->mTempRegIdx == -1 );
-			pNode->mTempRegIdx = io_tempIdx++;
-
-			fprintf_s( pFile, "\t%s\t$t%i\t%s\t%s\n",
-							pNode->GetTokStr(),
-								pNode->mTempRegIdx,
-									pO1Str,
-										pO2Str );
+			//fprintf_s( pFile, "\nWEIRDDD !! ( %s )\n", pNode->GetTokStr() );
 		}
-	}
-	else
-	{
-		//fprintf_s( pFile, "\nWEIRDDD !! ( %s )\n", pNode->GetTokStr() );
 	}
 }
 
