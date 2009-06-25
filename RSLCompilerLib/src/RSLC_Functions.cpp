@@ -211,14 +211,17 @@ static void instrumentFuncsReturn( TokNode *pNode, int &out_parentIdx )
 	{
 		DASSERT( pNode->mpParent != NULL );
 
-		if ( pNode->mpParent->mpToken->IsAssignOp() )
+		//if ( pNode->mpParent->mpToken->idType == T_TYPE_OPERATOR )
+		if ( pNode->mpParent->mpToken->IsBiOp() )
 		{
-			DASSERT( pNode->mpParent->mpChilds.size() == 2 );
-			DASSERT( pNode->mpParent->mpChilds[1] == pNode );
-			
-			if ( pNode->mpParent->mpChilds[0]->mpToken->id != T_TD_TEMPDEST )
+			int	ownIdx	= (pNode->mpParent->mpChilds[0] == pNode ? 0 : 1);
+			int	otherIdx= ownIdx ^ 1;
+
+			DASSERT( pNode->mpParent->mpChilds[ownIdx] == pNode );
+
+			if ( pNode->mpParent->mpChilds[otherIdx]->mpToken->id != T_TD_TEMPDEST )
 			{
-				insertAssignToTemp( pNode->mpParent, 1 );
+				insertAssignToTemp( pNode->mpParent, ownIdx );
 			}
 		}
 	}
@@ -267,11 +270,23 @@ static const char *getTempOperand( TokNode *pOperand, char *pOutBuff, size_t max
 //==================================================================
 static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutSize, size_t &io_tempIdx )
 {
-	if ( pOperand->mpVarDef )
-		return pOperand->mpVarDef->mInternalName.c_str();
+	if ( pOperand->mNodeType == TokNode::TYPE_FUNCCALL )
+	{
+		DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() == 2 );
+		DASSERT( pOperand->mpParent->mpChilds[0]->mTempRegIdx != -1 );
+
+		sprintf_s( pOutBuff, maxOutSize, "$t%i", pOperand->mpParent->mpChilds[0]->mTempRegIdx );
+
+		return pOutBuff;
+	}
 	else
 	if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
 		return pOperand->GetTokStr();
+	else
+	if ( pOperand->mpToken->idType == T_TYPE_STDFUNC )
+	{
+		return getTempOperand( pOperand, pOutBuff, maxOutSize, io_tempIdx );
+	}
 	else
 //	if ( pOperand->mpToken->idType == T_TYPE_OPERATOR )
 	{
@@ -311,9 +326,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 	{
 		TokNode *pChild = pNode->mpParent->mpParent->GetChildTry( 0 );
 
-		//const char	*pOStr = getTempOperand( pChild, op1NameBuff, _countof(op1NameBuff), io_tempIdx );
-
-		sprintf_s( op1NameBuff, _countof(op1NameBuff), "$t%i", io_tempIdx++ );
+		sprintf_s( op1NameBuff, _countof(op1NameBuff), "$t%i", pChild->mTempRegIdx );
 
 		fprintf_s( pFile, "\t%s", op1NameBuff );
 	}
@@ -362,6 +375,17 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 
 		DASSERT( pBracket->mpToken->id == T_OP_LFT_BRACKET );
 
+		if ( pNode->mpParent &&
+			 pNode->mpParent->mpToken->IsAssignOp() )
+		{
+			TokNode *pDestTemp = pNode->mpParent->GetChildTry( 0 );
+
+			DASSERT( pDestTemp->mpToken->idType == T_TYPE_TEMPDEST );
+			DASSERT( pDestTemp->mTempRegIdx == -1 );
+
+			pDestTemp->mTempRegIdx = io_tempIdx++;
+		}
+
 		writeFuncParams( pFile, pBracket, io_tempIdx );
 	}
 	else
@@ -369,6 +393,12 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 	{
 		TokNode *pOperand1 = pNode->GetChildTry( 0 );
 		TokNode *pOperand2 = pNode->GetChildTry( 1 );
+
+		// no assignment for function call as it's done above
+		if ( pNode->mpToken->id == T_OP_ASSIGN &&
+			(pOperand1->mNodeType == TokNode::TYPE_FUNCCALL ||
+			 pOperand2->mNodeType == TokNode::TYPE_FUNCCALL ) )
+			return;
 
 		if ( pOperand1 && pOperand2 )
 		{
@@ -379,17 +409,6 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 			const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff), io_tempIdx );
 
 			bool	doAssign = pNode->mpToken->IsAssignOp();
-
-	/*
-			if NOT( doAssign )
-			{
-				TokNode	*pParent = pNode->mpParent;
-				if ( pParent && pParent->GetBlockType() == BLKT_FUNCCALL )
-				{
-					doAssign = true;
-				}
-			}
-	*/
 
 			if ( doAssign )
 			{
