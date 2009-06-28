@@ -14,6 +14,7 @@
 #include "RSLC_Variables.h"
 #include "RSLC_Functions.h"
 #include "RSLC_Operators.h"
+#include "RSLC_Registers.h"
 #include "RSLCompiler.h"
 
 //==================================================================
@@ -56,6 +57,10 @@ RSLCompiler::RSLCompiler( const char *pSource, size_t sourceSize )
 	ReparentOperators( mpRoot );
 
 	InstrumentFunctionCalls( mpRoot );
+
+	ResolveFunctionCalls( mpRoot );
+
+	AssignRegisters( mpRoot );
 
 	// produce some debug info in the output file
 	TraverseTree( mpRoot, 0 );

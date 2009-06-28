@@ -175,6 +175,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_Registers.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Registers.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Token.cpp"
 				>
 			</File>

@@ -21,6 +21,12 @@ namespace RSLC
 //==================================================================
 class TokNode
 {
+#ifdef _DEBUG
+	static size_t	sUIDCnt;
+
+	size_t			mUIDCnt;
+#endif
+
 public:
 	enum Type
 	{
@@ -62,6 +68,9 @@ public:
 		mpVarDef(NULL),
 		mTempRegIdx(-1)
 	{
+#ifdef _DEBUG
+		mUIDCnt = sUIDCnt++;
+#endif
 	}
 
 	~TokNode()

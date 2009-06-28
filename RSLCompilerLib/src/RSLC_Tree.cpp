@@ -14,6 +14,11 @@ namespace RSLC
 {
 
 //==================================================================
+#ifdef _DEBUG
+size_t	TokNode::sUIDCnt;
+#endif
+
+//==================================================================
 TokNode *TokNode::GetLeft()
 {
 	if NOT( mpParent )
@@ -162,7 +167,7 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 							pNode->SetBlockType( BLKT_SHPARAMS );
 						else	// function
 						if ( pFnType->mpToken->idType == T_TYPE_DATATYPE )
-							pNode->SetBlockType( BLKT_SHPARAMS );
+							pNode->SetBlockType( BLKT_FNPARAMS );
 						else
 						{
 							DASSERT( 0 );
@@ -339,7 +344,8 @@ void TraverseTree( TokNode *pNode, int depth )
 	{
 	case BLKT_UNKNOWN:		break;
 	case BLKT_ROOT:			printf( " <ROOT %i> ", pNode->mBlockID );	break;
-	case BLKT_SHPARAMS:		printf( " <PARAMS %i> ", pNode->mBlockID );	break;
+	case BLKT_SHPARAMS:		printf( " <SH PARAMS %i> ", pNode->mBlockID );	break;
+	case BLKT_FNPARAMS:		printf( " <FN PARAMS %i> ", pNode->mBlockID );	break;
 	case BLKT_CODEBLOCK:	printf( " <CODEBLK %i> ", pNode->mBlockID );	break;
 	case BLKT_EXPRESSION:	printf( " <EXPR %i> ", pNode->mBlockID );		break;
 	}

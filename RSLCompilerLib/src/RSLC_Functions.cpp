@@ -160,6 +160,7 @@ static void insertAssignToTemp( TokNode *pNode, size_t childIdx )
 
 	TokNode	*pOldNode = pNode->mpChilds[childIdx];
 	pNode->mpChilds[childIdx] = pAssgnNode;
+	pAssgnNode->mpParent = pNode;
 
 	pAssgnNode->AddNewChild( pDestRegTok );
 
@@ -243,80 +244,93 @@ void InstrumentFunctionCalls( TokNode *pRoot )
 }
 
 //==================================================================
-static const char *getTempOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutSize, size_t &io_tempIdx )
+static TokNode *cloneBranch( TokNode *pNode, TokNode *pDstParent )
 {
-	while ( pOperand->mTempRegIdx == -1 )
+	TokNode	*pNewNode = DNEW TokNode( pNode->mpToken );
+
+	if ( pDstParent )
+		pDstParent->AddChild( pNewNode );
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		if ( pOperand->mpToken->idType == T_TYPE_TEMPDEST )
+		cloneBranch( pNode->mpChilds[i], pNewNode );
+	}
+
+	if NOT( pDstParent )
+		return pNewNode;
+	else
+		return NULL;
+}
+
+//==================================================================
+static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
+{
+	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
+	{
+		for (size_t i=0; i < funcs.size(); ++i)
 		{
-			// assign a temporary and get out
-			pOperand->mTempRegIdx = io_tempIdx++;
-			break;
+			if ( 0 == _stricmp(
+						pNode->mpToken->GetStrChar(),
+						funcs[i].mpNameTok->GetStrChar()
+						) )
+			{
+				TokNode	*pDest = cloneBranch( funcs[i].mpCodeBlkNode, NULL );
+
+				pDest->mpParent = pNode->mpParent;
+				pNode->mpParent->mpChilds[parentIdx] = pDest;
+
+				//pNode->UnlinkFromParent();
+				DSAFE_DELETE( pNode );
+
+				//if ( parentIdx )
+				//	--parentIdx;
+
+				return;
+			}
 		}
-
-		if ( pOperand->mpChilds.size() == 0 )
-			return "BADDDD";
-
-		// expect at least one children
-		DASSERT( pOperand->mpChilds.size() > 0 );
-		pOperand = pOperand->mpChilds[0];
 	}
 
-	sprintf_s( pOutBuff, maxOutSize, "$t%i", pOperand->mTempRegIdx );
-
-	return pOutBuff;
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		resolveFunctionCalls( pNode->mpChilds[i], funcs, i );
+	}
 }
 
 //==================================================================
-static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutSize, size_t &io_tempIdx )
+void ResolveFunctionCalls( TokNode *pNode )
 {
-	if ( pOperand->mNodeType == TokNode::TYPE_FUNCCALL )
-	{
-		DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() == 2 );
-		DASSERT( pOperand->mpParent->mpChilds[0]->mTempRegIdx != -1 );
+	const DVec<Function> &funcs = pNode->GetFuncs();
 
-		sprintf_s( pOutBuff, maxOutSize, "$t%i", pOperand->mpParent->mpChilds[0]->mTempRegIdx );
-
-		return pOutBuff;
-	}
-	else
-	if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
-		return pOperand->GetTokStr();
-	else
-	if ( pOperand->mpToken->idType == T_TYPE_STDFUNC )
-	{
-		return getTempOperand( pOperand, pOutBuff, maxOutSize, io_tempIdx );
-	}
-	else
-//	if ( pOperand->mpToken->idType == T_TYPE_OPERATOR )
-	{
-		return getTempOperand( pOperand, pOutBuff, maxOutSize, io_tempIdx );
-	}
-//	else
-//	{
-//	}
+	size_t	curIdx = 0;
+	resolveFunctionCalls( pNode, funcs, curIdx );
 }
 
-/*
+//==================================================================
+static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutSize )
+{
+	//DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() >= 1 );
+	while ( pOperand )
+	{
+		if ( pOperand->mTempRegIdx != -1 )
+		{
+			sprintf_s( pOutBuff, maxOutSize, "$t%i", pOperand->mTempRegIdx );
 
-*
-	+
-		a
-		b
+			return pOutBuff;
+		}
+		else
+		if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
+			return pOperand->GetTokStr();
 
-	+
-		c
-		d
+		pOperand = pOperand->GetChildTry( 0 );
+	}
 
-	$t0 = + a b
-	$t1 = + c d
+	//DASSERT( 0 );
 
-$t2 = +	$t0	$t1
-
-*/
+	return "WHAT ?!";
+}
 
 //==================================================================
-static void writeFuncParams( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
+static void writeFuncParams( FILE *pFile, TokNode *pNode )
 {
 	char	op1NameBuff[32];
 
@@ -338,7 +352,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 		if ( pChild->mpToken->id == T_OP_COMMA )
 			continue;
 
-		const char	*pOStr = getOperand( pChild, op1NameBuff, _countof(op1NameBuff), io_tempIdx );
+		const char	*pOStr = getOperand( pChild, op1NameBuff, _countof(op1NameBuff) );
 
 		fprintf_s( pFile, "\t%s", pOStr );
 	}
@@ -347,13 +361,13 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 }
 
 //==================================================================
-static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
+static void buildExpression( FILE *pFile, TokNode *pNode )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
 		//if ( pNode->mpChilds[i]->mpToken->idType == T_TYPE_OPERATOR )
 		{
-			buildExpression( pFile, pNode->mpChilds[i], io_tempIdx );
+			buildExpression( pFile, pNode->mpChilds[i] );
 		}
 	}
 
@@ -375,18 +389,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 
 		DASSERT( pBracket->mpToken->id == T_OP_LFT_BRACKET );
 
-		if ( pNode->mpParent &&
-			 pNode->mpParent->mpToken->IsAssignOp() )
-		{
-			TokNode *pDestTemp = pNode->mpParent->GetChildTry( 0 );
-
-			DASSERT( pDestTemp->mpToken->idType == T_TYPE_TEMPDEST );
-			DASSERT( pDestTemp->mTempRegIdx == -1 );
-
-			pDestTemp->mTempRegIdx = io_tempIdx++;
-		}
-
-		writeFuncParams( pFile, pBracket, io_tempIdx );
+		writeFuncParams( pFile, pBracket );
 	}
 	else
 	if ( pNode->mpToken->IsBiOp() )
@@ -405,8 +408,8 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 			char	op1NameBuff[32];
 			char	op2NameBuff[32];
 
-			const char	*pO1Str = getOperand( pOperand1, op1NameBuff, _countof(op1NameBuff), io_tempIdx );
-			const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff), io_tempIdx );
+			const char	*pO1Str = getOperand( pOperand1, op1NameBuff, _countof(op1NameBuff) );
+			const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff) );
 
 			bool	doAssign = pNode->mpToken->IsAssignOp();
 
@@ -420,15 +423,9 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 									pO1Str,
 										pO1Str,
 											pO2Str );
-
-				//fprintf_s( pFile, "\n" );
 			}
 			else
 			{
-				// a one time assignment only..
-				DASSERT( pNode->mTempRegIdx == -1 );
-				pNode->mTempRegIdx = io_tempIdx++;
-
 				fprintf_s( pFile, "\t%s\t$t%i\t%s\t%s\n",
 								pNode->GetTokStr(),
 									pNode->mTempRegIdx,
@@ -436,24 +433,6 @@ static void buildExpression( FILE *pFile, TokNode *pNode, size_t &io_tempIdx )
 											pO2Str );
 			}
 		}
-		else
-		{
-			//fprintf_s( pFile, "\nWEIRDDD !! ( %s )\n", pNode->GetTokStr() );
-		}
-	}
-}
-
-//==================================================================
-static void generateExpressions( FILE *pFile, TokNode *pCodeBlkNode )
-{
-	for (size_t i=0; i < pCodeBlkNode->mpChilds.size(); ++i)
-	{
-		TokNode	*pNode = pCodeBlkNode->mpChilds[i];
-
-		size_t	tempIdx = 0;
-		// are we assigning something 
-		//if ( pNode->mpToken->IsAssignOp() )
-			buildExpression( pFile, pNode, tempIdx );
 	}
 }
 
@@ -465,6 +444,9 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 	for (size_t i=0; i < funcs.size(); ++i)
 	{
 		const Function	&func = funcs[i];
+
+		if NOT( func.IsShader() )
+			continue;
 
 		fprintf_s( pFile, "\n;====================================\n" );
 
@@ -479,7 +461,12 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 			fprintf_s( pFile, "function %s\n", func.mpNameTok->GetStrChar() );
 		}
 
-		generateExpressions( pFile, func.mpCodeBlkNode );
+		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
+		{
+			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[j];
+
+			buildExpression( pFile, pNode );
+		}
 
 		fprintf_s( pFile, "\n\tret\n" );
 	}

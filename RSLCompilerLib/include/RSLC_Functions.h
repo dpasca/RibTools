@@ -35,11 +35,18 @@ public:
 	~Function()
 	{
 	}
+
+	bool IsShader() const
+	{
+		return mpRetTypeTok->idType == T_TYPE_SHADERTYPE;
+	}
+
 };
 
 //==================================================================
 void DiscoverFunctions( TokNode *pRoot );
 void InstrumentFunctionCalls( TokNode *pRoot );
+void ResolveFunctionCalls( TokNode *pNode );
 void WriteFunctions( FILE *pFile, TokNode *pNode );
 
 //==================================================================

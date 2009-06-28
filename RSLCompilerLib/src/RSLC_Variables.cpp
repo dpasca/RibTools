@@ -62,7 +62,7 @@ static void AddVariable(
 		if ( pNode->GetBlockType() == BLKT_CODEBLOCK || pNode->GetBlockType() == BLKT_EXPRESSION )
 			pVar->mIsVarying = true;
 		else
-		if ( pNode->GetBlockType() == BLKT_SHPARAMS )
+		if ( pNode->GetBlockType() == BLKT_SHPARAMS || pNode->GetBlockType() == BLKT_FNPARAMS )
 			pVar->mIsVarying = false;
 		else
 			pVar->mIsVarying = true;
@@ -189,6 +189,7 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 
 		DASSERT(
 			blkType == BLKT_SHPARAMS ||
+			blkType == BLKT_FNPARAMS ||
 			blkType == BLKT_CODEBLOCK ||
 			blkType == BLKT_EXPRESSION
 			);
@@ -212,7 +213,8 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 		else
 */
 		if ( blkType == BLKT_CODEBLOCK ||
-			 blkType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+			 blkType == BLKT_SHPARAMS ||	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+			 blkType == BLKT_FNPARAMS		// $$$ NOT REALLY THE SAME ..but for now, it's ok
 			 )
 		{
 			TokNode	*pDTypeNode;
@@ -316,54 +318,60 @@ static void scanWriteVars( FILE *pFile, TokNode *pNode )
 
 	if ( vars.size() )
 	{
-		fprintf_s( pFile, "\t; -- vars for block %i\n", pNode->GetBlockID() );
+		//fprintf_s( pFile, "\t; -- vars for block %i\n", pNode->GetBlockID() );
 
-		for (size_t i=0; i < vars.size(); ++i)
+		if ( pNode->GetBlockType() == BLKT_SHPARAMS )
 		{
-			const Variable	&var = vars[i];
-
-			fprintf_s( pFile, "\t" );
-
-			fprintf_s( pFile, "%-18s", var.mInternalName.c_str() );
-
-			fprintf_s( pFile, "\t" );
-
-			switch ( pNode->GetBlockType() )
+			for (size_t i=0; i < vars.size(); ++i)
 			{
-			case BLKT_SHPARAMS:		fprintf_s( pFile, "parameter" );	break;
-			case BLKT_CODEBLOCK:	fprintf_s( pFile, "temporary" );	break;
-			case BLKT_EXPRESSION:	fprintf_s( pFile, "temporary" );	break;
-			}
+				const Variable	&var = vars[i];
 
-			fprintf_s( pFile, "\t" );
-
-			if ( var.mIsVarying )
-				fprintf_s( pFile, "varying" );
-			else
-				fprintf_s( pFile, "uniform" );
-
-			if ( var.mpDTypeTok )
-			{
 				fprintf_s( pFile, "\t" );
-				switch ( var.mpDTypeTok->id )
-				{
-				case T_DT_float:	fprintf_s( pFile, "float" );	break;
-				case T_DT_vector:	fprintf_s( pFile, "vector" );	break;
-				case T_DT_point:	fprintf_s( pFile, "point" );	break;
-				case T_DT_normal:	fprintf_s( pFile, "normal" );	break;
-				case T_DT_color:	fprintf_s( pFile, "color" );	break;
-				case T_DT_string:	fprintf_s( pFile, "string" );	break;
 
-				default:
-					throw Exception( "Bad type ?!", var.mpDTypeTok );
-					break;
+				fprintf_s( pFile, "%-18s", var.mInternalName.c_str() );
+
+				fprintf_s( pFile, "\t" );
+
+				fprintf_s( pFile, "parameter" );
+/*
+				switch ( pNode->GetBlockType() )
+				{
+				case BLKT_SHPARAMS:		fprintf_s( pFile, "parameter" );	break;
+				case BLKT_CODEBLOCK:	fprintf_s( pFile, "temporary" );	break;
+				case BLKT_EXPRESSION:	fprintf_s( pFile, "temporary" );	break;
 				}
+*/
+
+				fprintf_s( pFile, "\t" );
+
+				if ( var.mIsVarying )
+					fprintf_s( pFile, "varying" );
+				else
+					fprintf_s( pFile, "uniform" );
+
+				if ( var.mpDTypeTok )
+				{
+					fprintf_s( pFile, "\t" );
+					switch ( var.mpDTypeTok->id )
+					{
+					case T_DT_float:	fprintf_s( pFile, "float" );	break;
+					case T_DT_vector:	fprintf_s( pFile, "vector" );	break;
+					case T_DT_point:	fprintf_s( pFile, "point" );	break;
+					case T_DT_normal:	fprintf_s( pFile, "normal" );	break;
+					case T_DT_color:	fprintf_s( pFile, "color" );	break;
+					case T_DT_string:	fprintf_s( pFile, "string" );	break;
+
+					default:
+						throw Exception( "Bad type ?!", var.mpDTypeTok );
+						break;
+					}
+				}
+
+				fprintf_s( pFile, "\n" );
 			}
 
 			fprintf_s( pFile, "\n" );
 		}
-
-		fprintf_s( pFile, "\n" );
 	}
 
 
