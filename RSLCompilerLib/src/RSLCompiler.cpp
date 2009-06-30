@@ -37,8 +37,13 @@ RSLCompiler::RSLCompiler( const char *pSource, size_t sourceSize )
 				mTokens[i].str.c_str() );
 	}
 
+	mpRoot = DNEW TokNode( NULL );
+
 	// make the basic tree with nested blocks based on brackets
-	mpRoot = MakeTree( mTokens );
+	MakeTree( mpRoot, mTokens );
+
+	//
+	AddStandardVariables( mpRoot );
 
 	// discover variables declarations and usage
 	DiscoverVariables( mpRoot );

@@ -305,6 +305,51 @@ void discoverVariablesUsage( TokNode *pNode )
 }
 
 //==================================================================
+static TokNode *newVarNode( const char *pStr )
+{
+	return DNEW TokNode( TokenFromDefOrNTerm( pStr ) );
+}
+
+//==================================================================
+void AddStandardVariables( TokNode *pNode )
+{
+	static const char *sGlobalsDefs[] =
+	{
+		"color"	,	"varying"	,	"Cs"	,	// also uniform ?
+		"color"	,	"varying"	,	"Os"	,	// also uniform ?
+		"point"	,	"varying"	,	"P"	,
+		//"point"	,	"varying"	,	"Ps"	,
+		"point"	,	"varying"	,	"dPdu"	,
+		"point"	,	"varying"	,	"dPdv"	,
+		"vector",	"varying"	,	"N"	,
+		"vector",	"varying"	,	"Ng"	,	// also uniform ?
+		"float"	,	"varying"	,	"u"	,
+		"float"	,	"varying"	,	"v"	,
+		"float"	,	"varying"	,	"du"	,	// also uniform ?
+		"float"	,	"varying"	,	"dv"	,	// also uniform ?
+		"float"	,	"varying"	,	"s"	,		// also uniform ?
+		"float"	,	"varying"	,	"t"	,		// also uniform ?
+		"vector",	"varying"	,	"L"	,		// also uniform ?
+		"color"	,	"varying"	,	"Cl"	,	// also uniform ?
+		"vector",	"varying"	,	"I"	,
+		"color"	,	"varying"	,	"Ci"	,
+		"color"	,	"varying"	,	"Oi"	,
+		"point"	,	"uniform"	,	"E"	,
+		//""	,	""	,	"A"	,
+	};
+
+	for (size_t i=0; i < _countof(sGlobalsDefs); i += 3)
+	{
+		AddVariable(
+				pNode,
+				newVarNode( sGlobalsDefs[i+0] ),
+				newVarNode( sGlobalsDefs[i+1] ),
+				NULL,
+				newVarNode( sGlobalsDefs[i+2] ) );
+	}
+}
+
+//==================================================================
 void DiscoverVariables( TokNode *pNode )
 {
 	discoverVariablesDeclarations( pNode );

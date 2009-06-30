@@ -99,7 +99,7 @@ static void assignRegisters_expr( TokNode *pNode, size_t &io_tempIdx )
 			DASSERT( pDestTemp->mpToken->idType == T_TYPE_TEMPDEST );
 			DASSERT( pDestTemp->mTempRegIdx == -1 );
 
-			pDestTemp->mTempRegIdx = io_tempIdx++;
+			pDestTemp->mTempRegIdx	= io_tempIdx++;
 		}
 
 		assignRegisters_expr_fcall( pBracket, io_tempIdx );

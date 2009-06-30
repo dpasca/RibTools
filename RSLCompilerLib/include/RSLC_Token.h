@@ -199,6 +199,15 @@ public:
 		sourceLine(0)
 		{}
 
+	Token( const char *pStr_, TokenID id_, TokenIDType idType_ ) :
+		str(pStr_),
+		id(id_),
+		idType(idType_),
+		isPrecededByWS(false),
+		isBadNumber(false),
+		sourceLine(0)
+		{}
+
 	const char *GetStrChar() const
 	{
 		return str.c_str();
@@ -221,6 +230,8 @@ public:
 const char *GetTokenTypeStr( TokenIDType tokidtype );
 const char *GetTokenIDStr( TokenID tokid );
 void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize );
+
+Token *TokenFromDefOrNTerm( const char *pTokenStr, int lineCnt=0 );
 
 //==================================================================
 }

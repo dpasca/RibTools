@@ -143,7 +143,7 @@ void DiscoverFunctions( TokNode *pRoot )
 }
 
 //==================================================================
-static void insertAssignToTemp( TokNode *pNode, size_t childIdx )
+static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType, bool isVarying )
 {
 	Token	*pDestRegTok = DNEW Token();
 	Token	*pAssgnOpTok = DNEW Token();
@@ -162,9 +162,30 @@ static void insertAssignToTemp( TokNode *pNode, size_t childIdx )
 	pNode->mpChilds[childIdx] = pAssgnNode;
 	pAssgnNode->mpParent = pNode;
 
-	pAssgnNode->AddNewChild( pDestRegTok );
+	TokNode *pDestRegNode = pAssgnNode->AddNewChild( pDestRegTok );
+	pDestRegNode->mTempRegType		= varType;
+	pDestRegNode->mTempRegIsVarying	= isVarying;
 
 	pAssgnNode->AddChild( pOldNode );
+}
+
+//==================================================================
+static VarType varTypeFromToken( Token *pTok )
+{
+	DASSERT( pTok->idType == T_TYPE_DATATYPE );
+
+	switch ( pTok->id )
+	{
+	case T_DT_float	: return VT_FLOAT;
+	case T_DT_vector: return VT_VECTOR;
+	case T_DT_point	: return VT_POINT;
+	case T_DT_normal: return VT_NORMAL;
+	case T_DT_color	: return VT_COLOR;
+	case T_DT_string: return VT_STRING;
+	}
+
+	DASSERT( 0 );
+	return VT_FLOAT;
 }
 
 //==================================================================
@@ -190,7 +211,13 @@ static void instrumentFuncsParams( TokNode *pNode, int &out_parentIdx )
 				if ( pParamsNode->mpChilds[i]->mpToken->id == T_OP_COMMA )
 					continue;
 
-				insertAssignToTemp( pParamsNode, i );
+				// $$$ need to get the function params types from definition here..
+
+				insertAssignToTemp(
+						pParamsNode,
+						i,
+						VT_VECTOR,
+						true );
 
 				//i += 2;
 			}
@@ -220,9 +247,15 @@ static void instrumentFuncsReturn( TokNode *pNode, int &out_parentIdx )
 
 			DASSERT( pNode->mpParent->mpChilds[ownIdx] == pNode );
 
-			if ( pNode->mpParent->mpChilds[otherIdx]->mpToken->id != T_TD_TEMPDEST )
+			if ( pNode->mpParent->mpChilds[otherIdx]->mpToken->idType != T_TYPE_TEMPDEST )
 			{
-				insertAssignToTemp( pNode->mpParent, ownIdx );
+				// $$$ need to get the function return values types from definition here..
+
+				insertAssignToTemp(
+						pNode->mpParent,
+						ownIdx,
+						VT_VECTOR,
+						true );
 			}
 		}
 	}
@@ -306,6 +339,31 @@ void ResolveFunctionCalls( TokNode *pNode )
 }
 
 //==================================================================
+static void getTempRegName( TokNode *pOperand, char *pOutBuff, size_t maxOutSize )
+{
+	char	regBase[16] = {0};
+
+	switch ( pOperand->mTempRegType )
+	{
+	case VT_FLOAT:	regBase[0] = 's'; break;
+	case VT_POINT:	regBase[0] = 'v'; break;
+	case VT_COLOR:	regBase[0] = 'v'; break;
+	case VT_STRING:	regBase[0] = 's'; DASSERT( 0 ); break;
+	case VT_VECTOR:	regBase[0] = 'v'; break;
+	case VT_NORMAL:	regBase[0] = 'v'; break;
+	case VT_MATRIX:	regBase[0] = 'v'; DASSERT( 0 ); break;
+	default:
+		DASSERT( 0 );
+		break;
+	}
+
+	if NOT( pOperand->mTempRegIsVarying )
+		strcat_s( regBase, "u" );
+
+	sprintf_s( pOutBuff, maxOutSize, "$%s%i", regBase, pOperand->mTempRegIdx );
+}
+
+//==================================================================
 static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutSize )
 {
 	//DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() >= 1 );
@@ -313,8 +371,7 @@ static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutS
 	{
 		if ( pOperand->mTempRegIdx != -1 )
 		{
-			sprintf_s( pOutBuff, maxOutSize, "$t%i", pOperand->mTempRegIdx );
-
+			getTempRegName( pOperand, pOutBuff, maxOutSize );
 			return pOutBuff;
 		}
 		else
@@ -340,7 +397,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 	{
 		TokNode *pChild = pNode->mpParent->mpParent->GetChildTry( 0 );
 
-		sprintf_s( op1NameBuff, _countof(op1NameBuff), "$t%i", pChild->mTempRegIdx );
+		getTempRegName( pChild, op1NameBuff, _countof(op1NameBuff) );
 
 		fprintf_s( pFile, "\t%s", op1NameBuff );
 	}
@@ -426,9 +483,11 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 			}
 			else
 			{
-				fprintf_s( pFile, "\t%s\t$t%i\t%s\t%s\n",
+				char regName[32];
+				getTempRegName( pNode, regName, _countof(regName) );
+				fprintf_s( pFile, "\t%s\t%s\t%s\t%s\n",
 								pNode->GetTokStr(),
-									pNode->mTempRegIdx,
+									regName,
 										pO1Str,
 											pO2Str );
 			}

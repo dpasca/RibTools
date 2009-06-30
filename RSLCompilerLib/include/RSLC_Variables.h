@@ -59,6 +59,7 @@ public:
 };
 
 //==================================================================
+void AddStandardVariables( TokNode *pNode );
 void DiscoverVariables( TokNode *pNode );
 void WriteVariables( FILE *pFile, TokNode *pNode );
 

@@ -19,6 +19,19 @@ namespace RSLC
 {
 
 //==================================================================
+enum VarType
+{
+	VT_FLOAT,
+	VT_POINT,
+	VT_COLOR,
+	VT_STRING,
+	VT_VECTOR,
+	VT_NORMAL,
+	VT_MATRIX,
+	VT_N
+};
+
+//==================================================================
 class TokNode
 {
 #ifdef _DEBUG
@@ -56,6 +69,8 @@ public:
 	Variable		*mpVarDef;	// this is the variable definition
 								// in case this node is variable usage
 
+	VarType			mTempRegType;
+	bool			mTempRegIsVarying;
 	int				mTempRegIdx;// using while building code
 
 public:
@@ -66,6 +81,8 @@ public:
 		mBlockType(BLKT_UNKNOWN),
 		mBlockID(0),
 		mpVarDef(NULL),
+		mTempRegType(VT_FLOAT),
+		mTempRegIsVarying(false),
 		mTempRegIdx(-1)
 	{
 #ifdef _DEBUG
@@ -167,7 +184,7 @@ public:
 };
 
 //==================================================================
-TokNode *MakeTree( DVec<Token> &tokens );
+void MakeTree( TokNode *pNode, DVec<Token> &tokens );
 void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx=NULL );
 void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx=NULL );
 void TraverseTree( TokNode *pNode, int depth );

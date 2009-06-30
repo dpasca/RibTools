@@ -219,10 +219,8 @@ static bool doBracketsMatch( TokenID lastOpenBraket, TokenID thisCloseBracket )
 }
 
 //==================================================================
-TokNode *MakeTree( DVec<Token> &tokens )
+void MakeTree( TokNode *pRoot, DVec<Token> &tokens )
 {
-	TokNode	*pRoot = DNEW TokNode( NULL );
-
 	//pRoot->mBlockType = AT_ROOT;
 
 	TokNode	*pCurNode = pRoot;
@@ -263,8 +261,6 @@ TokNode *MakeTree( DVec<Token> &tokens )
 
 	u_int	blockCnt = 0;
 	defineBlockTypeAndID( pRoot, blockCnt );
-
-	return pRoot;
 }
 
 //==================================================================

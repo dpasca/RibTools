@@ -220,6 +220,21 @@ static bool isAlphaNumStrFirstChar( char ch )
 }
 
 //==================================================================
+Token *TokenFromDefOrNTerm( const char *pTokenStr, int lineCnt )
+{
+	for (size_t j=T_VL_STRING+1; j < TOKEN_N; ++j)
+	{
+		const TokenDef &tokDef = _sTokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
+
+		if ( tokDef.pStr && 0 == strcmp( pTokenStr, tokDef.pStr ) )
+			return DNEW Token( tokDef.pStr, tokDef.id, tokDef.idType );
+	}
+
+	return DNEW Token( pTokenStr, T_NONTERM, T_TYPE_NONTERM );
+}
+
+
+//==================================================================
 static bool matchTokenDef(
 					DVec<Token> &tokens,
 					const char *pSource,
@@ -228,7 +243,7 @@ static bool matchTokenDef(
 					bool wasPrecededByWS,
 					int lineCnt )
 {
-	for (size_t j=1; j < TOKEN_N; ++j)
+	for (size_t j=T_VL_STRING+1; j < TOKEN_N; ++j)
 	{
 		const TokenDef &tokDef = _sTokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
 
