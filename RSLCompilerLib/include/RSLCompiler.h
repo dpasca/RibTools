@@ -24,7 +24,10 @@ class RSLCompiler
 	static const char	*mpsVersionString;
 
 public:
-	RSLCompiler( const char *pSource, size_t sourceSize );
+	RSLCompiler(
+		const char *pSource,
+		size_t sourceSize,
+		const char *pBaseInclude );
 
 	~RSLCompiler();
 

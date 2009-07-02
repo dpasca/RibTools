@@ -69,6 +69,7 @@ static void AddVariable(
 	}
 }
 
+/*
 //==================================================================
 static bool fndVarDefBeginInBlock(
 		size_t &i,
@@ -118,6 +119,7 @@ static bool fndVarDefBeginInBlock(
 
 	return false;
 }
+*/
 
 /*
 //==================================================================
@@ -181,8 +183,99 @@ static bool iterateNextExpression( size_t &i, TokNode *pNode )
 }
 
 //==================================================================
+static void discoveFunctionParamsDeclaration( TokNode *pNode, size_t &i )
+{
+	TokNode	*pDTypeNode	= NULL;
+	TokNode	*pDetailNode= NULL;
+	TokNode	*pOutputNode= NULL;
+	bool	prevWasComma = false;
+
+	for (; i < pNode->mpChilds.size(); ++i)
+	{
+		TokNode *pA = pNode->GetChildTry( i + 0 );
+
+		if NOT( pA )
+			throw Exception( "Broken definition ?", pA );
+
+		// end of param list
+		if ( pA->mpToken->id == T_OP_RGT_BRACKET )
+			break;
+
+		if ( pA->mpToken->idType == T_TYPE_DATATYPE )
+		{
+			if ( pDTypeNode )
+				if ( prevWasComma )
+				{
+					pDTypeNode = NULL;
+					pDetailNode= NULL;
+					pOutputNode= NULL;
+				}
+				else
+					throw Exception( "Data type specified twice !", pA );
+
+			pDTypeNode = pA;
+		}
+		else
+		if ( pA->mpToken->idType == T_TYPE_DETAIL )
+		{
+			if ( pDetailNode )
+				if ( prevWasComma )
+				{
+					pDTypeNode = NULL;
+					pDetailNode= NULL;
+					pOutputNode= NULL;
+				}
+				else
+					throw Exception( "Detail specified twice !", pA );
+
+			pDetailNode = pA;
+		}
+		else
+		if ( pA->mpToken->id == T_KW_output )
+		{
+			if ( pOutputNode )
+				if ( prevWasComma )
+				{
+					pDTypeNode = NULL;
+					pDetailNode= NULL;
+					pOutputNode= NULL;
+				}
+				else
+					throw Exception( "'output' specified twice !", pA );
+
+			pOutputNode = pA;
+		}
+		else
+		if ( pA->mpToken->id == T_OP_COMMA )
+		{
+			// next...
+		}
+		else
+		if ( pA->mpToken->id == T_OP_SEMICOL )
+		{
+			// reset current type, etc
+			pDTypeNode = NULL;
+			pDetailNode= NULL;
+			pOutputNode= NULL;
+		}
+		else
+		if ( pA->mpToken->idType == T_TYPE_NONTERM )
+		{
+			// Note: "space cast" only for expressions ?
+			AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pA );
+		}
+		else
+			throw Exception( "Broken definition ?", pA );
+
+		prevWasComma = (pA->mpToken->id == T_OP_COMMA);
+	}
+}
+
+//==================================================================
 static void discoverVariablesDeclarations( TokNode *pNode )
 {
+	size_t i = 0;
+
 	if ( pNode->mpToken )
 	{
 		BlockType	blkType = pNode->GetBlockType();
@@ -194,62 +287,53 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 			blkType == BLKT_EXPRESSION
 			);
 
-/*
-		if ( blkType == BLKT_EXPRESSION )
-		{
-			for (size_t i=0; i < pNode->mpChilds.size();)
-			{
-				TokNode	*pChild0 = pNode->GetChildTry( i + 0 );
-				TokNode	*pChild1 = pNode->GetChildTry( i + 1 );
-				TokNode	*pChild2 = pNode->GetChildTry( i + 2 );
-
-				if NOT( fndVarInExpr( i, pNode, pChild0, pChild1, pChild2 ) )
-				{
-					++i;
-					continue;
-				}
-			}
-		}
-		else
-*/
-		if ( blkType == BLKT_CODEBLOCK ||
-			 blkType == BLKT_SHPARAMS ||	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+		if ( blkType == BLKT_SHPARAMS ||	// $$$ NOT REALLY THE SAME ..but for now, it's ok
 			 blkType == BLKT_FNPARAMS		// $$$ NOT REALLY THE SAME ..but for now, it's ok
 			 )
 		{
-			TokNode	*pDTypeNode;
-			TokNode	*pDetailNode;
+			discoveFunctionParamsDeclaration( pNode, i );
+		}
+/*
+		else
+		if ( blkType == BLKT_CODEBLOCK )
+		{
+			TokNode	*pDTypeNode	= NULL;
+			TokNode	*pDetailNode= NULL;
+			TokNode	*pOutputNode= NULL;
 
-			size_t i=0;
-			while ( fndVarDefBeginInBlock(
-							i,
-							pNode,
-							pNode->GetChildTry( i + 0 ),
-							pNode->GetChildTry( i + 1 ),
-							pDTypeNode,
-							pDetailNode ) )
+			for (; i < pNode->mpChilds.size(); ++i)
 			{
-				for (; i < pNode->mpChilds.size();)
+				while ( fndVarDefBeginInBlock(
+								i,
+								pNode,
+								pNode->GetChildTry( i + 0 ),
+								pNode->GetChildTry( i + 1 ),
+								pDTypeNode,
+								pDetailNode ) )
 				{
-					TokNode	*pVarName = pNode->GetChildTry( i );
+					for (; i < pNode->mpChilds.size();)
+					{
+						TokNode	*pVarName = pNode->GetChildTry( i );
 
-					if NOT( pVarName->IsNonTerminal() )
-						throw Exception( "Expecting a variable name !" );
-					
-					// no "space cast" in the declaration in the curl braces
-					AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
+						if NOT( pVarName->IsNonTerminal() )
+							throw Exception( "Expecting a variable name !" );
+						
+						// no "space cast" in the declaration in the curl braces
+						AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
 
-					if NOT( iterateNextExpression( i, pNode ) )
+						if NOT( iterateNextExpression( i, pNode ) )
+							break;
+					}
+
+					if NOT( i < pNode->mpChilds.size() )
 						break;
 				}
-
-				if NOT( i < pNode->mpChilds.size() )
-					break;
 			}
 		}
+*/
 	}
 
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	for (; i < pNode->mpChilds.size(); ++i)
 	{
 		if ( pNode->mpChilds[i]->mpToken->id == T_OP_LFT_CRL_BRACKET ||
 			 pNode->mpChilds[i]->mpToken->id == T_OP_LFT_BRACKET )

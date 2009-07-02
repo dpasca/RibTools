@@ -209,6 +209,15 @@ public:
 		*grow() = tmp;
 	}
 
+	void append_array( const T *pSrc, size_t cnt )
+	{
+		T	*pDes = grow( cnt );
+		for (size_t i=0; i < cnt; ++i)
+		{
+			pDes[i] = pSrc[i];
+		}
+	}
+
 	const	T &back() const { DASSERT( mSize >= 1 ); return mpData[mSize-1]; }
 			T &back()		{ DASSERT( mSize >= 1 ); return mpData[mSize-1]; }
 

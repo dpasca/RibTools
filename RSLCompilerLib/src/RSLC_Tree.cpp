@@ -170,7 +170,7 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 							pNode->SetBlockType( BLKT_FNPARAMS );
 						else
 						{
-							DASSERT( 0 );
+							throw Exception( "Return type unknown", pNode );
 						}
 					}
 				}

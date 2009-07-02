@@ -42,7 +42,10 @@ int main( int argc, char *argv[] )
 
 	try 
 	{
-		RSLCompiler	compiler( (const char *)pInData, inDataSize );
+		RSLCompiler	compiler(
+						(const char *)pInData,
+						inDataSize,
+						"Resources\\RSLC_Builtins.sl" );
 
 		printf( "Generating %s...\n", pRRFName );
 
