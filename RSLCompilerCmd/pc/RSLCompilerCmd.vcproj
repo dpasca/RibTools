@@ -194,6 +194,10 @@
 				RelativePath="..\tests\test2.sl"
 				>
 			</File>
+			<File
+				RelativePath="..\tests\test3.sl"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resources"

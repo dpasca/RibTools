@@ -147,6 +147,25 @@ void TokNode::UnlinkFromParent()
 }
 
 //==================================================================
+void TokNode::ReplaceNode( TokNode *pNode )
+{
+	if NOT( pNode->mpParent )
+		return;
+
+	for (size_t i=0; i < pNode->mpParent->mpChilds.size(); ++i)
+	{
+		if ( pNode->mpParent->mpChilds[i] == pNode )
+		{
+			pNode->mpParent->mpChilds[i] = this;
+			mpParent = pNode->mpParent;
+			return;
+		}
+	}
+
+	DASSERT( 0 );
+}
+
+//==================================================================
 static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 {
 	if ( pNode->mpToken )

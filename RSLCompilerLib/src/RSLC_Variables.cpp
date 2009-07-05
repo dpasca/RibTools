@@ -264,8 +264,8 @@ static void discoveFunctionParamsDeclaration( TokNode *pNode, size_t &i )
 			// Note: "space cast" only for expressions ?
 			AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pA );
 		}
-		else
-			throw Exception( "Broken definition ?", pA );
+		//else
+		//	throw Exception( "Broken definition ?", pA );
 
 		prevWasComma = (pA->mpToken->id == T_OP_COMMA);
 	}

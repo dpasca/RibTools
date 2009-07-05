@@ -21,11 +21,13 @@ class TokNode;
 class Function
 {
 public:
+	TokNode			*mpParamsNode;
 	TokNode			*mpCodeBlkNode;
 	Token			*mpRetTypeTok;
 	Token			*mpNameTok;
 
 	Function() :
+		mpParamsNode(NULL),
 		mpCodeBlkNode(NULL),
 		mpRetTypeTok(NULL),
 		mpNameTok(NULL)

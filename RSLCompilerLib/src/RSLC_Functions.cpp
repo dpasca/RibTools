@@ -39,9 +39,16 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 
 		Function	*pFunc = funcs.grow();
 
+		pFunc->mpParamsNode		= pParamsBlk;
 		pFunc->mpCodeBlkNode	= pNode;
 		pFunc->mpNameTok		= pFuncName->mpToken;
 		pFunc->mpRetTypeTok		= pRetType->mpToken;
+
+		// params block becomes children of the function body
+		pFunc->mpCodeBlkNode->Reparent( pFunc->mpParamsNode );
+		pFunc->mpParamsNode->AddChild( pFunc->mpCodeBlkNode );
+
+		i -= 1;
 
 		pFuncName->mNodeType = TokNode::TYPE_FUNCDEF;	// mark the node as a function definition
 	}
@@ -119,7 +126,8 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 {
 	bool	isDataType = pNode->IsDataType();
 
-	if ( (pNode->IsNonTerminal() ||
+	if ( !pNode->IsParentRoot() &&  // parent cannot be root !!
+		 (pNode->IsNonTerminal() ||
 		  pNode->IsStdFunction() ||
 		  isDataType) &&
 			pNode->mNodeType == TokNode::TYPE_STANDARD )
@@ -189,7 +197,7 @@ static VarType varTypeFromToken( Token *pTok )
 }
 
 //==================================================================
-static void instrumentFuncsParams( TokNode *pNode, int &out_parentIdx )
+static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
 {
 	bool	isDataType = pNode->IsDataType();
 
@@ -226,12 +234,12 @@ static void instrumentFuncsParams( TokNode *pNode, int &out_parentIdx )
 
 	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
 	{
-		instrumentFuncsParams( pNode->mpChilds[i], i );
+		instrumentFuncsCallsParams( pNode->mpChilds[i], i );
 	}
 }
 
 //==================================================================
-static void instrumentFuncsReturn( TokNode *pNode, int &out_parentIdx )
+static void instrumentFuncsCallsReturn( TokNode *pNode, int &out_parentIdx )
 {
 	bool	isDataType = pNode->IsDataType();
 
@@ -262,7 +270,7 @@ static void instrumentFuncsReturn( TokNode *pNode, int &out_parentIdx )
 
 	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
 	{
-		instrumentFuncsReturn( pNode->mpChilds[i], i );
+		instrumentFuncsCallsReturn( pNode->mpChilds[i], i );
 	}
 }
 
@@ -270,10 +278,10 @@ static void instrumentFuncsReturn( TokNode *pNode, int &out_parentIdx )
 void InstrumentFunctionCalls( TokNode *pRoot )
 {
 	int	parentIdx = 0;
-	instrumentFuncsParams( pRoot, parentIdx );
+	instrumentFuncsCallsParams( pRoot, parentIdx );
 
 	parentIdx = 0;
-	instrumentFuncsReturn( pRoot, parentIdx );
+	instrumentFuncsCallsReturn( pRoot, parentIdx );
 }
 
 //==================================================================
@@ -307,16 +315,11 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 						funcs[i].mpNameTok->GetStrChar()
 						) )
 			{
-				TokNode	*pDest = cloneBranch( funcs[i].mpCodeBlkNode, NULL );
+				TokNode	*pClonedParams = cloneBranch( funcs[i].mpParamsNode, NULL );
 
-				pDest->mpParent = pNode->mpParent;
-				pNode->mpParent->mpChilds[parentIdx] = pDest;
+				pClonedParams->ReplaceNode( pNode );
 
-				//pNode->UnlinkFromParent();
 				DSAFE_DELETE( pNode );
-
-				//if ( parentIdx )
-				//	--parentIdx;
 
 				return;
 			}

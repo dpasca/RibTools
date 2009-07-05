@@ -21,47 +21,55 @@ static void reparentBiOperators(
 						size_t &out_parentIdx,
 						bool excludeIfFuncParam=false )
 {
-	if ( pNode->mpToken &&
-			(	!excludeIfFuncParam ||
-				!pNode->mpParent ||
-				pNode->mpParent->GetBlockType() != BLKT_FUNCCALL )
-		)
+	if ( pNode->mpToken )
 	{
-		for (size_t i=0; i < matchIDsN; ++i)
+		bool	dontProcess = false;
+		if ( excludeIfFuncParam && pNode->mpParent )
 		{
-			if ( pMatchingIDs[i] == pNode->mpToken->id )
+			BlockType	blkType = pNode->mpParent->GetBlockType();
+
+			if ( blkType == BLKT_FUNCCALL || blkType == BLKT_FNPARAMS )
+				dontProcess = true;
+		}
+
+		if NOT( dontProcess )
+		{
+			for (size_t i=0; i < matchIDsN; ++i)
 			{
-				TokNode	*pLValue = pNode->GetLeft();
-				TokNode	*pRValue = pNode->GetRight();
-
-				//if NOT( pLValue )
-				//	throw Exception( "Missing left value in expression assignment.", pNode->mpToken );
-
-				if ( pRValue && pLValue )
+				if ( pMatchingIDs[i] == pNode->mpToken->id )
 				{
-					//	L	=	R
+					TokNode	*pLValue = pNode->GetLeft();
+					TokNode	*pRValue = pNode->GetRight();
 
-					if ( pRValue )
+					//if NOT( pLValue )
+					//	throw Exception( "Missing left value in expression assignment.", pNode->mpToken );
+
+					if ( pRValue && pLValue )
 					{
-						pRValue->Reparent( pNode );
-						pNode->mpChilds.push_front( pRValue );
-					}
-					//	L	=
-					//			R
+						//	L	=	R
 
-					if ( pLValue )
-					{
-						pLValue->Reparent( pNode );
-						pNode->mpChilds.push_front( pLValue );
-					}
-					//		=
-					//	L		R
+						if ( pRValue )
+						{
+							pRValue->Reparent( pNode );
+							pNode->mpChilds.push_front( pRValue );
+						}
+						//	L	=
+						//			R
 
-					DASSERT( out_parentIdx > 0 );
-					out_parentIdx -= 1;
+						if ( pLValue )
+						{
+							pLValue->Reparent( pNode );
+							pNode->mpChilds.push_front( pLValue );
+						}
+						//		=
+						//	L		R
+
+						DASSERT( out_parentIdx > 0 );
+						out_parentIdx -= 1;
+					}
+
+					break;
 				}
-
-				break;
 			}
 		}
 	}

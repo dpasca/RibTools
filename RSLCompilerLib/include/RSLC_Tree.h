@@ -174,6 +174,8 @@ public:
 	bool IsDataType() const			{ return mpToken ? mpToken->idType == T_TYPE_DATATYPE : false; }
 	bool IsTokenID( TokenID id ) const	{ return mpToken ? mpToken->id == id : false; }
 
+	bool IsParentRoot() const			{ return mpParent && mpParent->mpParent == NULL;	}
+
 	void UnlinkFromParent();
 
 	void Reparent( TokNode *pNewParent )
@@ -181,6 +183,8 @@ public:
 		UnlinkFromParent();
 		mpParent = pNewParent;
 	}
+
+	void ReplaceNode( TokNode *pNode );
 };
 
 //==================================================================
