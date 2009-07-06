@@ -25,7 +25,7 @@ static void AddVariable(
 	Variable	*pVar = pNode->GetVars().grow();
 
 	pVar->mpDTypeTok		= pDTypeNode->mpToken;
-	pVar->mpOwnerNode		= pNode;
+	//pVar->mpOwnerNode		= pNode;
 	pVar->mpDetailTok		= pDetailNode ? pDetailNode->mpToken : NULL;
 	pVar->mpSpaceCastTok	= pSpaceCastTok ? pSpaceCastTok->mpToken : NULL;
 	pVar->mpDefNameTok		= pNameNode ? pNameNode->mpToken : NULL;

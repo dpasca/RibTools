@@ -72,7 +72,7 @@ RSLCompiler::RSLCompiler(
 				mTokens[i].str.c_str() );
 	}
 
-	mpRoot = DNEW TokNode( NULL );
+	mpRoot = DNEW TokNode( (Token *)NULL );
 
 	// make the basic tree with nested blocks based on brackets
 	MakeTree( mpRoot, mTokens );

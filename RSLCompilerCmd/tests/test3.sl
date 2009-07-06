@@ -2,9 +2,9 @@
    ..this comment is part of the test 8)*/
 
 /*==========================================*/
-float dude( float a=1, float b )
+float dude( float a=1, float bb )
 {
-	float c = a + b;
+	float c = a + bb;
 	return c;
 }
 

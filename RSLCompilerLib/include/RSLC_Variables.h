@@ -19,11 +19,40 @@ namespace RSLC
 class TokNode;
 
 //==================================================================
+enum VarType
+{
+	VT_FLOAT,
+	VT_POINT,
+	VT_COLOR,
+	VT_STRING,
+	VT_VECTOR,
+	VT_NORMAL,
+	VT_MATRIX,
+	VT_N
+};
+
+//==================================================================
+class Register
+{
+public:
+	VarType			mVarType;
+	bool			mIsVarying;
+	int				mRegIdx;
+
+	Register() :
+		mVarType(VT_FLOAT),
+		mIsVarying(false),
+		mRegIdx(-1)
+	{
+	}
+};
+
+//==================================================================
 class Variable
 {
 public:
 	std::string		mInternalName;
-	TokNode			*mpOwnerNode;
+	//TokNode			*mpOwnerNode;
 	Token			*mpDTypeTok;
 	Token			*mpDetailTok;
 	Token			*mpSpaceCastTok;
@@ -32,14 +61,29 @@ public:
 	bool			mIsVarying;
 	bool			mIsLValue;
 
+	Register		mBuild_Register;
+
+
 	Variable() :
-		mpOwnerNode(NULL),
+		//mpOwnerNode(NULL),
 		mpDTypeTok(NULL),
 		mpDetailTok(NULL),
 		mpSpaceCastTok(NULL),
 		mpDefNameTok(NULL),
 		mIsVarying(true),
 		mIsLValue(false)
+	{
+	}
+
+	Variable( const Variable &from ) :
+		mInternalName	(	from.mInternalName		),
+		mpDTypeTok		(	from.mpDTypeTok			),
+		mpDetailTok		(	from.mpDetailTok		),
+		mpSpaceCastTok	(	from.mpSpaceCastTok		),
+		mpDefNameTok	(	from.mpDefNameTok		),
+		mpDefValToks	(	from.mpDefValToks		),
+		mIsVarying		(	from.mIsVarying			),
+		mIsLValue		(	from.mIsLValue			)
 	{
 	}
 

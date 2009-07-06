@@ -171,8 +171,8 @@ static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType
 	pAssgnNode->mpParent = pNode;
 
 	TokNode *pDestRegNode = pAssgnNode->AddNewChild( pDestRegTok );
-	pDestRegNode->mTempRegType		= varType;
-	pDestRegNode->mTempRegIsVarying	= isVarying;
+	pDestRegNode->mBuild_TmpReg.mVarType		= varType;
+	pDestRegNode->mBuild_TmpReg.mIsVarying	= isVarying;
 
 	pAssgnNode->AddChild( pOldNode );
 }
@@ -287,7 +287,7 @@ void InstrumentFunctionCalls( TokNode *pRoot )
 //==================================================================
 static TokNode *cloneBranch( TokNode *pNode, TokNode *pDstParent )
 {
-	TokNode	*pNewNode = DNEW TokNode( pNode->mpToken );
+	TokNode	*pNewNode = DNEW TokNode( pNode );
 
 	if ( pDstParent )
 		pDstParent->AddChild( pNewNode );
@@ -346,7 +346,7 @@ static void getTempRegName( TokNode *pOperand, char *pOutBuff, size_t maxOutSize
 {
 	char	regBase[16] = {0};
 
-	switch ( pOperand->mTempRegType )
+	switch ( pOperand->mBuild_TmpReg.mVarType )
 	{
 	case VT_FLOAT:	regBase[0] = 's'; break;
 	case VT_POINT:	regBase[0] = 'v'; break;
@@ -360,10 +360,10 @@ static void getTempRegName( TokNode *pOperand, char *pOutBuff, size_t maxOutSize
 		break;
 	}
 
-	if NOT( pOperand->mTempRegIsVarying )
+	if NOT( pOperand->mBuild_TmpReg.mIsVarying )
 		strcat_s( regBase, "u" );
 
-	sprintf_s( pOutBuff, maxOutSize, "$%s%i", regBase, pOperand->mTempRegIdx );
+	sprintf_s( pOutBuff, maxOutSize, "$%s%i", regBase, pOperand->mBuild_TmpReg.mRegIdx );
 }
 
 //==================================================================
@@ -372,7 +372,7 @@ static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutS
 	//DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() >= 1 );
 	while ( pOperand )
 	{
-		if ( pOperand->mTempRegIdx != -1 )
+		if ( pOperand->mBuild_TmpReg.mRegIdx != -1 )
 		{
 			getTempRegName( pOperand, pOutBuff, maxOutSize );
 			return pOutBuff;
@@ -459,8 +459,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 		// no assignment for function call as it's done above
 		if ( pNode->mpToken->id == T_OP_ASSIGN &&
-			(pOperand1->mNodeType == TokNode::TYPE_FUNCCALL ||
-			 pOperand2->mNodeType == TokNode::TYPE_FUNCCALL ) )
+			 pOperand1->mNodeType == TokNode::TYPE_FUNCCALL )
 			return;
 
 		if ( pOperand1 && pOperand2 )

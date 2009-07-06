@@ -16,12 +16,12 @@ namespace RSLC
 //==================================================================
 static void solveTempOperand( TokNode *pOperand, size_t &io_tempIdx )
 {
-	while ( pOperand->mTempRegIdx == -1 )
+	while ( pOperand->mBuild_TmpReg.mRegIdx == -1 )
 	{
 		if ( pOperand->mpToken->idType == T_TYPE_TEMPDEST )
 		{
 			// assign a temporary and get out
-			pOperand->mTempRegIdx = io_tempIdx++;
+			pOperand->mBuild_TmpReg.mRegIdx = io_tempIdx++;
 			break;
 		}
 
@@ -42,7 +42,7 @@ static void solveOperand( TokNode *pOperand, size_t &io_tempIdx )
 	if ( pOperand->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
 		DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() == 2 );
-		DASSERT( pOperand->mpParent->mpChilds[0]->mTempRegIdx != -1 );
+		DASSERT( pOperand->mpParent->mpChilds[0]->mBuild_TmpReg.mRegIdx != -1 );
 	}
 	else
 	if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
@@ -97,9 +97,9 @@ static void assignRegisters_expr( TokNode *pNode, size_t &io_tempIdx )
 			TokNode *pDestTemp = pNode->mpParent->GetChildTry( 0 );
 
 			DASSERT( pDestTemp->mpToken->idType == T_TYPE_TEMPDEST );
-			DASSERT( pDestTemp->mTempRegIdx == -1 );
+			DASSERT( pDestTemp->mBuild_TmpReg.mRegIdx == -1 );
 
-			pDestTemp->mTempRegIdx	= io_tempIdx++;
+			pDestTemp->mBuild_TmpReg.mRegIdx	= io_tempIdx++;
 		}
 
 		assignRegisters_expr_fcall( pBracket, io_tempIdx );
@@ -124,8 +124,8 @@ static void assignRegisters_expr( TokNode *pNode, size_t &io_tempIdx )
 			if NOT( pNode->mpToken->IsAssignOp() )
 			{
 				// a one time assignment only..
-				DASSERT( pNode->mTempRegIdx == -1 );
-				pNode->mTempRegIdx = io_tempIdx++;
+				DASSERT( pNode->mBuild_TmpReg.mRegIdx == -1 );
+				pNode->mBuild_TmpReg.mRegIdx = io_tempIdx++;
 			}
 		}
 		else

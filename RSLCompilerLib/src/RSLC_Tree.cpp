@@ -166,6 +166,35 @@ void TokNode::ReplaceNode( TokNode *pNode )
 }
 
 //==================================================================
+TokNode::TokNode( Token *pObj ) :
+	mpToken(pObj),
+	mpParent(NULL),
+	mNodeType(TYPE_STANDARD),
+	mBlockType(BLKT_UNKNOWN),
+	mBlockID(0),
+	mpVarDef(NULL)
+{
+#ifdef _DEBUG
+	mUIDCnt = sUIDCnt++;
+#endif
+}
+
+//==================================================================
+TokNode::TokNode( TokNode *pObj ) :
+	mpToken(pObj->mpToken),
+	mpParent(NULL),
+	mNodeType(pObj->mNodeType),
+	mBlockType(pObj->mBlockType),
+	mBlockID(0),
+	mpVarDef(pObj->mpVarDef),
+	mBuild_TmpReg(pObj->mBuild_TmpReg)
+{
+#ifdef _DEBUG
+	mUIDCnt = sUIDCnt++;
+#endif
+}
+
+//==================================================================
 static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 {
 	if ( pNode->mpToken )
