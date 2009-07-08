@@ -19,6 +19,26 @@ namespace RSLC
 {
 
 //==================================================================
+class VarLink
+{
+public:
+	TokNode		*mpNode;
+	size_t		mVarIdx;
+
+	VarLink() :
+		mpNode(NULL),
+		mVarIdx(DNPOS)
+	{
+	}
+
+	bool IsValid() const { return mVarIdx != DNPOS; }
+	bool IsGlobal() const;
+
+	Variable *GetVarPtr();
+	const Variable *GetVarPtr() const;
+};
+
+//==================================================================
 class TokNode
 {
 #ifdef _DEBUG
@@ -53,7 +73,8 @@ private:
 public:
 	u_int			mBlockID;
 	DVec<TokNode*>	mpChilds;
-	Variable		*mpVarDef;	// this is the variable definition
+
+	VarLink			mVarLink;	// this is the variable definition
 								// in case this node is variable usage
 
 	Register		mBuild_TmpReg;	// using while building code
@@ -138,7 +159,7 @@ public:
 		  DVec<Function> &GetFuncs()		{ return mFunctions;	}
 	const DVec<Function> &GetFuncs() const	{ return mFunctions;	}
 
-	Variable *FindVariableByDefName( const char *pName );
+	VarLink FindVariableByDefName( const char *pName );
 
 	bool IsCodeBlock() const			{ return mBlockType == BLKT_CODEBLOCK; }
 	bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
@@ -158,6 +179,23 @@ public:
 	}
 
 	void ReplaceNode( TokNode *pNode );
+
+	Register BuildGetRegister() const
+	{
+		if ( mVarLink.IsValid() )
+		{
+			DASSERT( !mBuild_TmpReg.IsValid() );
+			return mVarLink.GetVarPtr()->mBuild_Register;
+		}
+		else
+		if ( mBuild_TmpReg.IsValid() )
+		{
+			DASSERT( !mVarLink.IsValid() );
+			return mBuild_TmpReg;
+		}
+		else
+			return Register();
+	}
 };
 
 //==================================================================

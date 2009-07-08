@@ -22,6 +22,9 @@ void *operator new( size_t size, const char *pFile, int line );
 void *operator new [] ( size_t size, const char *pFile, int line );
 void operator delete( void *p, const char *pFile, int line );
 void operator delete [] ( void *p, const char *pFile, int line );
+
+void *operator new( size_t size );
+void *operator new [] ( size_t size );
 void operator delete( void *p );
 void operator delete [] ( void *p );
 

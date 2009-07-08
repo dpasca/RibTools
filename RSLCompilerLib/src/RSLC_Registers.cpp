@@ -14,7 +14,7 @@ namespace RSLC
 {
 
 //==================================================================
-static void solveTempOperand( TokNode *pOperand, size_t &io_tempIdx )
+static void solveTempOperand( TokNode *pOperand, int &io_tempIdx )
 {
 	while ( pOperand->mBuild_TmpReg.mRegIdx == -1 )
 	{
@@ -37,7 +37,7 @@ static void solveTempOperand( TokNode *pOperand, size_t &io_tempIdx )
 }
 
 //==================================================================
-static void solveOperand( TokNode *pOperand, size_t &io_tempIdx )
+static void solveOperand( TokNode *pOperand, int &io_tempIdx )
 {
 	if ( pOperand->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
@@ -47,6 +47,13 @@ static void solveOperand( TokNode *pOperand, size_t &io_tempIdx )
 	else
 	if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
 	{
+		if ( pOperand->mVarLink.IsValid() && !pOperand->mVarLink.IsGlobal() )
+		{
+			Variable	*pVar = pOperand->mVarLink.GetVarPtr();
+
+			if NOT( pVar->mBuild_Register.IsValid() )
+				pVar->BuildSetupRegister( io_tempIdx );
+		}
 	}
 	else
 	{
@@ -55,7 +62,7 @@ static void solveOperand( TokNode *pOperand, size_t &io_tempIdx )
 }
 
 //==================================================================
-static void assignRegisters_expr_fcall( TokNode *pNode, size_t &io_tempIdx )
+static void assignRegisters_expr_fcall( TokNode *pNode, int &io_tempIdx )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
@@ -69,7 +76,7 @@ static void assignRegisters_expr_fcall( TokNode *pNode, size_t &io_tempIdx )
 }
 
 //==================================================================
-static void assignRegisters_expr( TokNode *pNode, size_t &io_tempIdx )
+static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
@@ -151,7 +158,7 @@ void AssignRegisters( TokNode *pNode )
 		{
 			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[i];
 
-			size_t	tempIdx = 0;
+			int	tempIdx = 0;
 
 			assignRegisters_expr( pNode, tempIdx );
 		}

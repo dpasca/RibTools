@@ -53,6 +53,26 @@ void operator delete [] ( void *p, const char *pFile, int line )
 }
 
 //==================================================================
+void *operator new( size_t size )
+{
+    void *p = _mm_malloc( size, 64 );
+	if NOT( p )
+		throw std::bad_alloc();
+
+    return p;
+}
+
+//==================================================================
+void *operator new [] ( size_t size )
+{
+    void *p = _mm_malloc( size, 64 );
+	if NOT( p )
+		throw std::bad_alloc();
+
+    return p;
+}
+
+//==================================================================
 void operator delete( void *p )
 {
 	if ( p )

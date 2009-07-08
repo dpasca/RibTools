@@ -14,6 +14,27 @@ namespace RSLC
 {
 
 //==================================================================
+Variable * VarLink::GetVarPtr()
+{
+	return mVarIdx != DNPOS ? &mpNode->GetVars()[mVarIdx] : NULL;
+}
+
+//==================================================================
+const Variable * VarLink::GetVarPtr() const
+{
+	return mVarIdx != DNPOS ? &mpNode->GetVars()[mVarIdx] : NULL;
+}
+
+//==================================================================
+bool VarLink::IsGlobal() const
+{
+	if ( mpNode && mpNode->GetBlockType() == BLKT_ROOT )
+		return true;
+	else
+		return false;
+}
+
+//==================================================================
 #ifdef _DEBUG
 size_t	TokNode::sUIDCnt;
 #endif
@@ -113,19 +134,23 @@ TokNode *TokNode::GetNext()
 }
 
 //==================================================================
-Variable *TokNode::FindVariableByDefName( const char *pName )
+VarLink TokNode::FindVariableByDefName( const char *pName )
 {
+	VarLink	result;
+
 	for (size_t i=0; i < mVariables.size(); ++i)
 	{
-		Variable	*pVar = &mVariables[i];
+		const Variable	*pVar = &mVariables[i];
 		if ( pVar->HasDefName() )
 			if ( 0 == strcmp( pVar->GetDefName(), pName ) )
 			{
-				return pVar;
+				result.mpNode = this;
+				result.mVarIdx = i;
+				break;
 			}
 	}
 
-	return NULL;
+	return result;
 }
 
 //==================================================================
@@ -171,8 +196,7 @@ TokNode::TokNode( Token *pObj ) :
 	mpParent(NULL),
 	mNodeType(TYPE_STANDARD),
 	mBlockType(BLKT_UNKNOWN),
-	mBlockID(0),
-	mpVarDef(NULL)
+	mBlockID(0)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
@@ -182,11 +206,13 @@ TokNode::TokNode( Token *pObj ) :
 //==================================================================
 TokNode::TokNode( TokNode *pObj ) :
 	mpToken(pObj->mpToken),
+	mVariables		(pObj->mVariables),
+	mFunctions		(pObj->mFunctions),
 	mpParent(NULL),
 	mNodeType(pObj->mNodeType),
 	mBlockType(pObj->mBlockType),
 	mBlockID(0),
-	mpVarDef(pObj->mpVarDef),
+	mVarLink(pObj->mVarLink),
 	mBuild_TmpReg(pObj->mBuild_TmpReg)
 {
 #ifdef _DEBUG
@@ -378,9 +404,9 @@ void TraverseTree( TokNode *pNode, int depth )
 	{
 		printf( "%s", pNode->mpToken->str.c_str() );
 		
-		if ( pNode->mpVarDef )
+		if ( pNode->mVarLink.GetVarPtr() )
 		{
-			printf( " <<VARIABLE: %s>>", pNode->mpVarDef->mInternalName.c_str() );
+			printf( " <<VARIABLE: %s>>", pNode->mVarLink.GetVarPtr()->mInternalName.c_str() );
 		}
 	}
 

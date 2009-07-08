@@ -15,6 +15,35 @@ namespace RSLC
 {
 
 //==================================================================
+static VarType varTypeFromToken( Token *pTok )
+{
+	DASSERT( pTok->idType == T_TYPE_DATATYPE );
+
+	switch ( pTok->id )
+	{
+	case T_DT_float	: return VT_FLOAT;
+	case T_DT_vector: return VT_VECTOR;
+	case T_DT_point	: return VT_POINT;
+	case T_DT_normal: return VT_NORMAL;
+	case T_DT_color	: return VT_COLOR;
+	case T_DT_string: return VT_STRING;
+	}
+
+	DASSERT( 0 );
+	return VT_FLOAT;
+}
+
+//==================================================================
+void Variable::BuildSetupRegister( int &io_regIdx )
+{
+	DASSERT( !mBuild_Register.IsValid() );
+
+	mBuild_Register.mIsVarying	= mIsVarying;
+	mBuild_Register.mVarType	= varTypeFromToken( mpDTypeTok );
+	mBuild_Register.mRegIdx		= io_regIdx++;
+}
+
+//==================================================================
 static void AddVariable(
 					TokNode *pNode,
 					TokNode *pDTypeNode,
@@ -22,6 +51,10 @@ static void AddVariable(
 					TokNode *pSpaceCastTok,
 					TokNode *pNameNode )
 {
+	// setup the var link
+	pNameNode->mVarLink.mVarIdx = pNode->GetVars().size();
+	pNameNode->mVarLink.mpNode = pNode;
+
 	Variable	*pVar = pNode->GetVars().grow();
 
 	pVar->mpDTypeTok		= pDTypeNode->mpToken;
@@ -69,7 +102,6 @@ static void AddVariable(
 	}
 }
 
-/*
 //==================================================================
 static bool fndVarDefBeginInBlock(
 		size_t &i,
@@ -119,7 +151,6 @@ static bool fndVarDefBeginInBlock(
 
 	return false;
 }
-*/
 
 /*
 //==================================================================
@@ -293,7 +324,6 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 		{
 			discoveFunctionParamsDeclaration( pNode, i );
 		}
-/*
 		else
 		if ( blkType == BLKT_CODEBLOCK )
 		{
@@ -330,7 +360,6 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 				}
 			}
 		}
-*/
 	}
 
 	for (; i < pNode->mpChilds.size(); ++i)
@@ -362,8 +391,8 @@ static bool isVarUsedAsLValue( const char *pVarName, TokNode *pNode )
 //==================================================================
 void discoverVariablesUsage( TokNode *pNode )
 {
-	// for every non-terminal
-	if ( pNode->IsNonTerminal() )
+	// for every non-terminal, and that doesn't have a var link (declarations would already..)
+	if ( pNode->IsNonTerminal() && !pNode->mVarLink.IsValid() )
 	{
 		// scan backward and up, looking for a variable definition matching the name
 		for (TokNode *pVarDefBlock = pNode->mpParent; pVarDefBlock; pVarDefBlock = pVarDefBlock->mpParent)
@@ -371,11 +400,11 @@ void discoverVariablesUsage( TokNode *pNode )
 			// do we have variables declaration ?
 			if ( pVarDefBlock->GetVars().size() )
 			{
-				Variable *pVar = pVarDefBlock->FindVariableByDefName( pNode->GetTokStr() );
+				VarLink varLink = pVarDefBlock->FindVariableByDefName( pNode->GetTokStr() );
 
-				if ( pVar )
+				if ( varLink.IsValid() )
 				{
-					pNode->mpVarDef = pVar;
+					pNode->mVarLink = varLink;
 					break;
 				}
 			}

@@ -45,6 +45,8 @@ public:
 		mRegIdx(-1)
 	{
 	}
+
+	bool IsValid() const { return mRegIdx != -1; }
 };
 
 //==================================================================
@@ -100,6 +102,8 @@ public:
 		else
 			return NULL;
 	}
+
+	void BuildSetupRegister( int &io_regIdx );
 };
 
 //==================================================================

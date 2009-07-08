@@ -6,6 +6,7 @@
 /// copyright info. 
 //==================================================================
 
+#include <map>
 #include "RSLC_Tree.h"
 #include "RSLC_Functions.h"
 #include "RSLC_Exceptions.h"
@@ -178,25 +179,6 @@ static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType
 }
 
 //==================================================================
-static VarType varTypeFromToken( Token *pTok )
-{
-	DASSERT( pTok->idType == T_TYPE_DATATYPE );
-
-	switch ( pTok->id )
-	{
-	case T_DT_float	: return VT_FLOAT;
-	case T_DT_vector: return VT_VECTOR;
-	case T_DT_point	: return VT_POINT;
-	case T_DT_normal: return VT_NORMAL;
-	case T_DT_color	: return VT_COLOR;
-	case T_DT_string: return VT_STRING;
-	}
-
-	DASSERT( 0 );
-	return VT_FLOAT;
-}
-
-//==================================================================
 static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
 {
 	bool	isDataType = pNode->IsDataType();
@@ -285,22 +267,44 @@ void InstrumentFunctionCalls( TokNode *pRoot )
 }
 
 //==================================================================
-static TokNode *cloneBranch( TokNode *pNode, TokNode *pDstParent )
+static TokNode *cloneBranch_BuildNodes(
+								TokNode *pNode,
+								TokNode *pDstParent,
+								std::map<TokNode*,TokNode*>	&oldToNewMap )
 {
 	TokNode	*pNewNode = DNEW TokNode( pNode );
+
+	oldToNewMap[pNode] = pNewNode;
 
 	if ( pDstParent )
 		pDstParent->AddChild( pNewNode );
 
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	if ( pNewNode->mVarLink.IsValid() )
 	{
-		cloneBranch( pNode->mpChilds[i], pNewNode );
+		TokNode	*pReplaceNode = oldToNewMap[ pNode->mVarLink.mpNode ];
+
+		DASSERT( pNode->mVarLink.mpNode->GetVars().size() != 0 );
+		DASSERT( pNode->mVarLink.mpNode->GetVars().size() == pReplaceNode->GetVars().size() );
+
+		pNewNode->mVarLink.mpNode = pReplaceNode;
 	}
 
-	if NOT( pDstParent )
-		return pNewNode;
-	else
-		return NULL;
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		cloneBranch_BuildNodes( pNode->mpChilds[i], pNewNode, oldToNewMap );
+	}
+
+	return pNewNode;
+}
+
+//==================================================================
+static TokNode *cloneBranch( TokNode *pNode )
+{
+	std::map<TokNode*,TokNode*>	oldToNewMap;
+
+	TokNode	*pNewBase = cloneBranch_BuildNodes( pNode, NULL, oldToNewMap );
+
+	return pNewBase;
 }
 
 //==================================================================
@@ -315,7 +319,7 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 						funcs[i].mpNameTok->GetStrChar()
 						) )
 			{
-				TokNode	*pClonedParams = cloneBranch( funcs[i].mpParamsNode, NULL );
+				TokNode	*pClonedParams = cloneBranch( funcs[i].mpParamsNode );
 
 				pClonedParams->ReplaceNode( pNode );
 
@@ -342,11 +346,11 @@ void ResolveFunctionCalls( TokNode *pNode )
 }
 
 //==================================================================
-static void getTempRegName( TokNode *pOperand, char *pOutBuff, size_t maxOutSize )
+static void getRegName( const Register &reg, char *pOutBuff, size_t maxOutSize )
 {
 	char	regBase[16] = {0};
 
-	switch ( pOperand->mBuild_TmpReg.mVarType )
+	switch ( reg.mVarType )
 	{
 	case VT_FLOAT:	regBase[0] = 's'; break;
 	case VT_POINT:	regBase[0] = 'v'; break;
@@ -360,10 +364,10 @@ static void getTempRegName( TokNode *pOperand, char *pOutBuff, size_t maxOutSize
 		break;
 	}
 
-	if NOT( pOperand->mBuild_TmpReg.mIsVarying )
+	if NOT( reg.mIsVarying )
 		strcat_s( regBase, "u" );
 
-	sprintf_s( pOutBuff, maxOutSize, "$%s%i", regBase, pOperand->mBuild_TmpReg.mRegIdx );
+	sprintf_s( pOutBuff, maxOutSize, "$%s%i", regBase, reg.mRegIdx );
 }
 
 //==================================================================
@@ -372,9 +376,11 @@ static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutS
 	//DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() >= 1 );
 	while ( pOperand )
 	{
-		if ( pOperand->mBuild_TmpReg.mRegIdx != -1 )
+		Register	reg = pOperand->BuildGetRegister();
+
+		if ( reg.IsValid() )
 		{
-			getTempRegName( pOperand, pOutBuff, maxOutSize );
+			getRegName( reg, pOutBuff, maxOutSize );
 			return pOutBuff;
 		}
 		else
@@ -400,7 +406,9 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 	{
 		TokNode *pChild = pNode->mpParent->mpParent->GetChildTry( 0 );
 
-		getTempRegName( pChild, op1NameBuff, _countof(op1NameBuff) );
+		Register	reg = pChild->BuildGetRegister();
+
+		getRegName( reg, op1NameBuff, _countof(op1NameBuff) );
 
 		fprintf_s( pFile, "\t%s", op1NameBuff );
 	}
@@ -486,7 +494,10 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 			else
 			{
 				char regName[32];
-				getTempRegName( pNode, regName, _countof(regName) );
+		
+				Register	reg = pNode->BuildGetRegister();
+				getRegName( reg, regName, _countof(regName) );
+
 				fprintf_s( pFile, "\t%s\t%s\t%s\t%s\n",
 								pNode->GetTokStr(),
 									regName,
