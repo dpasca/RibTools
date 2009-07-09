@@ -303,7 +303,7 @@ static void discoveFunctionParamsDeclaration( TokNode *pNode, size_t &i )
 }
 
 //==================================================================
-static void discoverVariablesDeclarations( TokNode *pNode )
+void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	size_t i = 0;
 
@@ -367,7 +367,7 @@ static void discoverVariablesDeclarations( TokNode *pNode )
 		if ( pNode->mpChilds[i]->mpToken->id == T_OP_LFT_CRL_BRACKET ||
 			 pNode->mpChilds[i]->mpToken->id == T_OP_LFT_BRACKET )
 		{
-			discoverVariablesDeclarations( pNode->mpChilds[i] );
+			DiscoverVariablesDeclarations( pNode->mpChilds[i] );
 		}
 	}
 }
@@ -389,7 +389,7 @@ static bool isVarUsedAsLValue( const char *pVarName, TokNode *pNode )
 */
 
 //==================================================================
-void discoverVariablesUsage( TokNode *pNode )
+void DiscoverVariablesUsage( TokNode *pNode )
 {
 	// for every non-terminal, and that doesn't have a var link (declarations would already..)
 	if ( pNode->IsNonTerminal() && !pNode->mVarLink.IsValid() )
@@ -413,7 +413,7 @@ void discoverVariablesUsage( TokNode *pNode )
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		discoverVariablesUsage( pNode->mpChilds[i] );
+		DiscoverVariablesUsage( pNode->mpChilds[i] );
 	}
 }
 
@@ -460,13 +460,6 @@ void AddStandardVariables( TokNode *pNode )
 				NULL,
 				newVarNode( sGlobalsDefs[i+2] ) );
 	}
-}
-
-//==================================================================
-void DiscoverVariables( TokNode *pNode )
-{
-	discoverVariablesDeclarations( pNode );
-	discoverVariablesUsage( pNode );
 }
 
 //==================================================================

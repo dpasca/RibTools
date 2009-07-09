@@ -80,8 +80,8 @@ RSLCompiler::RSLCompiler(
 	//
 	AddStandardVariables( mpRoot );
 
-	// discover variables declarations and usage
-	DiscoverVariables( mpRoot );
+	// discover variables declarations
+	DiscoverVariablesDeclarations( mpRoot );
 
 	// discover functions declarations and usage
 	DiscoverFunctions( mpRoot );
@@ -95,6 +95,9 @@ RSLCompiler::RSLCompiler(
 
 	// develop the tree based on operators with the proper precedence
 	ReparentOperators( mpRoot );
+
+	// discover variables usage
+	DiscoverVariablesUsage( mpRoot );
 
 	InstrumentFunctionCalls( mpRoot );
 
