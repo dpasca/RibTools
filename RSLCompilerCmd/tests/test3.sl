@@ -2,7 +2,7 @@
    ..this comment is part of the test 8)*/
 
 /*==========================================*/
-float dude( float a=1, float bb )
+float dude( float a=1, bb )
 {
 	float c = a + bb;
 	return c;

@@ -108,86 +108,56 @@ static bool fndVarDefBeginInBlock(
 		TokNode *pNode,
 		TokNode	*pChild0,
 		TokNode	*pChild1,
+		TokNode	*pChild2,
 		TokNode	* &out_pDTypeNode,
-		TokNode	* &out_pDetailNode
+		TokNode	* &out_pDetailNode,
+		TokNode	* &out_pOutputNode
 		)
 {
-	if ( pChild0 &&
-		 (pChild0->mpToken->idType == T_TYPE_DATATYPE ||
-		  pChild0->mpToken->idType == T_TYPE_DETAIL ) )
-	{
-		// 3 possible cases
+	out_pDTypeNode	= NULL;
+	out_pDetailNode	= NULL;
+	out_pOutputNode	= NULL;
 
-		// 1) TYPE NTERM
-		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) )
+	TokNode	*pChilds[3] = { pChild0, pChild1, pChild2 };
+
+	for (size_t j=0; j < 3; ++j)
+	{
+		if NOT( pChilds[j] )
+			break;
+
+		if ( pChilds[j]->mpToken->idType == T_TYPE_DATATYPE )
 		{
-			out_pDTypeNode	= pChild0;
-			out_pDetailNode	= NULL;
-			i += 1;
-		}
-		else	// 2) TYPE DETAIL NTERM
-		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DATATYPE) &&
-			(pChild1 && pChild1->mpToken->idType == T_TYPE_DETAIL) )
-		{
-			out_pDTypeNode	= pChild0;
-			out_pDetailNode	= pChild1;
-			i += 2;
-		}
-		else	// 3) DETAIL TYPE NTERM
-		if ((pChild0 && pChild0->mpToken->idType == T_TYPE_DETAIL) &&
-			(pChild1 && pChild1->mpToken->idType == T_TYPE_DATATYPE) )
-		{
-			out_pDTypeNode	= pChild1;
-			out_pDetailNode	= pChild0;
-			i += 2;
+			if ( out_pDTypeNode )
+				throw Exception( "Broken variable declaration", pChilds[j] );
+
+			out_pDTypeNode = pChilds[j];
+			++i;
 		}
 		else
+		if ( pChilds[j]->mpToken->idType == T_TYPE_DETAIL )
 		{
-			throw Exception( "Broken variable declaration", pChild0->mpToken );
-		}
+			if ( out_pDetailNode )
+				throw Exception( "Broken variable declaration", pChilds[j] );
 
-		return true;
+			out_pDetailNode = pChilds[j];
+			++i;
+		}
+		else
+		if ( pChilds[j]->mpToken->id == T_KW_output )
+		{
+			if ( out_pOutputNode )
+				throw Exception( "Broken variable declaration", pChilds[j] );
+
+			out_pOutputNode = pChilds[j];
+			++i;
+		}
 	}
 
-	return false;
-}
-
-/*
-//==================================================================
-static bool fndVarInExpr(
-		size_t &i,
-		TokNode *pNode,
-		TokNode	*pChild0,
-		TokNode	*pChild1,
-		TokNode	*pChild2
-		)
-{
-	if ( pChild0->mpToken->idType == T_TYPE_DATATYPE )
-	{
-		// 2 possible cases
-		// 1) DT (+constructor params)
-		// 2) DT CAST (+constructor params)
-
-		// always varying..
-
-		TokNode *pSpaceCast = NULL;
-
-		if ((pChild1 && pChild1->mpToken->id == T_VL_STRING) )
-		{
-			pSpaceCast = pChild1;
-			i += 1;
-		}
-
-		i += 1;
-
-		AddVariable( pNode, pChild0, NULL, pSpaceCast, NULL );
-
+	if ( out_pDTypeNode || out_pDetailNode || out_pOutputNode )
 		return true;
-	}
-
-	return false;
+	else
+		return false;
 }
-*/
 
 //==================================================================
 static bool iterateNextExpression( size_t &i, TokNode *pNode )
@@ -214,95 +184,6 @@ static bool iterateNextExpression( size_t &i, TokNode *pNode )
 }
 
 //==================================================================
-static void discoveFunctionParamsDeclaration( TokNode *pNode, size_t &i )
-{
-	TokNode	*pDTypeNode	= NULL;
-	TokNode	*pDetailNode= NULL;
-	TokNode	*pOutputNode= NULL;
-	bool	prevWasComma = false;
-
-	for (; i < pNode->mpChilds.size(); ++i)
-	{
-		TokNode *pA = pNode->GetChildTry( i + 0 );
-
-		if NOT( pA )
-			throw Exception( "Broken definition ?", pA );
-
-		// end of param list
-		if ( pA->mpToken->id == T_OP_RGT_BRACKET )
-			break;
-
-		if ( pA->mpToken->idType == T_TYPE_DATATYPE )
-		{
-			if ( pDTypeNode )
-				if ( prevWasComma )
-				{
-					pDTypeNode = NULL;
-					pDetailNode= NULL;
-					pOutputNode= NULL;
-				}
-				else
-					throw Exception( "Data type specified twice !", pA );
-
-			pDTypeNode = pA;
-		}
-		else
-		if ( pA->mpToken->idType == T_TYPE_DETAIL )
-		{
-			if ( pDetailNode )
-				if ( prevWasComma )
-				{
-					pDTypeNode = NULL;
-					pDetailNode= NULL;
-					pOutputNode= NULL;
-				}
-				else
-					throw Exception( "Detail specified twice !", pA );
-
-			pDetailNode = pA;
-		}
-		else
-		if ( pA->mpToken->id == T_KW_output )
-		{
-			if ( pOutputNode )
-				if ( prevWasComma )
-				{
-					pDTypeNode = NULL;
-					pDetailNode= NULL;
-					pOutputNode= NULL;
-				}
-				else
-					throw Exception( "'output' specified twice !", pA );
-
-			pOutputNode = pA;
-		}
-		else
-		if ( pA->mpToken->id == T_OP_COMMA )
-		{
-			// next...
-		}
-		else
-		if ( pA->mpToken->id == T_OP_SEMICOL )
-		{
-			// reset current type, etc
-			pDTypeNode = NULL;
-			pDetailNode= NULL;
-			pOutputNode= NULL;
-		}
-		else
-		if ( pA->mpToken->idType == T_TYPE_NONTERM )
-		{
-			// Note: "space cast" only for expressions ?
-			AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pA );
-		}
-		//else
-		//	throw Exception( "Broken definition ?", pA );
-
-		prevWasComma = (pA->mpToken->id == T_OP_COMMA);
-	}
-}
-
-//==================================================================
 void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	size_t i = 0;
@@ -319,13 +200,8 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 			);
 
 		if ( blkType == BLKT_SHPARAMS ||	// $$$ NOT REALLY THE SAME ..but for now, it's ok
-			 blkType == BLKT_FNPARAMS		// $$$ NOT REALLY THE SAME ..but for now, it's ok
-			 )
-		{
-			discoveFunctionParamsDeclaration( pNode, i );
-		}
-		else
-		if ( blkType == BLKT_CODEBLOCK )
+			 blkType == BLKT_FNPARAMS ||
+			 blkType == BLKT_CODEBLOCK )
 		{
 			TokNode	*pDTypeNode	= NULL;
 			TokNode	*pDetailNode= NULL;
@@ -338,18 +214,39 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 								pNode,
 								pNode->GetChildTry( i + 0 ),
 								pNode->GetChildTry( i + 1 ),
+								pNode->GetChildTry( i + 2 ),
 								pDTypeNode,
-								pDetailNode ) )
+								pDetailNode,
+								pOutputNode ) )
 				{
+					if ( pOutputNode && blkType == BLKT_CODEBLOCK )
+						throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pOutputNode );
+
 					for (; i < pNode->mpChilds.size();)
 					{
 						TokNode	*pVarName = pNode->GetChildTry( i );
 
-						if NOT( pVarName->IsNonTerminal() )
-							throw Exception( "Expecting a variable name !" );
-						
-						// no "space cast" in the declaration in the curl braces
-						AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
+						if ( pVarName->IsNonTerminal() )
+						{						
+							// no "space cast" in the declaration in the curl braces
+							AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
+						}
+						else
+						{
+							if ( blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS )
+							{
+								// functions and shader params are allowed to change type after
+								// a comma !
+
+								if ( pNode->mpToken->idType == T_TYPE_DATATYPE )
+									pDTypeNode = pNode;
+								else
+								if ( pNode->mpToken->idType == T_TYPE_DETAIL )
+									pDetailNode = pNode;
+							}
+							else
+								throw Exception( "Expecting a variable name !" );
+						}
 
 						if NOT( iterateNextExpression( i, pNode ) )
 							break;
