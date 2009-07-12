@@ -99,7 +99,7 @@ RSLCompiler::RSLCompiler(
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
 
-	InstrumentFunctionCalls( mpRoot );
+	//InstrumentFunctionCalls( mpRoot );
 
 	ResolveFunctionCalls( mpRoot );
 

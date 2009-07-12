@@ -259,6 +259,17 @@ public:
 	}
 
 	bool IsBiOp() const;
+
+	bool IsCmpOp() const
+	{
+		return
+			id == T_OP_LSEQ	||
+			id == T_OP_GEEQ	||
+			id == T_OP_LSTH	||
+			id == T_OP_GRTH	||
+			id == T_OP_EQ	||
+			id == T_OP_NEQ	;
+	}
 };
 
 //==================================================================

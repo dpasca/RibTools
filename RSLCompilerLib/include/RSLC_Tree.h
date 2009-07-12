@@ -180,22 +180,11 @@ public:
 
 	void ReplaceNode( TokNode *pNode );
 
-	Register BuildGetRegister() const
-	{
-		if ( mVarLink.IsValid() )
-		{
-			DASSERT( !mBuild_TmpReg.IsValid() );
-			return mVarLink.GetVarPtr()->mBuild_Register;
-		}
-		else
-		if ( mBuild_TmpReg.IsValid() )
-		{
-			DASSERT( !mVarLink.IsValid() );
-			return mBuild_TmpReg;
-		}
-		else
-			return Register();
-	}
+	Register BuildGetRegister() const;
+
+	VarType GetVarType() const;
+
+	bool IsVarying() const;
 };
 
 //==================================================================

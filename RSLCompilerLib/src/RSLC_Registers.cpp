@@ -8,6 +8,7 @@
 
 #include "RSLC_Tree.h"
 #include "RSLC_Registers.h"
+#include "RSLC_Operators.h"
 
 //==================================================================
 namespace RSLC
@@ -16,12 +17,12 @@ namespace RSLC
 //==================================================================
 static void solveTempOperand( TokNode *pOperand, int &io_tempIdx )
 {
-	while ( pOperand->mBuild_TmpReg.mRegIdx == -1 )
+	while ( pOperand->mBuild_TmpReg.GetRegIdx() == -1 )
 	{
 		if ( pOperand->mpToken->idType == T_TYPE_TEMPDEST )
 		{
 			// assign a temporary and get out
-			pOperand->mBuild_TmpReg.mRegIdx = io_tempIdx++;
+			pOperand->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );
 			break;
 		}
 
@@ -42,7 +43,7 @@ static void solveOperand( TokNode *pOperand, int &io_tempIdx )
 	if ( pOperand->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
 		DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() == 2 );
-		DASSERT( pOperand->mpParent->mpChilds[0]->mBuild_TmpReg.mRegIdx != -1 );
+		DASSERT( pOperand->mpParent->mpChilds[0]->mBuild_TmpReg.GetRegIdx() != -1 );
 	}
 	else
 	if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
@@ -61,6 +62,29 @@ static void solveOperand( TokNode *pOperand, int &io_tempIdx )
 	}
 }
 
+/*
+//==================================================================
+static VarType getOperandType( TokNode *pOperand )
+{
+	if ( pOperand->mVarLink.IsValid() )
+	{
+		Variable	*pVar = pOperand->mVarLink.GetVarPtr();
+
+		return pVar->GetVarType();
+	}
+	else
+	{
+		if ( pOperand->mpToken->idType == T_TYPE_TEMPDEST )
+			return pOperand->mBuild_TmpReg.GetRegIdx();
+	}
+
+	DASSERT( 0 );
+
+	return VT_UNKNOWN;
+}
+*/
+
+/*
 //==================================================================
 static void assignRegisters_expr_fcall( TokNode *pNode, int &io_tempIdx )
 {
@@ -74,6 +98,7 @@ static void assignRegisters_expr_fcall( TokNode *pNode, int &io_tempIdx )
 		solveOperand( pChild, io_tempIdx );
 	}
 }
+*/
 
 //==================================================================
 static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
@@ -83,6 +108,7 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 		assignRegisters_expr( pNode->mpChilds[i], io_tempIdx );
 	}
 
+/*
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
 		//pNode->mpToken->id == T_OP_ASSIGN
@@ -104,23 +130,27 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 			TokNode *pDestTemp = pNode->mpParent->GetChildTry( 0 );
 
 			DASSERT( pDestTemp->mpToken->idType == T_TYPE_TEMPDEST );
-			DASSERT( pDestTemp->mBuild_TmpReg.mRegIdx == -1 );
 
-			pDestTemp->mBuild_TmpReg.mRegIdx	= io_tempIdx++;
+			pDestTemp->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );
 		}
 
 		assignRegisters_expr_fcall( pBracket, io_tempIdx );
 	}
 	else
+*/
 	if ( pNode->mpToken->IsBiOp() )
 	{
 		TokNode *pOperand1 = pNode->GetChildTry( 0 );
 		TokNode *pOperand2 = pNode->GetChildTry( 1 );
 
 		// no assignment for function call as it's done above
-		if ( pNode->mpToken->id == T_OP_ASSIGN &&
+		if ( pNode->mpToken->id == T_OP_ASSIGN
+/*
+			&&
 			(pOperand1->mNodeType == TokNode::TYPE_FUNCCALL ||
-			 pOperand2->mNodeType == TokNode::TYPE_FUNCCALL ) )
+			 pOperand2->mNodeType == TokNode::TYPE_FUNCCALL )
+*/
+			 )
 			return;
 
 		if ( pOperand1 && pOperand2 )
@@ -130,9 +160,17 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 
 			if NOT( pNode->mpToken->IsAssignOp() )
 			{
-				// a one time assignment only..
-				DASSERT( pNode->mBuild_TmpReg.mRegIdx == -1 );
-				pNode->mBuild_TmpReg.mRegIdx = io_tempIdx++;
+				VarType	varType;
+				bool	isVarying;
+				SolveBiOpType(
+							pNode,
+							pOperand1,
+							pOperand2,
+							varType,
+							isVarying );
+
+				pNode->mBuild_TmpReg.SetType( varType, isVarying );
+				pNode->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );
 			}
 		}
 		else

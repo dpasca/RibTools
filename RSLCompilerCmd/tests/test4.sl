@@ -2,15 +2,14 @@
    ..this comment is part of the test 8)*/
 
 /*==========================================*/
-float dude( float a=1, bb )
+vector bobo( float d )
 {
-	float c = a + bb;
-	return c + 1;
+	vector tt = vector(0,1,0);
+	return tt + d;
 }
 
 /*==========================================*/
-surface test3( float b )
+surface test4( float b )
 {
-	Ci = dude( 180, P );
-	Oi = Os;
+	Oi = bobo( 2 );
 }

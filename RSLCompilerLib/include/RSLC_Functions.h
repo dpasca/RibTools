@@ -24,13 +24,13 @@ public:
 	TokNode			*mpParamsNode;
 	TokNode			*mpCodeBlkNode;
 	Token			*mpRetTypeTok;
-	Token			*mpNameTok;
+	TokNode			*mpNameNode;
 
 	Function() :
 		mpParamsNode(NULL),
 		mpCodeBlkNode(NULL),
 		mpRetTypeTok(NULL),
-		mpNameTok(NULL)
+		mpNameNode(NULL)
 	{
 	}
 

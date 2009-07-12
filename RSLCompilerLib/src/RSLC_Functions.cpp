@@ -42,7 +42,7 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 
 		pFunc->mpParamsNode		= pParamsBlk;
 		pFunc->mpCodeBlkNode	= pNode;
-		pFunc->mpNameTok		= pFuncName->mpToken;
+		pFunc->mpNameNode		= pFuncName;
 		pFunc->mpRetTypeTok		= pRetType->mpToken;
 
 		// params block becomes children of the function body
@@ -172,8 +172,7 @@ static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType
 	pAssgnNode->mpParent = pNode;
 
 	TokNode *pDestRegNode = pAssgnNode->AddNewChild( pDestRegTok );
-	pDestRegNode->mBuild_TmpReg.mVarType		= varType;
-	pDestRegNode->mBuild_TmpReg.mIsVarying	= isVarying;
+	pDestRegNode->mBuild_TmpReg.SetType( varType, isVarying );
 
 	pAssgnNode->AddChild( pOldNode );
 }
@@ -283,10 +282,13 @@ static TokNode *cloneBranch_BuildNodes(
 	{
 		TokNode	*pReplaceNode = oldToNewMap[ pNode->mVarLink.mpNode ];
 
-		DASSERT( pNode->mVarLink.mpNode->GetVars().size() != 0 );
-		DASSERT( pNode->mVarLink.mpNode->GetVars().size() == pReplaceNode->GetVars().size() );
+		if ( pReplaceNode )
+		{
+			DASSERT( pNode->mVarLink.mpNode->GetVars().size() != 0 );
+			DASSERT( pNode->mVarLink.mpNode->GetVars().size() == pReplaceNode->GetVars().size() );
 
-		pNewNode->mVarLink.mpNode = pReplaceNode;
+			pNewNode->mVarLink.mpNode = pReplaceNode;
+		}
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -308,25 +310,68 @@ static TokNode *cloneBranch( TokNode *pNode )
 }
 
 //==================================================================
+static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Function> &funcs )
+{
+	Function	*pFound = NULL;
+
+	TokNode *pFCallParams = pFCallNode->GetChildTry( 0 );
+	DASSERT( pFCallParams != NULL );
+
+	//for (size_t i=0; i < funcs.size(); ++i)
+	{
+		TokNode	*pCallParams = pFCallNode->GetChildTry( 0 );
+		for (size_t j=0; j < pCallParams->mpChilds.size(); ++j)
+		{
+			const TokNode	*pParam = pCallParams->mpChilds[j];
+			// assignment to temp register case
+			if ( pParam->mpToken->id == T_OP_ASSIGN )
+			{
+				const TokNode	*pParamVal = pParam->GetChildTry(0);
+				// first child is the destination..
+				if ( pParamVal->mpToken->id == T_TD_TEMPDEST )
+				{
+					printf( "Param %i, is '%s' tmp register\n",
+								j,
+								VarTypeToString( pParamVal->mBuild_TmpReg.GetVarType() )
+							);
+				}
+			}
+		}
+	}
+
+	Function	*pBestMatch = NULL;
+	size_t		convertMatches = 0;
+	size_t		exactMatches = 0;
+
+	for (size_t i=0; i < funcs.size(); ++i)
+	{
+		if ( _stricmp(
+				pFCallNode->mpToken->GetStrChar(),
+				funcs[i].mpNameNode->GetTokStr()
+				) )
+			continue;
+
+		return &funcs[i];
+	}
+
+	return NULL;
+}
+
+//==================================================================
 static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
 {
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
-		for (size_t i=0; i < funcs.size(); ++i)
+		const Function	*pFunc = matchFunctionByParams( pNode, funcs );
+		
+		if ( pFunc )
 		{
-			if ( 0 == _stricmp(
-						pNode->mpToken->GetStrChar(),
-						funcs[i].mpNameTok->GetStrChar()
-						) )
-			{
-				TokNode	*pClonedParams = cloneBranch( funcs[i].mpParamsNode );
+			TokNode	*pClonedParams = cloneBranch( pFunc->mpParamsNode );
 
-				pClonedParams->ReplaceNode( pNode );
+			pClonedParams->ReplaceNode( pNode );
 
-				DSAFE_DELETE( pNode );
-
-				return;
-			}
+			DSAFE_DELETE( pNode );
+			return;
 		}
 	}
 
@@ -337,12 +382,149 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 }
 
 //==================================================================
+static TokNode *insertAssignToNode(
+						TokNode	*pDestNode,
+						TokNode	*pSrcNode )
+{
+	TokNode	*pAssgnNode = DNEW TokNode(
+								DNEW Token( "=", T_OP_ASSIGN, T_TYPE_OPERATOR )
+								);
+
+	TokNode	*pDestClone = cloneBranch( pDestNode );
+	TokNode	*pSrcClone = cloneBranch( pSrcNode );
+
+	pAssgnNode->AddChild( pDestClone );
+	pAssgnNode->AddChild( pSrcClone );
+
+	return pAssgnNode;
+}
+
+//==================================================================
+static void instrumentFCallReturn( TokNode	*pNode, TokNode	*pDestNode )
+{
+	TokNode	*pRetNode = pNode->GetRight();
+
+	TokNode	*pAssign = insertAssignToNode(
+								pDestNode,
+								pRetNode );
+
+	pAssign->ReplaceNode( pNode );
+	DSAFE_DELETE( pNode );
+
+	pRetNode->UnlinkFromParent();
+	DSAFE_DELETE( pRetNode );
+}
+
+//==================================================================
+static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *>	&pAssignOpsToRemove )
+{
+	if ( pNode->mpToken && pNode->mpToken->id == T_KW_return )
+	{
+		TokNode	*pFnParams = pNode;
+		while ( pFnParams )
+		{
+			if ( pFnParams->GetBlockType() == BLKT_FNPARAMS )
+			{
+				break;
+			}
+			pFnParams = pFnParams->mpParent;
+		}
+
+		if ( pFnParams->mpParent->GetBlockType() != BLKT_ROOT )
+		{
+			TokNode	*pAssignOp = pFnParams->mpParent;
+
+			if ( pAssignOp->mpToken->IsAssignOp() )
+			{
+				pAssignOpsToRemove.push_back( pAssignOp );
+				instrumentFCallReturn( pNode, pAssignOp->GetChildTry(0) );
+				return;
+			}
+			else
+			{
+				// Could just delete the branch here.. maybe.. if there is no other form of output..
+			}
+		}
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		resolveFunctionReturns( pNode->mpChilds[i], pAssignOpsToRemove );
+	}
+}
+
+/*
+	=
+		b
+		(
+			{
+				return
+				+
+					1
+					2
+
+	=
+		b
+		(
+			{
+				=
+					b
+					+
+						1
+						2
+
+	(
+		{
+			=
+				b
+				+
+					1
+					2
+*/
+//==================================================================
 void ResolveFunctionCalls( TokNode *pNode )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
 
 	size_t	curIdx = 0;
 	resolveFunctionCalls( pNode, funcs, curIdx );
+
+	DVec<TokNode *>	pAssignOpsToRemove;
+	resolveFunctionReturns( pNode, pAssignOpsToRemove );
+
+	/*	pAssignOpsToRemove[i]	( = )
+			pOldDest
+			pFnParams
+				1
+				2
+	*/
+
+	for (size_t i=0; i < pAssignOpsToRemove.size(); ++i)
+	{
+		TokNode	*pOldDest = pAssignOpsToRemove[i]->GetChildTry( 0 );
+		TokNode	*pFnParams = pAssignOpsToRemove[i]->GetChildTry( 1 );
+
+		DASSERT( pFnParams->GetBlockType() == BLKT_FNPARAMS );
+
+		pOldDest->UnlinkFromParent();
+		DSAFE_DELETE( pOldDest );
+
+	/*	pAssignOpsToRemove[i]	( = )
+			pFnParams
+				1
+				2
+	*/
+
+		pFnParams->ReplaceNode( pAssignOpsToRemove[i] );
+
+		pAssignOpsToRemove[i]->mpChilds.clear();
+		DSAFE_DELETE( pAssignOpsToRemove[i] );
+
+	/*	pFnParams	( <- pAssignOpsToRemove[i]	( = ) )
+			1
+			2
+	*/
+	}
 }
 
 //==================================================================
@@ -350,7 +532,7 @@ static void getRegName( const Register &reg, char *pOutBuff, size_t maxOutSize )
 {
 	char	regBase[16] = {0};
 
-	switch ( reg.mVarType )
+	switch ( reg.GetVarType() )
 	{
 	case VT_FLOAT:	regBase[0] = 's'; break;
 	case VT_POINT:	regBase[0] = 'v'; break;
@@ -358,16 +540,18 @@ static void getRegName( const Register &reg, char *pOutBuff, size_t maxOutSize )
 	case VT_STRING:	regBase[0] = 's'; DASSERT( 0 ); break;
 	case VT_VECTOR:	regBase[0] = 'v'; break;
 	case VT_NORMAL:	regBase[0] = 'v'; break;
-	case VT_MATRIX:	regBase[0] = 'v'; DASSERT( 0 ); break;
+	case VT_MATRIX:	regBase[0] = 'm'; DASSERT( 0 ); break;
+	case VT_BOOL:	regBase[0] = 'b'; break;
 	default:
-		DASSERT( 0 );
+		strcpy_s( regBase, "UNK_" );
+		//DASSERT( 0 );
 		break;
 	}
 
-	if NOT( reg.mIsVarying )
+	if NOT( reg.IsVarying() )
 		strcat_s( regBase, "u" );
 
-	sprintf_s( pOutBuff, maxOutSize, "$%s%i", regBase, reg.mRegIdx );
+	sprintf_s( pOutBuff, maxOutSize, "$%s%i", regBase, reg.GetRegIdx() );
 }
 
 //==================================================================
@@ -526,11 +710,11 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 		{
 			fprintf_s( pFile, "%s %s\n",
 							func.mpRetTypeTok->GetStrChar(),
-								func.mpNameTok->GetStrChar() );
+								func.mpNameNode->GetTokStr() );
 		}
 		else
 		{
-			fprintf_s( pFile, "function %s\n", func.mpNameTok->GetStrChar() );
+			fprintf_s( pFile, "function %s\n", func.mpNameNode->GetTokStr() );
 		}
 
 		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)

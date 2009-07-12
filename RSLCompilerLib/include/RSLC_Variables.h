@@ -17,34 +17,54 @@ namespace RSLC
 
 //==================================================================
 class TokNode;
+class Function;
 
 //==================================================================
 enum VarType
 {
-	VT_FLOAT,
-	VT_POINT,
-	VT_COLOR,
-	VT_STRING,
-	VT_VECTOR,
-	VT_NORMAL,
-	VT_MATRIX,
+	VT_UNKNOWN	,
+	VT_FLOAT	,
+	VT_POINT	,
+	VT_COLOR	,
+	VT_STRING	,
+	VT_VECTOR	,
+	VT_NORMAL	,
+	VT_MATRIX	,
+	VT_BOOL		,
 	VT_N
 };
 
 //==================================================================
 class Register
 {
-public:
 	VarType			mVarType;
 	bool			mIsVarying;
 	int				mRegIdx;
 
+public:
 	Register() :
-		mVarType(VT_FLOAT),
+		mVarType(VT_UNKNOWN),
 		mIsVarying(false),
 		mRegIdx(-1)
 	{
 	}
+
+	void SetType( VarType vtype, bool isVarying )
+	{
+		DASSERT( mVarType == VT_UNKNOWN && mIsVarying == false );
+		mVarType	= vtype;
+		mIsVarying	= isVarying;
+	}
+
+	void SetRegIdx( int regIdx )
+	{
+		DASSERT( mRegIdx == -1 );
+		mRegIdx		= regIdx;
+	}
+
+	VarType	GetVarType() const	{ return mVarType; }
+	bool	IsVarying() const	{ return mIsVarying; }
+	int		GetRegIdx() const	{ return mRegIdx; }
 
 	bool IsValid() const { return mRegIdx != -1; }
 };
@@ -60,6 +80,7 @@ public:
 	Token			*mpSpaceCastTok;
 	Token			*mpDefNameTok;
 	DVec<Token*>	mpDefValToks;
+	VarType			mVarType;
 	bool			mIsVarying;
 	bool			mIsLValue;
 
@@ -72,6 +93,7 @@ public:
 		mpDetailTok(NULL),
 		mpSpaceCastTok(NULL),
 		mpDefNameTok(NULL),
+		mVarType(VT_UNKNOWN),
 		mIsVarying(true),
 		mIsLValue(false)
 	{
@@ -84,6 +106,7 @@ public:
 		mpSpaceCastTok	(	from.mpSpaceCastTok		),
 		mpDefNameTok	(	from.mpDefNameTok		),
 		mpDefValToks	(	from.mpDefValToks		),
+		mVarType		(	from.mVarType			),
 		mIsVarying		(	from.mIsVarying			),
 		mIsLValue		(	from.mIsLValue			)
 	{
@@ -104,7 +127,15 @@ public:
 	}
 
 	void BuildSetupRegister( int &io_regIdx );
+
+	VarType GetVarType() const;
+
+	bool IsVarying() const;
+
 };
+
+//==================================================================
+const char *VarTypeToString( VarType type );
 
 //==================================================================
 void AddStandardVariables( TokNode *pNode );

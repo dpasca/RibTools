@@ -17,6 +17,13 @@ class TokNode;
 
 void ReparentOperators( TokNode *pNode );
 
+void SolveBiOpType(
+					const TokNode *pOperator,
+					const TokNode *pOperand1,
+					const TokNode *pOperand2,
+					VarType &out_varType,
+					bool &out_isVarying );
+
 //==================================================================
 }
 

@@ -8,10 +8,141 @@
 
 #include "RSLC_Tree.h"
 #include "RSLC_Operators.h"
+#include "RSLC_Exceptions.h"
 
 //==================================================================
 namespace RSLC
 {
+
+//==================================================================
+static bool areTypesCompatible( VarType vt1, VarType vt2 )
+{
+	if ( vt1 == vt2 )
+		return true;
+
+	if (
+		(vt1 == VT_POINT	&& vt2 == VT_VECTOR	) ||
+		(vt1 == VT_POINT	&& vt2 == VT_NORMAL	) ||
+		(vt1 == VT_VECTOR	&& vt2 == VT_POINT	)||
+		(vt1 == VT_VECTOR	&& vt2 == VT_NORMAL	) ||
+		(vt1 == VT_NORMAL	&& vt2 == VT_POINT	) ||
+		(vt1 == VT_NORMAL	&& vt2 == VT_VECTOR	)
+		)
+		return true;
+
+	return false;
+}
+
+//==================================================================
+static bool isVector( VarType vt1 )
+{
+	return vt1 == VT_POINT || vt1 == VT_VECTOR || vt1 == VT_NORMAL;
+}
+
+//==================================================================
+static bool isScalar( VarType vt1 )
+{
+	return vt1 == VT_FLOAT;
+}
+
+//==================================================================
+static bool isMatrix( VarType vt1 )
+{
+	return vt1 == VT_MATRIX;
+}
+
+//==================================================================
+void SolveBiOpType(
+					const TokNode *pOperator,
+					const TokNode *pOperand1,
+					const TokNode *pOperand2,
+					VarType &out_varType,
+					bool &out_isVarying )
+{
+	out_varType		= VT_UNKNOWN;
+	out_isVarying	= false;
+
+	DASSERT( pOperator->mpToken->IsBiOp() );
+
+	VarType	vt1 = pOperand1->GetVarType();
+	VarType	vt2 = pOperand2->GetVarType();
+
+	DASSERT( vt1 != VT_UNKNOWN && vt2 != VT_UNKNOWN );
+
+	if ( (vt1 == VT_STRING) != (vt2 == VT_STRING) )
+		throw Exception( "Strings can only operate with other strings !", pOperator );
+
+	if ( vt1 == VT_STRING )
+	{
+		// strings are always uniform !!!
+		DASSERT( pOperand1->IsVarying() == false );
+		DASSERT( pOperand2->IsVarying() == false );
+
+		if ( pOperator->mpToken->id != T_OP_ASSIGN ||
+			 pOperator->mpToken->id != T_OP_EQ ||
+			 pOperator->mpToken->id != T_OP_NEQ
+			 )
+			throw Exception( "Invalid operator between strings !", pOperator );
+	}
+
+	// varying is easy.. out is varying if even one of the two is
+	out_isVarying = (pOperand1->IsVarying() || pOperand2->IsVarying() );
+
+	// handle comparison operators
+	if ( pOperator->mpToken->IsCmpOp() )
+	{
+		if NOT( areTypesCompatible( vt1, vt2 ) )
+			throw Exception( "Incompatible types in comparison", pOperator );
+
+		out_varType = VT_BOOL;
+	}
+
+	switch ( pOperator->mpToken->id )
+	{
+	case T_OP_ASSIGN	:
+	case T_OP_PLUSASS	:
+	case T_OP_MINUSASS	:
+	case T_OP_MULASS	:
+	case T_OP_PLUS		:
+	case T_OP_MINUS		:
+	case T_OP_MUL		:
+		if ( areTypesCompatible( vt1, vt2 ) )	out_varType = vt1; else
+		if ( isScalar( vt1 ) && isVector( vt2 ) ) out_varType = vt2; else
+		if ( isVector( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
+		if ( isScalar( vt1 ) && isMatrix( vt2 ) ) out_varType = vt2; else
+		if ( isMatrix( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
+		if ( isVector( vt1 ) && isMatrix( vt2 ) ) out_varType = vt1; else
+		if ( isMatrix( vt1 ) && isVector( vt2 ) ) out_varType = vt2;
+		break;
+
+	case T_OP_DIVASS	:
+	case T_OP_DIV		:
+		if ( areTypesCompatible( vt1, vt2 ) )	out_varType = vt1; else
+		if ( isVector( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
+		if ( isMatrix( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
+		if ( isMatrix( vt1 ) && isVector( vt2 ) ) out_varType = vt1;
+		break;
+	
+	case T_OP_POW		:
+		if ( isScalar( vt1 ) && isScalar( vt2 ) ) out_varType = vt1;
+		break;
+
+	case T_OP_DOT		:
+		if ( isVector( vt1 ) && isVector( vt2 ) ) out_varType = VT_FLOAT;
+		break;
+
+	case T_OP_LOGIC_AND	:
+	case T_OP_LOGIC_OR	:
+	default:
+		DASSERT( 0 );
+		break;
+	}
+
+	if ( out_varType == VT_UNKNOWN )
+	{
+		throw Exception( "Could not resolve operation !", pOperator );
+	}
+}
 
 //==================================================================
 static void reparentBiOperators(

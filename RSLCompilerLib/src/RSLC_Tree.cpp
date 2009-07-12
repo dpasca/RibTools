@@ -183,6 +183,7 @@ void TokNode::ReplaceNode( TokNode *pNode )
 		{
 			pNode->mpParent->mpChilds[i] = this;
 			mpParent = pNode->mpParent;
+			pNode->mpParent = NULL;
 			return;
 		}
 	}
@@ -218,6 +219,63 @@ TokNode::TokNode( TokNode *pObj ) :
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
 #endif
+}
+
+//==================================================================
+RSLC::Register TokNode::BuildGetRegister() const
+{
+	if ( mVarLink.IsValid() )
+	{
+		DASSERT( !mBuild_TmpReg.IsValid() );
+		return mVarLink.GetVarPtr()->mBuild_Register;
+	}
+	else
+	if ( mBuild_TmpReg.IsValid() )
+	{
+		DASSERT( !mVarLink.IsValid() );
+		return mBuild_TmpReg;
+	}
+	else
+		return Register();
+}
+
+//==================================================================
+RSLC::VarType TokNode::GetVarType() const
+{
+	if ( mpToken->idType == T_TYPE_VALUE )
+	{
+		if ( mpToken->id == T_VL_NUMBER )
+			return VT_FLOAT;
+		else
+		if ( mpToken->id == T_VL_STRING )
+			return VT_STRING;
+
+		DASSERT( 0 );
+		return VT_UNKNOWN;
+	}
+	else
+	if ( mVarLink.IsValid() )
+		return mVarLink.GetVarPtr()->GetVarType();
+	else
+	{
+		DASSERT( mBuild_TmpReg.GetVarType() != VT_UNKNOWN );
+		return mBuild_TmpReg.GetVarType();
+	}
+}
+
+//==================================================================
+bool TokNode::IsVarying() const
+{
+	if ( mpToken->idType == T_TYPE_VALUE )
+		return false;
+	else
+	if ( mVarLink.IsValid() )
+		return mVarLink.GetVarPtr()->IsVarying();
+	else
+	{
+		DASSERT( mBuild_TmpReg.GetVarType() != VT_UNKNOWN );
+		return mBuild_TmpReg.IsVarying();
+	}
 }
 
 //==================================================================

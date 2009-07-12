@@ -234,3 +234,12 @@ color	environment( string name[channel]; texture coordinates, [parameterlist] ){
 float	shadow( string name[channel]; texture coordinates[, parameterlist] ){}
 float	textureinfo( string texturename, dataname; output type variable ){}
 */
+
+void __vector_ctor_f3( output vector v, float x, float y, float z );
+
+vector vector( float x, float y, float z )
+{
+	vector tmp;
+	__vector_ctor_f3( tmp, x+1, y, z );
+	return tmp;
+}

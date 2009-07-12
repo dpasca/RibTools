@@ -34,13 +34,58 @@ static VarType varTypeFromToken( Token *pTok )
 }
 
 //==================================================================
+const char *VarTypeToString( VarType type )
+{
+	switch ( type )
+	{
+	case VT_FLOAT	: return "float"	;
+	case VT_POINT	: return "point"	;
+	case VT_COLOR	: return "color"	;
+	case VT_STRING	: return "string"	;
+	case VT_VECTOR	: return "vector"	;
+	case VT_NORMAL	: return "normal"	;
+	case VT_MATRIX	: return "matrix"	;
+	case VT_BOOL	: return "bool"		;
+
+	default:
+	case VT_UNKNOWN	: return "UNKNOWN"	;
+	}
+}
+
+//==================================================================
 void Variable::BuildSetupRegister( int &io_regIdx )
 {
 	DASSERT( !mBuild_Register.IsValid() );
 
-	mBuild_Register.mIsVarying	= mIsVarying;
-	mBuild_Register.mVarType	= varTypeFromToken( mpDTypeTok );
-	mBuild_Register.mRegIdx		= io_regIdx++;
+	mBuild_Register.SetType( mVarType, mIsVarying );
+	mBuild_Register.SetRegIdx( io_regIdx++ );
+}
+
+//==================================================================
+RSLC::VarType Variable::GetVarType() const
+{
+	if ( mBuild_Register.IsValid() )
+	{
+		DASSERT( mBuild_Register.GetVarType() == mVarType );
+		return mBuild_Register.GetVarType();
+	}
+	else
+	{
+
+		return mVarType;
+	}
+}
+
+//==================================================================
+bool Variable::IsVarying() const
+{
+	if ( mBuild_Register.IsValid() )
+	{
+		DASSERT( mBuild_Register.IsVarying() == mIsVarying );
+		return mBuild_Register.IsVarying();
+	}
+	else
+		return mIsVarying;
 }
 
 //==================================================================
@@ -100,6 +145,8 @@ static void AddVariable(
 		else
 			pVar->mIsVarying = true;
 	}
+
+	pVar->mVarType = varTypeFromToken( pVar->mpDTypeTok );
 }
 
 //==================================================================
@@ -184,6 +231,18 @@ static bool iterateNextExpression( size_t &i, TokNode *pNode )
 }
 
 //==================================================================
+static Function *findFunctionByNameNode( DVec<Function> &funcs, TokNode *pFindNode )
+{
+	for (size_t i=0; i < funcs.size(); ++i)
+	{
+		if ( funcs[i].mpNameNode == pFindNode )
+			return &funcs[i];
+	}
+
+	return NULL;
+}
+
+//==================================================================
 void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	size_t i = 0;
@@ -206,7 +265,7 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 			TokNode	*pDTypeNode	= NULL;
 			TokNode	*pDetailNode= NULL;
 			TokNode	*pOutputNode= NULL;
-
+			
 			for (; i < pNode->mpChilds.size(); ++i)
 			{
 				while ( fndVarDefBeginInBlock(
@@ -244,8 +303,8 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 								if ( pNode->mpToken->idType == T_TYPE_DETAIL )
 									pDetailNode = pNode;
 							}
-							else
-								throw Exception( "Expecting a variable name !" );
+							//else
+							//	throw Exception( "Expecting a variable name !" );
 						}
 
 						if NOT( iterateNextExpression( i, pNode ) )
