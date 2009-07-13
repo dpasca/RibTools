@@ -5,7 +5,8 @@
 vector bobo( float d )
 {
 	vector tt = vector(0,1,0);
-	return tt + d;
+
+	return tt + vector(0,0,2) + d;
 }
 
 /*==========================================*/

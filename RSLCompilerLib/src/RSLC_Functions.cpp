@@ -271,7 +271,7 @@ static TokNode *cloneBranch_BuildNodes(
 								TokNode *pDstParent,
 								std::map<TokNode*,TokNode*>	&oldToNewMap )
 {
-	TokNode	*pNewNode = DNEW TokNode( pNode );
+	TokNode	*pNewNode = DNEW TokNode( *pNode );
 
 	oldToNewMap[pNode] = pNewNode;
 
@@ -358,7 +358,7 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 }
 
 //==================================================================
-static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
+static bool resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
 {
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
@@ -370,57 +370,74 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 
 			pClonedParams->ReplaceNode( pNode );
 
+			AddVariable(
+				pClonedParams->mpParent,
+				DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
+				DNEW TokNode( DNEW Token( "varying", T_DE_varying, T_TYPE_DETAIL ) ),	// %%% forced varying for now !
+				NULL,
+				pClonedParams );
+
+/*
+			pClonedParams->mBuild_TmpReg.SetType(
+								VarTypeFromToken( pFunc->mpRetTypeTok ),
+								true );	// force varying for now..
+*/
+
 			DSAFE_DELETE( pNode );
-			return;
+			return true;
 		}
 	}
 
+	bool resolvedSomething = false;
+
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		resolveFunctionCalls( pNode->mpChilds[i], funcs, i );
+		resolvedSomething = resolveFunctionCalls( pNode->mpChilds[i], funcs, i );
 	}
+
+	return resolvedSomething;
 }
 
 //==================================================================
 static TokNode *insertAssignToNode(
-						TokNode	*pDestNode,
+						const VarLink	&destVLink,
 						TokNode	*pSrcNode )
 {
 	TokNode	*pAssgnNode = DNEW TokNode(
 								DNEW Token( "=", T_OP_ASSIGN, T_TYPE_OPERATOR )
 								);
 
-	TokNode	*pDestClone = cloneBranch( pDestNode );
+	TokNode	*pNewDest = DNEW TokNode( DNEW Token( "ReturnDest", T_TD_TEMPDEST, T_TYPE_TEMPDEST ) );
+	pNewDest->mVarLink = destVLink;
+
 	TokNode	*pSrcClone = cloneBranch( pSrcNode );
 
-	pAssgnNode->AddChild( pDestClone );
+	pAssgnNode->AddChild( pNewDest );
 	pAssgnNode->AddChild( pSrcClone );
 
 	return pAssgnNode;
 }
 
 //==================================================================
-static void instrumentFCallReturn( TokNode	*pNode, TokNode	*pDestNode )
+static void instrumentFCallReturn( TokNode *pReturnNode, const VarLink	&destVLink )
 {
-	TokNode	*pRetNode = pNode->GetRight();
+	TokNode	*pRetNode = pReturnNode->GetRight();
 
-	TokNode	*pAssign = insertAssignToNode(
-								pDestNode,
-								pRetNode );
+	TokNode	*pAssign = insertAssignToNode( destVLink, pRetNode );
 
-	pAssign->ReplaceNode( pNode );
-	DSAFE_DELETE( pNode );
+	pAssign->ReplaceNode( pReturnNode );
+	DSAFE_DELETE( pReturnNode );
 
 	pRetNode->UnlinkFromParent();
 	DSAFE_DELETE( pRetNode );
 }
 
 //==================================================================
-static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *>	&pAssignOpsToRemove )
+static void resolveFunctionReturns( TokNode *pReturnNode, DVec<TokNode *> &pAssignOpsToRemove )
 {
-	if ( pNode->mpToken && pNode->mpToken->id == T_KW_return )
+	if ( pReturnNode->mpToken && pReturnNode->mpToken->id == T_KW_return )
 	{
-		TokNode	*pFnParams = pNode;
+		TokNode	*pFnParams = pReturnNode;
 		while ( pFnParams )
 		{
 			if ( pFnParams->GetBlockType() == BLKT_FNPARAMS )
@@ -429,6 +446,8 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *>	&pAssignOpsT
 			}
 			pFnParams = pFnParams->mpParent;
 		}
+		DASSERT( pFnParams->GetBlockType() == BLKT_FNPARAMS );
+/*
 
 		if ( pFnParams->mpParent->GetBlockType() != BLKT_ROOT )
 		{
@@ -437,7 +456,7 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *>	&pAssignOpsT
 			if ( pAssignOp->mpToken->IsAssignOp() )
 			{
 				pAssignOpsToRemove.push_back( pAssignOp );
-				instrumentFCallReturn( pNode, pAssignOp->GetChildTry(0) );
+				instrumentFCallReturn( pReturnNode, pAssignOp->GetChildTry(0) );
 				return;
 			}
 			else
@@ -445,11 +464,14 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *>	&pAssignOpsT
 				// Could just delete the branch here.. maybe.. if there is no other form of output..
 			}
 		}
+*/
+		instrumentFCallReturn( pReturnNode, pFnParams->mVarLink );
+		return;
 	}
 
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	for (size_t i=0; i < pReturnNode->mpChilds.size(); ++i)
 	{
-		resolveFunctionReturns( pNode->mpChilds[i], pAssignOpsToRemove );
+		resolveFunctionReturns( pReturnNode->mpChilds[i], pAssignOpsToRemove );
 	}
 }
 
@@ -486,45 +508,52 @@ void ResolveFunctionCalls( TokNode *pNode )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
 
-	size_t	curIdx = 0;
-	resolveFunctionCalls( pNode, funcs, curIdx );
+	bool	resolvedCalls;
 
 	DVec<TokNode *>	pAssignOpsToRemove;
-	resolveFunctionReturns( pNode, pAssignOpsToRemove );
+	//do {
 
-	/*	pAssignOpsToRemove[i]	( = )
-			pOldDest
-			pFnParams
-				1
-				2
-	*/
+		size_t	curIdx = 0;
+		resolvedCalls = resolveFunctionCalls( pNode, funcs, curIdx );
 
-	for (size_t i=0; i < pAssignOpsToRemove.size(); ++i)
-	{
-		TokNode	*pOldDest = pAssignOpsToRemove[i]->GetChildTry( 0 );
-		TokNode	*pFnParams = pAssignOpsToRemove[i]->GetChildTry( 1 );
+		pAssignOpsToRemove.clear();
+		resolveFunctionReturns( pNode, pAssignOpsToRemove );
 
-		DASSERT( pFnParams->GetBlockType() == BLKT_FNPARAMS );
+		/*	pAssignOpsToRemove[i]	( = )
+				pOldDest
+				pFnParams
+					1
+					2
+		*/
+#if 0
+		for (size_t i=0; i < pAssignOpsToRemove.size(); ++i)
+		{
+			TokNode	*pOldDest = pAssignOpsToRemove[i]->GetChildTry( 0 );
+			TokNode	*pFnParams = pAssignOpsToRemove[i]->GetChildTry( 1 );
 
-		pOldDest->UnlinkFromParent();
-		DSAFE_DELETE( pOldDest );
+			DASSERT( pFnParams->GetBlockType() == BLKT_FNPARAMS );
 
-	/*	pAssignOpsToRemove[i]	( = )
-			pFnParams
-				1
-				2
-	*/
+			pOldDest->UnlinkFromParent();
+			DSAFE_DELETE( pOldDest );
 
-		pFnParams->ReplaceNode( pAssignOpsToRemove[i] );
+			/*	pAssignOpsToRemove[i]	( = )
+					pFnParams
+						1
+						2
+			*/
 
-		pAssignOpsToRemove[i]->mpChilds.clear();
-		DSAFE_DELETE( pAssignOpsToRemove[i] );
+			pFnParams->ReplaceNode( pAssignOpsToRemove[i] );
 
-	/*	pFnParams	( <- pAssignOpsToRemove[i]	( = ) )
-			1
-			2
-	*/
-	}
+			pAssignOpsToRemove[i]->mpChilds.clear();
+			DSAFE_DELETE( pAssignOpsToRemove[i] );
+
+			/*	pFnParams	( <- pAssignOpsToRemove[i]	( = ) )
+					1
+					2
+			*/
+		}
+#endif
+	//} while ( resolvedCalls );
 }
 
 //==================================================================

@@ -82,7 +82,7 @@ public:
 public:
 	TokNode( Token *pObj );
 
-	TokNode( TokNode *pObj );
+	TokNode( const TokNode &from );
 
 	~TokNode()
 	{

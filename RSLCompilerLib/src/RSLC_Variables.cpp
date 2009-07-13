@@ -15,7 +15,7 @@ namespace RSLC
 {
 
 //==================================================================
-static VarType varTypeFromToken( Token *pTok )
+VarType VarTypeFromToken( const Token *pTok )
 {
 	DASSERT( pTok->idType == T_TYPE_DATATYPE );
 
@@ -89,12 +89,12 @@ bool Variable::IsVarying() const
 }
 
 //==================================================================
-static void AddVariable(
-					TokNode *pNode,
-					TokNode *pDTypeNode,
-					TokNode *pDetailNode,
-					TokNode *pSpaceCastTok,
-					TokNode *pNameNode )
+void AddVariable(
+			TokNode *pNode,
+			TokNode *pDTypeNode,
+			TokNode *pDetailNode,
+			TokNode *pSpaceCastTok,
+			TokNode *pNameNode )
 {
 	// setup the var link
 	pNameNode->mVarLink.mVarIdx = pNode->GetVars().size();
@@ -146,7 +146,7 @@ static void AddVariable(
 			pVar->mIsVarying = true;
 	}
 
-	pVar->mVarType = varTypeFromToken( pVar->mpDTypeTok );
+	pVar->mVarType = VarTypeFromToken( pVar->mpDTypeTok );
 }
 
 //==================================================================

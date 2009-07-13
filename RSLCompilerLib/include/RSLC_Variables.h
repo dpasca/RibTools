@@ -135,6 +135,15 @@ public:
 };
 
 //==================================================================
+void AddVariable(
+			TokNode *pNode,
+			TokNode *pDTypeNode,
+			TokNode *pDetailNode,
+			TokNode *pSpaceCastTok,
+			TokNode *pNameNode );
+
+//==================================================================
+VarType VarTypeFromToken( const Token *pTok );
 const char *VarTypeToString( VarType type );
 
 //==================================================================

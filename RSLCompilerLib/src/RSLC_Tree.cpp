@@ -205,16 +205,16 @@ TokNode::TokNode( Token *pObj ) :
 }
 
 //==================================================================
-TokNode::TokNode( TokNode *pObj ) :
-	mpToken(pObj->mpToken),
-	mVariables		(pObj->mVariables),
-	mFunctions		(pObj->mFunctions),
-	mpParent(NULL),
-	mNodeType(pObj->mNodeType),
-	mBlockType(pObj->mBlockType),
-	mBlockID(0),
-	mVarLink(pObj->mVarLink),
-	mBuild_TmpReg(pObj->mBuild_TmpReg)
+TokNode::TokNode( const TokNode &from ) :
+	mpToken			(from.mpToken),
+	mVariables		(from.mVariables),
+	mFunctions		(from.mFunctions),
+	mpParent		(NULL),
+	mNodeType		(from.mNodeType),
+	mBlockType		(from.mBlockType),
+	mBlockID		(0),
+	mVarLink		(from.mVarLink),
+	mBuild_TmpReg	(from.mBuild_TmpReg)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
