@@ -67,6 +67,7 @@ public:
 	int		GetRegIdx() const	{ return mRegIdx; }
 
 	bool IsValid() const { return mRegIdx != -1; }
+	bool IsAssigned() const { return mRegIdx != -1; }
 };
 
 //==================================================================
@@ -126,7 +127,8 @@ public:
 			return NULL;
 	}
 
-	void BuildSetupRegister( int &io_regIdx );
+	void AssignRegister( int &io_regIdx );
+	bool IsRegisterAssigned() const;
 
 	VarType GetVarType() const;
 

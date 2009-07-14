@@ -240,6 +240,6 @@ void __vector_ctor_f3( output vector v, float x, float y, float z );
 vector vector( float x, float y, float z )
 {
 	vector tmp;
-	__vector_ctor_f3( tmp, x+1, y, z );
+	__vector_ctor_f3( tmp, x, y, z );
 	return tmp;
 }

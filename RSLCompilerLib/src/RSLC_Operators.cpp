@@ -40,6 +40,12 @@ static bool isVector( VarType vt1 )
 }
 
 //==================================================================
+static bool isColorr( VarType vt1 )
+{
+	return vt1 == VT_COLOR;
+}
+
+//==================================================================
 static bool isScalar( VarType vt1 )
 {
 	return vt1 == VT_FLOAT;
@@ -108,7 +114,9 @@ void SolveBiOpType(
 	case T_OP_MUL		:
 		if ( areTypesCompatible( vt1, vt2 ) )	out_varType = vt1; else
 		if ( isScalar( vt1 ) && isVector( vt2 ) ) out_varType = vt2; else
+		if ( isScalar( vt1 ) && isColorr( vt2 ) ) out_varType = vt2; else
 		if ( isVector( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
+		if ( isColorr( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
 		if ( isScalar( vt1 ) && isMatrix( vt2 ) ) out_varType = vt2; else
 		if ( isMatrix( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
 		if ( isVector( vt1 ) && isMatrix( vt2 ) ) out_varType = vt1; else
@@ -119,6 +127,7 @@ void SolveBiOpType(
 	case T_OP_DIV		:
 		if ( areTypesCompatible( vt1, vt2 ) )	out_varType = vt1; else
 		if ( isVector( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
+		if ( isColorr( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
 		if ( isMatrix( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
 		if ( isMatrix( vt1 ) && isVector( vt2 ) ) out_varType = vt1;
 		break;
@@ -140,7 +149,13 @@ void SolveBiOpType(
 
 	if ( out_varType == VT_UNKNOWN )
 	{
-		throw Exception( "Could not resolve operation !", pOperator );
+		throw Exception(
+			DUT::SSPrintFS(
+					"Could not resolve operation. Incompatible types [ '%s' %s '%s' ] ?",
+						VarTypeToString( vt1 ),
+						pOperator->GetTokStr(),
+						VarTypeToString( vt2 ) )
+					, pOperator );
 	}
 }
 

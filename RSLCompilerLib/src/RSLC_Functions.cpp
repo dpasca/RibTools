@@ -419,7 +419,7 @@ static TokNode *insertAssignToNode(
 }
 
 //==================================================================
-static void instrumentFCallReturn( TokNode *pReturnNode, const VarLink	&destVLink )
+static TokNode *instrumentFCallReturn( TokNode *pReturnNode, const VarLink	&destVLink )
 {
 	TokNode	*pRetNode = pReturnNode->GetRight();
 
@@ -430,14 +430,18 @@ static void instrumentFCallReturn( TokNode *pReturnNode, const VarLink	&destVLin
 
 	pRetNode->UnlinkFromParent();
 	DSAFE_DELETE( pRetNode );
+
+	return pAssign;
 }
 
 //==================================================================
-static void resolveFunctionReturns( TokNode *pReturnNode, DVec<TokNode *> &pAssignOpsToRemove )
+static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsToRemove )
 {
-	if ( pReturnNode->mpToken && pReturnNode->mpToken->id == T_KW_return )
+	if ( pNode->mpToken && pNode->mpToken->id == T_KW_return )
 	{
-		TokNode	*pFnParams = pReturnNode;
+		TokNode *pReturnNode = pNode;
+
+		TokNode	*pFnParams = pReturnNode;	// start from "return"
 		while ( pFnParams )
 		{
 			if ( pFnParams->GetBlockType() == BLKT_FNPARAMS )
@@ -447,31 +451,17 @@ static void resolveFunctionReturns( TokNode *pReturnNode, DVec<TokNode *> &pAssi
 			pFnParams = pFnParams->mpParent;
 		}
 		DASSERT( pFnParams->GetBlockType() == BLKT_FNPARAMS );
-/*
 
-		if ( pFnParams->mpParent->GetBlockType() != BLKT_ROOT )
-		{
-			TokNode	*pAssignOp = pFnParams->mpParent;
+		pNode = instrumentFCallReturn( pReturnNode, pFnParams->mVarLink );
 
-			if ( pAssignOp->mpToken->IsAssignOp() )
-			{
-				pAssignOpsToRemove.push_back( pAssignOp );
-				instrumentFCallReturn( pReturnNode, pAssignOp->GetChildTry(0) );
-				return;
-			}
-			else
-			{
-				// Could just delete the branch here.. maybe.. if there is no other form of output..
-			}
-		}
-*/
-		instrumentFCallReturn( pReturnNode, pFnParams->mVarLink );
-		return;
+		// pNode points to the next node to be used to condinue dig recursively
+		pNode = pNode->GetChildTry( 1 );
+		DASSERT( pNode != NULL );
 	}
 
-	for (size_t i=0; i < pReturnNode->mpChilds.size(); ++i)
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		resolveFunctionReturns( pReturnNode->mpChilds[i], pAssignOpsToRemove );
+		resolveFunctionReturns( pNode->mpChilds[i], pAssignOpsToRemove );
 	}
 }
 
@@ -685,6 +675,16 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 		if ( pOperand1 && pOperand2 )
 		{
+/*
+			VarType	opResVarType;
+			bool	opResIsVarying;
+			SolveBiOpType( pNode, pOperand1, pOperand2, opResVarType, opResIsVarying );
+
+			DASSERT( pNode->mVarLink.IsValid() == false );
+
+			pNode->mBuild_TmpReg.SetType( opResVarType, opResIsVarying );
+*/
+
 			char	op1NameBuff[32];
 			char	op2NameBuff[32];
 

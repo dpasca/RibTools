@@ -53,12 +53,18 @@ const char *VarTypeToString( VarType type )
 }
 
 //==================================================================
-void Variable::BuildSetupRegister( int &io_regIdx )
+void Variable::AssignRegister( int &io_regIdx )
 {
 	DASSERT( !mBuild_Register.IsValid() );
 
 	mBuild_Register.SetType( mVarType, mIsVarying );
 	mBuild_Register.SetRegIdx( io_regIdx++ );
+}
+
+//==================================================================
+bool Variable::IsRegisterAssigned() const
+{
+	return mBuild_Register.IsAssigned();
 }
 
 //==================================================================

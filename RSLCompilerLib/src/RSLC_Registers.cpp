@@ -53,7 +53,7 @@ static void solveOperand( TokNode *pOperand, int &io_tempIdx )
 			Variable	*pVar = pOperand->mVarLink.GetVarPtr();
 
 			if NOT( pVar->mBuild_Register.IsValid() )
-				pVar->BuildSetupRegister( io_tempIdx );
+				pVar->AssignRegister( io_tempIdx );
 		}
 	}
 	else
@@ -108,75 +108,31 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 		assignRegisters_expr( pNode->mpChilds[i], io_tempIdx );
 	}
 
-/*
-	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
-	{
-		//pNode->mpToken->id == T_OP_ASSIGN
-		size_t	nextChild = 0;
-		TokNode *pChild = pNode->GetChildTry( nextChild );
-		if ( pChild && pChild->mpToken->id == T_VL_STRING )
-		{
-			pChild = NULL;
-			++nextChild;
-		}
-
-		TokNode *pBracket = pNode->GetChildTry( nextChild );
-
-		DASSERT( pBracket->mpToken->id == T_OP_LFT_BRACKET );
-
-		if ( pNode->mpParent &&
-			 pNode->mpParent->mpToken->IsAssignOp() )
-		{
-			TokNode *pDestTemp = pNode->mpParent->GetChildTry( 0 );
-
-			DASSERT( pDestTemp->mpToken->idType == T_TYPE_TEMPDEST );
-
-			pDestTemp->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );
-		}
-
-		assignRegisters_expr_fcall( pBracket, io_tempIdx );
-	}
-	else
-*/
 	if ( pNode->mpToken->IsBiOp() )
 	{
 		TokNode *pOperand1 = pNode->GetChildTry( 0 );
 		TokNode *pOperand2 = pNode->GetChildTry( 1 );
 
 		// no assignment for function call as it's done above
-		if ( pNode->mpToken->id == T_OP_ASSIGN
-/*
-			&&
-			(pOperand1->mNodeType == TokNode::TYPE_FUNCCALL ||
-			 pOperand2->mNodeType == TokNode::TYPE_FUNCCALL )
-*/
-			 )
-			return;
+		VarType	opResVarType;
+		bool	opResIsVarying;
+		SolveBiOpType( pNode, pOperand1, pOperand2, opResVarType, opResIsVarying );
 
-		if ( pOperand1 && pOperand2 )
-		{
-			solveOperand( pOperand1, io_tempIdx );
-			solveOperand( pOperand2, io_tempIdx );
+		DASSERT( pNode->mVarLink.IsValid() == false );
 
-			if NOT( pNode->mpToken->IsAssignOp() )
-			{
-				VarType	varType;
-				bool	isVarying;
-				SolveBiOpType(
-							pNode,
-							pOperand1,
-							pOperand2,
-							varType,
-							isVarying );
+		pNode->mBuild_TmpReg.SetType( opResVarType, opResIsVarying );
+	}
 
-				pNode->mBuild_TmpReg.SetType( varType, isVarying );
-				pNode->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );
-			}
-		}
-		else
-		{
-			//fprintf_s( pFile, "\nWEIRDDD !! ( %s )\n", pNode->GetTokStr() );
-		}
+	if ( pNode->mVarLink.IsValid() )
+	{
+		if NOT( pNode->mVarLink.GetVarPtr()->IsRegisterAssigned() )
+			pNode->mVarLink.GetVarPtr()->AssignRegister( io_tempIdx );
+	}
+	else
+	if ( pNode->mBuild_TmpReg.GetVarType() != VT_UNKNOWN )
+	{
+		//if NOT( pNode->mBuild_TmpReg.IsAssigned() )
+			pNode->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );	
 	}
 }
 
@@ -192,9 +148,9 @@ void AssignRegisters( TokNode *pNode )
 		if NOT( func.IsShader() )
 			continue;
 
-		for (size_t i=0; i < func.mpCodeBlkNode->mpChilds.size(); ++i)
+		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
 		{
-			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[i];
+			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[j];
 
 			int	tempIdx = 0;
 
