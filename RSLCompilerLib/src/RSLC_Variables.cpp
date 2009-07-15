@@ -9,6 +9,7 @@
 #include "RSLC_Tree.h"
 #include "RSLC_Variables.h"
 #include "RSLC_Exceptions.h"
+#include "RSLC_Defs_StdVars.h"
 
 //==================================================================
 namespace RSLC
@@ -388,39 +389,60 @@ static TokNode *newVarNode( const char *pStr )
 //==================================================================
 void AddStandardVariables( TokNode *pNode )
 {
-	static const char *sGlobalsDefs[] =
-	{
-		"color"	,	"varying"	,	"Cs"	,	// also uniform ?
-		"color"	,	"varying"	,	"Os"	,	// also uniform ?
-		"point"	,	"varying"	,	"P"	,
-		//"point"	,	"varying"	,	"Ps"	,
-		"point"	,	"varying"	,	"dPdu"	,
-		"point"	,	"varying"	,	"dPdv"	,
-		"vector",	"varying"	,	"N"	,
-		"vector",	"varying"	,	"Ng"	,	// also uniform ?
-		"float"	,	"varying"	,	"u"	,
-		"float"	,	"varying"	,	"v"	,
-		"float"	,	"varying"	,	"du"	,	// also uniform ?
-		"float"	,	"varying"	,	"dv"	,	// also uniform ?
-		"float"	,	"varying"	,	"s"	,		// also uniform ?
-		"float"	,	"varying"	,	"t"	,		// also uniform ?
-		"vector",	"varying"	,	"L"	,		// also uniform ?
-		"color"	,	"varying"	,	"Cl"	,	// also uniform ?
-		"vector",	"varying"	,	"I"	,
-		"color"	,	"varying"	,	"Ci"	,
-		"color"	,	"varying"	,	"Oi"	,
-		"point"	,	"uniform"	,	"E"	,
-		//""	,	""	,	"A"	,
-	};
-
-	for (size_t i=0; i < _countof(sGlobalsDefs); i += 3)
+	for (size_t i=0; i < _countof(_gGlobalsDefs); i += 3)
 	{
 		AddVariable(
 				pNode,
-				newVarNode( sGlobalsDefs[i+0] ),
-				newVarNode( sGlobalsDefs[i+1] ),
+				newVarNode( _gGlobalsDefs[i+0] ),
+				newVarNode( _gGlobalsDefs[i+1] ),
 				NULL,
-				newVarNode( sGlobalsDefs[i+2] ) );
+				newVarNode( _gGlobalsDefs[i+2] ) );
+	}
+}
+
+//==================================================================
+static size_t findStandardVariable( const char *pName )
+{
+	for (size_t i=0; i < _countof(_gGlobalsDefs); i += 3)
+	{
+		if ( 0 == _stricmp( _gGlobalsDefs[i+2], pName ) )
+			return i/3;
+	}
+
+	return DNPOS;
+}
+
+//==================================================================
+static void collecedUsedStdVars_sub( TokNode *pNode, DVec<size_t> &io_usedStdVarsList )
+{
+	if ( pNode->mVarLink.IsValid() && pNode->mVarLink.IsGlobal() )
+	{
+		const Variable	*pVar = pNode->mVarLink.GetVarPtr();
+
+		size_t	idx = findStandardVariable( pVar->mpDefNameTok->GetStrChar() );
+
+		DASSERT( idx != DNPOS );
+
+		io_usedStdVarsList.find_or_push_back( idx );
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		collecedUsedStdVars_sub( pNode->mpChilds[i], io_usedStdVarsList );
+	}
+}
+
+//==================================================================
+void CollecedUsedStdVars( TokNode *pRoot, DVec<size_t> &io_usedStdVarsList )
+{
+	for (size_t i=0; i < pRoot->GetFuncs().size(); ++i)
+	{
+		const Function	&func = pRoot->GetFuncs()[i];
+
+		if NOT( func.IsShader() )
+			continue;
+
+		collecedUsedStdVars_sub( func.mpParamsNode, io_usedStdVarsList );
 	}
 }
 
@@ -495,8 +517,18 @@ static void scanWriteVars( FILE *pFile, TokNode *pNode )
 }
 
 //==================================================================
-void WriteVariables( FILE *pFile, TokNode *pNode )
+void WriteVariables( FILE *pFile, TokNode *pNode, const DVec<size_t> &usedStdVars )
 {
+	for (size_t i=0; i < usedStdVars.size(); ++i)
+	{
+		size_t j = usedStdVars[ i ] * 3;
+
+		fprintf_s( pFile, "\t%-18s\tglobal\t%s\t%s\n",
+							_gGlobalsDefs[j+2],
+							_gGlobalsDefs[j+1],
+							_gGlobalsDefs[j+0] );
+	}
+
 	scanWriteVars( pFile, pNode );
 }
 

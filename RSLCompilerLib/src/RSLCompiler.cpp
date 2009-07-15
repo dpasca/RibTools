@@ -105,6 +105,9 @@ RSLCompiler::RSLCompiler(
 
 	AssignRegisters( mpRoot );
 
+	mUsedStdVars.clear();
+	CollecedUsedStdVars( mpRoot, mUsedStdVars );
+
 	// produce some debug info in the output file
 	TraverseTree( mpRoot, 0 );
 }
@@ -139,7 +142,7 @@ void RSLCompiler::SaveASM( const char *pFName, const char *pRefSourceName )
 
 	fprintf_s( pFile, "\n.data\n" );
 
-	WriteVariables( pFile, mpRoot );
+	WriteVariables( pFile, mpRoot, mUsedStdVars );
 
 	fprintf_s( pFile, "\n.code\n" );
 

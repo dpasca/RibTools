@@ -151,17 +151,18 @@ vector	cellnoise( float u, v ){}
 vector	cellnoise( point pt ){}
 vector	cellnoise( point pt, float t ){}
 */
-float xcomp( point	P ){}
-float xcomp( vector	P ){}
-float xcomp( normal	P ){}
+
+float xcomp( point	P ){ float tmp; _intr_xcompsv( tmp, P ); return tmp; }
+float xcomp( vector	P ){ float tmp; _intr_xcompsv( tmp, P ); return tmp; }
+float xcomp( normal	P ){ float tmp; _intr_xcompsv( tmp, P ); return tmp; }
 	   
-float ycomp( point	P ){}
-float ycomp( vector	P ){}
-float ycomp( normal	P ){}
-	   
-float zcomp( point	P ){}
-float zcomp( vector	P ){}
-float zcomp( normal	P ){}
+float ycomp( point	P ){ float tmp; _intr_ycompsv( tmp, P ); return tmp; }
+float ycomp( vector	P ){ float tmp; _intr_ycompsv( tmp, P ); return tmp; }
+float ycomp( normal	P ){ float tmp; _intr_ycompsv( tmp, P ); return tmp; }
+									  
+float zcomp( point	P ){ float tmp; _intr_zcompsv( tmp, P ); return tmp; }
+float zcomp( vector	P ){ float tmp; _intr_zcompsv( tmp, P ); return tmp; }
+float zcomp( normal	P ){ float tmp; _intr_zcompsv( tmp, P ); return tmp; }
 
 void	setxcomp( output point	 P; float x ){}
 void	setxcomp( output vector	 P; float x ){}

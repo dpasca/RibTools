@@ -358,7 +358,7 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 }
 
 //==================================================================
-static bool resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
+static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
 {
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
@@ -377,25 +377,16 @@ static bool resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 				NULL,
 				pClonedParams );
 
-/*
-			pClonedParams->mBuild_TmpReg.SetType(
-								VarTypeFromToken( pFunc->mpRetTypeTok ),
-								true );	// force varying for now..
-*/
 
 			DSAFE_DELETE( pNode );
-			return true;
+			return;
 		}
 	}
 
-	bool resolvedSomething = false;
-
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		resolvedSomething = resolveFunctionCalls( pNode->mpChilds[i], funcs, i );
+		resolveFunctionCalls( pNode->mpChilds[i], funcs, i );
 	}
-
-	return resolvedSomething;
 }
 
 //==================================================================
@@ -498,52 +489,11 @@ void ResolveFunctionCalls( TokNode *pNode )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
 
-	bool	resolvedCalls;
+	size_t	curIdx = 0;
+	resolveFunctionCalls( pNode, funcs, curIdx );
 
 	DVec<TokNode *>	pAssignOpsToRemove;
-	//do {
-
-		size_t	curIdx = 0;
-		resolvedCalls = resolveFunctionCalls( pNode, funcs, curIdx );
-
-		pAssignOpsToRemove.clear();
-		resolveFunctionReturns( pNode, pAssignOpsToRemove );
-
-		/*	pAssignOpsToRemove[i]	( = )
-				pOldDest
-				pFnParams
-					1
-					2
-		*/
-#if 0
-		for (size_t i=0; i < pAssignOpsToRemove.size(); ++i)
-		{
-			TokNode	*pOldDest = pAssignOpsToRemove[i]->GetChildTry( 0 );
-			TokNode	*pFnParams = pAssignOpsToRemove[i]->GetChildTry( 1 );
-
-			DASSERT( pFnParams->GetBlockType() == BLKT_FNPARAMS );
-
-			pOldDest->UnlinkFromParent();
-			DSAFE_DELETE( pOldDest );
-
-			/*	pAssignOpsToRemove[i]	( = )
-					pFnParams
-						1
-						2
-			*/
-
-			pFnParams->ReplaceNode( pAssignOpsToRemove[i] );
-
-			pAssignOpsToRemove[i]->mpChilds.clear();
-			DSAFE_DELETE( pAssignOpsToRemove[i] );
-
-			/*	pFnParams	( <- pAssignOpsToRemove[i]	( = ) )
-					1
-					2
-			*/
-		}
-#endif
-	//} while ( resolvedCalls );
+	resolveFunctionReturns( pNode, pAssignOpsToRemove );
 }
 
 //==================================================================
@@ -559,7 +509,7 @@ static void getRegName( const Register &reg, char *pOutBuff, size_t maxOutSize )
 	case VT_STRING:	regBase[0] = 's'; DASSERT( 0 ); break;
 	case VT_VECTOR:	regBase[0] = 'v'; break;
 	case VT_NORMAL:	regBase[0] = 'v'; break;
-	case VT_MATRIX:	regBase[0] = 'm'; DASSERT( 0 ); break;
+	case VT_MATRIX:	regBase[0] = 'm'; break;
 	case VT_BOOL:	regBase[0] = 'b'; break;
 	default:
 		strcpy_s( regBase, "UNK_" );

@@ -9,6 +9,7 @@
 #include "RSLC_Tree.h"
 #include "RSLC_Operators.h"
 #include "RSLC_Exceptions.h"
+#include "RSLC_Defs_OpConvert.h"
 
 //==================================================================
 namespace RSLC
@@ -31,30 +32,6 @@ static bool areTypesCompatible( VarType vt1, VarType vt2 )
 		return true;
 
 	return false;
-}
-
-//==================================================================
-static bool isVector( VarType vt1 )
-{
-	return vt1 == VT_POINT || vt1 == VT_VECTOR || vt1 == VT_NORMAL;
-}
-
-//==================================================================
-static bool isColorr( VarType vt1 )
-{
-	return vt1 == VT_COLOR;
-}
-
-//==================================================================
-static bool isScalar( VarType vt1 )
-{
-	return vt1 == VT_FLOAT;
-}
-
-//==================================================================
-static bool isMatrix( VarType vt1 )
-{
-	return vt1 == VT_MATRIX;
 }
 
 //==================================================================
@@ -102,60 +79,32 @@ void SolveBiOpType(
 
 		out_varType = VT_BOOL;
 	}
-
-	switch ( pOperator->mpToken->id )
+	else
 	{
-	case T_OP_ASSIGN	:
-	case T_OP_PLUSASS	:
-	case T_OP_MINUSASS	:
-	case T_OP_MULASS	:
-	case T_OP_PLUS		:
-	case T_OP_MINUS		:
-	case T_OP_MUL		:
-		if ( areTypesCompatible( vt1, vt2 ) )	out_varType = vt1; else
-		if ( isScalar( vt1 ) && isVector( vt2 ) ) out_varType = vt2; else
-		if ( isScalar( vt1 ) && isColorr( vt2 ) ) out_varType = vt2; else
-		if ( isVector( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
-		if ( isColorr( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
-		if ( isScalar( vt1 ) && isMatrix( vt2 ) ) out_varType = vt2; else
-		if ( isMatrix( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
-		if ( isVector( vt1 ) && isMatrix( vt2 ) ) out_varType = vt1; else
-		if ( isMatrix( vt1 ) && isVector( vt2 ) ) out_varType = vt2;
-		break;
+		for (size_t i=0; i < _countof(_gBiOpConvertRules); ++i)
+		{
+			if NOT( pOperator->mpToken->id == _gBiOpConvertRules[i].mOper )
+				continue;
 
-	case T_OP_DIVASS	:
-	case T_OP_DIV		:
-		if ( areTypesCompatible( vt1, vt2 ) )	out_varType = vt1; else
-		if ( isVector( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
-		if ( isColorr( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
-		if ( isMatrix( vt1 ) && isScalar( vt2 ) ) out_varType = vt1; else
-		if ( isMatrix( vt1 ) && isVector( vt2 ) ) out_varType = vt1;
-		break;
-	
-	case T_OP_POW		:
-		if ( isScalar( vt1 ) && isScalar( vt2 ) ) out_varType = vt1;
-		break;
+			if NOT(
+				areTypesCompatible( _gBiOpConvertRules[i].mLType, vt1 ) &&
+				areTypesCompatible( _gBiOpConvertRules[i].mRType, vt2 )
+				)
+				continue;
 
-	case T_OP_DOT		:
-		if ( isVector( vt1 ) && isVector( vt2 ) ) out_varType = VT_FLOAT;
-		break;
+			out_varType = _gBiOpConvertRules[i].mResType;
+		}
 
-	case T_OP_LOGIC_AND	:
-	case T_OP_LOGIC_OR	:
-	default:
-		DASSERT( 0 );
-		break;
-	}
-
-	if ( out_varType == VT_UNKNOWN )
-	{
-		throw Exception(
-			DUT::SSPrintFS(
-					"Could not resolve operation. Incompatible types [ '%s' %s '%s' ] ?",
-						VarTypeToString( vt1 ),
-						pOperator->GetTokStr(),
-						VarTypeToString( vt2 ) )
-					, pOperator );
+		if ( out_varType == VT_UNKNOWN )
+		{
+			throw Exception(
+				DUT::SSPrintFS(
+						"Could not resolve operation. Incompatible types [ '%s' %s '%s' ] ?",
+							VarTypeToString( vt1 ),
+							pOperator->GetTokStr(),
+							VarTypeToString( vt2 ) )
+						, pOperator );
+		}
 	}
 }
 

@@ -159,6 +159,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\RSLC_Defs_OpConvert.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Defs_StdVars.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Exceptions.cpp"
 				>
 			</File>

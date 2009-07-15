@@ -125,8 +125,12 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 
 	if ( pNode->mVarLink.IsValid() )
 	{
-		if NOT( pNode->mVarLink.GetVarPtr()->IsRegisterAssigned() )
+		if (
+			!pNode->mVarLink.IsGlobal() &&
+			!pNode->mVarLink.GetVarPtr()->IsRegisterAssigned() )
+		{
 			pNode->mVarLink.GetVarPtr()->AssignRegister( io_tempIdx );
+		}
 	}
 	else
 	if ( pNode->mBuild_TmpReg.GetVarType() != VT_UNKNOWN )
