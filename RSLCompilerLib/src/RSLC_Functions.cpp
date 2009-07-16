@@ -151,74 +151,7 @@ void DiscoverFunctions( TokNode *pRoot )
 	discoverFuncsUsage( pRoot, pRoot->GetFuncs(), idx );
 }
 
-//==================================================================
-static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType, bool isVarying )
-{
-	Token	*pDestRegTok = DNEW Token();
-	Token	*pAssgnOpTok = DNEW Token();
-
-	pDestRegTok->idType	= T_TYPE_TEMPDEST;
-	pDestRegTok->id		= T_TD_TEMPDEST;
-	pDestRegTok->str	= "TEMP_DEST_REG";
-
-	pAssgnOpTok->idType = T_TYPE_OPERATOR;
-	pAssgnOpTok->id		= T_OP_ASSIGN;
-	pAssgnOpTok->str	= "=";
-
-	TokNode	*pAssgnNode = DNEW TokNode( pAssgnOpTok );
-
-	TokNode	*pOldNode = pNode->mpChilds[childIdx];
-	pNode->mpChilds[childIdx] = pAssgnNode;
-	pAssgnNode->mpParent = pNode;
-
-	TokNode *pDestRegNode = pAssgnNode->AddNewChild( pDestRegTok );
-	pDestRegNode->mBuild_TmpReg.SetType( varType, isVarying );
-
-	pAssgnNode->AddChild( pOldNode );
-}
-
-//==================================================================
-static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
-{
-	bool	isDataType = pNode->IsDataType();
-
-	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
-	{
-		TokNode	*pParamsNode = pNode->GetChildTry( 0 );
-
-		// skip eventual space-cast string
-		if ( pParamsNode && pParamsNode->mpToken->id == T_VL_STRING )
-		{
-			pParamsNode = pNode->GetChildTry( 1 );
-		}
-
-		// do we have params ?
-		if ( pParamsNode )
-		{
-			for (size_t i=0; i < pParamsNode->mpChilds.size(); ++i)
-			{
-				if ( pParamsNode->mpChilds[i]->mpToken->id == T_OP_COMMA )
-					continue;
-
-				// $$$ need to get the function params types from definition here..
-
-				insertAssignToTemp(
-						pParamsNode,
-						i,
-						VT_VECTOR,
-						true );
-
-				//i += 2;
-			}
-		}
-	}
-
-	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
-	{
-		instrumentFuncsCallsParams( pNode->mpChilds[i], i );
-	}
-}
-
+/*
 //==================================================================
 static void instrumentFuncsCallsReturn( TokNode *pNode, int &out_parentIdx )
 {
@@ -254,7 +187,9 @@ static void instrumentFuncsCallsReturn( TokNode *pNode, int &out_parentIdx )
 		instrumentFuncsCallsReturn( pNode->mpChilds[i], i );
 	}
 }
+*/
 
+/*
 //==================================================================
 void InstrumentFunctionCalls( TokNode *pRoot )
 {
@@ -264,6 +199,7 @@ void InstrumentFunctionCalls( TokNode *pRoot )
 	parentIdx = 0;
 	instrumentFuncsCallsReturn( pRoot, parentIdx );
 }
+*/
 
 //==================================================================
 static TokNode *cloneBranch_BuildNodes(
@@ -358,6 +294,90 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 }
 
 //==================================================================
+static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType, bool isVarying )
+{
+	Token	*pDestRegTok = DNEW Token();
+	Token	*pAssgnOpTok = DNEW Token();
+
+	pDestRegTok->idType	= T_TYPE_TEMPDEST;
+	pDestRegTok->id		= T_TD_TEMPDEST;
+	pDestRegTok->str	= "TEMP_DEST_REG";
+
+	pAssgnOpTok->idType = T_TYPE_OPERATOR;
+	pAssgnOpTok->id		= T_OP_ASSIGN;
+	pAssgnOpTok->str	= "=";
+
+	TokNode	*pAssgnNode = DNEW TokNode( pAssgnOpTok );
+
+	TokNode	*pOldNode = pNode->mpChilds[childIdx];
+	pNode->mpChilds[childIdx] = pAssgnNode;
+	pAssgnNode->mpParent = pNode;
+
+	TokNode *pDestRegNode = pAssgnNode->AddNewChild( pDestRegTok );
+	pDestRegNode->mBuild_TmpReg.SetType( varType, isVarying );
+
+	pAssgnNode->AddChild( pOldNode );
+}
+
+//==================================================================
+static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
+{
+	bool	isDataType = pNode->IsDataType();
+
+	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
+	{
+		TokNode	*pParamsNode = pNode->GetChildTry( 0 );
+
+		// skip eventual space-cast string
+		if ( pParamsNode && pParamsNode->mpToken->id == T_VL_STRING )
+		{
+			pParamsNode = pNode->GetChildTry( 1 );
+		}
+
+		// do we have params ?
+		if ( pParamsNode )
+		{
+		}
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		instrumentFuncsCallsParams( pNode->mpChilds[i], i );
+	}
+}
+
+//==================================================================
+static void assignPassingParams( TokNode *pClonedParams, TokNode *pPassParams )
+{
+	for (size_t i=0,j=0; i < pClonedParams->mpChilds.size(); ++i)
+	{
+		if ( pClonedParams->mpChilds[i]->mpToken->id == T_OP_COMMA )
+			continue;
+
+		if ( pClonedParams->mpChilds[i]->mpToken->id != T_NONTERM )
+			continue;
+
+		TokNode	*pPassParam = pPassParams->GetChildTry( j++ );
+
+		if NOT( pPassParam )
+			throw Exception( "Missing parameter ?", pPassParams );
+
+		//printf( "PASSSS %s = %s\n", pClonedParams->mpChilds[i]->GetTokStr(), pPassParam->GetTokStr() );
+
+		// $$$ need to get the function params types from definition here..
+
+/*
+		insertAssignToTemp(
+				pParamsNode,
+				i,
+				VT_VECTOR,
+				true );
+*/
+	}
+
+}
+
+//==================================================================
 static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
 {
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
@@ -377,6 +397,9 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 				NULL,
 				pClonedParams );
 
+			TokNode	*pPassParams = pNode->GetChildTry( 0 );
+
+			assignPassingParams( pClonedParams, pPassParams );
 
 			DSAFE_DELETE( pNode );
 			return;
@@ -457,33 +480,22 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsT
 }
 
 /*
-	=
-		b
-		(
-			{
-				return
-				+
-					1
-					2
-
-	=
-		b
-		(
-			{
-				=
-					b
-					+
-						1
-						2
-
 	(
 		{
+			return
+			+
+				1
+				2
+
+	(->ReturnDest
+		{
 			=
-				b
+				ReturnDest
 				+
 					1
 					2
 */
+
 //==================================================================
 void ResolveFunctionCalls( TokNode *pNode )
 {

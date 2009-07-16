@@ -1,15 +1,10 @@
-/*
+
 float	radians( float deg )
 {
-	float	tmp;
-	float	rad;
-
-	tmp = __lds( 0.0174532925 );
-	rad = __mulss( deg, tmp );
-
-	return rad;
+	return deg * 0.0174532925;
 }
 
+/*
 float	degrees( float rad )
 {
 	float	tmp;
@@ -22,7 +17,7 @@ float	degrees( float rad )
 	return deg;
 }
 */
-float	radians( float deg );
+
 float	degrees( float rad );
 
 float	sin( float a ){}
