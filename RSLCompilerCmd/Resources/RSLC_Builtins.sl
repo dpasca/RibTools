@@ -4,21 +4,10 @@ float	radians( float deg )
 	return deg * 0.0174532925;
 }
 
-/*
 float	degrees( float rad )
 {
-	float	tmp;
-	float	deg;
-	__asm
-	{
-		lds		tmp	57.29577957855
-		mulss	deg	rad	tmp
-	}
-	return deg;
+	return rad * 57.29577957855;
 }
-*/
-
-float	degrees( float rad );
 
 float	sin( float a ){}
 float	asin( float a ){}
@@ -147,17 +136,17 @@ vector	cellnoise( point pt ){}
 vector	cellnoise( point pt, float t ){}
 */
 
-float xcomp( point	P ){ float tmp; _intr_xcompsv( tmp, P ); return tmp; }
-float xcomp( vector	P ){ float tmp; _intr_xcompsv( tmp, P ); return tmp; }
-float xcomp( normal	P ){ float tmp; _intr_xcompsv( tmp, P ); return tmp; }
+float xcomp( point	P ){ float tmp; _asm_xcompsv( tmp, P ); return tmp; }
+float xcomp( vector	P ){ float tmp; _asm_xcompsv( tmp, P ); return tmp; }
+float xcomp( normal	P ){ float tmp; _asm_xcompsv( tmp, P ); return tmp; }
 	   
-float ycomp( point	P ){ float tmp; _intr_ycompsv( tmp, P ); return tmp; }
-float ycomp( vector	P ){ float tmp; _intr_ycompsv( tmp, P ); return tmp; }
-float ycomp( normal	P ){ float tmp; _intr_ycompsv( tmp, P ); return tmp; }
+float ycomp( point	P ){ float tmp; _asm_ycompsv( tmp, P ); return tmp; }
+float ycomp( vector	P ){ float tmp; _asm_ycompsv( tmp, P ); return tmp; }
+float ycomp( normal	P ){ float tmp; _asm_ycompsv( tmp, P ); return tmp; }
 									  
-float zcomp( point	P ){ float tmp; _intr_zcompsv( tmp, P ); return tmp; }
-float zcomp( vector	P ){ float tmp; _intr_zcompsv( tmp, P ); return tmp; }
-float zcomp( normal	P ){ float tmp; _intr_zcompsv( tmp, P ); return tmp; }
+float zcomp( point	P ){ float tmp; _asm_zcompsv( tmp, P ); return tmp; }
+float zcomp( vector	P ){ float tmp; _asm_zcompsv( tmp, P ); return tmp; }
+float zcomp( normal	P ){ float tmp; _asm_zcompsv( tmp, P ); return tmp; }
 
 void	setxcomp( output point	 P; float x ){}
 void	setxcomp( output vector	 P; float x ){}
@@ -231,11 +220,4 @@ float	shadow( string name[channel]; texture coordinates[, parameterlist] ){}
 float	textureinfo( string texturename, dataname; output type variable ){}
 */
 
-void __vector_ctor_f3( output vector v, float x, float y, float z );
-
-vector vector( float x, float y, float z )
-{
-	vector tmp;
-	__vector_ctor_f3( tmp, x, y, z );
-	return tmp;
-}
+vector vector( float x, float y, float z )	{ vector tmp; _asm_movvs3( tmp, x, y, z ); return tmp; }

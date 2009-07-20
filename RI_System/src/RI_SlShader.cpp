@@ -389,6 +389,8 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	SOP::Inst_2Op<VECTOR,SINGLE,OP_VS_DIV>,
 	SOP::Inst_2Op<VECTOR,VECTOR,OP_VV_DIV>,
 
+	SOP::Inst_MOVVS3<SlVec3,SlScalar>,
+
 	SOP::Inst_LD1<SINGLE>,
 	SOP::Inst_LD3<VECTOR>,
 

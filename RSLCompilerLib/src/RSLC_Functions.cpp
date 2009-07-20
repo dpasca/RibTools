@@ -16,6 +16,26 @@ namespace RSLC
 {
 
 //==================================================================
+static void removeCommasFromParams( TokNode *pNode )
+{
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		TokNode	*pChild = pNode->mpChilds[i];
+		if ( pChild->mpToken->id == T_OP_COMMA )
+		{
+			if ( pChild->mpChilds.size() != 0 )
+			{
+				throw Exception( "Broken function definition",  pNode );
+			}
+
+			pChild->UnlinkFromParent();
+			DSAFE_DELETE( pChild );
+			--i;
+		}
+	}
+}
+
+//==================================================================
 static void discoverFuncsDeclarations( TokNode *pRoot )
 {
 	DVec<Function>	&funcs = pRoot->GetFuncs();
@@ -39,6 +59,8 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 		}
 
 		Function	*pFunc = funcs.grow();
+
+		removeCommasFromParams( pParamsBlk );
 
 		pFunc->mpParamsNode		= pParamsBlk;
 		pFunc->mpCodeBlkNode	= pNode;
@@ -90,35 +112,28 @@ static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
 		// set the block type as a function call
 		pRightNode->UpdateBlockTypeToFuncCall();
 
-		//if ( pRightNode->mpToken->id == T_OP_LFT_BRACKET )
-		{
-			/*
-				b
+		/*
+			b
+			(
+			)
+
+			..becomes..
+
+			b
 				(
 				)
 
-				..becomes..
+			..the loop above will skip one, so we need to backpedal..
+		*/
 
-				b
-					(
-					)
+		out_parentIdx -= 1;
 
-				..the loop above will skip one, so we need to backpedal..
-			*/
+		pRightNode->Reparent( pFuncCallNode );
+		pFuncCallNode->mpChilds.push_back( pRightNode );
 
-			out_parentIdx -= 1;
+		removeCommasFromParams( pRightNode );
 
-			pRightNode->Reparent( pFuncCallNode );
-			pFuncCallNode->mpChilds.push_back( pRightNode );
-
-			pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
-		}
-/*
-		else
-		{
-			throw Exception( "Expecting a left bracket !", pRightNode->mpToken );
-		}
-*/
+		pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
 	}
 }
 
@@ -150,56 +165,6 @@ void DiscoverFunctions( TokNode *pRoot )
 	int	idx = 0;
 	discoverFuncsUsage( pRoot, pRoot->GetFuncs(), idx );
 }
-
-/*
-//==================================================================
-static void instrumentFuncsCallsReturn( TokNode *pNode, int &out_parentIdx )
-{
-	bool	isDataType = pNode->IsDataType();
-
-	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
-	{
-		DASSERT( pNode->mpParent != NULL );
-
-		//if ( pNode->mpParent->mpToken->idType == T_TYPE_OPERATOR )
-		if ( pNode->mpParent->mpToken->IsBiOp() )
-		{
-			int	ownIdx	= (pNode->mpParent->mpChilds[0] == pNode ? 0 : 1);
-			int	otherIdx= ownIdx ^ 1;
-
-			DASSERT( pNode->mpParent->mpChilds[ownIdx] == pNode );
-
-			if ( pNode->mpParent->mpChilds[otherIdx]->mpToken->idType != T_TYPE_TEMPDEST )
-			{
-				// $$$ need to get the function return values types from definition here..
-
-				insertAssignToTemp(
-						pNode->mpParent,
-						ownIdx,
-						VT_VECTOR,
-						true );
-			}
-		}
-	}
-
-	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
-	{
-		instrumentFuncsCallsReturn( pNode->mpChilds[i], i );
-	}
-}
-*/
-
-/*
-//==================================================================
-void InstrumentFunctionCalls( TokNode *pRoot )
-{
-	int	parentIdx = 0;
-	instrumentFuncsCallsParams( pRoot, parentIdx );
-
-	parentIdx = 0;
-	instrumentFuncsCallsReturn( pRoot, parentIdx );
-}
-*/
 
 //==================================================================
 static TokNode *cloneBranch_BuildNodes(
@@ -294,6 +259,28 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 }
 
 //==================================================================
+/*
+dest
+
+---------
+
+=
+	dest
+	src
+*/
+static void insertAssignTo( TokNode *pDestNode, TokNode *pSrcNode )
+{
+	TokNode	*pAssgnNode = DNEW TokNode( DNEW Token( "=", T_OP_ASSIGN, T_TYPE_OPERATOR ) );
+
+	TokNode *pCloneSrcNode = cloneBranch( pSrcNode );
+
+	pAssgnNode->ReplaceNode( pDestNode );
+
+	pAssgnNode->AddChild( pDestNode );
+	pAssgnNode->AddChild( pCloneSrcNode );
+}
+
+//==================================================================
 static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType, bool isVarying )
 {
 	Token	*pDestRegTok = DNEW Token();
@@ -351,9 +338,6 @@ static void assignPassingParams( TokNode *pClonedParams, TokNode *pPassParams )
 {
 	for (size_t i=0,j=0; i < pClonedParams->mpChilds.size(); ++i)
 	{
-		if ( pClonedParams->mpChilds[i]->mpToken->id == T_OP_COMMA )
-			continue;
-
 		if ( pClonedParams->mpChilds[i]->mpToken->id != T_NONTERM )
 			continue;
 
@@ -362,17 +346,10 @@ static void assignPassingParams( TokNode *pClonedParams, TokNode *pPassParams )
 		if NOT( pPassParam )
 			throw Exception( "Missing parameter ?", pPassParams );
 
+		insertAssignTo( pClonedParams->mpChilds[i], pPassParam );
 		//printf( "PASSSS %s = %s\n", pClonedParams->mpChilds[i]->GetTokStr(), pPassParam->GetTokStr() );
 
 		// $$$ need to get the function params types from definition here..
-
-/*
-		insertAssignToTemp(
-				pParamsNode,
-				i,
-				VT_VECTOR,
-				true );
-*/
 	}
 
 }
@@ -390,6 +367,7 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 
 			pClonedParams->ReplaceNode( pNode );
 
+			// return node
 			AddVariable(
 				pClonedParams->mpParent,
 				DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
@@ -468,7 +446,7 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsT
 
 		pNode = instrumentFCallReturn( pReturnNode, pFnParams->mVarLink );
 
-		// pNode points to the next node to be used to condinue dig recursively
+		// pNode points to the next node to be used to continue dig recursively
 		pNode = pNode->GetChildTry( 1 );
 		DASSERT( pNode != NULL );
 	}
@@ -518,7 +496,7 @@ static void getRegName( const Register &reg, char *pOutBuff, size_t maxOutSize )
 	case VT_FLOAT:	regBase[0] = 's'; break;
 	case VT_POINT:	regBase[0] = 'v'; break;
 	case VT_COLOR:	regBase[0] = 'v'; break;
-	case VT_STRING:	regBase[0] = 's'; DASSERT( 0 ); break;
+	case VT_STRING:	regBase[0] = 'x'; DASSERT( 0 ); break;
 	case VT_VECTOR:	regBase[0] = 'v'; break;
 	case VT_NORMAL:	regBase[0] = 'v'; break;
 	case VT_MATRIX:	regBase[0] = 'm'; break;
@@ -536,8 +514,16 @@ static void getRegName( const Register &reg, char *pOutBuff, size_t maxOutSize )
 }
 
 //==================================================================
-static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutSize )
+static const char *getOperand(
+					TokNode *pOperand,
+					char *pOutBuff,
+					size_t maxOutSize,
+					VarType &out_varType,
+					bool &out_isValue )
 {
+	out_varType = VT_UNKNOWN;
+	out_isValue	= false;
+
 	//DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() >= 1 );
 	while ( pOperand )
 	{
@@ -545,12 +531,25 @@ static const char *getOperand( TokNode *pOperand, char *pOutBuff, size_t maxOutS
 
 		if ( reg.IsValid() )
 		{
+			out_varType = reg.GetVarType();
+			out_isValue	= false;
 			getRegName( reg, pOutBuff, maxOutSize );
 			return pOutBuff;
 		}
 		else
-		if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
+		if ( pOperand->mpToken->idType == T_TYPE_VALUE )
+		{
+			out_varType = VT_FLOAT;
+			out_isValue	= true;
 			return pOperand->GetTokStr();
+		}
+		else
+		if ( pOperand->mpToken->idType == T_TYPE_NONTERM )
+		{
+			out_varType = pOperand->GetVarType();
+			out_isValue	= false;
+			return pOperand->GetTokStr();
+		}
 
 		pOperand = pOperand->GetChildTry( 0 );
 	}
@@ -585,12 +584,48 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 		if ( pChild->mpToken->id == T_OP_COMMA )
 			continue;
 
-		const char	*pOStr = getOperand( pChild, op1NameBuff, _countof(op1NameBuff) );
+		VarType	varType;
+		bool	isValue;
+		const char	*pOStr = getOperand( pChild, op1NameBuff, _countof(op1NameBuff), varType, isValue );
 
 		fprintf_s( pFile, "\t%s", pOStr );
 	}
 
 	fprintf_s( pFile, "\n\n" );
+}
+
+//==================================================================
+static const char *asmOpCodeFromOpToken( const Token *pTok )
+{
+	switch ( pTok->id )
+	{
+	case T_OP_MUL:		return "mul";
+	case T_OP_DIV:		return "div";
+	case T_OP_PLUS:		return "add";
+	case T_OP_MINUS:	return "sub";
+	case T_OP_POW:		return "pow";
+	case T_OP_DOT:		return "dot";
+
+	default:
+		return pTok->str.c_str();
+	}
+}
+
+//==================================================================
+static std::string resolveIntrinsics( const char *pIntrName )
+{
+	static size_t		sBaseLen;
+	static const char	*spBaseStr = "_asm_";
+	
+	if ( sBaseLen == 0 )
+		sBaseLen = strlen( "_asm_" );
+
+	if ( pIntrName == strstr( pIntrName, spBaseStr ) )
+	{
+		return pIntrName + sBaseLen;
+	}
+	else
+		return "UNKNOWN_INTRINSIC";
 }
 
 //==================================================================
@@ -606,17 +641,19 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
-		//pNode->mpToken->id == T_OP_ASSIGN
 		size_t	nextChild = 0;
 		TokNode *pChild = pNode->GetChildTry( nextChild );
+
+		std::string	asmName = resolveIntrinsics( pNode->GetTokStr() );
+
 		if ( pChild && pChild->mpToken->id == T_VL_STRING )
 		{
-			fprintf_s( pFile, "\t%s\t%s", pNode->GetTokStr(), pChild->GetTokStr() );
+			fprintf_s( pFile, "\t%s\t%s", asmName.c_str(), pChild->GetTokStr() );
 			pChild = NULL;
 			++nextChild;
 		}
 		else
-			fprintf_s( pFile, "\t%s", pNode->GetTokStr() );
+			fprintf_s( pFile, "\t%s", asmName.c_str() );
 
 		TokNode *pBracket = pNode->GetChildTry( nextChild );
 
@@ -637,34 +674,52 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 		if ( pOperand1 && pOperand2 )
 		{
-/*
-			VarType	opResVarType;
-			bool	opResIsVarying;
-			SolveBiOpType( pNode, pOperand1, pOperand2, opResVarType, opResIsVarying );
-
-			DASSERT( pNode->mVarLink.IsValid() == false );
-
-			pNode->mBuild_TmpReg.SetType( opResVarType, opResIsVarying );
-*/
-
 			char	op1NameBuff[32];
 			char	op2NameBuff[32];
+			VarType	varType1;
+			VarType	varType2;
+			bool	isValue1;
+			bool	isValue2;
 
-			const char	*pO1Str = getOperand( pOperand1, op1NameBuff, _countof(op1NameBuff) );
-			const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff) );
+			const char	*pO1Str = getOperand( pOperand1, op1NameBuff, _countof(op1NameBuff), varType1, isValue1 );
+			const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff), varType2, isValue2 );
 
 			bool	doAssign = pNode->mpToken->IsAssignOp();
+
+			char l1 = VarTypeToLetter(varType1);
+			char l2 = VarTypeToLetter(varType2);
 
 			if ( doAssign )
 			{
 				if ( pNode->mpToken->id == T_OP_ASSIGN )
-					fprintf_s( pFile, "\tmov\t%s\t%s\n", pO1Str, pO2Str );
+				{
+					// build either a load instruction or a move
+					if ( isValue2 )
+						fprintf_s(
+								pFile,
+								"\tld%c\t%s\t%s\n",
+								l1,
+								pO1Str,
+								pO2Str );
+					else
+						fprintf_s(
+								pFile,
+								"\tmov%c%c\t%s\t%s\n",
+								l1,
+								l2,
+								pO1Str,
+								pO2Str );
+				}
 				else
-					fprintf_s( pFile, "\t%s\t%s\t%s\t%s\n",
-								pNode->GetTokStr(),
-									pO1Str,
-										pO1Str,
-											pO2Str );
+					fprintf_s(
+							pFile,
+							"\t%s%c%c\t%s\t%s\t%s\n",
+							asmOpCodeFromOpToken( pNode->mpToken ),
+							l1,
+							l2,
+							pO1Str,
+							pO1Str,
+							pO2Str );
 			}
 			else
 			{
@@ -673,11 +728,15 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 				Register	reg = pNode->BuildGetRegister();
 				getRegName( reg, regName, _countof(regName) );
 
-				fprintf_s( pFile, "\t%s\t%s\t%s\t%s\n",
-								pNode->GetTokStr(),
-									regName,
-										pO1Str,
-											pO2Str );
+				fprintf_s(
+						pFile,
+						"\t%s%c%c\t%s\t%s\t%s\n",
+						asmOpCodeFromOpToken( pNode->mpToken ),
+						l1,
+						l2,
+						regName,
+						pO1Str,
+						pO2Str );
 			}
 		}
 	}

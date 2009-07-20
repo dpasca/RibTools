@@ -54,6 +54,26 @@ const char *VarTypeToString( VarType type )
 }
 
 //==================================================================
+char VarTypeToLetter( VarType type )
+{
+	switch ( type )
+	{
+	case VT_FLOAT:	return 's'; break;
+	case VT_POINT:	return 'v'; break;
+	case VT_COLOR:	return 'v'; break;
+	case VT_STRING:	return 'x'; break;
+	case VT_VECTOR:	return 'v'; break;
+	case VT_NORMAL:	return 'v'; break;
+	case VT_MATRIX:	return 'm'; break;
+	case VT_BOOL:	return 'b'; break;
+
+	default:
+		DASSERT( 0 );
+		return '!';
+	}
+}
+
+//==================================================================
 void Variable::AssignRegister( int &io_regIdx )
 {
 	DASSERT( !mBuild_Register.IsValid() );
@@ -218,17 +238,17 @@ static bool iterateNextExpression( size_t &i, TokNode *pNode )
 {
 	for (++i; i < pNode->mpChilds.size(); ++i)
 	{
-		if ( pNode->mpChilds[i]->IsTokenID( T_OP_COMMA ) )
-		{
-			++i;
-			return true;
-		}
-		else
 		if ( pNode->mpChilds[i]->IsTokenID( T_OP_SEMICOL ) ||
 			 pNode->mpChilds[i]->IsTokenID( T_OP_RGT_BRACKET ) )
 		{
 			++i;
 			return false;
+		}
+		else
+		if ( pNode->mpChilds[i]->IsTokenID( T_OP_COMMA ) )
+		{
+			++i;
+			return true;
 		}
 	}
 
@@ -288,10 +308,22 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 					if ( pOutputNode && blkType == BLKT_CODEBLOCK )
 						throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pOutputNode );
 
-					for (; i < pNode->mpChilds.size();)
+					for (; i < pNode->mpChilds.size(); ++i)
 					{
 						TokNode	*pVarName = pNode->GetChildTry( i );
 
+						if ( pVarName->IsTokenID( T_OP_SEMICOL ) ||
+							 pVarName->IsTokenID( T_OP_RGT_BRACKET ) )
+						{
+							++i;
+							break;
+						}
+						else
+						if ( pVarName->IsTokenID( T_OP_COMMA ) )
+						{
+							continue;
+						}
+						else
 						if ( pVarName->IsNonTerminal() )
 						{						
 							// no "space cast" in the declaration in the curl braces
@@ -304,18 +336,15 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 								// functions and shader params are allowed to change type after
 								// a comma !
 
-								if ( pNode->mpToken->idType == T_TYPE_DATATYPE )
-									pDTypeNode = pNode;
+								if ( pVarName->mpToken->idType == T_TYPE_DATATYPE )
+									pDTypeNode = pVarName;
 								else
-								if ( pNode->mpToken->idType == T_TYPE_DETAIL )
-									pDetailNode = pNode;
+								if ( pVarName->mpToken->idType == T_TYPE_DETAIL )
+									pDetailNode = pVarName;
 							}
 							//else
 							//	throw Exception( "Expecting a variable name !" );
 						}
-
-						if NOT( iterateNextExpression( i, pNode ) )
-							break;
 					}
 
 					if NOT( i < pNode->mpChilds.size() )
@@ -330,6 +359,12 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 		if ( pNode->mpChilds[i]->mpToken->id == T_OP_LFT_CRL_BRACKET ||
 			 pNode->mpChilds[i]->mpToken->id == T_OP_LFT_BRACKET )
 		{
+			if ( i > 0 && 0 == strcmp( "vector", pNode->mpChilds[i-1]->GetTokStr() ) )
+			{
+				int yoyo = 1;
+			}
+			
+
 			DiscoverVariablesDeclarations( pNode->mpChilds[i] );
 		}
 	}

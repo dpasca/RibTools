@@ -99,6 +99,57 @@ void Inst_LD3( SlRunContext &ctx )
 }
 
 //==================================================================
+template <class TA, class TB>
+void Inst_MOVVS3( SlRunContext &ctx )
+{
+		  TA*	lhs	= ctx.GetVoidRW<TA>( 1 );
+	const TB*	op1	= ctx.GetVoidRO<TB>( 2 );
+	const TB*	op2	= ctx.GetVoidRO<TB>( 3 );
+	const TB*	op3	= ctx.GetVoidRO<TB>( 4 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op2_offset = 0;
+		int		op3_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+		int		op2_step = ctx.GetSymbolVaryingStep( 3 );
+		int		op3_step = ctx.GetSymbolVaryingStep( 4 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				lhs[0][i] = op1[op1_offset];
+				lhs[1][i] = op2[op2_offset];
+				lhs[2][i] = op3[op3_offset];
+			}
+
+			op1_offset	+= op1_step;
+			op2_offset	+= op2_step;
+			op3_offset	+= op3_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
+				 !ctx.IsSymbolVarying( 3 ) &&
+				 !ctx.IsSymbolVarying( 4 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0][0] = op1[0];
+			lhs[1][0] = op2[0];
+			lhs[2][0] = op3[0];
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 template <class TA, class TB, const OpCodeID opCodeID>
 void Inst_1Op( SlRunContext &ctx )
 {

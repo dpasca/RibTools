@@ -94,6 +94,7 @@ enum TokenID
 	OP_DEF(	"]"		,	RGT_SQ_BRACKET		)	,
 	OP_DEF(	"{"		,	LFT_CRL_BRACKET		)	,
 	OP_DEF(	"}"		,	RGT_CRL_BRACKET		)	,
+	OP_DEF(	"#"		,	HASH		)	,
 
 	DT_DEF( float			)	,
 	DT_DEF( vector			)	,

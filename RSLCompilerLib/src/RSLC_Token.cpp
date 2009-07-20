@@ -68,6 +68,7 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	OP_DEF(	"]"		,	RGT_SQ_BRACKET		)	,
 	OP_DEF(	"{"		,	LFT_CRL_BRACKET		)	,
 	OP_DEF(	"}"		,	RGT_CRL_BRACKET		)	,
+	OP_DEF(	"#"		,	HASH		)	,
 
 	DT_DEF( float			)	,
 	DT_DEF( vector			)	,
@@ -618,6 +619,8 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 
 		if ( handleString( pSource, i, sourceSize, tokens, lineCnt ) )
 			continue;
+
+		throw Exception( DUT::SSPrintFS( "Invalid character '%c' at line %i !", pSource[i], lineCnt+1 ) );
 	}
 
 	// solve ambiguities about variables named like standard functions !

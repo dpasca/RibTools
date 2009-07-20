@@ -68,6 +68,8 @@ enum OpCodeID
 	OP_VV_DIV	,
 
 	// no need for index alignment from here on
+	OP_VS3_MOV	,
+
 	OP_LDS	,
 	OP_LDV	,
 

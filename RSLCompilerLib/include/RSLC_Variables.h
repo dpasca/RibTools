@@ -147,6 +147,7 @@ void AddVariable(
 //==================================================================
 VarType VarTypeFromToken( const Token *pTok );
 const char *VarTypeToString( VarType type );
+char VarTypeToLetter( VarType type );
 
 //==================================================================
 void AddStandardVariables( TokNode *pNode );

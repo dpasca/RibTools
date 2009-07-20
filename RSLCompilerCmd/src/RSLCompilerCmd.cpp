@@ -31,7 +31,7 @@ int main( int argc, char *argv[] )
 	const char	*pRRFName = argv[2];
 
 	printf( "Opening %s in input...\n", pSLFName );
-	
+
 	void	*pInData;
 	size_t	inDataSize;
 	if NOT( DUT::GrabFile( pSLFName, pInData, inDataSize ) )
