@@ -127,7 +127,7 @@ public:
 			return NULL;
 	}
 
-	void AssignRegister( int &io_regIdx );
+	void AssignRegister( int regIdx );
 	bool IsRegisterAssigned() const;
 
 	VarType GetVarType() const;
@@ -151,7 +151,7 @@ char VarTypeToLetter( VarType type );
 
 //==================================================================
 void AddStandardVariables( TokNode *pNode );
-void CollecedUsedStdVars( TokNode *pNode, DVec<size_t> &io_usedStdVarsList );
+void CollectUsedStdVars( TokNode *pNode, DVec<size_t> &io_usedStdVarsList );
 void DiscoverVariablesDeclarations( TokNode *pNode );
 void DiscoverVariablesUsage( TokNode *pNode );
 void DiscoverVariables( TokNode *pNode );

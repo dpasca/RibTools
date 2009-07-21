@@ -10,6 +10,7 @@
 #include "RSLC_Tree.h"
 #include "RSLC_Functions.h"
 #include "RSLC_Exceptions.h"
+#include "RSLC_Registers.h"
 
 //==================================================================
 namespace RSLC
@@ -380,7 +381,9 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 			assignPassingParams( pClonedParams, pPassParams );
 
 			DSAFE_DELETE( pNode );
-			return;
+			//return;
+
+			pNode = pClonedParams;
 		}
 	}
 
@@ -487,37 +490,8 @@ void ResolveFunctionCalls( TokNode *pNode )
 }
 
 //==================================================================
-static void getRegName( const Register &reg, char *pOutBuff, size_t maxOutSize )
-{
-	char	regBase[16] = {0};
-
-	switch ( reg.GetVarType() )
-	{
-	case VT_FLOAT:	regBase[0] = 's'; break;
-	case VT_POINT:	regBase[0] = 'v'; break;
-	case VT_COLOR:	regBase[0] = 'v'; break;
-	case VT_STRING:	regBase[0] = 'x'; DASSERT( 0 ); break;
-	case VT_VECTOR:	regBase[0] = 'v'; break;
-	case VT_NORMAL:	regBase[0] = 'v'; break;
-	case VT_MATRIX:	regBase[0] = 'm'; break;
-	case VT_BOOL:	regBase[0] = 'b'; break;
-	default:
-		strcpy_s( regBase, "UNK_" );
-		//DASSERT( 0 );
-		break;
-	}
-
-	if NOT( reg.IsVarying() )
-		strcat_s( regBase, "u" );
-
-	sprintf_s( pOutBuff, maxOutSize, "$%s%i", regBase, reg.GetRegIdx() );
-}
-
-//==================================================================
-static const char *getOperand(
+static const std::string getOperand(
 					TokNode *pOperand,
-					char *pOutBuff,
-					size_t maxOutSize,
 					VarType &out_varType,
 					bool &out_isValue )
 {
@@ -533,8 +507,8 @@ static const char *getOperand(
 		{
 			out_varType = reg.GetVarType();
 			out_isValue	= false;
-			getRegName( reg, pOutBuff, maxOutSize );
-			return pOutBuff;
+
+			return GetRegName( reg );
 		}
 		else
 		if ( pOperand->mpToken->idType == T_TYPE_VALUE )
@@ -562,8 +536,6 @@ static const char *getOperand(
 //==================================================================
 static void writeFuncParams( FILE *pFile, TokNode *pNode )
 {
-	char	op1NameBuff[32];
-
 	if ( pNode->mpParent &&
 		 pNode->mpParent->mpParent &&
 		 pNode->mpParent->mpParent->mpToken->IsAssignOp() )
@@ -572,9 +544,9 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 
 		Register	reg = pChild->BuildGetRegister();
 
-		getRegName( reg, op1NameBuff, _countof(op1NameBuff) );
+		std::string regName = GetRegName( reg );
 
-		fprintf_s( pFile, "\t%s", op1NameBuff );
+		fprintf_s( pFile, "\t%s", regName.c_str() );
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -586,9 +558,9 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 
 		VarType	varType;
 		bool	isValue;
-		const char	*pOStr = getOperand( pChild, op1NameBuff, _countof(op1NameBuff), varType, isValue );
+		std::string opStr = getOperand( pChild, varType, isValue );
 
-		fprintf_s( pFile, "\t%s", pOStr );
+		fprintf_s( pFile, "\t%s", opStr.c_str() );
 	}
 
 	fprintf_s( pFile, "\n\n" );
@@ -674,15 +646,13 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 		if ( pOperand1 && pOperand2 )
 		{
-			char	op1NameBuff[32];
-			char	op2NameBuff[32];
 			VarType	varType1;
 			VarType	varType2;
 			bool	isValue1;
 			bool	isValue2;
 
-			const char	*pO1Str = getOperand( pOperand1, op1NameBuff, _countof(op1NameBuff), varType1, isValue1 );
-			const char	*pO2Str = getOperand( pOperand2, op2NameBuff, _countof(op2NameBuff), varType2, isValue2 );
+			std::string	o1Str = getOperand( pOperand1, varType1, isValue1 );
+			std::string	o2Str = getOperand( pOperand2, varType2, isValue2 );
 
 			bool	doAssign = pNode->mpToken->IsAssignOp();
 
@@ -699,16 +669,16 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 								pFile,
 								"\tld%c\t%s\t%s\n",
 								l1,
-								pO1Str,
-								pO2Str );
+								o1Str.c_str(),
+								o2Str.c_str() );
 					else
 						fprintf_s(
 								pFile,
 								"\tmov%c%c\t%s\t%s\n",
 								l1,
 								l2,
-								pO1Str,
-								pO2Str );
+								o1Str.c_str(),
+								o2Str.c_str() );
 				}
 				else
 					fprintf_s(
@@ -717,16 +687,14 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 							asmOpCodeFromOpToken( pNode->mpToken ),
 							l1,
 							l2,
-							pO1Str,
-							pO1Str,
-							pO2Str );
+							o1Str.c_str(),
+							o1Str.c_str(),
+							o2Str.c_str() );
 			}
 			else
 			{
-				char regName[32];
-		
 				Register	reg = pNode->BuildGetRegister();
-				getRegName( reg, regName, _countof(regName) );
+				std::string regName = GetRegName( reg );
 
 				fprintf_s(
 						pFile,
@@ -734,9 +702,9 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 						asmOpCodeFromOpToken( pNode->mpToken ),
 						l1,
 						l2,
-						regName,
-						pO1Str,
-						pO2Str );
+						regName.c_str(),
+						o1Str.c_str(),
+						o2Str.c_str() );
 			}
 		}
 	}

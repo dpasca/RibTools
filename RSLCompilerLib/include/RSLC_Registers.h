@@ -15,6 +15,7 @@ namespace RSLC
 
 //==================================================================
 void AssignRegisters( class TokNode *pNode );
+std::string GetRegName( const Register &reg );
 
 //==================================================================
 }

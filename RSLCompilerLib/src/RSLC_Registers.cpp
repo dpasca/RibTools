@@ -14,54 +14,6 @@
 namespace RSLC
 {
 
-//==================================================================
-static void solveTempOperand( TokNode *pOperand, int &io_tempIdx )
-{
-	while ( pOperand->mBuild_TmpReg.GetRegIdx() == -1 )
-	{
-		if ( pOperand->mpToken->idType == T_TYPE_TEMPDEST )
-		{
-			// assign a temporary and get out
-			pOperand->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );
-			break;
-		}
-
-		if ( pOperand->mpChilds.size() == 0 )
-		{
-			return;	// "BADDDD";
-		}
-
-		// expect at least one children
-		DASSERT( pOperand->mpChilds.size() > 0 );
-		pOperand = pOperand->mpChilds[0];
-	}
-}
-
-//==================================================================
-static void solveOperand( TokNode *pOperand, int &io_tempIdx )
-{
-	if ( pOperand->mNodeType == TokNode::TYPE_FUNCCALL )
-	{
-		DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() == 2 );
-		DASSERT( pOperand->mpParent->mpChilds[0]->mBuild_TmpReg.GetRegIdx() != -1 );
-	}
-	else
-	if ( pOperand->mpToken->idType == T_TYPE_VALUE || pOperand->mpToken->idType == T_TYPE_NONTERM )
-	{
-		if ( pOperand->mVarLink.IsValid() && !pOperand->mVarLink.IsGlobal() )
-		{
-			Variable	*pVar = pOperand->mVarLink.GetVarPtr();
-
-			if NOT( pVar->mBuild_Register.IsValid() )
-				pVar->AssignRegister( io_tempIdx );
-		}
-	}
-	else
-	{
-		solveTempOperand( pOperand, io_tempIdx );
-	}
-}
-
 /*
 //==================================================================
 static VarType getOperandType( TokNode *pOperand )
@@ -81,22 +33,6 @@ static VarType getOperandType( TokNode *pOperand )
 	DASSERT( 0 );
 
 	return VT_UNKNOWN;
-}
-*/
-
-/*
-//==================================================================
-static void assignRegisters_expr_fcall( TokNode *pNode, int &io_tempIdx )
-{
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-	{
-		TokNode *pChild = pNode->mpChilds[ i ];
-
-		if ( pChild->mpToken->id == T_OP_COMMA )
-			continue;
-
-		solveOperand( pChild, io_tempIdx );
-	}
 }
 */
 
@@ -125,11 +61,10 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 
 	if ( pNode->mVarLink.IsValid() )
 	{
-		if (
-			!pNode->mVarLink.IsGlobal() &&
+		if (!pNode->mVarLink.IsGlobal() &&
 			!pNode->mVarLink.GetVarPtr()->IsRegisterAssigned() )
 		{
-			pNode->mVarLink.GetVarPtr()->AssignRegister( io_tempIdx );
+			pNode->mVarLink.GetVarPtr()->AssignRegister( io_tempIdx++ );
 		}
 	}
 	else
@@ -161,6 +96,33 @@ void AssignRegisters( TokNode *pNode )
 			assignRegisters_expr( pNode, tempIdx );
 		}
 	}
+}
+
+//==================================================================
+std::string GetRegName( const Register &reg )
+{
+	char	regBase[16] = {0};
+
+	switch ( reg.GetVarType() )
+	{
+	case VT_FLOAT:	regBase[0] = 's'; break;
+	case VT_POINT:	regBase[0] = 'v'; break;
+	case VT_COLOR:	regBase[0] = 'v'; break;
+	case VT_STRING:	regBase[0] = 'x'; DASSERT( 0 ); break;
+	case VT_VECTOR:	regBase[0] = 'v'; break;
+	case VT_NORMAL:	regBase[0] = 'v'; break;
+	case VT_MATRIX:	regBase[0] = 'm'; break;
+	case VT_BOOL:	regBase[0] = 'b'; break;
+	default:
+		strcpy_s( regBase, "UNK_" );
+		//DASSERT( 0 );
+		break;
+	}
+
+	if NOT( reg.IsVarying() )
+		strcat_s( regBase, "u" );
+
+	return DUT::SSPrintF( "$%s%i", regBase, reg.GetRegIdx() );
 }
 
 //==================================================================

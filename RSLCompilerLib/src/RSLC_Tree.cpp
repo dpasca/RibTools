@@ -8,6 +8,7 @@
 
 #include "RSLC_Tree.h"
 #include "RSLC_Exceptions.h"
+#include "RSLC_Registers.h"
 
 //==================================================================
 namespace RSLC
@@ -464,9 +465,17 @@ void TraverseTree( TokNode *pNode, int depth )
 		
 		if ( pNode->mVarLink.GetVarPtr() )
 		{
-			printf( " <<VARIABLE: %s>>", pNode->mVarLink.GetVarPtr()->mInternalName.c_str() );
+			Register	reg = pNode->mVarLink.GetVarPtr()->mBuild_Register;
+			std::string regName = GetRegName( reg );
+
+			printf( " // %s - %s - %s",
+				regName.c_str(),
+				pNode->mVarLink.GetVarPtr()->mInternalName.c_str(),
+				pNode->mVarLink.GetVarPtr()->IsVarying() ? "varying" : "uniform"
+				);
 		}
 	}
+
 
 	switch ( pNode->GetBlockType() )
 	{

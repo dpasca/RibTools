@@ -99,14 +99,12 @@ RSLCompiler::RSLCompiler(
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
 
-	//InstrumentFunctionCalls( mpRoot );
-
 	ResolveFunctionCalls( mpRoot );
 
 	AssignRegisters( mpRoot );
 
 	mUsedStdVars.clear();
-	CollecedUsedStdVars( mpRoot, mUsedStdVars );
+	CollectUsedStdVars( mpRoot, mUsedStdVars );
 
 	// produce some debug info in the output file
 	TraverseTree( mpRoot, 0 );

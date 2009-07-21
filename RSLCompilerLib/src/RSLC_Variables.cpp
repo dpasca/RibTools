@@ -74,12 +74,12 @@ char VarTypeToLetter( VarType type )
 }
 
 //==================================================================
-void Variable::AssignRegister( int &io_regIdx )
+void Variable::AssignRegister( int regIdx )
 {
 	DASSERT( !mBuild_Register.IsValid() );
 
 	mBuild_Register.SetType( mVarType, mIsVarying );
-	mBuild_Register.SetRegIdx( io_regIdx++ );
+	mBuild_Register.SetRegIdx( regIdx );
 }
 
 //==================================================================
@@ -468,7 +468,7 @@ static void collecedUsedStdVars_sub( TokNode *pNode, DVec<size_t> &io_usedStdVar
 }
 
 //==================================================================
-void CollecedUsedStdVars( TokNode *pRoot, DVec<size_t> &io_usedStdVarsList )
+void CollectUsedStdVars( TokNode *pRoot, DVec<size_t> &io_usedStdVarsList )
 {
 	for (size_t i=0; i < pRoot->GetFuncs().size(); ++i)
 	{

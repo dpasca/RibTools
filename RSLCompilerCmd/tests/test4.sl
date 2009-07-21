@@ -16,7 +16,5 @@ vector bobo( float d ) /* float e=1 */
 /*==========================================*/
 surface test4( float b )
 {
-	vector aaaa = bobo( 2 );
-
-	Oi = Os * xcomp( aaaa );
+	Oi = Os * xcomp( bobo( 2 ) );
 }
