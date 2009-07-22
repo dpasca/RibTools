@@ -1,3 +1,12 @@
+/*==================================================================
+/// RSLC_Builtins.sl
+///
+/// Created by Davide Pasca - 2009/07/23
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================*/
+/* Basic declarations ad found in RenderMan specs and instrumented
+for RibRender */
 
 float	radians( float deg )
 {
@@ -25,34 +34,31 @@ float	log( float x, base ){}
 float	mod( float a, b ){}
 float	abs( float x ){}
 float	sign( float x ){}
-/*
-type 	min(type a, b, ... ){}
-type	max( type a, b, ... ){}
-type	clamp( type a, min, max ){}
-*/
-float	min( float	a, b )	{}
-point	min( point	a, b )	{}
-vector	min( vector	a, b )	{}
-normal	min( normal	a, b )	{}
-color	min( color	a, b )	{}
 
-float	max( float	a, b )	{}
-point	max( point	a, b )	{}
-vector	max( vector	a, b )	{}
-normal	max( normal	a, b )	{}
-color	max( color	a, b )	{}
+float	min( float	a, b )		{	float	tmp; _asm_min( tmp, a, b ); return tmp; }
+point	min( point	a, b )		{	point	tmp; _asm_min( tmp, a, b ); return tmp; }
+vector	min( vector	a, b )		{	vector	tmp; _asm_min( tmp, a, b ); return tmp; }
+normal	min( normal	a, b )		{	normal	tmp; _asm_min( tmp, a, b ); return tmp; }
+color	min( color	a, b )		{	color	tmp; _asm_min( tmp, a, b ); return tmp; }
 
-float	clamp( float	a, b )	{}
-point	clamp( point	a, b )	{}
-vector	clamp( vector	a, b )	{}
-normal	clamp( normal	a, b )	{}
-color	clamp( color	a, b )	{}
+float	max( float	a, b )		{	float	tmp; _asm_max( tmp, a, b ); return tmp; }
+point	max( point	a, b )		{	point	tmp; _asm_max( tmp, a, b ); return tmp; }
+vector	max( vector	a, b )		{	vector	tmp; _asm_max( tmp, a, b ); return tmp; }
+normal	max( normal	a, b )		{	normal	tmp; _asm_max( tmp, a, b ); return tmp; }
+color	max( color	a, b )		{	color	tmp; _asm_max( tmp, a, b ); return tmp; }
 
-float	mix(float x, y; float alpha ){}
-point	mix(point x, y; float alpha ){}
-vector	mix(vector x, y; float alpha ){}
-normal	mix(normal x, y; float alpha ){}
-color	mix(color x, y; float alpha ){}
+float	clamp( float	a, b )	{	float	tmp; _asm_clamp( tmp, a, b ); return tmp; }
+point	clamp( point	a, b )	{	point	tmp; _asm_clamp( tmp, a, b ); return tmp; }
+vector	clamp( vector	a, b )	{	vector	tmp; _asm_clamp( tmp, a, b ); return tmp; }
+normal	clamp( normal	a, b )	{	normal	tmp; _asm_clamp( tmp, a, b ); return tmp; }
+color	clamp( color	a, b )	{	color	tmp; _asm_clamp( tmp, a, b ); return tmp; }
+                                                   
+float	mix(float	x, y; float alpha )	{	float	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
+point	mix(point	x, y; float alpha )	{	point	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
+vector	mix(vector	x, y; float alpha )	{	vector	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
+normal	mix(normal	x, y; float alpha )	{	normal	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
+color	mix(color	x, y; float alpha )	{	color	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
+                                                                            
 float	floor( float x ){}
 float	ceil( float x ){}
 float	round( float x ){}
@@ -190,7 +196,6 @@ normal	ntransform( string fromspace; matrix m; normal n ){}
 point	calculatenormal( point P ){}
 float	comp( color c; float index ){}
 void	setcomp( output color c; float index, value ){}
-color	mix( color color0, color1; float value ){}
 /*
 color	ctransform( string tospace; color C ){}
 color	ctransform( string fromspace, tospace; color C ){}
@@ -205,8 +210,10 @@ void	printf( string pattern, val1, val2,..., valn ){}
 string	format( string pattern, val1, val2,..., valn ){}
 float	match( string pattern, subject ){}
 */
-color	ambient(){}
-color	diffuse( normal N ){}
+
+color	ambient()			{	color tmp; _asm_ambient( tmp );		return tmp;	}
+color	diffuse( normal N )	{	color tmp; _asm_diffuse( tmp, N );	return tmp;	}
+
 color	specular( normal N; vector V; float roughness ){}
 color	specularbrdf( vector L; normal N; vector V; float roughness ){}
 color	phong( normal N; vector V; float size ){}

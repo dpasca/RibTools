@@ -24,10 +24,9 @@ static bool renderFile(
 	int forcedWd=-1,
 	int forcedHe=-1 )
 {
-	void	*pData;
-	size_t	dataSize;
+	DVec<U8>	fileData;
 
-	if NOT( DUT::GrabFile( pFileName, pData, dataSize ) )
+	if NOT( DUT::GrabFile( pFileName, fileData ) )
 	{
 		printf( "Could not open the file in input. Quitting !\n" );
 		return false;
@@ -45,12 +44,12 @@ static bool renderFile(
 	RI::Machine				machine( &framework, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
 
 	RI::Parser				parser;
-	for (size_t i=0; i <= dataSize; ++i)
+	for (size_t i=0; i <= fileData.size(); ++i)
 	{
-		if ( i == dataSize )
+		if ( i == fileData.size() )
 			parser.AddChar( 0 );
 		else
-			parser.AddChar( ((char *)pData)[i] );
+			parser.AddChar( (char)fileData[i] );
 
 		while ( parser.HasNewCommand() )
 		{

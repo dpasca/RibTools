@@ -10,6 +10,7 @@
 #define RSLC_TOKEN_H
 
 #include <string>
+#include "DSystem/include/DUtils.h"
 #include "DSystem/include/DContainers.h"
 
 //==================================================================

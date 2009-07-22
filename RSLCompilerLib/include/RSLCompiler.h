@@ -26,10 +26,22 @@ class RSLCompiler
 	DVec<size_t>		mUsedStdVars;
 
 public:
+	class Params
+	{
+	public:
+		bool	mDbgOutputTree;
+
+		Params() :
+			mDbgOutputTree(false)
+		{
+		}
+	};
+
 	RSLCompiler(
 		const char *pSource,
 		size_t sourceSize,
-		const char *pBaseInclude );
+		const char *pBaseInclude,
+		const Params &params );
 
 	~RSLCompiler();
 

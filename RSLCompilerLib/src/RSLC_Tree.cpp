@@ -476,7 +476,6 @@ void TraverseTree( TokNode *pNode, int depth )
 		}
 	}
 
-
 	switch ( pNode->GetBlockType() )
 	{
 	case BLKT_UNKNOWN:		break;

@@ -32,9 +32,8 @@ int main( int argc, char *argv[] )
 
 	printf( "Opening %s in input...\n", pSLFName );
 
-	void	*pInData;
-	size_t	inDataSize;
-	if NOT( DUT::GrabFile( pSLFName, pInData, inDataSize ) )
+	DVec<U8>	inData;
+	if NOT( DUT::GrabFile( pSLFName, inData ) )
 	{
 		printf( "ERROR: Failed opening %s\n", pSLFName );
 		exit( -1 );
@@ -42,10 +41,14 @@ int main( int argc, char *argv[] )
 
 	try 
 	{
+		RSLCompiler::Params	params;
+		params.mDbgOutputTree = true;
+
 		RSLCompiler	compiler(
-						(const char *)pInData,
-						inDataSize,
-						"Resources\\RSLC_Builtins.sl" );
+						(const char *)&inData[0],
+						inData.size(),
+						"Resources\\Shaders\\RSLC_Builtins.sl",
+						params );
 
 		printf( "Generating %s...\n", pRRFName );
 

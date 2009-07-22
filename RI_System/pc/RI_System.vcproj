@@ -475,6 +475,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Resources\Shaders\matte.sl"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Resources\Shaders\metal.rrasm"
 					>
 				</File>

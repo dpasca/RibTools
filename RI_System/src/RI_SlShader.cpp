@@ -17,6 +17,7 @@
 #include "RI_SlShader_Ops_Base.h"
 #include "RI_SlShader_Ops_Lighting.h"
 #include "RI_SlShader_Ops_Noise.h"
+#include "RSLCompilerLib/include/RSLCompiler.h"
 
 //==================================================================
 //#define FORCE_MEM_CORRUPTION_CHECK
@@ -24,6 +25,52 @@
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+static std::string compileSLToAsm(
+						DUT::MemFile &slSource,
+						const char *pSrcFPathName,
+						const char *pAppResDir )
+{
+	// compile
+	char	asmOutName[1024];
+
+	strcpy_s( asmOutName, pSrcFPathName );
+	DUT::GetFileNameExt( asmOutName )[0] = 0;	// cut the extension
+	strcat_s( asmOutName, "autogen.rrasm" );	// make the .autogen etc name
+
+	std::string	basInclude( pAppResDir );
+	basInclude += "/RSLC_Builtins.sl";
+
+	try {
+		RSLCompiler::Params	params;
+		params.mDbgOutputTree = false;
+
+		// try compile
+		RSLCompiler	compiler(
+						(const char *)slSource.GetData(),
+						slSource.GetDataSize(),
+						basInclude.c_str(),
+						params
+					);
+
+		// save autogen rrasm file
+		compiler.SaveASM( asmOutName, pSrcFPathName );
+	}
+	catch ( RSLC::Exception &e )
+	{
+		printf(
+			"ERROR: while compiling '%s'..\n%s\n",
+			pSrcFPathName,
+			e.GetMessage().c_str() );
+	}
+	catch ( ... )
+	{
+		printf( "ERROR while compiling '%s'\n", pSrcFPathName );
+	}
+
+	return asmOutName;
+}
 
 //==================================================================
 /// SlShader
@@ -38,14 +85,48 @@ SlShader::SlShader( const CtorParams &params ) :
 		DUT::MemFile	file((const void *)params.pSource,
 							  strlen(params.pSource) );
 
-		ShaderAsmParser	parser( file, this, params.pName );
+		// umm.. really ?
+		bool	isSL =
+			(0 == strcasecmp( DUT::GetFileNameExt( params.pName ), "sl" ) );
+
+		if ( isSL )
+		{
+			std::string asmFileName = compileSLToAsm( file, params.pName, params.pAppResDir );
+
+			DUT::MemFile	tmpFile( asmFileName.c_str() );
+
+			ShaderAsmParser	parser( tmpFile, this, params.pName );
+		}
+		else
+		{
+
+			ShaderAsmParser	parser( file, this, params.pName );
+		}
 	}
 	else
 	if ( params.pSourceFileName )
 	{
 		DUT::MemFile	file( params.pSourceFileName );
 
-		ShaderAsmParser	parser( file, this, params.pName );
+		// umm.. really ?
+		bool	isSL =
+			(0 == strcasecmp( DUT::GetFileNameExt( params.pSourceFileName ), "sl" ) );
+
+		if ( isSL )
+		{
+			std::string asmFileName = compileSLToAsm(
+												file,
+												params.pSourceFileName,
+												params.pAppResDir );
+
+			DUT::MemFile	tmpFile( asmFileName.c_str() );
+
+			ShaderAsmParser	parser( tmpFile, this, params.pName );
+		}
+		else
+		{
+			ShaderAsmParser	parser( file, this, params.pName );
+		}
 	}
 	else
 	{

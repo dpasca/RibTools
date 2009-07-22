@@ -344,14 +344,39 @@ static void onError( const char *pFmt, ... )
 }
 
 //==================================================================
-SlShader *Attributes::loadShader( const char *pBasePath, const char *pSName )
+static void onWarning( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	puts( buff );
+}
+
+//==================================================================
+SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName )
 {
 	char	buff[1024];
 
 	SlShader::CtorParams	params;
 	params.pName			= pSName;
+	params.pAppResDir		= pAppResDir;
 	params.pSourceFileName	= buff;	
-	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+
+	sprintf( buff, "%s/%s.sl", pBasePath, pSName );
+	if NOT( DUT::FileExists( buff ) )
+	{
+		sprintf( buff, "%s/%s.rrasm", pBasePath, pSName );
+		if NOT( DUT::FileExists( buff ) )
+		{
+			// couldn't find
+			return NULL;
+		}
+	}
 
 	SlShader *pShader = NULL;
 
@@ -359,6 +384,7 @@ SlShader *Attributes::loadShader( const char *pBasePath, const char *pSName )
 		pShader = DNEW SlShader( params );
 	} catch ( ... )
 	{
+		onError( "Could not assemble '%s' !", params.pSourceFileName );
 		return NULL;
 	}
 
@@ -378,10 +404,12 @@ SlShader *Attributes::getShader( const char *pShaderName, const char *pAlternate
 	if ( pShader )
 		return pShader;
 
-	if ( pShader = loadShader( mpState->GetBaseDir(), pShaderName ) )
+	const char *pAppResDir = mpState->GetDefShadersDir();
+
+	if ( pShader = loadShader( mpState->GetBaseDir(), pAppResDir, pShaderName ) )
 		return pShader;
 
-	if ( pShader = loadShader( mpState->GetDefShadersDir(), pShaderName ) )
+	if ( pShader = loadShader( pAppResDir, pAppResDir, pShaderName ) )
 		return pShader;
 
 	if ( pAlternateName )

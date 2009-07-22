@@ -136,9 +136,22 @@ void State::addDefShader( const char *pBasePath, const char *pSName )
 
 	SlShader::CtorParams	params;
 	params.pName			= pSName;
-	params.pSourceFileName	= buff;	
-	sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-	SlShader *pShader = (SlShader *)mResManager.AddResource( DNEW SlShader( params ) );
+	params.pSourceFileName	= buff;
+	params.pAppResDir		= mDefaultShadersDir.c_str();
+
+	SlShader *pShader = NULL;
+	try 
+	{
+		sprintf( buff, "%s/%s.sl", pBasePath, params.pName );
+		pShader = DNEW SlShader( params );
+	}
+	catch ( ... )
+	{
+		sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+		pShader = DNEW SlShader( params );
+	}
+
+	mResManager.AddResource( pShader );
 }
 
 //==================================================================

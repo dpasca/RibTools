@@ -202,10 +202,9 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	if NOT( pFileName[0] )
 		return false;
 
-	void	*pData;
-	size_t	dataSize;
+	DVec<U8>	fileData;
 
-	if NOT( DUT::GrabFile( pFileName, pData, dataSize ) )
+	if NOT( DUT::GrabFile( pFileName, fileData ) )
 	{
 		printf( "Could not open the file in input. Quitting !\n" );
 		return false;
@@ -225,15 +224,15 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	RI::Machine			machine( &framework, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
 
 	RI::Parser			parser;
-	for (size_t i=0; i <= dataSize; ++i)
+	for (size_t i=0; i <= fileData.size(); ++i)
 	{
-		if ( i == dataSize )
+		if ( i == fileData.size() )
 			parser.AddChar( 0 );
 		else
-			parser.AddChar( ((char *)pData)[i] );
+			parser.AddChar( (char)fileData[i] );
 
 	#if defined(ECHO_INPUT)
-		printf( "%c", ((char *)pData)[i] );
+		printf( "%c", (char)fileData[i] );
 	#endif
 
 		while ( parser.HasNewCommand() )

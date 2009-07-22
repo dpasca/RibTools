@@ -53,7 +53,8 @@ static void grabfile( const char *pFName, DVec<char> &out_data )
 RSLCompiler::RSLCompiler(
 		const char *pSource,
 		size_t sourceSize,
-		const char *pBaseInclude )
+		const char *pBaseInclude,
+		const Params &params )
 {
 	DVec<char>	sourceInc;
 
@@ -63,6 +64,7 @@ RSLCompiler::RSLCompiler(
 
 	Tokenizer( mTokens, &sourceInc[0], sourceInc.size() );
 
+#if 0	// useful to debug the tokenizer
 	for (size_t i=0; i < mTokens.size(); ++i)
 	{
 		printf( "%3i) %i - %-12s - %s\n",
@@ -71,6 +73,7 @@ RSLCompiler::RSLCompiler(
 				GetTokenTypeStr( mTokens[i].idType ),
 				mTokens[i].str.c_str() );
 	}
+#endif
 
 	mpRoot = DNEW TokNode( (Token *)NULL );
 
@@ -107,7 +110,8 @@ RSLCompiler::RSLCompiler(
 	CollectUsedStdVars( mpRoot, mUsedStdVars );
 
 	// produce some debug info in the output file
-	TraverseTree( mpRoot, 0 );
+	if ( params.mDbgOutputTree )
+		TraverseTree( mpRoot, 0 );
 }
 
 //==================================================================

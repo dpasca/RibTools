@@ -209,15 +209,17 @@ public:
 		const char	*pName;
 		const char	*pSource;
 		const char	*pSourceFileName;
+		const char	*pAppResDir;
 		
 		CtorParams() :
 			pName(NULL),
 			pSource(NULL),
-			pSourceFileName(NULL)
+			pSourceFileName(NULL),
+			pAppResDir(NULL)
 		{
 		}
 	};
-	
+
 	SlShader( const CtorParams &params );
 };
 

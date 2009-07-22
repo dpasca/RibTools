@@ -191,6 +191,18 @@
 				RelativePath="..\include\DUtils.h"
 				>
 			</File>
+			<File
+				RelativePath="..\include\DUtils_Base.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DUtils_Files.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DUtils_Files.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

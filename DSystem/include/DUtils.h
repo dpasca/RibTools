@@ -10,58 +10,36 @@
 #define DUTILS_H
 
 #include "DTypes.h"
-
-#ifdef NDEBUG
-	#define DASSERT(_X_)			((void)0)
-#else
-	#define DASSERT(_X_)			\
-			{\
-				bool ok=(_X_);\
-				if ( !ok ) {\
-					DUT::DAssert( ok, __FILE__, __LINE__ );\
-			} }
-#endif
-
-#define DASSTHROW(_X_,_MSG_)		\
-			{\
-				bool ok=(_X_);\
-				if ( !ok ) {\
-					DUT::DAssThrow( ok, __FILE__, __LINE__, DUT::SSPrintF _MSG_ );\
-			} }
+#include "DUtils_Base.h"
+#include "DUtils_Files.h"
 
 //==================================================================
 namespace DUT
 {
 
 //==================================================================
-bool GrabFile( const char *pFileName, void * &out_pData, size_t &out_dataSize );
-
-DStr GetDirNameFromFPathName( const char *pInFPathname );
 
 char *SSPrintF( const char *pFmt, ... );
 std::string SSPrintFS( const char *pFmt, ... );
-
-void DAssert( bool ok, const char *pFile, int line );
-void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg );
-
-//==================================================================
-const char *GetFileNameOnly( const char *pPathFileName );
 
 //==================================================================
 /// MemFile
 //==================================================================
 class MemFile
 {
+	DVec<U8>	mOwnData;
 	const U8	*mpData;
 	size_t		mDataSize;
 	size_t		mReadPos;
-	bool		mOwnData;
 	bool		mIsReadOnly;
 
 public:
 	MemFile( const void *pDataSrc, size_t dataSize );
 	MemFile( const char *pFileName );
 	~MemFile();
+
+	const U8 *GetData() const		{	return mpData;	}
+	size_t GetDataSize() const	{	return mDataSize;	}
 
 	bool ReadTextLine( char *pDestStr, size_t destStrMaxSize );
 };

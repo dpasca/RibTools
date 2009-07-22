@@ -114,7 +114,7 @@ public:
 	void cmdDisplacement( ParamList &params );
 
 private:
-	SlShader *loadShader( const char *pBasePath, const char *pSName );
+	SlShader *loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName );
 	SlShader *getShader( const char *pShaderName, const char *pAlternateName );
 };
 

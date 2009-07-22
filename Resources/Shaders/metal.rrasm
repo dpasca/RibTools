@@ -32,7 +32,8 @@ surface
 	faceforward	Nf	$v0	I
 
 	normalize	$v0		I
-	subvv		V	ZeroVec	$v0
+	ldv			$vu1	0
+	subvv		V	$vu1	$v0
 
 	movvv		Oi	Os		// Oi = Os
 	
