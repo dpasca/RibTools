@@ -2,13 +2,13 @@
    ..this comment is part of the test 8)*/
 
 /*==========================================*/
-vector bobo( float d ) /* float e=1 */
+vector bobo( float d )
 {
-/*
-	vector tt = vector(0,1,0);
+	/* eventual dead code elimination
+	would remove the two lines below */
 
+	vector tt = vector(0,1,0);
 	return tt + vector(0,0,2) + d;
-*/
 
 	return vector(0,1,0);
 }

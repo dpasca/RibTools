@@ -9,6 +9,7 @@
 #include "RSLC_Tree.h"
 #include "RSLC_Registers.h"
 #include "RSLC_Operators.h"
+#include "RSLC_Exceptions.h"
 
 //==================================================================
 namespace RSLC
@@ -56,7 +57,35 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 
 		DASSERT( pNode->mVarLink.IsValid() == false );
 
-		pNode->mBuild_TmpReg.SetType( opResVarType, opResIsVarying );
+		// is this an assignment ?
+		if ( pNode->mpToken->IsAssignOp() )
+		{
+			// ..are we dealing with varying data at all ?
+			if ( opResIsVarying )
+			{
+				Variable	*pOp1Var = pOperand1->mVarLink.GetVarPtr();
+
+				// is the destination not varying ?
+				if NOT( pOp1Var->IsVarying() )
+				{
+					if ( pOp1Var->IsForcedDetail() )
+					{
+						// this is the end of it..
+						throw Exception( "Cannot assign a varying variable to an 'uniform' destination", pNode );
+					}
+					else
+					{
+						pOp1Var->SetVarying( opResIsVarying );
+					}
+				}
+			}			
+		}
+		else
+		{
+			// ..if not.. then allocate a temporary register
+			pNode->mBuild_TmpReg.SetType( opResVarType, opResIsVarying, false );
+			pNode->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );	
+		}
 	}
 
 	if ( pNode->mVarLink.IsValid() )
@@ -67,12 +96,14 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 			pNode->mVarLink.GetVarPtr()->AssignRegister( io_tempIdx++ );
 		}
 	}
+/*
 	else
 	if ( pNode->mBuild_TmpReg.GetVarType() != VT_UNKNOWN )
 	{
 		//if NOT( pNode->mBuild_TmpReg.IsAssigned() )
 			pNode->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );	
 	}
+*/
 }
 
 //==================================================================

@@ -39,21 +39,24 @@ class Register
 {
 	VarType			mVarType;
 	bool			mIsVarying;
+	bool			mIsForcedDetail;
 	int				mRegIdx;
 
 public:
 	Register() :
 		mVarType(VT_UNKNOWN),
 		mIsVarying(false),
+		mIsForcedDetail(false),
 		mRegIdx(-1)
 	{
 	}
 
-	void SetType( VarType vtype, bool isVarying )
+	void SetType( VarType vtype, bool isVarying, bool isForcedDetail )
 	{
 		DASSERT( mVarType == VT_UNKNOWN && mIsVarying == false );
-		mVarType	= vtype;
-		mIsVarying	= isVarying;
+		mVarType		= vtype;
+		mIsVarying		= isVarying;
+		mIsForcedDetail	= isForcedDetail;
 	}
 
 	void SetRegIdx( int regIdx )
@@ -62,12 +65,19 @@ public:
 		mRegIdx		= regIdx;
 	}
 
-	VarType	GetVarType() const	{ return mVarType; }
-	bool	IsVarying() const	{ return mIsVarying; }
-	int		GetRegIdx() const	{ return mRegIdx; }
+	void SetVarying( bool varying )
+	{
+		DASSERT( mIsForcedDetail == false );
+		mIsVarying = varying;
+	}
 
-	bool IsValid() const { return mRegIdx != -1; }
-	bool IsAssigned() const { return mRegIdx != -1; }
+	VarType	GetVarType() const		{ return mVarType; }
+	bool	IsVarying() const		{ return mIsVarying; }
+	bool	IsForcedDetail() const	{ return mIsForcedDetail; }
+	int		GetRegIdx() const		{ return mRegIdx; }
+
+	bool IsValid() const			{ return mRegIdx != -1; }
+	bool IsAssigned() const			{ return mRegIdx != -1; }
 };
 
 //==================================================================
@@ -83,6 +93,7 @@ public:
 	DVec<Token*>	mpDefValToks;
 	VarType			mVarType;
 	bool			mIsVarying;
+	bool			mIsForcedDetail;
 	bool			mIsLValue;
 
 	Register		mBuild_Register;
@@ -95,7 +106,8 @@ public:
 		mpSpaceCastTok(NULL),
 		mpDefNameTok(NULL),
 		mVarType(VT_UNKNOWN),
-		mIsVarying(true),
+		mIsVarying(false),
+		mIsForcedDetail(false),
 		mIsLValue(false)
 	{
 	}
@@ -109,6 +121,7 @@ public:
 		mpDefValToks	(	from.mpDefValToks		),
 		mVarType		(	from.mVarType			),
 		mIsVarying		(	from.mIsVarying			),
+		mIsForcedDetail	(	from.mIsForcedDetail	),
 		mIsLValue		(	from.mIsLValue			)
 	{
 	}
@@ -133,7 +146,8 @@ public:
 	VarType GetVarType() const;
 
 	bool IsVarying() const;
-
+	bool IsForcedDetail() const;
+	void SetVarying( bool varying );
 };
 
 //==================================================================

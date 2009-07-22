@@ -281,6 +281,7 @@ static void insertAssignTo( TokNode *pDestNode, TokNode *pSrcNode )
 	pAssgnNode->AddChild( pCloneSrcNode );
 }
 
+/*
 //==================================================================
 static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType, bool isVarying )
 {
@@ -306,6 +307,7 @@ static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType
 
 	pAssgnNode->AddChild( pOldNode );
 }
+*/
 
 //==================================================================
 static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )

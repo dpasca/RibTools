@@ -78,7 +78,7 @@ void Variable::AssignRegister( int regIdx )
 {
 	DASSERT( !mBuild_Register.IsValid() );
 
-	mBuild_Register.SetType( mVarType, mIsVarying );
+	mBuild_Register.SetType( mVarType, mIsVarying, mIsForcedDetail );
 	mBuild_Register.SetRegIdx( regIdx );
 }
 
@@ -91,28 +91,38 @@ bool Variable::IsRegisterAssigned() const
 //==================================================================
 RSLC::VarType Variable::GetVarType() const
 {
-	if ( mBuild_Register.IsValid() )
-	{
-		DASSERT( mBuild_Register.GetVarType() == mVarType );
-		return mBuild_Register.GetVarType();
-	}
-	else
-	{
+	DASSERT( !mBuild_Register.IsValid() || mBuild_Register.GetVarType() == mVarType );
 
-		return mVarType;
-	}
+	return mVarType;
 }
 
 //==================================================================
 bool Variable::IsVarying() const
 {
+	DASSERT( !mBuild_Register.IsValid() || mBuild_Register.IsVarying() == mIsVarying );
+
+	return mIsVarying;
+}
+
+//==================================================================
+bool Variable::IsForcedDetail() const
+{
+	DASSERT( mBuild_Register.IsForcedDetail() == mIsForcedDetail );
+
+	return mIsForcedDetail;
+}
+
+//==================================================================
+void Variable::SetVarying( bool varying )
+{
+	DASSERT( mIsForcedDetail == false );
+
+	mIsVarying = varying;
+
 	if ( mBuild_Register.IsValid() )
 	{
-		DASSERT( mBuild_Register.IsVarying() == mIsVarying );
-		return mBuild_Register.IsVarying();
+		mBuild_Register.SetVarying( varying );
 	}
-	else
-		return mIsVarying;
 }
 
 //==================================================================
@@ -159,6 +169,8 @@ void AddVariable(
 			pVar->mIsVarying = true;
 		else
 			pVar->mIsVarying = false;
+
+		pVar->mIsForcedDetail = true;	// detail was specified
 	}
 	else
 	{
@@ -171,6 +183,8 @@ void AddVariable(
 			pVar->mIsVarying = false;
 		else
 			pVar->mIsVarying = true;
+
+		pVar->mIsForcedDetail = false;	// detail temporarily assumed
 	}
 
 	pVar->mVarType = VarTypeFromToken( pVar->mpDTypeTok );
@@ -498,7 +512,7 @@ static void scanWriteVars( FILE *pFile, TokNode *pNode )
 
 				fprintf_s( pFile, "\t" );
 
-				fprintf_s( pFile, "%-18s", var.mInternalName.c_str() );
+				fprintf_s( pFile, "%-18s", var.mpDefNameTok->GetStrChar() );
 
 				fprintf_s( pFile, "\t" );
 
