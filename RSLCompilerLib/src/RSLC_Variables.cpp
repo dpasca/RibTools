@@ -10,6 +10,7 @@
 #include "RSLC_Variables.h"
 #include "RSLC_Exceptions.h"
 #include "RSLC_Defs_StdVars.h"
+#include "RSLC_Registers.h"
 
 //==================================================================
 namespace RSLC
@@ -126,7 +127,21 @@ void Variable::SetVarying( bool varying )
 }
 
 //==================================================================
-void AddVariable(
+std::string Variable::GetUseName() const
+{
+	if ( mBuild_Register.IsValid() )
+	{
+		return GetRegName( mBuild_Register );
+	}
+	else
+		if ( mIsGlobal || mIsSHParam )
+			return mpDefNameTok->str;
+		else
+			return mInternalName;
+}
+
+//==================================================================
+Variable *AddVariable(
 			TokNode *pNode,
 			TokNode *pDTypeNode,
 			TokNode *pDetailNode,
@@ -188,6 +203,113 @@ void AddVariable(
 	}
 
 	pVar->mVarType = VarTypeFromToken( pVar->mpDTypeTok );
+
+	return pVar;
+}
+
+//==================================================================
+void AddSelfVariable(
+			TokNode *pNode,
+			VarType	varType,
+			bool	isVarying,
+			bool	isDetailForced )
+{
+	//DASSERT( pNode->GetVars().size() == 0 );
+
+	// setup the var link
+	pNode->mVarLink.mVarIdx = pNode->GetVars().size();
+	pNode->mVarLink.mpNode = pNode;
+
+	Variable	*pVar = pNode->GetVars().grow();
+
+	pVar->mVarType			= varType;
+	pVar->mIsVarying		= isVarying;
+	pVar->mIsForcedDetail	= isDetailForced;
+}
+
+//==================================================================
+void AddConstVariable( TokNode *pNode, TokNode *pRoot )
+{
+	DASSERT( pNode->mpToken->idType == T_TYPE_VALUE );
+
+	VarType		vtype;
+	float		floatVal = 0;
+	const char	*pStrVal = NULL;
+
+	DVec<Variable> &vars = pRoot->GetVars();
+
+	// see if it matches and existing constant..
+
+	if ( pNode->mpToken->id == T_VL_NUMBER )
+	{
+		vtype = VT_FLOAT;
+		floatVal = (float)atof( pNode->GetTokStr() );
+
+		for (size_t i=0; i < vars.size(); ++i)
+		{
+			if ( vars[i].IsConstant() )
+			{
+				if ( vars[i].mBaseValNum.size() == 1 &&
+					 vars[i].mBaseValNum[0] == floatVal )
+				{
+					pNode->mVarLink.mVarIdx = i;
+					pNode->mVarLink.mpNode = pRoot;
+					return;
+				}
+			}
+		}
+	}
+	else
+	if ( pNode->mpToken->id == T_VL_STRING )
+	{
+		vtype = VT_STRING;
+		pStrVal = pNode->GetTokStr();
+
+		for (size_t i=0; i < vars.size(); ++i)
+		{
+			if ( vars[i].IsConstant() )
+			{
+				if ( vars[i].mBaseValNum.size() == 1 &&
+					 0 == strcmp( vars[i].mBaseValStr.c_str(), pStrVal ) )
+				{
+					pNode->mVarLink.mVarIdx = i;
+					pNode->mVarLink.mpNode = pRoot;
+					return;
+				}
+			}
+		}
+	}
+	else
+	{
+		DASSERT( 0 );
+		return;
+	}
+
+	// ..if not found, then need to make it from scratch
+
+	// setup the var link
+	pNode->mVarLink.mVarIdx = pRoot->GetVars().size();
+	pNode->mVarLink.mpNode = pRoot;
+
+	Variable	*pVar = pRoot->GetVars().grow();
+
+	pVar->mIsVarying		= false;
+	pVar->mIsForcedDetail	= false;
+	pVar->mHasBaseVal		= true;
+
+	pVar->mInternalName		= DUT::SSPrintF( "_@K%02i", pNode->mVarLink.mVarIdx );
+
+	pVar->mVarType			= vtype;
+
+	if ( pNode->mpToken->id == T_VL_NUMBER )
+	{
+		pVar->mBaseValNum.push_back( floatVal );
+	}
+	else
+	if ( pNode->mpToken->id == T_VL_STRING )
+	{
+		pVar->mBaseValStr = pStrVal;
+	}
 }
 
 //==================================================================
@@ -341,7 +463,10 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 						if ( pVarName->IsNonTerminal() )
 						{						
 							// no "space cast" in the declaration in the curl braces
-							AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
+							Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
+
+							if ( blkType == BLKT_SHPARAMS )
+								pVar->mIsSHParam = true;	// mark as shader param
 						}
 						else
 						{
@@ -440,12 +565,15 @@ void AddStandardVariables( TokNode *pNode )
 {
 	for (size_t i=0; i < _countof(_gGlobalsDefs); i += 3)
 	{
-		AddVariable(
-				pNode,
-				newVarNode( _gGlobalsDefs[i+0] ),
-				newVarNode( _gGlobalsDefs[i+1] ),
-				NULL,
-				newVarNode( _gGlobalsDefs[i+2] ) );
+		Variable *pVar =
+					AddVariable(
+							pNode,
+							newVarNode( _gGlobalsDefs[i+0] ),
+							newVarNode( _gGlobalsDefs[i+1] ),
+							NULL,
+							newVarNode( _gGlobalsDefs[i+2] ) );
+
+		pVar->mIsGlobal = true;
 	}
 }
 
@@ -464,10 +592,10 @@ static size_t findStandardVariable( const char *pName )
 //==================================================================
 static void collecedUsedStdVars_sub( TokNode *pNode, DVec<size_t> &io_usedStdVarsList )
 {
-	if ( pNode->mVarLink.IsValid() && pNode->mVarLink.IsGlobal() )
-	{
-		const Variable	*pVar = pNode->mVarLink.GetVarPtr();
+	const Variable	*pVar = pNode->mVarLink.GetVarPtr();
 
+	if ( pVar && pVar->mIsGlobal )
+	{
 		size_t	idx = findStandardVariable( pVar->mpDefNameTok->GetStrChar() );
 
 		DASSERT( idx != DNPOS );
@@ -496,7 +624,44 @@ void CollectUsedStdVars( TokNode *pRoot, DVec<size_t> &io_usedStdVarsList )
 }
 
 //==================================================================
-static void scanWriteVars( FILE *pFile, TokNode *pNode )
+static void writeVariable( FILE *pFile, const Variable &var )
+{
+	fprintf_s( pFile, "\t" );
+
+	fprintf_s( pFile, "%-12s\t", var.GetUseName().c_str() );
+
+	const char *pStorage = "ERROR!!!";
+
+	if ( var.mIsGlobal )	pStorage = "global"; else
+	if ( var.mIsSHParam )	pStorage = "parameter"; else
+	if ( var.mHasBaseVal )	pStorage = "constant";
+
+	fprintf_s( pFile, "%-9s ", pStorage );
+
+	if ( var.mIsVarying )
+		fprintf_s( pFile, "varying " );
+	else
+		fprintf_s( pFile, "uniform " );
+
+	fprintf_s( pFile, "%-7s ", VarTypeToString( var.GetVarType() ) );
+
+	if ( var.mHasBaseVal )
+	{
+		// should be either numbers or a string.. but enough asserts for now !!
+
+		for (size_t k=0; k < var.mBaseValNum.size(); ++k)
+			fprintf_s( pFile, "\t%f", var.mBaseValNum[k] );
+
+		if ( var.mBaseValStr.length() )
+			fprintf_s( pFile, "\t\"%s\"", var.mBaseValStr.c_str() );
+	}
+
+	fprintf_s( pFile, "\n" );
+}
+
+//==================================================================
+// $$$ doesn't really need to be recursive..
+static void writeShaderParamVariables( FILE *pFile, TokNode *pNode )
 {
 	const DVec<Variable> &vars = pNode->GetVars();
 
@@ -510,75 +675,54 @@ static void scanWriteVars( FILE *pFile, TokNode *pNode )
 			{
 				const Variable	&var = vars[i];
 
-				fprintf_s( pFile, "\t" );
-
-				fprintf_s( pFile, "%-18s", var.mpDefNameTok->GetStrChar() );
-
-				fprintf_s( pFile, "\t" );
-
-				fprintf_s( pFile, "parameter" );
-/*
-				switch ( pNode->GetBlockType() )
-				{
-				case BLKT_SHPARAMS:		fprintf_s( pFile, "parameter" );	break;
-				case BLKT_CODEBLOCK:	fprintf_s( pFile, "temporary" );	break;
-				case BLKT_EXPRESSION:	fprintf_s( pFile, "temporary" );	break;
-				}
-*/
-
-				fprintf_s( pFile, "\t" );
-
-				if ( var.mIsVarying )
-					fprintf_s( pFile, "varying" );
-				else
-					fprintf_s( pFile, "uniform" );
-
-				if ( var.mpDTypeTok )
-				{
-					fprintf_s( pFile, "\t" );
-					switch ( var.mpDTypeTok->id )
-					{
-					case T_DT_float:	fprintf_s( pFile, "float" );	break;
-					case T_DT_vector:	fprintf_s( pFile, "vector" );	break;
-					case T_DT_point:	fprintf_s( pFile, "point" );	break;
-					case T_DT_normal:	fprintf_s( pFile, "normal" );	break;
-					case T_DT_color:	fprintf_s( pFile, "color" );	break;
-					case T_DT_string:	fprintf_s( pFile, "string" );	break;
-
-					default:
-						throw Exception( "Bad type ?!", var.mpDTypeTok );
-						break;
-					}
-				}
-
-				fprintf_s( pFile, "\n" );
+				writeVariable( pFile, var );
 			}
-
-			fprintf_s( pFile, "\n" );
 		}
 	}
 
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		scanWriteVars( pFile, pNode->mpChilds[i] );
+		writeShaderParamVariables( pFile, pNode->mpChilds[i] );
 	}
 }
 
 //==================================================================
 void WriteVariables( FILE *pFile, TokNode *pNode, const DVec<size_t> &usedStdVars )
 {
+	const DVec<Variable> &vars = pNode->GetVars();
+
+	// write all used globals
 	for (size_t i=0; i < usedStdVars.size(); ++i)
 	{
 		size_t j = usedStdVars[ i ] * 3;
 
-		fprintf_s( pFile, "\t%-18s\tglobal\t%s\t%s\n",
+		const Variable	&var = vars[i];
+
+		DASSERT( var.mIsGlobal && !var.mBaseValNum.size() );
+
+		fprintf_s( pFile, "\t%-12s\tglobal\t%s\t%s\n",
 							_gGlobalsDefs[j+2],
 							_gGlobalsDefs[j+1],
 							_gGlobalsDefs[j+0] );
 	}
 
-	scanWriteVars( pFile, pNode );
+	fprintf_s( pFile, "\n" );
+
+	// write all vars that are in the root but that are not actually globals
+	// ..most likely constants !
+
+	for (size_t i=0; i < vars.size(); ++i)
+	{
+		const Variable	&var = vars[i];
+
+		if ( !var.mIsGlobal && !var.mIsSHParam )
+			writeVariable( pFile, var );
+	}
+
+	fprintf_s( pFile, "\n" );
+
+	writeShaderParamVariables( pFile, pNode );
 }
 
 //==================================================================

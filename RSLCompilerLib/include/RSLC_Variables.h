@@ -95,9 +95,14 @@ public:
 	bool			mIsVarying;
 	bool			mIsForcedDetail;
 	bool			mIsLValue;
+	bool			mIsGlobal;
+	bool			mIsSHParam;
 
 	Register		mBuild_Register;
 
+	bool			mHasBaseVal;
+	DVec<float>		mBaseValNum;
+	std::string		mBaseValStr;
 
 	Variable() :
 		//mpOwnerNode(NULL),
@@ -108,7 +113,10 @@ public:
 		mVarType(VT_UNKNOWN),
 		mIsVarying(false),
 		mIsForcedDetail(false),
-		mIsLValue(false)
+		mIsLValue(false),
+		mIsGlobal(false),
+		mIsSHParam(false),
+		mHasBaseVal(false)
 	{
 	}
 
@@ -122,7 +130,11 @@ public:
 		mVarType		(	from.mVarType			),
 		mIsVarying		(	from.mIsVarying			),
 		mIsForcedDetail	(	from.mIsForcedDetail	),
-		mIsLValue		(	from.mIsLValue			)
+		mIsLValue		(	from.mIsLValue			),
+		mIsGlobal		(	from.mIsGlobal			),
+		mIsSHParam		(	from.mIsSHParam			),
+		mBaseValNum		(	from.mBaseValNum		),
+		mHasBaseVal		(	from.mHasBaseVal		)
 	{
 	}
 
@@ -140,6 +152,8 @@ public:
 			return NULL;
 	}
 
+	std::string GetUseName() const;
+
 	void AssignRegister( int regIdx );
 	bool IsRegisterAssigned() const;
 
@@ -148,15 +162,28 @@ public:
 	bool IsVarying() const;
 	bool IsForcedDetail() const;
 	void SetVarying( bool varying );
+
+	bool IsConstant() const
+	{
+		return mHasBaseVal && !mIsGlobal && !mIsSHParam && !mIsVarying;
+	}
 };
 
 //==================================================================
-void AddVariable(
+Variable *AddVariable(
 			TokNode *pNode,
 			TokNode *pDTypeNode,
 			TokNode *pDetailNode,
 			TokNode *pSpaceCastTok,
 			TokNode *pNameNode );
+
+void AddSelfVariable(
+			TokNode *pNode,
+			VarType	varType,
+			bool	isVarying,
+			bool	isDetailForced );
+
+void AddConstVariable( TokNode *pNode, TokNode *pRoot );
 
 //==================================================================
 VarType VarTypeFromToken( const Token *pTok );

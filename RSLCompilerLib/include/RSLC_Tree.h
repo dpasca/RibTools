@@ -32,7 +32,6 @@ public:
 	}
 
 	bool IsValid() const { return mVarIdx != DNPOS; }
-	bool IsGlobal() const;
 
 	Variable *GetVarPtr();
 	const Variable *GetVarPtr() const;
@@ -76,8 +75,6 @@ public:
 
 	VarLink			mVarLink;	// this is the variable definition
 								// in case this node is variable usage
-
-	Register		mBuild_TmpReg;	// using while building code
 
 public:
 	TokNode( Token *pObj );
@@ -180,7 +177,10 @@ public:
 
 	void ReplaceNode( TokNode *pNode );
 
-	Register BuildGetRegister() const;
+	const	Variable *GetVarPtr() const	{	return mVarLink.GetVarPtr();	}
+			Variable *GetVarPtr()		{	return mVarLink.GetVarPtr();	}
+
+	Register GetRegister() const;
 
 	VarType GetVarType() const;
 

@@ -27,15 +27,6 @@ const Variable * VarLink::GetVarPtr() const
 }
 
 //==================================================================
-bool VarLink::IsGlobal() const
-{
-	if ( mpNode && mpNode->GetBlockType() == BLKT_ROOT )
-		return true;
-	else
-		return false;
-}
-
-//==================================================================
 #ifdef _DEBUG
 size_t	TokNode::sUIDCnt;
 #endif
@@ -214,8 +205,7 @@ TokNode::TokNode( const TokNode &from ) :
 	mNodeType		(from.mNodeType),
 	mBlockType		(from.mBlockType),
 	mBlockID		(0),
-	mVarLink		(from.mVarLink),
-	mBuild_TmpReg	(from.mBuild_TmpReg)
+	mVarLink		(from.mVarLink)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
@@ -223,18 +213,11 @@ TokNode::TokNode( const TokNode &from ) :
 }
 
 //==================================================================
-RSLC::Register TokNode::BuildGetRegister() const
+RSLC::Register TokNode::GetRegister() const
 {
 	if ( mVarLink.IsValid() )
 	{
-		DASSERT( !mBuild_TmpReg.IsValid() );
 		return mVarLink.GetVarPtr()->mBuild_Register;
-	}
-	else
-	if ( mBuild_TmpReg.IsValid() )
-	{
-		DASSERT( !mVarLink.IsValid() );
-		return mBuild_TmpReg;
 	}
 	else
 		return Register();
@@ -259,8 +242,8 @@ RSLC::VarType TokNode::GetVarType() const
 		return mVarLink.GetVarPtr()->GetVarType();
 	else
 	{
-		DASSERT( mBuild_TmpReg.GetVarType() != VT_UNKNOWN );
-		return mBuild_TmpReg.GetVarType();
+		DASSERT( 0 );
+		return VT_UNKNOWN;
 	}
 }
 
@@ -274,8 +257,8 @@ bool TokNode::IsVarying() const
 		return mVarLink.GetVarPtr()->IsVarying();
 	else
 	{
-		DASSERT( mBuild_TmpReg.GetVarType() != VT_UNKNOWN );
-		return mBuild_TmpReg.IsVarying();
+		DASSERT( 0 );
+		return false;
 	}
 }
 
@@ -426,6 +409,37 @@ void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx )
 	}
 }
 
+/*
+//==================================================================
+void RemoveOpeningExpressionBrackets( TokNode *pNode, int *pParentScanIdx )
+{
+	if ( pNode->mpToken )
+	{
+		switch ( pNode->mpToken->id )
+		{
+		case RSLC::T_OP_LFT_BRACKET		:
+
+			// $$$
+			// right brackets should have no children !
+			DASSERT( pNode->mpChilds.size() == 0 );
+
+			pNode->UnlinkFromParent();
+			DSAFE_DELETE( pNode );
+
+			if ( pParentScanIdx )
+				*pParentScanIdx -= 1;
+
+			return;
+		}
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		RemoveOpeningExpressionBrackets( pNode->mpChilds[i], &i );
+	}
+}
+*/
+
 //==================================================================
 void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx )
 {
@@ -494,19 +508,18 @@ void TraverseTree( TokNode *pNode, int depth )
 
 		for (size_t i=0; i < vars.size(); ++i)
 		{
-			printf( " %s %s %s,",
-						vars[i].mpDetailTok ? 
-							vars[i].mpDetailTok->str.c_str() :
-							"",
-/*
-						vars[i].mIsVarying ? 
+			printf( " %s %s %s (%s),",
+						vars[i].IsVarying() ? 
 							"varying" :
 							"uniform",
-*/
-						vars[i].mpDTypeTok->str.c_str(),
+
+						VarTypeToString( vars[i].GetVarType() ),
+
 						vars[i].mpDefNameTok ?
 							vars[i].mpDefNameTok->str.c_str() :
-							"NONAME"
+							"N/A",
+
+						vars[i].mInternalName.c_str()
 					);
 		}
 

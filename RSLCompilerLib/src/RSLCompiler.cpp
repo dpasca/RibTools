@@ -104,6 +104,8 @@ RSLCompiler::RSLCompiler(
 
 	ResolveFunctionCalls( mpRoot );
 
+	RealizeConstants( mpRoot );
+
 	AssignRegisters( mpRoot );
 
 	mUsedStdVars.clear();

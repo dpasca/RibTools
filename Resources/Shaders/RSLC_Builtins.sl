@@ -166,17 +166,20 @@ void	setzcomp( output point	 P; float z ){}
 void	setzcomp( output vector	 P; float z ){}
 void	setzcomp( output normal	 P; float z ){}
 
-float	length( vector V ){}
-vector	normalize( vector V ){}
-float	distance( point P1, P2 ){}
+float	length( vector V )		{	float tmp; _asm_length( tmp, V ); return tmp;	}
+vector	normalize( vector V )	{	vector tmp; _asm_normalize( tmp, V ); return tmp;	}
+float	distance( point P1, P2 ){	float tmp; _asm_distance( tmp, P1, P2 ); return tmp;	}
+
 /*
 float	ptlined ( point Q, P1, P2 ){}
 float	rotate ( point Q; float angle; point P1, P2 ){}
 float	area( point P ){}
 */
 /* vector	faceforward( vector N, I [, Nref]){} */
-vector	faceforward( vector N, I ){}
-vector	reflect( vector I, N ){}
+
+vector	faceforward( vector N, I )	{	vector tmp; _asm_faceforward( tmp, N, I ); return tmp;	}
+vector	reflect( vector I, N )		{	vector tmp; _asm_reflect( tmp, I, N ); return tmp;	}
+
 /*
 vector	refract( vector I, N; float eta ){}
 color	fresnel( vector I, N; float eta; output float Kr, Kt; [output vector R, T] ){}	// color ?

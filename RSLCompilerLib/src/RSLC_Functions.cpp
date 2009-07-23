@@ -232,9 +232,9 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 				// first child is the destination..
 				if ( pParamVal->mpToken->id == T_TD_TEMPDEST )
 				{
-					printf( "Param %i, is '%s' tmp register\n",
+					printf( "Param %i, is '%s'\n",
 								j,
-								VarTypeToString( pParamVal->mBuild_TmpReg.GetVarType() )
+								VarTypeToString( pParamVal->GetVarType() )
 							);
 				}
 			}
@@ -494,38 +494,41 @@ void ResolveFunctionCalls( TokNode *pNode )
 //==================================================================
 static const std::string getOperand(
 					TokNode *pOperand,
-					VarType &out_varType,
-					bool &out_isValue )
+					VarType &out_varType )
 {
 	out_varType = VT_UNKNOWN;
-	out_isValue	= false;
 
 	//DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() >= 1 );
 	while ( pOperand )
 	{
-		Register	reg = pOperand->BuildGetRegister();
+		const Variable	*pVar = pOperand->GetVarPtr();
 
-		if ( reg.IsValid() )
+		if ( pVar )
 		{
-			out_varType = reg.GetVarType();
-			out_isValue	= false;
-
-			return GetRegName( reg );
+			// this should be the common (if not unique ?) case
+			out_varType = pVar->GetVarType();
+			return pVar->GetUseName();
 		}
 		else
 		if ( pOperand->mpToken->idType == T_TYPE_VALUE )
 		{
 			out_varType = VT_FLOAT;
-			out_isValue	= true;
 			return pOperand->GetTokStr();
 		}
+/*
 		else
-		if ( pOperand->mpToken->idType == T_TYPE_NONTERM )
 		{
-			out_varType = pOperand->GetVarType();
-			out_isValue	= false;
-			return pOperand->GetTokStr();
+			DASSERT( 0 );
+			Register	reg = pOperand->GetRegister();
+
+			if ( reg.IsValid() )
+			{
+				out_varType = reg.GetVarType();
+
+				return GetRegName( reg );
+			}
 		}
+*/
 
 		pOperand = pOperand->GetChildTry( 0 );
 	}
@@ -544,7 +547,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 	{
 		TokNode *pChild = pNode->mpParent->mpParent->GetChildTry( 0 );
 
-		Register	reg = pChild->BuildGetRegister();
+		Register	reg = pChild->GetRegister();
 
 		std::string regName = GetRegName( reg );
 
@@ -559,10 +562,9 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 			continue;
 
 		VarType	varType;
-		bool	isValue;
-		std::string opStr = getOperand( pChild, varType, isValue );
+		std::string opStr = getOperand( pChild, varType );
 
-		fprintf_s( pFile, "\t%s", opStr.c_str() );
+		fprintf_s( pFile, "\t%-6s", opStr.c_str() );
 	}
 
 	fprintf_s( pFile, "\n\n" );
@@ -650,11 +652,9 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 		{
 			VarType	varType1;
 			VarType	varType2;
-			bool	isValue1;
-			bool	isValue2;
 
-			std::string	o1Str = getOperand( pOperand1, varType1, isValue1 );
-			std::string	o2Str = getOperand( pOperand2, varType2, isValue2 );
+			std::string	o1Str = getOperand( pOperand1, varType1 );
+			std::string	o2Str = getOperand( pOperand2, varType2 );
 
 			bool	doAssign = pNode->mpToken->IsAssignOp();
 
@@ -666,6 +666,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 				if ( pNode->mpToken->id == T_OP_ASSIGN )
 				{
 					// build either a load instruction or a move
+/*
 					if ( isValue2 )
 						fprintf_s(
 								pFile,
@@ -674,9 +675,10 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 								o1Str.c_str(),
 								o2Str.c_str() );
 					else
+*/
 						fprintf_s(
 								pFile,
-								"\tmov%c%c\t%s\t%s\n",
+								"\tmov%c%c\t%-6s\t%-6s\n",
 								l1,
 								l2,
 								o1Str.c_str(),
@@ -685,7 +687,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 				else
 					fprintf_s(
 							pFile,
-							"\t%s%c%c\t%s\t%s\t%s\n",
+							"\t%s%c%c\t%-6s\t%-6s\t%-6s\n",
 							asmOpCodeFromOpToken( pNode->mpToken ),
 							l1,
 							l2,
@@ -695,12 +697,12 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 			}
 			else
 			{
-				Register	reg = pNode->BuildGetRegister();
+				Register	reg = pNode->GetRegister();
 				std::string regName = GetRegName( reg );
 
 				fprintf_s(
 						pFile,
-						"\t%s%c%c\t%s\t%s\t%s\n",
+						"\t%s%c%c\t%-6s\t%-6s\t%-6s\n",
 						asmOpCodeFromOpToken( pNode->mpToken ),
 						l1,
 						l2,

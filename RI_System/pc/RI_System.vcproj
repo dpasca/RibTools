@@ -483,6 +483,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Resources\Shaders\RSLC_Builtins.sl"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Resources\Shaders\test.rrasm"
 					>
 				</File>

@@ -38,6 +38,95 @@ static VarType getOperandType( TokNode *pOperand )
 */
 
 //==================================================================
+static void realizeConstants_rec( TokNode *pNode, TokNode *pRoot )
+{
+	if ( pNode->mpToken && pNode->mpToken->idType == T_TYPE_VALUE )
+	{
+		AddConstVariable( pNode, pRoot );
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		realizeConstants_rec( pNode->mpChilds[i], pRoot );
+	}
+}
+
+//==================================================================
+void RealizeConstants( TokNode *pRoot )
+{
+	const DVec<Function> &funcs = pRoot->GetFuncs();
+
+	for (size_t i=0; i < funcs.size(); ++i)
+	{
+		const Function	&func = funcs[i];
+
+		if NOT( func.IsShader() )
+			continue;
+
+		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
+		{
+			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[j];
+
+			int	tempIdx = 0;
+
+			realizeConstants_rec( pNode, pRoot );
+		}
+	}
+}
+
+//==================================================================
+static void assignRegisters_expr_BiOp( TokNode *pNode )
+{
+	TokNode *pOperand1 = pNode->GetChildTry( 0 );
+	TokNode *pOperand2 = pNode->GetChildTry( 1 );
+
+	// scan down to find a variable
+	while ( pOperand1 && !pOperand1->GetVarPtr() )
+		pOperand1 = pOperand1->GetChildTry( 0 );
+
+	while ( pOperand2 && !pOperand2->GetVarPtr() )
+		pOperand2 = pOperand2->GetChildTry( 0 );
+
+	DASSERT( pOperand1 && pOperand2 );
+
+	// no assignment for function call as it's done above
+	VarType	opResVarType;
+	bool	opResIsVarying;
+	SolveBiOpType( pNode, pOperand1, pOperand2, opResVarType, opResIsVarying );
+
+	DASSERT( pNode->mVarLink.IsValid() == false );
+
+	// is this an assignment ?
+	if ( pNode->mpToken->IsAssignOp() )
+	{
+		// ..are we dealing with varying data at all ?
+		if ( opResIsVarying )
+		{
+			Variable	*pOp1Var = pOperand1->mVarLink.GetVarPtr();
+
+			// is the destination not varying ?
+			if NOT( pOp1Var->IsVarying() )
+			{
+				if ( pOp1Var->IsForcedDetail() )
+				{
+					// this is the end of it..
+					throw Exception( "Cannot assign a varying variable to an 'uniform' destination", pNode );
+				}
+				else
+				{
+					pOp1Var->SetVarying( opResIsVarying );
+				}
+			}
+		}			
+	}
+	else
+	{
+		if NOT( pNode->mpToken->idType == T_TYPE_VALUE )
+			AddSelfVariable( pNode, opResVarType, opResIsVarying, false );
+	}
+}
+
+//==================================================================
 static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -47,63 +136,20 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 
 	if ( pNode->mpToken->IsBiOp() )
 	{
-		TokNode *pOperand1 = pNode->GetChildTry( 0 );
-		TokNode *pOperand2 = pNode->GetChildTry( 1 );
-
-		// no assignment for function call as it's done above
-		VarType	opResVarType;
-		bool	opResIsVarying;
-		SolveBiOpType( pNode, pOperand1, pOperand2, opResVarType, opResIsVarying );
-
-		DASSERT( pNode->mVarLink.IsValid() == false );
-
-		// is this an assignment ?
-		if ( pNode->mpToken->IsAssignOp() )
-		{
-			// ..are we dealing with varying data at all ?
-			if ( opResIsVarying )
-			{
-				Variable	*pOp1Var = pOperand1->mVarLink.GetVarPtr();
-
-				// is the destination not varying ?
-				if NOT( pOp1Var->IsVarying() )
-				{
-					if ( pOp1Var->IsForcedDetail() )
-					{
-						// this is the end of it..
-						throw Exception( "Cannot assign a varying variable to an 'uniform' destination", pNode );
-					}
-					else
-					{
-						pOp1Var->SetVarying( opResIsVarying );
-					}
-				}
-			}			
-		}
-		else
-		{
-			// ..if not.. then allocate a temporary register
-			pNode->mBuild_TmpReg.SetType( opResVarType, opResIsVarying, false );
-			pNode->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );	
-		}
+		assignRegisters_expr_BiOp( pNode );
 	}
 
-	if ( pNode->mVarLink.IsValid() )
+	const Variable	*pVar = pNode->GetVarPtr();
+
+	if ( pVar )
 	{
-		if (!pNode->mVarLink.IsGlobal() &&
-			!pNode->mVarLink.GetVarPtr()->IsRegisterAssigned() )
+		if (!pVar->mHasBaseVal &&
+			!pVar->mIsGlobal &&
+			!pVar->IsRegisterAssigned() )
 		{
-			pNode->mVarLink.GetVarPtr()->AssignRegister( io_tempIdx++ );
+			pNode->GetVarPtr()->AssignRegister( io_tempIdx++ );
 		}
 	}
-/*
-	else
-	if ( pNode->mBuild_TmpReg.GetVarType() != VT_UNKNOWN )
-	{
-		//if NOT( pNode->mBuild_TmpReg.IsAssigned() )
-			pNode->mBuild_TmpReg.SetRegIdx( io_tempIdx++ );	
-	}
-*/
 }
 
 //==================================================================
