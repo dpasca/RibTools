@@ -24,11 +24,12 @@
 
 typedef int	errno_t;
 
-#endif
-
 errno_t fopen_s( FILE **out_ppFile, const char *pFName, const char *pMode );
 
 void strtime( char *pDest, size_t maxLen=0 );
+
+#endif
+
 void numstrdate( char *pDest, size_t maxLen=0 );
 
 #endif

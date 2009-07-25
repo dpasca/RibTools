@@ -176,6 +176,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\DSafeCrt.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DTypes.cpp"
 				>
 			</File>

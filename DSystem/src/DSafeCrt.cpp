@@ -9,6 +9,9 @@
 #include <string.h>
 #include "DSafeCrt.h"
 
+//===============================================================
+#if !defined(_MSC_VER)
+
 //==================================================================
 errno_t fopen_s( FILE **out_ppFile, const char *pFName, const char *pMode )
 {
@@ -28,6 +31,8 @@ void strtime( char *pDest, size_t maxLen )
 
 	strcpy_s( pDest, ctime( &t ) );
 }
+
+#endif
 
 //==================================================================
 void numstrdate( char *pDest, size_t maxLen )

@@ -230,6 +230,8 @@ I64 GetTimeTicks()
 //==================================================================
 double TimeTicksToMS( I64 ticks )
 {
+	static double	coe;
+
 #if defined(_MSC_VER)
 	static I64  	freq;
 
@@ -240,7 +242,7 @@ double TimeTicksToMS( I64 ticks )
 	}
 
 #else
-	static double	coe = 1.0 / 1000.0;
+	coe = 1.0 / 1000.0;
 
 #endif
 
