@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2008/12/31
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DUTILS_H
@@ -16,11 +16,6 @@
 //==================================================================
 namespace DUT
 {
-
-//==================================================================
-
-char *SSPrintF( const char *pFmt, ... );
-std::string SSPrintFS( const char *pFmt, ... );
 
 //==================================================================
 /// MemFile

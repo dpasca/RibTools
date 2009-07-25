@@ -3,15 +3,16 @@
 ///
 /// Created by Davide Pasca - 2008/12/17
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DCONTAINERS_H
 #define DCONTAINERS_H
 
+#include <memory.h>
 #include "DTypes.h"
-#include "DUtils_Base.h"
 #include "DMemory.h"
+#include "DUtils_Base.h"
 
 //==================================================================
 static const size_t	NPOS = (size_t)-1;
@@ -44,13 +45,13 @@ public:
 	{
 		copyFrom( from );
 	}
-	
+
 	virtual ~DVec()
 	{
 		clear();
 		freeAll();
 	}
-	
+
 	DVec &operator=(const DVec& rhs)
 	{
 		clear();
@@ -68,7 +69,7 @@ private:
 		for (size_t i=0; i < mSize; ++i)
 			mpData[i] = from.mpData[i];
 	}
-	
+
 	void freeAll()
 	{
 		mSizeAlloc = 0;
@@ -103,7 +104,7 @@ public:
 
 			DDELETE_ARRAY( (u_char *)mpData );
 		}
-		
+
 		mpData = newPData;
 		mSizeAlloc = newSizeAlloc;
 	}
@@ -112,7 +113,7 @@ public:
 	{
 		if ( newSize == mSize )
 			return;
-		
+
 		if ( newSize > mSizeAlloc )
 		{
 			size_t newSizeAlloc = mSizeAlloc * 2;
@@ -134,11 +135,11 @@ public:
 
 				DDELETE_ARRAY( (u_char *)mpData );
 			}
-			
+
 			mpData = newPData;
 			mSizeAlloc = newSizeAlloc;
 		}
-		
+
 		if ( newSize < mSize )
 		{
 			for (size_t i=newSize; i < mSize; ++i)
@@ -149,7 +150,7 @@ public:
 			for (size_t i=mSize; i < newSize; ++i)
 				new (&mpData[i]) T;
 		}
-		
+
 		mSize = newSize;
 	}
 
@@ -171,7 +172,7 @@ public:
 		}
 		mSize -= 1;
 	}
-	
+
 	void push_front( const T &val )
 	{
 		grow();
@@ -179,7 +180,7 @@ public:
 		{
 			mpData[i-1] = mpData[i-2];
 		}
-		
+
 		mpData[0] = val;
 	}
 
@@ -222,7 +223,13 @@ public:
 			T &back()		{ DASSERT( mSize >= 1 ); return mpData[mSize-1]; }
 
 	const T &operator[]( size_t idx ) const { DASSERT( idx < mSize ); return mpData[ idx ]; }
+
+#if defined(__GNUC__)	// WTF ?!
+		  T &operator[]( size_t idx )		{ return mpData[ idx ]; }
+#else
 		  T &operator[]( size_t idx )		{ DASSERT( idx < mSize ); return mpData[ idx ]; }
+#endif
+
 };
 #else
 //==================================================================
@@ -250,12 +257,12 @@ public:
 	{
 		mVec.push_back( val );
 	}
-	
+
 	void pop()
 	{
 		mVec.pop_back();
 	}
-	
+
 	const T &top() const
 	{
 		return mVec.back();
@@ -265,7 +272,7 @@ public:
 	{
 		return mVec.back();
 	}
-	
+
 	void clear()
 	{
 		mVec.clear();
@@ -287,12 +294,12 @@ public:
 	{
 		mVec.push_back( top() );
 	}
-	
+
 	void pop()
 	{
 		mVec.pop_back();
 	}
-	
+
 	const T &top() const
 	{
 		return mVec.back();
@@ -320,7 +327,7 @@ public:
 	CopyStackMax()
 	{
 		T	*p = (T *)&mVec[0];
-		DNEW ( p ) T;
+		new ( p ) T;
 		mSize = 1;
 	}
 
@@ -329,10 +336,10 @@ public:
 		DASSTHROW( mSize < MAX, ("Out of bounds !") );
 
 		*(T *)&mVec[mSize * sizeof(T)] = top();
-		
+
 		mSize += 1;
 	}
-	
+
 	void pop()
 	{
 		DASSTHROW( mSize >= 0, ("Out of bounds !") );
@@ -348,7 +355,7 @@ public:
 	{
 		return *(T *)&mVec[(mSize-1) * sizeof(T)];
 	}
-	
+
 	void clear()
 	{
 		for (size_t i=0; i < mSize; ++i)

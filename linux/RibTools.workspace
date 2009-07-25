@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="RibRender workspace">
+		<Project filename="../DSystem/linux/DSystem.cbp" />
+		<Project filename="../RI_System/linux/RI_System.cbp" />
+		<Project filename="../DMath/linux/DMath.cbp" />
+		<Project filename="../external/freeglut-2.4.0/freeglut_static.cbp" />
+		<Project filename="../external/jpeg-6b/linux/libjpeg.cbp" />
+		<Project filename="../RibRenderTool/linux/RibRenderTool.cbp" />
+		<Project filename="../RibRenderFile/linux/RibRenderFile.cbp" />
+		<Project filename="../RSLCompilerLib/linux/RSLCompilerLib.cbp" />
+		<Project filename="../RSLCompilerCmd/linux/RSLCompilerCmd.cbp" active="1">
+			<Depends filename="../DSystem/linux/DSystem.cbp" />
+			<Depends filename="../RSLCompilerLib/linux/RSLCompilerLib.cbp" />
+		</Project>
+	</Workspace>
+</CodeBlocks_workspace_file>

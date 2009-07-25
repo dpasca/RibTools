@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="RI_System" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-W" />
+					<Add option="-O0" />
+					<Add directory="../../" />
+					<Add directory="../include" />
+					<Add directory="../../DSystem/include" />
+					<Add directory="../../DMath/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../" />
+					<Add directory="../include" />
+					<Add directory="../../DSystem/include" />
+					<Add directory="../../DMath/include" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-W" />
+					<Add option="-O3" />
+					<Add directory="../../" />
+					<Add directory="../include" />
+					<Add directory="../../DSystem/include" />
+					<Add directory="../../DMath/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../" />
+					<Add directory="../include" />
+					<Add directory="../../DSystem/include" />
+					<Add directory="../../DMath/include" />
+				</ResourceCompiler>
+			</Target>
+		</Build>
+		<Unit filename="../include/RI_Attributes.h" />
+		<Unit filename="../include/RI_Base.h" />
+		<Unit filename="../include/RI_Buffer2D.h" />
+		<Unit filename="../include/RI_FrameworkREYES.h" />
+		<Unit filename="../include/RI_HiderREYES.h" />
+		<Unit filename="../include/RI_LightSource.h" />
+		<Unit filename="../include/RI_Machine.h" />
+		<Unit filename="../include/RI_MicroPolygon.h" />
+		<Unit filename="../include/RI_MicroPolygonGrid.h" />
+		<Unit filename="../include/RI_Noise.h" />
+		<Unit filename="../include/RI_Options.h" />
+		<Unit filename="../include/RI_Param.h" />
+		<Unit filename="../include/RI_Parser.h" />
+		<Unit filename="../include/RI_Primitive.h" />
+		<Unit filename="../include/RI_Primitive_Base.h" />
+		<Unit filename="../include/RI_Primitive_Patch.h" />
+		<Unit filename="../include/RI_Primitive_Poly.h" />
+		<Unit filename="../include/RI_Primitive_Quadric.h" />
+		<Unit filename="../include/RI_Resource.h" />
+		<Unit filename="../include/RI_SlRunContext.h" />
+		<Unit filename="../include/RI_SlShader.h" />
+		<Unit filename="../include/RI_SlShaderAsmParser.h" />
+		<Unit filename="../include/RI_SlShader_Ops_Base.h" />
+		<Unit filename="../include/RI_SlShader_Ops_Lighting.h" />
+		<Unit filename="../include/RI_SlShader_Ops_Noise.h" />
+		<Unit filename="../include/RI_SlSymbol.h" />
+		<Unit filename="../include/RI_State.h" />
+		<Unit filename="../include/RI_Symbol.h" />
+		<Unit filename="../include/RI_Tokens.h" />
+		<Unit filename="../include/RI_Transform.h" />
+		<Unit filename="stdafx.cpp" />
+		<Unit filename="stdafx.h" />
+		<Unit filename="targetver.h" />
+		<Unit filename="../src/RI_Attributes.cpp" />
+		<Unit filename="../src/RI_Base.cpp" />
+		<Unit filename="../src/RI_Buffer2D.cpp" />
+		<Unit filename="../src/RI_FrameworkREYES.cpp" />
+		<Unit filename="../src/RI_HiderREYES.cpp" />
+		<Unit filename="../src/RI_LightSource.cpp" />
+		<Unit filename="../src/RI_Machine.cpp" />
+		<Unit filename="../src/RI_MicroPolygonGrid.cpp" />
+		<Unit filename="../src/RI_Noise.cpp" />
+		<Unit filename="../src/RI_Options.cpp" />
+		<Unit filename="../src/RI_Param.cpp" />
+		<Unit filename="../src/RI_Parser.cpp" />
+		<Unit filename="../src/RI_Primitive.cpp" />
+		<Unit filename="../src/RI_Primitive_Base.cpp" />
+		<Unit filename="../src/RI_Primitive_Patch.cpp" />
+		<Unit filename="../src/RI_Primitive_Poly.cpp" />
+		<Unit filename="../src/RI_Primitive_Quadric.cpp" />
+		<Unit filename="../src/RI_Resource.cpp" />
+		<Unit filename="../src/RI_SlRunContext.cpp" />
+		<Unit filename="../src/RI_SlShader.cpp" />
+		<Unit filename="../src/RI_SlShaderAsmParser.cpp" />
+		<Unit filename="../src/RI_SlShader_Ops_Lighting.cpp" />
+		<Unit filename="../src/RI_SlSymbol.cpp" />
+		<Unit filename="../src/RI_State.cpp" />
+		<Unit filename="../src/RI_State_Error.cpp" />
+		<Unit filename="../src/RI_State_Prims.cpp" />
+		<Unit filename="../src/RI_Symbol.cpp" />
+		<Unit filename="../src/RI_Tokens.cpp" />
+		<Unit filename="../src/RI_Transform.cpp" />
+		<Unit filename="../src/Tokenizer.cpp" />
+		<Unit filename="../src/Tokenizer.h" />
+		<Unit filename="../../Resources/Shaders/RSLC_Builtins.sl" />
+		<Unit filename="../../Resources/Shaders/ambientlight.rrasm" />
+		<Unit filename="../../Resources/Shaders/constant.rrasm" />
+		<Unit filename="../../Resources/Shaders/dbg_normal_col.rrasm" />
+		<Unit filename="../../Resources/Shaders/distantlight.rrasm" />
+		<Unit filename="../../Resources/Shaders/matte.rrasm" />
+		<Unit filename="../../Resources/Shaders/matte.sl" />
+		<Unit filename="../../Resources/Shaders/metal.rrasm" />
+		<Unit filename="../../Resources/Shaders/test.rrasm" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

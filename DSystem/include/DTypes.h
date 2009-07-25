@@ -14,6 +14,8 @@
 #include <vector>
 #include <string>
 
+#include "DSafeCrt.h"
+
 //===============================================================
 #ifdef _MSC_VER
 inline int strcasecmp( const char *a, const char *b )
@@ -56,16 +58,21 @@ typedef unsigned char		U8;
 typedef unsigned short		U16;
 typedef unsigned int		U32;
 
+#if defined(_MSC_VER)
 typedef unsigned __int64	U64;
 typedef	__int64				I64;
+#else
+typedef unsigned long long	U64;
+typedef	long long			I64;
+#endif
 
 //===============================================================
-#ifdef _MSC_VER
+//#ifdef _MSC_VER
 
 typedef unsigned char	u_char;
 typedef unsigned short	u_short;
 typedef unsigned int	u_int;
 
-#endif
+//#endif
 
 #endif

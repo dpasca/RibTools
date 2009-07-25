@@ -3,12 +3,13 @@
 ///
 /// Created by Davide Pasca - 2009/7/23
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DUTILS_FILES_H
 #define DUTILS_FILES_H
 
+#include "DTypes.h"
 #include "DContainers.h"
 
 //==================================================================

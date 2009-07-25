@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/5/30
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include <map>
@@ -92,7 +92,7 @@ static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
 		if ( isDataType )
 		{
 			// ok, it's just a space cast..
-			
+
 			// ..reparent the cast string as child of the function call node
 			out_parentIdx -= 1;
 
@@ -247,7 +247,7 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 
 	for (size_t i=0; i < funcs.size(); ++i)
 	{
-		if ( _stricmp(
+		if ( strcasecmp(
 				pFCallNode->mpToken->GetStrChar(),
 				funcs[i].mpNameNode->GetTokStr()
 				) )
@@ -363,7 +363,7 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
 		const Function	*pFunc = matchFunctionByParams( pNode, funcs );
-		
+
 		if ( pFunc )
 		{
 			TokNode	*pClonedParams = cloneBranch( pFunc->mpParamsNode );
@@ -592,7 +592,7 @@ static std::string resolveIntrinsics( const char *pIntrName )
 {
 	static size_t		sBaseLen;
 	static const char	*spBaseStr = "_asm_";
-	
+
 	if ( sBaseLen == 0 )
 		sBaseLen = strlen( "_asm_" );
 

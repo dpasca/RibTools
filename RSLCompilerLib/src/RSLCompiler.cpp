@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/5/21
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include <time.h>
@@ -34,7 +34,7 @@ static void grabfile( const char *pFName, DVec<char> &out_data )
 	if ( fopen_s( &pFile, pFName, "rb" ) )
 	{
 		std::string	msg = DUT::SSPrintFS( "Failed to open %s", pFName );
-		
+
 		throw Exception( msg );
 	}
 
@@ -134,7 +134,7 @@ void RSLCompiler::SaveASM( const char *pFName, const char *pRefSourceName )
 
 	char dateStr[256];
 	char timeStr[256];
-	_strdate_s( dateStr);
+	numstrdate( dateStr);
 	_strtime_s( timeStr );
 
 	fprintf_s( pFile, ";==========================================================\n" );

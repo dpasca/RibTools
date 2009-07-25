@@ -3,10 +3,15 @@
 ///
 /// Created by Davide Pasca - 2009/5/1
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
-#include <Windows.h>
+#if defined(_MSC_VER)
+    #include <Windows.h>
+#else
+    #include <sys/time.h>
+#endif
+
 #include <stdio.h>
 #include <stdexcept>
 #include <stdarg.h>
@@ -31,7 +36,7 @@ char *SSPrintF( const char *pFmt, ... )
 
 	char *p = DNEW char [ strlen(buff)+1 ];
 	strcpy( p, buff );
-	
+
 	return p;
 }
 
@@ -45,7 +50,7 @@ std::string SSPrintFS( const char *pFmt, ... )
 	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
 
 	va_end( vl );
-	
+
 	return std::string( buff );
 }
 
@@ -56,13 +61,19 @@ void DAssert( bool ok, const char *pFile, int line )
 		return;
 
 	char	buff[1024];
-	
+
 	sprintf( buff, "ASSERT: %s %i\n", pFile, line );
-	
+
 	puts( buff );
-	
+
 #if defined(_DEBUG)
+
+#if defined(_MSC_VER)
 	DebugBreak();
+#else
+	__asm__ ( "int3" );
+#endif
+
 #endif
 }
 
@@ -73,7 +84,7 @@ void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 		return;
 
 	char	buff[1024];
-	
+
 	if ( pNewCharMsg )
 	{
 		sprintf( buff, "ASSERT EXCEPT: %s - %s %i\n", pNewCharMsg, pFile, line );
@@ -84,9 +95,9 @@ void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 	{
 		sprintf( buff, "ASSERT EXCEPT: %s %i\n", pFile, line );
 	}
-	
+
 	puts( buff );
-	
+
 #if !defined(NDEBUG)
 #endif
 	throw std::runtime_error( buff );
@@ -115,7 +126,7 @@ MemFile::MemFile( const char *pFileName ) :
 	{
 		DASSTHROW( 0, ("Could not open the file %s in input.", pFileName) );
 	}
-	
+
 	mpData = (const U8 *)&mOwnData[0];
 	mDataSize = mOwnData.size();
 }
@@ -149,7 +160,7 @@ bool MemFile::ReadTextLine( char *pDestStr, size_t destStrMaxSize )
 
 	DASSTHROW( destIdx < destStrMaxSize, ("Writing out of bounds !") );
 	pDestStr[ destIdx ] = 0;
-	
+
 	DASSERT( mReadPos <= mDataSize );
 
 	return true;
@@ -168,7 +179,7 @@ void StrStripBeginEndWhite( char *pStr )
 
 	if NOT( len )
 		return;
-	
+
 	int	newLen = len;
 	for (int i=(int)len-1; i >= 0; --i)
 	{
@@ -200,8 +211,18 @@ void StrStripBeginEndWhite( char *pStr )
 //==================================================================
 I64 GetTimeTicks()
 {
-	__int64	val;
+	I64	val;
+
+#if defined(_MSC_VER)
 	QueryPerformanceCounter( (LARGE_INTEGER *)&val );
+
+#else
+	timeval		timeVal;
+
+	gettimeofday( &timeVal, NULL );
+
+	val = (I64)timeVal.tv_sec * (1000*1000) + (I64)timeVal.tv_usec;
+#endif
 
 	return val;
 }
@@ -209,16 +230,21 @@ I64 GetTimeTicks()
 //==================================================================
 double TimeTicksToMS( I64 ticks )
 {
-	static __int64	freq;
-	static double	coe;
-	
+#if defined(_MSC_VER)
+	static I64  	freq;
+
 	if ( freq == 0 )
 	{
 		QueryPerformanceFrequency( (LARGE_INTEGER *)&freq );
-		coe = 1.0 / freq;
+		coe = 1000.0 / freq;
 	}
 
-	return ticks * coe; 
+#else
+	static double	coe = 1.0 / 1000.0;
+
+#endif
+
+	return ticks * coe;
 }
 
 //==================================================================

@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/5/9
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include <exception>
@@ -14,6 +14,9 @@
 	#include <malloc.h>
 
 #elif defined(__MACH__)
+	#include <mm_malloc.h>
+
+#else
 	#include <mm_malloc.h>
 
 #endif

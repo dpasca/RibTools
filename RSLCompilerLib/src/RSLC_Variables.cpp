@@ -3,9 +3,10 @@
 ///
 /// Created by Davide Pasca - 2009/5/26
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
+#include <stdlib.h>
 #include "RSLC_Tree.h"
 #include "RSLC_Variables.h"
 #include "RSLC_Exceptions.h"
@@ -428,7 +429,7 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 			TokNode	*pDTypeNode	= NULL;
 			TokNode	*pDetailNode= NULL;
 			TokNode	*pOutputNode= NULL;
-			
+
 			for (; i < pNode->mpChilds.size(); ++i)
 			{
 				while ( fndVarDefBeginInBlock(
@@ -461,7 +462,7 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 						}
 						else
 						if ( pVarName->IsNonTerminal() )
-						{						
+						{
 							// no "space cast" in the declaration in the curl braces
 							Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
 
@@ -502,7 +503,7 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 			{
 				int yoyo = 1;
 			}
-			
+
 
 			DiscoverVariablesDeclarations( pNode->mpChilds[i] );
 		}
@@ -582,7 +583,7 @@ static size_t findStandardVariable( const char *pName )
 {
 	for (size_t i=0; i < _countof(_gGlobalsDefs); i += 3)
 	{
-		if ( 0 == _stricmp( _gGlobalsDefs[i+2], pName ) )
+		if ( 0 == strcasecmp( _gGlobalsDefs[i+2], pName ) )
 			return i/3;
 	}
 

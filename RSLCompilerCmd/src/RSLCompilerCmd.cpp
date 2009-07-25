@@ -3,13 +3,14 @@
 ///
 /// Created by Davide Pasca - 2009/5/21
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include <stdio.h>
-#include "DSystem/include/DTypes.h"
-#include "DSystem/include/DUtils.h"
+#include <stdlib.h>
+//#include "DSystem/include/DUtils.h"
 #include "RSLCompilerLib/include/RSLCompiler.h"
+#include "DSystem/include/DUtils_Files.h"
 
 //==================================================================
 static void printUsage( const char *pCmdName )
@@ -39,7 +40,7 @@ int main( int argc, char *argv[] )
 		exit( -1 );
 	}
 
-	try 
+	try
 	{
 		RSLCompiler::Params	params;
 		params.mDbgOutputTree = true;
