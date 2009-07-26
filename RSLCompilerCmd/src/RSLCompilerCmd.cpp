@@ -48,7 +48,7 @@ int main( int argc, char *argv[] )
 		RSLCompiler	compiler(
 						(const char *)&inData[0],
 						inData.size(),
-						"Resources\\Shaders\\RSLC_Builtins.sl",
+						"Resources/Shaders/RSLC_Builtins.sl",
 						params );
 
 		printf( "Generating %s...\n", pRRFName );
