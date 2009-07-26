@@ -21,8 +21,8 @@ namespace SOP
 template <class TA>
 void Inst_CMPLT( SlRunContext &ctx )
 {
-	const TA	*lhs	= ctx.GetVoidRO<TA>( 1 );
-	const TA	*rhs	= ctx.GetVoidRO<TA>( 2 );
+	const TA	*lhs	= ctx.GetVoidRO( (const TA *)0, 1 );
+	const TA	*rhs	= ctx.GetVoidRO( (const TA *)0, 2 );
 
 	DASSERT( !ctx.IsSymbolVarying( 1 ) );
 	DASSERT( !ctx.IsSymbolVarying( 2 ) );
@@ -42,7 +42,7 @@ void Inst_CMPLT( SlRunContext &ctx )
 template <class TA>
 void Inst_LD1( SlRunContext &ctx )
 {
-	TA		*lhs		= ctx.GetVoidRW<TA>( 1 );
+	TA		*lhs		= ctx.GetVoidRW( (TA *)0,  1 );
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
 	TA		tmp = TA( ctx.GetImmFloat( 2 ) );
@@ -72,7 +72,7 @@ void Inst_LD1( SlRunContext &ctx )
 template <class TA>
 void Inst_LD3( SlRunContext &ctx )
 {
-	TA		*lhs		= ctx.GetVoidRW<TA>( 1 );
+	TA		*lhs		= ctx.GetVoidRW( (TA *)0,  1 );
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
 	TA		tmp = TA( ctx.GetImmFloat( 2 ), ctx.GetImmFloat( 3 ), ctx.GetImmFloat( 4 ) );
@@ -102,10 +102,10 @@ void Inst_LD3( SlRunContext &ctx )
 template <class TA, class TB>
 void Inst_MOVVS3( SlRunContext &ctx )
 {
-		  TA*	lhs	= ctx.GetVoidRW<TA>( 1 );
-	const TB*	op1	= ctx.GetVoidRO<TB>( 2 );
-	const TB*	op2	= ctx.GetVoidRO<TB>( 3 );
-	const TB*	op3	= ctx.GetVoidRO<TB>( 4 );
+		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
+	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
+	const TB*	op2	= ctx.GetVoidRO( (const TB *)0, 3 );
+	const TB*	op3	= ctx.GetVoidRO( (const TB *)0, 4 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -153,8 +153,8 @@ void Inst_MOVVS3( SlRunContext &ctx )
 template <class TA, class TB, const OpCodeID opCodeID>
 void Inst_1Op( SlRunContext &ctx )
 {
-		  TA*	lhs	= ctx.GetVoidRW<TA>( 1 );
-	const TB*	op1	= ctx.GetVoidRO<TB>( 2 );
+		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
+	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -197,9 +197,9 @@ void Inst_1Op( SlRunContext &ctx )
 template <class TA, class TB, const OpCodeID opCodeID>
 void Inst_2Op( SlRunContext &ctx )
 {
-		  TA*	lhs	= ctx.GetVoidRW<TA>( 1 );
-	const TA*	op1	= ctx.GetVoidRO<TA>( 2 );
-	const TB*	op2	= ctx.GetVoidRO<TB>( 3 );
+		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
+	const TA*	op1	= ctx.GetVoidRO( (const TA *)0, 2 );
+	const TB*	op2	= ctx.GetVoidRO( (const TB *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -249,8 +249,8 @@ void Inst_2Op( SlRunContext &ctx )
 template <const size_t COMP_IDX>
 void Inst_GetVComp( SlRunContext &ctx )
 {
-		  SlScalar*	lhs	= ctx.GetVoidRW<SlScalar>( 1 );
-	const SlVec3*	op1	= ctx.GetVoidRO<SlVec3>( 2 );
+		  SlScalar*	lhs	= ctx.GetVoidRW( (		SlScalar*)0, 1 );
+	const SlVec3*	op1	= ctx.GetVoidRO( (const	SlVec3	*)0	,2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -286,8 +286,8 @@ void Inst_GetVComp( SlRunContext &ctx )
 template <const size_t COMP_IDX>
 void Inst_SetVComp( SlRunContext &ctx )
 {
-		  SlVec3*	lhs	= ctx.GetVoidRW<SlVec3>( 1 );
-	const SlScalar*	op1	= ctx.GetVoidRO<SlScalar>( 2 );
+		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3	*)0, 1 );
+	const SlScalar*	op1	= ctx.GetVoidRO( (const SlScalar*)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 

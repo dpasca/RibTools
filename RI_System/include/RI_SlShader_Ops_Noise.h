@@ -21,8 +21,8 @@ namespace SOP
 template <class TB>
 inline void Inst_Noise1( SlRunContext &ctx )
 {
-		  SlScalar*	lhs	= ctx.GetVoidRW<SlScalar>( 1 );
-	const TB*		op1	= ctx.GetVoidRO<TB>( 2 );
+		  SlScalar*	lhs	= ctx.GetVoidRW( (SlScalar *)0, 1 );
+	const TB*		op1	= ctx.GetVoidRO( (const TB *)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -56,8 +56,8 @@ inline void Inst_Noise1( SlRunContext &ctx )
 template <class TB>
 inline void Inst_Noise3( SlRunContext &ctx )
 {
-		  SlVec3*	lhs	= ctx.GetVoidRW<SlVec3>( 1 );
-	const TB*		op1	= ctx.GetVoidRO<TB>( 2 );
+		  SlVec3*	lhs	= ctx.GetVoidRW( (	  SlVec3*)0, 1 );
+	const TB	*	op1	= ctx.GetVoidRO( (const TB	*)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	

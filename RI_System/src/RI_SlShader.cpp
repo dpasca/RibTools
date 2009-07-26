@@ -297,9 +297,9 @@ typedef void (*ShaderInstruction)( SlRunContext &ctx );
 //==================================================================
 static void Inst_Faceforward( SlRunContext &ctx )
 {
-		  SlVec3* lhs	= ctx.GetVoidRW<SlVec3>( 1 );
-	const SlVec3* pN	= ctx.GetVoidRO<SlVec3>( 2 );
-	const SlVec3* pI	= ctx.GetVoidRO<SlVec3>( 3 );
+		  SlVec3* lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
+	const SlVec3* pN	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
+	const SlVec3* pI	= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
 
 	const SlSymbol*	 pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", SlSymbol::NORMAL );
 	const SlVec3* pNg = (const SlVec3 *)pNgSymbol->GetData();
@@ -341,8 +341,8 @@ static void Inst_Faceforward( SlRunContext &ctx )
 //==================================================================
 static void Inst_Normalize( SlRunContext &ctx )
 {
-		  SlVec3*	lhs	= ctx.GetVoidRW<SlVec3>( 1 );
-	const SlVec3*	op1	= ctx.GetVoidRO<SlVec3>( 2 );
+		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
+	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 	
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -373,8 +373,8 @@ static void Inst_Normalize( SlRunContext &ctx )
 //==================================================================
 static void Inst_CalculateNormal( SlRunContext &ctx )
 {
-		  SlVec3*	lhs	= ctx.GetVoidRW<SlVec3>( 1 );
-	const SlVec3*	op1	= ctx.GetVoidRO<SlVec3>( 2 );
+		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
+	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
 	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodu", SlSymbol::FLOAT );
 	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodv", SlSymbol::FLOAT );

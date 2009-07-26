@@ -111,20 +111,7 @@ public:
 		return GetOp(argc)->mSymbol.mIsVarying ? 1 : 0;
 	}
 
-	template <class _T>
-	_T *GetVoidRW( u_int argc )
-	{
-		return 0;
-	}
-
-	template <class _T>
-	const _T *GetVoidRO( u_int argc ) const
-	{
-		return 0;
-	}
-
-	template <>
-	SlScalar *GetVoidRW( u_int argc )
+	SlScalar *GetVoidRW( SlScalar *unused, u_int argc )
 	{
 		SlValue	&value = GetValue(argc);
 
@@ -134,16 +121,17 @@ public:
 		return (SlScalar *)value.Data.pVoidValue;
 	}
 
-	template <>
-	const SlScalar *GetVoidRO( u_int argc ) const
+	SlVec2 *GetVoidRW( SlVec2 *unused, u_int argc )
 	{
-		const SlValue	&value = GetValue(argc);
-		DASSERT( value.mpSrcSymbol->mType == SlSymbol::FLOAT );
-		return (const SlScalar *)value.Data.pVoidValue;
+		SlValue	&value = GetValue(argc);
+
+		DASSERT( value.mpSrcSymbol->mType == SlSymbol::FLOAT &&
+				 value.Flags.mCanChange != 0 );
+
+		return (SlVec2 *)value.Data.pVoidValue;
 	}
 
-	template <>
-	SlVec3 *GetVoidRW( u_int argc )
+	SlVec3 *GetVoidRW( SlVec3 *unused, u_int argc )
 	{
 		SlValue	&value = GetValue(argc);
 
@@ -157,8 +145,21 @@ public:
 		return (SlVec3 *)value.Data.pVoidValue;
 	}
 
-	template <>
-	const SlVec3 *GetVoidRO( u_int argc ) const
+	const SlScalar *GetVoidRO( const SlScalar *unused, u_int argc ) const
+	{
+		const SlValue	&value = GetValue(argc);
+		DASSERT( value.mpSrcSymbol->mType == SlSymbol::FLOAT );
+		return (const SlScalar *)value.Data.pVoidValue;
+	}
+
+	const SlVec2 *GetVoidRO( const SlVec2 *unused, u_int argc ) const
+	{
+		const SlValue	&value = GetValue(argc);
+		DASSERT( value.mpSrcSymbol->mType == SlSymbol::FLOAT );
+		return (const SlVec2 *)value.Data.pVoidValue;
+	}
+
+	const SlVec3 *GetVoidRO( const SlVec3 *unused, u_int argc ) const
 	{
 		const SlValue	&value = GetValue(argc);
 

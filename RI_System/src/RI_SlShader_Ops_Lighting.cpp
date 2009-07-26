@@ -78,8 +78,8 @@ return C;
 
 void Inst_Diffuse( SlRunContext &ctx )
 {
-		  SlColor* lhs	= ctx.GetVoidRW<SlColor>( 1 );
-	const SlVec3 * op1	= ctx.GetVoidRO<SlVec3>( 2 );
+		  SlColor* lhs	= ctx.GetVoidRW( (		SlColor*)0, 1 );
+	const SlVec3 * op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
 	const SlSymbol*	pPSymbol = ctx.mpSymbols->LookupVariable( "P", SlSymbol::POINT );
 	const Point3*	pP = (const Point3 *)pPSymbol->GetData();
@@ -135,7 +135,7 @@ void Inst_Diffuse( SlRunContext &ctx )
 // this is a simplified version.. until lights become available 8)
 void Inst_Ambient( SlRunContext &ctx )
 {
-	SlColor*	lhs	= ctx.GetVoidRW<SlColor>( 1 );
+	SlColor*	lhs	= ctx.GetVoidRW( (SlColor*)0, 1 );
 
 	if NOT( ctx.mCache.mAmbientColDone )
 	{
