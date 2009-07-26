@@ -17,7 +17,6 @@
 					<Add option="-W" />
 					<Add option="-g" />
 					<Add option="-O0" />
-					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CONSOLE" />
 					<Add directory="../../" />
@@ -34,7 +33,6 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-W" />
-					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_CONSOLE" />
 					<Add directory="../../" />

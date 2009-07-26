@@ -16,7 +16,6 @@
 				<Compiler>
 					<Add option="-D_DEBUG" />
 					<Add option="-DFREEGLUT_STATIC" />
-					<Add option="-DWIN32" />
 					<Add option="-D_LIB" />
 					<Add option="-W" />
 					<Add option="-O0" />
@@ -36,7 +35,6 @@
 				<Compiler>
 					<Add option="-DNDEBUG" />
 					<Add option="-DFREEGLUT_STATIC" />
-					<Add option="-DWIN32" />
 					<Add option="-D_LIB" />
 					<Add option="-W" />
 					<Add option="-O2" />

@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/2/19
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef RI_SLSHADER_H
@@ -210,7 +210,7 @@ public:
 		const char	*pSource;
 		const char	*pSourceFileName;
 		const char	*pAppResDir;
-		
+
 		CtorParams() :
 			pName(NULL),
 			pSource(NULL),
@@ -277,7 +277,7 @@ public:
 	SlValue	*Bind( const SlSymbolList &gridSymbols ) const;
 	void Unbind( SlValue * &pDataSegment ) const;
 
-	void Run( SlRunContext &ctx ) const;
+	void Run( class SlRunContext &ctx ) const;
 };
 
 //==================================================================

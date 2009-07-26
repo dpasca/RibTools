@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/3/16
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include "stdafx.h"
@@ -118,14 +118,14 @@ void SlSymbol::AllocDefault( const void *pSrcData )
 			((SlColor *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
 			((SlColor *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
 			break;
-	
+
 	case SlSymbol::VECTOR:
 	case SlSymbol::NORMAL:
 			((SlVec3 *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
 			((SlVec3 *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
 			((SlVec3 *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
 			break;
-	
+
 	case SlSymbol::STRING:
 	case SlSymbol::MATRIX:
 			DASSTHROW( mpValArray == NULL, ("Currently unsupported type !") );
@@ -225,8 +225,10 @@ SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type 
 		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
 			DASSTHROW( symbol.mType == type,
-						(__FUNCTION__" %s type not matching ! It's %i, but expecting %i",
-								symbol.mType, type ) );
+						("%s type not matching ! It's %i, but expecting %i",
+								__FUNCTION__,
+								symbol.mType,
+								type ) );
 
 			return &symbol;
 		}
@@ -245,8 +247,10 @@ const SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type
 		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
 			DASSTHROW( symbol.mType == type,
-						(__FUNCTION__" %s type not matching ! It's %i, but expecting %i",
-								symbol.mType, type ) );
+						("%s type not matching ! It's %i, but expecting %i",
+								__FUNCTION__,
+								symbol.mType,
+								type ) );
 
 			return &symbol;
 		}

@@ -3,11 +3,12 @@
 ///
 /// Created by Davide Pasca - 2008/12/17
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include "stdafx.h"
 #include <stdarg.h>
+#include <stdexcept>
 #include "RI_State.h"
 #include "RI_Attributes.h"
 
@@ -52,7 +53,7 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mpState				= rhs.mpState;
 	mpStatics			= rhs.mpStatics;
 	mpResManager		= rhs.mpResManager;
-	
+
 	mpRevision			= rhs.mpRevision			;
 	mSymbols			= rhs.mSymbols				;
 	mBound				= rhs.mBound				;
@@ -75,7 +76,7 @@ void Attributes::copyFrom(const Attributes& rhs)
 		mpCustomUBasis = DNEW Matrix44( *rhs.mpCustomUBasis );
 
 	if ( rhs.mpCustomVBasis )
-		mpCustomVBasis = DNEW Matrix44( *rhs.mpCustomVBasis );	
+		mpCustomVBasis = DNEW Matrix44( *rhs.mpCustomVBasis );
 
 	mUSteps				= rhs.mUSteps				;
 	mVSteps				= rhs.mVSteps				;
@@ -120,7 +121,7 @@ void Attributes::Init(
 
 	mpCustomUBasis = NULL;
 	mpCustomVBasis = NULL;
-	
+
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
 
@@ -168,22 +169,22 @@ void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 //==================================================================
 void Attributes::cmdOrientation( RtToken orientation )
 {
-	if ( 0 == _stricmp( orientation, RI_INSIDE ) )
+	if ( 0 == strcasecmp( orientation, RI_INSIDE ) )
 	{
 		mOrientationFlipped = true;
 	}
 	else
-	if ( 0 == _stricmp( orientation, RI_OUTSIDE ) )
+	if ( 0 == strcasecmp( orientation, RI_OUTSIDE ) )
 	{
 		mOrientationFlipped = false;
 	}
 	else
-	if ( 0 == _stricmp( orientation, RI_LH ) )
+	if ( 0 == strcasecmp( orientation, RI_LH ) )
 	{
 		printf( "WARNING: Unsupported LH orientation\n" );	// TODO
 	}
 	else
-	if ( 0 == _stricmp( orientation, RI_RH ) )
+	if ( 0 == strcasecmp( orientation, RI_RH ) )
 	{
 		printf( "WARNING: Unsupported RH orientation\n" );	// TODO
 	}
@@ -365,7 +366,7 @@ SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir,
 	SlShader::CtorParams	params;
 	params.pName			= pSName;
 	params.pAppResDir		= pAppResDir;
-	params.pSourceFileName	= buff;	
+	params.pSourceFileName	= buff;
 
 	sprintf( buff, "%s/%s.sl", pBasePath, pSName );
 	if NOT( DUT::FileExists( buff ) )
@@ -430,7 +431,7 @@ void Attributes::cmdSurface( ParamList &params )
 	}
 
 	const char *pShaderName = params[0].PChar();
-	
+
 	SlShader	*pShader = getShader( pShaderName, "matte" );
 
 	if ( pShader )
@@ -449,7 +450,7 @@ void Attributes::cmdDisplacement( ParamList &params )
 	}
 
 	const char *pShaderName = params[0].PChar();
-	
+
 	SlShader	*pShader = getShader( pShaderName, NULL );
 
 	if ( pShader )

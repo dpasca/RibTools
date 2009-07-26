@@ -12,12 +12,11 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-DWIN32" />
-					<Add option="-D_DEBUG" />
-					<Add option="-D_CONSOLE" />
 					<Add option="-W" />
 					<Add option="-g" />
 					<Add option="-O0" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
 					<Add directory="../../" />
 					<Add directory="../../external/jpeg-6b" />
 					<Add directory="../../external/jpeg-6b/pc" />
@@ -27,9 +26,6 @@
 					<Add directory="../../external/jpeg-6b" />
 					<Add directory="../../external/jpeg-6b/pc" />
 				</ResourceCompiler>
-				<ExtraCommands>
-					<Add after="mkdir ..\..\Distrib\RibRenderFile&#x0D;&#x0A;mkdir ..\..\Distrib\RibRenderFile\Tests&#x0D;&#x0A;mkdir ..\..\Distrib\RibRenderFile\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\RibRenderFile\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\RibRenderFile\Resources&#x0D;&#x0A;xcopy /E /Y  ..\..\Distrib\RibRenderFile\&#x0D;&#x0A;" />
-				</ExtraCommands>
 			</Target>
 			<Target title="Release">
 				<Option output="RibRenderFile" prefix_auto="1" extension_auto="1" />
@@ -37,11 +33,10 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-DWIN32" />
+					<Add option="-O2" />
+					<Add option="-W" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_CONSOLE" />
-					<Add option="-W" />
-					<Add option="-O2" />
 					<Add directory="../../" />
 					<Add directory="../../external/jpeg-6b" />
 					<Add directory="../../external/jpeg-6b/pc" />
@@ -51,11 +46,24 @@
 					<Add directory="../../external/jpeg-6b" />
 					<Add directory="../../external/jpeg-6b/pc" />
 				</ResourceCompiler>
-				<ExtraCommands>
-					<Add after="mkdir ..\..\Distrib\RibRenderFile&#x0D;&#x0A;mkdir ..\..\Distrib\RibRenderFile\Tests&#x0D;&#x0A;mkdir ..\..\Distrib\RibRenderFile\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\RibRenderFile\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\RibRenderFile\Resources&#x0D;&#x0A;xcopy /E /Y  ..\..\Distrib\RibRenderFile\&#x0D;&#x0A;" />
-				</ExtraCommands>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-march=pentium4" />
+		</Compiler>
+		<Linker>
+			<Add library="../../DMath/linux/lib.a" />
+			<Add library="../../DSystem/linux/lib.a" />
+			<Add library="../../external/jpeg-6b/linux/lib.a" />
+			<Add library="../../RI_System/linux/lib.a" />
+			<Add library="../../RSLCompilerLib/linux/lib.a" />
+		</Linker>
+		<ExtraCommands>
+			<Add after="mkdir -p ../../Distrib" />
+			<Add after="rsync -aC  RibRenderFile ../../Distrib/RibRenderFile/" />
+			<Add after="rsync -aC /home/davide/Desktop/ribtools/Resources ../../Distrib/RibRenderFile/" />
+			<Add after="rsync -aC ../tests ../../Distrib/RibRenderFile/" />
+		</ExtraCommands>
 		<Unit filename="../RenderOutputFile.cpp" />
 		<Unit filename="../RenderOutputFile.h" />
 		<Unit filename="../RibRenderFile.cpp" />

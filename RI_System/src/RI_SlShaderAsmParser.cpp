@@ -3,11 +3,12 @@
 ///
 /// Created by Davide Pasca - 2009/3/4
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include "stdafx.h"
 #include <memory>
+#include <stdexcept>
 #include <stdarg.h>
 #include "DUtils.h"
 #include "RI_SlRunContext.h"
@@ -41,27 +42,27 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"movsv"		,		2,							0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
 	"movvs"		,		2,							0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
 	"movvv"		,		2,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-																						   
+
 	"absss"		,		2,							0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
 	"abssv"		,		2,							0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
 	"absvs"		,		2,							0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
 	"absvv"		,		2,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-													
+
 	"addss"		,		3,							0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
 	"addsv"		,		3,							0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
 	"addvs"		,		3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
 	"addvv"		,		3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
-																						   
+
 	"subss"		,		3,							0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
 	"subsv"		,		3,							0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
 	"subvs"		,		3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
 	"subvv"		,		3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
-													
+
 	"mulss"		,		3,							0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
 	"mulsv"		,		3,							0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
 	"mulvs"		,		3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
 	"mulvv"		,		3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
-																						   
+
 	"divss"		,		3,							0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
 	"divsv"		,		3,							0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
 	"divvs"		,		3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
@@ -88,7 +89,7 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"setxcompvs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
 	"setycompvs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
 	"setzcompvs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-													
+
 	"normalize"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
 	"faceforward"	,	3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
 	"diffuse"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
@@ -97,7 +98,7 @@ static OpCodeDef	gsOpCodeDefs[] =
 
 	"ret"			,	0,							0,	OPRTYPE_NA,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
 
-	NULL
+	NULL			,	0,							0,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA
 };
 
 //==================================================================
@@ -130,7 +131,7 @@ static void stripComments( char *pTxt )
 				pTxt[0] = 0;
 				return;
 			}
-			
+
 		++pTxt;
 	}
 }
@@ -156,7 +157,7 @@ bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSec
 	{
 		if ( curSection != SEC_CODE )
 			onError( "Shader type must be defined in the .code block" );
-		
+
 		mpShader->mType = type;
 		mpShader->mStartPC = mpShader->mCode.size();
 	}
@@ -178,7 +179,7 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 		strcpy_s( lineWork, lineBuff );
 
 		stripComments( lineWork );
-	
+
 		DUT::StrStripBeginEndWhite( lineWork );
 
 		if NOT( lineWork[0] )
@@ -187,7 +188,7 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 			continue;
 		}
 
-		try 
+		try
 		{
 			if ( handleShaderTypeDef( lineWork, curSection ) )
 			{
@@ -252,11 +253,11 @@ void ShaderAsmParser::resolveLabels()
 void ShaderAsmParser::getVector( const char *pStr, float out_val[], int n )
 {
 	int	gotN;
-	
-	if ( n == 1 ) gotN = sscanf( pStr, "%f"			, out_val+0, out_val+1, out_val+2 ); else
-	if ( n == 2 ) gotN = sscanf( pStr, "%f %f"		, out_val+0, out_val+1, out_val+2 ); else
+
+	if ( n == 1 ) gotN = sscanf( pStr, "%f"			, out_val+0 ); else
+	if ( n == 2 ) gotN = sscanf( pStr, "%f %f"		, out_val+0, out_val+1 ); else
 	if ( n == 3 ) gotN = sscanf( pStr, "%f %f %f"	, out_val+0, out_val+1, out_val+2 ); else
-	if ( n == 4 ) gotN = sscanf( pStr, "%f %f %f %f", out_val+0, out_val+1, out_val+2 ); else
+	if ( n == 4 ) gotN = sscanf( pStr, "%f %f %f %f", out_val+0, out_val+1, out_val+2 , out_val+3 ); else
 	{
 		onError( "getVector() can't handle so many dimensions (^^;) !" );
 	}
@@ -273,12 +274,12 @@ void ShaderAsmParser::getVector( const char *pStr, float out_val[], int n )
 void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 {
 	//printf( "SEC_DATA: %s\n", lineBuff );
-	
+
 	const char *pLineEnd = lineBuff + strlen( lineBuff );
-	
+
 	char *pTokCtx;
 	char *pTok;
-	
+
 	auto_ptr<SlSymbol>	pSymbol( DNEW SlSymbol() );
 	pSymbol->Reset();
 
@@ -291,7 +292,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	{
 		onError( "ERROR: Expecting storage definition" );
 	}
-		
+
 	if ( 0 == strcmp( pTok, "constant"  ) ) pSymbol->mStorage = SlSymbol::CONSTANT ; else
 	if ( 0 == strcmp( pTok, "parameter" ) ) pSymbol->mStorage = SlSymbol::PARAMETER; else
 	if ( 0 == strcmp( pTok, "temporary" ) ) pSymbol->mStorage = SlSymbol::TEMPORARY; else
@@ -388,7 +389,7 @@ const OpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &opCodeI
 			opCodeIdx = i;
 			return gsOpCodeDefs + i;
 		}
-		
+
 	return NULL;
 }
 
@@ -398,7 +399,7 @@ int ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
 	for (size_t i=0; i < mpShader->mSymbols.size(); ++i)
 	{
 		const char *pShaderSymName = mpShader->mSymbols[i]->mName.c_str();
-		
+
 		if ( ignoreCase )
 		{
 			if ( 0 == strcasecmp( pName, pShaderSymName ) )
@@ -420,7 +421,7 @@ int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 	int	idx = findSymbol( pName, true );
 	if ( idx != -1 )
 		return idx;
-		
+
 	size_t	len = strlen( pName );
 	if ( len < 3 )
 		return -1;
@@ -482,7 +483,7 @@ static OperTypeID getOperTypeFromSlSymbolType( SlSymbol::Type slSymType, bool &o
 							return OPRTYPE_F3 ;
 	//case SlSymbol:::		return OPRTYPE_F4 ;
 	case SlSymbol::MATRIX:	return OPRTYPE_M44;
-	
+
 	default:
 		out_success = false;
 		return OPRTYPE_F1;
@@ -585,7 +586,7 @@ void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCode
 bool ShaderAsmParser::parseLabelDef( const char *pTok )
 {
 	size_t	len = strlen( pTok );
-	
+
 	if ( len && pTok[len-1] == ':' )
 	{
 		if ( len < 2 )
@@ -608,21 +609,21 @@ bool ShaderAsmParser::parseLabelDef( const char *pTok )
 void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 {
 	//printf( "SEC_CODE: %s\n", lineBuff );
-	
+
 	char *pTokCtx;
 	char *pTok;
 
 	if NOT( pTok = strtok_r( lineBuff, " \t", &pTokCtx ) )
 		return;
-		
+
 	DUT::StrStripBeginEndWhite( pTok );
 
 	if ( parseLabelDef( pTok ) )
 		return;
-	
+
 	u_int	opCodeIdx;
 	const OpCodeDef	*pOpDef = findOpDef( pTok, opCodeIdx );
-	
+
 	if NOT( pOpDef )
 	{
 		onError( "ERROR: Unknown opcode '%s' !\n", pTok );

@@ -21,6 +21,9 @@
 #define strcat_s	strcat
 #define _strdate_s	strdate
 #define _strtime_s	strtime
+#define sprintf_s	sprintf
+
+#define	_getcwd		getcwd
 
 typedef int	errno_t;
 

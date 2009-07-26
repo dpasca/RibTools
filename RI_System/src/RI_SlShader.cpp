@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/2/19
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include "stdafx.h"
@@ -156,13 +156,13 @@ void SlShaderInstance::SetParameter(
 			bool			isVarying,
 			void			*pValue )
 {
-	
+
 }
 
 //==================================================================
 static void matchSymbols( const SlSymbol &a, const SlSymbol &b )
 {
-	if ( _stricmp( a.mName.c_str(), b.mName.c_str() ) )
+	if ( strcasecmp( a.mName.c_str(), b.mName.c_str() ) )
 	{
 		DASSTHROW( 0, ("Names not matching ! %s != %s", a.mName.c_str(), b.mName.c_str()) );
 	}
@@ -186,7 +186,7 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 	size_t	symbolsN = mpShader->mSymbols.size();
 
 	SlValue	*pDataSegment = DNEW SlValue [ symbolsN ];
-	
+
 	for (size_t i=0; i < symbolsN; ++i)
 	{
 		const SlSymbol	&symbol = *mpShader->mSymbols[i];
@@ -314,7 +314,7 @@ static void Inst_Faceforward( SlRunContext &ctx )
 		int		N_offset	= 0;
 		int		I_offset	= 0;
 		int		Ng_offset	= 0;
-		
+
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )
@@ -343,14 +343,14 @@ static void Inst_Normalize( SlRunContext &ctx )
 {
 		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
 	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
-	
+
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-	
+
 	if ( lhs_varying )
 	{
 		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
 		int		op1_offset = 0;
-		
+
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
 			if ( ctx.IsProcessorActive( i ) )

@@ -3,12 +3,18 @@
 ///
 /// Created by Davide Pasca - 2009/4/12
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include <stdio.h>
 #include <stdexcept>
+
+#if defined(WIN32)
 #include <direct.h>
+#else
+//#include <direct.h>
+#endif
+
 #include "DSystem/include/DUtils.h"
 #include "RI_System/include/RI_Parser.h"
 #include "RI_System/include/RI_Machine.h"
@@ -58,9 +64,9 @@ static bool renderFile(
 			int				cmdLine;
 
 			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
-			
+
 			printf( "CMD %s ", cmdName.c_str() );
-			
+
 			if ( cmdParams.size() )
 				printf( "(%i params)", cmdParams.size() );
 
@@ -110,19 +116,19 @@ int main(int argc, char** argv)
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(512, 256);
-    
+
     glutCreateWindow( "RibRender" );
 
     glutDisplayFunc( display );
     glutReshapeFunc( reshape );
 	glutPassiveMotionFunc( passiveMotion );
     glutIdleFunc(idle);
-	
+
 	glutCreateMenu( menuFunc );
 
 	for (int i=0; gsTestRibFiles[i]; ++i)
 		 glutAddMenuEntry( gsTestRibFiles[i], i );
-	
+
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	strcpy( gpFileToRender, argv[1] );

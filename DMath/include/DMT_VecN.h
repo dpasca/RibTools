@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/5/9
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DMT_VECN_H
@@ -99,9 +99,13 @@ public:
 
 	VecN operator +=(const VecN &rval)			{ *this = *this + rval; return *this; }
 
+#if defined(_MSC_VER)
 	const float &operator [] (size_t i) const	{ return v.m128_f32[i]; }
 		  float &operator [] (size_t i)			{ return v.m128_f32[i]; }
-
+#else
+	const float &operator [] (size_t i) const	{ return ((const float *)&v)[i]; }
+		  float &operator [] (size_t i)			{ return ((float *)&v)[i]; }
+#endif
 
 	friend VecN	DSqrt( const VecN &a )	{ return _mm_sqrt_ps( a.v );	}
 	friend VecN	DRSqrt( const VecN &a )	{ return _mm_rsqrt_ps( a.v );	}
@@ -125,8 +129,8 @@ public:
 		return _mm_and_ps( a.v, _mm_set_ps1( *(float *)&notSignBitMask ) );
 	}
 
-	friend VecN	DSin( const VecN &a ) { VecN tmp; for (size_t i=0; i<4; ++i) tmp.v.m128_f32[i] = DSin( a[i] ); return tmp; }
-	friend VecN	DCos( const VecN &a ) { VecN tmp; for (size_t i=0; i<4; ++i) tmp.v.m128_f32[i] = DCos( a[i] ); return tmp; }
+	friend VecN	DSin( const VecN &a ) { VecN tmp; for (size_t i=0; i<4; ++i) tmp[i] = DSin( a[i] ); return tmp; }
+	friend VecN	DCos( const VecN &a ) { VecN tmp; for (size_t i=0; i<4; ++i) tmp[i] = DCos( a[i] ); return tmp; }
 	//friend VecN operator * (const _S &lval, const VecN &rval) { return rval * lval; }
 };
 
