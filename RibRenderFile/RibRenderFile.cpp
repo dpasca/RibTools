@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 	_getcwd( startDir, sizeof(startDir) );
 	printf( "startDir: %s\n", startDir );
 
-	sprintf_s( defaultResDir, "%s/../../Resources", startDir );
+	sprintf_s( defaultResDir, "%s/Resources", startDir );
 	printf( "defaultResDir: %s\n", startDir );
 
 	char	outName[4096];
