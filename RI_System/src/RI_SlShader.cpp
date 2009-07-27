@@ -73,6 +73,35 @@ static std::string compileSLToAsm(
 }
 
 //==================================================================
+static void compileFromMemFile(
+				DUT::MemFile &file,
+				SlShader *pShader,
+				const char *pFileName,
+				const char *pShaderName,
+				const char *pAppResDir )
+{
+	// umm.. really ?
+	bool	isSL =
+		(0 == strcasecmp( DUT::GetFileNameExt( pFileName ), "sl" ) );
+
+	if ( isSL )
+	{
+		std::string asmFileName = compileSLToAsm(
+											file,
+											pFileName,
+											pAppResDir );
+
+		DUT::MemFile	tmpFile( asmFileName.c_str() );
+
+		ShaderAsmParser	parser( tmpFile, pShader, pShaderName );
+	}
+	else
+	{
+		ShaderAsmParser	parser( file, pShader, pShaderName );
+	}
+}
+
+//==================================================================
 /// SlShader
 //==================================================================
 SlShader::SlShader( const CtorParams &params ) :
@@ -85,48 +114,14 @@ SlShader::SlShader( const CtorParams &params ) :
 		DUT::MemFile	file((const void *)params.pSource,
 							  strlen(params.pSource) );
 
-		// umm.. really ?
-		bool	isSL =
-			(0 == strcasecmp( DUT::GetFileNameExt( params.pName ), "sl" ) );
-
-		if ( isSL )
-		{
-			std::string asmFileName = compileSLToAsm( file, params.pName, params.pAppResDir );
-
-			DUT::MemFile	tmpFile( asmFileName.c_str() );
-
-			ShaderAsmParser	parser( tmpFile, this, params.pName );
-		}
-		else
-		{
-
-			ShaderAsmParser	parser( file, this, params.pName );
-		}
+		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir );
 	}
 	else
 	if ( params.pSourceFileName )
 	{
 		DUT::MemFile	file( params.pSourceFileName );
 
-		// umm.. really ?
-		bool	isSL =
-			(0 == strcasecmp( DUT::GetFileNameExt( params.pSourceFileName ), "sl" ) );
-
-		if ( isSL )
-		{
-			std::string asmFileName = compileSLToAsm(
-												file,
-												params.pSourceFileName,
-												params.pAppResDir );
-
-			DUT::MemFile	tmpFile( asmFileName.c_str() );
-
-			ShaderAsmParser	parser( tmpFile, this, params.pName );
-		}
-		else
-		{
-			ShaderAsmParser	parser( file, this, params.pName );
-		}
+		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir );
 	}
 	else
 	{

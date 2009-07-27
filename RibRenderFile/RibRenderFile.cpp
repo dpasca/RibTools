@@ -42,8 +42,8 @@ static bool renderFile(
 
 	char	defaultShadersDir[4096];
 	sprintf_s( defaultShadersDir, "%s/Shaders", pDefaultResourcesDir );
-	printf( "Base Dir: %s\n", baseDir.c_str() );
-	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
+	//printf( "Base Dir: %s\n", baseDir.c_str() );
+	//printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
 	RI::HiderREYES::Params	hiderParams;
 	RI::FrameworkREYES		framework( pRenderOutput, hiderParams );
@@ -89,52 +89,33 @@ static bool renderFile(
 //===============================================================
 int main(int argc, char** argv)
 {
-	if ( argc != 2 )
+	if ( argc != 3 )
 	{
-		printf( "Invalid param count. Quitting !\n" );
+		printf( "Usage: %s <rib file> <output JPEG file>\n", argv[0] );
+		return -1;
+	}
+
+	const char *pOutExt = DUT::GetFileNameExt( argv[2] );
+
+	if ( 0 != strcasecmp( pOutExt, "jpg" ) &&
+		 0 != strcasecmp( pOutExt, "jpeg" ) )
+	{
+		printf( "Error: output file name must have a 'jpg' or 'jpeg' extension\n" );
 		return -1;
 	}
 
 	char	defaultResDir[2048];
-	char	startDir[2048];
 
-	_getcwd( startDir, sizeof(startDir) );
-	printf( "startDir: %s\n", startDir );
+	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
 
-	sprintf_s( defaultResDir, "%s/Resources", startDir );
-	printf( "defaultResDir: %s\n", startDir );
+	if ( exePath.length() )
+		sprintf_s( defaultResDir, "%s/Resources", exePath.c_str() );
+	else
+		strcpy_s( defaultResDir, "Resources" );
 
-	char	outName[4096];
-	sprintf_s( outName, "%s.jpg", argv[1] );
-
-	RenderOutputFile	rendOut( outName );
+	RenderOutputFile	rendOut( argv[2] );
 
 	renderFile( argv[1], defaultResDir, &rendOut );
-
-/*
-    glutInit(&argc, argv);
-
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(512, 256);
-
-    glutCreateWindow( "RibRender" );
-
-    glutDisplayFunc( display );
-    glutReshapeFunc( reshape );
-	glutPassiveMotionFunc( passiveMotion );
-    glutIdleFunc(idle);
-
-	glutCreateMenu( menuFunc );
-
-	for (int i=0; gsTestRibFiles[i]; ++i)
-		 glutAddMenuEntry( gsTestRibFiles[i], i );
-
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
-
-	strcpy( gpFileToRender, argv[1] );
-
-	glutMainLoop();
-*/
 
     return EXIT_SUCCESS;
 }

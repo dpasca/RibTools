@@ -64,7 +64,7 @@ RibRendTool::RibRendTool() :
 	printf( "mStartDir: %s\n", mStartDir );
 
 	sprintf( mDefaultResDir, "%s/Resources", mStartDir );
-	printf( "mDefaultResDir: %s\n", mStartDir );
+	printf( "mDefaultResDir: %s\n", mDefaultResDir );
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize( 640, 480 );

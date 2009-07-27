@@ -85,9 +85,11 @@ char *GetFileNameExt( char *pPathFileName )
 //==================================================================
 DStr GetDirNameFromFPathName( const char *pInFPathname )
 {
+	const char *pInFPathnameEnd = pInFPathname + strlen( pInFPathname );
+
 	const char *pFNamePtr = GetFileNameOnly( pInFPathname );
 
-	if ( pFNamePtr <= pInFPathname )
+	if ( pFNamePtr >= pInFPathnameEnd )
 		return DStr();	// and empty string after all..
 	else
 	{
