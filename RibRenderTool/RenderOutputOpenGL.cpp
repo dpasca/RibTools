@@ -8,7 +8,8 @@
  */
 
 #include "RenderOutputOpenGL.h"
-#ifdef _MSC_VER
+
+#if defined(WIN32) || defined(__linux__)
 	#include <GL/glut.h>
 #else
 	#include <GLUT/glut.h>
@@ -21,7 +22,7 @@ RenderOutputOpenGL::RenderOutputOpenGL() :
 	mpBuffer(NULL), mTexId(0), mWd(0), mHe(0), mTexWd(0), mTexHe(0)
 {
 	const char *pExtensionsStr = (const char *)glGetString( GL_EXTENSIONS );
-	
+
 	if (
 		0 == strstr( pExtensionsStr, "GL_ARB_texture_non_power_of_two" ) &&
 		0 == strstr( pExtensionsStr, "GL_ARB_texture_rectangle" ) &&
@@ -87,7 +88,7 @@ void RenderOutputOpenGL::Blit() const
 	glEnable( GL_TEXTURE_2D );
 
 	glBindTexture( GL_TEXTURE_2D, mTexId );
-	
+
 	float w = (float)mWd;
 	float h = (float)mHe;
 
@@ -145,7 +146,7 @@ void RenderOutputOpenGL::alloc( u_int w, u_int h )
 
 	glTexImage2D( GL_TEXTURE_2D, 0, 3, mTexWd, mTexHe, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 	mpBuffer = DNEW u_char [ w * h * 4 ];
-	
+
 	glutReshapeWindow( w, h );
 }
 

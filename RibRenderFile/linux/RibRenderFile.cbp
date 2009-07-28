@@ -8,6 +8,7 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="RibRenderFile" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Distrib/RibRenderFile" />
 				<Option object_output="Debug" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -29,6 +30,7 @@
 			</Target>
 			<Target title="Release">
 				<Option output="RibRenderFile" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Distrib/RibRenderFile" />
 				<Option object_output="Release" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -59,10 +61,10 @@
 			<Add library="../../RSLCompilerLib/linux/lib.a" />
 		</Linker>
 		<ExtraCommands>
-			<Add after="mkdir -p ../../Distrib" />
-			<Add after="rsync -aC  RibRenderFile ../../Distrib/RibRenderFile/" />
-			<Add after="rsync -aC /home/davide/Desktop/ribtools/Resources ../../Distrib/RibRenderFile/" />
-			<Add after="rsync -aC ../tests ../../Distrib/RibRenderFile/" />
+			<Add before="mkdir -p ../../distrib" />
+			<Add before="mkdir -p ../../distrib/RibRenderFile" />
+			<Add after="rsync -aC ../../Resources ../../distrib/RibRenderFile/" />
+			<Add after="rsync -aC ../../Tests ../../distrib/RibRenderFile/" />
 		</ExtraCommands>
 		<Unit filename="../RenderOutputFile.cpp" />
 		<Unit filename="../RenderOutputFile.h" />

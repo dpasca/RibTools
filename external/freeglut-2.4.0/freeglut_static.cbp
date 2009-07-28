@@ -14,11 +14,11 @@
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-W" />
+					<Add option="-O0" />
 					<Add option="-D_DEBUG" />
 					<Add option="-DFREEGLUT_STATIC" />
 					<Add option="-D_LIB" />
-					<Add option="-W" />
-					<Add option="-O0" />
 					<Add directory="include" />
 				</Compiler>
 				<ResourceCompiler>
@@ -45,6 +45,10 @@
 				</ResourceCompiler>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-DTARGET_HOST_UNIX_X11" />
+			<Add option="-DHAVE_FCNTL_H" />
+		</Compiler>
 		<Unit filename="include/GL/freeglut.h" />
 		<Unit filename="include/GL/freeglut_ext.h" />
 		<Unit filename="include/GL/freeglut_std.h" />

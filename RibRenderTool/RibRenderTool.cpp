@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/4/25
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #include <stdio.h>
@@ -19,8 +19,15 @@
 	#include <GL/glut.h>
 	#include <direct.h>
 	#include <io.h>
+
+#elif defined(__linux__)
+	#include <GL/glut.h>
+	#include <sys/types.h>
+	#include <dirent.h>
+
 #else
 	#include <GLUT/glut.h>
+
 #endif
 
 //#define ECHO_INPUT
@@ -117,6 +124,8 @@ void RibRendTool::RebuildMenu()
 	glutAddMenuEntry( "-- Test Files --", -1 );
 
 	mTestRibFiles.clear();
+
+#if defined(WIN32)
 	_finddatai64_t	findData;
 	intptr_t	handle = _findfirst64( "Tests/*.rib", &findData );
 	if ( handle != -1 )
@@ -135,6 +144,24 @@ void RibRendTool::RebuildMenu()
 
 		_findclose( handle );
 	}
+
+#elif defined(__linux__)
+
+	DIR	*pDir = opendir( "Tests" );
+	if ( pDir )
+	{
+		struct dirent *pDirent;
+
+		while ( pDirent = readdir( pDir ) )
+		{
+			//pDirent->
+		}
+
+		closedir( pDir );
+	}
+
+#endif
+
 }
 
 //==================================================================

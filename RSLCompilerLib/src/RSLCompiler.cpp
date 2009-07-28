@@ -7,6 +7,7 @@
 //==================================================================
 
 #include <time.h>
+#include "DSystem/include/DSafeCrt.h"
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DContainers.h"
 #include "RSLC_Token.h"

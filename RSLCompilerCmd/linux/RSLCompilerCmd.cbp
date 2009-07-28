@@ -8,11 +8,11 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="RSLCompilerCmd" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Distrib/RSLCompilerCmd" />
 				<Option object_output="Debug" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option parameters="tests/matte.sl dude.rrasm &gt; dude.c" />
-				<Option working_dir="../../Distrib/RSLCompilerCmd" />
 				<Compiler>
 					<Add option="-W" />
 					<Add option="-g" />
@@ -27,6 +27,7 @@
 			</Target>
 			<Target title="Release">
 				<Option output="RSLCompilerCmd" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Distrib/RSLCompilerCmd" />
 				<Option object_output="Release" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -47,11 +48,10 @@
 			<Add library="../../DSystem/linux/lib.a" />
 		</Linker>
 		<ExtraCommands>
-			<Add after="mkdir -p ../../Distrib" />
-			<Add after="rsync -aC  RSLCompilerCmd ../../Distrib/RSLCompilerCmd/" />
-			<Add after="rsync -aC /home/davide/Desktop/ribtools/Resources ../../Distrib/RSLCompilerCmd/" />
-			<Add after="rsync -aC ../tests ../../Distrib/RSLCompilerCmd/" />
-			<Mode after="always" />
+			<Add before="mkdir -p ../../distrib" />
+			<Add before="mkdir -p ../../distrib/RSLCompilerCmd" />
+			<Add after="rsync -aC ../../Resources ../../distrib/RSLCompilerCmd/" />
+			<Add after="rsync -aC ../../Tests ../../distrib/RSLCompilerCmd/" />
 		</ExtraCommands>
 		<Unit filename="../src/RSLCompilerCmd.cpp" />
 		<Unit filename="../tests/matte.sl" />

@@ -8,15 +8,15 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="RibRenderTool" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Distrib/RibRenderTool" />
 				<Option object_output="Debug" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-D_DEBUG" />
-					<Add option="-D_CONSOLE" />
-					<Add option="-DFREEGLUT_STATIC" />
 					<Add option="-W" />
 					<Add option="-O0" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
 					<Add directory="../" />
 					<Add directory="../../" />
 					<Add directory="../../external/freeglut-2.4.0/include" />
@@ -26,21 +26,18 @@
 					<Add directory="../../" />
 					<Add directory="../../external/freeglut-2.4.0/include" />
 				</ResourceCompiler>
-				<ExtraCommands>
-					<Add after="mkdir ..\..\Distrib\RibRenderTool&#x0D;&#x0A;mkdir ..\..\Distrib\RibRenderTool\Tests&#x0D;&#x0A;mkdir ..\..\Distrib\RibRenderTool\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\RibRenderTool\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\RibRenderTool\Resources&#x0D;&#x0A;xcopy /E /Y  ..\..\Distrib\RibRenderTool\&#x0D;&#x0A;" />
-				</ExtraCommands>
 			</Target>
 			<Target title="Release">
 				<Option output="RibRenderTool" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Distrib/RibRenderTool" />
 				<Option object_output="Release" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-O3" />
+					<Add option="-W" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_CONSOLE" />
-					<Add option="-DFREEGLUT_STATIC" />
-					<Add option="-W" />
-					<Add option="-O3" />
 					<Add directory="../" />
 					<Add directory="../../" />
 					<Add directory="../../external/freeglut-2.4.0/include" />
@@ -50,11 +47,29 @@
 					<Add directory="../../" />
 					<Add directory="../../external/freeglut-2.4.0/include" />
 				</ResourceCompiler>
-				<ExtraCommands>
-					<Add after="mkdir ..\..\Distrib\RibRenderTool&#x0D;&#x0A;mkdir ..\..\Distrib\RibRenderTool\Tests&#x0D;&#x0A;mkdir ..\..\Distrib\RibRenderTool\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\RibRenderTool\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\RibRenderTool\Resources&#x0D;&#x0A;xcopy /E /Y  ..\..\Distrib\RibRenderTool\&#x0D;&#x0A;" />
-				</ExtraCommands>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-march=pentium4" />
+		</Compiler>
+		<Linker>
+			<Add library="../../DMath/linux/lib.a" />
+			<Add library="../../DSystem/linux/lib.a" />
+			<Add library="../../external/jpeg-6b/linux/lib.a" />
+			<Add library="../../RI_System/linux/lib.a" />
+			<Add library="../../RSLCompilerLib/linux/lib.a" />
+			<Add library="libGLU.a" />
+			<Add library="libglut.a" />
+			<Add library="libGL.a" />
+			<Add library="libX11.a" />
+			<Add library="libXext.a" />
+		</Linker>
+		<ExtraCommands>
+			<Add before="mkdir -p ../../distrib" />
+			<Add before="mkdir -p ../../distrib/RibRenderTool" />
+			<Add after="rsync -aC ../../Resources ../../distrib/RibRenderTool/" />
+			<Add after="rsync -aC ../../Tests ../../distrib/RibRenderTool/" />
+		</ExtraCommands>
 		<Unit filename="../RenderOutputOpenGL.cpp" />
 		<Unit filename="../RenderOutputOpenGL.h" />
 		<Unit filename="../RibRenderTool.cpp" />
