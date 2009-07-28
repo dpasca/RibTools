@@ -14,6 +14,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-W" />
+					<Add option="-g" />
 					<Add option="-O0" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CONSOLE" />
@@ -54,15 +55,15 @@
 		</Compiler>
 		<Linker>
 			<Add library="../../DMath/linux/lib.a" />
-			<Add library="../../DSystem/linux/lib.a" />
 			<Add library="../../external/jpeg-6b/linux/lib.a" />
 			<Add library="../../RI_System/linux/lib.a" />
 			<Add library="../../RSLCompilerLib/linux/lib.a" />
+			<Add library="libX11.a" />
+			<Add library="libXext.a" />
 			<Add library="libGLU.a" />
 			<Add library="libglut.a" />
 			<Add library="libGL.a" />
-			<Add library="libX11.a" />
-			<Add library="libXext.a" />
+			<Add library="../../DSystem/linux/lib.a" />
 		</Linker>
 		<ExtraCommands>
 			<Add before="mkdir -p ../../distrib" />

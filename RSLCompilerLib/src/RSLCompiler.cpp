@@ -26,44 +26,23 @@ using namespace	RSLC;
 const char	*RSLCompiler::mpsVersionString = "0.1a";
 
 //==================================================================
-static void grabfile( const char *pFName, DVec<char> &out_data )
-{
-	out_data.clear();
-
-	FILE	*pFile;
-
-	if ( fopen_s( &pFile, pFName, "rb" ) )
-	{
-		std::string	msg = DUT::SSPrintFS( "Failed to open %s", pFName );
-
-		throw Exception( msg );
-	}
-
-	fseek( pFile, 0, SEEK_END );
-	size_t	len = ftell( pFile );
-	fseek( pFile, 0, SEEK_SET );
-
-	out_data.resize( len );
-
-	fread( &out_data[0], 1, len, pFile );
-
-	fclose( pFile );
-}
-
-//==================================================================
 RSLCompiler::RSLCompiler(
 		const char *pSource,
 		size_t sourceSize,
 		const char *pBaseInclude,
 		const Params &params )
 {
-	DVec<char>	sourceInc;
+	DVec<U8>	sourceInc;
 
-	grabfile( pBaseInclude, sourceInc );
+	if NOT( DUT::GrabFile( pBaseInclude, sourceInc ) )
+	{
+		std::string	msg = DUT::SSPrintFS( "Failed to open %s", pBaseInclude );
+		throw Exception( msg );
+	}
 
-	sourceInc.append_array( pSource, sourceSize );
+	sourceInc.append_array( (const U8 *)pSource, sourceSize );
 
-	Tokenizer( mTokens, &sourceInc[0], sourceInc.size() );
+	Tokenizer( mTokens, (const char *)&sourceInc[0], sourceInc.size() );
 
 #if 0	// useful to debug the tokenizer
 	for (size_t i=0; i < mTokens.size(); ++i)

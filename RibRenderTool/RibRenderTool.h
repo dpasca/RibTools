@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/4/27
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef RIBRENDERTOOL_H
@@ -19,8 +19,8 @@ class RibRendTool
 
 public:
 	char				mFileToRender[2048];
-	char				mDefaultResDir[2048];
-	char				mStartDir[2048];
+	char				mExePath[2048];
+	char				mExeResPath[2048];
 	DVec<DStr>			mTestRibFiles;
 
 	RI::HiderREYES::Params	mREYESParams;
@@ -39,7 +39,7 @@ public:
 	};
 
 	//===============================================================
-	RibRendTool();
+	RibRendTool( const char *p );
 	~RibRendTool();
 
 	void SetFileToRender( const char *pFName );

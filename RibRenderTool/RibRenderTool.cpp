@@ -55,7 +55,7 @@ char *RibRendTool::msTestRibFiles[] =
 */
 
 //==================================================================
-RibRendTool::RibRendTool() :
+RibRendTool::RibRendTool( const char *pExePath ) :
 	mpRenderOutput(NULL),
 	mLastUsedWd(0),
 	mLastUsedHe(0),
@@ -67,11 +67,9 @@ RibRendTool::RibRendTool() :
 
 	mFileToRender[0] = 0;
 
-	getcwd( mStartDir, sizeof(mStartDir) );
-	printf( "mStartDir: %s\n", mStartDir );
+	strcpy_s( mExePath, pExePath );
 
-	sprintf( mDefaultResDir, "%s/Resources", mStartDir );
-	printf( "mDefaultResDir: %s\n", mDefaultResDir );
+	sprintf( mExeResPath, "%s/Resources", mExePath );
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize( 640, 480 );
@@ -186,7 +184,7 @@ void RibRendTool::MenuFunc( int id )
 
 	if ( id >= MENUID_FILES )
 	{
-		strcpy( mFileToRender, mStartDir );
+		strcpy( mFileToRender, mExePath );
 		strcat( mFileToRender, "/Tests/" );
 		strcat( mFileToRender, mTestRibFiles[id - MENUID_FILES].c_str() );
 
@@ -243,7 +241,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	mpRenderOutput = DNEW RenderOutputOpenGL();
 
 	char	defaultShadersDir[4096];
-	sprintf( defaultShadersDir, "%s/Shaders", mDefaultResDir );
+	sprintf( defaultShadersDir, "%s/Shaders", mExeResPath );
 	printf( "Base Dir: %s\n", baseDir.c_str() );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
@@ -401,17 +399,14 @@ int main(int argc, char** argv)
 					_CRTDBG_LEAK_CHECK_DF );
 #endif
 
-/*
-	if ( argc != 2 )
-	{
-		printf( "Invalid param count. Quitting !\n" );
-		return -1;
-	}
-*/
-
     glutInit(&argc, argv);
 
-	RibRendTool	tool;
+
+	char	defaultResDir[2048];
+
+	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
+
+	RibRendTool	tool( exePath.c_str() );
 
 	// set optional initial file name
 	if ( argc >= 2 )
