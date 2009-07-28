@@ -402,8 +402,6 @@ int main(int argc, char** argv)
     glutInit(&argc, argv);
 
 
-	char	defaultResDir[2048];
-
 	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
 
 	RibRendTool	tool( exePath.c_str() );
