@@ -37,7 +37,7 @@ const char *ErrorToString( Error errCode )
 	case E_BADTOKEN			:	return "invalid binary token";
 	case E_BADVERSION		:	return "protocol version number mismatch";
 	case E_LIMITCHECK		:	return "overflowing an internal limit";
-	case E_OUTOFMEMORY		:	return "generic instance of insufficient memory";
+	case E_OUTOFMEMORY_X	:	return "generic instance of insufficient memory";
 	case E_PROTOCOLBOTCH	:	return "malformed binary encoding";
 	case E_STRINGTOOBIG		:	return "insufficient memory to read string";
 	case E_SYNTAXERROR		:	return "general syntactic error";

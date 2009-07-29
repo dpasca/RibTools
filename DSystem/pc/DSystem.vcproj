@@ -176,6 +176,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\DNetwork.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DNetwork.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DSafeCrt.cpp"
 				>
 			</File>

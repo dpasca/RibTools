@@ -16,6 +16,7 @@
 #endif
 
 #include "DSystem/include/DUtils.h"
+#include "DSystem/include/DNetwork.h"
 #include "RI_System/include/RI_Parser.h"
 #include "RI_System/include/RI_Machine.h"
 #include "RI_System/include/RI_FrameworkREYES.h"
@@ -87,11 +88,92 @@ static bool renderFile(
 }
 
 //===============================================================
-int main(int argc, char** argv)
+static void printUsage( int argc, char **argv )
+{
+	printf( "Usage:\n" );
+	printf( "\t%s <rib file> <output JPEG file>\n", argv[0] );
+	printf( "\t%s -server [-port <port number>]\n", argv[0] );
+}
+
+//===============================================================
+static void serverTask( SOCKET clientSock )
+{
+	printf( "Rendering for %i... yeah, right !!\n", clientSock );
+}
+
+//===============================================================
+static int serverMain( int argc, char **argv )
+{
+	int	port = 32323;
+
+	for (int i=1; i < argc; ++i)
+	{
+		if ( 0 == strcasecmp( "-port", argv[i] ) )
+		{
+			if ( (i+1) >= argc )
+			{
+				printf( "Missing port value.\n" );
+				return -1;
+			}
+
+			port = atoi( argv[i+1] );
+			if ( port <= 0 && port >= 65536 )
+			{
+				printf( "Invalid port range.\n" );
+				return -1;
+			}
+
+			i += 1;
+		}
+	}
+	
+	DNET::Listener	listener( port );
+
+	if NOT( listener.Start() )
+	{
+		printf( "Failed to open port %i\n", port );
+		return -1;
+	}
+	printf( "Listening on port %i for connections..\n", port );
+
+
+	while ( true )
+	{
+		SOCKET	acceptedSock;
+
+		switch ( listener.Idle( acceptedSock, 500 ) )
+		{
+		case DNET::Listener::IRT_CONNECTED:
+			listener.Stop();
+
+			printf( "Accepted socket %i\n", acceptedSock );
+			serverTask( acceptedSock );
+
+			closesocket( acceptedSock );
+
+			if NOT( listener.Start() )
+			{
+				printf( "Failed to open port %i\n", port );
+				return -1;
+			}
+			printf( "Listening on port %i for connections..\n", port );
+			break;
+
+		case DNET::Listener::IRT_ERROR:
+			printf( "Error while listening !\n" );
+			break;
+		}
+	}
+
+    return 0;
+}
+
+//===============================================================
+static int clientMain( int argc, char **argv )
 {
 	if ( argc != 3 )
 	{
-		printf( "Usage: %s <rib file> <output JPEG file>\n", argv[0] );
+		printUsage( argc, argv );
 		return -1;
 	}
 
@@ -117,5 +199,19 @@ int main(int argc, char** argv)
 
 	renderFile( argv[1], defaultResDir, &rendOut );
 
-    return EXIT_SUCCESS;
+    return 0;
+}
+
+//===============================================================
+int main( int argc, char **argv )
+{
+	DNET::InitializeSocket();	// bha !
+
+	for (int i=1; i < argc; ++i)
+	{
+		if ( 0 == strcasecmp( "-server", argv[i] ) )
+			return serverMain( argc, argv );
+	}
+
+	return clientMain( argc, argv );
 }
