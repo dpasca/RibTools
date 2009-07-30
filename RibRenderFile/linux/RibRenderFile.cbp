@@ -12,6 +12,7 @@
 				<Option object_output="Debug" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="-server" />
 				<Compiler>
 					<Add option="-W" />
 					<Add option="-g" />
@@ -56,9 +57,9 @@
 		<Linker>
 			<Add library="../../DMath/linux/lib.a" />
 			<Add library="../../DSystem/linux/lib.a" />
-			<Add library="../../external/jpeg-6b/linux/lib.a" />
 			<Add library="../../RI_System/linux/lib.a" />
 			<Add library="../../RSLCompilerLib/linux/lib.a" />
+			<Add library="../../external/jpeg-6b/linux/lib.a" />
 		</Linker>
 		<ExtraCommands>
 			<Add before="mkdir -p ../../distrib" />

@@ -99,6 +99,7 @@ bool Listener::Start()
 	if ( -1 == bind( mListenSock, (struct sockaddr *)&in_sa, sizeof(in_sa) ) )
 	{
 		closesocket( mListenSock );
+		mListenSock = -1;
 		return false;
 	}
 
@@ -109,7 +110,7 @@ bool Listener::Start()
 		return false;
 	}
 
-	if ( setNonBlocking( mListenSock ) )
+	if NOT( setNonBlocking( mListenSock ) )
 	{
 		closesocket( mListenSock );
 		mListenSock = -1;
@@ -159,7 +160,7 @@ Listener::IdleRetType Listener::Idle( SOCKET &out_acceptedSock, U32 waitMSec )
 		if ( out_acceptedSock != INVALID_SOCKET )
 		{
 			// make non-blocking
-			if ( setNonBlocking( mListenSock ) )
+			if NOT( setNonBlocking( mListenSock ) )
 			{
 				closesocket( out_acceptedSock );
 				out_acceptedSock = INVALID_SOCKET;
