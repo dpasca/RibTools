@@ -69,7 +69,7 @@ static bool setNonBlocking( SOCKET sock )
 {
 #if defined(WIN32)
 	u_long	blockflg = 1;
-	if ( -1 == ioctlsocket( mListenSock, FIONBIO, &blockflg ) )
+	if ( -1 == ioctlsocket( sock, FIONBIO, &blockflg ) )
 		return false;
 
 #elif defined(__linux__)
