@@ -3,14 +3,25 @@
 ///
 /// Created by Davide Pasca - 2009/7/30
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
+
+#include <memory.h>
 
 #include "DNetwork.h"
 
 #if defined(WIN32)
 
 #pragma comment(lib, "wsock32.lib")
+
+#elif defined(__linux__)
+
+#include <netdb.h>
+#include <fcntl.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 
 #endif
 
@@ -54,6 +65,23 @@ Listener::~Listener()
 }
 
 //==================================================================
+static bool setNonBlocking( SOCKET sock )
+{
+#if defined(WIN32)
+	u_long	blockflg = 1;
+	if ( -1 == ioctlsocket( mListenSock, FIONBIO, &blockflg ) )
+		return false;
+
+#elif defined(__linux__)
+	if ( -1 == fcntl( sock, F_SETFL, O_NONBLOCK ) )
+		return false;
+
+#endif
+
+	return true;
+}
+
+//==================================================================
 bool Listener::Start()
 {
 	struct sockaddr_in	in_sa;
@@ -77,13 +105,14 @@ bool Listener::Start()
 	if ( -1 == listen( mListenSock, SOMAXCONN ) )
 	{
 		closesocket( mListenSock );
+		mListenSock = -1;
 		return false;
 	}
 
-	u_long	blockflg = 1;
-	if ( ioctlsocket( mListenSock, FIONBIO, &blockflg ) < 0 )
+	if ( setNonBlocking( mListenSock ) )
 	{
 		closesocket( mListenSock );
+		mListenSock = -1;
 		return false;
 	}
 
@@ -130,8 +159,7 @@ Listener::IdleRetType Listener::Idle( SOCKET &out_acceptedSock, U32 waitMSec )
 		if ( out_acceptedSock != INVALID_SOCKET )
 		{
 			// make non-blocking
-			u_long	blockflg = 1;
-			if ( ioctlsocket( out_acceptedSock, FIONBIO, &blockflg ) < 0 )
+			if ( setNonBlocking( mListenSock ) )
 			{
 				closesocket( out_acceptedSock );
 				out_acceptedSock = INVALID_SOCKET;

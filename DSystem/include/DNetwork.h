@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/7/30
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DNETWORK_H
@@ -20,6 +20,8 @@
 
 typedef int	SOCKET;
 static const SOCKET	INVALID_SOCKET = -1;
+
+#define closesocket	close
 
 #endif
 

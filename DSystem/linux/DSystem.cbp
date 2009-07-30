@@ -45,6 +45,7 @@
 		</Build>
 		<Unit filename="../include/DContainers.h" />
 		<Unit filename="../include/DMemory.h" />
+		<Unit filename="../include/DNetwork.h" />
 		<Unit filename="../include/DSafeCrt.h" />
 		<Unit filename="../include/DTypes.h" />
 		<Unit filename="../include/DUtils.h" />
@@ -52,6 +53,7 @@
 		<Unit filename="../include/DUtils_Files.h" />
 		<Unit filename="../src/DContainers.cpp" />
 		<Unit filename="../src/DMemory.cpp" />
+		<Unit filename="../src/DNetwork.cpp" />
 		<Unit filename="../src/DSafeCrt.cpp" />
 		<Unit filename="../src/DTypes.cpp" />
 		<Unit filename="../src/DUtils.cpp" />
