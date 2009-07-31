@@ -17,7 +17,7 @@
 
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DNetwork.h"
-#include "RI_System/include/RI_Parser.h"
+#include "RI_System/include/RI_Render.h"
 #include "RI_System/include/RI_Machine.h"
 #include "RI_System/include/RI_FrameworkREYES.h"
 #include "RenderOutputFile.h"
@@ -31,14 +31,6 @@ static bool renderFile(
 	int forcedWd=-1,
 	int forcedHe=-1 )
 {
-	DVec<U8>	fileData;
-
-	if NOT( DUT::GrabFile( pFileName, fileData ) )
-	{
-		printf( "Could not open the file in input. Quitting !\n" );
-		return false;
-	}
-
 	DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
 
 	char	defaultShadersDir[4096];
@@ -50,41 +42,17 @@ static bool renderFile(
 	RI::FrameworkREYES		framework( pRenderOutput, hiderParams );
 	RI::Machine				machine( &framework, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
 
-	RI::Parser				parser;
-	for (size_t i=0; i <= fileData.size(); ++i)
+	try
 	{
-		if ( i == fileData.size() )
-			parser.AddChar( 0 );
-		else
-			parser.AddChar( (char)fileData[i] );
+		RI::Render	render( pFileName, machine );
 
-		while ( parser.HasNewCommand() )
-		{
-			DStr			cmdName;
-			RI::ParamList	cmdParams;
-			int				cmdLine;
-
-			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
-
-			printf( "CMD %s ", cmdName.c_str() );
-
-			if ( cmdParams.size() )
-				printf( "(%i params)", cmdParams.size() );
-
-			puts( "" );
-
-
-			try {
-				machine.AddCommand( cmdName, cmdParams );
-			} catch ( std::runtime_error ex )
-			{
-				printf( "ERROR at line: %i\n", cmdLine );
-				break;
-			}
-		}
+		return true;
+	}
+	catch ( ... )
+	{
+		return false;
 	}
 
-	return true;
 }
 
 //===============================================================

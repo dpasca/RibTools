@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdexcept>
 #include "DSystem/include/DUtils.h"
-#include "RI_System/include/RI_Parser.h"
+#include "RI_System/include/RI_Render.h"
 #include "RI_System/include/RI_Machine.h"
 #include "RI_System/include/RI_FrameworkREYES.h"
 #include "RenderOutputOpenGL.h"
@@ -248,43 +248,13 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	RI::FrameworkREYES	framework( mpRenderOutput, mREYESParams );
 	RI::Machine			machine( &framework, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
 
-	RI::Parser			parser;
-	for (size_t i=0; i <= fileData.size(); ++i)
+	try
 	{
-		if ( i == fileData.size() )
-			parser.AddChar( 0 );
-		else
-			parser.AddChar( (char)fileData[i] );
-
-	#if defined(ECHO_INPUT)
-		printf( "%c", (char)fileData[i] );
-	#endif
-
-		while ( parser.HasNewCommand() )
-		{
-			DStr			cmdName;
-			RI::ParamList	cmdParams;
-			int				cmdLine;
-
-			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
-
-			//printf( "%3i - %s\n", cmdLine, cmdName.c_str() );
-
-			printf( "CMD %s ", cmdName.c_str() );
-
-			if ( cmdParams.size() )
-				printf( "(%i params)", cmdParams.size() );
-
-			puts( "" );
-
-			try {
-				machine.AddCommand( cmdName, cmdParams );
-			} catch ( std::runtime_error ex )
-			{
-				printf( "ERROR at line: %i\n", cmdLine );
-				break;
-			}
-		}
+		RI::Render	render( pFileName, machine );
+	}
+	catch ( ... )
+	{
+		return false;
 	}
 
 	mLastUsedWd = (int)mpRenderOutput->GetCurWd();

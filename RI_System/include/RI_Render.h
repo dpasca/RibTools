@@ -1,48 +1,35 @@
 //==================================================================
-/// DUtils.h
+/// RI_Render.h
 ///
-/// Created by Davide Pasca - 2008/12/31
+/// Created by Davide Pasca - 2009/8/1
 /// See the file "license.txt" that comes with this project for
-/// copyright info.
+/// copyright info. 
 //==================================================================
 
-#ifndef DUTILS_H
-#define DUTILS_H
+#ifndef RI_RENDER_H
+#define RI_RENDER_H
 
-#include "DTypes.h"
-#include "DUtils_Base.h"
-#include "DUtils_Files.h"
+#include "DSystem/include/DNetwork.h"
 
 //==================================================================
-namespace DUT
+namespace RI
 {
 
 //==================================================================
-void StrStripBeginEndWhite( char *pStr );
-
-I64 GetTimeTicks();
-double TimeTicksToMS( I64 ticks );
+class Machine;
 
 //==================================================================
-/// QuickProf
+/// Render
 //==================================================================
-class QuickProf
+class Render
 {
-	const char *mpMsg;
-	I64			mStart;
 
 public:
-	QuickProf( const char *pMsg ) :
-		mpMsg(pMsg)
-	{
-		mStart = DUT::GetTimeTicks();
-	}
-
-	~QuickProf()
-	{
-		I64	elapsed = DUT::GetTimeTicks() - mStart;
-		printf( "%s: %4.2lf ms\n", mpMsg, DUT::TimeTicksToMS( elapsed ) );
-	}
+	Render(
+		const char *pFileName,
+		Machine		&machine,
+		SOCKET		ioSocket=INVALID_SOCKET,
+		bool		verbose=false );
 };
 
 //==================================================================
