@@ -1,7 +1,12 @@
 
+* Compiler
+
+  sudo apt-get install g++		# for GCC/g++ !!
+
+
 * IDE
   
-  Code::Blocks
+  sudo apt-get install codeblocks	# for Code::Blocks
 
 * Dependencies
 
