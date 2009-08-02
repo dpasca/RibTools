@@ -10,6 +10,7 @@
 #include "DSystem/include/DSafeCrt.h"
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DContainers.h"
+#include "DSystem/include/DUtils_Files.h"
 #include "RSLC_Token.h"
 #include "RSLC_Tree.h"
 #include "RSLC_Variables.h"

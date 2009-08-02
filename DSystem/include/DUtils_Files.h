@@ -29,28 +29,6 @@ const char *GetFileNameExt( const char *pPathFileName );
 char *GetFileNameExt( char *pPathFileName );
 
 //==================================================================
-/// MemFile
-//==================================================================
-class MemFile
-{
-	DVec<U8>	mOwnData;
-	const U8	*mpData;
-	size_t		mDataSize;
-	size_t		mReadPos;
-	bool		mIsReadOnly;
-
-public:
-	MemFile( const void *pDataSrc, size_t dataSize );
-	MemFile( const char *pFileName );
-	~MemFile();
-
-	const U8 *GetData() const	{	return mpData;		}
-	size_t GetDataSize() const	{	return mDataSize;	}
-
-	bool ReadTextLine( char *pDestStr, size_t destStrMaxSize );
-};
-
-//==================================================================
 }
 
 #endif

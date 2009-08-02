@@ -11,6 +11,7 @@
 
 #include "RI_Base.h"
 #include "RI_SlShader.h"
+#include "DSystem/include/DUtils_MemFile.h"
 
 //==================================================================
 namespace RI
@@ -38,7 +39,6 @@ class ShaderAsmParser
 	};
 
 	SlShader		*mpShader;
-	DUT::MemFile	*mpFile;
 	const char		*mpName;
 	DVec<Label>		mLabelDefs;
 	DVec<Label>		mLabelRefs;

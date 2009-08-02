@@ -18,23 +18,26 @@ namespace RI
 //==================================================================
 /// Render
 //==================================================================
-Render::Render( const char *pFileName, Machine &machine, SOCKET ioSocket, bool verbose )
+Render::Render( const char			*pFileName,
+				Machine				&machine,
+				DUT::FileManager	&fileManager,
+				bool				verbose )
 {
-	DVec<U8>	fileData;
+	DUT::MemFile	file;
 
-	if NOT( DUT::GrabFile( pFileName, fileData ) )
+	if NOT( fileManager.GetFile( file, pFileName ) )
 	{
 		DASSTHROW( 0, ( "Could not open the file in input. Quitting !\n" ) );
 	}
 
 	RI::Parser	parser;
 
-	for (size_t i=0; i <= fileData.size(); ++i)
+	for (size_t i=0; i <= file.GetDataSize(); ++i)
 	{
-		if ( i == fileData.size() )
+		if ( i == file.GetDataSize() )
 			parser.AddChar( 0 );
 		else
-			parser.AddChar( (char)fileData[i] );
+			parser.AddChar( (char)file.GetData()[i] );
 
 		while ( parser.HasNewCommand() )
 		{

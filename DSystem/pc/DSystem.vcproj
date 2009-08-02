@@ -168,6 +168,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\DCriticalSection.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DMemory.cpp"
 				>
 			</File>
@@ -181,6 +185,38 @@
 			</File>
 			<File
 				RelativePath="..\include\DNetwork.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DNetwork_Base.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DNetwork_Base.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DNetwork_Connecter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DNetwork_Connecter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DNetwork_Listener.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DNetwork_Listener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DNetwork_PacketManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DNetwork_PacketManager.h"
 				>
 			</File>
 			<File
@@ -208,11 +244,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\DUtils_FileManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DUtils_FileManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DUtils_Files.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\include\DUtils_Files.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DUtils_MemFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DUtils_MemFile.h"
 				>
 			</File>
 		</Filter>

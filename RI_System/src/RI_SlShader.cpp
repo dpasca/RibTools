@@ -18,6 +18,7 @@
 #include "RI_SlShader_Ops_Lighting.h"
 #include "RI_SlShader_Ops_Noise.h"
 #include "RSLCompilerLib/include/RSLCompiler.h"
+#include "DSystem/include/DUtils_Files.h"
 
 //==================================================================
 //#define FORCE_MEM_CORRUPTION_CHECK

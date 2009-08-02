@@ -238,6 +238,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\RI_Net_Protocol.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_Noise.cpp"
 				>
 			</File>

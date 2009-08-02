@@ -219,6 +219,19 @@ public:
 		}
 	}
 
+	void get_ownership( DVec<T> &from )
+	{
+		freeAll();
+
+		mpData		= from.mpData;
+		mSize		= from.mSize;
+		mSizeAlloc	= from.mSizeAlloc;
+
+		from.mpData		= NULL;
+		from.mSize		= 0;
+		from.mSizeAlloc	= 0;
+	}
+
 	const	T &back() const { DASSERT( mSize >= 1 ); return mpData[mSize-1]; }
 			T &back()		{ DASSERT( mSize >= 1 ); return mpData[mSize-1]; }
 

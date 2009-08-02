@@ -56,6 +56,7 @@ typedef std::string	DStr;
 typedef unsigned char		U8;
 typedef unsigned short		U16;
 typedef unsigned int		U32;
+typedef			 int		I32;
 
 #if defined(_MSC_VER)
 typedef unsigned __int64	U64;

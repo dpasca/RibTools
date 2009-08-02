@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="RibRenderFile"
-	ProjectGUID="{C913A525-2C67-4105-B536-C24D3B1E3EEB}"
-	RootNamespace="RibRenderFile"
+	Name="RibRenderLib"
+	ProjectGUID="{00116463-4CDD-4BD4-A4E4-4F37D964633C}"
+	RootNamespace="RibRenderLib"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -20,12 +20,11 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -42,11 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../;&quot;../../external/jpeg-6b&quot;;&quot;../../external/jpeg-6b/pc&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="../include; ../.."
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -61,18 +61,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				OutputFile="..\..\Distrib\$(ProjectName)\$(ProjectName).exe"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -84,24 +76,19 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -119,10 +106,11 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../;&quot;../../external/jpeg-6b&quot;;&quot;../../external/jpeg-6b/pc&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="../include; ../.."
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -137,20 +125,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				OutputFile="..\..\Distrib\$(ProjectName)\$(ProjectName).exe"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -162,11 +140,7 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
@@ -179,27 +153,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\RenderOutputFile.cpp"
+				RelativePath="..\src\RibRenderLib.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\RenderOutputFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\RibRenderFile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\RibRenderFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\RibRenderFile_ClientMain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\RibRenderFile_ServerMain.cpp"
+				RelativePath="..\include\RibRenderLib.h"
 				>
 			</File>
 		</Filter>

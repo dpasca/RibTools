@@ -105,7 +105,6 @@ static OpCodeDef	gsOpCodeDefs[] =
 /// ShaderAsmParser
 //==================================================================
 ShaderAsmParser::ShaderAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName ) :
-	mpFile(&file),
 	mpShader(pShader),
 	mpName(pName)
 {

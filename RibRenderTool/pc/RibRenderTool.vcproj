@@ -65,6 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="..\..\Distrib\$(ProjectName)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -147,6 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="..\..\Distrib\$(ProjectName)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"

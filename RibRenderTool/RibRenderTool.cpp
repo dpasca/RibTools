@@ -8,10 +8,10 @@
 
 #include <stdio.h>
 #include <stdexcept>
+#include "RibRenderLib/include/RibRenderLib.h"
+
 #include "DSystem/include/DUtils.h"
-#include "RI_System/include/RI_Render.h"
-#include "RI_System/include/RI_Machine.h"
-#include "RI_System/include/RI_FrameworkREYES.h"
+#include "DSystem/include/DUtils_Files.h"
 #include "RenderOutputOpenGL.h"
 #include "RibRenderTool.h"
 
@@ -227,14 +227,6 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	if NOT( pFileName[0] )
 		return false;
 
-	DVec<U8>	fileData;
-
-	if NOT( DUT::GrabFile( pFileName, fileData ) )
-	{
-		printf( "Could not open the file in input. Quitting !\n" );
-		return false;
-	}
-
 	DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
 
 	DSAFE_DELETE( mpRenderOutput );
@@ -248,9 +240,11 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	RI::FrameworkREYES	framework( mpRenderOutput, mREYESParams );
 	RI::Machine			machine( &framework, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
 
+	DUT::FileManager	fileManager;
+
 	try
 	{
-		RI::Render	render( pFileName, machine );
+		RI::Render	render( pFileName, machine, fileManager );
 	}
 	catch ( ... )
 	{

@@ -1,11 +1,10 @@
-/*
- *  RI_FrameworkREYES.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/08.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_FrameworkREYES.h
+///
+/// Created by Davide Pasca - 2009/02/08
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_FRAMEWORKREYES_H
 #define RI_FRAMEWORKREYES_H
@@ -32,6 +31,40 @@ public:
 	virtual void Blit() const = 0;
 	virtual u_int GetCurWd() const = 0;
 	virtual u_int GetCurHe() const = 0;
+};
+
+//==================================================================
+class RenderOutputMem : public RenderOutputBase
+{
+	u_int		mCurWd;
+	u_int		mCurHe;
+	DVec<float>	mData;
+
+public:
+	RenderOutputMem() :
+		mCurWd(0),
+		mCurHe(0)
+	{
+	}
+
+	~RenderOutputMem()
+	{
+	}
+
+	void Update( u_int w, u_int h, const float *pSrcData )
+	{
+		mCurWd = w;
+		mCurHe = h;
+		mData.clear();
+		mData.append_array( pSrcData, w * h * 3 );
+	}
+
+	void Blit() const
+	{
+	}
+
+	u_int GetCurWd() const	{ return mCurWd; }
+	u_int GetCurHe() const	{ return mCurHe; }
 };
 
 //==================================================================

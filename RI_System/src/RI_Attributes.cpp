@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include "RI_State.h"
 #include "RI_Attributes.h"
+#include "DSystem/include/DUtils_Files.h"
 
 //==================================================================
 namespace RI
