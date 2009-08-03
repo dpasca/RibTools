@@ -190,7 +190,25 @@ void FrameworkREYES::WorldEnd()
 
 	worldEnd_splitAndAddToBuckets();
 
+	mpRenderOutput->SetSize( mOptions.mXRes, mOptions.mYRes );
+
 	worldEnd_renderBuckets();
+
+	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
+	{
+		u_int	x1 = mHider.mpBuckets[bi]->mX1;
+		u_int	y1 = mHider.mpBuckets[bi]->mY1;
+
+		mpRenderOutput->UpdateRegion(
+					x1,
+					y1,
+					mHider.mpBuckets[bi]->mX2 - x1,
+					mHider.mpBuckets[bi]->mY2 - y1,
+					mHider.GetOutputData( x1, y1 ),
+					mHider.GetOutputDataStride()
+					);
+	}
+
 
 	// --- release the primitives in all the buckets
 	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
@@ -215,13 +233,6 @@ void FrameworkREYES::WorldEnd()
 
 	DASSERT( mHider.GetOutputDataWd() == (u_int)mOptions.mXRes );
 	DASSERT( mHider.GetOutputDataHe() == (u_int)mOptions.mYRes );
-
-	//glutReshapeWindow( mOptions.mXRes, mOptions.mYRes );
-	mpRenderOutput->Update(
-				mOptions.mXRes,
-				mOptions.mYRes,
-				mHider.GetOutputData()
-				);
 }
 
 

@@ -15,9 +15,9 @@ static int serverTask( SOCKET clientSock )
 
 	DUT::FileManager		fileManager( clientSock, false );
 
-	RI::NetRendJob			netRenderJob;
+	RI::NetRendJob			netRendJob;
 
-	if NOT( fileManager.GetData( &netRenderJob, sizeof(netRenderJob) ) )
+	if NOT( fileManager.GetData( &netRendJob, sizeof(netRendJob) ) )
 	{
 		printf( "Failed to read the NetRendJob data\n" );
 		return -1;
@@ -25,21 +25,21 @@ static int serverTask( SOCKET clientSock )
 	else
 	{
 		printf( "Got a nice NetRendJob !\n" );
-		printf( "\tFileName  = %s\n", netRenderJob.FileName );
-		printf( "\tBaseDir   = %s\n", netRenderJob.BaseDir );
-		printf( "\tDefResDir = %s\n", netRenderJob.DefaultResourcesDir );
-		printf( "\tForcedWd  = %i\n", netRenderJob.ForcedWd );
-		printf( "\tForcedHe  = %i\n", netRenderJob.ForcedHe );
+		printf( "\tFileName  = %s\n", netRendJob.FileName );
+		printf( "\tBaseDir   = %s\n", netRendJob.BaseDir );
+		printf( "\tDefResDir = %s\n", netRendJob.DefaultResourcesDir );
+		printf( "\tForcedWd  = %i\n", netRendJob.ForcedWd );
+		printf( "\tForcedHe  = %i\n", netRendJob.ForcedHe );
 	}
 
 	RI::RenderOutputMem		rendOut;
 	RI::HiderREYES::Params	hiderParams;
 	RI::FrameworkREYES		framework( &rendOut, hiderParams );
-	RI::Machine				machine( &framework, netRenderJob.BaseDir, netRenderJob.DefaultResourcesDir );
+	RI::Machine				machine( &framework, netRendJob.BaseDir, netRendJob.DefaultResourcesDir );
 
 	try
 	{
-		RI::Render	render( netRenderJob.FileName, machine, fileManager );
+		RRL::Render	render( netRendJob.FileName, machine, fileManager );
 	}
 	catch ( ... )
 	{

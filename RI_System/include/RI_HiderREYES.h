@@ -62,7 +62,7 @@ public:
 		mZBuff.Fill( FLT_MAX );
 	}
 
-	void EndRender( Buffer2D<3> &outCBuff )
+	void EndRender( Buffer2D<RI::NCOLS> &outCBuff )
 	{
 		mZBuff.Free();
 
@@ -120,7 +120,7 @@ private:
 	friend class FrameworkREYES;
 
 	Options				mOptions;
-	Buffer2D<3>			mFinalBuff;
+	Buffer2D<RI::NCOLS>	mFinalBuff;
 	DVec<Bucket *>		mpBuckets;
 	Params				mParams;
 	DVec<PrimitiveBase *>	mpPrims;
@@ -157,12 +157,17 @@ public:
 			float				destOffY,
 			u_int				destWd,
 			u_int				destHe,
-			Buffer2D<3>			&destBuff,
+			Buffer2D<NCOLS>		&destBuff,
 			Buffer2D<1>			&zBuff ) const;
 
-	u_int		GetOutputDataWd() const	{ return mFinalBuff.GetWd();	}
-	u_int		GetOutputDataHe() const	{ return mFinalBuff.GetHe();	}
-	const float *GetOutputData() const { return mFinalBuff.GetData(); }
+	u_int		GetOutputDataStride() const	{ return mFinalBuff.GetWd() * NCOLS;	}
+	u_int		GetOutputDataWd() const		{ return mFinalBuff.GetWd();			}
+	u_int		GetOutputDataHe() const		{ return mFinalBuff.GetHe();			}
+
+	const float *GetOutputData( u_int x1, u_int y1 ) const
+	{
+		return mFinalBuff.GetSampleCPtr( (int)x1, (int)y1 );
+	}
 
 private:
 	bool	makeRasterBound(

@@ -8,6 +8,7 @@
 
 #include "RibRenderLib.h"
 #include "DSystem/include/DNetwork_Connecter.h"
+#include "RI_System/include/RI_Parser.h"
 
 //==================================================================
 namespace RRL
@@ -111,6 +112,101 @@ void ConnectToServers( DVec<ServerEntry> &srvList, U32 timeoutMS )
 	for (size_t i=0; i < pConnecters.size(); ++i)
 		DSAFE_DELETE( pConnecters[i] );
 }
+
+//==================================================================
+/// Render
+//==================================================================
+Render::Render( const char			*pFileName,
+			    RI::Machine			&machine,
+				DUT::FileManager	&fileManager,
+				bool				verbose )
+{
+	DUT::MemFile	file;
+
+	if NOT( fileManager.GetFile( file, pFileName ) )
+	{
+		DASSTHROW( 0, ( "Could not open the file in input. Quitting !\n" ) );
+	}
+
+	RI::Parser	parser;
+
+	for (size_t i=0; i <= file.GetDataSize(); ++i)
+	{
+		if ( i == file.GetDataSize() )
+			parser.AddChar( 0 );
+		else
+			parser.AddChar( (char)file.GetData()[i] );
+
+		while ( parser.HasNewCommand() )
+		{
+			DStr			cmdName;
+			RI::ParamList	cmdParams;
+			int				cmdLine;
+
+			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
+
+			if ( verbose )
+			{
+				printf( "CMD %s ", cmdName.c_str() );
+
+				if ( cmdParams.size() )
+					printf( "(%i params)", cmdParams.size() );
+
+				puts( "" );
+			}
+
+
+			try {
+				machine.AddCommand( cmdName, cmdParams );
+			} catch ( std::runtime_error ex )
+			{
+				printf( "ERROR at line: %i\n", cmdLine );
+				break;
+			}
+		}
+	}
+}
+
+/*
+//==================================================================
+static void renderBucketsClient( DVec<ServerEntry> &srvList )
+{
+	size_t	buckIdx = 0;
+	size_t	bucketsN;
+
+	while ( buckIdx < bucketsN )
+	{
+		size_t buckIdx2 = buckIdx + 4;
+
+		buckIdx2 = DMIN( buckIdx2, bucketsN );
+
+		size_t	spanN = buckIdx2 - buckIdx;
+
+		for (size_t si=0; si < srvList.size(); ++si)
+		{
+			if NOT( srvList[si].mIsWorking )
+			{
+				// send job: buckets from buckIdx to buckIdx + spanN
+				buckIdx = buckIdx2;
+				break;
+			}
+		}
+	
+		for (size_t si=0; si < srvList.size(); ++si)
+		{
+			if ( srvList[si].mIsWorking )
+			{
+				srvList[si]->mpFilemanager->GetData();
+
+				// send job: buckets from buckIdx to buckIdx + spanN
+				buckIdx = buckIdx2;
+				break;
+			}
+		}
+	}
+	
+}
+*/
 
 //==================================================================
 }

@@ -84,6 +84,16 @@ public:
 			return NULL;
 	}
 
+	const float *GetSampleCPtr( int x, int y ) const
+	{
+		if ( x >= 0 && y >= 0 && x < (int)mWd && y < (int)mHe )
+		{
+			return &mpData[ (x + mWd * y) * NCHANS + 0 ];
+		}
+		else
+			return NULL;
+	}
+
 	void DrawHLine( int x1, int y, int x2, const float *pVal )
 	{
 		for (int x=x1; x <= x2; ++x)

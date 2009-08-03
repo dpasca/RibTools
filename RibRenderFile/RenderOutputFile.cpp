@@ -14,23 +14,6 @@ extern "C"
 };
 
 //==================================================================
-// RenderOutputFile
-//==================================================================
-RenderOutputFile::RenderOutputFile( const char *pFileName ) :
-	mpFileName(pFileName),
-	mpBuffer(NULL),
-	mWd(0),
-	mHe(0)
-{
-}
-
-//==================================================================
-RenderOutputFile::~RenderOutputFile()
-{
-	DSAFE_DELETE_ARRAY( mpBuffer );
-}
-
-//==================================================================
 static void write_JPEG_file(
 			const char * filename,
 			int quality,
@@ -80,12 +63,35 @@ static void write_JPEG_file(
 }
 
 //==================================================================
-void RenderOutputFile::Update( u_int w, u_int h, const float *pSrcData )
+// RenderOutputFile
+//==================================================================
+RenderOutputFile::RenderOutputFile( const char *pFileName ) :
+	mpFileName(pFileName),
+	mpBuffer(NULL),
+	mWd(0),
+	mHe(0)
+{
+}
+
+//==================================================================
+RenderOutputFile::~RenderOutputFile()
+{
+	if ( mWd && mHe )
+		write_JPEG_file( mpFileName, 100, mpBuffer, mWd, mHe );
+
+	DSAFE_DELETE_ARRAY( mpBuffer );
+}
+
+//==================================================================
+void RenderOutputFile::SetSize( u_int w, u_int h )
 {
 	alloc( w, h );
-	convert( w, h, pSrcData );
+}
 
-	write_JPEG_file( mpFileName, 100, mpBuffer, w, h );
+//==================================================================
+void RenderOutputFile::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+{
+	convert( x1, y1, w, h, pSrcData, srcStride );
 }
 
 //==================================================================
@@ -102,21 +108,28 @@ void RenderOutputFile::alloc( u_int w, u_int h )
 	mWd = w;
 	mHe = h;
 
-	mpBuffer = DNEW u_char [ w * h * 3 ];
+	mpBuffer = DNEW u_char [ w * h * RI::NCOLS ];
 }
 
 //==================================================================
-void RenderOutputFile::convert( u_int w, u_int h, const float *pSrcData )
+void RenderOutputFile::convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
 {
-	u_char	*pDest = mpBuffer;
+	u_char	*pDest = mpBuffer + (x1 + y1 * mWd) * RI::NCOLS;
 
 	for (u_int j=0; j < h; ++j)
+	{
+		const float *pSrcData2 = pSrcData;
+		pSrcData += srcStride;
+
+		u_char	*pDest2 = pDest;
+		pDest += mWd * RI::NCOLS;
+
 		for (u_int i=0; i < w; ++i)
 		{
-			int	r = (int)(pSrcData[0] * 255.0f);
-			int	g = (int)(pSrcData[1] * 255.0f);
-			int	b = (int)(pSrcData[2] * 255.0f);
-			pSrcData += 3;
+			int	r = (int)(pSrcData2[0] * 255.0f);
+			int	g = (int)(pSrcData2[1] * 255.0f);
+			int	b = (int)(pSrcData2[2] * 255.0f);
+			pSrcData2 += RI::NCOLS;
 
 #if 1
 			if ( r < 0 ) r = 0; else if ( r > 255 ) r = 255;
@@ -127,9 +140,10 @@ void RenderOutputFile::convert( u_int w, u_int h, const float *pSrcData )
 			if ( g < 0 ) g = -g; if ( g > 255 ) g = 255;
 			if ( b < 0 ) b = -b; if ( b > 255 ) b = 255;
 #endif
-			pDest[0] = (u_char)r;
-			pDest[1] = (u_char)g;
-			pDest[2] = (u_char)b;
-			pDest += 3;
+			pDest2[0] = (u_char)r;
+			pDest2[1] = (u_char)g;
+			pDest2[2] = (u_char)b;
+			pDest2 += RI::NCOLS;
 		}
+	}
 }

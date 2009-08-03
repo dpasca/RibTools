@@ -244,7 +244,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 
 	try
 	{
-		RI::Render	render( pFileName, machine, fileManager );
+		RRL::Render	render( pFileName, machine, fileManager );
 	}
 	catch ( ... )
 	{

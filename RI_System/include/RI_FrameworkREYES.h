@@ -27,7 +27,8 @@ class RenderOutputBase
 public:
 	virtual ~RenderOutputBase() {};
 
-	virtual void Update( u_int w, u_int h, const float *pSrcData ) = 0;
+	virtual void SetSize( u_int w, u_int h ) = 0;
+	virtual void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride ) = 0;
 	virtual void Blit() const = 0;
 	virtual u_int GetCurWd() const = 0;
 	virtual u_int GetCurHe() const = 0;
@@ -51,12 +52,31 @@ public:
 	{
 	}
 
-	void Update( u_int w, u_int h, const float *pSrcData )
+	void SetSize( u_int w, u_int h )
 	{
 		mCurWd = w;
 		mCurHe = h;
 		mData.clear();
-		mData.append_array( pSrcData, w * h * 3 );
+		mData.resize( w * h * 3 );
+	}
+
+	void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+	{
+		u_int	x2 = x1 + w;
+		u_int	y2 = y1 + h;
+
+		float *pDest = &mData[0] + (x1 + y1 * mCurWd) * 3;
+
+		size_t	wc = w * 3;
+
+		for (size_t i=0; i < h; ++i)
+		{
+			for (size_t j=0; j < wc; ++j)
+				pDest[j] = pSrcData[j];
+
+			pSrcData += srcStride;
+			pDest += wc;
+		}
 	}
 
 	void Blit() const

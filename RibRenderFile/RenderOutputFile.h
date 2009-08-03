@@ -25,14 +25,15 @@ public:
 	RenderOutputFile( const char *pFileName );	
 	~RenderOutputFile();
 
-		void Update( u_int w, u_int h, const float *pSrcData );	
+		void SetSize( u_int w, u_int h );
+		void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride );
 		void Blit() const;
 		u_int GetCurWd() const {	return mWd; }
 		u_int GetCurHe() const {	return mHe;	}
 
 private:
 	void alloc( u_int w, u_int h );
-	void convert( u_int w, u_int h, const float *pSrcData );
+	void convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride );
 };
 
 #endif

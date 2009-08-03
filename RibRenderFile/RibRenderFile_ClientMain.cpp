@@ -101,7 +101,7 @@ int ClientMain( int argc, char **argv )
 
 		try
 		{
-			RI::Render	render( argv[1], machine, fileManager );
+			RRL::Render	render( argv[1], machine, fileManager );
 		}
 		catch ( ... )
 		{

@@ -50,25 +50,30 @@ RenderOutputOpenGL::~RenderOutputOpenGL()
 }
 
 //==================================================================
-void RenderOutputOpenGL::Update( u_int w, u_int h, const float *pSrcData )
+void RenderOutputOpenGL::SetSize( u_int w, u_int h )
 {
 	glBindTexture( GL_TEXTURE_2D, mTexId );
 
-	//glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 	alloc( w, h );
-	convert( w, h, pSrcData );
+}
+
+//==================================================================
+void RenderOutputOpenGL::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+{
+	glBindTexture( GL_TEXTURE_2D, mTexId );
+
+	convert( x1, y1, w, h, pSrcData, srcStride );
+
 	glTexSubImage2D(
 					GL_TEXTURE_2D,
 					0,
-					0,
-					0,
+					x1,
+					y1,
 					w,
 					h,
 					GL_RGBA,
 					GL_UNSIGNED_BYTE,
-					mpBuffer );
-
-	//glPixelStorei( GL_PACK_ALIGNMENT, 0 );
+					mpBuffer + (x1 + y1 * mWd) * RI::NCOLS );
 }
 
 //==================================================================
@@ -150,17 +155,22 @@ void RenderOutputOpenGL::alloc( u_int w, u_int h )
 }
 
 //==================================================================
-void RenderOutputOpenGL::convert( u_int w, u_int h, const float *pSrcData )
+void RenderOutputOpenGL::convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
 {
-	u_char	*pDest = mpBuffer;
+	u_char	*pDest = mpBuffer + (x1 + y1 * mWd) * RI::NCOLS;
 
 	for (u_int j=0; j < h; ++j)
+	{
+		const float *pSrcData2 = pSrcData;
+
+		pSrcData += srcStride;
+
 		for (u_int i=0; i < w; ++i)
 		{
-			int	r = (int)(pSrcData[0] * 255.0f);
-			int	g = (int)(pSrcData[1] * 255.0f);
-			int	b = (int)(pSrcData[2] * 255.0f);
-			pSrcData += 3;
+			int	r = (int)(pSrcData2[0] * 255.0f);
+			int	g = (int)(pSrcData2[1] * 255.0f);
+			int	b = (int)(pSrcData2[2] * 255.0f);
+			pSrcData2 += 3;
 
 #if 1
 			if ( r < 0 ) r = 0; else if ( r > 255 ) r = 255;
@@ -177,4 +187,5 @@ void RenderOutputOpenGL::convert( u_int w, u_int h, const float *pSrcData )
 			pDest[3] = 255;
 			pDest += 4;
 		}
+	}
 }

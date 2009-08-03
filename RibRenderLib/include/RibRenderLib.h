@@ -31,12 +31,14 @@ public:
 	SOCKET				mSock;
 	DUT::FileManager	*mpFilemanager;
 	bool				mIsValid;
+	bool				mIsWorking;
 
 	ServerEntry() :
 		mPortToCall(32323),
 		mSock(INVALID_SOCKET),
 		mpFilemanager(NULL),
-		mIsValid(true)
+		mIsValid(true),
+		mIsWorking(false)
 	{
 	}
 
@@ -53,6 +55,20 @@ public:
 
 //==================================================================
 void ConnectToServers( DVec<ServerEntry> &srvList, U32 timeoutMS );
+
+//==================================================================
+/// Render
+//==================================================================
+class Render
+{
+
+public:
+	Render(
+		const char			*pFileName,
+		RI::Machine			&machine,
+		DUT::FileManager	&fileManager,
+		bool				verbose=false );
+};
 
 //==================================================================
 }
