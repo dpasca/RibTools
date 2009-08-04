@@ -34,7 +34,7 @@ static int serverTask( SOCKET clientSock )
 
 	RI::RenderOutputMem		rendOut;
 	RI::HiderREYES::Params	hiderParams;
-	RI::FrameworkREYES		framework( &rendOut, hiderParams );
+	RI::FrameworkREYES		framework( &rendOut, NULL, hiderParams );
 	RI::Machine				machine( &framework, netRendJob.BaseDir, netRendJob.DefaultResourcesDir );
 
 	try

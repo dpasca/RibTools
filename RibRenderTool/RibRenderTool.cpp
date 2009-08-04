@@ -237,7 +237,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	printf( "Base Dir: %s\n", baseDir.c_str() );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
-	RI::FrameworkREYES	framework( mpRenderOutput, mREYESParams );
+	RI::FrameworkREYES	framework( mpRenderOutput, NULL, mREYESParams );
 	RI::Machine			machine( &framework, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
 
 	DUT::FileManager	fileManager;

@@ -25,7 +25,7 @@ class Transform;
 class RenderOutputBase
 {
 public:
-	virtual ~RenderOutputBase() {};
+	virtual ~RenderOutputBase() {}
 
 	virtual void SetSize( u_int w, u_int h ) = 0;
 	virtual void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride ) = 0;
@@ -88,12 +88,27 @@ public:
 };
 
 //==================================================================
+class RenderBucketsBase
+{
+public:
+	virtual ~RenderBucketsBase() {}
+
+	virtual void Render( HiderREYES &hider ) = 0;
+/*
+private:
+	RenderBucketsBase( const RenderBucketsBase &from ) {}
+	void operator =( const RenderBucketsBase &from ) {}
+*/
+};
+
+//==================================================================
 /// FrameworkREYES
 //==================================================================
 class FrameworkREYES
 {
 public:
 	RenderOutputBase	*mpRenderOutput;
+	RenderBucketsBase	*mpRenderBuckets;
 	SymbolList			*mpStatics;
 	HiderREYES			mHider;
 
@@ -109,6 +124,7 @@ private:
 
 public:
 	FrameworkREYES(	RenderOutputBase *pRenderOutput,
+					RenderBucketsBase *pRenderBuckets,
 					const HiderREYES &hiderParams );
 
 	void SetStatics( SymbolList *pStatics )
@@ -128,12 +144,12 @@ public:
 
 	void WorldEnd();
 
+	static void RenderBucket_s( HiderREYES &hider, Bucket &bucket );
+
 private:
-	static void renderBucket_s( HiderREYES &hider, Bucket &bucket );
 
 	void	worldEnd_simplify();
 	void	worldEnd_splitAndAddToBuckets();
-	void	worldEnd_renderBuckets();
 };
 
 //==================================================================

@@ -169,6 +169,8 @@ public:
 		return mFinalBuff.GetSampleCPtr( (int)x1, (int)y1 );
 	}
 
+	const DVec<Bucket *>	&GetBuckets() {	return mpBuckets; }
+
 private:
 	bool	makeRasterBound(
 						const Bound &b,

@@ -21,8 +21,10 @@ namespace RI
 //==================================================================
 FrameworkREYES::FrameworkREYES(
 						RenderOutputBase *pRenderOutput,
+						RenderBucketsBase *pRenderBuckets,
 						const HiderREYES &hiderParams ) :
 	mpRenderOutput(pRenderOutput),
+	mpRenderBuckets(pRenderBuckets),
 	mpStatics(NULL),
 	mHider(hiderParams)
 {
@@ -61,7 +63,7 @@ void FrameworkREYES::Insert(
 }
 
 //==================================================================
-void FrameworkREYES::renderBucket_s( HiderREYES &hider, Bucket &bucket )
+void FrameworkREYES::RenderBucket_s( HiderREYES &hider, Bucket &bucket )
 {
 	DVec<SimplePrimitiveBase *>	&pPrimList = bucket.GetPrimList();
 
@@ -157,19 +159,27 @@ void FrameworkREYES::worldEnd_splitAndAddToBuckets()
 }
 
 //==================================================================
-void FrameworkREYES::worldEnd_renderBuckets()
+/// RenderBucketsStd
+//==================================================================
+class RenderBucketsStd : public RenderBucketsBase
 {
-	DUT::QuickProf	prof( __FUNCTION__ );
-
-	int	bucketsN = (int)mHider.mpBuckets.size();
-
-	// --- dice primitives accumulated in the buckets
-	#pragma omp parallel for
-	for (int bi=0; bi < bucketsN; ++bi)
+public:
+	void Render( HiderREYES &hider )
 	{
-		renderBucket_s( mHider, *mHider.mpBuckets[ bi ] );
+		DUT::QuickProf	prof( __FUNCTION__ );
+
+		const DVec<Bucket *>	buckets = hider.GetBuckets();
+	
+		int	bucketsN = (int)buckets.size();
+
+		// --- dice primitives accumulated in the buckets
+		#pragma omp parallel for
+		for (int bi=0; bi < bucketsN; ++bi)
+		{
+			FrameworkREYES::RenderBucket_s( hider, *buckets[ bi ] );
+		}
 	}
-}
+};
 
 //==================================================================
 void FrameworkREYES::WorldEnd()
@@ -192,8 +202,20 @@ void FrameworkREYES::WorldEnd()
 
 	mpRenderOutput->SetSize( mOptions.mXRes, mOptions.mYRes );
 
-	worldEnd_renderBuckets();
 
+	// render the buckets..
+	if ( mpRenderBuckets )
+	{
+		mpRenderBuckets->Render( mHider );
+	}
+	else
+	{
+		RenderBucketsStd	rendBuck;
+
+		rendBuck.Render( mHider );
+	}
+
+	// update the regions
 	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
 	{
 		u_int	x1 = mHider.mpBuckets[bi]->mX1;
@@ -208,7 +230,6 @@ void FrameworkREYES::WorldEnd()
 					mHider.GetOutputDataStride()
 					);
 	}
-
 
 	// --- release the primitives in all the buckets
 	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)

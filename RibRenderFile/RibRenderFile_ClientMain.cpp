@@ -53,6 +53,45 @@ static bool getServersList( int argc, char **argv, DVec<RRL::ServerEntry> &list 
 }
 
 //==================================================================
+/// RenderBucketsStd
+//==================================================================
+class RenderBucketsClient : public RI::RenderBucketsBase
+{
+	DVec<RRL::ServerEntry>	*mpServList;
+
+public:
+	//==================================================================
+	RenderBucketsClient( DVec<RRL::ServerEntry> &servList ) :
+		mpServList(&servList)
+	{
+	}
+
+	//==================================================================
+	void Render( RI::HiderREYES &hider )
+	{
+		DUT::QuickProf	prof( __FUNCTION__ );
+
+		const DVec<RI::Bucket *>	&buckets = hider.GetBuckets();
+
+		// TODO -
+		// - Loop buckets
+		// -- Give a range of buckets to each server
+		// -- Get results from servers (move RenderOutput UpdateRange here ?)
+		//
+		// - Implement the corresponding server side of things..
+	
+		int	bucketsN = (int)buckets.size();
+
+		// --- dice primitives accumulated in the buckets
+		#pragma omp parallel for
+		for (int bi=0; bi < bucketsN; ++bi)
+		{
+			RI::FrameworkREYES::RenderBucket_s( hider, *buckets[ bi ] );
+		}
+	}
+};
+
+//==================================================================
 int ClientMain( int argc, char **argv )
 {
 	if ( argc < 3 )
@@ -90,14 +129,14 @@ int ClientMain( int argc, char **argv )
 		return -1;
 	}
 
+	RenderOutputFile		rendOut( argv[2] );
+	RI::HiderREYES::Params	hiderParams;
+	DUT::FileManager		fileManager;
+
 	if NOT( servList.size() )
 	{
-		RenderOutputFile		rendOut( argv[2] );
-		RI::HiderREYES::Params	hiderParams;
-		RI::FrameworkREYES		framework( &rendOut, hiderParams );
+		RI::FrameworkREYES		framework( &rendOut, NULL, hiderParams );
 		RI::Machine				machine( &framework, baseDir.c_str(), defaultShadersDir );
-
-		DUT::FileManager		fileManager;
 
 		try
 		{
@@ -139,7 +178,19 @@ int ClientMain( int argc, char **argv )
 			}
 		}
 
-		Sleep( 10000 );
+		RenderBucketsClient		rendBuckets( servList );
+
+		RI::FrameworkREYES		framework( &rendOut, &rendBuckets, hiderParams );
+		RI::Machine				machine( &framework, baseDir.c_str(), defaultShadersDir );
+
+		try
+		{
+			RRL::Render	render( argv[1], machine, fileManager );
+		}
+		catch ( ... )
+		{
+			return -1;
+		}
 	}
 
     return 0;
