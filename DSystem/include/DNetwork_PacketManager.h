@@ -96,6 +96,9 @@ public:
 
 	void Send( const void *pData, size_t dataSize );
 
+	U8 *SendBegin( size_t dataSize );
+	void SendEnd();
+
 	Packet *GetNextPacket();
 	Packet *WaitNextPacket();
 

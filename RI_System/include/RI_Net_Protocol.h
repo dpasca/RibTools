@@ -14,16 +14,6 @@ namespace RI
 {
 
 //==================================================================
-struct NetRendJob
-{
-	char	FileName[512];
-	char	BaseDir[512];
-	char	DefaultResourcesDir[512];
-	I32		ForcedWd;
-	I32		ForcedHe;
-};
-
-//==================================================================
 }
 
 #endif

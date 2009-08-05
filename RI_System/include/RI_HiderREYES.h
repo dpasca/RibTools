@@ -30,7 +30,7 @@ public:
 	int							mY1;
 	int							mX2;
 	int							mY2;
-	Buffer2D<3>					mCBuff;
+	Buffer2D<NCOLS>				mCBuff;
 	Buffer2D<1>					mZBuff;
 	DVec<SimplePrimitiveBase *>	mpPrims;
 
@@ -62,7 +62,7 @@ public:
 		mZBuff.Fill( FLT_MAX );
 	}
 
-	void EndRender( Buffer2D<RI::NCOLS> &outCBuff )
+	void EndRender( Buffer2D<NCOLS> &outCBuff )
 	{
 		mZBuff.Free();
 
@@ -119,10 +119,10 @@ public:
 private:
 	friend class FrameworkREYES;
 
-	Options				mOptions;
-	Buffer2D<RI::NCOLS>	mFinalBuff;
-	DVec<Bucket *>		mpBuckets;
-	Params				mParams;
+	Options					mOptions;
+	Buffer2D<NCOLS>			mFinalBuff;
+	DVec<Bucket *>			mpBuckets;
+	Params					mParams;
 	DVec<PrimitiveBase *>	mpPrims;
 
 public:
@@ -170,6 +170,9 @@ public:
 	}
 
 	const DVec<Bucket *>	&GetBuckets() {	return mpBuckets; }
+
+	size_t		GetOutputBucketMemSize( size_t buckIdx ) const;
+	void		CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize ) const;
 
 private:
 	bool	makeRasterBound(

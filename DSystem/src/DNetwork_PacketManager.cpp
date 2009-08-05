@@ -67,6 +67,30 @@ void PacketManager::Send( const void *pData, size_t dataSize )
 }
 
 //==================================================================
+U8 *PacketManager::SendBegin( size_t dataSize )
+{
+	DUT::CriticalSection::Block	lock( mSendList.mInQueueCS );
+
+	Packet	*pPacket = DNEW Packet();
+
+	mSendList.mInQueue.push_back( pPacket );
+
+	pPacket->mDataBuff.resize( dataSize + sizeof(U32) );
+
+	U32	*ptr = (U32 *)&pPacket->mDataBuff[0];
+
+	ptr[0] = (U32)dataSize;
+
+	return (U8 *)&ptr[1];
+}
+
+//==================================================================
+void PacketManager::SendEnd()
+{
+	ResumeThread( mThreadHandle );
+}
+
+//==================================================================
 Packet *PacketManager::GetNextPacket()
 {
 	if NOT( mRecvOutQueue.size() )

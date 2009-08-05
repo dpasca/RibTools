@@ -38,9 +38,11 @@ inline int strcasecmp( const char *a, const char *b )
 #define	DMIN(_A_,_B_)			((_A_) < (_B_) ? (_A_) : (_B_))
 #define	DMAX(_A_,_B_)			((_A_) > (_B_) ? (_A_) : (_B_))
 
+//===============================================================
 namespace D
 {
 
+//===============================================================
 template <class T>
 T Clamp( const T& val, const T& left, const T& right )
 {
@@ -49,8 +51,24 @@ T Clamp( const T& val, const T& left, const T& right )
 						return val;
 }
 
+//===============================================================
+template <class T>
+T Min( const T& left, const T& right )
+{
+	return DMIN( left, right );
 }
 
+//===============================================================
+template <class T>
+T Max( const T& left, const T& right )
+{
+	return DMAX( left, right );
+}
+
+//===============================================================
+}
+
+//===============================================================
 typedef std::string	DStr;
 
 typedef unsigned char		U8;

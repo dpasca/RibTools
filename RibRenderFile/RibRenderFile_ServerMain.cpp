@@ -15,7 +15,7 @@ static int serverTask( SOCKET clientSock )
 
 	DUT::FileManager		fileManager( clientSock, false );
 
-	RI::NetRendJob			netRendJob;
+	RRL::NET::MsgRendJob	netRendJob;
 
 	if NOT( fileManager.GetData( &netRendJob, sizeof(netRendJob) ) )
 	{
@@ -32,9 +32,11 @@ static int serverTask( SOCKET clientSock )
 		printf( "\tForcedHe  = %i\n", netRendJob.ForcedHe );
 	}
 
-	RI::RenderOutputMem		rendOut;
+	RRL::NET::RenderBucketsServer	rendBuckets( fileManager );
+
+	RI::RenderOutputNull	rendOutNull;
 	RI::HiderREYES::Params	hiderParams;
-	RI::FrameworkREYES		framework( &rendOut, NULL, hiderParams );
+	RI::FrameworkREYES		framework( &rendOutNull, &rendBuckets, hiderParams );
 	RI::Machine				machine( &framework, netRendJob.BaseDir, netRendJob.DefaultResourcesDir );
 
 	try

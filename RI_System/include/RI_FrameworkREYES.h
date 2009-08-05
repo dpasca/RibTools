@@ -22,6 +22,8 @@ class Attributes;
 class Transform;
 
 //==================================================================
+/// RenderOutputBase
+//==================================================================
 class RenderOutputBase
 {
 public:
@@ -34,6 +36,24 @@ public:
 	virtual u_int GetCurHe() const = 0;
 };
 
+//==================================================================
+/// RenderOutputNull
+//==================================================================
+class RenderOutputNull : public RenderOutputBase
+{
+public:
+	RenderOutputNull() {}
+	~RenderOutputNull() {}
+
+		void SetSize( u_int w, u_int h ) {}
+		void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride ) {}
+		void Blit() const {}
+		u_int GetCurWd() const {	return 0; }
+		u_int GetCurHe() const {	return 0; }
+};
+
+//==================================================================
+/// RenderOutputMem
 //==================================================================
 class RenderOutputMem : public RenderOutputBase
 {

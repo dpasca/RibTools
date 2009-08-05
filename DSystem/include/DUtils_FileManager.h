@@ -23,6 +23,8 @@ class FileManager
 	SOCKET				mSock;
 	bool				mIsConnectionBroken;
 	bool				mIsServing;
+
+public:
 	DNET::PacketManager	*mpPkMan;
 
 public:

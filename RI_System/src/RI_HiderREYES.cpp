@@ -345,4 +345,36 @@ void HiderREYES::Hide(
 }
 
 //==================================================================
+size_t HiderREYES::GetOutputBucketMemSize( size_t buckIdx ) const
+{
+	const Bucket	&buck = *mpBuckets[ buckIdx ];
+
+	u_int	wd = (u_int)(buck.mX2 - buck.mX1);
+	u_int	he = (u_int)(buck.mY2 - buck.mY1);
+
+	return sizeof(float) * NCOLS * wd * he;
+}
+
+//==================================================================
+void HiderREYES::CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize ) const
+{
+	const Bucket	&buck = *mpBuckets[ buckIdx ];
+
+	u_int	wd	= (u_int)(buck.mX2 - buck.mX1);
+	u_int	he	= (u_int)(buck.mY2 - buck.mY1);
+
+	const float *pSrc = GetOutputData( buck.mX1, buck.mY1 );
+
+	size_t wdStride = wd * NCOLS;
+	size_t srcStride = GetOutputDataStride();
+
+	for (u_int y=0; y < he; ++y)
+	{
+		memcpy( pDest, pSrc, sizeof(float) * wdStride );
+		pDest += wdStride;
+		pSrc += srcStride;
+	}
+}
+
+//==================================================================
 }

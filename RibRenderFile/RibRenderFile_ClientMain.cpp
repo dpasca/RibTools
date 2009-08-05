@@ -9,7 +9,7 @@
 #include "RibRenderFile.h"
 
 //==================================================================
-static bool getServersList( int argc, char **argv, DVec<RRL::ServerEntry> &list )
+static bool getServersList( int argc, char **argv, DVec<RRL::NET::Server> &list )
 {
 	list.clear();
 
@@ -23,7 +23,7 @@ static bool getServersList( int argc, char **argv, DVec<RRL::ServerEntry> &list 
 				return false;
 			}
 
-			RRL::ServerEntry	*pServEntry = list.grow();
+			RRL::NET::Server	*pServEntry = list.grow();
 
 			char	*pContext = NULL;
 			
@@ -52,44 +52,6 @@ static bool getServersList( int argc, char **argv, DVec<RRL::ServerEntry> &list 
 	return true;
 }
 
-//==================================================================
-/// RenderBucketsStd
-//==================================================================
-class RenderBucketsClient : public RI::RenderBucketsBase
-{
-	DVec<RRL::ServerEntry>	*mpServList;
-
-public:
-	//==================================================================
-	RenderBucketsClient( DVec<RRL::ServerEntry> &servList ) :
-		mpServList(&servList)
-	{
-	}
-
-	//==================================================================
-	void Render( RI::HiderREYES &hider )
-	{
-		DUT::QuickProf	prof( __FUNCTION__ );
-
-		const DVec<RI::Bucket *>	&buckets = hider.GetBuckets();
-
-		// TODO -
-		// - Loop buckets
-		// -- Give a range of buckets to each server
-		// -- Get results from servers (move RenderOutput UpdateRange here ?)
-		//
-		// - Implement the corresponding server side of things..
-	
-		int	bucketsN = (int)buckets.size();
-
-		// --- dice primitives accumulated in the buckets
-		#pragma omp parallel for
-		for (int bi=0; bi < bucketsN; ++bi)
-		{
-			RI::FrameworkREYES::RenderBucket_s( hider, *buckets[ bi ] );
-		}
-	}
-};
 
 //==================================================================
 int ClientMain( int argc, char **argv )
@@ -122,7 +84,7 @@ int ClientMain( int argc, char **argv )
 
 	sprintf_s( defaultShadersDir, "%s/Shaders", defaultResDir );
 
-	DVec<RRL::ServerEntry> servList;
+	DVec<RRL::NET::Server> servList;
 	if NOT( getServersList( argc, argv, servList ) )
 	{
 		printf( "Error in the server srvList\n" );
@@ -150,7 +112,7 @@ int ClientMain( int argc, char **argv )
 	else
 	{
 		// prepare the template job header for the servers
-		RI::NetRendJob	netRendJob;
+		RRL::NET::MsgRendJob	netRendJob;
 		memset( &netRendJob, 0, sizeof(netRendJob) );
 		strcpy_s( netRendJob.FileName	, argv[1] );
 		strcpy_s( netRendJob.BaseDir	, baseDir.c_str() );
@@ -160,7 +122,7 @@ int ClientMain( int argc, char **argv )
 
 		// connect to all servers
 		printf( "Connecting to servers...\n" );
-		RRL::ConnectToServers( servList, 3 * 1000 );
+		RRL::NET::ConnectToServers( servList, 3 * 1000 );
 
 		// for each server..
 		for (size_t i=0; i < servList.size(); ++i)
@@ -178,10 +140,10 @@ int ClientMain( int argc, char **argv )
 			}
 		}
 
-		RenderBucketsClient		rendBuckets( servList );
+		RRL::NET::RenderBucketsClient	rendBuckets( servList );
 
-		RI::FrameworkREYES		framework( &rendOut, &rendBuckets, hiderParams );
-		RI::Machine				machine( &framework, baseDir.c_str(), defaultShadersDir );
+		RI::FrameworkREYES				framework( &rendOut, &rendBuckets, hiderParams );
+		RI::Machine						machine( &framework, baseDir.c_str(), defaultShadersDir );
 
 		try
 		{

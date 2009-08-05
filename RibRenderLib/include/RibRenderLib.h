@@ -18,43 +18,11 @@
 #include "RI_System/include/RI_Machine.h"
 #include "RI_System/include/RI_FrameworkREYES.h"
 
+#include "RibRenderLib_Net.h"
+
 //==================================================================
 namespace RRL
 {
-
-//===============================================================
-class ServerEntry
-{
-public:
-	DStr				mAddressName;
-	int					mPortToCall;
-	SOCKET				mSock;
-	DUT::FileManager	*mpFilemanager;
-	bool				mIsValid;
-	bool				mIsWorking;
-
-	ServerEntry() :
-		mPortToCall(32323),
-		mSock(INVALID_SOCKET),
-		mpFilemanager(NULL),
-		mIsValid(true),
-		mIsWorking(false)
-	{
-	}
-
-	~ServerEntry()
-	{
-		DSAFE_DELETE( mpFilemanager );
-	}
-
-	bool IsConnected() const
-	{
-		return mSock != INVALID_SOCKET && mIsValid;
-	}
-};
-
-//==================================================================
-void ConnectToServers( DVec<ServerEntry> &srvList, U32 timeoutMS );
 
 //==================================================================
 /// Render

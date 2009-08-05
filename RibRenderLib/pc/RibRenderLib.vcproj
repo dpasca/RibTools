@@ -160,6 +160,30 @@
 				RelativePath="..\include\RibRenderLib.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\RibRenderLib_Net.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RibRenderLib_Net.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RibRenderLib_Net_RenderBucketsClient.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RibRenderLib_Net_RenderBucketsClient.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RibRenderLib_Net_RenderBucketsServer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RibRenderLib_Net_RenderBucketsServer.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
