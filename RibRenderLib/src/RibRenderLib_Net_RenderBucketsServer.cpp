@@ -28,27 +28,35 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 {
 	DNET::Packet	*pPacket;
 
-	pPacket = mpFileManager->mpPkMan->WaitNextPacket();
-
-	DASSTHROW(
-		pPacket->mDataBuff.size() >= sizeof(U32),
-			("Unexpected packet in RenderBucketsServer") );
-
-	U32	msgID = ((const U32 *)&pPacket->mDataBuff[0])[0];
-
-	if ( msgID == MSGID_RENDBUCKETS )
+	while ( true )
 	{
-		const MsgRendBuckes	&msg = *((const MsgRendBuckes *)&pPacket->mDataBuff[0]);
+		pPacket = mpFileManager->mpPkMan->WaitNextPacket();
 
-		rendBucketsRange( hider, msg.BucketStart, msg.BucketEnd );
-
-		sendBucketsData( hider, msg.BucketStart, msg.BucketEnd );
-	}
-	else
-	{
 		DASSTHROW(
 			pPacket->mDataBuff.size() >= sizeof(U32),
 				("Unexpected packet in RenderBucketsServer") );
+
+		U32	msgID = ((const U32 *)&pPacket->mDataBuff[0])[0];
+
+		if ( msgID == MSGID_RENDBUCKETS )
+		{
+			const MsgRendBuckes	&msg = *((const MsgRendBuckes *)&pPacket->mDataBuff[0]);
+
+			rendBucketsRange( hider, msg.BucketStart, msg.BucketEnd );
+
+			sendBucketsData( hider, msg.BucketStart, msg.BucketEnd );
+		}
+		else
+		if ( msgID == MSGID_RENDDONE )
+		{
+			break;
+		}
+		else
+		{
+			DASSTHROW(
+				pPacket->mDataBuff.size() >= sizeof(U32),
+					("Unexpected packet in RenderBucketsServer") );
+		}
 	}
 }
 

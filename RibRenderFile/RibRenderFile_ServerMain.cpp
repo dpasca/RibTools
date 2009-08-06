@@ -13,7 +13,7 @@ static int serverTask( SOCKET clientSock )
 {
 	printf( "Rendering for %i... yeah, right !!\n", clientSock );
 
-	DUT::FileManager		fileManager( clientSock, false );
+	DUT::FileManager		fileManager( clientSock, false, RRL::NET::MSGID_FILEREQ );
 
 	RRL::NET::MsgRendJob	netRendJob;
 

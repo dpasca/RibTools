@@ -23,13 +23,14 @@ class FileManager
 	SOCKET				mSock;
 	bool				mIsConnectionBroken;
 	bool				mIsServing;
+	U32					mReqMsgID;
 
 public:
 	DNET::PacketManager	*mpPkMan;
 
 public:
 	FileManager();
-	FileManager( SOCKET sock, bool serving );
+	FileManager( SOCKET sock, bool serving, U32 reqMsgID );
 	~FileManager();
 
 	void SendData( const void *pData, size_t dataSize );

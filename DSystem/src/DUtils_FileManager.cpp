@@ -17,16 +17,18 @@ FileManager::FileManager() :
 	mSock(INVALID_SOCKET),
 	mIsConnectionBroken(false),
 	mIsServing(true),
-	mpPkMan(NULL)
+	mpPkMan(NULL),
+	mReqMsgID(0)
 {
 }
 
 //==================================================================
-FileManager::FileManager( SOCKET sock, bool serving ) :
+FileManager::FileManager( SOCKET sock, bool serving, U32 reqMsgID ) :
 	mSock(sock),
 	mIsConnectionBroken(false),
 	mIsServing(serving),
-	mpPkMan(NULL)
+	mpPkMan(NULL),
+	mReqMsgID(reqMsgID)
 {
 	mpPkMan = DNEW DNET::PacketManager( sock );
 }
@@ -48,7 +50,16 @@ bool FileManager::GetFile( DUT::MemFile &memfile, const char *pFileName )
 {
 	if ( mpPkMan )
 	{
-		//mpPkMan->Send();
+		char buff[2048];
+
+		U32 nameLen = (U32)strlen(pFileName);
+		DASSERT( nameLen < _countof(buff) );
+
+		MemWriter	writer( buff, sizeof(buff) );
+		writer.WriteValue( mReqMsgID );
+		writer.WriteValue( nameLen );
+		writer.WriteArray( pFileName, nameLen );
+		mpPkMan->Send( buff, writer.GetCurSize() );
 
 		DNET::Packet *pPacket = mpPkMan->WaitNextPacket();
 

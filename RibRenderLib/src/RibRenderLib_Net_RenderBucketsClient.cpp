@@ -50,6 +50,17 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 		checkServersData();
 	}
 
+	for (size_t i=0; i < mpServList->size(); ++i)
+	{
+		Server &srv = (*mpServList)[i];
+
+		if ( srv.IsConnected() )
+		{
+			MsgRendDone	msg;
+			srv.mpFilemanager->mpPkMan->Send( &msg, sizeof(msg) );
+		}
+	}
+
 	// wait for all servers to deliver !!
 	while NOT( checkServersData() )
 	{

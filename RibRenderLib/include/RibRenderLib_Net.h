@@ -24,8 +24,10 @@ namespace NET
 //===============================================================
 enum MsgID
 {
+	MSGID_FILEREQ,
 	MSGID_RENDJOB,
 	MSGID_RENDBUCKETS,
+	MSGID_RENDDONE,
 	MSGID_BUCKETDATA,
 	MSGID_N
 };
@@ -64,6 +66,17 @@ struct MsgRendBuckes
 };
 
 //===============================================================
+struct MsgRendDone
+{
+	U32		MsgID;
+
+	MsgRendDone()
+	{
+		MsgID = MSGID_RENDDONE;
+	}
+};
+
+//===============================================================
 struct MsgBucketData
 {
 	U32		MsgID;
@@ -84,14 +97,12 @@ class Server
 public:
 	DStr				mAddressName;
 	int					mPortToCall;
-	SOCKET				mSock;
 	DUT::FileManager	*mpFilemanager;
 	bool				mIsValid;
 	bool				mIsBusy;
 
 	Server() :
 		mPortToCall(32323),
-		mSock(INVALID_SOCKET),
 		mpFilemanager(NULL),
 		mIsValid(true),
 		mIsBusy(false)
@@ -105,7 +116,7 @@ public:
 
 	bool IsConnected() const
 	{
-		return mSock != INVALID_SOCKET && mIsValid;
+		return mpFilemanager && mpFilemanager->mpPkMan->IsConnected();
 	}
 };
 

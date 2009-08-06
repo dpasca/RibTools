@@ -85,8 +85,7 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 				break;
 
 			case DNET::Connecter::RETVAL_CONNECTED:
-				srvList[i].mSock = pConn->GetSocket();
-				srvList[i].mpFilemanager = DNEW DUT::FileManager( srvList[i].mSock, false );
+				srvList[i].mpFilemanager = DNEW DUT::FileManager( pConn->GetSocket(), false, RRL::NET::MSGID_FILEREQ );
 				break;
 
 			case DNET::Connecter::RETVAL_ERROR:

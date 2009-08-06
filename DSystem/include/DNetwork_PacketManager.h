@@ -94,6 +94,8 @@ public:
 	PacketManager( SOCKET socket );
 	~PacketManager();
 
+	bool IsConnected() const { return mSocket != INVALID_SOCKET && !mFatalError; }
+
 	void Send( const void *pData, size_t dataSize );
 
 	U8 *SendBegin( size_t dataSize );

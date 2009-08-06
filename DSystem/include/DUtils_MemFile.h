@@ -85,6 +85,8 @@ public:
 
 		return ptr;
 	}
+
+	size_t GetCurSize() const { return mIdx; }
 };
 
 //==================================================================
