@@ -224,6 +224,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\DSafeCrt.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DTypes.cpp"
 				>
 			</File>

@@ -730,7 +730,7 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 
 		if ( func.mpRetTypeTok->idType == T_TYPE_SHADERTYPE )
 		{
-			fprintf_s( pFile, "%s %s\n",
+			fprintf_s( pFile, "%s ;== %s\n",
 							func.mpRetTypeTok->GetStrChar(),
 								func.mpNameNode->GetTokStr() );
 		}

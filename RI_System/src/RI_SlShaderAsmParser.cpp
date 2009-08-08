@@ -136,6 +136,12 @@ static void stripComments( char *pTxt )
 }
 
 //==================================================================
+static bool beginsWithI( const char *pStr, const char *pMatch )
+{
+	return DUT::StrStrI( pStr, pMatch ) == pStr;
+}
+
+//==================================================================
 bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSection )
 {
 	SlShader::Type	type = SlShader::TYPE_UNKNOWN;
@@ -148,7 +154,20 @@ bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSec
 	if ( !strcasecmp( pLineWork, "imager" ) )		type = SlShader::TYPE_IMAGER;
 
 	if ( type == SlShader::TYPE_UNKNOWN )
+	{
+		if (
+			beginsWithI( pLineWork, "light" ) 			||
+			beginsWithI( pLineWork, "surface" )			||
+			beginsWithI( pLineWork, "volume" )			||
+			beginsWithI( pLineWork, "displacement" )	||
+			beginsWithI( pLineWork, "transformation" )	||
+			beginsWithI( pLineWork, "imager" ) )
+		{
+			onError( "Shader start/type needs to be defined alone in a line" );
+		}
+
 		return false;
+	}
 
 	if ( mpShader->mType != SlShader::TYPE_UNKNOWN )
 		onError( "Shader start/type already defined !" );

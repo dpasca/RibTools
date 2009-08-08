@@ -21,6 +21,7 @@ namespace DUT
 
 //==================================================================
 void StrStripBeginEndWhite( char *pStr );
+const char *StrStrI( const char *pStr, const char *pSearch );
 
 I64 GetTimeTicks();
 double TimeTicksToMS( I64 ticks );

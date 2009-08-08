@@ -146,6 +146,26 @@ void StrStripBeginEndWhite( char *pStr )
 }
 
 //==================================================================
+const char *StrStrI( const char *pStr, const char *pSearch )
+{
+	for (size_t i=0; pStr[i]; ++i)
+	{
+		if ( tolower(pSearch[0]) == tolower(pStr[i]) )
+		{
+			for (size_t j=0; pSearch[j]; ++j)
+			{
+				if ( tolower(pStr[i+j]) != tolower(pSearch[j]) )
+					return NULL;
+			}
+
+			return pStr + i;
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
 I64 GetTimeTicks()
 {
 	I64	val;
