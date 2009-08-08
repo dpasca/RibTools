@@ -99,10 +99,17 @@ class MemReader
 	size_t		mMaxSize;
 
 public:
-	MemReader( void *pDest, size_t maxSize ) :
-		mpSrc((U8 *)pDest),
+	MemReader( const void *pDest, size_t maxSize ) :
+		mpSrc((const U8 *)pDest),
 		mIdx(0),
 		mMaxSize(maxSize)
+	{
+	}
+
+	MemReader( const DVec<U8> &vec ) :
+		mpSrc((const U8 *)&vec[0]),
+		mIdx(0),
+		mMaxSize(vec.size())
 	{
 	}
 

@@ -13,84 +13,9 @@
 //==================================================================
 namespace RRL
 {
-
-//==================================================================
-class TimeOut
-{
-	I64	mStartTicks;
-	U32	mTimeOutMS;
-
-public:
-	TimeOut( U32 timeoutMS ) :
-		mTimeOutMS(timeoutMS),
-		mStartTicks(DUT::GetTimeTicks())
-	{
-	}
-
-	bool IsExpired() const
-	{
-		I64 delta = DUT::GetTimeTicks() - mStartTicks;
-
-		return DUT::TimeTicksToMS( delta ) > mTimeOutMS;
-	}
-};
-
 //==================================================================
 namespace NET
 {
-
-//==================================================================
-/// FileManagerNet
-//==================================================================
-FileManagerNet::FileManagerNet( DNET::PacketManager &packManager ) :
-	mpPakMan(&packManager)
-{
-}
-
-//===============================================================
-void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
-{
-	char buff[2048];
-
-	U32 nameLen = (U32)strlen(pFileName);
-	DASSERT( nameLen < _countof(buff) );
-
-	DUT::MemWriter	writer( buff, sizeof(buff) );
-	writer.WriteValue( MSGID_FILEREQ );
-	writer.WriteValue( nameLen );
-	writer.WriteArray( pFileName, nameLen );
-	mpPakMan->Send( buff, writer.GetCurSize() );
-
-	DNET::Packet *pPacket = mpPakMan->WaitNextPacket();
-
-	if NOT( pPacket )
-	{
-		DSAFE_DELETE( pPacket );
-		DASSTHROW( 0, ( "Could not retrieve the file %s !", pFileName ) );
-		return;
-	}
-
-	out_vec.get_ownership( pPacket->mDataBuff );
-
-	DSAFE_DELETE( pPacket );
-}
-
-//===============================================================
-bool FileManagerNet::FileExists( const char *pFileName ) const
-{
-	char buff[2048];
-
-	U32 nameLen = (U32)strlen(pFileName);
-	DASSERT( nameLen < _countof(buff) );
-
-	DUT::MemWriter	writer( buff, sizeof(buff) );
-	writer.WriteValue( MSGID_FILEEXISTREQ );
-	writer.WriteValue( nameLen );
-	writer.WriteArray( pFileName, nameLen );
-	mpPakMan->Send( buff, writer.GetCurSize() );
-
-	return false;
-}
 
 //===============================================================
 void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
@@ -119,7 +44,7 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 		}
 	}
 
-	TimeOut	timeOut( timeoutMS );
+	DUT::TimeOut	timeOut( timeoutMS );
 
 	// loop until there is some connection waiting
 	bool	isSomeConnectionWaiting = false;
@@ -140,8 +65,8 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 
 			case DNET::Connecter::RETVAL_CONNECTED:
 				DASSERT( srvList[i].mpPakMan == NULL );
-				srvList[i].mpPakMan = DNEW DNET::PacketManager( pConn->GetSocket() );
-				srvList[i].mpFilemanager = DNEW FileManagerNet( *srvList[i].mpPakMan );
+				srvList[i].Init( 
+							DNEW DNET::PacketManager( pConn->GetSocket() ) );
 				break;
 
 			case DNET::Connecter::RETVAL_ERROR:

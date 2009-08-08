@@ -10,9 +10,10 @@
 #define DNETWORK_PACKETMANAGER_H
 
 #include <memory.h>
+#include "DNetwork_Base.h"
 #include "DContainers.h"
 #include "DCriticalSection.h"
-#include "DNetwork_Base.h"
+#include "DThreads.h"
 
 //==================================================================
 namespace DNET
@@ -47,7 +48,7 @@ private:
 //===============================================================
 /// 
 //===============================================================
-class PacketManager
+class PacketManager : public DTH::ThreadedBase
 {
 	class Queue
 	{
@@ -81,13 +82,6 @@ class PacketManager
 	DUT::CriticalSection	mTroubledSocketsListCSection;
 
 	bool					mFatalError;
-	bool					mQuitRequest;
-	bool					mQuitAck;
-
-#if defined(WIN32)
-	HANDLE					mThreadHandle;
-#endif
-
 
 public:
 	//===============================================================
@@ -101,16 +95,15 @@ public:
 	U8 *SendBegin( size_t dataSize );
 	void SendEnd();
 
-	Packet *GetNextPacket();
-	Packet *WaitNextPacket();
+	Packet *GetNextPacket( bool doRemove );
+	Packet *WaitNextPacket( bool doRemove, U32 timeoutMS=0 );
+
+	void RemovePacket( Packet *pPacket );
+	void RemoveAndDeletePacket( Packet *pPacket );
 
 private:
-	static void threadMain_s( void *pThis )
-	{
-		((PacketManager *)pThis)->threadMain();
-	}
-
-	void threadMain();
+		void threadMain();
+	
 	void threadOnSockError( Packet &entry );
 };
 

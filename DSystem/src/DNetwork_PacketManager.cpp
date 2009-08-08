@@ -8,6 +8,7 @@
 
 #include "DNetwork.h"
 #include "DNetwork_PacketManager.h"
+#include "DUtils.h"
 
 //==================================================================
 namespace DNET
@@ -18,29 +19,13 @@ namespace DNET
 //==================================================================
 PacketManager::PacketManager( SOCKET socket ) :
 	mSocket(socket),
-	mQuitRequest(false),
-	mQuitAck(false),
 	mFatalError(false)
 {
-#if defined(WIN32)
-	mThreadHandle = CreateThread( NULL, 16384, (LPTHREAD_START_ROUTINE)threadMain_s, (void *)this, 0, NULL );
-#endif
 }
 
 //==================================================================
 PacketManager::~PacketManager()
 {
-#if defined(WIN32)
-	// wait for quit to be acknowledged
-	mQuitRequest = true;
-	while ( mQuitAck == false )
-	{
-		ResumeThread( mThreadHandle );
-		SwitchToThread();
-	}
-
-	CloseHandle( mThreadHandle );
-#endif
 }
 
 //==================================================================
@@ -91,7 +76,7 @@ void PacketManager::SendEnd()
 }
 
 //==================================================================
-Packet *PacketManager::GetNextPacket()
+Packet *PacketManager::GetNextPacket( bool doRemove )
 {
 	if NOT( mRecvOutQueue.size() )
 		return NULL;
@@ -103,17 +88,52 @@ Packet *PacketManager::GetNextPacket()
 
 	Packet	*pOutEntry = mRecvOutQueue[0];
 
-	mRecvOutQueue.erase( mRecvOutQueue.begin() );
+	if ( doRemove )
+		mRecvOutQueue.erase( mRecvOutQueue.begin() );
 
 	return pOutEntry;
 }
 
 //==================================================================
-Packet *PacketManager::WaitNextPacket()
+void PacketManager::RemovePacket( Packet *pPacket )
 {
-	Packet *pPacket;
+	DASSERT( mRecvOutQueue.size() != 0 );
 
-	while NOT( pPacket = GetNextPacket() )
+	DUT::CriticalSection::Block	lock( mRecvOutQueueCS );
+
+	DASSERT( mRecvOutQueue.size() != 0 );
+
+	for (size_t i=0; i < mRecvOutQueue.size(); ++i)
+	{
+		if ( pPacket == mRecvOutQueue[i] )
+		{
+			mRecvOutQueue.erase( mRecvOutQueue.begin() + i );
+			return;
+		}
+	}
+
+	DASSERT( 0 );
+}
+
+//==================================================================
+void PacketManager::RemoveAndDeletePacket( Packet *pPacket )
+{
+	RemovePacket( pPacket );
+	DSAFE_DELETE( pPacket );
+}
+
+//==================================================================
+Packet *PacketManager::WaitNextPacket( bool doRemove, U32 timeoutMS )
+{
+	if ( mFatalError )
+		return NULL;
+
+	Packet			*pPacket;
+
+	DUT::TimeOut	timeOut( timeoutMS );
+
+	while ( !(pPacket = GetNextPacket( doRemove )) &&
+			(timeoutMS == 0 || !timeOut.IsExpired()) )
 	{
 		if ( mFatalError )
 			return NULL;

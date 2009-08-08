@@ -30,13 +30,13 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 
 	while ( true )
 	{
-		pPacket = mpPakMan->WaitNextPacket();
+		pPacket = mpPakMan->WaitNextPacket( false );
 
 		DASSTHROW(
 			pPacket->mDataBuff.size() >= sizeof(U32),
 				("Unexpected packet in RenderBucketsServer") );
 
-		U32	msgID = ((const U32 *)&pPacket->mDataBuff[0])[0];
+		MsgID	msgID = GetMsgID( pPacket );
 
 		if ( msgID == MSGID_RENDBUCKETS )
 		{
@@ -45,18 +45,23 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 			rendBucketsRange( hider, msg.BucketStart, msg.BucketEnd );
 
 			sendBucketsData( hider, msg.BucketStart, msg.BucketEnd );
+
+			mpPakMan->RemoveAndDeletePacket( pPacket );
 		}
 		else
 		if ( msgID == MSGID_RENDDONE )
 		{
+			mpPakMan->RemoveAndDeletePacket( pPacket );
 			break;
 		}
+/*
 		else
 		{
 			DASSTHROW(
 				pPacket->mDataBuff.size() >= sizeof(U32),
 					("Unexpected packet in RenderBucketsServer") );
 		}
+*/
 	}
 }
 

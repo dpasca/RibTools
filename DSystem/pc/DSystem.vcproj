@@ -228,6 +228,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\DThreads.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DThreads.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DTypes.cpp"
 				>
 			</File>

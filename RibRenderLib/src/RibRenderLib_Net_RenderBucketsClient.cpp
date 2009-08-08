@@ -80,7 +80,7 @@ bool RenderBucketsClient::checkServersData()
 		if ( !srv.IsConnected() || !srv.mIsBusy )
 			continue;
 
-		DNET::Packet *pPacket = srv.mpPakMan->GetNextPacket();
+		DNET::Packet *pPacket = srv.mpPakMan->GetNextPacket( false );
 
 		if ( pPacket )
 		{
@@ -88,16 +88,12 @@ bool RenderBucketsClient::checkServersData()
 				pPacket->mDataBuff.size() >= sizeof(U32),
 					("Received broken packet from a server !") );
 
-			MsgID	msgID = (MsgID)((const U32 *)&pPacket->mDataBuff[0])[0];
+			MsgID	msgID = GetMsgID( pPacket );
 			if ( msgID == MSGID_BUCKETDATA )
 			{
 				srv.mIsBusy = false;
-			}
-			else
-			{
-				DASSTHROW(
-					0,
-						("Received broken packet from a server !") );
+
+				srv.mpPakMan->RemoveAndDeletePacket( pPacket );
 			}
 		}
 		else

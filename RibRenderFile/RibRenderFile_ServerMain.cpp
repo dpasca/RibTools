@@ -19,7 +19,7 @@ static int serverTask( SOCKET clientSock )
 	RRL::NET::MsgRendJob		netRendJob;
 
 	try {
-		DNET::Packet *pPack = packetManager.WaitNextPacket();
+		DNET::Packet *pPack = packetManager.WaitNextPacket( true );
 		netRendJob = *(const RRL::NET::MsgRendJob *)&pPack->mDataBuff[0];
 	} catch (...)
 	{

@@ -49,6 +49,29 @@ public:
 };
 
 //==================================================================
+/// TimeOut
+//==================================================================
+class TimeOut
+{
+	I64	mStartTicks;
+	U32	mTimeOutMS;
+
+public:
+	TimeOut( U32 timeoutMS ) :
+		mTimeOutMS(timeoutMS),
+		mStartTicks(GetTimeTicks())
+	{
+	}
+
+	bool IsExpired() const
+	{
+		I64 delta = GetTimeTicks() - mStartTicks;
+
+		return TimeTicksToMS( delta ) > mTimeOutMS;
+	}
+};
+
+//==================================================================
 }
 
 #endif
