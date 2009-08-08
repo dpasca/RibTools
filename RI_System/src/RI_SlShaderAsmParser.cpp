@@ -213,7 +213,7 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 		}
 		catch ( ... )
 		{
-			printf( "For shader '%s' at line %i\n%i) %s", mpName, lineCnt+1, lineCnt+1, lineBuff );
+			printf( "For shader '%s' at line %i\n%i) %s\n", mpName, lineCnt+1, lineCnt+1, lineBuff );
 			throw;
 		}
 

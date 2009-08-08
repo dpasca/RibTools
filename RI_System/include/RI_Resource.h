@@ -136,11 +136,7 @@ public:
 		Collect();
 	}
 	
-	ResourceBase *AddResource( ResourceBase *pRes )
-	{
-		mpList.push_back( pRes );
-		return pRes;
-	}
+	ResourceBase *AddResource( ResourceBase *pRes );
 
 	ResourceBase *FindResource( const char *pName, ResourceBase::Type type );
 

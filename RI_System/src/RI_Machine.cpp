@@ -18,11 +18,12 @@ namespace RI
 //==================================================================
 Machine::Machine(
 			FrameworkREYES *pFramework,
+			FileManagerBase	*pFileManager,
 			const char *pBaseDir,
 			const char *pDefaultShadersDir,
 			int forcedWd,
 			int forcedHe ) :
-	mState(pFramework, pBaseDir, pDefaultShadersDir),
+	mState(pFramework, pFileManager, pBaseDir, pDefaultShadersDir),
 	mForcedWd(forcedWd),
 	mForcedHe(forcedHe)
 {

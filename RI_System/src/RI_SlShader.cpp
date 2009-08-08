@@ -105,22 +105,23 @@ static void compileFromMemFile(
 //==================================================================
 /// SlShader
 //==================================================================
-SlShader::SlShader( const CtorParams &params ) :
+SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 	ResourceBase(params.pName, ResourceBase::TYPE_SHADER),
 	mType(TYPE_UNKNOWN),
 	mStartPC(0)
 {
+	DUT::MemFile	file;
+
 	if ( params.pSource )
 	{
-		DUT::MemFile	file((const void *)params.pSource,
-							  strlen(params.pSource) );
+		file.Init( (const void *)params.pSource, strlen(params.pSource) );
 
 		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir );
 	}
 	else
 	if ( params.pSourceFileName )
 	{
-		DUT::MemFile	file( params.pSourceFileName );
+		fileManager.GrabFile( params.pSourceFileName, file );
 
 		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir );
 	}

@@ -12,6 +12,7 @@
 #include "RI_Base.h"
 #include "RI_SlSymbol.h"
 #include "RI_Resource.h"
+#include "RI_FileManager.h"
 
 //==================================================================
 namespace RI
@@ -220,7 +221,7 @@ public:
 		}
 	};
 
-	SlShader( const CtorParams &params );
+	SlShader( const CtorParams &params, FileManagerBase &fileManager );
 };
 
 //==================================================================

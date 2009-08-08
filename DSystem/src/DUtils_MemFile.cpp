@@ -76,7 +76,12 @@ void MemFile::Init( const char *pFileName )
 //==================================================================
 void MemFile::InitExclusiveOwenership( DVec<U8> &fromData )
 {
+	mDataSize = fromData.size();
 	mOwnData.get_ownership( fromData );
+
+	mpData		= &mOwnData[0];
+	mReadPos	= 0;
+	mIsReadOnly	= true;
 }
 
 //==================================================================

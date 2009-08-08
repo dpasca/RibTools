@@ -13,35 +13,39 @@ static int serverTask( SOCKET clientSock )
 {
 	printf( "Rendering for %i... yeah, right !!\n", clientSock );
 
-	DUT::FileManager		fileManager( clientSock, false, RRL::NET::MSGID_FILEREQ );
 
-	RRL::NET::MsgRendJob	netRendJob;
+	DNET::PacketManager			packetManager( clientSock );
 
-	if NOT( fileManager.GetData( &netRendJob, sizeof(netRendJob) ) )
+	RRL::NET::MsgRendJob		netRendJob;
+
+	try {
+		DNET::Packet *pPack = packetManager.WaitNextPacket();
+		netRendJob = *(const RRL::NET::MsgRendJob *)&pPack->mDataBuff[0];
+	} catch (...)
 	{
 		printf( "Failed to read the NetRendJob data\n" );
 		return -1;
 	}
-	else
-	{
-		printf( "Got a nice NetRendJob !\n" );
-		printf( "\tFileName  = %s\n", netRendJob.FileName );
-		printf( "\tBaseDir   = %s\n", netRendJob.BaseDir );
-		printf( "\tDefResDir = %s\n", netRendJob.DefaultResourcesDir );
-		printf( "\tForcedWd  = %i\n", netRendJob.ForcedWd );
-		printf( "\tForcedHe  = %i\n", netRendJob.ForcedHe );
-	}
 
-	RRL::NET::RenderBucketsServer	rendBuckets( fileManager );
+	printf( "Got a nice NetRendJob !\n" );
+	printf( "\tFileName  = %s\n", netRendJob.FileName );
+	printf( "\tBaseDir   = %s\n", netRendJob.BaseDir );
+	printf( "\tDefResDir = %s\n", netRendJob.DefaultResourcesDir );
+	printf( "\tForcedWd  = %i\n", netRendJob.ForcedWd );
+	printf( "\tForcedHe  = %i\n", netRendJob.ForcedHe );
+
+	RRL::NET::FileManagerNet		fileManagerNet( packetManager );
+
+	RRL::NET::RenderBucketsServer	rendBuckets( packetManager );
 
 	RI::RenderOutputNull	rendOutNull;
 	RI::HiderREYES::Params	hiderParams;
 	RI::FrameworkREYES		framework( &rendOutNull, &rendBuckets, hiderParams );
-	RI::Machine				machine( &framework, netRendJob.BaseDir, netRendJob.DefaultResourcesDir );
+	RI::Machine				machine( &framework, &fileManagerNet, netRendJob.BaseDir, netRendJob.DefaultResourcesDir );
 
 	try
 	{
-		RRL::Render	render( netRendJob.FileName, machine, fileManager );
+		RRL::Render	render( netRendJob.FileName, machine, fileManagerNet );
 	}
 	catch ( ... )
 	{

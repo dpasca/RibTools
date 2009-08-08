@@ -383,7 +383,7 @@ SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir,
 	SlShader *pShader = NULL;
 
 	try {
-		pShader = DNEW SlShader( params );
+		pShader = DNEW SlShader( params, mpState->GetFileManager() );
 	} catch ( ... )
 	{
 		onError( "Could not assemble '%s' !", params.pSourceFileName );

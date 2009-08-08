@@ -36,6 +36,14 @@ void ResourceManager::Collect()
 }
 
 //==================================================================
+ResourceBase * ResourceManager::AddResource( ResourceBase *pRes )
+{
+	DASSERT( pRes != NULL );
+	mpList.push_back( pRes );
+	return pRes;
+}
+
+//==================================================================
 ResourceBase *ResourceManager::FindResource(
 								const char *pName,
 								ResourceBase::Type type )

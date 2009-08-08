@@ -18,8 +18,8 @@ namespace NET
 //==================================================================
 /// RenderBucketsServer
 //==================================================================
-RenderBucketsServer::RenderBucketsServer( DUT::FileManager &fileManager ) :
-	mpFileManager(&fileManager)
+RenderBucketsServer::RenderBucketsServer( DNET::PacketManager &pakMan ) :
+	mpPakMan(&pakMan)
 {
 }
 
@@ -30,7 +30,7 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 
 	while ( true )
 	{
-		pPacket = mpFileManager->mpPkMan->WaitNextPacket();
+		pPacket = mpPakMan->WaitNextPacket();
 
 		DASSTHROW(
 			pPacket->mDataBuff.size() >= sizeof(U32),
@@ -84,14 +84,14 @@ void RenderBucketsServer::sendBucketsData( RI::HiderREYES &hider, int buckRangeX
 	{
 		size_t	buckMemSize = hider.GetOutputBucketMemSize( (size_t)bi );
 
-		U8 *pSendData = mpFileManager->mpPkMan->SendBegin( sizeof(MsgBucketData) + buckMemSize );
+		U8 *pSendData = mpPakMan->SendBegin( sizeof(MsgBucketData) + buckMemSize );
 
 			MsgBucketData	&msg = *(MsgBucketData *)pSendData; pSendData += sizeof(MsgBucketData);
 			msg.BucketIdx = bi;
 
 			hider.CopyOutputBucket( (size_t)bi, (float *)pSendData, buckMemSize );
 
-		mpFileManager->mpPkMan->SendEnd();
+		mpPakMan->SendEnd();
 	}
 }
 

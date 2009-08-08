@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\RI_FileManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_FrameworkREYES.cpp"
 				>
 			</File>

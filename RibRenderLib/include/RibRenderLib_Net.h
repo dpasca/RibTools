@@ -12,7 +12,7 @@
 #include "DSystem/include/DTypes.h"
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DUtils.h"
-#include "DSystem/include/DUtils_FileManager.h"
+#include "RI_System/include/RI_FileManager.h"
 
 //==================================================================
 namespace RRL
@@ -25,6 +25,9 @@ namespace NET
 enum MsgID
 {
 	MSGID_FILEREQ,
+	MSGID_FILEEXISTREQ,
+	MSGID_FILEEXISTANSYES,
+	MSGID_FILEEXISTANSNO,
 	MSGID_RENDJOB,
 	MSGID_RENDBUCKETS,
 	MSGID_RENDDONE,
@@ -89,20 +92,38 @@ struct MsgBucketData
 	}
 };
 
+//==================================================================
+/// FileManagerNet
+//==================================================================
+class FileManagerNet : public RI::FileManagerBase
+{
+	friend class Server;
+
+	DNET::PacketManager	*mpPakMan;
+
+public:
+	FileManagerNet( DNET::PacketManager &packManager );
+
+		void GrabFile( const char *pFileName, DVec<U8> &out_vec );
+		bool FileExists( const char *pFileName ) const;
+};
+
 //===============================================================
 /// Server
 //==================================================================
 class Server
 {
 public:
-	DStr				mAddressName;
-	int					mPortToCall;
-	DUT::FileManager	*mpFilemanager;
-	bool				mIsValid;
-	bool				mIsBusy;
+	DStr			mAddressName;
+	int				mPortToCall;
+	DNET::PacketManager	*mpPakMan;
+	FileManagerNet	*mpFilemanager;
+	bool			mIsValid;
+	bool			mIsBusy;
 
 	Server() :
 		mPortToCall(32323),
+		mpPakMan(NULL),
 		mpFilemanager(NULL),
 		mIsValid(true),
 		mIsBusy(false)
@@ -111,12 +132,13 @@ public:
 
 	~Server()
 	{
+		DSAFE_DELETE( mpPakMan );
 		DSAFE_DELETE( mpFilemanager );
 	}
 
 	bool IsConnected() const
 	{
-		return mpFilemanager && mpFilemanager->mpPkMan->IsConnected();
+		return mpFilemanager && mpFilemanager->mpPakMan->IsConnected();
 	}
 };
 

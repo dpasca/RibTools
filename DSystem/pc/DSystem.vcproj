@@ -244,14 +244,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\DUtils_FileManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\DUtils_FileManager.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\DUtils_Files.cpp"
 				>
 			</File>

@@ -19,15 +19,12 @@ namespace RRL
 //==================================================================
 Render::Render( const char			*pFileName,
 			    RI::Machine			&machine,
-				DUT::FileManager	&fileManager,
+				RI::FileManagerBase	&fileManager,
 				bool				verbose )
 {
 	DUT::MemFile	file;
 
-	if NOT( fileManager.GetFile( file, pFileName ) )
-	{
-		DASSTHROW( 0, ( "Could not open the file in input. Quitting !\n" ) );
-	}
+	fileManager.GrabFile( pFileName, file );
 
 	RI::Parser	parser;
 

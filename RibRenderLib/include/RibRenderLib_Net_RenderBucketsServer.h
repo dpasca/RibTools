@@ -12,8 +12,6 @@
 #include "DSystem/include/DTypes.h"
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DUtils.h"
-#include "DSystem/include/DUtils_FileManager.h"
-
 #include "RI_System/include/RI_FrameworkREYES.h"
 
 #include "RibRenderLib_Net.h"
@@ -30,10 +28,10 @@ namespace NET
 //==================================================================
 class RenderBucketsServer : public RI::RenderBucketsBase
 {
-	DUT::FileManager	*mpFileManager;
+	DNET::PacketManager	*mpPakMan;
 
 public:
-	RenderBucketsServer( DUT::FileManager &fileManager );
+	RenderBucketsServer( DNET::PacketManager &pakMan );
 	void Render( RI::HiderREYES &hider );
 
 private:

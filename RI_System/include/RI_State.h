@@ -17,6 +17,7 @@
 #include "RI_FrameworkREYES.h"
 #include "RI_Primitive.h"
 #include "RI_LightSource.h"
+#include "RI_FileManager.h"
 
 //==================================================================
 namespace RI
@@ -66,6 +67,8 @@ class State
 	Matrix44				mMtxWorldCamera;
 
 	FrameworkREYES			*mpFramework;
+
+	FileManagerBase			*mpFileManager;
 	
 	DStr					mDefaultShadersDir;
 	DStr					mBaseDir;
@@ -83,11 +86,13 @@ class State
 public:
 	State(
 		FrameworkREYES *pFramework,
+		FileManagerBase	*pFileManager,
 		const char *pBaseDir,
 		const char *pDefaultShadersDir );
 	~State();
 
-	const char *GetBaseDir()		const	{	return mBaseDir.c_str();	}
+	FileManagerBase &GetFileManager()		{	return *mpFileManager;				}
+	const char *GetBaseDir()		const	{	return mBaseDir.c_str();			}
 	const char *GetDefShadersDir() const	{	return mDefaultShadersDir.c_str();	}
 
 	void	Begin( RtToken name );

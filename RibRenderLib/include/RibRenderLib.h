@@ -10,7 +10,6 @@
 #define RIBRENDERLIB_H
 
 #include "DSystem/include/DTypes.h"
-#include "DSystem/include/DUtils_FileManager.h"
 #include "DSystem/include/DNetwork.h"
 
 #include "RI_System/include/RI_Render.h"
@@ -34,7 +33,7 @@ public:
 	Render(
 		const char			*pFileName,
 		RI::Machine			&machine,
-		DUT::FileManager	&fileManager,
+		RI::FileManagerBase	&fileManager,
 		bool				verbose=false );
 };
 

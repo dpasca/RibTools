@@ -57,7 +57,7 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 		if ( srv.IsConnected() )
 		{
 			MsgRendDone	msg;
-			srv.mpFilemanager->mpPkMan->Send( &msg, sizeof(msg) );
+			srv.mpPakMan->Send( &msg, sizeof(msg) );
 		}
 	}
 
@@ -80,7 +80,7 @@ bool RenderBucketsClient::checkServersData()
 		if ( !srv.IsConnected() || !srv.mIsBusy )
 			continue;
 
-		DNET::Packet *pPacket = srv.mpFilemanager->mpPkMan->GetNextPacket();
+		DNET::Packet *pPacket = srv.mpPakMan->GetNextPacket();
 
 		if ( pPacket )
 		{
@@ -132,7 +132,7 @@ bool RenderBucketsClient::dispatchToServer( int buckRangeX1, int buckRangeX2 )
 		MsgRendBuckes	msg;
 		msg.BucketStart = (U32)buckRangeX1;
 		msg.BucketEnd	= (U32)buckRangeX2;
-		pUseServer->mpFilemanager->SendData( &msg, sizeof(msg) );
+		pUseServer->mpPakMan->Send( &msg, sizeof(msg) );
 		pUseServer->mIsBusy = true;	// set as busy
 		return true;
 	}

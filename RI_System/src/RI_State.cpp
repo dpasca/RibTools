@@ -1,11 +1,10 @@
-/*
- *  RI_State.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_State.cpp
+///
+/// Created by Davide Pasca - 2008/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_State.h"
@@ -20,9 +19,11 @@ namespace RI
 //==================================================================
 State::State(
 		FrameworkREYES *pFramework,
+		FileManagerBase	*pFileManager,
 		const char *pBaseDir,
 		const char *pDefaultShadersDir ) :
 	mpFramework(pFramework),
+	mpFileManager(pFileManager),
 	mBaseDir(pBaseDir),
 	mDefaultShadersDir(pDefaultShadersDir)
 {
@@ -143,15 +144,26 @@ void State::addDefShader( const char *pBasePath, const char *pSName )
 	try 
 	{
 		sprintf( buff, "%s/%s.sl", pBasePath, params.pName );
-		pShader = DNEW SlShader( params );
+		
+		if ( mpFileManager->FileExists( buff ) )
+		{
+			pShader = DNEW SlShader( params, *mpFileManager );
+			mResManager.AddResource( pShader );
+		}
+		else
+		{
+			sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
+			if ( mpFileManager->FileExists( buff ) )
+			{
+				pShader = DNEW SlShader( params, *mpFileManager );
+				mResManager.AddResource( pShader );
+			}
+		}
 	}
 	catch ( ... )
 	{
-		sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-		pShader = DNEW SlShader( params );
+		printf( "Error: Failed to load the shader %s\n", params.pName );
 	}
-
-	mResManager.AddResource( pShader );
 }
 
 //==================================================================

@@ -93,16 +93,16 @@ int ClientMain( int argc, char **argv )
 
 	RenderOutputFile		rendOut( argv[2] );
 	RI::HiderREYES::Params	hiderParams;
-	DUT::FileManager		fileManager;
+	RI::FileManagerDisk		fileManagerDisk;
 
 	if NOT( servList.size() )
 	{
 		RI::FrameworkREYES		framework( &rendOut, NULL, hiderParams );
-		RI::Machine				machine( &framework, baseDir.c_str(), defaultShadersDir );
+		RI::Machine				machine( &framework, &fileManagerDisk, baseDir.c_str(), defaultShadersDir );
 
 		try
 		{
-			RRL::Render	render( argv[1], machine, fileManager );
+			RRL::Render	render( argv[1], machine, fileManagerDisk );
 		}
 		catch ( ... )
 		{
@@ -132,7 +132,7 @@ int ClientMain( int argc, char **argv )
 			{
 				// print a nice message and start by sending a job header..
 				printf( "Successfully connected to %s:%i\n", servList[i].mAddressName.c_str(), servList[i].mPortToCall );
-				servList[i].mpFilemanager->SendData( &netRendJob, sizeof(netRendJob) );
+				servList[i].mpPakMan->Send( &netRendJob, sizeof(netRendJob) );
 			}
 			else
 			{
@@ -143,11 +143,11 @@ int ClientMain( int argc, char **argv )
 		RRL::NET::RenderBucketsClient	rendBuckets( servList );
 
 		RI::FrameworkREYES				framework( &rendOut, &rendBuckets, hiderParams );
-		RI::Machine						machine( &framework, baseDir.c_str(), defaultShadersDir );
+		RI::Machine						machine( &framework, &fileManagerDisk, baseDir.c_str(), defaultShadersDir );
 
 		try
 		{
-			RRL::Render	render( argv[1], machine, fileManager );
+			RRL::Render	render( argv[1], machine, fileManagerDisk );
 		}
 		catch ( ... )
 		{
