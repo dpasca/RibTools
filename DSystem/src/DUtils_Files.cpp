@@ -35,6 +35,35 @@ bool GrabFile( const char *pFileName, DVec<U8> &out_data )
 }
 
 //==================================================================
+FILE *BeginGrabFile( const char *pFileName, size_t &out_fileSize )
+{
+	out_fileSize = 0;
+
+	FILE	*pFile = fopen( pFileName, "rb" );
+	if NOT( pFile )
+		return NULL;
+
+	fseek( pFile, 0, SEEK_END );
+	out_fileSize = ftell( pFile );
+	fseek( pFile, 0, SEEK_SET );
+
+	return pFile;
+}
+
+//==================================================================
+bool EndGrabFile( FILE *pFile, void *pDest, size_t readSize )
+{
+	if ( readSize != fread( pDest, 1, readSize, pFile ) )
+	{
+		fclose( pFile );
+		return false;
+	}
+
+	fclose( pFile );
+	return true;
+}
+
+//==================================================================
 bool FileExists( const char *pFileName )
 {
 	FILE	*pFile = fopen( pFileName, "rb" );

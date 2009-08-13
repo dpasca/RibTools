@@ -26,15 +26,10 @@ RenderBucketsServer::RenderBucketsServer( DNET::PacketManager &pakMan ) :
 //==================================================================
 void RenderBucketsServer::Render( RI::HiderREYES &hider )
 {
-	DNET::Packet	*pPacket;
-
 	while ( true )
 	{
-		pPacket = mpPakMan->WaitNextPacket( false );
-
-		DASSTHROW(
-			pPacket->mDataBuff.size() >= sizeof(U32),
-				("Unexpected packet in RenderBucketsServer") );
+		U32 ids[] = { MSGID_RENDBUCKETS, MSGID_RENDDONE };
+		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 10 );
 
 		MsgID	msgID = GetMsgID( pPacket );
 
@@ -45,23 +40,14 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 			rendBucketsRange( hider, msg.BucketStart, msg.BucketEnd );
 
 			sendBucketsData( hider, msg.BucketStart, msg.BucketEnd );
-
-			mpPakMan->RemoveAndDeletePacket( pPacket );
 		}
 		else
 		if ( msgID == MSGID_RENDDONE )
 		{
-			mpPakMan->RemoveAndDeletePacket( pPacket );
 			break;
 		}
-/*
-		else
-		{
-			DASSTHROW(
-				pPacket->mDataBuff.size() >= sizeof(U32),
-					("Unexpected packet in RenderBucketsServer") );
-		}
-*/
+
+		mpPakMan->DeletePacket( pPacket );
 	}
 }
 

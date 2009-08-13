@@ -36,9 +36,11 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 
 			srvList[i].mIsValid = true;
 			pConnecters[i] = pConn;
+			printf( "Found %s..\n", srvList[i].mAddressName.c_str() );
 		}
 		catch ( ... )
 		{
+			printf( "Error: Could not resolve %s\n", srvList[i].mAddressName.c_str() );
 			srvList[i].mIsValid = false;
 			pConnecters[i] = NULL;
 		}
@@ -54,7 +56,7 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 		{
 			DNET::Connecter *pConn = pConnecters[i];
 
-			if ( pConn->IsConnected() )
+			if ( !pConn || pConn->IsConnected() )
 				continue;
 
 			switch ( pConn->TryConnect() )
@@ -67,9 +69,12 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 				DASSERT( srvList[i].mpPakMan == NULL );
 				srvList[i].Init( 
 							DNEW DNET::PacketManager( pConn->GetSocket() ) );
+
+				printf( "* Successfully connected to %s..\n", srvList[i].mAddressName.c_str() );
 				break;
 
 			case DNET::Connecter::RETVAL_ERROR:
+				printf( "! Failed to connect to %s..\n", srvList[i].mAddressName.c_str() );
 				srvList[i].mIsValid = false;
 				break;
 
@@ -81,9 +86,7 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 
 		if ( isSomeConnectionWaiting )
 		{
-		#if defined WIN32
-			Sleep( 1 );	// avoid overloading the CPU !
-		#endif
+			DUT::SleepMS( 1 );	// avoid overloading the CPU !
 		}
 
 		if ( timeOut.IsExpired() )

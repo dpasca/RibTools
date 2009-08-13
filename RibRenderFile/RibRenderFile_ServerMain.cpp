@@ -19,8 +19,10 @@ static int serverTask( SOCKET clientSock )
 	RRL::NET::MsgRendJob		netRendJob;
 
 	try {
-		DNET::Packet *pPack = packetManager.WaitNextPacket( true );
+		U32 ids[] = { RRL::NET::MSGID_RENDJOB };
+		DNET::Packet *pPack = packetManager.WaitNextPacketMatch( true, ids, _countof(ids) );
 		netRendJob = *(const RRL::NET::MsgRendJob *)&pPack->mDataBuff[0];
+		packetManager.DeletePacket( pPack );
 	} catch (...)
 	{
 		printf( "Failed to read the NetRendJob data\n" );

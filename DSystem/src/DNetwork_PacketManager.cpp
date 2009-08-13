@@ -95,6 +95,41 @@ Packet *PacketManager::GetNextPacket( bool doRemove )
 }
 
 //==================================================================
+Packet *PacketManager::GetNextPacketMatch(
+							bool doRemove,
+							U32 matchArray[],
+							size_t matchArrayN )
+{
+	if NOT( mRecvOutQueue.size() )
+		return NULL;
+
+	DUT::CriticalSection::Block	lock( mRecvOutQueueCS );
+
+	if NOT( mRecvOutQueue.size() )
+		return NULL;
+
+	for (size_t i=0; i < mRecvOutQueue.size(); ++i)
+	{
+		Packet	*pOutEntry = mRecvOutQueue[i];
+		DASSERT( pOutEntry->mDataBuff.size() >= sizeof(U32) );
+
+		U32 packID = *((const U32 *)&pOutEntry->mDataBuff[0]);
+		for (size_t j=0; j < matchArrayN; ++j)
+		{
+			if ( packID == matchArray[j] )
+			{
+				if ( doRemove )
+					mRecvOutQueue.erase( mRecvOutQueue.begin()+i );
+
+				return pOutEntry;		
+			}
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
 void PacketManager::RemovePacket( Packet *pPacket )
 {
 	DASSERT( mRecvOutQueue.size() != 0 );
@@ -138,9 +173,33 @@ Packet *PacketManager::WaitNextPacket( bool doRemove, U32 timeoutMS )
 		if ( mFatalError )
 			return NULL;
 
-	#if defined(WIN32)
-		Sleep( 1 );
-	#endif
+		DUT::SleepMS( 1 );
+	}
+
+	return pPacket;
+}
+
+//==================================================================
+Packet *PacketManager::WaitNextPacketMatch(
+					   bool doRemove,
+					   U32 matchArray[],
+					   size_t matchArrayN,
+					   U32 timeoutMS )
+{
+	if ( mFatalError )
+		return NULL;
+
+	Packet			*pPacket;
+
+	DUT::TimeOut	timeOut( timeoutMS );
+
+	while ( !(pPacket = GetNextPacketMatch( doRemove, matchArray, matchArrayN )) &&
+			(timeoutMS == 0 || !timeOut.IsExpired()) )
+	{
+		if ( mFatalError )
+			return NULL;
+
+		DUT::SleepMS( 1 );
 	}
 
 	return pPacket;
@@ -244,7 +303,7 @@ void PacketManager::threadMain()
 		// zombie state
 		if ( mFatalError )
 		{
-			Sleep( 10 );
+			DUT::SleepMS( 10 );
 			continue;
 		}
 

@@ -8,6 +8,8 @@
 
 #include "RibRenderLib_Net_RenderBucketsClient.h"
 
+#define NO_LOCAL_RENDERING
+
 //==================================================================
 namespace RRL
 {
@@ -25,6 +27,20 @@ RenderBucketsClient::RenderBucketsClient( DVec<Server> &servList ) :
 }
 
 //==================================================================
+bool RenderBucketsClient::isAnyServerAvailable() const
+{
+	for (size_t i=0; i < mpServList->size(); ++i)
+	{
+		Server &srv = (*mpServList)[i];
+
+		if ( srv.IsConnected() )
+			return true;
+	}
+
+	return false;
+}
+
+//==================================================================
 void RenderBucketsClient::Render( RI::HiderREYES &hider )
 {
 	DUT::QuickProf	prof( __FUNCTION__ );
@@ -33,12 +49,27 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 
 	int		bucketsN = (int)buckets.size();
 
+	// loop through the buckets, rendering directly or assigning them
+	// to other servers
 	for (int buckRangeX1=0; buckRangeX1 < bucketsN; buckRangeX1 += 4)
 	{
 		// pick a range of 4 buckets
 		int buckRangeX2 = DMIN( buckRangeX1 + 4, bucketsN );
 
 		// try to give the buckets to render to the server
+	#if defined(NO_LOCAL_RENDERING)
+		while NOT( dispatchToServer( buckRangeX1, buckRangeX2 ) )
+		{
+			// in case one woudl disconnect from all servers..
+			if NOT( isAnyServerAvailable() )
+			{
+				printf( "! No servers available, rendering not possible !\n" );
+				return;
+			}
+
+			DUT::SleepMS( 10 );
+		}
+	#else
 		if NOT( dispatchToServer( buckRangeX1, buckRangeX2 ) )
 		{
 			// otherwise render locally..
@@ -46,10 +77,13 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 			for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
 				RI::FrameworkREYES::RenderBucket_s( hider, *buckets[ bi ] );
 		}
+	#endif
 
 		checkServersData();
 	}
 
+	// tell all servers that we are done rendering
+	// ..and they should stop waiting for buckets
 	for (size_t i=0; i < mpServList->size(); ++i)
 	{
 		Server &srv = (*mpServList)[i];
@@ -61,10 +95,10 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 		}
 	}
 
-	// wait for all servers to deliver !!
+	// wait for all servers to complete !!
 	while NOT( checkServersData() )
 	{
-		Sleep( 10 );
+		DUT::SleepMS( 10 );
 	}
 }
 

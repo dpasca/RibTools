@@ -19,6 +19,9 @@ namespace DUT
 //==================================================================
 bool GrabFile( const char *pFileName, DVec<U8> &out_data );
 
+FILE *BeginGrabFile( const char *pFileName, size_t &out_fileSize );
+bool EndGrabFile( FILE *pFile, void *pDest, size_t readSize );
+
 bool FileExists( const char *pFileName );
 
 DStr GetDirNameFromFPathName( const char *pInFPathname );

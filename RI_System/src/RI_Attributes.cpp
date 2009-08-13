@@ -260,7 +260,7 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 
 	if NOT( pShader )
 	{
-		printf( "Could not find the light shader '%s' !", params[0].PChar() );
+		printf( "Could not find the light shader '%s' !\n", params[0].PChar() );
 		return false;
 	}
 

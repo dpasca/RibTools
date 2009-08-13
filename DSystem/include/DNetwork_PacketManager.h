@@ -78,9 +78,6 @@ class PacketManager : public DTH::ThreadedBase
 	DUT::CriticalSection	mRecvOutQueueCS;
 	DVec<Packet *>			mRecvOutQueue;
 
-	DVec<SOCKET>			mTroubledSocketsList;
-	DUT::CriticalSection	mTroubledSocketsListCSection;
-
 	bool					mFatalError;
 
 public:
@@ -92,14 +89,36 @@ public:
 
 	void Send( const void *pData, size_t dataSize );
 
+	template<class T>
+	void SendValue( const T &val)
+	{
+		Send( &val, sizeof(val) );
+	}
+
 	U8 *SendBegin( size_t dataSize );
 	void SendEnd();
 
 	Packet *GetNextPacket( bool doRemove );
 	Packet *WaitNextPacket( bool doRemove, U32 timeoutMS=0 );
 
+	Packet *GetNextPacketMatch(
+		bool doRemove,
+		U32 matchArray[],
+		size_t matchArrayN );
+
+	Packet *WaitNextPacketMatch(
+			bool doRemove,
+			U32 matchArray[],
+			size_t matchArrayN,
+			U32 timeoutMS=0 );
+
 	void RemovePacket( Packet *pPacket );
 	void RemoveAndDeletePacket( Packet *pPacket );
+
+	void DeletePacket( Packet * &pPacket )
+	{
+		DSAFE_DELETE( pPacket )
+	}
 
 private:
 		void threadMain();

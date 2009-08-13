@@ -52,7 +52,9 @@ void FileServer::threadMain()
 			return;
 		}
 
-		DNET::Packet *pPacket = mpPakMan->WaitNextPacket( false, 20 );
+		U32 ids[] = { MSGID_FILEEXISTREQ, MSGID_FILEREQ };
+		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 20 );
+
 		if NOT( pPacket )
 			continue;
 
@@ -67,25 +69,55 @@ void FileServer::threadMain()
 			if NOT( makeString( buff, sizeof(buff), reader ) )
 			{
 				printf( "FileServer: requested bad filename !\n" );
-				mpPakMan->RemoveAndDeletePacket( pPacket );
+				mpPakMan->DeletePacket( pPacket );
 				continue;
 			}
 
-			printf( "FileServer: exit req for %s\n", buff );	
-			mpPakMan->RemoveAndDeletePacket( pPacket );
+			if ( DUT::FileExists( buff ) )
+			{
+				printf( "NETLOG: SEND MSGID_FILEEXISTANSYES (%s)\n", buff );
+				mpPakMan->SendValue( (U32)MSGID_FILEEXISTANSYES );
+			}
+			else
+			{
+				printf( "NETLOG: SEND MSGID_FILEEXISTANSNO (%s)\n", buff );
+				mpPakMan->SendValue( (U32)MSGID_FILEEXISTANSNO );
+			}
+
+			mpPakMan->DeletePacket( pPacket );
 		}
 		else
-		if ( msgID == MSGID_FILEEXISTREQ )
+		if ( msgID == MSGID_FILEREQ )
 		{
 			if NOT( makeString( buff, sizeof(buff), reader ) )
 			{
 				printf( "FileServer: requested bad filename !\n" );
-				mpPakMan->RemoveAndDeletePacket( pPacket );
+				mpPakMan->DeletePacket( pPacket );
 				continue;
 			}
 
-			printf( "FileServer: exit req for %s\n", buff );	
-			mpPakMan->RemoveAndDeletePacket( pPacket );
+			size_t	fileSize;
+			FILE	*pFile;
+			if NOT( pFile = DUT::BeginGrabFile( buff, fileSize ) )
+			{
+				printf( "NETLOG: SEND MSGID_FILEREQANS_FAIL (%s)\n", buff );
+				mpPakMan->SendValue( (U32)MSGID_FILEREQANS_FAIL );
+			}
+			else
+			{
+				// $$$ does not handle failure in read...
+
+				U8	*pPackData = mpPakMan->SendBegin( fileSize + sizeof(U32) );
+				DUT::MemWriter	writer( pPackData, fileSize + sizeof(U32) );
+				writer.WriteValue( (U32)MSGID_FILEREQANS_DATA );
+
+				DUT::EndGrabFile( pFile, writer.GetDataPtr( fileSize ), fileSize );
+
+				printf( "NETLOG: SEND MSGID_FILEREQANS_DATA (%s)\n", buff );
+				mpPakMan->SendEnd();
+			}
+
+			mpPakMan->DeletePacket( pPacket );
 		}
 	}
 }

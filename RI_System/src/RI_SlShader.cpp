@@ -202,7 +202,7 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 			{
 				const SlSymbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
 
-				DASSTHROW( pFoundSymbol != NULL, ("Could not find the global %s !", pFindName) );
+				DASSTHROW( pFoundSymbol != NULL, ("Could not find the global %s !\n", pFindName) );
 
 				matchSymbols( symbol, *pFoundSymbol );
 

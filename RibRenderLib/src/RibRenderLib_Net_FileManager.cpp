@@ -38,29 +38,38 @@ void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
 	writer.WriteArray( pFileName, nameLen );
 	mpPakMan->Send( buff, writer.GetCurSize() );
 
+	printf( "NETLOG: SEND MSGID_FILEREQ %s\n", pFileName );
+
 	while ( true )
 	{
-		DNET::Packet *pPacket = mpPakMan->WaitNextPacket( false, 10 );
+		if NOT( mpPakMan->IsConnected() )
+			DASSTHROW( 0, ("Could not read %s, connection broken !", pFileName) )
+
+		U32 ids[] = { MSGID_FILEREQANS_DATA, MSGID_FILEREQANS_FAIL };
+		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 10 );
 
 		if ( pPacket )
 		{
-			switch ( GetMsgID( pPacket ) )
+			MsgID	msgID = GetMsgID( pPacket );
+
+			switch ( msgID )
 			{
 			case MSGID_FILEREQANS_DATA:
-				printf( "Got data for file %s\n", pFileName );
+				printf( "NETLOG: RECV MSGID_FILEREQANS_DATA\n" );
 				{
 					size_t dataSize = pPacket->mDataBuff.size() - sizeof(U32);
 					out_vec.resize( dataSize );
 					memcpy( &out_vec[0], &pPacket->mDataBuff[0], dataSize );
 				}
-				mpPakMan->RemoveAndDeletePacket( pPacket );
 				break;
 
 			case MSGID_FILEREQANS_FAIL:
+				printf( "NETLOG: RECV MSGID_FILEREQANS_FAIL\n" );
 				DASSTHROW( 0, ( "ERROR: Could not retrieve the file %s !\n", pFileName ) );
-				mpPakMan->RemoveAndDeletePacket( pPacket );
 				break;
 			}
+
+			mpPakMan->DeletePacket( pPacket );
 		}
 	}
 }
@@ -79,20 +88,31 @@ bool FileManagerNet::FileExists( const char *pFileName ) const
 	writer.WriteArray( pFileName, nameLen );
 	mpPakMan->Send( buff, writer.GetCurSize() );
 
+	printf( "NETLOG: SEND MSGID_FILEEXISTREQ %s\n", pFileName );
+
 	while ( true )
 	{
-		DNET::Packet *pPacket = mpPakMan->WaitNextPacket( false, 10 );
+		if NOT( mpPakMan->IsConnected() )
+			DASSTHROW( 0, ("Could not read %s, connection broken !", pFileName) )
+
+		U32 ids[] = { MSGID_FILEEXISTANSYES, MSGID_FILEEXISTANSNO };
+		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 10 );
 
 		if ( pPacket )
 		{
-			switch ( GetMsgID( pPacket ) )
+			MsgID msgID = GetMsgID( pPacket );
+			switch ( msgID )
 			{
 			case MSGID_FILEEXISTANSYES:
+				printf( "NETLOG: RECV MSGID_FILEEXISTANSYES\n" );
 				return true;
 
 			case MSGID_FILEEXISTANSNO:
+				printf( "NETLOG: RECV MSGID_FILEEXISTANSNO\n" );
 				return false;
 			}
+
+			mpPakMan->DeletePacket( pPacket );
 		}
 	}
 }

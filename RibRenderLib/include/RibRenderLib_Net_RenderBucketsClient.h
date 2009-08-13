@@ -39,6 +39,7 @@ private:
 	Server *findFreeServer();
 	bool dispatchToServer( int buckRangeX1, int buckRangeX2 );
 	bool checkServersData();
+	bool isAnyServerAvailable() const;
 };
 
 //==================================================================

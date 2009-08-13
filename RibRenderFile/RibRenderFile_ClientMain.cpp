@@ -113,7 +113,6 @@ int ClientMain( int argc, char **argv )
 	{
 		// prepare the template job header for the servers
 		RRL::NET::MsgRendJob	netRendJob;
-		memset( &netRendJob, 0, sizeof(netRendJob) );
 		strcpy_s( netRendJob.FileName	, argv[1] );
 		strcpy_s( netRendJob.BaseDir	, baseDir.c_str() );
 		strcpy_s( netRendJob.DefaultResourcesDir, defaultShadersDir );
