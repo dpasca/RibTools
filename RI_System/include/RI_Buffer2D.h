@@ -84,7 +84,17 @@ public:
 			return NULL;
 	}
 
-	const float *GetSampleCPtr( int x, int y ) const
+	const float *GetSamplePtrR( int x, int y ) const
+	{
+		if ( x >= 0 && y >= 0 && x < (int)mWd && y < (int)mHe )
+		{
+			return &mpData[ (x + mWd * y) * NCHANS + 0 ];
+		}
+		else
+			return NULL;
+	}
+
+	float *GetSamplePtrRW( int x, int y )
 	{
 		if ( x >= 0 && y >= 0 && x < (int)mWd && y < (int)mHe )
 		{

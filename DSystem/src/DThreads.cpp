@@ -10,6 +10,7 @@
 #include <windows.h>
 #endif
 
+#include "DUtils.h"
 #include "DThreads.h"
 
 //==================================================================
@@ -32,10 +33,12 @@ ThreadedBase::~ThreadedBase()
 #if defined(WIN32)
 	// wait for quit to be acknowledged
 	mQuitRequest = true;
+	ResumeThread( mThreadHandle );
 	while ( mQuitAck == false )
 	{
 		ResumeThread( mThreadHandle );
-		SwitchToThread();
+		//SwitchToThread();
+		DUT::SleepMS( 10 );
 	}
 
 	CloseHandle( mThreadHandle );

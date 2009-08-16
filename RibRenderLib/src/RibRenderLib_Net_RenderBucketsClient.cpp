@@ -8,7 +8,7 @@
 
 #include "RibRenderLib_Net_RenderBucketsClient.h"
 
-#define NO_LOCAL_RENDERING
+//#define NO_LOCAL_RENDERING
 
 //==================================================================
 namespace RRL
@@ -60,50 +60,42 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 	#if defined(NO_LOCAL_RENDERING)
 		while NOT( dispatchToServer( buckRangeX1, buckRangeX2 ) )
 		{
-			// in case one woudl disconnect from all servers..
+			// in case one would disconnect from all servers..
 			if NOT( isAnyServerAvailable() )
 			{
 				printf( "! No servers available, rendering not possible !\n" );
 				return;
 			}
 
+			checkServersData( hider );
 			DUT::SleepMS( 10 );
 		}
 	#else
 		if NOT( dispatchToServer( buckRangeX1, buckRangeX2 ) )
 		{
 			// otherwise render locally..
-			//#pragma omp parallel for
+			#pragma omp parallel for
 			for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
 				RI::FrameworkREYES::RenderBucket_s( hider, *buckets[ bi ] );
 		}
 	#endif
 
-		checkServersData();
+		checkServersData( hider );
 	}
 
 	// tell all servers that we are done rendering
 	// ..and they should stop waiting for buckets
-	for (size_t i=0; i < mpServList->size(); ++i)
-	{
-		Server &srv = (*mpServList)[i];
-
-		if ( srv.IsConnected() )
-		{
-			MsgRendDone	msg;
-			srv.mpPakMan->Send( &msg, sizeof(msg) );
-		}
-	}
+	sendRendDone();
 
 	// wait for all servers to complete !!
-	while NOT( checkServersData() )
+	while NOT( checkServersData( hider ) )
 	{
 		DUT::SleepMS( 10 );
 	}
 }
 
 //==================================================================
-bool RenderBucketsClient::checkServersData()
+bool RenderBucketsClient::checkServersData( RI::HiderREYES &hider )
 {
 	bool	allDone = true;
 
@@ -111,7 +103,7 @@ bool RenderBucketsClient::checkServersData()
 	{
 		Server &srv = (*mpServList)[i];
 
-		if ( !srv.IsConnected() || !srv.mIsBusy )
+		if ( !srv.IsConnected() || srv.mBusyCnt == 0 )
 			continue;
 
 		DNET::Packet *pPacket = srv.mpPakMan->GetNextPacket( false );
@@ -123,9 +115,30 @@ bool RenderBucketsClient::checkServersData()
 					("Received broken packet from a server !") );
 
 			MsgID	msgID = GetMsgID( pPacket );
+
 			if ( msgID == MSGID_BUCKETDATA )
 			{
-				srv.mIsBusy = false;
+				const MsgBucketData	*pMsg =
+					(const MsgBucketData *)pPacket->GetDataPtrRecv();
+
+				const float *pPixData = (const float *)(pMsg + 1);
+
+				size_t pixDataSize = pPacket->GetDataSize() -
+											sizeof(MsgBucketData);
+
+				printf( "NETLOG RECV MSGID_BUCKETDATA\n" );
+
+				DASSERT(
+					pixDataSize == hider.GetOutputBucketMemSize( pMsg->BucketIdx )
+						);
+
+				// store the pixel data
+				hider.StoreOutputBucket(
+						pMsg->BucketIdx,
+						pPixData,
+						pixDataSize );
+
+				srv.mBusyCnt -= 1;
 
 				srv.mpPakMan->RemoveAndDeletePacket( pPacket );
 			}
@@ -146,11 +159,29 @@ Server * RenderBucketsClient::findFreeServer()
 	{
 		Server &srv = (*mpServList)[i];
 
-		if ( srv.IsConnected() && !srv.mIsBusy )
+		DASSERT( srv.mBusyCnt >= 0 );
+
+		if ( srv.IsConnected() && srv.mBusyCnt == 0 )
 			return &srv;
 	}
 
 	return NULL;
+}
+
+//==================================================================
+void RenderBucketsClient::sendRendDone()
+{
+	for (size_t i=0; i < mpServList->size(); ++i)
+	{
+		Server &srv = (*mpServList)[i];
+
+		if NOT( srv.IsConnected() )
+			continue;
+
+		MsgRendDone	msg;
+
+		srv.mpPakMan->Send( &msg, sizeof(msg) );
+	}
 }
 
 //==================================================================
@@ -159,11 +190,13 @@ bool RenderBucketsClient::dispatchToServer( int buckRangeX1, int buckRangeX2 )
 	Server	*pUseServer = findFreeServer();
 	if ( pUseServer )
 	{
+		int cnt = buckRangeX2 - buckRangeX1;
+
 		MsgRendBuckes	msg;
 		msg.BucketStart = (U32)buckRangeX1;
 		msg.BucketEnd	= (U32)buckRangeX2;
 		pUseServer->mpPakMan->Send( &msg, sizeof(msg) );
-		pUseServer->mIsBusy = true;	// set as busy
+		pUseServer->mBusyCnt += cnt;	// set as busy
 		return true;
 	}
 	else

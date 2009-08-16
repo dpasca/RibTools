@@ -368,12 +368,42 @@ void HiderREYES::CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxS
 	size_t wdStride = wd * NCOLS;
 	size_t srcStride = GetOutputDataStride();
 
+	U8	*pDestEnd = (U8 *)pDest + destMaxSize;
+
 	for (u_int y=0; y < he; ++y)
 	{
 		memcpy( pDest, pSrc, sizeof(float) * wdStride );
 		pDest += wdStride;
 		pSrc += srcStride;
 	}
+
+	DASSERT( (U8*)pDest == pDestEnd );
+}
+
+//==================================================================
+void HiderREYES::StoreOutputBucket( size_t buckIdx, const float *pSrc, size_t srcSize )
+{
+	const Bucket	&buck = *mpBuckets[ buckIdx ];
+
+	u_int	wd	= (u_int)(buck.mX2 - buck.mX1);
+	u_int	he	= (u_int)(buck.mY2 - buck.mY1);
+
+	float *pDest = GetOutputDataRW( buck.mX1, buck.mY1 );
+	size_t desStride = GetOutputDataStride();
+
+	size_t wdStride = wd * NCOLS;
+
+	U8	*pSrcEnd = (U8 *)pSrc + srcSize;
+
+	for (u_int y=0; y < he; ++y)
+	{
+		memcpy( pDest, pSrc, sizeof(float) * wdStride );
+
+		pSrc	+= wdStride;
+		pDest	+= desStride;
+	}
+
+	DASSERT( (U8*)pSrc == pSrcEnd );
 }
 
 //==================================================================

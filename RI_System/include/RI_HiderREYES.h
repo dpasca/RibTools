@@ -166,13 +166,20 @@ public:
 
 	const float *GetOutputData( u_int x1, u_int y1 ) const
 	{
-		return mFinalBuff.GetSampleCPtr( (int)x1, (int)y1 );
+		return mFinalBuff.GetSamplePtrR( (int)x1, (int)y1 );
+	}
+
+	float *GetOutputDataRW( u_int x1, u_int y1 )
+	{
+		return mFinalBuff.GetSamplePtrRW( (int)x1, (int)y1 );
 	}
 
 	const DVec<Bucket *>	&GetBuckets() {	return mpBuckets; }
 
-	size_t		GetOutputBucketMemSize( size_t buckIdx ) const;
-	void		CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize ) const;
+	size_t	GetOutputBucketMemSize( size_t buckIdx ) const;
+	void	CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize ) const;
+
+	void	StoreOutputBucket( size_t buckIdx, const float *pSrc, size_t srcSize );
 
 private:
 	bool	makeRasterBound(

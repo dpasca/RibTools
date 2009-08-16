@@ -136,9 +136,23 @@ static void stripComments( char *pTxt )
 }
 
 //==================================================================
-static bool beginsWithI( const char *pStr, const char *pMatch )
+static bool beginsWithTokenI( const char *pStr, const char *pMatch )
 {
-	return DUT::StrStrI( pStr, pMatch ) == pStr;
+	size_t	strLen = strlen( pStr );
+	size_t	matchLen = strlen( pMatch );
+
+	if ( strLen > matchLen &&
+		 DUT::StrStrI( pStr, pMatch ) == pStr )
+	{
+		return
+			pStr[matchLen] == ' ' ||
+			pStr[matchLen] == '\t' ||
+			pStr[matchLen] == '\n' ||
+			pStr[matchLen] == '\r' ||
+			pStr[matchLen] == '\f';
+	}
+
+	return false;
 }
 
 //==================================================================
@@ -156,12 +170,12 @@ bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSec
 	if ( type == SlShader::TYPE_UNKNOWN )
 	{
 		if (
-			beginsWithI( pLineWork, "light" ) 			||
-			beginsWithI( pLineWork, "surface" )			||
-			beginsWithI( pLineWork, "volume" )			||
-			beginsWithI( pLineWork, "displacement" )	||
-			beginsWithI( pLineWork, "transformation" )	||
-			beginsWithI( pLineWork, "imager" ) )
+			beginsWithTokenI( pLineWork, "light" ) 			||
+			beginsWithTokenI( pLineWork, "surface" )			||
+			beginsWithTokenI( pLineWork, "volume" )			||
+			beginsWithTokenI( pLineWork, "displacement" )	||
+			beginsWithTokenI( pLineWork, "transformation" )	||
+			beginsWithTokenI( pLineWork, "imager" ) )
 		{
 			onError( "Shader start/type needs to be defined alone in a line" );
 		}

@@ -31,10 +31,23 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 		U32 ids[] = { MSGID_RENDBUCKETS, MSGID_RENDDONE };
 		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 10 );
 
+		if NOT( pPacket )
+		{
+			if ( mpPakMan->IsConnected() )
+				continue;
+			else
+			{
+				printf( "Error: Connection interrupted, but no DONE rendering message received\n" );
+				break;
+			}
+		}
+
 		MsgID	msgID = GetMsgID( pPacket );
 
 		if ( msgID == MSGID_RENDBUCKETS )
 		{
+			printf( "NETLOG RECV MSGID_RENDBUCKETS\n" );
+
 			const MsgRendBuckes	&msg = *((const MsgRendBuckes *)&pPacket->mDataBuff[0]);
 
 			rendBucketsRange( hider, msg.BucketStart, msg.BucketEnd );
@@ -44,6 +57,7 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 		else
 		if ( msgID == MSGID_RENDDONE )
 		{
+			printf( "RECV MSGID_RENDDONE\n" );
 			break;
 		}
 
@@ -58,8 +72,8 @@ void RenderBucketsServer::rendBucketsRange( RI::HiderREYES &hider, int buckRange
 
 	DASSERT(
 		buckRangeX1 >= 0 &&
-		buckRangeX1 <= buckRangeX2 &&
-		buckRangeX2 < (int)buckets.size() );
+		buckRangeX1 < buckRangeX2 &&
+		buckRangeX2 <= (int)buckets.size() );
 
 	#pragma omp parallel for
 	for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
@@ -75,14 +89,19 @@ void RenderBucketsServer::sendBucketsData( RI::HiderREYES &hider, int buckRangeX
 	{
 		size_t	buckMemSize = hider.GetOutputBucketMemSize( (size_t)bi );
 
-		U8 *pSendData = mpPakMan->SendBegin( sizeof(MsgBucketData) + buckMemSize );
+		DNET::Packet *pPacket;
+		pPacket = mpPakMan->SendBegin( sizeof(MsgBucketData) + buckMemSize );
 
-			MsgBucketData	&msg = *(MsgBucketData *)pSendData; pSendData += sizeof(MsgBucketData);
+			U8 *pSendData = pPacket->GetDataPtrSend();
+
+			MsgBucketData	&msg = *(new ( pSendData ) MsgBucketData());
+			pSendData += sizeof(MsgBucketData);
 			msg.BucketIdx = bi;
 
 			hider.CopyOutputBucket( (size_t)bi, (float *)pSendData, buckMemSize );
 
-		mpPakMan->SendEnd();
+		printf( "NETLOG SEND MSGID_BUCKETDATA\n" );
+		mpPakMan->SendEnd( pPacket );
 	}
 }
 

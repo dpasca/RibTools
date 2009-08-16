@@ -59,7 +59,7 @@ void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
 				{
 					size_t dataSize = pPacket->mDataBuff.size() - sizeof(U32);
 					out_vec.resize( dataSize );
-					memcpy( &out_vec[0], &pPacket->mDataBuff[0], dataSize );
+					memcpy( &out_vec[0], &pPacket->mDataBuff[sizeof(U32)], dataSize );
 				}
 				break;
 
@@ -70,6 +70,7 @@ void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
 			}
 
 			mpPakMan->DeletePacket( pPacket );
+			break;
 		}
 	}
 }

@@ -52,13 +52,11 @@ void PacketManager::Send( const void *pData, size_t dataSize )
 }
 
 //==================================================================
-U8 *PacketManager::SendBegin( size_t dataSize )
+Packet *PacketManager::SendBegin( size_t dataSize )
 {
-	DUT::CriticalSection::Block	lock( mSendList.mInQueueCS );
+	//DUT::CriticalSection::Block	lock( mSendList.mInQueueCS );
 
 	Packet	*pPacket = DNEW Packet();
-
-	mSendList.mInQueue.push_back( pPacket );
 
 	pPacket->mDataBuff.resize( dataSize + sizeof(U32) );
 
@@ -66,12 +64,18 @@ U8 *PacketManager::SendBegin( size_t dataSize )
 
 	ptr[0] = (U32)dataSize;
 
-	return (U8 *)&ptr[1];
+	return pPacket;
 }
 
 //==================================================================
-void PacketManager::SendEnd()
+void PacketManager::SendEnd( Packet *pPacket )
 {
+	{
+	DUT::CriticalSection::Block	lock( mSendList.mInQueueCS );
+
+		mSendList.mInQueue.push_back( pPacket );
+	}
+
 	ResumeThread( mThreadHandle );
 }
 
@@ -224,10 +228,15 @@ static int niceSend( SOCKET sock, const DVec<U8> &data, size_t &curSize )
 	// got an error ?
 	if ( doneSize == SOCKET_ERROR )
 	{
-		if ( LastSockErr() != EWOULDBLOCK )
+		int err = LastSockErr();
+		if ( err == EWOULDBLOCK )
 			return 1;
 		else
+		{
+			printf( "niceSend(): Fatal socket error: %s\n",
+						GetSockErrStr( err ) );
 			return -1;
+		}
 	}
 
 	// update the sent size
@@ -253,11 +262,12 @@ static int niceRecv( SOCKET sock, DVec<U8> &data, size_t &curSize )
 	if ( doneSize == SOCKET_ERROR )
 	{
 		int err = LastSockErr();
-		if ( err != EWOULDBLOCK )
+		if ( err == EWOULDBLOCK )
 			return 1;
 		else
 		{
-			printf( "Fatal socket error ! %s\n", GetSockErrStr( err ) );
+			printf( "niceRecv(): Fatal socket error: %s\n",
+						GetSockErrStr( err ) );
 			return -1;
 		}
 	}
@@ -377,7 +387,8 @@ void PacketManager::threadMain()
 				int err = LastSockErr();
 				if ( err != EWOULDBLOCK )
 				{
-					printf( "Fatal socket error ! %s\n", GetSockErrStr( err ) );
+					printf( "PacketManager: Fatal socket error on receive: %s\n",
+								GetSockErrStr( err ) );
 					mFatalError = true;
 					goto fatalError;
 				}

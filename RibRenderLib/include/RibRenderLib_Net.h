@@ -24,7 +24,7 @@ namespace NET
 //===============================================================
 enum MsgID
 {
-	MSGID_FILEREQ,
+	MSGID_FILEREQ		 = 333,
 	MSGID_FILEREQANS_DATA,
 	MSGID_FILEREQANS_FAIL,
 	MSGID_FILEEXISTREQ,

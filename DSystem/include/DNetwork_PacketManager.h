@@ -36,8 +36,30 @@ public:
 	{
 	}
 
+/*
 	virtual ~Packet()
 	{
+	}
+*/
+	const U8 *GetDataPtrRecv() const
+	{
+		if ( mDataBuff.size() )
+			return &mDataBuff[0];
+		else
+			return NULL;
+	}
+
+	U8 *GetDataPtrSend()
+	{
+		if ( mDataBuff.size() >= sizeof(U32) )
+			return &mDataBuff[sizeof(U32)];
+		else
+			return NULL;
+	}
+
+	size_t GetDataSize() const
+	{
+		return mDataBuff.size();
 	}
 
 private:
@@ -95,8 +117,8 @@ public:
 		Send( &val, sizeof(val) );
 	}
 
-	U8 *SendBegin( size_t dataSize );
-	void SendEnd();
+	Packet *SendBegin( size_t dataSize );
+	void SendEnd( Packet *pPacket );
 
 	Packet *GetNextPacket( bool doRemove );
 	Packet *WaitNextPacket( bool doRemove, U32 timeoutMS=0 );

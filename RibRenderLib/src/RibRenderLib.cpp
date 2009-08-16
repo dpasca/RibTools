@@ -22,6 +22,9 @@ Render::Render( const char			*pFileName,
 				RI::FileManagerBase	&fileManager,
 				bool				verbose )
 {
+	// $$$ TMP
+	verbose = true;
+
 	DUT::MemFile	file;
 
 	fileManager.GrabFile( pFileName, file );
@@ -58,7 +61,9 @@ Render::Render( const char			*pFileName,
 				machine.AddCommand( cmdName, cmdParams );
 			} catch ( std::runtime_error ex )
 			{
-				printf( "ERROR at line: %i\n", cmdLine );
+				printf( "Error while parsing line %i\n> CMD: %s\n",
+					cmdLine,
+					cmdName.c_str() );
 				break;
 			}
 		}

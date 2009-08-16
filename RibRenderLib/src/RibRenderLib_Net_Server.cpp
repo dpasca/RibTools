@@ -24,7 +24,7 @@ Server::Server() :
 	mpFilemanager(NULL),
 	mpFileServer(NULL),
 	mIsValid(true),
-	mIsBusy(false)
+	mBusyCnt(0)
 {
 
 }
@@ -32,9 +32,9 @@ Server::Server() :
 //==================================================================
 Server::~Server()
 {
-	DSAFE_DELETE( mpPakMan );
 	DSAFE_DELETE( mpFilemanager );
 	DSAFE_DELETE( mpFileServer );
+	DSAFE_DELETE( mpPakMan );
 }
 
 //==================================================================

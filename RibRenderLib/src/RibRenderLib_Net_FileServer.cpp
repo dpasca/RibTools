@@ -52,6 +52,12 @@ void FileServer::threadMain()
 			return;
 		}
 
+		if NOT( mpPakMan->IsConnected() )
+		{
+			DUT::SleepMS( 20 );
+			continue;
+		}
+
 		U32 ids[] = { MSGID_FILEEXISTREQ, MSGID_FILEREQ };
 		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 20 );
 
@@ -72,6 +78,8 @@ void FileServer::threadMain()
 				mpPakMan->DeletePacket( pPacket );
 				continue;
 			}
+
+			printf( "NETLOG: RECV MSGID_FILEEXISTREQ (%s)\n", buff );
 
 			if ( DUT::FileExists( buff ) )
 			{
@@ -96,6 +104,8 @@ void FileServer::threadMain()
 				continue;
 			}
 
+			printf( "NETLOG: RECV MSGID_FILEREQ (%s)\n", buff );
+
 			size_t	fileSize;
 			FILE	*pFile;
 			if NOT( pFile = DUT::BeginGrabFile( buff, fileSize ) )
@@ -107,14 +117,16 @@ void FileServer::threadMain()
 			{
 				// $$$ does not handle failure in read...
 
-				U8	*pPackData = mpPakMan->SendBegin( fileSize + sizeof(U32) );
-				DUT::MemWriter	writer( pPackData, fileSize + sizeof(U32) );
+				DNET::Packet *pOutPacket = mpPakMan->SendBegin( fileSize + sizeof(U32) );
+
+				DUT::MemWriter	writer( pOutPacket->GetDataPtrSend(), fileSize );
+
 				writer.WriteValue( (U32)MSGID_FILEREQANS_DATA );
 
 				DUT::EndGrabFile( pFile, writer.GetDataPtr( fileSize ), fileSize );
 
 				printf( "NETLOG: SEND MSGID_FILEREQANS_DATA (%s)\n", buff );
-				mpPakMan->SendEnd();
+				mpPakMan->SendEnd( pOutPacket );
 			}
 
 			mpPakMan->DeletePacket( pPacket );

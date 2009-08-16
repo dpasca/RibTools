@@ -33,7 +33,7 @@ public:
 	FileManagerNet		*mpFilemanager;
 	FileServer			*mpFileServer;
 	bool				mIsValid;
-	bool				mIsBusy;
+	int					mBusyCnt;
 
 	Server();
 	~Server();
