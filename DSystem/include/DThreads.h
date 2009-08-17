@@ -34,6 +34,7 @@ private:
 	}
 
 protected:
+	void KillThread();
 	virtual void threadMain() = 0;
 };
 

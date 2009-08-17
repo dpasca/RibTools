@@ -30,6 +30,12 @@ ThreadedBase::ThreadedBase() :
 //==================================================================
 ThreadedBase::~ThreadedBase()
 {
+	DASSERT( mQuitAck == true );
+}
+
+//==================================================================
+void ThreadedBase::KillThread()
+{
 #if defined(WIN32)
 	// wait for quit to be acknowledged
 	mQuitRequest = true;

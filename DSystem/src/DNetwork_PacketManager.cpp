@@ -26,6 +26,7 @@ PacketManager::PacketManager( SOCKET socket ) :
 //==================================================================
 PacketManager::~PacketManager()
 {
+	DTH::ThreadedBase::KillThread();
 }
 
 //==================================================================

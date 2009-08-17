@@ -25,6 +25,10 @@ class FileServer : DTH::ThreadedBase
 
 public:
 	FileServer( DNET::PacketManager *pPakMan );
+	~FileServer()
+	{
+		DTH::ThreadedBase::KillThread();
+	}
 
 private:
 	void threadMain();
