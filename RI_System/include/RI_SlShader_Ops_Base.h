@@ -150,15 +150,13 @@ void Inst_MOVVS3( SlRunContext &ctx )
 }
 
 //==================================================================
-template <class TA, class TB, const OpCodeID opCodeID>
+template <class TA, class TB, const OpBaseTypeID opBaseTypeID>
 void Inst_1Op( SlRunContext &ctx )
 {
 		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
 	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-
-	const u_int opCodeMsk = opCodeID & ~OPERANDS_VEC_MSK;
 
 	if ( lhs_varying )
 	{
@@ -169,8 +167,8 @@ void Inst_1Op( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				if ( opCodeMsk == OP_SS_MOV	) lhs[i] = op1[op1_offset]; else
-				if ( opCodeMsk == OP_SS_ABS	) lhs[i] = DAbs( op1[op1_offset] );
+				if ( opBaseTypeID == OBT_MOV	) lhs[i] = op1[op1_offset]; else
+				if ( opBaseTypeID == OBT_ABS	) lhs[i] = DAbs( op1[op1_offset] );
 					else { DASSERT( 0 ); }
 			}
 
@@ -184,8 +182,8 @@ void Inst_1Op( SlRunContext &ctx )
 
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
-			if ( opCodeMsk == OP_SS_MOV	) lhs[0] = op1[0]; else
-			if ( opCodeMsk == OP_SS_ABS	) lhs[0] = DAbs( op1[0] );
+			if ( opBaseTypeID == OBT_MOV	) lhs[0] = op1[0]; else
+			if ( opBaseTypeID == OBT_ABS	) lhs[0] = DAbs( op1[0] );
 				else { DASSERT( 0 ); }
 		}
 	}
@@ -194,7 +192,7 @@ void Inst_1Op( SlRunContext &ctx )
 }
 
 //==================================================================
-template <class TA, class TB, const OpCodeID opCodeID>
+template <class TA, class TB, const OpBaseTypeID opBaseTypeID>
 void Inst_2Op( SlRunContext &ctx )
 {
 		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
@@ -202,8 +200,6 @@ void Inst_2Op( SlRunContext &ctx )
 	const TB*	op2	= ctx.GetVoidRO( (const TB *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-
-	const u_int opCodeMsk = opCodeID & ~OPERANDS_VEC_MSK;
 
 	if ( lhs_varying )
 	{
@@ -216,10 +212,10 @@ void Inst_2Op( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				if ( opCodeMsk == OP_SS_ADD ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
-				if ( opCodeMsk == OP_SS_SUB ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
-				if ( opCodeMsk == OP_SS_MUL ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
-				if ( opCodeMsk == OP_SS_DIV ) lhs[i] = op1[op1_offset] / op2[op2_offset];
+				if ( opBaseTypeID == OBT_ADD ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
+				if ( opBaseTypeID == OBT_SUB ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
+				if ( opBaseTypeID == OBT_MUL ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
+				if ( opBaseTypeID == OBT_DIV ) lhs[i] = op1[op1_offset] / op2[op2_offset];
 					else { DASSERT( 0 ); }
 			}
 			
@@ -234,10 +230,10 @@ void Inst_2Op( SlRunContext &ctx )
 
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
-			if ( opCodeMsk == OP_SS_ADD ) lhs[0] = op1[0] + op2[0]; else
-			if ( opCodeMsk == OP_SS_SUB ) lhs[0] = op1[0] - op2[0]; else
-			if ( opCodeMsk == OP_SS_MUL ) lhs[0] = op1[0] * op2[0]; else
-			if ( opCodeMsk == OP_SS_DIV ) lhs[0] = op1[0] / op2[0];
+			if ( opBaseTypeID == OBT_ADD ) lhs[0] = op1[0] + op2[0]; else
+			if ( opBaseTypeID == OBT_SUB ) lhs[0] = op1[0] - op2[0]; else
+			if ( opBaseTypeID == OBT_MUL ) lhs[0] = op1[0] * op2[0]; else
+			if ( opBaseTypeID == OBT_DIV ) lhs[0] = op1[0] / op2[0];
 				else { DASSERT( 0 ); }
 		}
 	}

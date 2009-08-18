@@ -35,36 +35,43 @@ enum OperTypeID
 static const u_int OPERANDS_VEC_MSK	= 0x00000003;
 
 //==================================================================
+enum OpBaseTypeID
+{
+	OBT_MOV	,
+	OBT_ABS	,
+	OBT_ADD	,
+	OBT_SUB	,
+	OBT_MUL	,
+	OBT_DIV	,
+
+	OBT_N
+};
+
+//==================================================================
 enum OpCodeID
 {
 	// following need to be multiple of 4 and start from 0
 	OP_SS_MOV	,
-	OP_SV_MOV	,
 	OP_VS_MOV	,
 	OP_VV_MOV	,
 
 	OP_SS_ABS	,
-	OP_SV_ABS	,
 	OP_VS_ABS	,
 	OP_VV_ABS	,
 
 	OP_SS_ADD	,
-	OP_SV_ADD	,
 	OP_VS_ADD	,
 	OP_VV_ADD	,
 
 	OP_SS_SUB	,
-	OP_SV_SUB	,
 	OP_VS_SUB	,
 	OP_VV_SUB	,
 
 	OP_SS_MUL	,
-	OP_SV_MUL	,
 	OP_VS_MUL	,
 	OP_VV_MUL	,
 
 	OP_SS_DIV	,
-	OP_SV_DIV	,
 	OP_VS_DIV	,
 	OP_VV_DIV	,
 
