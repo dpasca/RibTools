@@ -31,21 +31,20 @@ const char *Tokenizer::GetDataTypeName( DataType dtype )
 //===============================================================
 static bool isFloatStr( const char *pStr )
 {
-	char ch;
-	while ( ch = *pStr++ )
+	if (
+		strchr( pStr, '.' ) ||
+		strchr( pStr, 'f' ) ||
+		strchr( pStr, 'F' ) ||
+		strchr( pStr, 'd' ) ||
+		strchr( pStr, 'D' ) ||
+		strchr( pStr, 'e' ) ||
+		strchr( pStr, 'E' ) )
 	{
-		if NOT( (ch >= '0' && ch <= '9') ||
-				ch == '.' ||
-				ch == 'e' ||
-				ch == 'f' ||
-				ch == 'E' ||
-				ch == 'F' ||
-				ch == '-' ||
-				ch == '+'  )
-			return false;
+		double tmp;
+		return 1 == sscanf( pStr, "%ld", &tmp );
 	}
-	
-	return true;
+	else
+		return false;
 }
 
 //===============================================================
@@ -273,6 +272,10 @@ void Tokenizer::setDataType()
 void Tokenizer::changeToFloatArray()
 {
 	mIsArrayFloat = true;
+	DASSERT( mFloatArray.size() == 0 );
+	
+	mFloatArray.resize( mIntArray.size() );
+
 	for (size_t i=0; i < mIntArray.size(); ++i)
 		mFloatArray[i] = (float)mIntArray[i];
 }	

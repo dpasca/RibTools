@@ -194,16 +194,42 @@ bool HiderREYES::makeRasterBound(
 
 	Matrix44	mtxLocalProj = mtxLocalWorld * mMtxWorldProj;
 
+	static const U32	CCODE_X1 = 1;
+	static const U32	CCODE_X2 = 2;
+	static const U32	CCODE_Y1 = 4;
+	static const U32	CCODE_Y2 = 8;
+	static const U32	CCODE_Z1 = 16;
+	static const U32	CCODE_Z2 = 32;
+
+	U32 orCode = 0;
+	U32 andCode = 0xff;
+
 	for (size_t i=0; i < 8; ++i)
 	{
 		Vec4f	Pproj = V4__V3W1_Mul_M44<Vec4f,Vec3f,float>( boxVerts[i], mtxLocalProj );
 
-		if ( Pproj.w() > 0 )
-		{
-			float	oow = 1.0f / Pproj.w();
+		float	x = Pproj.x();
+		float	y = Pproj.y();
+		float	z = Pproj.z();
+		float	w = Pproj.w();
+		
+		U32 code = 0;
+		if ( x < -w )	code |= CCODE_X1;
+		if ( x >  w )	code |= CCODE_X2;
+		if ( y < -w )	code |= CCODE_Y1;
+		if ( y >  w )	code |= CCODE_Y2;
+		if ( z < -w )	code |= CCODE_Z1;
+		if ( z >  w )	code |= CCODE_Z2;
 
-			float	winX = destHalfWd + destHalfWd * Pproj.x() * oow;
-			float	winY = destHalfHe - destHalfHe * Pproj.y() * oow;
+		orCode |= code;
+		andCode &= code;
+
+		if ( w > 0 )
+		{
+			float	oow = 1.0f / w;
+
+			float	winX = destHalfWd + destHalfWd * x * oow;
+			float	winY = destHalfHe - destHalfHe * y * oow;
 
 			minX = DMIN( minX, winX );
 			minY = DMIN( minY, winY );
@@ -214,9 +240,13 @@ bool HiderREYES::makeRasterBound(
 		{
 			// $$$ this shouldn't happen ..once proper
 			// front plane clipping is implemented 8)
-			DASSERT( 0 );
+			//DASSERT( 0 );
+			return false;
 		}
 	}
+
+	if ( andCode )
+		return false;
 
 	out_bound2d[0] = minX;
 	out_bound2d[1] = minY;

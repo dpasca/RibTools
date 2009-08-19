@@ -57,6 +57,17 @@ public:
 	Transform			*mpTransform;
 
 public:
+/*
+	// a copy constructor 
+	PrimitiveBase( const PrimitiveBase &from ) :
+		mRefCnt(0),
+		mType(from.mType),
+		mpAttribs(from.mpAttribs),
+		mpTransform(from.mpTransform)
+	{
+	}
+*/
+
 	PrimitiveBase( Type type ) :
 		mType(type),
 		mpAttribs(NULL),

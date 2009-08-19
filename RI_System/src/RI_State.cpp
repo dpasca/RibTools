@@ -28,7 +28,6 @@ State::State(
 	mDefaultShadersDir(pDefaultShadersDir)
 {
 	mModeStack.push( MD_UNDEFINED );
-	Begin( "dummy" );
 
 	mMtxWorldCamera.Identity();
 
@@ -180,8 +179,6 @@ void State::makeDefaultShaders( const char *pBasePath )
 //==================================================================
 State::~State()
 {
-	End();
-
 	mModeStack.clear();
 	mOptionsStack.clear();
 	mAttributesStack.clear();

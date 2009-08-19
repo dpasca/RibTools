@@ -79,13 +79,17 @@ bool MakeBoundFromUVRange( const _S &This, Bound &out_bound )
 class PatchBilinear : public SimplePrimitiveBase
 {
 private:
-	ParamList		mParams;
+	//ParamList		mParams;
 	Vec3f			mHullPos_sca[4];
-	SlVec3			mHullPos[4];
+	//SlVec3			mHullPos[4];
 
 public:
 	PatchBilinear( ParamList &params, const SymbolList &staticSymbols );
 	PatchBilinear( ParamList &params, const Vec3f hull[4] );
+
+	~PatchBilinear()
+	{
+	}
 
 		PatchBilinear *Clone() const {	return DNEW PatchBilinear( *this ); }
 

@@ -23,7 +23,9 @@ namespace RI
 //==================================================================
 void SimplePrimitiveBase::Split( HiderREYES &hider, bool uSplit, bool vSplit )
 {
-	if ( mSplitCnt > 10 )
+	DASSERT( IsUsed() );
+
+	if ( mSplitCnt > 9 )
 	{
 		// $$$ too many splits !!!
 		mSplitCnt = mSplitCnt;

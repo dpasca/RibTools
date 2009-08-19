@@ -1,11 +1,10 @@
-/*
- *  RI_Options.h
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Options.h
+///
+/// Created by Davide Pasca - 2008/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_OPTIONS_H
 #define RI_OPTIONS_H

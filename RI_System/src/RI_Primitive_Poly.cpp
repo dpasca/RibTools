@@ -176,15 +176,22 @@ void PointsGeneralPolygons::Simplify( HiderREYES &hider )
 			return;
 		}
 
+		if ( (pi+1) >= mParams.size() )
+		{
+			DASSTHROW( 0, ("Missing values") );
+		}
+
 		const char *pNameParam = mParams[pi].PChar();
+
+		++pi;
 
 		if ( 0 == strcasecmp( pNameParam, "P" ) )
 		{
-			PValuesParIdx = pi+1;
+			PValuesParIdx = pi;
 		}
 
 		vinfo[vinfoN].pName	= pNameParam;
-		vinfo[vinfoN].parIdx= pi + 1;
+		vinfo[vinfoN].parIdx= pi;
 		++vinfoN;
 	}
 

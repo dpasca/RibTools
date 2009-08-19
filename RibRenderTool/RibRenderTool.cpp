@@ -245,6 +245,11 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	{
 		RRL::Render	render( pFileName, machine, fileManager );
 	}
+	catch ( std::bad_alloc )
+	{
+		printf( "Out of Memory !!!\n" );
+		return false;
+	}
 	catch ( ... )
 	{
 		return false;

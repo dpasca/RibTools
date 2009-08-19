@@ -31,6 +31,8 @@ Render::Render( const char			*pFileName,
 
 	RI::Parser	parser;
 
+	machine.GetState().Begin( "dummy" );
+
 	for (size_t i=0; i <= file.GetDataSize(); ++i)
 	{
 		if ( i == file.GetDataSize() )
@@ -68,6 +70,8 @@ Render::Render( const char			*pFileName,
 			}
 		}
 	}
+
+	machine.GetState().End();
 }
 
 //==================================================================

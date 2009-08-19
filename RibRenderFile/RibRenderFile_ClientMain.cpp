@@ -97,12 +97,17 @@ int ClientMain( int argc, char **argv )
 
 	if NOT( servList.size() )
 	{
-		RI::FrameworkREYES		framework( &rendOut, NULL, hiderParams );
-		RI::Machine				machine( &framework, &fileManagerDisk, baseDir.c_str(), defaultShadersDir );
-
 		try
 		{
+			RI::FrameworkREYES		framework( &rendOut, NULL, hiderParams );
+			RI::Machine				machine( &framework, &fileManagerDisk, baseDir.c_str(), defaultShadersDir );
+
 			RRL::Render	render( argv[1], machine, fileManagerDisk );
+		}
+		catch ( std::bad_alloc )
+		{
+			printf( "Out of Memory !!!\n" );
+			return -1;
 		}
 		catch ( ... )
 		{

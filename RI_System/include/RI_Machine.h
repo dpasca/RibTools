@@ -43,6 +43,8 @@ public:
 		printf( "Error %s !!\n", ErrorToString( errCode ) );
 	}
 
+	State &GetState()	{	return mState;	}
+
 private:
 	void unknownCommand( const char *pCmdName );
 	void exN( size_t n, const ParamList &cmdParams );

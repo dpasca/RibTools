@@ -127,32 +127,26 @@ void PatchMesh::Simplify( HiderREYES &hider )
 
 //==================================================================
 PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols ) :
-	SimplePrimitiveBase(PATCHBILINEAR),
-	mParams(params)
+	SimplePrimitiveBase(PATCHBILINEAR)//,
+	//mParams(params)
 {
 	Vec3f	pos[4];
 
 	bool	gotP = ParamsFindP( params, staticSymbols, pos, 4 );
 
 	for (int i=0; i < 4; ++i)
-	{
 		mHullPos_sca[i] = pos[i];
-		mHullPos[i] = pos[i];
-	}
 
 	DASSTHROW( gotP, ("Missing hull parameter") );
 }
 
 //==================================================================
 PatchBilinear::PatchBilinear( ParamList &params, const Vec3f hull[4] ) :
-	SimplePrimitiveBase(PATCHBILINEAR),
-	mParams(params)
+	SimplePrimitiveBase(PATCHBILINEAR)//,
+	//mParams(params)
 {
 	for (int i=0; i < 4; ++i)
-	{
 		mHullPos_sca[i] = hull[i];
-		mHullPos[i] = hull[i];
-	}
 }
 
 //==================================================================
@@ -186,18 +180,23 @@ void PatchBilinear::Eval_dPdu_dPdv(
 				SlVec3 *out_dPdu,
 				SlVec3 *out_dPdv ) const
 {
-	SlVec3	left	= DMix( mHullPos[0], mHullPos[2], uv[1] );
-	SlVec3	right	= DMix( mHullPos[1], mHullPos[3], uv[1] );
+	SlVec3	hullPos[4];
+
+	for (int i=0; i < 4; ++i)
+		hullPos[i] = mHullPos_sca[i];
+
+	SlVec3	left	= DMix( hullPos[0], hullPos[2], uv[1] );
+	SlVec3	right	= DMix( hullPos[1], hullPos[3], uv[1] );
 	out_pt			= DMix( left, right, uv[0] );
 
 	if ( out_dPdu )
 	{
-		SlVec3	left	= mHullPos[2] - mHullPos[0];
-		SlVec3	right	= mHullPos[3] - mHullPos[1];
+		SlVec3	left	= hullPos[2] - hullPos[0];
+		SlVec3	right	= hullPos[3] - hullPos[1];
 		*out_dPdv		= DMix( left, right, uv[0] );
 
-		SlVec3	bottom	= mHullPos[1] - mHullPos[0];
-		SlVec3	top		= mHullPos[3] - mHullPos[2];
+		SlVec3	bottom	= hullPos[1] - hullPos[0];
+		SlVec3	top		= hullPos[3] - hullPos[2];
 		*out_dPdu		= DMix( bottom, top, uv[1] );
 	}
 }

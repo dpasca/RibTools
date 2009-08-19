@@ -83,6 +83,15 @@ class RefCount
 	int		mRefCount;
 	
 public:
+	RefCount( const RefCount &from ) : mRefCount(0)
+	{
+	}
+	
+	RefCount &operator=( const RefCount &from )
+	{
+		mRefCount = 0;
+	}
+
 	RefCount() :
 		mRefCount(0)
 	{
