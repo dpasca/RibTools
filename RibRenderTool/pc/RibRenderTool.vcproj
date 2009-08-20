@@ -25,7 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;mkdir ..\..\Distrib\&#x0D;&#x0A;mkdir ..\..\Distrib\Resources&#x0D;&#x0A;mkdir ..\..\Distrib\TestScenes&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\TestScenes ..\..\Distrib\TestScenes&#x0D;&#x0A;"
+				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;xcopy /E /Y ..\..\DistribSrc ..\..\Distrib&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -105,7 +105,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;mkdir ..\..\Distrib\&#x0D;&#x0A;mkdir ..\..\Distrib\Resources&#x0D;&#x0A;mkdir ..\..\Distrib\TestScenes&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\TestScenes ..\..\Distrib\TestScenes&#x0D;&#x0A;"
+				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;xcopy /E /Y ..\..\DistribSrc ..\..\Distrib&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

@@ -4,7 +4,7 @@
 
 This project's goal is to parse and to some extent render RenderMan RIB files.
 
-The test files are taken from the RenSH project by Ian Stephenson (http://www.dctsystems.co.uk/RenderMan/rensh.html).
+Some of the test files are taken from the RenSH project by Ian Stephenson (http://www.dctsystems.co.uk/RenderMan/rensh.html).
 I'm not sure about the original authors for those files.
 
 More informations available on the project's home page: http://kazzuya.com/ribtools
