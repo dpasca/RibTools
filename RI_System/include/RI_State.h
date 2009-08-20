@@ -50,6 +50,23 @@ Transform
 //==================================================================
 class State
 {
+public:
+	struct Params
+	{
+		FrameworkREYES	*mpFramework		;
+		FileManagerBase	*mpFileManager		;
+		DStr			mBaseDir			;
+		DStr			mDefaultShadersDir	;
+		DStr			mForcedSurfaceShader;
+
+		Params() :
+			mpFramework			(NULL),
+			mpFileManager		(NULL)
+		{
+		}
+	};
+
+private:
 	SymbolList				mStatics;
 	Stack<Mode>				mModeStack;
 	CopyStack<Options	>	mOptionsStack;
@@ -66,13 +83,9 @@ class State
 
 	Matrix44				mMtxWorldCamera;
 
-	FrameworkREYES			*mpFramework;
-
-	FileManagerBase			*mpFileManager;
-	
-	DStr					mDefaultShadersDir;
-	DStr					mBaseDir;
-
+public:
+	Params					mParams;
+private:
 	ResourceManager			mResManager;
 
 	enum OpType
@@ -84,16 +97,12 @@ class State
 	};
 
 public:
-	State(
-		FrameworkREYES *pFramework,
-		FileManagerBase	*pFileManager,
-		const char *pBaseDir,
-		const char *pDefaultShadersDir );
+	State( const Params &params );
 	~State();
 
-	FileManagerBase &GetFileManager()		{	return *mpFileManager;				}
-	const char *GetBaseDir()		const	{	return mBaseDir.c_str();			}
-	const char *GetDefShadersDir() const	{	return mDefaultShadersDir.c_str();	}
+	FileManagerBase &GetFileManager()		{	return *mParams.mpFileManager;				}
+	const char *GetBaseDir()		const	{	return mParams.mBaseDir.c_str();			}
+	const char *GetDefShadersDir() const	{	return mParams.mDefaultShadersDir.c_str();	}
 
 	void	Begin( RtToken name );
 	void	End();

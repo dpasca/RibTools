@@ -167,7 +167,14 @@ public:
 
 	virtual SimplePrimitiveBase	*Clone() const = 0;
 
-	bool SetupForDiceOrSplit(	const HiderREYES &hider,
+	enum DosRes
+	{
+		DOSRES_CULL,
+		DOSRES_DICE,
+		DOSRES_SPLIT,
+	};
+
+	DosRes SetupForDiceOrSplit(	const HiderREYES &hider,
 								bool &out_uSplit,
 								bool &out_vSplit );
 

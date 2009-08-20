@@ -25,7 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;"
+				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;mkdir ..\..\Distrib\&#x0D;&#x0A;mkdir ..\..\Distrib\Resources&#x0D;&#x0A;mkdir ..\..\Distrib\TestScenes&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\TestScenes ..\..\Distrib\TestScenes&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -66,7 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib"
-				OutputFile="..\..\Distrib\$(ProjectName)\$(ProjectName).exe"
+				OutputFile="..\..\Distrib\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -105,7 +105,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;mkdir ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\$(ProjectName)\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\Tests ..\..\Distrib\$(ProjectName)\Tests&#x0D;&#x0A;"
+				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;mkdir ..\..\Distrib\&#x0D;&#x0A;mkdir ..\..\Distrib\Resources&#x0D;&#x0A;mkdir ..\..\Distrib\TestScenes&#x0D;&#x0A;xcopy /E /Y ..\..\Resources ..\..\Distrib\Resources&#x0D;&#x0A;xcopy /E /Y ..\..\TestScenes ..\..\Distrib\TestScenes&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -149,7 +149,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib"
-				OutputFile="..\..\Distrib\$(ProjectName)\$(ProjectName).exe"
+				OutputFile="..\..\Distrib\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"

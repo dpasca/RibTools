@@ -50,7 +50,13 @@ static int serverTask( SOCKET clientSock )
 	RI::RenderOutputNull	rendOutNull;
 	RI::HiderREYES::Params	hiderParams;
 	RI::FrameworkREYES		framework( &rendOutNull, &rendBuckets, hiderParams );
-	RI::Machine				machine( &framework, &fileManagerNet, netRendJob.BaseDir, netRendJob.DefaultResourcesDir );
+
+	RI::Machine::Params	params;
+	params.mState.mpFramework			= &framework;
+	params.mState.mpFileManager			= &fileManagerNet;
+	params.mState.mBaseDir				= netRendJob.BaseDir;
+	params.mState.mDefaultShadersDir	= netRendJob.DefaultResourcesDir;
+	RI::Machine				machine( params );
 
 	try
 	{

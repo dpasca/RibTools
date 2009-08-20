@@ -27,13 +27,21 @@ class Machine
 	int		mForcedHe;
 
 public:
-	Machine(
-		FrameworkREYES *pFramework,
-		FileManagerBase	*pFileManager,
-		const char *pBaseDir,
-		const char *pDefaultShadersDir,
-		int forcedWd=-1,
-		int forcedHe=-1 );
+	struct Params
+	{
+		State::Params	mState;
+		int				mForcedWd			;
+		int				mForcedHe			;
+
+		Params() :
+			mForcedWd			(-1),
+			mForcedHe			(-1)
+		{
+		}
+	};
+
+public:
+	Machine( const Params &params );
 	
 	void AddCommand(const DStr	&cmdName,
 					ParamList	&cmdParams );

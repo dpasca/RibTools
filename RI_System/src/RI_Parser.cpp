@@ -107,13 +107,13 @@ void Parser::AddChar( char ch )
 	case Tokenizer::DT_INT_ARRAY:
 			param = mCurParams.grow();
 			param->type				= Param::INT_ARR;
-			param->u.intArrayVal		= mpTokenizer->GetDataIntAttary();
+			param->u.intArrayVal		= mpTokenizer->GetDataIntArray();
 			break;
 	
 	case Tokenizer::DT_FLOAT_ARRAY:
 			param = mCurParams.grow();
 			param->type				= Param::FLT_ARR;
-			param->u.floatArrayVal	= mpTokenizer->GetDataFloatAttary();
+			param->u.floatArrayVal	= mpTokenizer->GetDataFloatArray();
 			break;
 
 	case Tokenizer::DT_STRING:
@@ -135,8 +135,8 @@ void Parser::AddChar( char ch )
 	case Tokenizer::DT_ALPHANUMERIC:printf( "%s \n", mpTokenizer->GetDataAphaNum() );	break;
 	case Tokenizer::DT_INT:			printf( "%i \n", mpTokenizer->GetDataInt()	);	break;
 	case Tokenizer::DT_FLOAT:		printf( "%f \n", mpTokenizer->GetDataFloat()	);	break;
-	case Tokenizer::DT_INT_ARRAY:	printArray( mpTokenizer->GetDataIntAttary()	);	break;	
-	case Tokenizer::DT_FLOAT_ARRAY:	printArray( mpTokenizer->GetDataFloatAttary()	);	break;
+	case Tokenizer::DT_INT_ARRAY:	printArray( mpTokenizer->GetDataIntArray()	);	break;	
+	case Tokenizer::DT_FLOAT_ARRAY:	printArray( mpTokenizer->GetDataFloatArray()	);	break;
 	case Tokenizer::DT_STRING:		printf( "%s \n", mpTokenizer->GetDataString()	);	break;
 	
 	default:

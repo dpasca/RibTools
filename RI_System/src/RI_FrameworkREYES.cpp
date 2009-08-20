@@ -141,16 +141,19 @@ void FrameworkREYES::worldEnd_splitAndAddToBuckets()
 
 		bool	uSplit;
 		bool	vSplit;
-		bool	willDice = pPrim->SetupForDiceOrSplit( mHider, uSplit, vSplit );
+		SimplePrimitiveBase::DosRes	dosRes =
+				pPrim->SetupForDiceOrSplit( mHider, uSplit, vSplit );
 
-		if ( willDice )
+		if ( dosRes == SimplePrimitiveBase::DOSRES_DICE )
 		{
-			mHider.InsertForDicing( (SimplePrimitiveBase *)pPrim->Borrow() );
+			mHider.InsertForDicing( (SimplePrimitiveBase *)pPrim );
 		}
 		else
+		if ( dosRes == SimplePrimitiveBase::DOSRES_SPLIT )
 		{
 			pPrim->Split( mHider, uSplit, vSplit );
 		}
+		// otherwise it's cull..
 
 		pPrim->Release();
 		mHider.mpPrims[i] = NULL;

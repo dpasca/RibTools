@@ -16,16 +16,10 @@ namespace RI
 //==================================================================
 /// 
 //==================================================================
-Machine::Machine(
-			FrameworkREYES *pFramework,
-			FileManagerBase	*pFileManager,
-			const char *pBaseDir,
-			const char *pDefaultShadersDir,
-			int forcedWd,
-			int forcedHe ) :
-	mState(pFramework, pFileManager, pBaseDir, pDefaultShadersDir),
-	mForcedWd(forcedWd),
-	mForcedHe(forcedHe)
+Machine::Machine( const Params &params ) :
+	mState(params.mState),
+	mForcedWd(params.mForcedWd),
+	mForcedHe(params.mForcedHe)
 {
 }
 
@@ -227,7 +221,8 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Transform" )		{ exN( 1, p ); mState.TransformCmd(	p[0].PFlt(16) );	}	else
 	if ( nm == "Scale" )			{ exN( 3, p ); mState.Scale(		p[0], p[1], p[2] );	}	else
 	if ( nm == "Rotate" )			{ exN( 4, p ); mState.Rotate(		p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Translate" )		{ exN( 3, p ); mState.Translate(	p[0], p[1], p[2] );	}	else
+	if ( nm == "Translate" )		{ exN( 3, p );
+									mState.Translate(	p[0], p[1], p[2] );	}	else
 
 	// primitives
 	if ( nm == "Cone" )				{ exN( 3, p ); mState.Cone(			p[0], p[1], p[2] ); }	else

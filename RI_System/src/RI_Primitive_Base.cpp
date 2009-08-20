@@ -365,7 +365,8 @@ bool ParamsFindP(	ParamList &params,
 }
 
 //==================================================================
-bool SimplePrimitiveBase::SetupForDiceOrSplit(
+SimplePrimitiveBase::DosRes
+	SimplePrimitiveBase::SetupForDiceOrSplit(
 							const HiderREYES &hider,
 							bool &out_uSplit,
 							bool &out_vSplit )
@@ -381,6 +382,11 @@ bool SimplePrimitiveBase::SetupForDiceOrSplit(
 	
 	if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
 	{
+		if ( pixelArea < RI_EPSILON )
+		{
+			return DOSRES_CULL;
+		}
+
 		float	dim = DSqrt( pixelArea );
 
 		mDiceGridWd = RI_GET_SIMD_PAD_SUBS( (int)ceilf( dim ) );
@@ -389,14 +395,14 @@ bool SimplePrimitiveBase::SetupForDiceOrSplit(
 		out_uSplit = false;
 		out_vSplit = false;
 
-		return true;	// will dice
+		return DOSRES_DICE;	// will dice
 	}
 	else
 	{
 		out_uSplit = true;
 		out_vSplit = true;
 
-		return false;	// will split
+		return DOSRES_SPLIT;	// will split
 	}
 }
 

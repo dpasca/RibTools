@@ -369,8 +369,10 @@ SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir,
 	params.pAppResDir		= pAppResDir;
 	params.pSourceFileName	= buff;
 
+#if !defined(DISABLE_SL_SHADERS)
 	sprintf( buff, "%s/%s.sl", pBasePath, pSName );
 	if NOT( DUT::FileExists( buff ) )
+#endif
 	{
 		sprintf( buff, "%s/%s.rrasm", pBasePath, pSName );
 		if NOT( DUT::FileExists( buff ) )
@@ -431,7 +433,12 @@ void Attributes::cmdSurface( ParamList &params )
 		onError( "Missing parameters for 'surface' command !" );
 	}
 
-	const char *pShaderName = params[0].PChar();
+	const char *pShaderName;
+
+	if ( mpState->mParams.mForcedSurfaceShader.length() )
+		pShaderName = mpState->mParams.mForcedSurfaceShader.c_str();
+	else
+		pShaderName = params[0].PChar();
 
 	SlShader	*pShader = getShader( pShaderName, "matte" );
 

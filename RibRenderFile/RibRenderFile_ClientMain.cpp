@@ -100,7 +100,13 @@ int ClientMain( int argc, char **argv )
 		try
 		{
 			RI::FrameworkREYES		framework( &rendOut, NULL, hiderParams );
-			RI::Machine				machine( &framework, &fileManagerDisk, baseDir.c_str(), defaultShadersDir );
+
+			RI::Machine::Params	params;
+			params.mState.mpFramework			= &framework;
+			params.mState.mpFileManager			= &fileManagerDisk;
+			params.mState.mBaseDir				= baseDir;
+			params.mState.mDefaultShadersDir	= defaultShadersDir;
+			RI::Machine				machine( params );
 
 			RRL::Render	render( argv[1], machine, fileManagerDisk );
 		}
@@ -147,7 +153,13 @@ int ClientMain( int argc, char **argv )
 		RRL::NET::RenderBucketsClient	rendBuckets( servList );
 
 		RI::FrameworkREYES				framework( &rendOut, &rendBuckets, hiderParams );
-		RI::Machine						machine( &framework, &fileManagerDisk, baseDir.c_str(), defaultShadersDir );
+
+		RI::Machine::Params	params;
+		params.mState.mpFramework			= &framework;
+		params.mState.mpFileManager			= &fileManagerDisk;
+		params.mState.mBaseDir				= baseDir;
+		params.mState.mDefaultShadersDir	= defaultShadersDir;
+		RI::Machine						machine( params );
 
 		try
 		{

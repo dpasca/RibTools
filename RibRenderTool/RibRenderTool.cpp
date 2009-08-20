@@ -125,7 +125,7 @@ void RibRendTool::RebuildMenu()
 
 #if defined(WIN32)
 	_finddatai64_t	findData;
-	intptr_t	handle = _findfirst64( "Tests/*.rib", &findData );
+	intptr_t	handle = _findfirst64( "TestScenes/*.rib", &findData );
 	if ( handle != -1 )
 	{
 		int	ret = 0;
@@ -145,7 +145,7 @@ void RibRendTool::RebuildMenu()
 
 #elif defined(__linux__)
 
-	DIR	*pDir = opendir( "Tests" );
+	DIR	*pDir = opendir( "TestScenes" );
 	if ( pDir )
 	{
 		struct dirent *pDirent;
@@ -185,7 +185,7 @@ void RibRendTool::MenuFunc( int id )
 	if ( id >= MENUID_FILES )
 	{
 		strcpy( mFileToRender, mExePath );
-		strcat( mFileToRender, "/Tests/" );
+		strcat( mFileToRender, "/TestScenes/" );
 		strcat( mFileToRender, mTestRibFiles[id - MENUID_FILES].c_str() );
 
 		printf( "Render File: %s\n", mFileToRender );
@@ -239,7 +239,20 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 
 	RI::FrameworkREYES	framework( mpRenderOutput, NULL, mREYESParams );
 	RI::FileManagerDisk	fileManager;
-	RI::Machine			machine( &framework, &fileManager, baseDir.c_str(), defaultShadersDir, forcedWd, forcedHe );
+
+	RI::Machine::Params	params;
+	params.mState.mpFramework			= &framework;
+	params.mState.mpFileManager			= &fileManager;
+	params.mState.mBaseDir				= baseDir;
+	params.mState.mDefaultShadersDir	= defaultShadersDir;
+
+	if ( mREYESParams.mDbgColorCodedGrids )
+		params.mState.mForcedSurfaceShader = "constant";
+
+	params.mForcedWd					= forcedWd;
+	params.mForcedHe					= forcedHe;
+
+	RI::Machine			machine( params );
 
 	try
 	{
@@ -257,9 +270,6 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 
 	mLastUsedWd = (int)mpRenderOutput->GetCurWd();
 	mLastUsedHe = (int)mpRenderOutput->GetCurHe();
-
-	// it has been rendered...
-	mFileToRender[0] = 0;
 
 	return true;
 }
@@ -335,6 +345,9 @@ void RibRendTool::sIdleFunc()
 	if ( mspThis->mFileToRender[0] )
 	{
 		mspThis->RenderFile( false );
+
+		// it has been rendered...
+		mspThis->mFileToRender[0] = 0;
 
 		glutPostRedisplay();
 	}

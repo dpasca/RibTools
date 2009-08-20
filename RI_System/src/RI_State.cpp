@@ -17,15 +17,8 @@ namespace RI
 //==================================================================
 /// State
 //==================================================================
-State::State(
-		FrameworkREYES *pFramework,
-		FileManagerBase	*pFileManager,
-		const char *pBaseDir,
-		const char *pDefaultShadersDir ) :
-	mpFramework(pFramework),
-	mpFileManager(pFileManager),
-	mBaseDir(pBaseDir),
-	mDefaultShadersDir(pDefaultShadersDir)
+State::State( const Params &params ) :
+	mParams(params)
 {
 	mModeStack.push( MD_UNDEFINED );
 
@@ -119,14 +112,14 @@ State::State(
 	mStatics.FindOrAdd(	RI_HERMITEBASIS				, HermiteBasis		);
 	mStatics.FindOrAdd(	RI_POWERBASIS				, PowerBasis		);	
 	
-	makeDefaultShaders( mDefaultShadersDir.c_str() );
+	makeDefaultShaders( mParams.mDefaultShadersDir.c_str() );
 
 	mOptionsStack.top().Init( &mStatics, &mOptionsRevTrack );
 	mAttributesStack.top().Init( this, &mStatics, &mResManager, &mAttribsRevTrack );
 	mTransformOpenStack.top().Init( &mTransOpenRevTrack );
 	mTransformCloseStack.top().Init( &mTransCloseRevTrack );
 	
-	mpFramework->SetStatics( &mStatics );
+	mParams.mpFramework->SetStatics( &mStatics );
 }
 
 //==================================================================
@@ -137,24 +130,25 @@ void State::addDefShader( const char *pBasePath, const char *pSName )
 	SlShader::CtorParams	params;
 	params.pName			= pSName;
 	params.pSourceFileName	= buff;
-	params.pAppResDir		= mDefaultShadersDir.c_str();
+	params.pAppResDir		= mParams.mDefaultShadersDir.c_str();
 
 	SlShader *pShader = NULL;
 	try 
 	{
+#if !defined(DISABLE_SL_SHADERS)
 		sprintf( buff, "%s/%s.sl", pBasePath, params.pName );
-		
-		if ( mpFileManager->FileExists( buff ) )
+		if ( mParams.mpFileManager->FileExists( buff ) )
 		{
-			pShader = DNEW SlShader( params, *mpFileManager );
+			pShader = DNEW SlShader( params, *mParams.mpFileManager );
 			mResManager.AddResource( pShader );
 		}
 		else
+#endif
 		{
 			sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-			if ( mpFileManager->FileExists( buff ) )
+			if ( mParams.mpFileManager->FileExists( buff ) )
 			{
-				pShader = DNEW SlShader( params, *mpFileManager );
+				pShader = DNEW SlShader( params, *mParams.mpFileManager );
 				mResManager.AddResource( pShader );
 			}
 		}
@@ -240,12 +234,12 @@ void State::WorldBegin()
 	mTransformOpenStack.top().SetIdentity();
 	mTransformCloseStack.top().SetIdentity();
 
-	mpFramework->WorldBegin( mOptionsStack.top(), mMtxWorldCamera );
+	mParams.mpFramework->WorldBegin( mOptionsStack.top(), mMtxWorldCamera );
 }
 //==================================================================
 void State::WorldEnd()
 {
-	mpFramework->WorldEnd();
+	mParams.mpFramework->WorldEnd();
 
 	popStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 	popMode( MD_WORLD );

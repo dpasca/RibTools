@@ -52,9 +52,22 @@ const FltVec &Param::NumVec( size_t n )
 		if ( n != DNPOS )
 			ensIntArr( n );
 
-		u.floatArrayVal.resize( n );
-		for (size_t i=0; i < u.intArrayVal.size(); ++i)
-			u.floatArrayVal[i] = (float)u.intArrayVal[i];
+		// first time ?
+		if ( u.floatArrayVal.size() != n )
+		{
+			// build it
+			u.floatArrayVal.resize( n );
+			for (size_t i=0; i < u.intArrayVal.size(); ++i)
+				u.floatArrayVal[i] = (float)u.intArrayVal[i];
+		}
+#ifdef _DEBUG
+		else
+		{
+			// check it !
+			for (size_t i=0; i < u.intArrayVal.size(); ++i)
+				DASSERT( u.floatArrayVal[i] == (float)u.intArrayVal[i] );
+		}
+#endif
 	}
 	else
 		badType();

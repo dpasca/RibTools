@@ -1,11 +1,10 @@
-/*
- *  RI_State_Prims.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/08.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_State_Prims.cpp
+///
+/// Created by Davide Pasca - 2009/01/08
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_State.h"
@@ -18,7 +17,7 @@ namespace RI
 //==================================================================
 inline void State::insertPrimitive( PrimitiveBase *pPrim )
 {
-	mpFramework->Insert( pPrim,
+	mParams.mpFramework->Insert( pPrim,
 					  mAttributesStack.top(),
 					  mTransformOpenStack.top() );
 }
