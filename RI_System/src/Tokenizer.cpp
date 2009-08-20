@@ -28,6 +28,32 @@ const char *Tokenizer::GetDataTypeName( DataType dtype )
 	return "UNKNOWN";
 }
 
+/*
+//===============================================================
+static bool isFloatStr( const char *pStr )
+{
+	const char *pStrRun = pStr;
+
+	char ch;
+	while ( ch = *pStrRun++ )
+	{
+		if NOT( (ch >= '0' && ch <= '9') ||
+				ch == '.' ||
+				ch == 'e' ||
+				ch == 'f' ||
+				ch == 'E' ||
+				ch == 'F' ||
+				ch == '-' ||
+				ch == '+'  )
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+*/
+
 //===============================================================
 static bool isFloatStr( const char *pStr )
 {
@@ -41,7 +67,7 @@ static bool isFloatStr( const char *pStr )
 		strchr( pStr, 'E' ) )
 	{
 		double tmp;
-		return 1 == sscanf( pStr, "%ld", &tmp );
+		return 1 == sscanf( pStr, "%lf", &tmp );
 	}
 	else
 		return false;

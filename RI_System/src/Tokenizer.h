@@ -85,12 +85,12 @@ public:
 		mIsArrayFloat = false;
 	}
 
-	const char			*GetDataAphaNum()		const { return mDataAlphanum.c_str();	}
-	int					GetDataInt()			const { return mDataInt;	}
-	float				GetDataFloat()			const { return mDataFloat;	}
-	const DVec<int>		&GetDataIntAttary()		const	{ return mIntArray; }
-	const DVec<float>	&GetDataFloatAttary()	const	{ return mFloatArray; }
-	const char			*GetDataString()		const { return mDataString.c_str();	}
+	const char			*GetDataAphaNum()		const { DASSERT( mDataType == DT_ALPHANUMERIC ); return mDataAlphanum.c_str();	}
+	int					GetDataInt()			const { DASSERT( mDataType == DT_INT ); return mDataInt;	}
+	float				GetDataFloat()			const { DASSERT( mDataType == DT_FLOAT ); return mDataFloat;	}
+	const DVec<int>		&GetDataIntArray()		const { DASSERT( mDataType == DT_INT_ARRAY ); return mIntArray; }
+	const DVec<float>	&GetDataFloatArray()	const { DASSERT( mDataType == DT_FLOAT_ARRAY ); return mFloatArray; }
+	const char			*GetDataString()		const { DASSERT( mDataType == DT_STRING ); return mDataString.c_str();	}
 
 private:
 	void	setDataType();
