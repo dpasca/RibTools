@@ -22,9 +22,6 @@ Render::Render( const char			*pFileName,
 				RI::FileManagerBase	&fileManager,
 				bool				verbose )
 {
-	// $$$ TMP
-	verbose = true;
-
 	DUT::MemFile	file;
 
 	fileManager.GrabFile( pFileName, file );

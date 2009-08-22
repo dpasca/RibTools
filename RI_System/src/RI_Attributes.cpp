@@ -275,6 +275,11 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 	{
 		pLight->mType = LightSourceT::TYPE_DISTANT;
 	}
+	else
+	if ( 0 == strcasecmp( "arealight", params[0].PChar() ) )
+	{
+		pLight->mType = LightSourceT::TYPE_DISTANT;
+	}
 
 	pLight->mID = params[1].Int();
 
@@ -302,6 +307,12 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		else
 		if ( 0 == strcasecmp( pName, "to" ) )
 		{
+			pLight->mLocToPos = params[i+1].PFlt( 3 );
+		}
+		else
+		if ( 0 == strcasecmp( pName, "direction" ) )
+		{
+			pLight->mLocFromPos = Point3( 0, 0, 0 );
 			pLight->mLocToPos = params[i+1].PFlt( 3 );
 		}
 		else

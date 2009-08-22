@@ -161,11 +161,16 @@ void Machine::AddCommand(	const DStr	&cmdName,
 
 	}
 	else
+	if ( nm == "AreaLightSource" )
+	{
+		geN( 1, p );	// at least one param (the shader name)
+		mState.AreaLightSource( p );
+	}
+	else
 	if ( nm == "LightSource" )
 	{
+		geN( 1, p );	// at least one param (the shader name)
 		mState.LightSource( p );
-		//exN( 1, p );
-		//mState.FrameAspectRatio( p[0] );
 	}
 	else
 	if ( nm == "Surface" )

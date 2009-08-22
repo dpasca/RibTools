@@ -230,13 +230,13 @@ void PointsGeneralPolygons::Simplify( HiderREYES &hider )
 
 		nLoops = DMIN( nLoops, 1 );	// only the first loop
 		
+		DASSERT( (nVertsIdx+nLoops) <= nvertsN );
+
 		for (size_t j=0; j < nLoops; ++j)
 		{
-			DASSERT( nVertsIdx < nvertsN );
-
 			int nVerts = pNVerts[ nVertsIdx++ ];
 
-			DASSERT( (idxVertsIdx+nVerts) < nvertsN );
+			DASSERT( (idxVertsIdx+nVerts) <= vertsN );
 
 			tessellateToBilinearPatches(
 							hider,

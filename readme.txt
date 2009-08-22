@@ -1,20 +1,42 @@
 //==================================================================
-/// RibTools
+/// RibTools - http://kazzuya.com/ribtools
 //==================================================================
 
-This project's goal is to parse and to some extent render RenderMan RIB files.
+* About
 
-Some of the test files are taken from the RenSH project by Ian Stephenson (http://www.dctsystems.co.uk/RenderMan/rensh.html).
-I'm not sure about the original authors for those files.
+RibTools is a hobby project developed by me (Davide Pasca).
+The project main goal is to write RibRender, a RenderMan-compliant
+renderer.
+The focus of RibRender is towards speed and high scalability, it
+aims to achieve this by utilizing parallelism at all levels:
+ 
+ - Instruction level parallelism (Adaptive N-way SIMD)
+ - Many-cores hardware (OpenMP)
+ - Network-distributed rendering (Custom protocol over TCP/IP)
 
-More informations available on the project's home page: http://kazzuya.com/ribtools
+For more details, please see the project's web site, or contact
+me personally:
 
-Specific reference material:
-- Production Rendering ( http://books.google.com/books?id=krTfLA5b940C )
-- The RenderMan Companion ( http://books.google.com/books?id=jXr9CFO8GK8C&pgis=1 )
-- The RISpec ( https://renderman.pixar.com/products/rispec/index.htm )
+ - web: http://kazzuya.com/ribtools
+ - e-mail: dpasca <at> gmail.com
 
 
-Davide Pasca
-- dpasca <at> gmail.com
-- http://kazzuya.com
+* Credits
+
+RibTools includes code from the following libraries:
+
+- JPEG library - http://www.ijg.org
+- freeglut - http://freeglut.sourceforge.net
+
+Sample files were found on the Internet and are assumed to be
+freely redistributable. For any issues in that regard, please
+contact me personally and I'll be happy to give due credit or
+remove whatever eventual material 8)
+
+Most of the included RIB files are old samples that I found
+included in the "RenSH"(1) project.
+The "Sponza Atrium" model is originally from Marko Dabrovic. The
+RIB version was taken from the "lucille"(2) renderer project.
+
+- (1) RenSH - http://www.dctsystems.co.uk/RenderMan/rensh.html
+- (2) lucille - http://lucille.sourceforge.net

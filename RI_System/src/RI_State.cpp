@@ -168,6 +168,7 @@ void State::makeDefaultShaders( const char *pBasePath )
 	addDefShader( pBasePath, "test"				);
 	addDefShader( pBasePath, "ambientlight"		);
 	addDefShader( pBasePath, "distantlight"		);
+	addDefShader( pBasePath, "arealight"		);
 }
 
 //==================================================================
@@ -405,6 +406,18 @@ void State::Opacity( const Color &col )
 		return;
 
 	mAttributesStack.top().cmdOpacity( col );
+}
+
+//==================================================================
+void State::AreaLightSource( ParamList &params )
+{
+	if NOT( verifyOpType( OPTYPE_ATRB ) )
+		return;
+
+	mAttributesStack.top().cmdLightSource(
+								params,
+								mTransformOpenStack.top(),
+								mMtxWorldCamera );
 }
 
 //==================================================================
