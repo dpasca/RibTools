@@ -1,11 +1,10 @@
-/*
- *  RI_Primitive_Poly.h
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/27.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Primitive_Poly.h
+///
+/// Created by Davide Pasca - 2009/1/27
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_PRIMITIVE_POLY_H
 #define RI_PRIMITIVE_POLY_H
@@ -30,15 +29,6 @@ public:
 	Polygon( ParamList &params, const SymbolList &staticSymbols );
 
 		void Simplify( HiderREYES &hider );
-
-private:
-	void simplifyAddTriangle(
-				HiderREYES &fwork,
-				const Vec3f &v1,
-				const Vec3f &v2,
-				const Vec3f &v3
-				);
-
 };
 
 //==================================================================
@@ -53,15 +43,6 @@ public:
 	PointsGeneralPolygons( ParamList &params, const SymbolList &staticSymbols );
 
 		void Simplify( HiderREYES &hider );
-
-private:
-	void simplifyAddTriangle(
-				HiderREYES &hider,
-				const Vec3f &v1,
-				const Vec3f &v2,
-				const Vec3f &v3
-				);
-
 };
 
 //==================================================================

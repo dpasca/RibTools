@@ -298,7 +298,7 @@ void AddConstVariable( TokNode *pNode, TokNode *pRoot )
 	pVar->mIsForcedDetail	= false;
 	pVar->mHasBaseVal		= true;
 
-	pVar->mInternalName		= DUT::SSPrintF( "_@K%02i", pNode->mVarLink.mVarIdx );
+	pVar->mInternalName		= DUT::SSPrintFS( "_@K%02i", pNode->mVarLink.mVarIdx );
 
 	pVar->mVarType			= vtype;
 

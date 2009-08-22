@@ -106,6 +106,52 @@ static void addBoolMenuItem( const char *pName, bool onoff, int id )
 }
 
 //==================================================================
+void RibRendTool::addDirToMenu( const char *pDirName, const char *pFilesExt )
+{
+#if defined(WIN32)
+
+	DStr	buff = DUT::SSPrintFS( "%s/*.%s", pDirName, pFilesExt );
+
+	_finddatai64_t	findData;
+	intptr_t	handle = _findfirst64( buff.c_str(), &findData );
+	if ( handle != -1 )
+	{
+		int	ret = 0;
+		do
+		{
+			mTestRibFiles.push_back( findData.name );
+			mTestRibFilesPaths.push_back( pDirName );
+
+			glutAddMenuEntry(
+				DUT::SSPrintFS( "%s / %s", pDirName, findData.name ).c_str(),
+				MENUID_FILES + mTestRibFiles.size()-1 );
+
+			ret = _findnext64( handle, &findData );
+		} while ( ret == 0 );
+
+		_findclose( handle );
+	}
+
+#elif defined(__linux__)
+
+	DIR	*pDir = opendir( pDirName );
+	if ( pDir )
+	{
+		struct dirent *pDirent;
+
+		while ( pDirent = readdir( pDir ) )
+		{
+			//pDirent->
+		}
+
+		closedir( pDir );
+	}
+
+#endif
+
+}
+
+//==================================================================
 void RibRendTool::RebuildMenu()
 {
 	if ( mMainMenuID != -1 )
@@ -122,44 +168,10 @@ void RibRendTool::RebuildMenu()
 	glutAddMenuEntry( "-- Test Files --", -1 );
 
 	mTestRibFiles.clear();
+	mTestRibFilesPaths.clear();
 
-#if defined(WIN32)
-	_finddatai64_t	findData;
-	intptr_t	handle = _findfirst64( "TestScenes/*.rib", &findData );
-	if ( handle != -1 )
-	{
-		int	ret = 0;
-		do
-		{
-			mTestRibFiles.push_back( findData.name );
-
-			glutAddMenuEntry(
-				mTestRibFiles.back().c_str(),
-				MENUID_FILES + mTestRibFiles.size()-1 );
-
-			ret = _findnext64( handle, &findData );
-		} while ( ret == 0 );
-
-		_findclose( handle );
-	}
-
-#elif defined(__linux__)
-
-	DIR	*pDir = opendir( "TestScenes" );
-	if ( pDir )
-	{
-		struct dirent *pDirent;
-
-		while ( pDirent = readdir( pDir ) )
-		{
-			//pDirent->
-		}
-
-		closedir( pDir );
-	}
-
-#endif
-
+	addDirToMenu( "TestScenes", "rib" );
+	addDirToMenu( "TestScenes/Sponza", "rib" );
 }
 
 //==================================================================
@@ -184,9 +196,11 @@ void RibRendTool::MenuFunc( int id )
 
 	if ( id >= MENUID_FILES )
 	{
-		strcpy( mFileToRender, mExePath );
-		strcat( mFileToRender, "/TestScenes/" );
-		strcat( mFileToRender, mTestRibFiles[id - MENUID_FILES].c_str() );
+		strcpy_s( mFileToRender, mExePath );
+		strcat_s( mFileToRender, "/" );
+		strcat_s( mFileToRender, mTestRibFilesPaths[id - MENUID_FILES].c_str() );
+		strcat_s( mFileToRender, "/" );
+		strcat_s( mFileToRender, mTestRibFiles[id - MENUID_FILES].c_str() );
 
 		printf( "Render File: %s\n", mFileToRender );
 	}

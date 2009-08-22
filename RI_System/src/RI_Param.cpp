@@ -1,11 +1,10 @@
-/*
- *  RI_Param.cpp
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/18.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Param.cpp
+///
+/// Created by Davide Pasca - 2008/12/18
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_Param.h"
@@ -15,20 +14,22 @@ namespace RI
 {
 
 //==================================================================
-int findParam( const char *pFindName, u_int expectedType, int fromIdx, ParamList &params )
+int FindParam( const char *pFindName,
+			   u_int expectedType,
+			   u_int altExpectedType,
+			   int fromIdx,
+			   ParamList &params )
 {
-	DASSERT( ((params.size()-fromIdx) & 1) == 0 );
+	int n = (int)params.size() - 1;
 
-	if NOT( ((params.size()-fromIdx) & 1) == 0 )
-		return -1;
-
-	for (int i=fromIdx; i < (int)params.size(); i += 2)
+	for (int i=fromIdx; i < n; i += 2)
 	{
 		DASSERT( params[i].type == Param::STR );
 
 		if ( 0 == strcasecmp( pFindName, params[i] ) )
 		{
-			if ( params[i+1].type == expectedType )
+			if ( params[i+1].type == expectedType ||
+				 params[i+1].type == altExpectedType )
 				return i+1;
 			else
 				return -1;

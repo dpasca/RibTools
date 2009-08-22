@@ -131,7 +131,21 @@ public:
 };
 
 //==================================================================
-	int findParam( const char *pFindName, u_int expectedType, int fromIdx, ParamList &params );
+int FindParam(
+			const char *pFindName,
+			u_int expectedType,
+			u_int altExpectedType,
+			int fromIdx,
+			ParamList &params );
+
+inline int FindParam(
+			const char *pFindName,
+			u_int expectedType,
+			int fromIdx,
+			ParamList &params )
+{
+	return FindParam( pFindName, expectedType, expectedType, fromIdx, params );
+}
 
 //==================================================================
 }

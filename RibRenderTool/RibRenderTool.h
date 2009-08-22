@@ -22,6 +22,7 @@ public:
 	char				mExePath[2048];
 	char				mExeResPath[2048];
 	DVec<DStr>			mTestRibFiles;
+	DVec<DStr>			mTestRibFilesPaths;
 
 	RI::HiderREYES::Params	mREYESParams;
 
@@ -63,6 +64,8 @@ private:
 	static void sPassiveMotion( int x, int y );
 	static void sIdleFunc();
 	static void sMenuFunc( int id );
+
+	void addDirToMenu( const char *pDirName, const char *pFilesExt );
 
 };
 

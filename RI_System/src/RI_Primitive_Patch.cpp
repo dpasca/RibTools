@@ -42,7 +42,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	bool	uPeriodic = pyUWrap->IsNameI( RI_PERIODIC );
 	bool	vPeriodic = pyVWrap->IsNameI( RI_PERIODIC );
 		
-	int	PValuesParIdx = findParam( "P", Param::FLT_ARR, 5, mParams );
+	int	PValuesParIdx = FindParam( "P", Param::FLT_ARR, 5, mParams );
 	if ( PValuesParIdx == -1 )
 		return;
 	

@@ -29,11 +29,13 @@ Polygon::Polygon( ParamList &params, const SymbolList &staticSymbols ) :
 }
 
 //==================================================================
-void Polygon::simplifyAddTriangle(
+static void simplifyAddTriangle(
 				HiderREYES &hider,
 				const Vec3f &v1,
 				const Vec3f &v2,
-				const Vec3f &v3
+				const Vec3f &v3,
+				ParamList &params,
+				ComplexPrimitiveBase &srcPrim
 				)
 {
 	Vec3f	mid = (v1 + v2 + v3) * (1.0f/3);
@@ -46,23 +48,23 @@ void Polygon::simplifyAddTriangle(
 	patchVerts[1] = a;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( params, patchVerts ), srcPrim );
 	patchVerts[0] = v2;
 	patchVerts[1] = a;
 	patchVerts[2] = b;
 	patchVerts[3] = mid;
-	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( params, patchVerts ), srcPrim );
 	patchVerts[0] = v3;
 	patchVerts[1] = b;
 	patchVerts[2] = c;
 	patchVerts[3] = mid;
-	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
+	hider.InsertSimple( DNEW PatchBilinear( params, patchVerts ), srcPrim );
 }
 
 //==================================================================
 void Polygon::Simplify( HiderREYES &hider )
 {
-	int	PValuesParIdx = findParam( "P", Param::FLT_ARR, 0, mParams );
+	int	PValuesParIdx = FindParam( "P", Param::FLT_ARR, 0, mParams );
 	if ( PValuesParIdx == -1 )
 	{
 		DASSTHROW( 0, ("Missing 'P'") );
@@ -98,7 +100,9 @@ void Polygon::Simplify( HiderREYES &hider )
 						hider,
 						Vec3f( &paramP[3 * 0] ),
 						Vec3f( &paramP[3 * start] ),
-						Vec3f( &paramP[3 * end] )
+						Vec3f( &paramP[3 * end] ),
+						mParams,
+						*this
 					);
 	}
 }
@@ -113,43 +117,55 @@ PointsGeneralPolygons::PointsGeneralPolygons( ParamList &params, const SymbolLis
 }
 
 //==================================================================
-void PointsGeneralPolygons::simplifyAddTriangle(
-				HiderREYES &hider,
-				const Vec3f &v1,
-				const Vec3f &v2,
-				const Vec3f &v3
-				)
-{
-	Vec3f	mid = (v1 + v2 + v3) * (1.0f/3);
-	Vec3f	a	= (v1 + v2) * 0.5f;
-	Vec3f	b	= (v2 + v3) * 0.5f;
-	Vec3f	c	= (v1 + v3) * 0.5f;
-
-	Vec3f	patchVerts[4];
-	patchVerts[0] = v1;
-	patchVerts[1] = a;
-	patchVerts[2] = c;
-	patchVerts[3] = mid;
-	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
-	patchVerts[0] = v2;
-	patchVerts[1] = a;
-	patchVerts[2] = b;
-	patchVerts[3] = mid;
-	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
-	patchVerts[0] = v3;
-	patchVerts[1] = b;
-	patchVerts[2] = c;
-	patchVerts[3] = mid;
-	hider.InsertSimple( DNEW PatchBilinear( mParams, patchVerts ), *this );
-}
-
-//==================================================================
 static const size_t MAX_VERT_INFO = 32;
 struct VertInfo
 {
 	const char	*pName;
 	int			parIdx;
 };
+
+//==================================================================
+static void tessellateToBilinearPatches(
+							HiderREYES	 &hider,
+							const FltVec &paramP,
+							const int	 *pIndices,
+							int			 indicesN,
+							ParamList	 &primParams,
+							ComplexPrimitiveBase &srcPrim )
+{
+	int	last	= (int)indicesN - 1;
+	int	start	= 1;
+	int	end		= DMIN( (int)3, last );
+
+	Vec3f	patchVerts[4];
+
+	while ( (end - start) == 2 )
+	{
+		patchVerts[0].Set( &paramP[3 * pIndices[ 0			] ] );
+		patchVerts[1].Set( &paramP[3 * pIndices[ start		] ] );
+		patchVerts[2].Set( &paramP[3 * pIndices[ end		] ] );
+		patchVerts[3].Set( &paramP[3 * pIndices[ (start+1)	] ] );
+
+		hider.InsertSimple(
+				DNEW PatchBilinear( primParams, patchVerts ),
+				srcPrim );
+
+		start	= end;
+		end		= DMIN( start+2, last );
+	}
+
+	if ( (end - start) == 1 )
+	{	
+		simplifyAddTriangle(
+						hider,
+						Vec3f( &paramP[3 * pIndices[ 0		] ] ),
+						Vec3f( &paramP[3 * pIndices[ start	] ] ),
+						Vec3f( &paramP[3 * pIndices[ end	] ] ),
+						primParams,
+						srcPrim
+					);
+	}
+}
 
 //==================================================================
 void PointsGeneralPolygons::Simplify( HiderREYES &hider )
@@ -202,36 +218,36 @@ void PointsGeneralPolygons::Simplify( HiderREYES &hider )
 	}
 
 	const FltVec	&paramP = mParams[PValuesParIdx].NumVec();
-	
-	int	last	= (int)paramP.size()/3 - 1;
-	int	start	= 1;
-	int	end		= DMIN( (int)3, last );
-	
-	Vec3f	patchVerts[4];
-	
-	while ( (end - start) == 2 )
+
+	size_t nVertsIdx	= 0;
+	size_t idxVertsIdx	= 0;
+
+	for (size_t i=0; i < nloopsN; ++i)
 	{
-		patchVerts[0].Set( &paramP[3 * 0] );
-		patchVerts[1].Set( &paramP[3 * start] );
-		patchVerts[2].Set( &paramP[3 * end] );
-		patchVerts[3].Set( &paramP[3 * (start+1)] );
+		DASSTHROW( pNLoops[i] >= 0, ("Negative loops count ?!") );
 
-		hider.InsertSimple(
-				DNEW PatchBilinear( mParams, patchVerts ),
-				*this );
+		size_t nLoops = pNLoops[i];
+
+		nLoops = DMIN( nLoops, 1 );	// only the first loop
 		
-		start	= end;
-		end		= DMIN( start+2, last );
-	}
+		for (size_t j=0; j < nLoops; ++j)
+		{
+			DASSERT( nVertsIdx < nvertsN );
 
-	if ( (end - start) == 1 )
-	{	
-		simplifyAddTriangle(
-						hider,
-						Vec3f( &paramP[3 * 0] ),
-						Vec3f( &paramP[3 * start] ),
-						Vec3f( &paramP[3 * end] )
-					);
+			int nVerts = pNVerts[ nVertsIdx++ ];
+
+			DASSERT( (idxVertsIdx+nVerts) < nvertsN );
+
+			tessellateToBilinearPatches(
+							hider,
+							paramP,
+							&pVerts[ idxVertsIdx ],
+							nVerts,
+							mParams,
+							*this );
+
+			idxVertsIdx += nVerts;
+		}
 	}
 }
 

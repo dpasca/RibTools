@@ -199,7 +199,7 @@ std::string GetRegName( const Register &reg )
 	if NOT( reg.IsVarying() )
 		strcat_s( regBase, "u" );
 
-	return DUT::SSPrintF( "$%s%i", regBase, reg.GetRegIdx() );
+	return DUT::SSPrintFS( "$%s%i", regBase, reg.GetRegIdx() );
 }
 
 //==================================================================
