@@ -25,7 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;xcopy /E /Y ..\..\DistribSrc ..\..\Distrib&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -105,7 +105,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="mkdir ..\..\Distrib&#x0D;&#x0A;xcopy /E /Y ..\..\DistribSrc ..\..\Distrib&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

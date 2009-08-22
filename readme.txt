@@ -21,6 +21,12 @@ me personally:
  - e-mail: dpasca <at> gmail.com
 
 
+* Building
+
+- Use the build.bat script (currently DOES NOT build EXEs)
+- The PC Version requires Visual Studio 2008 or so
+
+
 * Credits
 
 RibTools includes code from the following libraries:
