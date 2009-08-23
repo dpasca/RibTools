@@ -18,8 +18,7 @@ namespace RI
 //==================================================================
 Machine::Machine( const Params &params ) :
 	mState(params.mState),
-	mForcedWd(params.mForcedWd),
-	mForcedHe(params.mForcedHe)
+	mParams(params)
 {
 }
 
@@ -92,6 +91,47 @@ static RtToken matchToken( const char *pStr, RtToken pAllowedTokens[] )
 	}
 	
 	return NULL;
+}
+
+//==================================================================
+void Machine::addFormatCmd( ParamList &p )
+{
+	exN( 3, p );
+
+	int	inWd = (int)p[0];
+	int	inHe = (int)p[1];
+
+	// bad case
+	if ( inWd < 0 || inHe < 0 )
+	{
+		DASSTHROW( false, ("Invalid size in Format") );
+	}
+
+	if ( mParams.mForcedLongDim > 0 )
+	{
+		int newWd;
+		int newHe;
+
+		if ( inWd > inHe )
+		{
+			newWd = mParams.mForcedLongDim;
+			newHe = mParams.mForcedLongDim * inHe / DMAX( inWd, 1 );
+		}
+		else
+		{
+			newHe = mParams.mForcedLongDim;
+			newWd = mParams.mForcedLongDim * inWd / DMAX( inHe, 1 );
+		}
+
+		mState.Format( newWd, newHe, p[2] );
+	}
+	else
+	if ( mParams.mForcedWd > 0 && mParams.mForcedHe > 0 )
+	{
+		mState.Format( mParams.mForcedWd, mParams.mForcedHe, p[2] );
+	}
+	else
+		mState.Format( p[0], p[1], p[2] );
 }
 
 //==================================================================
@@ -188,12 +228,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	// options
 	if ( nm == "Format" )
 	{
-		exN( 3, p );
-
-		if ( mForcedWd > 0 && mForcedHe > 0 )
-			mState.Format( mForcedWd, mForcedHe, p[2] );
-		else
-			mState.Format( p[0], p[1], p[2] );
+		addFormatCmd( p );
 	}
 	else
 	if ( nm == "FrameAspectRatio" )	{ exN( 1, p ); mState.FrameAspectRatio( p[0] );	}	else

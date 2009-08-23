@@ -22,30 +22,32 @@ namespace RI
 //==================================================================
 class Machine
 {
-	State	mState;
-	int		mForcedWd;
-	int		mForcedHe;
-
 public:
 	struct Params
 	{
 		State::Params	mState;
+		int				mForcedLongDim		;
 		int				mForcedWd			;
 		int				mForcedHe			;
 
 		Params() :
+			mForcedLongDim		(-1),
 			mForcedWd			(-1),
 			mForcedHe			(-1)
 		{
 		}
 	};
 
+private:
+	State	mState;
+	Params	mParams;
+
 public:
 	Machine( const Params &params );
-	
+
 	void AddCommand(const DStr	&cmdName,
 					ParamList	&cmdParams );
-	
+
 	void ErrHandler( Error errCode )
 	{
 		printf( "Error %s !!\n", ErrorToString( errCode ) );
@@ -57,6 +59,8 @@ private:
 	void unknownCommand( const char *pCmdName );
 	void exN( size_t n, const ParamList &cmdParams );
 	void geN( size_t n, const ParamList &cmdParams );
+
+	void addFormatCmd( ParamList &p );
 
 };
 

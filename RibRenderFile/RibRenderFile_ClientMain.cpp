@@ -52,17 +52,108 @@ static bool getServersList( int argc, char **argv, DVec<RRL::NET::Server> &list 
 	return true;
 }
 
+//==================================================================
+struct CmdParams
+{
+	const char				*pInFileName;
+	const char				*pOutFileName;
+	int						forcedlongdim;
+	DVec<RRL::NET::Server>	servList;
+
+	DStr					baseDir;
+
+	CmdParams() :
+		pInFileName		(NULL),
+		pOutFileName	(NULL),
+		forcedlongdim	(-1)
+	{
+	}
+};
+
+//==================================================================
+static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
+{
+	out_cmdPars.pInFileName	 = argv[2];
+	out_cmdPars.pOutFileName = argv[3];
+
+	out_cmdPars.baseDir = DUT::GetDirNameFromFPathName( out_cmdPars.pInFileName );
+
+	if NOT( getServersList( argc, argv, out_cmdPars.servList ) )
+	{
+		printf( "Error in the server list\n" );
+		return false;
+	}
+
+	for (int i=1; i < argc; ++i)
+	{
+		if ( 0 == strcasecmp( "-forcedlongdim", argv[i] ) )
+		{
+			if ( (i+1) >= argc )
+			{
+				printf( "Missing value for %s.\n", argv[i] );
+				return false;
+			}
+
+			out_cmdPars.forcedlongdim = atoi( argv[ i + 1 ] );
+
+			if ( out_cmdPars.forcedlongdim <= 0 ||
+				 out_cmdPars.forcedlongdim > 16384 )
+			{
+				printf( "Invalid value for %s.\n", argv[i] );
+			}
+		}
+	}
+
+	return true;
+}
+
+//==================================================================
+static void initServers( CmdParams &cmdPars, const char *defaultShadersDir )
+{
+	// prepare the template job header for the servers
+	RRL::NET::MsgRendJob	netRendJob;
+	strcpy_s( netRendJob.FileName	, cmdPars.pInFileName );
+	strcpy_s( netRendJob.BaseDir	, cmdPars.baseDir.c_str() );
+	strcpy_s( netRendJob.DefaultResourcesDir, defaultShadersDir );
+	netRendJob.ForcedLongDim = cmdPars.forcedlongdim;
+	netRendJob.ForcedWd = -1;
+	netRendJob.ForcedHe = -1;
+
+	// connect to all servers
+	printf( "Connecting to servers...\n" );
+	RRL::NET::ConnectToServers( cmdPars.servList, 3 * 1000 );
+
+	// for each server..
+	for (size_t i=0; i < cmdPars.servList.size(); ++i)
+	{
+		// if the connection was successful
+		if ( cmdPars.servList[i].IsConnected() )
+		{
+			// print a nice message and start by sending a job header..
+			printf( "Successfully connected to %s:%i\n", cmdPars.servList[i].mAddressName.c_str(), cmdPars.servList[i].mPortToCall );
+			cmdPars.servList[i].mpPakMan->Send( &netRendJob, sizeof(netRendJob) );
+		}
+		else
+		{
+			printf( "Failed to connect to %s:%i\n", cmdPars.servList[i].mAddressName.c_str(), cmdPars.servList[i].mPortToCall );
+		}
+	}
+}
 
 //==================================================================
 int ClientMain( int argc, char **argv )
 {
-	if ( argc < 3 )
+	if ( argc < 4 )
 	{
 		PrintUsage( argc, argv );
 		return -1;
 	}
 
-	const char *pOutExt = DUT::GetFileNameExt( argv[2] );
+	CmdParams	cmdPars;
+	if NOT( getCmdParams( argc, argv, cmdPars ) )
+		return -1;
+
+	const char *pOutExt = DUT::GetFileNameExt( cmdPars.pOutFileName );
 
 	if ( 0 != strcasecmp( pOutExt, "jpg" ) &&
 		 0 != strcasecmp( pOutExt, "jpeg" ) )
@@ -75,7 +166,6 @@ int ClientMain( int argc, char **argv )
 	char	defaultShadersDir[4096];
 
 	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
-	DStr	baseDir = DUT::GetDirNameFromFPathName( argv[1] );
 
 	if ( exePath.length() )
 		sprintf_s( defaultResDir, "%s/Resources", exePath.c_str() );
@@ -84,18 +174,11 @@ int ClientMain( int argc, char **argv )
 
 	sprintf_s( defaultShadersDir, "%s/Shaders", defaultResDir );
 
-	DVec<RRL::NET::Server> servList;
-	if NOT( getServersList( argc, argv, servList ) )
-	{
-		printf( "Error in the server srvList\n" );
-		return -1;
-	}
-
-	RenderOutputFile		rendOut( argv[2] );
+	RenderOutputFile		rendOut( cmdPars.pOutFileName );
 	RI::HiderREYES::Params	hiderParams;
 	RI::FileManagerDisk		fileManagerDisk;
 
-	if NOT( servList.size() )
+	if NOT( cmdPars.servList.size() )
 	{
 		try
 		{
@@ -104,11 +187,12 @@ int ClientMain( int argc, char **argv )
 			RI::Machine::Params	params;
 			params.mState.mpFramework			= &framework;
 			params.mState.mpFileManager			= &fileManagerDisk;
-			params.mState.mBaseDir				= baseDir;
+			params.mState.mBaseDir				= cmdPars.baseDir;
 			params.mState.mDefaultShadersDir	= defaultShadersDir;
+			params.mForcedLongDim				= cmdPars.forcedlongdim;
 			RI::Machine				machine( params );
 
-			RRL::Render	render( argv[1], machine, fileManagerDisk );
+			RRL::Render	render( cmdPars.pInFileName, machine, fileManagerDisk );
 		}
 		catch ( std::bad_alloc )
 		{
@@ -122,48 +206,28 @@ int ClientMain( int argc, char **argv )
 	}
 	else
 	{
-		// prepare the template job header for the servers
-		RRL::NET::MsgRendJob	netRendJob;
-		strcpy_s( netRendJob.FileName	, argv[1] );
-		strcpy_s( netRendJob.BaseDir	, baseDir.c_str() );
-		strcpy_s( netRendJob.DefaultResourcesDir, defaultShadersDir );
-		netRendJob.ForcedWd = -1;
-		netRendJob.ForcedHe = -1;
-
-		// connect to all servers
-		printf( "Connecting to servers...\n" );
-		RRL::NET::ConnectToServers( servList, 3 * 1000 );
-
-		// for each server..
-		for (size_t i=0; i < servList.size(); ++i)
-		{
-			// if the connection was successful
-			if ( servList[i].IsConnected() )
-			{
-				// print a nice message and start by sending a job header..
-				printf( "Successfully connected to %s:%i\n", servList[i].mAddressName.c_str(), servList[i].mPortToCall );
-				servList[i].mpPakMan->Send( &netRendJob, sizeof(netRendJob) );
-			}
-			else
-			{
-				printf( "Failed to connect to %s:%i\n", servList[i].mAddressName.c_str(), servList[i].mPortToCall );
-			}
-		}
-
-		RRL::NET::RenderBucketsClient	rendBuckets( servList );
-
-		RI::FrameworkREYES				framework( &rendOut, &rendBuckets, hiderParams );
-
-		RI::Machine::Params	params;
-		params.mState.mpFramework			= &framework;
-		params.mState.mpFileManager			= &fileManagerDisk;
-		params.mState.mBaseDir				= baseDir;
-		params.mState.mDefaultShadersDir	= defaultShadersDir;
-		RI::Machine						machine( params );
+		initServers( cmdPars, defaultShadersDir );
 
 		try
 		{
-			RRL::Render	render( argv[1], machine, fileManagerDisk );
+			RRL::NET::RenderBucketsClient	rendBuckets( cmdPars.servList );
+	
+			RI::FrameworkREYES				framework( &rendOut, &rendBuckets, hiderParams );
+
+			RI::Machine::Params	params;
+			params.mState.mpFramework			= &framework;
+			params.mState.mpFileManager			= &fileManagerDisk;
+			params.mState.mBaseDir				= cmdPars.baseDir;
+			params.mState.mDefaultShadersDir	= defaultShadersDir;
+			params.mForcedLongDim				= cmdPars.forcedlongdim;
+			RI::Machine						machine( params );
+
+			RRL::Render	render( cmdPars.pInFileName, machine, fileManagerDisk );
+		}
+		catch ( std::bad_alloc )
+		{
+			printf( "Out of Memory !!!\n" );
+			return -1;
 		}
 		catch ( ... )
 		{

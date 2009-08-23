@@ -67,7 +67,7 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 				return;
 			}
 
-			checkServersData( hider );
+			checkServersData( hider, false );
 			DUT::SleepMS( 10 );
 		}
 	#else
@@ -80,22 +80,24 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 		}
 	#endif
 
-		checkServersData( hider );
+		checkServersData( hider, false );
 	}
 
 	// tell all servers that we are done rendering
 	// ..and they should stop waiting for buckets
-	sendRendDone();
+	sendRendDoneToNotBusy();
 
 	// wait for all servers to complete !!
-	while NOT( checkServersData( hider ) )
+	while NOT( checkServersData( hider, true ) )
 	{
 		DUT::SleepMS( 10 );
 	}
 }
 
 //==================================================================
-bool RenderBucketsClient::checkServersData( RI::HiderREYES &hider )
+bool RenderBucketsClient::checkServersData(
+								RI::HiderREYES &hider,
+								bool replyDoneIfNotbusy )
 {
 	bool	allDone = true;
 
@@ -138,9 +140,25 @@ bool RenderBucketsClient::checkServersData( RI::HiderREYES &hider )
 						pPixData,
 						pixDataSize );
 
+				srv.mpPakMan->RemoveAndDeletePacket( pPacket );
+
+				// bucket done
 				srv.mBusyCnt -= 1;
 
-				srv.mpPakMan->RemoveAndDeletePacket( pPacket );
+				// waiting anymore buckets for this server ?
+				if ( srv.mBusyCnt != 0 )
+				{
+					// if yes, then make sure we don't return an
+					// all-done message
+					allDone = false;
+				}
+				else // if all buckets are done for this server..
+				if ( replyDoneIfNotbusy ) // do we want to relieve servers ?
+				{	
+					// send a goodbye message
+					MsgRendDone	msg;
+					srv.mpPakMan->SendValue( msg );
+				}
 			}
 		}
 		else
@@ -169,18 +187,17 @@ Server * RenderBucketsClient::findFreeServer()
 }
 
 //==================================================================
-void RenderBucketsClient::sendRendDone()
+void RenderBucketsClient::sendRendDoneToNotBusy()
 {
 	for (size_t i=0; i < mpServList->size(); ++i)
 	{
 		Server &srv = (*mpServList)[i];
 
-		if NOT( srv.IsConnected() )
+		if ( !srv.IsConnected() || srv.mBusyCnt )
 			continue;
 
 		MsgRendDone	msg;
-
-		srv.mpPakMan->Send( &msg, sizeof(msg) );
+		srv.mpPakMan->SendValue( msg );
 	}
 }
 
@@ -195,7 +212,7 @@ bool RenderBucketsClient::dispatchToServer( int buckRangeX1, int buckRangeX2 )
 		MsgRendBuckes	msg;
 		msg.BucketStart = (U32)buckRangeX1;
 		msg.BucketEnd	= (U32)buckRangeX2;
-		pUseServer->mpPakMan->Send( &msg, sizeof(msg) );
+		pUseServer->mpPakMan->SendValue( msg );
 		pUseServer->mBusyCnt += cnt;	// set as busy
 		return true;
 	}

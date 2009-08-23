@@ -40,6 +40,7 @@ static int serverTask( SOCKET clientSock )
 	printf( "\tFileName  = %s\n", netRendJob.FileName );
 	printf( "\tBaseDir   = %s\n", netRendJob.BaseDir );
 	printf( "\tDefResDir = %s\n", netRendJob.DefaultResourcesDir );
+	printf( "\tForcedLongSize  = %i\n", netRendJob.ForcedLongDim );
 	printf( "\tForcedWd  = %i\n", netRendJob.ForcedWd );
 	printf( "\tForcedHe  = %i\n", netRendJob.ForcedHe );
 
@@ -56,6 +57,9 @@ static int serverTask( SOCKET clientSock )
 	params.mState.mpFileManager			= &fileManagerNet;
 	params.mState.mBaseDir				= netRendJob.BaseDir;
 	params.mState.mDefaultShadersDir	= netRendJob.DefaultResourcesDir;
+	params.mForcedLongDim				= netRendJob.ForcedLongDim;
+	params.mForcedWd					= netRendJob.ForcedWd;
+	params.mForcedHe					= netRendJob.ForcedHe;
 	RI::Machine				machine( params );
 
 	try

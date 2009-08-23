@@ -112,7 +112,7 @@ public:
 	void Send( const void *pData, size_t dataSize );
 
 	template<class T>
-	void SendValue( const T &val)
+	void SendValue( const T &val )
 	{
 		Send( &val, sizeof(val) );
 	}

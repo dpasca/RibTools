@@ -38,9 +38,13 @@ public:
 private:
 	Server *findFreeServer();
 	bool dispatchToServer( int buckRangeX1, int buckRangeX2 );
-	bool checkServersData( RI::HiderREYES &hider );
+
+	bool checkServersData(
+					RI::HiderREYES &hider,
+					bool replyDoneIfNotbusy );
+
 	bool isAnyServerAvailable() const;
-	void sendRendDone();
+	void sendRendDoneToNotBusy();
 };
 
 //==================================================================
