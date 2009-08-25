@@ -9,6 +9,7 @@
 #include "RibRenderLib_Net_RenderBucketsClient.h"
 
 //#define NO_LOCAL_RENDERING
+#define BUCKETS_BATCH_SIZE	8
 
 //==================================================================
 namespace RRL
@@ -51,10 +52,10 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 
 	// loop through the buckets, rendering directly or assigning them
 	// to other servers
-	for (int buckRangeX1=0; buckRangeX1 < bucketsN; buckRangeX1 += 4)
+	for (int buckRangeX1=0; buckRangeX1 < bucketsN; buckRangeX1 += BUCKETS_BATCH_SIZE)
 	{
-		// pick a range of 4 buckets
-		int buckRangeX2 = DMIN( buckRangeX1 + 4, bucketsN );
+		// pick a range of "BUCKETS_BATCH_SIZE" buckets
+		int buckRangeX2 = DMIN( buckRangeX1 + BUCKETS_BATCH_SIZE, bucketsN );
 
 		// try to give the buckets to render to the server
 	#if defined(NO_LOCAL_RENDERING)

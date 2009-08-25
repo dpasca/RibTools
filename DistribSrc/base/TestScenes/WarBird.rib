@@ -24,8 +24,11 @@
 WorldBegin
 Scale .1 .1 .1
 
-LightSource "Light1" "distantlight" "intensity" [ 1 ] "lightcolor" [ 1 1 1 ] "from" [ -5 -5 -5 ] "to" [ 0 0 0 ]
-LightSource "Light2" "distantlight" "intensity" [ 1.0 ] "lightcolor" [ 1 1 1 ] "from" [ -5 10 -5 ] "to" [ 0 0 0 ]
+# DAVIDE - "fixed" lights IDs
+# LightSource "Light1" "distantlight" "intensity" [ 1 ] "lightcolor" [ 1 1 1 ] "from" [ -5 -5 -5 ] "to" [ 0 0 0 ]
+# LightSource "Light2" "distantlight" "intensity" [ 1.0 ] "lightcolor" [ 1 1 1 ] "from" [ -5 10 -5 ] "to" [ 0 0 0 ]
+LightSource "distantlight" 1 "intensity" [ 1 ] "lightcolor" [ 1 1 1 ] "from" [ -5 -5 -5 ] "to" [ 0 0 0 ]
+LightSource "distantlight" 2 "intensity" [ 1.0 ] "lightcolor" [ 1 1 1 ] "from" [ -5 10 -5 ] "to" [ 0 0 0 ]
 
 #ShadingInterpolation "smooth"
 GeometricApproximation "tesselation" "parametric" [10 10]
