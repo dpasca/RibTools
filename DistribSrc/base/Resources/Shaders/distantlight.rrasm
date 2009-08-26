@@ -24,6 +24,6 @@
 light
 	; temporary
 
-	movvv		Cl lightcolor
+	mov.vv		Cl lightcolor
 
 	ret

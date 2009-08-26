@@ -70,6 +70,7 @@ void SlRunContext::Setup(
 		mpShaderInst	= pShaderInst;
 		mpAttribs		= &attribs;
 
+		DASSERT( 0 != mpShaderInst->mpShader );
 		mpDataSegment	= mpShaderInst->Bind( *mpSymbols );
 	}
 

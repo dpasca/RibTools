@@ -57,8 +57,10 @@ public:
 	friend VecN	DCos( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
 };
 
-template <class _S, size_t _N>
-inline VecN<_S,_N> operator * (const _S &lval, const VecN<_S,_N> &rval) { return rval * lval; }
+template <class _S, size_t _N> inline VecN<_S,_N> operator + (const _S &lval, const VecN<_S,_N> &rval) { return rval + lval; }
+template <class _S, size_t _N> inline VecN<_S,_N> operator - (const _S &lval, const VecN<_S,_N> &rval) { return rval - lval; }
+template <class _S, size_t _N> inline VecN<_S,_N> operator * (const _S &lval, const VecN<_S,_N> &rval) { return rval * lval; }
+template <class _S, size_t _N> inline VecN<_S,_N> operator / (const _S &lval, const VecN<_S,_N> &rval) { return rval / lval; }
 
 #undef FOR_I_N
 

@@ -214,9 +214,20 @@ public:
 };
 
 //==================================================================
+template<class _S> Vec2<_S> operator + (const _S &lval, const Vec2<_S> &rval) { return rval + lval; }
+template<class _S> Vec2<_S> operator - (const _S &lval, const Vec2<_S> &rval) { return rval - lval; }
 template<class _S> Vec2<_S> operator * (const _S &lval, const Vec2<_S> &rval) { return rval * lval; }
+template<class _S> Vec2<_S> operator / (const _S &lval, const Vec2<_S> &rval) { return rval / lval; }
+
+template<class _S> Vec3<_S> operator + (const _S &lval, const Vec3<_S> &rval) { return rval + lval; }
+template<class _S> Vec3<_S> operator - (const _S &lval, const Vec3<_S> &rval) { return rval - lval; }
 template<class _S> Vec3<_S> operator * (const _S &lval, const Vec3<_S> &rval) { return rval * lval; }
+template<class _S> Vec3<_S> operator / (const _S &lval, const Vec3<_S> &rval) { return rval / lval; }
+
+template<class _S> Vec4<_S> operator + (const _S &lval, const Vec4<_S> &rval) { return rval + lval; }
+template<class _S> Vec4<_S> operator - (const _S &lval, const Vec4<_S> &rval) { return rval - lval; }
 template<class _S> Vec4<_S> operator * (const _S &lval, const Vec4<_S> &rval) { return rval * lval; }
+template<class _S> Vec4<_S> operator / (const _S &lval, const Vec4<_S> &rval) { return rval / lval; }
 
 //==================================================================
 /// float implementations

@@ -598,7 +598,15 @@ static std::string resolveIntrinsics( const char *pIntrName )
 
 	if ( pIntrName == strstr( pIntrName, spBaseStr ) )
 	{
-		return pIntrName + sBaseLen;
+		std::string	str = pIntrName + sBaseLen;
+
+		for (size_t i=0; i < str.length(); ++i)
+		{
+			if ( str[i] == '_' )
+				str[i] = '.';
+		}
+
+		return str; 
 	}
 	else
 		return "UNKNOWN_INTRINSIC";
@@ -678,7 +686,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 */
 						fprintf_s(
 								pFile,
-								"\tmov%c%c\t%-6s\t%-6s\n",
+								"\tmov.%c%c\t%-6s\t%-6s\n",
 								l1,
 								l2,
 								o1Str.c_str(),
@@ -687,7 +695,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 				else
 					fprintf_s(
 							pFile,
-							"\t%s%c%c\t%-6s\t%-6s\t%-6s\n",
+							"\t%s.%c%c\t%-6s\t%-6s\t%-6s\n",
 							asmOpCodeFromOpToken( pNode->mpToken ),
 							l1,
 							l2,
@@ -700,10 +708,13 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 				Register	reg = pNode->GetRegister();
 				std::string regName = GetRegName( reg );
 
+				char		lreg = VarTypeToLetter( reg.GetVarType() );
+
 				fprintf_s(
 						pFile,
-						"\t%s%c%c\t%-6s\t%-6s\t%-6s\n",
+						"\t%s.%c%c%c\t%-6s\t%-6s\t%-6s\n",
 						asmOpCodeFromOpToken( pNode->mpToken ),
+						lreg,
 						l1,
 						l2,
 						regName.c_str(),

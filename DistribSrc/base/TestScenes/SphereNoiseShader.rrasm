@@ -10,6 +10,6 @@
 .code
 
 surface
-	mulvs		$v0	P	_const1
+	mul.vvs		$v0	P	_const1
 	noise33		Ci	$v0
-	movvv		Oi	Os
+	mov.vv		Oi	Os

@@ -7,7 +7,7 @@
 .code
 
 surface
-	movvv	Ci	N
-	movvv	Oi	N
+	mov.vv	Ci	N
+	mov.vv	Oi	N
 
 	ret

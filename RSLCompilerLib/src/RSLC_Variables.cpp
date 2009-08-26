@@ -130,15 +130,15 @@ void Variable::SetVarying( bool varying )
 //==================================================================
 std::string Variable::GetUseName() const
 {
+	if ( mIsGlobal || mIsSHParam )
+		return mpDefNameTok->str;
+	else
 	if ( mBuild_Register.IsValid() )
 	{
 		return GetRegName( mBuild_Register );
 	}
 	else
-		if ( mIsGlobal || mIsSHParam )
-			return mpDefNameTok->str;
-		else
-			return mInternalName;
+		return mInternalName;
 }
 
 //==================================================================

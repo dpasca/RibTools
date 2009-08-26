@@ -18,14 +18,14 @@
 surface
 	normalize	$v0		N
 	;faceforward	$v0	$v0	I
-	;mulvv		$v0	$v0	Koe
-	;movvv		Ci	$v0
-	;mulvv		Ci	I	$v0
-	;movvv		Ci	I 
-	faceforward	Nf	$v0	I
-	movvv		Ci	Nf		// 
-	;movvv		Ci	I		// 
-	;addvv		Ci	Ci	Koe
-	movvv		Oi	Os		// Oi = Os
+	;mul.vvv		$v0	$v0	Koe
+	;mov.vv			Ci	$v0
+	;mul.vvv		Ci	I	$v0
+	;mov.vv			Ci	I 
+	faceforward		Nf	$v0	I
+	mov.vv			Ci	Nf		// 
+	;mov.vv			Ci	I		// 
+	;add.vvv		Ci	Ci	Koe
+	mov.vv			Oi	Os		// Oi = Os
 
 	ret

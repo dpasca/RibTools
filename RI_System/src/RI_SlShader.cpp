@@ -430,43 +430,47 @@ static void Inst_CalculateNormal( SlRunContext &ctx )
 }
 
 //==================================================================
-#define SINGLE	SlScalar
-#define VECTOR	SlVec3
+#define S SlScalar
+#define V SlVec3
 //#define MATRIX	Matrix44
 
 //==================================================================
 static ShaderInstruction	sInstructionTable[OP_N] =
 {
-	SOP::Inst_1Op<SINGLE,SINGLE,OBT_MOV>,
-	SOP::Inst_1Op<VECTOR,SINGLE,OBT_MOV>,
-	SOP::Inst_1Op<VECTOR,VECTOR,OBT_MOV>,
+	SOP::Inst_1Op<S,S,OBT_MOV>,
+	SOP::Inst_1Op<V,S,OBT_MOV>,
+	SOP::Inst_1Op<V,V,OBT_MOV>,
 
-	SOP::Inst_1Op<SINGLE,SINGLE,OBT_ABS>,
-	SOP::Inst_1Op<VECTOR,SINGLE,OBT_ABS>,
-	SOP::Inst_1Op<VECTOR,VECTOR,OBT_ABS>,
+	SOP::Inst_1Op<S,S,OBT_ABS>,
+	SOP::Inst_1Op<V,S,OBT_ABS>,
+	SOP::Inst_1Op<V,V,OBT_ABS>,
 
-	SOP::Inst_2Op<SINGLE,SINGLE,OBT_ADD>,
-	SOP::Inst_2Op<VECTOR,SINGLE,OBT_ADD>,
-	SOP::Inst_2Op<VECTOR,VECTOR,OBT_ADD>,
+	SOP::Inst_2Op<S,S,S,OBT_ADD>,
+	SOP::Inst_2Op<V,V,S,OBT_ADD>,
+	SOP::Inst_2Op<V,S,V,OBT_ADD>,
+	SOP::Inst_2Op<V,V,V,OBT_ADD>,
 
-	SOP::Inst_2Op<SINGLE,SINGLE,OBT_SUB>,
-	SOP::Inst_2Op<VECTOR,SINGLE,OBT_SUB>,
-	SOP::Inst_2Op<VECTOR,VECTOR,OBT_SUB>,
+	SOP::Inst_2Op<S,S,S,OBT_SUB>,
+	SOP::Inst_2Op<V,V,S,OBT_SUB>,
+	SOP::Inst_2Op<V,S,V,OBT_SUB>,
+	SOP::Inst_2Op<V,V,V,OBT_SUB>,
 
-	SOP::Inst_2Op<SINGLE,SINGLE,OBT_MUL>,
-	SOP::Inst_2Op<VECTOR,SINGLE,OBT_MUL>,
-	SOP::Inst_2Op<VECTOR,VECTOR,OBT_MUL>,
+	SOP::Inst_2Op<S,S,S,OBT_MUL>,
+	SOP::Inst_2Op<V,V,S,OBT_MUL>,
+	SOP::Inst_2Op<V,S,V,OBT_MUL>,
+	SOP::Inst_2Op<V,V,V,OBT_MUL>,
 
-	SOP::Inst_2Op<SINGLE,SINGLE,OBT_DIV>,
-	SOP::Inst_2Op<VECTOR,SINGLE,OBT_DIV>,
-	SOP::Inst_2Op<VECTOR,VECTOR,OBT_DIV>,
+	SOP::Inst_2Op<S,S,S,OBT_DIV>,
+	SOP::Inst_2Op<V,S,V,OBT_DIV>,
+	SOP::Inst_2Op<V,V,S,OBT_DIV>,
+	SOP::Inst_2Op<V,V,V,OBT_DIV>,
 
 	SOP::Inst_MOVVS3<SlVec3,SlScalar>,
 
-	SOP::Inst_LD1<SINGLE>,
-	SOP::Inst_LD3<VECTOR>,
+	SOP::Inst_LD1<S>,
+	SOP::Inst_LD3<V>,
 
-	SOP::Inst_CMPLT<SINGLE>,	// cmplt
+	SOP::Inst_CMPLT<S>,	// cmplt
 
 	SOP::Inst_Noise1<SlScalar>,
 	SOP::Inst_Noise1<SlVec2>,
@@ -491,6 +495,9 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 
 	NULL,	// ret
 };
+
+#undef S
+#undef V
 
 //==================================================================
 void SlShaderInstance::Run( SlRunContext &ctx ) const

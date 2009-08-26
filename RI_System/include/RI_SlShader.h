@@ -59,21 +59,25 @@ enum OpCodeID
 	OP_VS_ABS	,
 	OP_VV_ABS	,
 
-	OP_SS_ADD	,
-	OP_VS_ADD	,
-	OP_VV_ADD	,
+	OP_SSS_ADD	,
+	OP_VVS_ADD	,
+	OP_VSV_ADD	,
+	OP_VVV_ADD	,
 
-	OP_SS_SUB	,
-	OP_VS_SUB	,
-	OP_VV_SUB	,
+	OP_SSS_SUB	,
+	OP_VVS_SUB	,
+	OP_VSV_SUB	,
+	OP_VVV_SUB	,
 
-	OP_SS_MUL	,
-	OP_VS_MUL	,
-	OP_VV_MUL	,
+	OP_SSS_MUL	,
+	OP_VVS_MUL	,
+	OP_VSV_MUL	,
+	OP_VVV_MUL	,
 
-	OP_SS_DIV	,
-	OP_VS_DIV	,
-	OP_VV_DIV	,
+	OP_SSS_DIV	,
+	OP_VVS_DIV	,
+	OP_VSV_DIV	,
+	OP_VVV_DIV	,
 
 	// no need for index alignment from here on
 	OP_VS3_MOV	,

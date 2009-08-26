@@ -16,6 +16,6 @@
 .code
 
 light
-	mulvs		Cl	lightcolor	intensity
+	mul.vvs		Cl	lightcolor	intensity
 
 	ret

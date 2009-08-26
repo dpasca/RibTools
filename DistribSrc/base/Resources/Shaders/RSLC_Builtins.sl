@@ -32,7 +32,7 @@ float	inversesqrt( float x ){}
 float	log( float x ){}
 float	log( float x, base ){}
 float	mod( float a, b ){}
-float	abs( float x ){}
+float	abs( float x )		{	_asm_abs( x ); }
 float	sign( float x ){}
 
 float	min( float	a, b )		{	float	tmp; _asm_min( tmp, a, b ); return tmp; }
@@ -142,17 +142,17 @@ vector	cellnoise( point pt ){}
 vector	cellnoise( point pt, float t ){}
 */
 
-float xcomp( point	P ){ float tmp; _asm_xcompsv( tmp, P ); return tmp; }
-float xcomp( vector	P ){ float tmp; _asm_xcompsv( tmp, P ); return tmp; }
-float xcomp( normal	P ){ float tmp; _asm_xcompsv( tmp, P ); return tmp; }
+float xcomp( point	P ){ float tmp; _asm_xcomp_sv( tmp, P ); return tmp; }
+float xcomp( vector	P ){ float tmp; _asm_xcomp_sv( tmp, P ); return tmp; }
+float xcomp( normal	P ){ float tmp; _asm_xcomp_sv( tmp, P ); return tmp; }
 	   
-float ycomp( point	P ){ float tmp; _asm_ycompsv( tmp, P ); return tmp; }
-float ycomp( vector	P ){ float tmp; _asm_ycompsv( tmp, P ); return tmp; }
-float ycomp( normal	P ){ float tmp; _asm_ycompsv( tmp, P ); return tmp; }
+float ycomp( point	P ){ float tmp; _asm_ycomp_sv( tmp, P ); return tmp; }
+float ycomp( vector	P ){ float tmp; _asm_ycomp_sv( tmp, P ); return tmp; }
+float ycomp( normal	P ){ float tmp; _asm_ycomp_sv( tmp, P ); return tmp; }
 									  
-float zcomp( point	P ){ float tmp; _asm_zcompsv( tmp, P ); return tmp; }
-float zcomp( vector	P ){ float tmp; _asm_zcompsv( tmp, P ); return tmp; }
-float zcomp( normal	P ){ float tmp; _asm_zcompsv( tmp, P ); return tmp; }
+float zcomp( point	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
+float zcomp( vector	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
+float zcomp( normal	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
 
 void	setxcomp( output point	 P; float x ){}
 void	setxcomp( output vector	 P; float x ){}
@@ -230,4 +230,4 @@ float	shadow( string name[channel]; texture coordinates[, parameterlist] ){}
 float	textureinfo( string texturename, dataname; output type variable ){}
 */
 
-vector vector( float x, float y, float z )	{ vector tmp; _asm_movvs3( tmp, x, y, z ); return tmp; }
+vector vector( float x, float y, float z )	{ vector tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }

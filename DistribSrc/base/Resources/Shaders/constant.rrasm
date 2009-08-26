@@ -14,7 +14,7 @@
 .code
 
 surface
-	movvv	Ci	Cs
-	movvv	Oi	Os
+	mov.vv	Ci	Cs
+	mov.vv	Oi	Os
 
 	ret

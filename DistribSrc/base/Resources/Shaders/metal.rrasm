@@ -32,20 +32,20 @@ surface
 	faceforward	Nf	$v0	I
 
 	normalize	$v0		I
-	ldv			$vu1	0
-	subvv		V	$vu1	$v0
+	ld.v		$vu1	0 0 0
+	sub.vvv		V	$vu1	$v0
 
-	movvv		Oi	Os		// Oi = Os
+	mov.vv		Oi	Os		// Oi = Os
 	
 	specular	$v0	Nf	V	roughness
-	mulvs		$v0	$v0	Ks
+	mul.vvs		$v0	$v0	Ks
 
 	ambient		$v1			// -- Ka * ambient()
-	mulvs		$v1	$v1	Ka
+	mul.vvs		$v1	$v1	Ka
 
-	addvv		$v0	$v0	$v1	// +
+	add.vvv		$v0	$v0	$v1	// +
 
-	mulvv		$v0	$v0	Cs	// * Cs
-	mulvv		Ci	$v0	Os	// * Os -> Ci
+	mul.vvv		$v0	$v0	Cs	// * Cs
+	mul.vvv		Ci	$v0	Os	// * Os -> Ci
 
 	ret

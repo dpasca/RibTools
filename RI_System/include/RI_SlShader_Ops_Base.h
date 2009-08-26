@@ -192,12 +192,12 @@ void Inst_1Op( SlRunContext &ctx )
 }
 
 //==================================================================
-template <class TA, class TB, const OpBaseTypeID opBaseTypeID>
+template <class TA, class TB, class TC, const OpBaseTypeID opBaseTypeID>
 void Inst_2Op( SlRunContext &ctx )
 {
 		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
-	const TA*	op1	= ctx.GetVoidRO( (const TA *)0, 2 );
-	const TB*	op2	= ctx.GetVoidRO( (const TB *)0, 3 );
+	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
+	const TC*	op2	= ctx.GetVoidRO( (const TC *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 

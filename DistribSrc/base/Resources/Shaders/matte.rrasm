@@ -28,16 +28,16 @@ surface
 	faceforward	Nf	$v0	I
 
 	diffuse		$v0	Nf		// -- Kd * diffuse( Nf )
-	mulvs		$v0	$v0	Kd
+	mul.vvs		$v0	$v0	Kd
 
 	ambient		$v1			// -- Ka * ambient()
-	mulvs		$v1	$v1	Ka
+	mul.vvs		$v1	$v1	Ka
 
-	addvv		$v0	$v0	$v1	// +
+	add.vvv		$v0	$v0	$v1	// +
 
-	mulvv		$v0	$v0	Cs	// * Cs
-	mulvv		Ci	$v0	Os	// * Os -> Ci
+	mul.vvv		$v0	$v0	Cs	// * Cs
+	mul.vvv		Ci	$v0	Os	// * Os -> Ci
 
-	movvv		Oi	Os		// Oi = Os
+	mov.vv		Oi	Os		// Oi = Os
 
 	ret
