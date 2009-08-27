@@ -91,7 +91,7 @@ public:
 class HiderREYES
 {
 public:
-	SymbolList		*mpStatics;
+	SlSymbolList	*mpStatics;
 private:
 	Matrix44		mMtxWorldCamera;
 	Matrix44		mMtxWorldProj;

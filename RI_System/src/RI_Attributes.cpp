@@ -10,6 +10,7 @@
 #include <stdarg.h>
 #include <stdexcept>
 #include "RI_State.h"
+#include "RI_Symbol.h"
 #include "RI_Attributes.h"
 #include "DSystem/include/DUtils_Files.h"
 
@@ -98,7 +99,7 @@ Attributes::~Attributes()
 //==================================================================
 void Attributes::Init(
 				  State				*pState,
-				  SymbolList		*pStatics,
+				  SlSymbolList		*pStatics,
 				  ResourceManager	*pResManager,
 				  RevisionTracker	*pRevision )
 {
@@ -162,7 +163,7 @@ void Attributes::cmdDetailRange(float	minVisible,
 void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 										   float valueApproximation )
 {
-	mpyTypeApproximation	= mpStatics->FindVoid( typeApproximation );
+	mpyTypeApproximation	= mpStatics->LookupVariable( typeApproximation, SlSymbol::VOIDD );
 	mValueApproximation		= valueApproximation;
 	mpRevision->BumpRevision();
 }
@@ -206,7 +207,7 @@ void Attributes::cmdBasis(
 				RtToken vbasis, const float *pCustomVBasis, int vstep )
 {
 	if ( ubasis )
-		mpyUBasis = mpStatics->FindBasis( ubasis );
+		mpyUBasis = mpStatics->LookupVariable( ubasis, SlSymbol::MATRIX );
 	else
 	{
 		DSAFE_DELETE( mpCustomUBasis );
@@ -214,7 +215,7 @@ void Attributes::cmdBasis(
 	}
 
 	if ( vbasis )
-		mpyVBasis = mpStatics->FindBasis( vbasis );
+		mpyVBasis = mpStatics->LookupVariable( vbasis, SlSymbol::MATRIX );
 	else
 	{
 		DSAFE_DELETE( mpCustomVBasis );

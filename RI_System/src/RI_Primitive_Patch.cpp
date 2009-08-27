@@ -21,11 +21,11 @@ namespace RI
 //==================================================================
 PatchMesh::PatchMesh( RtToken type,
 					  ParamList &params,
-					  const SymbolList &staticSymbols ) :
+					  const SlSymbolList &staticSymbols ) :
 	ComplexPrimitiveBase(PATCHMESH),
 	mParams(params)
 {
-	mpyPatchType = staticSymbols.FindVoid( type );
+	mpyPatchType = staticSymbols.LookupVoid( type );
 }
 
 //==================================================================
@@ -34,10 +34,10 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	// PatchMesh "bilinear" 2 "nonperiodic" 5 "nonperiodic" "P"  [ -0.995625 2 -0.495465 ...
 	//               0      1       2       3       4        5     6
 
-	int			nu		= mParams[1];
-	CPSymVoid	pyUWrap = hider.mpStatics->FindVoid( mParams[2] );
-	int			nv		= mParams[3];
-	CPSymVoid	pyVWrap = hider.mpStatics->FindVoid( mParams[4] );
+	int				nu		= mParams[1];
+	const SlSymbol*	pyUWrap = hider.mpStatics->LookupVoid( mParams[2] );
+	int				nv		= mParams[3];
+	const SlSymbol*	pyVWrap = hider.mpStatics->LookupVoid( mParams[4] );
 
 	bool	uPeriodic = pyUWrap->IsNameI( RI_PERIODIC );
 	bool	vPeriodic = pyVWrap->IsNameI( RI_PERIODIC );
@@ -120,13 +120,13 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	}
 	else
 	{
-		DASSTHROW( 0, ("Unrecognized Patch type %s", mpyPatchType->pName ) );
+		DASSTHROW( 0, ("Unrecognized Patch type %s", mpyPatchType->mName ) );
 		//ErrHandler( E_BADARGUMENT );
 	}	
 }
 
 //==================================================================
-PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols ) :
+PatchBilinear::PatchBilinear( ParamList &params, const SlSymbolList &staticSymbols ) :
 	SimplePrimitiveBase(PATCHBILINEAR)//,
 	//mParams(params)
 {
@@ -202,7 +202,7 @@ void PatchBilinear::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
+PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SlSymbolList &staticSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
 {
@@ -220,7 +220,7 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 PatchBicubic::PatchBicubic( ParamList &params,
 							const Vec3f hull[16],
 						    const Attributes &attr,
-							const SymbolList &staticSymbols ) :
+							const SlSymbolList &staticSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
 {

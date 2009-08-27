@@ -63,7 +63,7 @@ void State::Torus( float maxRadius, float minRadius,
 //==================================================================
 void State::Patch( RtToken type, ParamList &params )
 {
-	CPSymVoid	pyPatchType = mStatics.FindVoid( type );
+	const SlSymbol*	pyPatchType = mStatics.LookupVoid( type );
 	
 	if ( pyPatchType->IsNameI( RI_BICUBIC ) )
 		insertPrimitive( DNEW RI::PatchBicubic( params, mAttributesStack.top(), mStatics ) );

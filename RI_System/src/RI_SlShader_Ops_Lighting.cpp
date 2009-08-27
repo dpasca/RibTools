@@ -7,7 +7,7 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_SlSymbol.h"
+#include "RI_Symbol.h"
 #include "RI_State.h"
 #include "RI_Attributes.h"
 #include "RI_LightSource.h"

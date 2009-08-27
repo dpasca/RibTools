@@ -32,7 +32,7 @@ public:
 	State			*mpState;
 
 private:
-	SymbolList		*mpStatics;
+	SlSymbolList	*mpStatics;
 	ResourceManager *mpResManager;
 
 public:
@@ -40,7 +40,7 @@ public:
 
 public:
 	//==================================================================
-	SymbolList			mSymbols;
+	SlSymbolList		mSymbols;
 					
 	Bound				mBound;				// DoBound()
 	Bound				mDetail;			// Detail()
@@ -50,14 +50,14 @@ public:
 	float				mUpperTransition;	//
 	float				mMaxVisible;		//
 					
-	CPSymVoid			mpyTypeApproximation;	// GeometricApproximation()
+	SlSymbol*			mpyTypeApproximation;	// GeometricApproximation()
 	float				mValueApproximation;
 					
 	bool				mOrientationFlipped;// Orientation()
 	int					mSides;				// Sides()
 
-	CPSymBasis			mpyUBasis;			// Basis()
-	CPSymBasis			mpyVBasis;
+	const SlSymbol*		mpyUBasis;			// Basis()
+	const SlSymbol*		mpyVBasis;
 	const RtBasis		*mpCustomUBasis;
 	const RtBasis		*mpCustomVBasis;
 	
@@ -79,7 +79,7 @@ public:
 
 	void Init(
 			State			*pState,
-			SymbolList		*pStatics,
+			SlSymbolList	*pStatics,
 			ResourceManager	*pResManager,
 			RevisionTracker	*pRevision );
 
@@ -103,8 +103,8 @@ public:
 	void cmdBasis(RtToken ubasis, const float *pCustomUBasis, int ustep,
 				  RtToken vbasis, const float *pCustomVBasis, int vstep );
 				  
-	const RtBasis &GetUBasis() const { return mpCustomUBasis ? *mpCustomUBasis : mpyUBasis->value; }
-	const RtBasis &GetVBasis() const { return mpCustomVBasis ? *mpCustomVBasis : mpyVBasis->value; }
+	const RtBasis &GetUBasis() const { return mpCustomUBasis ? *mpCustomUBasis : *(const RtBasis *)mpyUBasis->GetData(); }
+	const RtBasis &GetVBasis() const { return mpCustomVBasis ? *mpCustomVBasis : *(const RtBasis *)mpyVBasis->GetData(); }
 
 	void cmdColor( const Color &color );
 	void cmdOpacity( const Color &color );

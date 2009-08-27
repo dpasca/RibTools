@@ -10,7 +10,7 @@
 #ifndef RI_NOISE_H
 #define RI_NOISE_H
 
-#include "RI_SlSymbol.h"
+#include "RI_Symbol.h"
 
 //==================================================================
 namespace RI

@@ -23,11 +23,11 @@ namespace RI
 //==================================================================
 class Options
 {
-	SymbolList	*mpStatics;
+	SlSymbolList	*mpStatics;
 
 public:
 	Options();
-	void Init( SymbolList *pStatics, RevisionTracker *pRevision );
+	void Init( SlSymbolList *pStatics, RevisionTracker *pRevision );
 
 	// avoid initialization of default values and just copy..
 	//Options( const Options &options ) {	*this = options; }
@@ -43,9 +43,9 @@ public:
 	float	mLeft, mRight, mBottom, mTop;
 	float	mXMin, mXMax, mYMin, mYMax;
 	
-	CPSymVoid	mpyProjection;
-	ParamList	mProjectionParams;
-	Matrix44	mMtxCamProj;
+	const SlSymbol	*mpyProjection;
+	ParamList		mProjectionParams;
+	Matrix44		mMtxCamProj;
 	
 	float	mNearClip, mFarClip;
 	float	mFStop, mFocalLength, mFocalDistance;

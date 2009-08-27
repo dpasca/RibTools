@@ -29,7 +29,7 @@ Options::Options() :
 }
 
 //==================================================================
-void Options::Init( SymbolList *pStatics, RevisionTracker *pRevision )
+void Options::Init( SlSymbolList *pStatics, RevisionTracker *pRevision )
 {
 	mpStatics = pStatics;
 	mpRevision = pRevision;
@@ -190,7 +190,7 @@ void Options::Finalize()
 
 	if ( mProjectionParams[0].u.stringVal == RI_PERSPECTIVE )
 	{
-		mpyProjection	= mpStatics->FindVoid( RI_PERSPECTIVE );
+		mpyProjection	= mpStatics->LookupVoid( RI_PERSPECTIVE );
 		
 		for (size_t i=1; i < mProjectionParams.size(); ++i)
 		{
@@ -218,7 +218,7 @@ void Options::Finalize()
 	else
 	if ( mProjectionParams[0].u.stringVal == RI_ORTHOGRAPHIC )
 	{
-		mpyProjection	= mpStatics->FindVoid( RI_ORTHOGRAPHIC );
+		mpyProjection	= mpStatics->LookupVoid( RI_ORTHOGRAPHIC );
 	}
 }
 

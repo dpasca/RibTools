@@ -16,7 +16,7 @@ namespace RI
 {
 
 class Attributes;
-class SymbolList;
+class SlSymbolList;
 
 //==================================================================
 /// SlRunContext

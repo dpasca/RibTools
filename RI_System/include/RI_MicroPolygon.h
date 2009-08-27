@@ -12,7 +12,7 @@
 #include "DSystem/include/DTypes.h"
 #include "DSystem/include/DContainers.h"
 #include "DMath/include/DMath.h"
-#include "RI_SlSymbol.h"
+#include "RI_Symbol.h"
 
 //==================================================================
 namespace RI

@@ -374,14 +374,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_SlSymbol.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_SlSymbol.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RI_State.cpp"
 				>
 			</File>

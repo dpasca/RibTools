@@ -30,8 +30,7 @@ MicroPolygonGrid::MicroPolygonGrid() :
 	mpDataCs(0),
 	mpDataOs(0),
 	mSurfRunCtx(mSymbols, MAX_SIZE),
-	mDispRunCtx(mSymbols, MAX_SIZE),
-	mSymbols(16)
+	mDispRunCtx(mSymbols, MAX_SIZE)
 {
 	static const size_t allocN = MAX_SIZE;
 

@@ -10,7 +10,7 @@
 #define RI_SLSHADER_H
 
 #include "RI_Base.h"
-#include "RI_SlSymbol.h"
+#include "RI_Symbol.h"
 #include "RI_Resource.h"
 #include "RI_FileManager.h"
 
@@ -265,8 +265,7 @@ public:
 		return mpShader != NULL;
 	}
 
-	SlShaderInstance( const SlShaderInstance &right ) :
-		mCallingParams(32)
+	SlShaderInstance( const SlShaderInstance &right )
 	{
 		moShader.Borrow( right.moShader.Use() );
 		mpShader		= right.mpShader;

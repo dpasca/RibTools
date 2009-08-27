@@ -136,8 +136,7 @@ SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 //==================================================================
 SlShaderInstance::SlShaderInstance( size_t maxPointsN ) :
 	mpShader(NULL),
-	mMaxPointsN(maxPointsN),
-	mCallingParams(32)
+	mMaxPointsN(maxPointsN)
 {
 }
 
