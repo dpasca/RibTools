@@ -64,7 +64,7 @@ private:
 
 	void onError( const char *pFmt, ... );
 
-	void verifySymbolType(	SlSymbol::Type slSymType,
+	void verifySymbolType(	Symbol::Type slSymType,
 							OperTypeID otExpected,
 							int reportOpIdx,
 							const char *pReportOpName );

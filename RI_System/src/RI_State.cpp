@@ -24,10 +24,10 @@ State::State( const Params &params ) :
 
 	mMtxWorldCamera.Identity();
 
-	SlSymbolList::SymbolParams symPar;
-	symPar.mType		= SlSymbol::VOIDD;
+	SymbolList::SymbolParams symPar;
+	symPar.mType		= Symbol::VOIDD;
 	symPar.mIsVarying	= false;
-	symPar.mStorage		= SlSymbol::CONSTANT;
+	symPar.mStorage		= Symbol::CONSTANT;
 
 	symPar.mpName =		RI_FRAMEBUFFER				; mStatics.Add( symPar );
 	symPar.mpName = 	RI_FILE						; mStatics.Add( symPar );
@@ -112,9 +112,9 @@ State::State( const Params &params ) :
 	symPar.mpName = 	RI_HANDLER					; mStatics.Add( symPar );
 	symPar.mpName = 	RI_EMPTY_TOKEN				; mStatics.Add( symPar );
 
-	symPar.mType		= SlSymbol::MATRIX;
+	symPar.mType		= Symbol::MATRIX;
 	symPar.mIsVarying	= false;
-	symPar.mStorage		= SlSymbol::CONSTANT;
+	symPar.mStorage		= Symbol::CONSTANT;
 
 	symPar.mpName = RI_BEZIERBASIS				; mStatics.Add( symPar, (const void *)&BezierBasis	);
 	symPar.mpName = RI_BSPLINEBASIS				; mStatics.Add( symPar, (const void *)&BSplineBasis	);

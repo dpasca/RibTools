@@ -84,7 +84,7 @@ private:
 	//SlVec3			mHullPos[4];
 
 public:
-	PatchBilinear( ParamList &params, const SlSymbolList &staticSymbols );
+	PatchBilinear( ParamList &params, const SymbolList &staticSymbols );
 	PatchBilinear( ParamList &params, const Vec3f hull[4] );
 
 	~PatchBilinear()
@@ -171,11 +171,11 @@ private:
 	SplinePatchCalc<SlVec3,SlScalar>	mCalcV[4];
 
 public:
-	PatchBicubic( ParamList &params, const Attributes &attr, const SlSymbolList &staticSymbols );
+	PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols );
 	PatchBicubic( ParamList &params,
 							const Vec3f hull[16],
 						    const Attributes &attr,
-							const SlSymbolList &staticSymbols );
+							const SymbolList &staticSymbols );
 
 		PatchBicubic *Clone() const {	return DNEW PatchBicubic( *this ); }
 
@@ -209,13 +209,13 @@ private:
 class PatchMesh : public ComplexPrimitiveBase
 {
 public:
-	const SlSymbol*	mpyPatchType;
+	const Symbol*	mpyPatchType;
 	ParamList		mParams;
 
 public:
 	PatchMesh(RtToken type,
 			  ParamList &params,
-			  const SlSymbolList &staticSymbols );
+			  const SymbolList &staticSymbols );
 
 		void Simplify( HiderREYES &hider );
 };

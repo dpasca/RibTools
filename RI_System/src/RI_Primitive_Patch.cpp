@@ -21,7 +21,7 @@ namespace RI
 //==================================================================
 PatchMesh::PatchMesh( RtToken type,
 					  ParamList &params,
-					  const SlSymbolList &staticSymbols ) :
+					  const SymbolList &staticSymbols ) :
 	ComplexPrimitiveBase(PATCHMESH),
 	mParams(params)
 {
@@ -35,9 +35,9 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	//               0      1       2       3       4        5     6
 
 	int				nu		= mParams[1];
-	const SlSymbol*	pyUWrap = hider.mpStatics->LookupVoid( mParams[2] );
+	const Symbol*	pyUWrap = hider.mpStatics->LookupVoid( mParams[2] );
 	int				nv		= mParams[3];
-	const SlSymbol*	pyVWrap = hider.mpStatics->LookupVoid( mParams[4] );
+	const Symbol*	pyVWrap = hider.mpStatics->LookupVoid( mParams[4] );
 
 	bool	uPeriodic = pyUWrap->IsNameI( RI_PERIODIC );
 	bool	vPeriodic = pyVWrap->IsNameI( RI_PERIODIC );
@@ -126,7 +126,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 }
 
 //==================================================================
-PatchBilinear::PatchBilinear( ParamList &params, const SlSymbolList &staticSymbols ) :
+PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols ) :
 	SimplePrimitiveBase(PATCHBILINEAR)//,
 	//mParams(params)
 {
@@ -202,7 +202,7 @@ void PatchBilinear::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SlSymbolList &staticSymbols ) :
+PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
 {
@@ -220,7 +220,7 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SlS
 PatchBicubic::PatchBicubic( ParamList &params,
 							const Vec3f hull[16],
 						    const Attributes &attr,
-							const SlSymbolList &staticSymbols ) :
+							const SymbolList &staticSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
 {

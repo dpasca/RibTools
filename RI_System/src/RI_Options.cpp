@@ -29,7 +29,7 @@ Options::Options() :
 }
 
 //==================================================================
-void Options::Init( SlSymbolList *pStatics, RevisionTracker *pRevision )
+void Options::Init( SymbolList *pStatics, RevisionTracker *pRevision )
 {
 	mpStatics = pStatics;
 	mpRevision = pRevision;

@@ -154,14 +154,14 @@ void SimplePrimitiveBase::Dice(
 {
 	//SlVec3	*pPointsWS = g.mpPointsWS;
 
-	SlVec3	 *pPointsWS = (SlVec3 *)g.mSymbols.LookupVariableData( "P", SlSymbol::POINT );
-	SlScalar *pOODu	= (SlScalar *)g.mSymbols.LookupVariableData( "oodu", SlSymbol::FLOAT );
-	SlScalar *pOODv	= (SlScalar *)g.mSymbols.LookupVariableData( "oodv", SlSymbol::FLOAT );
-	SlVec3	 *pI	= (SlVec3 *)g.mSymbols.LookupVariableData( "I", SlSymbol::VECTOR );
-	SlVec3	 *pN	= (SlVec3 *)g.mSymbols.LookupVariableData( "N", SlSymbol::NORMAL );
-	SlVec3	 *pNg	= (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", SlSymbol::NORMAL );
-	SlColor	 *pOs	= (SlColor *)g.mSymbols.LookupVariableData( "Os", SlSymbol::COLOR );
-	SlColor	 *pCs	= (SlColor *)g.mSymbols.LookupVariableData( "Cs", SlSymbol::COLOR );
+	SlVec3	 *pPointsWS = (SlVec3 *)g.mSymbols.LookupVariableData( "P", Symbol::POINT );
+	SlScalar *pOODu	= (SlScalar *)g.mSymbols.LookupVariableData( "oodu", Symbol::FLOAT );
+	SlScalar *pOODv	= (SlScalar *)g.mSymbols.LookupVariableData( "oodv", Symbol::FLOAT );
+	SlVec3	 *pI	= (SlVec3 *)g.mSymbols.LookupVariableData( "I", Symbol::VECTOR );
+	SlVec3	 *pN	= (SlVec3 *)g.mSymbols.LookupVariableData( "N", Symbol::NORMAL );
+	SlVec3	 *pNg	= (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", Symbol::NORMAL );
+	SlColor	 *pOs	= (SlColor *)g.mSymbols.LookupVariableData( "Os", Symbol::COLOR );
+	SlColor	 *pCs	= (SlColor *)g.mSymbols.LookupVariableData( "Cs", Symbol::COLOR );
 
 	DASSERT( pPointsWS == g.mpPointsWS );
 
@@ -293,7 +293,7 @@ void SimplePrimitiveBase::Dice(
 
 //==================================================================
 bool ParamsFindP(	ParamList &params,
-					const SlSymbolList &staticSymbols,
+					const SymbolList &staticSymbols,
 					DVec<Vec3f> &out_vectorP,
 					int fromIdx )
 {
@@ -303,7 +303,7 @@ bool ParamsFindP(	ParamList &params,
 	{
 		DASSERT( params[i].type == Param::STR );
 
-		const SlSymbol* pyToken = staticSymbols.LookupVoid( params[i] );
+		const Symbol* pyToken = staticSymbols.LookupVoid( params[i] );
 		if ( pyToken && pyToken->IsNameI( "P" ) )
 		{
 			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );
@@ -326,7 +326,7 @@ bool ParamsFindP(	ParamList &params,
 
 //==================================================================
 bool ParamsFindP(	ParamList &params,
-					const SlSymbolList &staticSymbols,
+					const SymbolList &staticSymbols,
 					Vec3f	*pOut_vectorP,
 					int	expectedN,
 					int fromIdx )
@@ -337,7 +337,7 @@ bool ParamsFindP(	ParamList &params,
 	{
 		DASSERT( params[i].type == Param::STR );
 		
-		const SlSymbol* pyToken = staticSymbols.LookupVoid( params[i] );
+		const Symbol* pyToken = staticSymbols.LookupVoid( params[i] );
 		if ( pyToken && pyToken->IsNameI( "P" ) )
 		{
 			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );

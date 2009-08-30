@@ -34,77 +34,77 @@ MicroPolygonGrid::MicroPolygonGrid() :
 {
 	static const size_t allocN = MAX_SIZE;
 
-	SlSymbol *pSymbol;
+	Symbol *pSymbol;
 
 	// allocate some standard varying params
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "P";
-	pSymbol->mType = SlSymbol::POINT;
+	pSymbol->mType = Symbol::POINT;
 	mpPointsWS = (SlVec3 *)pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "oodu";
-	pSymbol->mType = SlSymbol::FLOAT;
+	pSymbol->mType = Symbol::FLOAT;
 	pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "oodv";
-	pSymbol->mType = SlSymbol::FLOAT;
+	pSymbol->mType = Symbol::FLOAT;
 	pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "I";
-	pSymbol->mType = SlSymbol::VECTOR;
+	pSymbol->mType = Symbol::VECTOR;
 	pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "N";
-	pSymbol->mType = SlSymbol::NORMAL;
+	pSymbol->mType = Symbol::NORMAL;
 	pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "Ng";
-	pSymbol->mType = SlSymbol::NORMAL;
+	pSymbol->mType = Symbol::NORMAL;
 	pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "Ci";
-	pSymbol->mType = SlSymbol::COLOR;
+	pSymbol->mType = Symbol::COLOR;
 	mpDataCi = (SlColor *)pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "Oi";
-	pSymbol->mType = SlSymbol::COLOR;
+	pSymbol->mType = Symbol::COLOR;
 	mpDataOi = (SlColor *)pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "Cs";
-	pSymbol->mType = SlSymbol::COLOR;
+	pSymbol->mType = Symbol::COLOR;
 	mpDataCs = (SlColor *)pSymbol->AllocData( MAX_SIZE );
 
 	pSymbol = mSymbols.Grow();
 	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = SlSymbol::GLOBAL;
+	pSymbol->mStorage = Symbol::GLOBAL;
 	pSymbol->mName = "Os";
-	pSymbol->mType = SlSymbol::COLOR;
+	pSymbol->mType = Symbol::COLOR;
 	mpDataOs = (SlColor *)pSymbol->AllocData( MAX_SIZE );
 }
 

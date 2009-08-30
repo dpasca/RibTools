@@ -18,7 +18,7 @@ namespace RI
 //==================================================================
 /// SlRunContext
 //==================================================================
-SlRunContext::SlRunContext( const SlSymbolList &symbols, size_t maxPointsN )
+SlRunContext::SlRunContext( const SymbolList &symbols, size_t maxPointsN )
 {
 	mBlocksXN;
 	mPointsYN;

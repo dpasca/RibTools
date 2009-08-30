@@ -32,7 +32,7 @@ public:
 	State			*mpState;
 
 private:
-	SlSymbolList	*mpStatics;
+	SymbolList	*mpStatics;
 	ResourceManager *mpResManager;
 
 public:
@@ -40,7 +40,7 @@ public:
 
 public:
 	//==================================================================
-	SlSymbolList		mSymbols;
+	SymbolList		mSymbols;
 					
 	Bound				mBound;				// DoBound()
 	Bound				mDetail;			// Detail()
@@ -50,14 +50,14 @@ public:
 	float				mUpperTransition;	//
 	float				mMaxVisible;		//
 					
-	SlSymbol*			mpyTypeApproximation;	// GeometricApproximation()
+	Symbol*			mpyTypeApproximation;	// GeometricApproximation()
 	float				mValueApproximation;
 					
 	bool				mOrientationFlipped;// Orientation()
 	int					mSides;				// Sides()
 
-	const SlSymbol*		mpyUBasis;			// Basis()
-	const SlSymbol*		mpyVBasis;
+	const Symbol*		mpyUBasis;			// Basis()
+	const Symbol*		mpyVBasis;
 	const RtBasis		*mpCustomUBasis;
 	const RtBasis		*mpCustomVBasis;
 	
@@ -79,7 +79,7 @@ public:
 
 	void Init(
 			State			*pState,
-			SlSymbolList	*pStatics,
+			SymbolList	*pStatics,
 			ResourceManager	*pResManager,
 			RevisionTracker	*pRevision );
 

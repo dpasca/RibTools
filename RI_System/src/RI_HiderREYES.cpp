@@ -318,8 +318,8 @@ void HiderREYES::Hide(
 
 	const SlVec3	*pPointsWS	= (const SlVec3 *)g.mpPointsWS;
 
-	const SlColor	*pOi = (const SlColor *)g.mSymbols.LookupVariableData( "Oi", SlSymbol::COLOR );
-	const SlColor	*pCi = (const SlColor *)g.mSymbols.LookupVariableData( "Ci", SlSymbol::COLOR );
+	const SlColor	*pOi = (const SlColor *)g.mSymbols.LookupVariableData( "Oi", Symbol::COLOR );
+	const SlColor	*pCi = (const SlColor *)g.mSymbols.LookupVariableData( "Ci", Symbol::COLOR );
 
 	size_t	blocksN = RI_GET_SIMD_BLOCKS( g.mPointsN );
 

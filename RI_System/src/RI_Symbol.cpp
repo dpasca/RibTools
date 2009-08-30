@@ -30,7 +30,7 @@ static void freeStream( void *p )
 }
 
 //==================================================================
-void *SlSymbol::AllocClone( size_t size ) const
+void *Symbol::AllocClone( size_t size ) const
 {
 	//DASSTHROW( mpDefaultVal == NULL, ("Shouldn't have a default value !!!") );
 
@@ -40,13 +40,13 @@ void *SlSymbol::AllocClone( size_t size ) const
 
 	switch ( mType )
 	{
-	case SlSymbol::FLOAT:	pOutData = allocStream( sizeof(SlScalar)*blocksN ); break;
-	case SlSymbol::POINT:	pOutData = allocStream( sizeof(SlVec3)*blocksN ); 	break;
-	case SlSymbol::COLOR:	pOutData = allocStream( sizeof(SlColor)*blocksN );	break;
-	case SlSymbol::VECTOR:	pOutData = allocStream( sizeof(SlVec3)*blocksN );	break;
-	case SlSymbol::NORMAL:	pOutData = allocStream( sizeof(SlVec3)*blocksN );	break;
-	case SlSymbol::MATRIX:	pOutData = allocStream( sizeof(Matrix44)*size );	break;
-	//case SlSymbol::STRING:	pOutData = new char		[ size ]; break;
+	case Symbol::FLOAT:	pOutData = allocStream( sizeof(SlScalar)*blocksN ); break;
+	case Symbol::POINT:	pOutData = allocStream( sizeof(SlVec3)*blocksN ); 	break;
+	case Symbol::COLOR:	pOutData = allocStream( sizeof(SlColor)*blocksN );	break;
+	case Symbol::VECTOR:	pOutData = allocStream( sizeof(SlVec3)*blocksN );	break;
+	case Symbol::NORMAL:	pOutData = allocStream( sizeof(SlVec3)*blocksN );	break;
+	case Symbol::MATRIX:	pOutData = allocStream( sizeof(Matrix44)*size );	break;
+	//case Symbol::STRING:	pOutData = new char		[ size ]; break;
 	default:
 		DASSERT( 0 );
 		break;
@@ -56,19 +56,19 @@ void *SlSymbol::AllocClone( size_t size ) const
 }
 
 //==================================================================
-void SlSymbol::FillDataWithDefault( void *pDestData, size_t size ) const
+void Symbol::FillDataWithDefault( void *pDestData, size_t size ) const
 {
 	size_t	blocksN = RI_GET_SIMD_BLOCKS( size );
 
 	switch ( mType )
 	{
-	case SlSymbol::FLOAT:	for (size_t i=0; i < blocksN; ++i) ((SlScalar *)pDestData)[i] = ((const SlScalar *)mpDefaultVal)[0]; break;
-	case SlSymbol::POINT:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
-	case SlSymbol::COLOR:	for (size_t i=0; i < blocksN; ++i) ((SlColor  *)pDestData)[i] = ((const SlColor  *)mpDefaultVal)[0]; break;
-	case SlSymbol::VECTOR:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
-	case SlSymbol::NORMAL:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
-	case SlSymbol::MATRIX:	for (size_t i=0; i < blocksN; ++i) ((Matrix44 *)pDestData)[i] = ((const Matrix44 *)mpDefaultVal)[0]; break;
-	//case SlSymbol::STRING: break;
+	case Symbol::FLOAT:	for (size_t i=0; i < blocksN; ++i) ((SlScalar *)pDestData)[i] = ((const SlScalar *)mpDefaultVal)[0]; break;
+	case Symbol::POINT:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
+	case Symbol::COLOR:	for (size_t i=0; i < blocksN; ++i) ((SlColor  *)pDestData)[i] = ((const SlColor  *)mpDefaultVal)[0]; break;
+	case Symbol::VECTOR:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
+	case Symbol::NORMAL:	for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
+	case Symbol::MATRIX:	for (size_t i=0; i < blocksN; ++i) ((Matrix44 *)pDestData)[i] = ((const Matrix44 *)mpDefaultVal)[0]; break;
+	//case Symbol::STRING: break;
 	default:
 		DASSERT( 0 );
 		break;
@@ -76,19 +76,19 @@ void SlSymbol::FillDataWithDefault( void *pDestData, size_t size ) const
 }
 
 //==================================================================
-void SlSymbol::FillData( void *pDestData, size_t size, const void *pSrcData ) const
+void Symbol::FillData( void *pDestData, size_t size, const void *pSrcData ) const
 {
 	size_t	blocksN = RI_GET_SIMD_BLOCKS( size );
 
 	switch ( mType )
 	{
-	case SlSymbol::FLOAT:	{ SlScalar	tmp(*(const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlScalar*)pDestData)[i] = tmp; } break;
-	case SlSymbol::POINT:	{ SlVec3	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlVec3	*)pDestData)[i] = tmp; } break;
-	case SlSymbol::COLOR:	{ SlColor	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlColor	*)pDestData)[i] = tmp; } break;
-	case SlSymbol::VECTOR:	{ SlVec3	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlVec3	*)pDestData)[i] = tmp; } break;
-	case SlSymbol::NORMAL:	{ SlVec3	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlVec3	*)pDestData)[i] = tmp; } break;
-	case SlSymbol::MATRIX:	{ Matrix44	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((Matrix44*)pDestData)[i] = tmp; } break;
-	//case SlSymbol::STRING: break;
+	case Symbol::FLOAT:	{ SlScalar	tmp(*(const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlScalar*)pDestData)[i] = tmp; } break;
+	case Symbol::POINT:	{ SlVec3	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlVec3	*)pDestData)[i] = tmp; } break;
+	case Symbol::COLOR:	{ SlColor	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlColor	*)pDestData)[i] = tmp; } break;
+	case Symbol::VECTOR:	{ SlVec3	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlVec3	*)pDestData)[i] = tmp; } break;
+	case Symbol::NORMAL:	{ SlVec3	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlVec3	*)pDestData)[i] = tmp; } break;
+	case Symbol::MATRIX:	{ Matrix44	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((Matrix44*)pDestData)[i] = tmp; } break;
+	//case Symbol::STRING: break;
 	default:
 		DASSERT( 0 );
 		break;
@@ -96,7 +96,7 @@ void SlSymbol::FillData( void *pDestData, size_t size, const void *pSrcData ) co
 }
 
 //==================================================================
-void *SlSymbol::AllocData( size_t size )
+void *Symbol::AllocData( size_t size )
 {
 	DASSTHROW( mpValArray == NULL && mpDefaultVal == NULL, ("Already allocated !!!") );
 
@@ -106,7 +106,7 @@ void *SlSymbol::AllocData( size_t size )
 }
 
 //==================================================================
-void SlSymbol::AllocDefault( const void *pSrcData )
+void Symbol::AllocDefault( const void *pSrcData )
 {
 	DASSTHROW( mpValArray == NULL && mpDefaultVal == NULL, ("Already allocated !!!") );
 
@@ -114,73 +114,73 @@ void SlSymbol::AllocDefault( const void *pSrcData )
 
 	switch ( mType )
 	{
-	case SlSymbol::FLOAT :
+	case Symbol::FLOAT :
 			((SlScalar *)mpDefaultVal)[0] = ((const float *)pSrcData)[0];
 			break;
 
-	case SlSymbol::POINT :
+	case Symbol::POINT :
 			((SlVec3 *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
 			((SlVec3 *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
 			((SlVec3 *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
 			break;
 
-	case SlSymbol::COLOR :
+	case Symbol::COLOR :
 			((SlColor *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
 			((SlColor *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
 			((SlColor *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
 			break;
 
-	case SlSymbol::VECTOR:
-	case SlSymbol::NORMAL:
+	case Symbol::VECTOR:
+	case Symbol::NORMAL:
 			((SlVec3 *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
 			((SlVec3 *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
 			((SlVec3 *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
 			break;
 
-	case SlSymbol::STRING:
-	case SlSymbol::MATRIX:
+	case Symbol::STRING:
+	case Symbol::MATRIX:
 			DASSTHROW( mpValArray == NULL, ("Currently unsupported type !") );
 			break;
 	}
 }
 
 //==================================================================
-void SlSymbol::FreeClone( void *pData ) const
+void Symbol::FreeClone( void *pData ) const
 {
 	if ( pData )
 		freeStream( pData );
 }
 
 //==================================================================
-/// SlSymbolList
+/// SymbolList
 //==================================================================
-SlSymbolList::SlSymbolList()
+SymbolList::SymbolList()
 {
 }
 
 //==================================================================
-SlSymbolList::SlSymbolList( const SlSymbolList &from )
-{
-	mpSymbols = from.mpSymbols;
-}
-
-//==================================================================
-void SlSymbolList::operator=( const SlSymbolList &from )
+SymbolList::SymbolList( const SymbolList &from )
 {
 	mpSymbols = from.mpSymbols;
 }
 
 //==================================================================
-SlSymbolList::~SlSymbolList()
+void SymbolList::operator=( const SymbolList &from )
+{
+	mpSymbols = from.mpSymbols;
+}
+
+//==================================================================
+SymbolList::~SymbolList()
 {
 }
 
 //==================================================================
-SlSymbol * SlSymbolList::LookupVariable( const char *pName )
+Symbol * SymbolList::LookupVariable( const char *pName )
 {
 	for (size_t i=0; i < size(); ++i)
 	{
-		SlSymbol	&symbol = (*this)[i];
+		Symbol	&symbol = (*this)[i];
 
 		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
@@ -192,11 +192,11 @@ SlSymbol * SlSymbolList::LookupVariable( const char *pName )
 }
 
 //==================================================================
-const SlSymbol * SlSymbolList::LookupVariableI( const char *pName ) const
+const Symbol * SymbolList::LookupVariableI( const char *pName ) const
 {
 	for (size_t i=0; i < size(); ++i)
 	{
-		const SlSymbol	&symbol = (*this)[i];
+		const Symbol	&symbol = (*this)[i];
 
 		if ( 0 == strcasecmp( symbol.mName.c_str(), pName ) )
 		{
@@ -208,11 +208,11 @@ const SlSymbol * SlSymbolList::LookupVariableI( const char *pName ) const
 }
 
 //==================================================================
-const SlSymbol * SlSymbolList::LookupVariable( const char *pName ) const
+const Symbol * SymbolList::LookupVariable( const char *pName ) const
 {
 	for (size_t i=0; i < size(); ++i)
 	{
-		const SlSymbol	&symbol = (*this)[i];
+		const Symbol	&symbol = (*this)[i];
 
 		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
@@ -224,33 +224,11 @@ const SlSymbol * SlSymbolList::LookupVariable( const char *pName ) const
 }
 
 //==================================================================
-SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type )
+Symbol * SymbolList::LookupVariable( const char *pName, Symbol::Type type )
 {
 	for (size_t i=0; i < size(); ++i)
 	{
-		SlSymbol	&symbol = (*this)[i];
-
-		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
-		{
-			DASSTHROW( symbol.mType == type,
-						("%s type not matching ! It's %i, but expecting %i",
-								__FUNCTION__,
-								symbol.mType,
-								type ) );
-
-			return &symbol;
-		}
-	}
-
-	return NULL;
-}
-
-//==================================================================
-const SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type type ) const
-{
-	for (size_t i=0; i < size(); ++i)
-	{
-		const SlSymbol	&symbol = (*this)[i];
+		Symbol	&symbol = (*this)[i];
 
 		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
 		{
@@ -268,9 +246,31 @@ const SlSymbol * SlSymbolList::LookupVariable( const char *pName, SlSymbol::Type
 }
 
 //==================================================================
-void *SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type )
+const Symbol * SymbolList::LookupVariable( const char *pName, Symbol::Type type ) const
 {
-	SlSymbol	*pSym = LookupVariable( pName, type );
+	for (size_t i=0; i < size(); ++i)
+	{
+		const Symbol	&symbol = (*this)[i];
+
+		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
+		{
+			DASSTHROW( symbol.mType == type,
+						("%s type not matching ! It's %i, but expecting %i",
+								__FUNCTION__,
+								symbol.mType,
+								type ) );
+
+			return &symbol;
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
+void *SymbolList::LookupVariableData( const char *pName, Symbol::Type type )
+{
+	Symbol	*pSym = LookupVariable( pName, type );
 	if NOT( pSym )
 		return NULL;
 	else
@@ -278,9 +278,9 @@ void *SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type )
 }
 
 //==================================================================
-const void *SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type type ) const
+const void *SymbolList::LookupVariableData( const char *pName, Symbol::Type type ) const
 {
-	const SlSymbol	*pSym = LookupVariable( pName, type );
+	const Symbol	*pSym = LookupVariable( pName, type );
 	if NOT( pSym )
 		return NULL;
 	else
@@ -288,14 +288,14 @@ const void *SlSymbolList::LookupVariableData( const char *pName, SlSymbol::Type 
 }
 
 //==================================================================
-SlSymbol *SlSymbolList::Add( const SymbolParams &params, const void *pSrcData )
+Symbol *SymbolList::Add( const SymbolParams &params, const void *pSrcData )
 {
 	if ( LookupVariableI( params.mpName ) )
 	{
 		DASSERT( 0 );
 		return NULL;
 	}
-	SlSymbol	*pSym = Grow();
+	Symbol	*pSym = Grow();
 	pSym->mName			= params.mpName;
 	pSym->mType			= params.mType;
 	pSym->mStorage		= params.mStorage;
@@ -310,16 +310,16 @@ SlSymbol *SlSymbolList::Add( const SymbolParams &params, const void *pSrcData )
 }
 
 //==================================================================
-void SlSymbolList::AddVoid( const char *pName )
+void SymbolList::AddVoid( const char *pName )
 {
 	if ( LookupVariableI( pName ) )
 	{
 		DASSERT( 0 );
 		return;
 	}
-	SlSymbol	*pSym = Grow();
+	Symbol	*pSym = Grow();
 	pSym->mName = pName;
-	pSym->mType	= SlSymbol::VOIDD;
+	pSym->mType	= Symbol::VOIDD;
 }
 
 //==================================================================

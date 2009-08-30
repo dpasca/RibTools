@@ -71,7 +71,7 @@ public:
 	Matrix44		mMtxLocalWorld;
 	float			mURange[2];
 	float			mVRange[2];
-	SlSymbolList	mSymbols;
+	SymbolList	mSymbols;
 	
 	MicroPolygonGrid();
 	~MicroPolygonGrid();

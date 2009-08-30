@@ -129,7 +129,7 @@ class FrameworkREYES
 public:
 	RenderOutputBase	*mpRenderOutput;
 	RenderBucketsBase	*mpRenderBuckets;
-	SlSymbolList		*mpStatics;
+	SymbolList		*mpStatics;
 	HiderREYES			mHider;
 
 private:
@@ -147,7 +147,7 @@ public:
 					RenderBucketsBase *pRenderBuckets,
 					const HiderREYES &hiderParams );
 
-	void SetStatics( SlSymbolList *pStatics )
+	void SetStatics( SymbolList *pStatics )
 	{
 		mpStatics = pStatics;
 

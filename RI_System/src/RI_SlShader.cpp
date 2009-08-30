@@ -148,7 +148,7 @@ SlShaderInstance::~SlShaderInstance()
 //==================================================================
 void SlShaderInstance::SetParameter(
 			const char		*pParamName,
-			SlSymbol::Type	type,
+			Symbol::Type	type,
 			bool			isVarying,
 			void			*pValue )
 {
@@ -156,7 +156,7 @@ void SlShaderInstance::SetParameter(
 }
 
 //==================================================================
-static void matchSymbols( const SlSymbol &a, const SlSymbol &b )
+static void matchSymbols( const Symbol &a, const Symbol &b )
 {
 	if ( strcasecmp( a.mName.c_str(), b.mName.c_str() ) )
 	{
@@ -177,7 +177,7 @@ static void matchSymbols( const SlSymbol &a, const SlSymbol &b )
 }
 
 //==================================================================
-SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
+SlValue	*SlShaderInstance::Bind( const SymbolList &gridSymbols ) const
 {
 	size_t	symbolsN = mpShader->mSymbols.size();
 
@@ -185,41 +185,41 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 
 	for (size_t i=0; i < symbolsN; ++i)
 	{
-		const SlSymbol	&symbol = *mpShader->mSymbols[i];
+		const Symbol	&symbol = *mpShader->mSymbols[i];
 
 		const char		*pFindName = symbol.mName.c_str();
 
 		switch ( symbol.mStorage )
 		{
-		case SlSymbol::CONSTANT:
+		case Symbol::CONSTANT:
 			DASSERT( symbol.mIsVarying == false );
 			pDataSegment[i].Flags.mOwnData = 0;
 			pDataSegment[i].SetDataR( symbol.GetConstantData(), &symbol );
 			break;
 
-		case SlSymbol::GLOBAL:
+		case Symbol::GLOBAL:
 			{
-				const SlSymbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
+				const Symbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
 
 				DASSTHROW( pFoundSymbol != NULL, ("Could not find the global %s !\n", pFindName) );
 
 				matchSymbols( symbol, *pFoundSymbol );
 
 				pDataSegment[i].Flags.mOwnData = 0;
-				pDataSegment[i].SetDataRW( ((SlSymbol *)pFoundSymbol)->GetRWData(), pFoundSymbol );
+				pDataSegment[i].SetDataRW( ((Symbol *)pFoundSymbol)->GetRWData(), pFoundSymbol );
 			}
 			break;
 
-		case SlSymbol::PARAMETER:
+		case Symbol::PARAMETER:
 			{
-				const SlSymbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
+				const Symbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
 
 				if ( pFoundSymbol )
 				{
 					matchSymbols( symbol, *pFoundSymbol );
 
 					pDataSegment[i].Flags.mOwnData = 0;
-					pDataSegment[i].SetDataRW( ((SlSymbol *)pFoundSymbol)->GetRWData(), pFoundSymbol );
+					pDataSegment[i].SetDataRW( ((Symbol *)pFoundSymbol)->GetRWData(), pFoundSymbol );
 				}
 				else
 				{
@@ -252,7 +252,7 @@ SlValue	*SlShaderInstance::Bind( const SlSymbolList &gridSymbols ) const
 			}
 			break;
 
-		case SlSymbol::TEMPORARY:
+		case Symbol::TEMPORARY:
 			//DASSERT( symbol.mIsVarying == true );
 			pDataSegment[i].Flags.mOwnData = 1;
 			if ( symbol.mIsVarying )
@@ -297,7 +297,7 @@ static void Inst_Faceforward( SlRunContext &ctx )
 	const SlVec3* pN	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 	const SlVec3* pI	= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
 
-	const SlSymbol*	 pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", SlSymbol::NORMAL );
+	const Symbol*	 pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", Symbol::NORMAL );
 	const SlVec3* pNg = (const SlVec3 *)pNgSymbol->GetData();
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
@@ -372,8 +372,8 @@ static void Inst_CalculateNormal( SlRunContext &ctx )
 		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
 	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
-	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodu", SlSymbol::FLOAT );
-	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodv", SlSymbol::FLOAT );
+	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodu", Symbol::FLOAT );
+	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodv", Symbol::FLOAT );
 
 	// only varying input and output !
 	DASSERT( ctx.IsSymbolVarying( 1 ) && ctx.IsSymbolVarying( 2 ) );

@@ -22,7 +22,7 @@ namespace RI
 //==================================================================
 /// Polygon
 //==================================================================
-Polygon::Polygon( ParamList &params, const SlSymbolList &staticSymbols ) :
+Polygon::Polygon( ParamList &params, const SymbolList &staticSymbols ) :
 	ComplexPrimitiveBase(POLYGON),
 	mParams(params)
 {
@@ -110,7 +110,7 @@ void Polygon::Simplify( HiderREYES &hider )
 //==================================================================
 /// 
 //==================================================================
-PointsGeneralPolygons::PointsGeneralPolygons( ParamList &params, const SlSymbolList &staticSymbols ) :
+PointsGeneralPolygons::PointsGeneralPolygons( ParamList &params, const SymbolList &staticSymbols ) :
 	ComplexPrimitiveBase(POINTSGENERALPOLYGONS),
 	mParams(params)
 {

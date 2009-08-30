@@ -33,7 +33,7 @@ typedef Vec4xSIMDf	SlVec4		__attribute__ ((aligned(64)));
 #endif
 
 //==================================================================
-class SlSymbol
+class Symbol
 {
 public:
 	enum Type
@@ -77,7 +77,7 @@ public:
 		mpDefaultVal = NULL;
 	}
 
-	SlSymbol()
+	Symbol()
 	{
 		mType = UNKNOWN;
 		mStorage = CONSTANT;
@@ -87,7 +87,7 @@ public:
 		mpDefaultVal = NULL;
 	}
 
-	~SlSymbol()
+	~Symbol()
 	{
 		FreeClone( mpValArray );
 		FreeClone( mpDefaultVal );
@@ -129,53 +129,53 @@ public:
 };
 
 //==================================================================
-class SlSymbolList
+class SymbolList
 {
-	DVec<SlSymbol> mpSymbols;
+	DVec<Symbol> mpSymbols;
 
 public:
 	struct SymbolParams
 	{
 		const char			*mpName;
-		SlSymbol::Type		mType;
-		SlSymbol::Storage	mStorage;
+		Symbol::Type		mType;
+		Symbol::Storage	mStorage;
 		bool				mIsVarying;
 
 		SymbolParams() :
 			mpName(NULL),
-			mType(SlSymbol::UNKNOWN),
-			mStorage(SlSymbol::CONSTANT),
+			mType(Symbol::UNKNOWN),
+			mStorage(Symbol::CONSTANT),
 			mIsVarying(false)
 		{
 		}
 	};
 
 public:
-	SlSymbolList();
-	~SlSymbolList();
+	SymbolList();
+	~SymbolList();
 
-	SlSymbolList( const SlSymbolList &from );
-	void operator = ( const SlSymbolList &from );
+	SymbolList( const SymbolList &from );
+	void operator = ( const SymbolList &from );
 
-		  SlSymbol *LookupVariable( const char *pName );
-	const SlSymbol *LookupVariable( const char *pName ) const;
-	const SlSymbol *LookupVariableI( const char *pName ) const;
+		  Symbol *LookupVariable( const char *pName );
+	const Symbol *LookupVariable( const char *pName ) const;
+	const Symbol *LookupVariableI( const char *pName ) const;
 
-		  SlSymbol *LookupVariable( const char *pName, SlSymbol::Type type );
-	const SlSymbol *LookupVariable( const char *pName, SlSymbol::Type type ) const ;
+		  Symbol *LookupVariable( const char *pName, Symbol::Type type );
+	const Symbol *LookupVariable( const char *pName, Symbol::Type type ) const ;
 
-	//	  SlSymbol *LookupVoid( const char *pName, SlSymbol::Type type );
-	const SlSymbol *LookupVoid( const char *pName ) const { return LookupVariable( pName, SlSymbol::VOIDD ); }
+	//	  Symbol *LookupVoid( const char *pName, Symbol::Type type );
+	const Symbol *LookupVoid( const char *pName ) const { return LookupVariable( pName, Symbol::VOIDD ); }
 
-	void *LookupVariableData( const char *pName, SlSymbol::Type type );
-	const void *LookupVariableData( const char *pName, SlSymbol::Type type ) const;
+	void *LookupVariableData( const char *pName, Symbol::Type type );
+	const void *LookupVariableData( const char *pName, Symbol::Type type ) const;
 
-	SlSymbol *Grow()
+	Symbol *Grow()
 	{
 		return mpSymbols.grow();
 	}
 
-	SlSymbol *Add( const SymbolParams &params, const void *pSrcData=NULL );
+	Symbol *Add( const SymbolParams &params, const void *pSrcData=NULL );
 
 	void AddVoid( const char *pName );
 
@@ -184,8 +184,8 @@ public:
 		return mpSymbols.size();
 	}
 
-	const SlSymbol &operator [] (size_t i) const{ return mpSymbols[i]; }
-		  SlSymbol &operator [] (size_t i)		{ return mpSymbols[i]; }
+	const Symbol &operator [] (size_t i) const{ return mpSymbols[i]; }
+		  Symbol &operator [] (size_t i)		{ return mpSymbols[i]; }
 };
 
 //==================================================================

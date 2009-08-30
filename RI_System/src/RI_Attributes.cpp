@@ -99,7 +99,7 @@ Attributes::~Attributes()
 //==================================================================
 void Attributes::Init(
 				  State				*pState,
-				  SlSymbolList		*pStatics,
+				  SymbolList		*pStatics,
 				  ResourceManager	*pResManager,
 				  RevisionTracker	*pRevision )
 {
@@ -163,7 +163,7 @@ void Attributes::cmdDetailRange(float	minVisible,
 void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 										   float valueApproximation )
 {
-	mpyTypeApproximation	= mpStatics->LookupVariable( typeApproximation, SlSymbol::VOIDD );
+	mpyTypeApproximation	= mpStatics->LookupVariable( typeApproximation, Symbol::VOIDD );
 	mValueApproximation		= valueApproximation;
 	mpRevision->BumpRevision();
 }
@@ -207,7 +207,7 @@ void Attributes::cmdBasis(
 				RtToken vbasis, const float *pCustomVBasis, int vstep )
 {
 	if ( ubasis )
-		mpyUBasis = mpStatics->LookupVariable( ubasis, SlSymbol::MATRIX );
+		mpyUBasis = mpStatics->LookupVariable( ubasis, Symbol::MATRIX );
 	else
 	{
 		DSAFE_DELETE( mpCustomUBasis );
@@ -215,7 +215,7 @@ void Attributes::cmdBasis(
 	}
 
 	if ( vbasis )
-		mpyVBasis = mpStatics->LookupVariable( vbasis, SlSymbol::MATRIX );
+		mpyVBasis = mpStatics->LookupVariable( vbasis, Symbol::MATRIX );
 	else
 	{
 		DSAFE_DELETE( mpCustomVBasis );

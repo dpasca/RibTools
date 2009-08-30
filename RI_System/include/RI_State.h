@@ -67,7 +67,7 @@ public:
 	};
 
 private:
-	SlSymbolList			mStatics;
+	SymbolList			mStatics;
 	Stack<Mode>				mModeStack;
 	CopyStack<Options	>	mOptionsStack;
 	CopyStack<Attributes>	mAttributesStack;

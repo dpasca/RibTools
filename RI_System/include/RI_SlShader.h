@@ -129,7 +129,7 @@ public:
 		const void	*pConstVoidValue;
 	} Data;
 
-	const SlSymbol	*mpSrcSymbol;
+	const Symbol	*mpSrcSymbol;
 
 	SlValue()
 	{
@@ -139,14 +139,14 @@ public:
 		mpSrcSymbol = NULL;
 	}
 
-	void SetDataR( const void *pData, const SlSymbol *pSrcSymbol )
+	void SetDataR( const void *pData, const Symbol *pSrcSymbol )
 	{
 		Flags.mCanChange		= 0;
 		Data.pConstVoidValue	= pData;
 		mpSrcSymbol				= pSrcSymbol;
 	}
 
-	void SetDataRW( void *pData, const SlSymbol *pSrcSymbol )
+	void SetDataRW( void *pData, const Symbol *pSrcSymbol )
 	{
 		Flags.mCanChange	= 1;
 		Data.pVoidValue		= pData;
@@ -168,7 +168,7 @@ struct SlSymbolWord
 {
 	u_int		mTableOffset;
 	bool		mIsVarying;
-	SlSymbol	*mpOrigSymbol;
+	Symbol	*mpOrigSymbol;
 };
 
 //==================================================================
@@ -212,7 +212,7 @@ public:
 public:
 	Type			mType;
 	DStr			mShaderName;
-	DVec<SlSymbol*>	mSymbols;
+	DVec<Symbol*>	mSymbols;
 	u_int			mStartPC;
 	DVec<SlCPUWord>	mCode;
 
@@ -248,7 +248,7 @@ class SlShaderInstance
 
 public:
 	//DVec<SlParameter>	mCallingParams;
-	SlSymbolList		mCallingParams;	// $$$ should get these from attributes and Surface params at some point !!
+	SymbolList		mCallingParams;	// $$$ should get these from attributes and Surface params at some point !!
 
 public:
 	SlShaderInstance( size_t maxPointsN );
@@ -281,11 +281,11 @@ public:
 
 	void SetParameter(
 				const char		*pParamName,
-				SlSymbol::Type	type,
+				Symbol::Type	type,
 				bool			isVarying,
 				void			*pValue );
 
-	SlValue	*Bind( const SlSymbolList &gridSymbols ) const;
+	SlValue	*Bind( const SymbolList &gridSymbols ) const;
 	void Unbind( SlValue * &pDataSegment ) const;
 
 	void Run( class SlRunContext &ctx ) const;
