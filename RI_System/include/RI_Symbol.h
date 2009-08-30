@@ -136,10 +136,10 @@ class SymbolList
 public:
 	struct SymbolParams
 	{
-		const char			*mpName;
-		Symbol::Type		mType;
+		const char		*mpName;
+		Symbol::Type	mType;
 		Symbol::Storage	mStorage;
-		bool				mIsVarying;
+		bool			mIsVarying;
 
 		SymbolParams() :
 			mpName(NULL),

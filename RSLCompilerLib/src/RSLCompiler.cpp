@@ -80,6 +80,8 @@ RSLCompiler::RSLCompiler(
 	// develop the tree based on operators with the proper precedence
 	ReparentOperators( mpRoot );
 
+	// here should handle default params expressions
+
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
 

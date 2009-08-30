@@ -407,6 +407,46 @@ static Function *findFunctionByNameNode( DVec<Function> &funcs, TokNode *pFindNo
 }
 
 //==================================================================
+/*
+static void handleDefaultValue( TokNode *pNode, Variable *pVar )
+{
+	TokNode	*pChild = pNode->GetChildTry( 0 );
+
+	if NOT( pChild )
+		return;
+
+	if ( pChild->IsTokenID( T_OP_ASSIGN ) )
+	{
+		TokNode	*pDefValExprNode = pNode->GetChildTry( 1 );
+		if NOT( pDefValExprNode )
+			throw Exception( "Broken default value definition", pNode );
+
+		printf( "Found default value for %s\n", pNode->GetTokStr() );
+	}
+	else
+	{
+		throw Exception(
+			DUT::SSPrintFS(
+					"Unexpected token %s after %s",
+					pChild->GetTokStr(),
+					pNode->GetTokStr() ),
+						pNode );
+	}
+}
+
+	if ( pNode->IsTokenID( T_OP_ASSIGN ) )
+		handleDefaultValue( pChild, pVar );
+	else
+	if ( pNode->IsTokenID( T_OP_LFT_BRACKET ) )
+	{
+	}
+	else
+	{
+		throw Exception( "Broken declaration ?", pNode );
+	}
+*/
+
+//==================================================================
 void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	size_t i = 0;
@@ -447,27 +487,29 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 
 					for (; i < pNode->mpChilds.size(); ++i)
 					{
-						TokNode	*pVarName = pNode->GetChildTry( i );
+						TokNode	*pChild = pNode->GetChildTry( i );
 
-						if ( pVarName->IsTokenID( T_OP_SEMICOL ) ||
-							 pVarName->IsTokenID( T_OP_RGT_BRACKET ) )
+						if ( pChild->IsTokenID( T_OP_SEMICOL ) ||
+							 pChild->IsTokenID( T_OP_RGT_BRACKET ) )
 						{
 							++i;
 							break;
 						}
 						else
-						if ( pVarName->IsTokenID( T_OP_COMMA ) )
+						if ( pChild->IsTokenID( T_OP_COMMA ) )
 						{
 							continue;
 						}
 						else
-						if ( pVarName->IsNonTerminal() )
+						if ( pChild->IsNonTerminal() )
 						{
 							// no "space cast" in the declaration in the curl braces
-							Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pVarName );
+							Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pChild );
 
 							if ( blkType == BLKT_SHPARAMS )
+							{
 								pVar->mIsSHParam = true;	// mark as shader param
+							}
 						}
 						else
 						{
@@ -476,11 +518,11 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 								// functions and shader params are allowed to change type after
 								// a comma !
 
-								if ( pVarName->mpToken->idType == T_TYPE_DATATYPE )
-									pDTypeNode = pVarName;
+								if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
+									pDTypeNode = pChild;
 								else
-								if ( pVarName->mpToken->idType == T_TYPE_DETAIL )
-									pDetailNode = pVarName;
+								if ( pChild->mpToken->idType == T_TYPE_DETAIL )
+									pDetailNode = pChild;
 							}
 							//else
 							//	throw Exception( "Expecting a variable name !" );
@@ -512,7 +554,7 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 
 /*
 //==================================================================
-static bool isVarUsedAsLValue( const char *pVarName, TokNode *pNode )
+static bool isVarUsedAsLValue( const char *pChild, TokNode *pNode )
 {
 	for (TokNode *pNode2 = pNode; pNode2; pNode2 = pNode2->GetNext())
 	{
@@ -521,7 +563,7 @@ static bool isVarUsedAsLValue( const char *pVarName, TokNode *pNode )
 	// recurse on all children that are NOT code blocks (because
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		isVarUsedAsLValue( pVarName, pNode->mpChilds[i] );
+		isVarUsedAsLValue( pChild, pNode->mpChilds[i] );
 	}
 }
 */
