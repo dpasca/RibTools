@@ -183,6 +183,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_Functions_DiscoverFunctions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_Functions_ResolveFunctionCalls.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_Functions_WriteFunctions.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Operators.cpp"
 				>
 			</File>

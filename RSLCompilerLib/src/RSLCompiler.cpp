@@ -81,6 +81,7 @@ RSLCompiler::RSLCompiler(
 	ReparentOperators( mpRoot );
 
 	// here should handle default params expressions
+	DiscoverDefaultParamValues( mpRoot );
 
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );

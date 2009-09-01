@@ -47,7 +47,11 @@ public:
 
 //==================================================================
 void DiscoverFunctions( TokNode *pRoot );
+
+void DiscoverDefaultParamValues( TokNode *pRoot );
+
 void ResolveFunctionCalls( TokNode *pNode );
+
 void WriteFunctions( FILE *pFile, TokNode *pNode );
 
 //==================================================================
