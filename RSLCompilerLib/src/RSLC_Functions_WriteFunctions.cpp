@@ -263,17 +263,18 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 		if NOT( func.IsShader() )
 			continue;
 
+		DASSERT( func.mpRetTypeTok->idType == T_TYPE_SHADERTYPE );
+
 		fprintf_s( pFile, "\n;====================================\n" );
 
-		if ( func.mpRetTypeTok->idType == T_TYPE_SHADERTYPE )
+		fprintf_s( pFile, "%s ;== %s\n",
+						func.mpRetTypeTok->GetStrChar(),
+							func.mpNameNode->GetTokStr() );
+
+		if ( func.mpParamsNode )
 		{
-			fprintf_s( pFile, "%s ;== %s\n",
-							func.mpRetTypeTok->GetStrChar(),
-								func.mpNameNode->GetTokStr() );
-		}
-		else
-		{
-			fprintf_s( pFile, "function %s\n", func.mpNameNode->GetTokStr() );
+			fprintf_s( pFile, "; Has params\n" );
+			// func.mpParamsNode
 		}
 
 		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
