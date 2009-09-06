@@ -143,10 +143,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		//if ( pNode->mpChilds[i]->mpToken->idType == T_TYPE_OPERATOR )
-		{
-			buildExpression( pFile, pNode->mpChilds[i] );
-		}
+		buildExpression( pFile, pNode->mpChilds[i] );
 	}
 
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
@@ -275,6 +272,11 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 		{
 			fprintf_s( pFile, "; Has params\n" );
 			// func.mpParamsNode
+			for (size_t i=0; i < func.mpParamsNode->mpChilds.size(); ++i)
+			{
+				//TokNode	*pParamNode = func.mpCodeBlkNode->mpChilds[j];
+				//buildExpression( pFile, pParamNode );
+			}
 		}
 
 		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)

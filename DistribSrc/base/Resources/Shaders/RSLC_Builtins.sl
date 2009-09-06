@@ -231,3 +231,5 @@ float	textureinfo( string texturename, dataname; output type variable ){}
 */
 
 vector vector( float x, float y, float z )	{ vector tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+color color( float r, float g, float b )	{ color tmp; _asm_mov_vs3( tmp, r, g, b ); return tmp; }
+

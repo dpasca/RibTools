@@ -6,22 +6,38 @@
 /// copyright info.
 //==================================================================
 
-#include <map>
 #include "RSLC_Tree.h"
-#include "RSLC_Functions.h"
 #include "RSLC_Exceptions.h"
 #include "RSLC_Registers.h"
+
+#include "RSLC_Functions.h"
 
 //==================================================================
 namespace RSLC
 {
 
-
 //==================================================================
-void DiscoverDefaultParamValues( TokNode *pRoot )
+void DiscoverDefaultParamValues( TokNode *pNode )
 {
-}
+	if (
+		pNode->mNodeType == TokNode::TYPE_BLOCK &&
+		pNode->GetBlockType() == BLKT_SHPARAMS )
+	{
+		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		{
+			TokNode *pChild = pNode->mpChilds[i];
 
+			if ( pChild->mpToken->id == T_OP_ASSIGN )
+			{
+			}
+		}
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		DiscoverDefaultParamValues( pNode->mpChilds[i] );
+	}
+}
 
 //==================================================================
 }
