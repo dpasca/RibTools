@@ -63,11 +63,18 @@ void RealizeConstants( TokNode *pRoot )
 		if NOT( func.IsShader() )
 			continue;
 
+		if ( func.mpParamsNode )
+		{
+			for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
+			{
+				TokNode	*pParamNode = func.mpParamsNode->mpChilds[j];
+				realizeConstants_rec( pParamNode, pRoot );
+			}
+		}
+
 		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
 		{
 			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[j];
-
-			int	tempIdx = 0;
 
 			realizeConstants_rec( pNode, pRoot );
 		}
@@ -94,7 +101,7 @@ static void assignRegisters_expr_BiOp( TokNode *pNode )
 	bool	opResIsVarying;
 	SolveBiOpType( pNode, pOperand1, pOperand2, opResVarType, opResIsVarying );
 
-	DASSERT( pNode->mVarLink.IsValid() == false );
+	// $$$ was here for a purpose !(?) - DASSERT( pNode->mVarLink.IsValid() == false );
 
 	// is this an assignment ?
 	if ( pNode->mpToken->IsAssignOp() )
@@ -163,6 +170,18 @@ void AssignRegisters( TokNode *pNode )
 
 		if NOT( func.IsShader() )
 			continue;
+
+		if ( func.mpParamsNode )
+		{
+			for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
+			{
+				TokNode	*pParamNode = func.mpParamsNode->mpChilds[j];
+
+				int	tempIdx = 0;
+
+				assignRegisters_expr( pParamNode, tempIdx );
+			}
+		}
 
 		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
 		{

@@ -29,6 +29,7 @@ void DiscoverDefaultParamValues( TokNode *pNode )
 
 			if ( pChild->mpToken->id == T_OP_ASSIGN )
 			{
+				//int yoyo = 1;
 			}
 		}
 	}

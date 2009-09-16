@@ -480,13 +480,24 @@ void TraverseTree( TokNode *pNode, int depth )
 		if ( pNode->mVarLink.GetVarPtr() )
 		{
 			Register	reg = pNode->mVarLink.GetVarPtr()->mBuild_Register;
-			std::string regName = GetRegName( reg );
 
-			printf( " // %s - %s - %s",
-				regName.c_str(),
-				pNode->mVarLink.GetVarPtr()->mInternalName.c_str(),
-				pNode->mVarLink.GetVarPtr()->IsVarying() ? "varying" : "uniform"
-				);
+			if ( reg.IsValid() )
+			{
+				std::string regName = GetRegName( reg );
+
+				printf( " // %s - %s - %s",
+					regName.c_str(),
+					pNode->mVarLink.GetVarPtr()->mInternalName.c_str(),
+					pNode->mVarLink.GetVarPtr()->IsVarying() ? "varying" : "uniform"
+					);
+			}
+			else
+			{
+				printf( " // %s - %s",
+					pNode->mVarLink.GetVarPtr()->mInternalName.c_str(),
+					pNode->mVarLink.GetVarPtr()->IsVarying() ? "varying" : "uniform"
+					);
+			}
 		}
 	}
 

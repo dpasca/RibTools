@@ -272,10 +272,10 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 		{
 			fprintf_s( pFile, "; Has params\n" );
 			// func.mpParamsNode
-			for (size_t i=0; i < func.mpParamsNode->mpChilds.size(); ++i)
+			for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
 			{
-				//TokNode	*pParamNode = func.mpCodeBlkNode->mpChilds[j];
-				//buildExpression( pFile, pParamNode );
+				TokNode	*pParamNode = func.mpParamsNode->mpChilds[j];
+				buildExpression( pFile, pParamNode );
 			}
 		}
 

@@ -216,6 +216,7 @@ SlValue	*SlShaderInstance::Bind( const SymbolList &gridSymbols ) const
 
 				if ( pFoundSymbol )
 				{
+					// verify symbol type
 					matchSymbols( symbol, *pFoundSymbol );
 
 					pDataSegment[i].Flags.mOwnData = 0;
