@@ -36,6 +36,10 @@ struct OpCodeDef
 };
 
 //==================================================================
+static const char *gpDefParamBaseLabelName = "__defparam_";
+static const char *gpMainLabelName = "__main";
+
+//==================================================================
 static OpCodeDef	gsOpCodeDefs[] =
 {
 	"mov.ss"		,		2,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
@@ -66,7 +70,9 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"div.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
 	"div.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
 
-	"mov.vs3"	,		4,							0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+	"mov.vs3"		,		4,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
+
+	"dot.svv"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
 
 	"ld.s"		,		2,							OPC_FLG_RIGHTISIMM,		OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 	"ld.v"		,		4,							OPC_FLG_RIGHTISIMM,		OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
@@ -189,7 +195,6 @@ bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSec
 			onError( "Shader type must be defined in the .code block" );
 
 		mpShader->mType = type;
-		mpShader->mStartPC = mpShader->mCode.size();
 	}
 
 	return true;
@@ -256,8 +261,47 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 }
 
 //==================================================================
+void ShaderAsmParser::processSpecialLabel( const Label &label )
+{
+	const char *pLabelName	= label.mName.c_str();
+
+	// is a default param value label ?
+	if ( strstr( pLabelName, gpDefParamBaseLabelName ) == pLabelName )
+	{
+		u_int		labelAddr	= label.mAddress;
+
+		const char *pVarName = pLabelName + strlen( gpDefParamBaseLabelName );
+
+		int	idx = findSymbol( pVarName, false );
+		if ( idx == -1 )
+			return;
+
+		mpShader->mSymbols[ idx ]->mDefaultValStartPC = labelAddr;
+	}
+	else
+	// is main/entry point label ?
+	if ( strstr( pLabelName, gpMainLabelName ) == pLabelName )
+	{
+		u_int		labelAddr	= label.mAddress;
+
+		mpShader->mStartPC = labelAddr;
+	}
+}
+
+//==================================================================
 void ShaderAsmParser::resolveLabels()
 {
+	for (size_t j=0; j < mLabelDefs.size(); ++j)
+	{
+		processSpecialLabel( mLabelDefs[j] );
+	}
+
+	// did we find the special label for the entry point ?
+	if ( mpShader->mStartPC == (u_int)-1 )
+	{
+		onError( "Entry point is missing !" );
+	}
+
 	for (size_t i=0; i < mLabelRefs.size(); ++i)
 	{
 		const Label	&ref = mLabelRefs[i];
@@ -320,7 +364,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
-		onError( "ERROR: Expecting storage definition" );
+		onError( "Expecting storage definition" );
 	}
 
 	if ( 0 == strcmp( pTok, "constant"  ) ) pSymbol->mStorage = Symbol::CONSTANT ; else
@@ -328,12 +372,12 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	if ( 0 == strcmp( pTok, "temporary" ) ) pSymbol->mStorage = Symbol::TEMPORARY; else
 	if ( 0 == strcmp( pTok, "global"	) ) pSymbol->mStorage = Symbol::GLOBAL   ; else
 	{
-		onError( "ERROR: Invalid storage definition: '%s'", pTok );
+		onError( "Invalid storage definition: '%s'", pTok );
 	}
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
-		onError( "ERROR: Expecting variability definition" );
+		onError( "Expecting variability definition" );
 	}
 
 	if ( 0 == strcmp( pTok, "varying"	) )
@@ -342,7 +386,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 
 		if ( pSymbol->mStorage == Symbol::CONSTANT )
 		{
-			onError( "ERROR: constant variables cannot be varying: '%s'", pTok );
+			onError( "constant variables cannot be varying: '%s'", pTok );
 		}
 	}
 	else
@@ -352,7 +396,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	}
 	else
 	{
-		onError( "ERROR: Invalid variability definition: '%s'", pTok );
+		onError( "Invalid variability definition: '%s'", pTok );
 	}
 
 /*
@@ -363,7 +407,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
-		onError( "ERROR: Expecting type definition" );
+		onError( "Expecting type definition" );
 	}
 
 	if ( 0 == strcmp( pTok, "float"  ) ) pSymbol->mType = Symbol::FLOAT ; else
@@ -374,7 +418,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	if ( 0 == strcmp( pTok, "normal" ) ) pSymbol->mType = Symbol::NORMAL; else
 	if ( 0 == strcmp( pTok, "matrix" ) ) pSymbol->mType = Symbol::MATRIX; else
 	{
-		onError( "ERROR: Invalid type definition: '%s'", pTok );
+		onError( "Invalid type definition: '%s'", pTok );
 	}
 
 	int	defParamCnt = 0;
@@ -404,7 +448,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	else
 	{
 		if ( pSymbol->mStorage == Symbol::CONSTANT )
-			onError( "ERROR: Missing constant value for '%s'", pTok );
+			onError( "Missing constant value for '%s'", pTok );
 	}
 
 	mpShader->mSymbols.push_back( pSymbol.release() );
@@ -539,7 +583,7 @@ void ShaderAsmParser::verifySymbolType(
 	if ( !success || otSolved != otExpected )
 	{
 		// following should except really..
-		onError( "ERROR: Invalid operand type at position %i (%s)", reportOpIdx+1, pReportOpName );
+		onError( "Invalid operand type at position %i (%s)", reportOpIdx+1, pReportOpName );
 	}
 }
 
@@ -550,7 +594,7 @@ void ShaderAsmParser::parseCode_handleOperImmediate( const char *pTok )
 
 	float	val;
 	if ( 1 != sscanf( pTok, "%f" , &val ) )
-		onError( "ERROR: Invalid immediate value %s", pTok );
+		onError( "Invalid immediate value %s", pTok );
 
 	word.mImmFloat.mValue = val;
 
@@ -586,7 +630,7 @@ void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCode
 
 		if ( symbolIdx == -1 )
 		{
-			onError( "ERROR: Symbol '%s' unknown !", pTok );
+			onError( "Symbol '%s' unknown !", pTok );
 		}
 
 		word.mSymbol.mTableOffset	= (u_int)symbolIdx;
@@ -656,7 +700,7 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 	if NOT( pOpDef )
 	{
-		onError( "ERROR: Unknown opcode '%s' !\n", pTok );
+		onError( "Unknown opcode '%s' !\n", pTok );
 	}
 
 	SlCPUWord		instruction;
@@ -672,7 +716,7 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 	{
 		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 		{
-			onError( "ERROR: missing operand #%i, "
+			onError( "missing operand #%i, "
 					"expecting %i operands",
 					i+1,
 					pOpDef->OperCnt );
@@ -697,7 +741,7 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 }
 
 //==================================================================
-void ShaderAsmParser::onError( const char *pFmt, ... )
+void ShaderAsmParser::onError( const char *pFmt, ... ) const
 {
 	va_list	vl;
 	va_start( vl, pFmt );

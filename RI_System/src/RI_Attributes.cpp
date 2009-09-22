@@ -358,6 +358,20 @@ static void onError( const char *pFmt, ... )
 }
 
 //==================================================================
+static void onException( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	puts( buff );
+}
+
+//==================================================================
 static void onWarning( const char *pFmt, ... )
 {
 	va_list	vl;
@@ -400,7 +414,7 @@ SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir,
 		pShader = DNEW SlShader( params, mpState->GetFileManager() );
 	} catch ( ... )
 	{
-		onError( "Could not assemble '%s' !", params.pSourceFileName );
+		onException( "Could not assemble '%s' !", params.pSourceFileName );
 		return NULL;
 	}
 

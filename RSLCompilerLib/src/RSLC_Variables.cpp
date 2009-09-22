@@ -417,46 +417,6 @@ static Function *findFunctionByNameNode( DVec<Function> &funcs, TokNode *pFindNo
 }
 
 //==================================================================
-/*
-static void handleDefaultValue( TokNode *pNode, Variable *pVar )
-{
-	TokNode	*pChild = pNode->GetChildTry( 0 );
-
-	if NOT( pChild )
-		return;
-
-	if ( pChild->IsTokenID( T_OP_ASSIGN ) )
-	{
-		TokNode	*pDefValExprNode = pNode->GetChildTry( 1 );
-		if NOT( pDefValExprNode )
-			throw Exception( "Broken default value definition", pNode );
-
-		printf( "Found default value for %s\n", pNode->GetTokStr() );
-	}
-	else
-	{
-		throw Exception(
-			DUT::SSPrintFS(
-					"Unexpected token %s after %s",
-					pChild->GetTokStr(),
-					pNode->GetTokStr() ),
-						pNode );
-	}
-}
-
-	if ( pNode->IsTokenID( T_OP_ASSIGN ) )
-		handleDefaultValue( pChild, pVar );
-	else
-	if ( pNode->IsTokenID( T_OP_LFT_BRACKET ) )
-	{
-	}
-	else
-	{
-		throw Exception( "Broken declaration ?", pNode );
-	}
-*/
-
-//==================================================================
 void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	size_t i = 0;
@@ -561,22 +521,6 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 		}
 	}
 }
-
-/*
-//==================================================================
-static bool isVarUsedAsLValue( const char *pChild, TokNode *pNode )
-{
-	for (TokNode *pNode2 = pNode; pNode2; pNode2 = pNode2->GetNext())
-	{
-	}
-
-	// recurse on all children that are NOT code blocks (because
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-	{
-		isVarUsedAsLValue( pChild, pNode->mpChilds[i] );
-	}
-}
-*/
 
 //==================================================================
 void DiscoverVariablesUsage( TokNode *pNode )

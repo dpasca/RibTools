@@ -65,6 +65,7 @@ public:
 	u_int	mArraySize;
 	void	*mpValArray;
 	void	*mpDefaultVal;
+	u_int	mDefaultValStartPC;
 
 	void Reset()
 	{
@@ -75,6 +76,7 @@ public:
 		mArraySize = 0;
 		mpValArray = NULL;
 		mpDefaultVal = NULL;
+		mDefaultValStartPC = (u_int)-1;
 	}
 
 	Symbol()
@@ -85,6 +87,7 @@ public:
 		mArraySize = 0;
 		mpValArray = NULL;
 		mpDefaultVal = NULL;
+		mDefaultValStartPC = (u_int)-1;
 	}
 
 	~Symbol()

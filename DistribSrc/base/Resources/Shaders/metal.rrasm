@@ -28,6 +28,8 @@
 .code
 
 surface
+
+__main:
 	normalize	$v0		N
 	faceforward	Nf	$v0	I
 

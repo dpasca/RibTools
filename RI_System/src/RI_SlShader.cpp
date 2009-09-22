@@ -28,18 +28,13 @@ namespace RI
 {
 
 //==================================================================
-static std::string compileSLToAsm(
+static void compileSLToAsm(
 						DUT::MemFile &slSource,
 						const char *pSrcFPathName,
-						const char *pAppResDir )
+						const char *pAppResDir,
+						const char *pAsmOutName )
 {
 	// compile
-	char	asmOutName[1024];
-
-	strcpy_s( asmOutName, pSrcFPathName );
-	DUT::GetFileNameExt( asmOutName )[0] = 0;	// cut the extension
-	strcat_s( asmOutName, "autogen.rrasm" );	// make the .autogen etc name
-
 	std::string	basInclude( pAppResDir );
 	basInclude += "/RSLC_Builtins.sl";
 
@@ -56,7 +51,7 @@ static std::string compileSLToAsm(
 					);
 
 		// save autogen rrasm file
-		compiler.SaveASM( asmOutName, pSrcFPathName );
+		compiler.SaveASM( pAsmOutName, pSrcFPathName );
 	}
 	catch ( RSLC::Exception &e )
 	{
@@ -69,8 +64,6 @@ static std::string compileSLToAsm(
 	{
 		printf( "ERROR while compiling '%s'\n", pSrcFPathName );
 	}
-
-	return asmOutName;
 }
 
 //==================================================================
@@ -79,27 +72,43 @@ static void compileFromMemFile(
 				SlShader *pShader,
 				const char *pFileName,
 				const char *pShaderName,
-				const char *pAppResDir )
+				const char *pAppResDir,
+				FileManagerBase &fileManager )
 {
-	// umm.. really ?
 	bool	isSL =
 		(0 == strcasecmp( DUT::GetFileNameExt( pFileName ), "sl" ) );
 
-	if ( isSL )
+	if NOT( isSL )
 	{
-		std::string asmFileName = compileSLToAsm(
-											file,
-											pFileName,
-											pAppResDir );
+		// compile/parse the rrasm file and return right away
+		ShaderAsmParser	parser( file, pShader, pShaderName );
+		return;
+	}
 
-		DUT::MemFile	tmpFile( asmFileName.c_str() );
+	// make the autogen name
+	char	asmOutName[1024];
+	strcpy_s( asmOutName, pFileName );
+	DUT::GetFileNameExt( asmOutName )[0] = 0;	// cut the extension
+	strcat_s( asmOutName, "autogen.rrasm" );	// make the .autogen etc name
 
-		ShaderAsmParser	parser( tmpFile, pShader, pShaderName );
+	DUT::MemFile	autogenAsmFile;
+
+	// does the autogen file already exist ?
+	if ( fileManager.FileExists( asmOutName ) )
+	{
+		// just get it from the file manager
+		fileManager.GrabFile( asmOutName, autogenAsmFile );
 	}
 	else
 	{
-		ShaderAsmParser	parser( file, pShader, pShaderName );
+		// ..otherwise.. compile the sl into an autogen.rrasm
+		compileSLToAsm( file, pFileName, pAppResDir, asmOutName );
+		// ..and also read in the file..
+		autogenAsmFile.Init( asmOutName );
 	}
+
+	// now parse/compile the rrasm file
+	ShaderAsmParser	parser( autogenAsmFile, pShader, pShaderName );
 }
 
 //==================================================================
@@ -108,7 +117,7 @@ static void compileFromMemFile(
 SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 	ResourceBase(params.pName, ResourceBase::TYPE_SHADER),
 	mType(TYPE_UNKNOWN),
-	mStartPC(0)
+	mStartPC((u_int)-1)
 {
 	DUT::MemFile	file;
 
@@ -116,14 +125,14 @@ SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 	{
 		file.Init( (const void *)params.pSource, strlen(params.pSource) );
 
-		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir );
+		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir, fileManager );
 	}
 	else
 	if ( params.pSourceFileName )
 	{
 		fileManager.GrabFile( params.pSourceFileName, file );
 
-		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir );
+		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir, fileManager );
 	}
 	else
 	{
@@ -177,8 +186,12 @@ static void matchSymbols( const Symbol &a, const Symbol &b )
 }
 
 //==================================================================
-SlValue	*SlShaderInstance::Bind( const SymbolList &gridSymbols ) const
+SlValue	*SlShaderInstance::Bind(
+					const SymbolList	&gridSymbols,
+					DVec<u_int>			&out_defParamValsStartPCs ) const
 {
+	out_defParamValsStartPCs.clear();
+
 	size_t	symbolsN = mpShader->mSymbols.size();
 
 	SlValue	*pDataSegment = DNEW SlValue [ symbolsN ];
@@ -244,8 +257,27 @@ SlValue	*SlShaderInstance::Bind( const SymbolList &gridSymbols ) const
 					}
 					else
 					{
+						pDataSegment[i].Flags.mOwnData = 1;
+
+						if ( symbol.mIsVarying )
+							pDataSegment[i].SetDataRW( symbol.AllocClone( mMaxPointsN ), &symbol );
+						else
+							pDataSegment[i].SetDataRW( symbol.AllocClone( 1 ), &symbol );
+
+						if ( symbol.mDefaultValStartPC != INVALID_PC )
+							out_defParamValsStartPCs.push_back( symbol.mDefaultValStartPC );
+/*
+						else
+						if ( symbol.GetUniformParamData() )
+							pDataSegment[i].mpSrcSymbol->mpDefaultVal = 
+							pDataSegment[i].SetDataRW( , &symbol );
+*/
+
+
+/*
 						pDataSegment[i].Flags.mOwnData = 0;
 						pDataSegment[i].SetDataR( symbol.GetUniformParamData(), &symbol );
+*/
 
 						//DASSTHROW( 0, ("Could not find symbol %s", pFindName) );
 					}
@@ -467,6 +499,8 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 
 	SOP::Inst_MOVVS3<SlVec3,SlScalar>,
 
+	SOP::Inst_Dot_SVV,
+
 	SOP::Inst_LD1<S>,
 	SOP::Inst_LD3<V>,
 
@@ -500,8 +534,11 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 #undef V
 
 //==================================================================
-void SlShaderInstance::Run( SlRunContext &ctx ) const
+void SlShaderInstance::runFrom( SlRunContext &ctx, u_int startPC ) const
 {
+	ctx.mProgramCounterIdx = 0;
+	ctx.mProgramCounter[ ctx.mProgramCounterIdx ] = startPC;
+
 	const SlCPUWord	*pWord = NULL;
 
 	try {
@@ -514,6 +551,7 @@ void SlShaderInstance::Run( SlRunContext &ctx ) const
 
 			if ( pWord->mOpCode.mTableOffset == OP_RET )
 			{
+				// what ? Subroutines ?
 				if ( ctx.mProgramCounterIdx == 0 )
 					return;
 
@@ -535,6 +573,20 @@ void SlShaderInstance::Run( SlRunContext &ctx ) const
 					mpShader->mShaderName.c_str(),
 						pWord->mOpCode.mDbgLineNum );
 	}
+}
+
+//==================================================================
+void SlShaderInstance::Run( SlRunContext &ctx ) const
+{
+	// run the default params fill subroutines (the instance
+	// determines which need to be called)
+	for (size_t i=0; i < ctx.mDefParamValsStartPCs.size(); ++i)
+	{
+		runFrom( ctx, ctx.mDefParamValsStartPCs[i] );
+	}
+
+	// run the main
+	runFrom( ctx, mpShader->mStartPC );
 }
 
 //==================================================================

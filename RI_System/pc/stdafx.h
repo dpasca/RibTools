@@ -18,4 +18,4 @@
 #include "RI_Base.h"
 #include "RI_Resource.h"
 
-#define DISABLE_SL_SHADERS
+//#define DISABLE_SL_SHADERS

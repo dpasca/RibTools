@@ -71,12 +71,15 @@ void SlRunContext::Setup(
 		mpAttribs		= &attribs;
 
 		DASSERT( 0 != mpShaderInst->mpShader );
-		mpDataSegment	= mpShaderInst->Bind( *mpSymbols );
+		mpDataSegment =
+			mpShaderInst->Bind(
+						*mpSymbols,
+						mDefParamValsStartPCs );
 	}
 
 	// reset the program counter
 	mProgramCounterIdx = 0;
-	mProgramCounter[ mProgramCounterIdx ] = 0;
+	mProgramCounter[ mProgramCounterIdx ] = (u_int)-1;
 
 	// initialize the SIMD state
 	InitializeSIMD( mMaxPointsN );
@@ -84,13 +87,18 @@ void SlRunContext::Setup(
 	// initialize the non uniform/constant values with eventual default data
 	for (size_t i=0; i < mpShaderInst->mpShader->mSymbols.size(); ++i)
 	{
-		if ( mpDataSegment[i].Flags.mOwnData &&
-			 mpDataSegment[i].mpSrcSymbol->mpDefaultVal != NULL )
-		{
-			DASSERT( mpDataSegment[i].Data.pVoidValue != NULL );
+		SlValue	&slValue = mpDataSegment[i];
 
-			mpDataSegment[i].mpSrcSymbol->FillDataWithDefault(
-							mpDataSegment[i].Data.pVoidValue, mMaxPointsN );
+		if ( slValue.Flags.mOwnData &&
+			 slValue.mpSrcSymbol->mpDefaultVal != NULL )
+		{
+			DASSERT( slValue.Data.pVoidValue != NULL );
+
+			size_t samplesN =
+				slValue.mpSrcSymbol->mIsVarying ? mMaxPointsN : 1;
+
+			slValue.mpSrcSymbol->FillDataWithDefault(
+							slValue.Data.pVoidValue, samplesN );
 		}
 	}
 }

@@ -16,6 +16,8 @@
 .code
 
 surface
+
+__main:
 	normalize	$v0		N
 	;faceforward	$v0	$v0	I
 	;mul.vvv		$v0	$v0	Koe

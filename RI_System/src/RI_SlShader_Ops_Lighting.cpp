@@ -43,7 +43,7 @@ static inline void illuminate(
 			SlVec3	lightDir( light.mRend.mDistant.mDirCS.x(), light.mRend.mDistant.mDirCS.y(), light.mRend.mDistant.mDirCS.z() );
 
 			SlScalar	norLightCosA = Nn.GetDot( lightDir );
-			//if ( norLightCosA < illConeCosA )
+			//if ( norLightCosA[0] >= illConeCosA )
 				accCol += lightCol * norLightCosA;
 		}
 	}

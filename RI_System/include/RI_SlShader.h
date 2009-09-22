@@ -50,7 +50,6 @@ enum OpBaseTypeID
 //==================================================================
 enum OpCodeID
 {
-	// following need to be multiple of 4 and start from 0
 	OP_SS_MOV	,
 	OP_VS_MOV	,
 	OP_VV_MOV	,
@@ -79,8 +78,9 @@ enum OpCodeID
 	OP_VSV_DIV	,
 	OP_VVV_DIV	,
 
-	// no need for index alignment from here on
 	OP_VS3_MOV	,
+
+	OP_SVV_DOT	,
 
 	OP_LDS	,
 	OP_LDV	,
@@ -285,10 +285,16 @@ public:
 				bool			isVarying,
 				void			*pValue );
 
-	SlValue	*Bind( const SymbolList &gridSymbols ) const;
+	SlValue	*Bind(
+			const SymbolList	&gridSymbols,
+			DVec<u_int>			&out_defParamValsStartPCs ) const;
+
 	void Unbind( SlValue * &pDataSegment ) const;
 
 	void Run( class SlRunContext &ctx ) const;
+
+private:
+	void runFrom( class SlRunContext &ctx, u_int startPC ) const;
 };
 
 //==================================================================

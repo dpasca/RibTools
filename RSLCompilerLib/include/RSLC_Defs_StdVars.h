@@ -22,8 +22,8 @@ const char *_gGlobalsDefs[] =
 	//"point"	,	"varying"	,	"Ps"	,
 	"point"	,	"varying"	,	"dPdu"	,
 	"point"	,	"varying"	,	"dPdv"	,
-	"vector",	"varying"	,	"N"	,
-	"vector",	"varying"	,	"Ng"	,	// also uniform ?
+	"normal",	"varying"	,	"N"	,
+	"normal",	"varying"	,	"Ng"	,	// also uniform ?
 	"float"	,	"varying"	,	"u"	,
 	"float"	,	"varying"	,	"v"	,
 	"float"	,	"varying"	,	"du"	,	// also uniform ?

@@ -16,6 +16,8 @@
 .code
 
 light
+
+__main:
 	mul.vvs		Cl	lightcolor	intensity
 
 	ret

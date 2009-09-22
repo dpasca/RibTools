@@ -24,7 +24,7 @@
 using namespace	RSLC;
 
 //==================================================================
-const char	*RSLCompiler::mpsVersionString = "0.1a";
+const char	*RSLCompiler::mpsVersionString = "0.2a";
 
 //==================================================================
 RSLCompiler::RSLCompiler(

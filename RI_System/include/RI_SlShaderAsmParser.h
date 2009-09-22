@@ -49,6 +49,7 @@ public:
 
 private:
 	void doParse( DUT::MemFile &file );
+	void processSpecialLabel( const Label &label );
 	void resolveLabels();
 	bool handleShaderTypeDef( const char *pLineWork, Section curSection );
 
@@ -62,7 +63,7 @@ private:
 	bool parseLabelDef( const char *pTok );
 	void getVector( const char *pStr, float out_val[], int n );
 
-	void onError( const char *pFmt, ... );
+	void onError( const char *pFmt, ... ) const;
 
 	void verifySymbolType(	Symbol::Type slSymType,
 							OperTypeID otExpected,

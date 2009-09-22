@@ -16,14 +16,26 @@
 	N		global varying normal
 	I		global varying vector
 
-	Ka		parameter uniform float 1
-	Kd		parameter uniform float 1
+	_@K19	constant  uniform float   	1.000000 
+	
+	Ka		parameter uniform float
+	Kd		parameter uniform float
 
 	Nf		temporary varying normal
 
 .code
 
 surface
+
+__defparam_Ka:
+	mov.ss		Ka	_@K19
+	ret
+
+__defparam_Kd:
+	mov.ss		Kd	_@K19
+	ret
+	
+__main:
 	normalize	$v0		N
 	faceforward	Nf	$v0	I
 

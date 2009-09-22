@@ -122,9 +122,9 @@ void Inst_MOVVS3( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				lhs[0][i] = op1[op1_offset];
-				lhs[1][i] = op2[op2_offset];
-				lhs[2][i] = op3[op3_offset];
+				lhs[i][0] = op1[op1_offset];
+				lhs[i][1] = op2[op2_offset];
+				lhs[i][2] = op3[op3_offset];
 			}
 
 			op1_offset	+= op1_step;
@@ -141,8 +141,8 @@ void Inst_MOVVS3( SlRunContext &ctx )
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
 			lhs[0][0] = op1[0];
-			lhs[1][0] = op2[0];
-			lhs[2][0] = op3[0];
+			lhs[0][1] = op2[0];
+			lhs[0][2] = op3[0];
 		}
 	}
 
@@ -215,8 +215,8 @@ void Inst_2Op( SlRunContext &ctx )
 				if ( opBaseTypeID == OBT_ADD ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
 				if ( opBaseTypeID == OBT_SUB ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
 				if ( opBaseTypeID == OBT_MUL ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
-				if ( opBaseTypeID == OBT_DIV ) lhs[i] = op1[op1_offset] / op2[op2_offset];
-					else { DASSERT( 0 ); }
+				if ( opBaseTypeID == OBT_DIV ) lhs[i] = op1[op1_offset] / op2[op2_offset]; else
+				{ DASSERT( 0 ); }
 			}
 			
 			op1_offset	+= op1_step;
@@ -233,8 +233,49 @@ void Inst_2Op( SlRunContext &ctx )
 			if ( opBaseTypeID == OBT_ADD ) lhs[0] = op1[0] + op2[0]; else
 			if ( opBaseTypeID == OBT_SUB ) lhs[0] = op1[0] - op2[0]; else
 			if ( opBaseTypeID == OBT_MUL ) lhs[0] = op1[0] * op2[0]; else
-			if ( opBaseTypeID == OBT_DIV ) lhs[0] = op1[0] / op2[0];
-				else { DASSERT( 0 ); }
+			if ( opBaseTypeID == OBT_DIV ) lhs[0] = op1[0] / op2[0]; else
+			{ DASSERT( 0 ); }
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
+void Inst_Dot_SVV( SlRunContext &ctx )
+{
+		  SlScalar*	lhs	= ctx.GetVoidRW( (	  SlScalar *)0, 1 );
+	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
+	const SlVec3*	op2	= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op2_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+		int		op2_step = ctx.GetSymbolVaryingStep( 3 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				lhs[i] = op1[op1_offset].GetDot( op2[op2_offset] );
+			}
+			
+			op1_offset	+= op1_step;
+			op2_offset	+= op2_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
+				 !ctx.IsSymbolVarying( 3 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0] = op1[0].GetDot( op2[0] );
 		}
 	}
 

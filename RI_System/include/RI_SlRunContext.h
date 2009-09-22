@@ -31,6 +31,8 @@ public:
 	u_int					mProgramCounterIdx;
 	u_int					mProgramCounter[MAX_PROG_STACK];
 
+	DVec<u_int>				mDefParamValsStartPCs;
+
 public:
 	u_int					mBlocksXN;
 	u_int					mPointsYN;

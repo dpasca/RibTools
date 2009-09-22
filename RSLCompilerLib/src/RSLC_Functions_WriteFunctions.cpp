@@ -93,7 +93,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 		fprintf_s( pFile, "\t%-6s", opStr.c_str() );
 	}
 
-	fprintf_s( pFile, "\n\n" );
+	fprintf_s( pFile, "\n" );
 }
 
 //==================================================================
@@ -207,6 +207,9 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 								o2Str.c_str() );
 					else
 */
+					// rudimentary form of optimization !
+					if NOT( l1 == l2 && o1Str == o2Str )
+					{
 						fprintf_s(
 								pFile,
 								"\tmov.%c%c\t%-6s\t%-6s\n",
@@ -214,6 +217,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 								l2,
 								o1Str.c_str(),
 								o2Str.c_str() );
+					}
 				}
 				else
 					fprintf_s(
@@ -249,6 +253,42 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 }
 
 //==================================================================
+static void writeDefParams( FILE *pFile, const Function &func )
+{
+	fprintf_s( pFile, "\n\t;==== Begin Def Params\n" );
+
+	for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
+	{
+		TokNode	*pParamNode = func.mpParamsNode->mpChilds[j];
+
+		// are we assigning something ?
+		if ( pParamNode->mpToken->IsAssignOp() )
+		{
+			// write the sub-routine for assignment..
+
+			// what node we assigning to ?
+			TokNode	*pDestAssignNode = pParamNode->GetChildTry( 0 );
+			DASSERT( pDestAssignNode != NULL );
+
+			// what variable are we assigning to ?
+			const Variable	*pLVar = pDestAssignNode->GetVarPtr();
+			DASSTHROW( pLVar != NULL, ("Default parameter broken ?!") );
+
+			// write the label with the variable's name
+			fprintf_s( pFile, "__defparam_%s:\n", pLVar->GetUseName().c_str() );
+
+			// write the assignment expression
+			buildExpression( pFile, pParamNode );
+
+			// ..and the return command
+			fprintf_s( pFile, "\tret\n" );
+		}
+	}
+
+	fprintf_s( pFile, "\t;==== End Def Params\n\n" );
+}
+
+//==================================================================
 void WriteFunctions( FILE *pFile, TokNode *pNode )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
@@ -268,16 +308,14 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 						func.mpRetTypeTok->GetStrChar(),
 							func.mpNameNode->GetTokStr() );
 
+		// write eventual code for default parameters
 		if ( func.mpParamsNode )
 		{
-			fprintf_s( pFile, "; Has params\n" );
-			// func.mpParamsNode
-			for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
-			{
-				TokNode	*pParamNode = func.mpParamsNode->mpChilds[j];
-				buildExpression( pFile, pParamNode );
-			}
+			writeDefParams( pFile, func );
 		}
+
+		// write the entry point finally !
+		fprintf_s( pFile, "__main:\n" );
 
 		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
 		{

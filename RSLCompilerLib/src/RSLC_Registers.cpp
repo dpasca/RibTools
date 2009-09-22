@@ -134,16 +134,23 @@ static void assignRegisters_expr_BiOp( TokNode *pNode )
 }
 
 //==================================================================
-static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
+static bool assignRegisters_expr( TokNode *pNode, int regIdx )
 {
+	int runRegIdx = regIdx;
+
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		assignRegisters_expr( pNode->mpChilds[i], io_tempIdx );
+		if ( assignRegisters_expr( pNode->mpChilds[i], runRegIdx ) )
+		{
+			runRegIdx += 1;
+		}
 	}
 
+	bool usedReg = false;
 	if ( pNode->mpToken->IsBiOp() )
 	{
 		assignRegisters_expr_BiOp( pNode );
+		usedReg = true;
 	}
 
 	const Variable	*pVar = pNode->GetVarPtr();
@@ -154,9 +161,12 @@ static void assignRegisters_expr( TokNode *pNode, int &io_tempIdx )
 			!pVar->mIsGlobal &&
 			!pVar->IsRegisterAssigned() )
 		{
-			pNode->GetVarPtr()->AssignRegister( io_tempIdx++ );
+			pNode->GetVarPtr()->AssignRegister( regIdx );
+			//return true;
 		}
 	}
+
+	return usedReg;
 }
 
 //==================================================================
@@ -171,6 +181,7 @@ void AssignRegisters( TokNode *pNode )
 		if NOT( func.IsShader() )
 			continue;
 
+/*
 		if ( func.mpParamsNode )
 		{
 			for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
@@ -187,10 +198,16 @@ void AssignRegisters( TokNode *pNode )
 		{
 			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[j];
 
-			int	tempIdx = 0;
+			int	tempIdx = 1000;
 
 			assignRegisters_expr( pNode, tempIdx );
 		}
+*/
+
+		if ( func.mpParamsNode )
+			assignRegisters_expr( func.mpParamsNode, 0 );
+		else
+			assignRegisters_expr( func.mpCodeBlkNode, 0 );
 	}
 }
 

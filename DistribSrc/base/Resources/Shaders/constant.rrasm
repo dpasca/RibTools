@@ -14,6 +14,8 @@
 .code
 
 surface
+
+__main:
 	mov.vv	Ci	Cs
 	mov.vv	Oi	Os
 

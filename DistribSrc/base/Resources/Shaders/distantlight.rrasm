@@ -22,6 +22,8 @@
 .code
 
 light
+
+__main:
 	; temporary
 
 	mov.vv		Cl lightcolor
