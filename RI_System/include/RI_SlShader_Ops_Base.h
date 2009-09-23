@@ -177,8 +177,7 @@ void Inst_1Op( SlRunContext &ctx )
 	}
 	else
 	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
-				 !ctx.IsSymbolVarying( 3 ) );
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
@@ -300,7 +299,7 @@ void Inst_GetVComp( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				lhs[i] = op1[COMP_IDX][op1_offset];
+				lhs[i] = op1[op1_offset][COMP_IDX];
 			}
 			
 			op1_offset	+= op1_step;
@@ -312,7 +311,7 @@ void Inst_GetVComp( SlRunContext &ctx )
 
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
-			lhs[0] = op1[COMP_IDX][0];
+			lhs[0] = op1[0][COMP_IDX];
 		}
 	}
 
@@ -337,7 +336,7 @@ void Inst_SetVComp( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				lhs[COMP_IDX][i] = op1[op1_offset];
+				lhs[i][COMP_IDX] = op1[op1_offset];
 			}
 			
 			op1_offset	+= op1_step;
@@ -349,7 +348,7 @@ void Inst_SetVComp( SlRunContext &ctx )
 
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
-			lhs[COMP_IDX][0] = op1[0];
+			lhs[0][COMP_IDX] = op1[0];
 		}
 	}
 
