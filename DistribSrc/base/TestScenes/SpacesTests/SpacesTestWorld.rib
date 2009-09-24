@@ -12,11 +12,17 @@ WorldBegin
 	
 		TransformBegin
 	
+			Rotate -45 0 1 0
+
 			Translate -.025 0 0
 			Sphere .01 -.01 .01 360
 
+			Rotate  45 0 1 0
+
 			Translate .025 0 0
 			Sphere .01 -.01 .01 360
+
+			Rotate  45 0 1 0
 
 			Translate  .025 0 0
 			Sphere .01 -.01 .01 360
@@ -27,11 +33,17 @@ WorldBegin
 
 		TransformBegin
 	
+			Rotate -45 1 0 0
+
 			Translate -.025 0 0
 			Sphere .01 -.01 .01 360
 
+			Rotate  45 1 0 0
+
 			Translate .025 0 0
 			Sphere .01 -.01 .01 360
+
+			Rotate  45 1 0 0
 
 			Translate  .025 0 0
 			Sphere .01 -.01 .01 360
@@ -42,11 +54,17 @@ WorldBegin
 
 		TransformBegin
 	
+			Rotate -45 0 0 1
+
 			Translate -.025 0 0
 			Sphere .01 -.01 .01 360
 
+			Rotate  45 0 0 1
+
 			Translate .025 0 0
 			Sphere .01 -.01 .01 360
+
+			Rotate  45 0 0 1
 
 			Translate  .025 0 0
 			Sphere .01 -.01 .01 360
