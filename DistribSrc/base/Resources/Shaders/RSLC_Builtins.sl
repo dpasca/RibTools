@@ -230,6 +230,7 @@ float	shadow( string name[channel]; texture coordinates[, parameterlist] ){}
 float	textureinfo( string texturename, dataname; output type variable ){}
 */
 
-vector vector( float x, float y, float z )	{ vector tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
-color color( float r, float g, float b )	{ color tmp; _asm_mov_vs3( tmp, r, g, b ); return tmp; }
-
+vector	vector( float x, float y, float z )	{ vector tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+color	color( float r, float g, float b )	{ color	 tmp; _asm_mov_vs3( tmp, r, g, b ); return tmp; }
+normal	normal( float x, float y, float z )	{ normal tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+point	point( float x, float y, float z )	{ point	 tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
