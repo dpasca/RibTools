@@ -85,7 +85,16 @@ static TokNode *cloneBranch( const TokNode *pNode )
 }
 
 //==================================================================
-static bool doVTypesMatch( const Function &func, const TokNode &callNode )
+static bool isVecNorPoint( VarType vtype )
+{
+	return
+		vtype == VT_VECTOR ||
+		vtype == VT_NORMAL ||
+		vtype == VT_POINT;
+}
+
+//==================================================================
+static bool doVTypesMatch( const Function &func, const TokNode &callNode, bool laxTypes )
 {
 	if ( callNode.mpChilds.size() != func.mParamsVarTypes.size() )
 		return false;
@@ -94,8 +103,24 @@ static bool doVTypesMatch( const Function &func, const TokNode &callNode )
 	{
 		VarType	vtype = callNode.mpChilds[i]->GetVarType();
 
-		if ( func.mParamsVarTypes[i] != vtype )
-			return false;
+		if ( laxTypes )
+		{
+			if ( isVecNorPoint( func.mParamsVarTypes[i] ) )
+			{
+				if NOT( isVecNorPoint( vtype ) )
+					return false;
+			}
+			else
+			{
+				if ( func.mParamsVarTypes[i] != vtype )
+					return false;
+			}
+		}
+		else
+		{
+			if ( func.mParamsVarTypes[i] != vtype )
+				return false;
+		}
 	}
 
 	return true;
@@ -113,6 +138,7 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 	size_t		convertMatches = 0;
 	size_t		exactMatches = 0;
 
+	// try exact matches first
 	for (size_t i=0; i < funcs.size(); ++i)
 	{
 		if ( strcmp(
@@ -123,12 +149,32 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 			continue;
 		}
 
-		// match number of params
-		if NOT( doVTypesMatch( funcs[i], *pFCallParams ) )
+		// match number and types of params
+		if NOT( doVTypesMatch( funcs[i], *pFCallParams, false ) )
 			continue;
 
 		return &funcs[i];
 	}
+
+	// now try "lax" match.. where vector, point and normal are all considered the same
+	// ..this is very likely how RSL works 8)
+	for (size_t i=0; i < funcs.size(); ++i)
+	{
+		if ( strcmp(
+				pFCallNode->mpToken->GetStrChar(),
+				funcs[i].mpNameNode->GetTokStr()
+				) )
+		{
+			continue;
+		}
+
+		// match number and types of params
+		if NOT( doVTypesMatch( funcs[i], *pFCallParams, true ) )
+			continue;
+
+		return &funcs[i];
+	}
+
 
 	return NULL;
 }
@@ -266,6 +312,20 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 			//pNode = pClonedParamsHooks;
 
 			//return false;
+		}
+		else
+		{
+			// not found ?
+			const char *pFuncName = pNode->mpToken->GetStrChar();
+
+			// is it an asm intrinsic ?
+			if ( pFuncName != strstr( pFuncName, "_asm_" ) )
+			{
+				// if not, then throw an exception
+				throw Exception(
+							DUT::SSPrintFS( "Could not find the function: %s", pFuncName ),
+							pNode );
+			}
 		}
 	}
 

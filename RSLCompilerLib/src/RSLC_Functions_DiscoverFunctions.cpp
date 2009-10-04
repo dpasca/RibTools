@@ -75,15 +75,23 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 
 		i -= 1;
 
+		if ( 0 == strcmp( pFuncName->GetTokStr(), "faceforward" ) )
+		{
+			int yoyo = 1;
+		}
+
 		pFuncName->mNodeType = TokNode::TYPE_FUNCDEF;	// mark the node as a function definition
 
 		for (size_t j=0; j < pFunc->mpParamsNode->mpChilds.size(); ++j)
 		{
-			const Token	*pParamTok = pFunc->mpParamsNode->mpChilds[j]->mpToken;
-			if ( pParamTok->idType == T_TYPE_DATATYPE )
+			const TokNode	*pParamNode = pFunc->mpParamsNode->mpChilds[j];
+			const Token		*pParamTok = pParamNode->mpToken;
+
+			if ( pParamTok->idType == T_TYPE_NONTERM )
 			{
-				VarType	vtype = VarTypeFromToken( pParamTok );
-				pFunc->mParamsVarTypes.push_back( vtype );
+				DASSERT( pParamNode->mVarLink.IsValid() );
+
+				pFunc->mParamsVarTypes.push_back( pParamNode->GetVarType() );
 			}
 		}
 	}

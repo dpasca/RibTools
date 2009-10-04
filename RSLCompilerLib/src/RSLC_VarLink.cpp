@@ -53,7 +53,8 @@ void VarLink::addRef()
 #ifdef _DEBUG
 	if ( mpNode )
 	{
-		mpNode->mpReferringVarLinks.find_or_push_back( this );
+		// umm disabling for now...
+		//mpNode->mpReferringVarLinks.find_or_push_back( this );
 	}
 #endif
 }
@@ -64,9 +65,10 @@ void VarLink::subRef()
 #ifdef _DEBUG
 	if ( mpNode )
 	{
-		DVec<VarLink*>::iterator it = mpNode->mpReferringVarLinks.find( this );
-		DASSERT( it != mpNode->mpReferringVarLinks.end() );
-		mpNode->mpReferringVarLinks.erase( it );
+		// umm disabling for now...
+		//DVec<VarLink*>::iterator it = mpNode->mpReferringVarLinks.find( this );
+		//DASSERT( it != mpNode->mpReferringVarLinks.end() );
+		//mpNode->mpReferringVarLinks.erase( it );
 	}
 #endif
 }

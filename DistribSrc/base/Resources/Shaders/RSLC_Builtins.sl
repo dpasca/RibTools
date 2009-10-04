@@ -168,6 +168,7 @@ void	setzcomp( output normal	 P; float z ){}
 
 float	length( vector V )		{	float tmp; _asm_length( tmp, V ); return tmp;	}
 vector	normalize( vector V )	{	vector tmp; _asm_normalize( tmp, V ); return tmp;	}
+normal	normalize( normal V )	{	normal tmp; _asm_normalize( tmp, V ); return tmp;	}
 float	distance( point P1, P2 ){	float tmp; _asm_distance( tmp, P1, P2 ); return tmp;	}
 
 /*
@@ -196,7 +197,7 @@ normal	ntransform( string fromspace, tospace; normal n ){}
 normal	ntransform( matrix m; normal n ){}
 normal	ntransform( string fromspace; matrix m; normal n ){}
 */
-point	calculatenormal( point P ){}
+normal	calculatenormal( point p )		{	normal tmp;	tmp = _asm_calculatenormal( p ); return tmp;	}
 float	comp( color c; float index ){}
 void	setcomp( output color c; float index, value ){}
 /*
