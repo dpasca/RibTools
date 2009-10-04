@@ -235,6 +235,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_VarLink.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_VarLink.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLCompiler.cpp"
 				>
 			</File>

@@ -76,6 +76,16 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 		i -= 1;
 
 		pFuncName->mNodeType = TokNode::TYPE_FUNCDEF;	// mark the node as a function definition
+
+		for (size_t j=0; j < pFunc->mpParamsNode->mpChilds.size(); ++j)
+		{
+			const Token	*pParamTok = pFunc->mpParamsNode->mpChilds[j]->mpToken;
+			if ( pParamTok->idType == T_TYPE_DATATYPE )
+			{
+				VarType	vtype = VarTypeFromToken( pParamTok );
+				pFunc->mParamsVarTypes.push_back( vtype );
+			}
+		}
 	}
 }
 
@@ -94,14 +104,20 @@ static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
 		{
 			// ok, it's just a space cast..
 
+			// ..next should be a bracket
+			TokNode *pParamsList = pRightNode->GetRight();
+
+			pRightNode->Reparent( pParamsList );
+			pParamsList->mpChilds.push_front( pRightNode );
+
+			pRightNode = pParamsList;
+/*
 			// ..reparent the cast string as child of the function call node
 			out_parentIdx -= 1;
 
 			pRightNode->Reparent( pFuncCallNode );
 			pFuncCallNode->mpChilds.push_back( pRightNode );
-
-			// ..next should be a bracket
-			pRightNode = pRightNode->GetRight();
+*/
 		}
 		else
 		{

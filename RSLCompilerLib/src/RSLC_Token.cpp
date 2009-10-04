@@ -75,6 +75,7 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	DT_DEF( point			)	,
 	DT_DEF( normal			)	,
 	DT_DEF( color			)	,
+	DT_DEF( matrix			)	,
 	DT_DEF( string			)	,
 	DT_DEF( void			)	,
 
@@ -495,15 +496,17 @@ static bool handleString(
 		tokens.back().idType = T_TYPE_VALUE;
 		tokens.back().id	 = T_VL_STRING;
 
-		tokens.back().str = pSource[i++];
+		//tokens.back().str = pSource[i++];
+		++i;
 		for (; i < sourceSize; ++i)
 		{
-			tokens.back().str += pSource[i];
 			if ( pSource[i] == '"' )
 			{
 				++i;
 				return true;
 			}
+			else
+				tokens.back().str += pSource[i];
 		}
 
 		throw Exception( "String not closing !", &tokens.back() );

@@ -15,28 +15,6 @@
 namespace RSLC
 {
 
-/*
-//==================================================================
-static VarType getOperandType( TokNode *pOperand )
-{
-	if ( pOperand->mVarLink.IsValid() )
-	{
-		Variable	*pVar = pOperand->mVarLink.GetVarPtr();
-
-		return pVar->GetVarType();
-	}
-	else
-	{
-		if ( pOperand->mpToken->idType == T_TYPE_TEMPDEST )
-			return pOperand->mBuild_TmpReg.GetRegIdx();
-	}
-
-	DASSERT( 0 );
-
-	return VT_UNKNOWN;
-}
-*/
-
 //==================================================================
 static void realizeConstants_rec( TokNode *pNode, TokNode *pRoot )
 {
@@ -221,7 +199,7 @@ std::string GetRegName( const Register &reg )
 	case VT_FLOAT:	regBase[0] = 's'; break;
 	case VT_POINT:	regBase[0] = 'v'; break;
 	case VT_COLOR:	regBase[0] = 'v'; break;
-	case VT_STRING:	regBase[0] = 'x'; DASSERT( 0 ); break;
+	case VT_STRING:	regBase[0] = 'x'; break;
 	case VT_VECTOR:	regBase[0] = 'v'; break;
 	case VT_NORMAL:	regBase[0] = 'v'; break;
 	case VT_MATRIX:	regBase[0] = 'm'; break;

@@ -59,10 +59,12 @@ int main( int argc, char *argv[] )
 	{
 		printf( "ERROR: %s !\n", e.GetMessage().c_str() );
 	}
+/*
 	catch ( ... )
 	{
 		printf( "ERROR while compiling !\n" );
 	}
+*/
 
 	printf( "Done !\n", pRRFName );
 

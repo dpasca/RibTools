@@ -13,29 +13,11 @@
 #include "RSLC_Token.h"
 #include "RSLC_Variables.h"
 #include "RSLC_Functions.h"
+#include "RSLC_VarLink.h"
 
 //==================================================================
 namespace RSLC
 {
-
-//==================================================================
-class VarLink
-{
-public:
-	TokNode		*mpNode;
-	size_t		mVarIdx;
-
-	VarLink() :
-		mpNode(NULL),
-		mVarIdx(DNPOS)
-	{
-	}
-
-	bool IsValid() const { return mVarIdx != DNPOS; }
-
-	Variable *GetVarPtr();
-	const Variable *GetVarPtr() const;
-};
 
 //==================================================================
 class TokNode
@@ -76,16 +58,16 @@ public:
 	VarLink			mVarLink;	// this is the variable definition
 								// in case this node is variable usage
 
+#ifdef _DEBUG
+	DVec<VarLink*>	mpReferringVarLinks;
+#endif
+
 public:
 	TokNode( Token *pObj );
 
 	TokNode( const TokNode &from );
 
-	~TokNode()
-	{
-		for (size_t i=0; i < mpChilds.size(); ++i)
-			DSAFE_DELETE( mpChilds[i] );
-	}
+	~TokNode();
 
 	void SetBlockType( BlockType blockType )
 	{

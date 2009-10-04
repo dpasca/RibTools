@@ -6,7 +6,7 @@
 /// copyright info. 
 //==================================================================
 
-#include <map>
+#include <hash_map>
 #include "RSLC_Tree.h"
 #include "RSLC_Functions.h"
 #include "RSLC_Exceptions.h"
@@ -18,11 +18,13 @@
 namespace RSLC
 {
 
+typedef stdext::hash_map<const TokNode*,TokNode*>	NodeToNodeMap;
+
 //==================================================================
 static TokNode *cloneBranch_BuildNodes(
-								TokNode *pNode,
+								const TokNode *pNode,
 								TokNode *pDstParent,
-								std::map<TokNode*,TokNode*>	&oldToNewMap )
+								NodeToNodeMap &oldToNewMap )
 {
 	TokNode	*pNewNode = DNEW TokNode( *pNode );
 
@@ -30,19 +32,6 @@ static TokNode *cloneBranch_BuildNodes(
 
 	if ( pDstParent )
 		pDstParent->AddChild( pNewNode );
-
-	if ( pNewNode->mVarLink.IsValid() )
-	{
-		TokNode	*pReplaceNode = oldToNewMap[ pNode->mVarLink.mpNode ];
-
-		if ( pReplaceNode )
-		{
-			DASSERT( pNode->mVarLink.mpNode->GetVars().size() != 0 );
-			DASSERT( pNode->mVarLink.mpNode->GetVars().size() == pReplaceNode->GetVars().size() );
-
-			pNewNode->mVarLink.mpNode = pReplaceNode;
-		}
-	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
@@ -53,13 +42,63 @@ static TokNode *cloneBranch_BuildNodes(
 }
 
 //==================================================================
-static TokNode *cloneBranch( TokNode *pNode )
+static void cloneBranch_RemapVarlinks(
+								TokNode *pNode,
+								NodeToNodeMap &oldToNewMap )
 {
-	std::map<TokNode*,TokNode*>	oldToNewMap;
+	if ( pNode->mVarLink.IsValid() )
+	{
+		const TokNode *pVarsNode = pNode->mVarLink.GetNode();
+
+		if ( oldToNewMap.find( pVarsNode ) != oldToNewMap.end() )
+		{
+			TokNode	*pReplaceNode = oldToNewMap[ pVarsNode ];
+	
+			DASSERT( pVarsNode->GetVars().size() != 0 );
+			DASSERT( pVarsNode->GetVars().size() == pReplaceNode->GetVars().size() );
+
+			pNode->mVarLink.ReplaceNode( pReplaceNode );
+		}
+		else
+		{
+			//DASSERT( 0 );
+		}
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		cloneBranch_RemapVarlinks( pNode->mpChilds[i], oldToNewMap );
+	}
+}
+
+//==================================================================
+static TokNode *cloneBranch( const TokNode *pNode )
+{
+	NodeToNodeMap	oldToNewMap;
 
 	TokNode	*pNewBase = cloneBranch_BuildNodes( pNode, NULL, oldToNewMap );
 
+	cloneBranch_RemapVarlinks( pNewBase, oldToNewMap );
+
+
 	return pNewBase;
+}
+
+//==================================================================
+static bool doVTypesMatch( const Function &func, const TokNode &callNode )
+{
+	if ( callNode.mpChilds.size() != func.mParamsVarTypes.size() )
+		return false;
+
+	for (size_t i=0; i < callNode.mpChilds.size(); ++i)
+	{
+		VarType	vtype = callNode.mpChilds[i]->GetVarType();
+
+		if ( func.mParamsVarTypes[i] != vtype )
+			return false;
+	}
+
+	return true;
 }
 
 //==================================================================
@@ -70,38 +109,22 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 	TokNode *pFCallParams = pFCallNode->GetChildTry( 0 );
 	DASSERT( pFCallParams != NULL );
 
-	//for (size_t i=0; i < funcs.size(); ++i)
-	{
-		TokNode	*pCallParams = pFCallNode->GetChildTry( 0 );
-		for (size_t j=0; j < pCallParams->mpChilds.size(); ++j)
-		{
-			const TokNode	*pParam = pCallParams->mpChilds[j];
-			// assignment to temp register case
-			if ( pParam->mpToken->id == T_OP_ASSIGN )
-			{
-				const TokNode	*pParamVal = pParam->GetChildTry(0);
-				// first child is the destination..
-				if ( pParamVal->mpToken->id == T_TD_TEMPDEST )
-				{
-					printf( "Param %i, is '%s'\n",
-								j,
-								VarTypeToString( pParamVal->GetVarType() )
-							);
-				}
-			}
-		}
-	}
-
 	Function	*pBestMatch = NULL;
 	size_t		convertMatches = 0;
 	size_t		exactMatches = 0;
 
 	for (size_t i=0; i < funcs.size(); ++i)
 	{
-		if ( strcasecmp(
+		if ( strcmp(
 				pFCallNode->mpToken->GetStrChar(),
 				funcs[i].mpNameNode->GetTokStr()
 				) )
+		{
+			continue;
+		}
+
+		// match number of params
+		if NOT( doVTypesMatch( funcs[i], *pFCallParams ) )
 			continue;
 
 		return &funcs[i];
@@ -109,56 +132,6 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 
 	return NULL;
 }
-
-//==================================================================
-/*
-dest
-
----------
-
-=
-	dest
-	src
-*/
-static void insertAssignTo( TokNode *pDestNode, TokNode *pSrcNode )
-{
-	TokNode	*pAssgnNode = DNEW TokNode( DNEW Token( "=", T_OP_ASSIGN, T_TYPE_OPERATOR ) );
-
-	TokNode *pCloneSrcNode = cloneBranch( pSrcNode );
-
-	pAssgnNode->ReplaceNode( pDestNode );
-
-	pAssgnNode->AddChild( pDestNode );
-	pAssgnNode->AddChild( pCloneSrcNode );
-}
-
-/*
-//==================================================================
-static void insertAssignToTemp( TokNode *pNode, size_t childIdx, VarType varType, bool isVarying )
-{
-	Token	*pDestRegTok = DNEW Token();
-	Token	*pAssgnOpTok = DNEW Token();
-
-	pDestRegTok->idType	= T_TYPE_TEMPDEST;
-	pDestRegTok->id		= T_TD_TEMPDEST;
-	pDestRegTok->str	= "TEMP_DEST_REG";
-
-	pAssgnOpTok->idType = T_TYPE_OPERATOR;
-	pAssgnOpTok->id		= T_OP_ASSIGN;
-	pAssgnOpTok->str	= "=";
-
-	TokNode	*pAssgnNode = DNEW TokNode( pAssgnOpTok );
-
-	TokNode	*pOldNode = pNode->mpChilds[childIdx];
-	pNode->mpChilds[childIdx] = pAssgnNode;
-	pAssgnNode->mpParent = pNode;
-
-	TokNode *pDestRegNode = pAssgnNode->AddNewChild( pDestRegTok );
-	pDestRegNode->mBuild_TmpReg.SetType( varType, isVarying );
-
-	pAssgnNode->AddChild( pOldNode );
-}
-*/
 
 //==================================================================
 static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
@@ -188,11 +161,33 @@ static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
 }
 
 //==================================================================
-static void assignPassingParams( TokNode *pClonedParams, TokNode *pPassParams )
+/*
+dest
+
+---------
+
+=
+	dest
+	src
+*/
+static void insertAssignTo( TokNode *pDestNode, const TokNode *pSrcNode )
 {
-	for (size_t i=0,j=0; i < pClonedParams->mpChilds.size(); ++i)
+	TokNode	*pAssgnNode = DNEW TokNode( DNEW Token( "=", T_OP_ASSIGN, T_TYPE_OPERATOR ) );
+
+	TokNode *pCloneSrcNode = cloneBranch( pSrcNode );
+
+	pAssgnNode->ReplaceNode( pDestNode );
+
+	pAssgnNode->AddChild( pDestNode );
+	pAssgnNode->AddChild( pCloneSrcNode );
+}
+
+//==================================================================
+static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassParams )
+{
+	for (size_t i=0,j=0; i < pParamsHooks->mpChilds.size(); ++i)
 	{
-		if ( pClonedParams->mpChilds[i]->mpToken->id != T_NONTERM )
+		if ( pParamsHooks->mpChilds[i]->mpToken->id != T_NONTERM )
 			continue;
 
 		TokNode	*pPassParam = pPassParams->GetChildTry( j++ );
@@ -200,8 +195,8 @@ static void assignPassingParams( TokNode *pClonedParams, TokNode *pPassParams )
 		if NOT( pPassParam )
 			throw Exception( "Missing parameter ?", pPassParams );
 
-		insertAssignTo( pClonedParams->mpChilds[i], pPassParam );
-		//printf( "PASSSS %s = %s\n", pClonedParams->mpChilds[i]->GetTokStr(), pPassParam->GetTokStr() );
+		insertAssignTo( pParamsHooks->mpChilds[i], pPassParam );
+		//printf( "PASSSS %s = %s\n", pClonedParamsHooks->mpChilds[i]->GetTokStr(), pPassParam->GetTokStr() );
 
 		// $$$ need to get the function params types from definition here..
 	}
@@ -209,53 +204,85 @@ static void assignPassingParams( TokNode *pClonedParams, TokNode *pPassParams )
 }
 
 //==================================================================
+#ifdef _DEBUG
+static void verifyVarLinks( TokNode *pNode )
+{
+	DASSERT( pNode->mVarLink.IsNodeValid() );
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		verifyVarLinks( pNode->mpChilds[i] );
+	}
+}
+#endif
+
+//==================================================================
 static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
 {
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		resolveFunctionCalls( pNode->mpChilds[i], funcs, i );
+		//if NOT( resolveFunctionCalls( pNode->mpChilds[i], funcs, i ) )
+		//	return false;
+	}
+
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
+#ifdef _DEBUG
+		TokNode *pParent = pNode->mpParent;
+#endif
+
 		const Function	*pFunc = matchFunctionByParams( pNode, funcs );
 
 		if ( pFunc )
 		{
-			TokNode	*pClonedParams = cloneBranch( pFunc->mpParamsNode );
+			TokNode	*pClonedParamsHooks = cloneBranch( pFunc->mpParamsNode );
 
-			pClonedParams->ReplaceNode( pNode );
+			// place the params block where the function call (name) currently is
+			pClonedParamsHooks->ReplaceNode( pNode );
 
-			// return node
+			// add a return node/variable
 			AddVariable(
-				pClonedParams->mpParent,
+				pClonedParamsHooks->mpParent,
 				DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
 				DNEW TokNode( DNEW Token( "varying", T_DE_varying, T_TYPE_DETAIL ) ),	// %%% forced varying for now !
 				NULL,
-				pClonedParams );
+				pClonedParamsHooks );
 
-			TokNode	*pPassParams = pNode->GetChildTry( 0 );
+			const TokNode	*pPassParams = pNode->GetChildTry( 0 );
 
-			assignPassingParams( pClonedParams, pPassParams );
+			assignPassingParams( pClonedParamsHooks, pPassParams );
 
+/*
+		#ifdef _DEBUG
+			verifyVarLinks( pParent );
+		#endif
 			DSAFE_DELETE( pNode );
+		#ifdef _DEBUG
+			verifyVarLinks( pParent );
+		#endif
+*/
 			//return;
+			//pNode = pClonedParamsHooks;
 
-			pNode = pClonedParams;
+			//return false;
 		}
 	}
 
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-	{
-		resolveFunctionCalls( pNode->mpChilds[i], funcs, i );
-	}
+	//return true;
 }
 
 //==================================================================
 static TokNode *insertAssignToNode(
 						const VarLink	&destVLink,
-						TokNode	*pSrcNode )
+						const TokNode	*pSrcNode )
 {
 	TokNode	*pAssgnNode = DNEW TokNode(
 								DNEW Token( "=", T_OP_ASSIGN, T_TYPE_OPERATOR )
 								);
 
 	TokNode	*pNewDest = DNEW TokNode( DNEW Token( "ReturnDest", T_TD_TEMPDEST, T_TYPE_TEMPDEST ) );
+
 	pNewDest->mVarLink = destVLink;
 
 	TokNode	*pSrcClone = cloneBranch( pSrcNode );
@@ -267,7 +294,7 @@ static TokNode *insertAssignToNode(
 }
 
 //==================================================================
-static TokNode *instrumentFCallReturn( TokNode *pReturnNode, const VarLink	&destVLink )
+static TokNode *instrumentFCallReturn( TokNode *pReturnNode, const VarLink &destVLink )
 {
 	TokNode	*pRetNode = pReturnNode->GetRight();
 

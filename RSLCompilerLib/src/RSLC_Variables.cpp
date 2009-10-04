@@ -29,6 +29,7 @@ VarType VarTypeFromToken( const Token *pTok )
 	case T_DT_point	: return VT_POINT;
 	case T_DT_normal: return VT_NORMAL;
 	case T_DT_color	: return VT_COLOR;
+	case T_DT_matrix: return VT_MATRIX;
 	case T_DT_string: return VT_STRING;
 	}
 
@@ -42,12 +43,12 @@ const char *VarTypeToString( VarType type )
 	switch ( type )
 	{
 	case VT_FLOAT	: return "float"	;
-	case VT_POINT	: return "point"	;
-	case VT_COLOR	: return "color"	;
-	case VT_STRING	: return "string"	;
 	case VT_VECTOR	: return "vector"	;
+	case VT_POINT	: return "point"	;
 	case VT_NORMAL	: return "normal"	;
+	case VT_COLOR	: return "color"	;
 	case VT_MATRIX	: return "matrix"	;
+	case VT_STRING	: return "string"	;
 	case VT_BOOL	: return "bool"		;
 
 	default:
@@ -61,12 +62,12 @@ char VarTypeToLetter( VarType type )
 	switch ( type )
 	{
 	case VT_FLOAT:	return 's'; break;
-	case VT_POINT:	return 'v'; break;
-	case VT_COLOR:	return 'v'; break;
-	case VT_STRING:	return 'x'; break;
 	case VT_VECTOR:	return 'v'; break;
+	case VT_POINT:	return 'v'; break;
 	case VT_NORMAL:	return 'v'; break;
+	case VT_COLOR:	return 'v'; break;
 	case VT_MATRIX:	return 'm'; break;
+	case VT_STRING:	return 'x'; break;
 	case VT_BOOL:	return 'b'; break;
 
 	default:
@@ -150,8 +151,7 @@ Variable *AddVariable(
 			TokNode *pNameNode )
 {
 	// setup the var link
-	pNameNode->mVarLink.mVarIdx = pNode->GetVars().size();
-	pNameNode->mVarLink.mpNode = pNode;
+	pNameNode->mVarLink.Setup( pNode, pNode->GetVars().size() );
 
 	Variable	*pVar = pNode->GetVars().grow();
 
@@ -228,8 +228,7 @@ void AddSelfVariable(
 	//DASSERT( pNode->GetVars().size() == 0 );
 
 	// setup the var link
-	pNode->mVarLink.mVarIdx = pNode->GetVars().size();
-	pNode->mVarLink.mpNode = pNode;
+	pNode->mVarLink.Setup( pNode, pNode->GetVars().size() );
 
 	Variable	*pVar = pNode->GetVars().grow();
 
@@ -263,8 +262,7 @@ void AddConstVariable( TokNode *pNode, TokNode *pRoot )
 				if ( vars[i].mBaseValNum.size() == 1 &&
 					 vars[i].mBaseValNum[0] == floatVal )
 				{
-					pNode->mVarLink.mVarIdx = i;
-					pNode->mVarLink.mpNode = pRoot;
+					pNode->mVarLink.Setup( pRoot, i );
 					return;
 				}
 			}
@@ -283,8 +281,7 @@ void AddConstVariable( TokNode *pNode, TokNode *pRoot )
 				if ( vars[i].mBaseValNum.size() == 1 &&
 					 0 == strcmp( vars[i].mBaseValStr.c_str(), pStrVal ) )
 				{
-					pNode->mVarLink.mVarIdx = i;
-					pNode->mVarLink.mpNode = pRoot;
+					pNode->mVarLink.Setup( pRoot, i );
 					return;
 				}
 			}
@@ -299,8 +296,7 @@ void AddConstVariable( TokNode *pNode, TokNode *pRoot )
 	// ..if not found, then need to make it from scratch
 
 	// setup the var link
-	pNode->mVarLink.mVarIdx = pRoot->GetVars().size();
-	pNode->mVarLink.mpNode = pRoot;
+	pNode->mVarLink.Setup( pRoot, pRoot->GetVars().size() );
 
 	Variable	*pVar = pRoot->GetVars().grow();
 
@@ -308,7 +304,7 @@ void AddConstVariable( TokNode *pNode, TokNode *pRoot )
 	pVar->mIsForcedDetail	= false;
 	pVar->mHasBaseVal		= true;
 
-	pVar->mInternalName		= DUT::SSPrintFS( "_@K%02i", pNode->mVarLink.mVarIdx );
+	pVar->mInternalName		= DUT::SSPrintFS( "_@K%02i", pNode->mVarLink.GetVarIdx() );
 
 	pVar->mVarType			= vtype;
 
@@ -378,30 +374,6 @@ static bool fndVarDefBeginInBlock(
 		return true;
 	else
 		return false;
-}
-
-//==================================================================
-static bool iterateNextExpression( size_t &i, TokNode *pNode )
-{
-	for (++i; i < pNode->mpChilds.size(); ++i)
-	{
-		if ( pNode->mpChilds[i]->IsTokenID( T_OP_SEMICOL ) ||
-			 pNode->mpChilds[i]->IsTokenID( T_OP_RGT_BRACKET ) )
-		{
-			++i;
-			return false;
-		}
-		else
-		if ( pNode->mpChilds[i]->IsTokenID( T_OP_COMMA ) )
-		{
-			++i;
-			return true;
-		}
-	}
-
-	//throw Exception( "Missing a ; ?" );
-
-	return false;
 }
 
 //==================================================================

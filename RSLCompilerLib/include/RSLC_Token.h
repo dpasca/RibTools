@@ -102,6 +102,7 @@ enum TokenID
 	DT_DEF( point			)	,
 	DT_DEF( normal			)	,
 	DT_DEF( color			)	,
+	DT_DEF( matrix			)	,
 	DT_DEF( string			)	,
 	DT_DEF( void			)	,
 

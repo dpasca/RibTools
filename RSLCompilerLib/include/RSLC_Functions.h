@@ -25,6 +25,7 @@ public:
 	TokNode			*mpCodeBlkNode;
 	Token			*mpRetTypeTok;
 	TokNode			*mpNameNode;
+	DVec<VarType>	mParamsVarTypes;
 
 	Function() :
 		mpParamsNode(NULL),

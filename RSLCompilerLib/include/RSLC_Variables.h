@@ -26,10 +26,10 @@ enum VarType
 	VT_FLOAT	,
 	VT_POINT	,
 	VT_COLOR	,
-	VT_STRING	,
 	VT_VECTOR	,
 	VT_NORMAL	,
 	VT_MATRIX	,
+	VT_STRING	,
 	VT_BOOL		,
 	VT_N
 };

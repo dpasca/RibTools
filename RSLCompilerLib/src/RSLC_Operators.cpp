@@ -61,8 +61,8 @@ void SolveBiOpType(
 		DASSERT( pOperand1->IsVarying() == false );
 		DASSERT( pOperand2->IsVarying() == false );
 
-		if ( pOperator->mpToken->id != T_OP_ASSIGN ||
-			 pOperator->mpToken->id != T_OP_EQ ||
+		if ( pOperator->mpToken->id != T_OP_ASSIGN &&
+			 pOperator->mpToken->id != T_OP_EQ &&
 			 pOperator->mpToken->id != T_OP_NEQ
 			 )
 			throw Exception( "Invalid operator between strings !", pOperator );

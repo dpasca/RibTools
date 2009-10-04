@@ -15,21 +15,55 @@ namespace RSLC
 {
 
 //==================================================================
-Variable * VarLink::GetVarPtr()
-{
-	return mVarIdx != DNPOS ? &mpNode->GetVars()[mVarIdx] : NULL;
-}
-
-//==================================================================
-const Variable * VarLink::GetVarPtr() const
-{
-	return mVarIdx != DNPOS ? &mpNode->GetVars()[mVarIdx] : NULL;
-}
-
-//==================================================================
 #ifdef _DEBUG
 size_t	TokNode::sUIDCnt;
 #endif
+
+//==================================================================
+TokNode::TokNode( Token *pObj ) :
+	mpToken(pObj),
+	mpParent(NULL),
+	mNodeType(TYPE_STANDARD),
+	mBlockType(BLKT_UNKNOWN),
+	mBlockID(0)
+{
+#ifdef _DEBUG
+	mUIDCnt = sUIDCnt++;
+#endif
+}
+
+//==================================================================
+TokNode::TokNode( const TokNode &from ) :
+	mpToken			(from.mpToken),
+	mVariables		(from.mVariables),
+	mFunctions		(from.mFunctions),
+	mpParent		(NULL),
+	mNodeType		(from.mNodeType),
+	mBlockType		(from.mBlockType),
+	mBlockID		(0),
+	mVarLink		(from.mVarLink)
+{
+#ifdef _DEBUG
+	mUIDCnt = sUIDCnt++;
+#endif
+}
+
+//==================================================================
+TokNode::~TokNode()
+{
+	for (size_t i=0; i < mpChilds.size(); ++i)
+		DSAFE_DELETE( mpChilds[i] );
+
+#ifdef _DEBUG
+	for (size_t i=0; i < mpReferringVarLinks.size(); ++i)
+	{
+		if ( mpReferringVarLinks[i]->GetNode() != this )
+		{
+			int yoyo = 1;
+		}
+	}
+#endif
+}
 
 //==================================================================
 TokNode *TokNode::GetLeft()
@@ -136,8 +170,7 @@ VarLink TokNode::FindVariableByDefName( const char *pName )
 		if ( pVar->HasDefName() )
 			if ( 0 == strcmp( pVar->GetDefName(), pName ) )
 			{
-				result.mpNode = this;
-				result.mVarIdx = i;
+				result.Setup( this, i );
 				break;
 			}
 	}
@@ -181,35 +214,6 @@ void TokNode::ReplaceNode( TokNode *pNode )
 	}
 
 	DASSERT( 0 );
-}
-
-//==================================================================
-TokNode::TokNode( Token *pObj ) :
-	mpToken(pObj),
-	mpParent(NULL),
-	mNodeType(TYPE_STANDARD),
-	mBlockType(BLKT_UNKNOWN),
-	mBlockID(0)
-{
-#ifdef _DEBUG
-	mUIDCnt = sUIDCnt++;
-#endif
-}
-
-//==================================================================
-TokNode::TokNode( const TokNode &from ) :
-	mpToken			(from.mpToken),
-	mVariables		(from.mVariables),
-	mFunctions		(from.mFunctions),
-	mpParent		(NULL),
-	mNodeType		(from.mNodeType),
-	mBlockType		(from.mBlockType),
-	mBlockID		(0),
-	mVarLink		(from.mVarLink)
-{
-#ifdef _DEBUG
-	mUIDCnt = sUIDCnt++;
-#endif
 }
 
 //==================================================================

@@ -84,6 +84,9 @@ public:
 	iterator		begin()			{ return mpData;	}
 	const_iterator	begin()	const	{ return mpData;	}
 
+	iterator		end()			{ return mpData + mSize;	}
+	const_iterator	end()	const	{ return mpData + mSize;	}
+
 	void clear()
 	{
 		resize( 0 );
@@ -196,15 +199,23 @@ public:
 		resize( mSize - 1 );
 	}
 
-	void find_or_push_back( const T &val )
+	iterator find( const T &val )
 	{
 		for (size_t i=0; i < mSize; ++i)
 		{
 			if ( mpData[i] == val )
 			{
-				return;
+				return mpData + i;
 			}
 		}
+
+		return end();
+	}
+
+	void find_or_push_back( const T &val )
+	{
+		if ( find( val ) != end() )
+			return;
 
 		T	tmp = val;	// TODO: why needs this ?!
 		*grow() = tmp;
