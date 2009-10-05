@@ -62,6 +62,7 @@ private:
 	void parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx );
 	bool parseLabelDef( const char *pTok );
 	void getVector( const char *pStr, float out_val[], int n );
+	void getString( const char *pStr, SlStr &out_str );
 
 	void onError( const char *pFmt, ... ) const;
 

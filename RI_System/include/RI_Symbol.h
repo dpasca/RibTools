@@ -33,6 +33,25 @@ typedef Vec4xSIMDf	SlVec4		__attribute__ ((aligned(64)));
 #endif
 
 //==================================================================
+class SlStr
+{
+	static const size_t	MAX_SIZE = 256;
+
+public:
+	char	mStr[MAX_SIZE];
+
+	SlStr()
+	{
+		mStr[0] = 0;
+	}
+
+	SlStr( const SlStr *pFrom )
+	{
+		strcpy_s( mStr, pFrom->mStr );
+	}
+};
+
+//==================================================================
 class Symbol
 {
 public:
@@ -42,10 +61,10 @@ public:
 		VOIDD,
 		FLOAT,
 		POINT,
-		COLOR,
-		STRING,
 		VECTOR,
 		NORMAL,
+		COLOR,
+		STRING,
 		MATRIX,
 		TYPES_N
 	};

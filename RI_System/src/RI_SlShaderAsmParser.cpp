@@ -345,6 +345,38 @@ void ShaderAsmParser::getVector( const char *pStr, float out_val[], int n )
 }
 
 //==================================================================
+void ShaderAsmParser::getString( const char *pStr, SlStr &out_str )
+{
+	const char *pStart = strstr( pStr, "\"" );
+
+	if NOT( pStart )
+		onError( "Malformed string ? '%s' ", pStr );
+
+	out_str.mStr[0] = 0;
+
+	++pStart;
+
+	size_t	destIdx = 0;
+
+	while ( pStart[0] )
+	{
+		if ( pStart[0] == '"' )
+		{
+			out_str.mStr[destIdx] = 0;
+			return;
+		}
+		else
+			out_str.mStr[destIdx] = pStart[0];
+
+		++destIdx;
+		++pStart;
+	}
+
+	onError( "Malformed string ? '%s' ", pStr );
+}
+
+
+//==================================================================
 void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 {
 	//printf( "SEC_DATA: %s\n", lineBuff );
@@ -426,24 +458,49 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	const char *pDefaultValueStr = pTok + strlen(pTok) + 1;
 	if ( pDefaultValueStr < pLineEnd )
 	{
-		float	tmp[64];
+		//printf( "Default value '%s'\n", pDefaultValueStr );
 
 		switch ( pSymbol->mType )
 		{
-		case Symbol::FLOAT : getVector( pDefaultValueStr, tmp, 1 ); break;
-		case Symbol::POINT : getVector( pDefaultValueStr, tmp, 3 ); break;
-		case Symbol::COLOR : getVector( pDefaultValueStr, tmp, 3 ); break;
+		case Symbol::FLOAT :
+			{
+				float	tmp[4];
+				getVector( pDefaultValueStr, tmp, 1 );
+				pSymbol->AllocDefault( tmp );
+			}
+			break;
+
+		case Symbol::COLOR :
+			{
+				float	tmp[4];
+				getVector( pDefaultValueStr, tmp, 1 );
+				pSymbol->AllocDefault( tmp );
+			}
+			break;
+
+		case Symbol::POINT :
 		case Symbol::VECTOR:
-		case Symbol::NORMAL: getVector( pDefaultValueStr, tmp, 3 ); break;
+		case Symbol::NORMAL:
+			{
+				float	tmp[4];
+				getVector( pDefaultValueStr, tmp, 1 );
+				pSymbol->AllocDefault( tmp );
+			}
+			break;
+
 		case Symbol::STRING:
+			{
+				SlStr	str;
+
+				getString( pDefaultValueStr, str );
+				pSymbol->AllocDefault( &str );
+			}
+			break;
+
 		case Symbol::MATRIX:
 				onError( "Currently unsupported default value (^^;> '%s'", pTok );
 				break;
 		}
-
-		pSymbol->AllocDefault( tmp );
-
-		//printf( "Default value '%s'\n", pDefaultValueStr );
 	}
 	else
 	{
