@@ -191,6 +191,21 @@ void Inst_1Op( SlRunContext &ctx )
 }
 
 //==================================================================
+static inline void Inst_MovXX( SlRunContext &ctx )
+{
+		  SlStr*	lhs	= ctx.GetVoidRW( (		SlStr *)0, 1 );
+	const SlStr*	op1	= ctx.GetVoidRO( (const SlStr *)0, 2 );
+
+	DASSERT(
+		ctx.IsSymbolVarying( 1 ) == false &&
+		ctx.IsSymbolVarying( 2 ) == false );
+
+	strcpy_s( lhs[0].mStr, op1[0].mStr );
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 template <class TA, class TB, class TC, const OpBaseTypeID opBaseTypeID>
 void Inst_2Op( SlRunContext &ctx )
 {

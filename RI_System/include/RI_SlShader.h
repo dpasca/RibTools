@@ -27,6 +27,7 @@ enum OperTypeID
 	OPRTYPE_F3 ,
 	OPRTYPE_F4 ,
 	OPRTYPE_M44,
+	OPRTYPE_STR,
 	OPRTYPE_ADDR,
 	OPRTYPE_N
 };
@@ -53,6 +54,8 @@ enum OpCodeID
 	OP_SS_MOV	,
 	OP_VS_MOV	,
 	OP_VV_MOV	,
+
+	OP_XX_MOV	,
 
 	OP_SS_ABS	,
 	OP_VS_ABS	,

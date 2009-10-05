@@ -46,6 +46,8 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"mov.vs"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
 	"mov.vv"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
 
+	"mov.xx"		,		2,						0,	OPRTYPE_STR,OPRTYPE_STR,OPRTYPE_NA,	OPRTYPE_NA,
+
 	"abs.ss"		,		2,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
 	"abs.vs"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
 	"abs.vv"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
@@ -557,8 +559,11 @@ int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 	if ( len < 3 )
 		return -1;
 
-	if NOT(	pName[1] == 's' || pName[1] == 'S' ||
-			pName[1] == 'v' || pName[1] == 'V' )
+	char typeLower = tolower( pName[1] );
+
+	if NOT(	typeLower == 's' ||
+			typeLower == 'v' ||
+			typeLower == 'x' )
 		return -1;
 
 	int	retIdx = (int)mpShader->mSymbols.size();
@@ -581,15 +586,21 @@ int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 	pSymbol->mArraySize	= 0;
 	pSymbol->mpValArray	= NULL;
 
-	if ( pName[1] == 's' || pName[1] == 'S' )
+	if ( typeLower == 's' )
 	{
 		// scalar base
 		pSymbol->mType	= Symbol::FLOAT;
 	}
 	else
+	if ( typeLower == 'v' )
 	{
 		// vector base
 		pSymbol->mType	= Symbol::VECTOR;
+	}
+	else
+	{
+		// string
+		pSymbol->mType	= Symbol::STRING;
 	}
 
 	mpShader->mSymbols.push_back( pSymbol.release() );
@@ -606,14 +617,15 @@ static OperTypeID getOperTypeFromSlSymbolType( Symbol::Type slSymType, bool &out
 	switch ( slSymType )
 	{
 	case Symbol::FLOAT:	return OPRTYPE_F1 ;
-	//case Symbol:::		return OPRTYPE_F2 ;
+
 	case Symbol::POINT:
-	case Symbol::COLOR:
 	case Symbol::VECTOR:
-	case Symbol::NORMAL:
-							return OPRTYPE_F3 ;
-	//case Symbol:::		return OPRTYPE_F4 ;
+	case Symbol::NORMAL:	return OPRTYPE_F3 ;
+
+	case Symbol::COLOR:		return OPRTYPE_F3 ;
+
 	case Symbol::MATRIX:	return OPRTYPE_M44;
+	case Symbol::STRING:	return OPRTYPE_STR;
 
 	default:
 		out_success = false;

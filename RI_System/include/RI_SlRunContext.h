@@ -147,6 +147,17 @@ public:
 		return (SlVec3 *)value.Data.pVoidValue;
 	}
 
+	SlStr *GetVoidRW( SlStr *unused, u_int argc )
+	{
+		SlValue	&value = GetValue(argc);
+
+		DASSERT(
+			(value.mpSrcSymbol->mType == Symbol::STRING) &&
+			 value.Flags.mCanChange != 0 );
+
+		return (SlStr *)value.Data.pVoidValue;
+	}
+
 	const SlScalar *GetVoidRO( const SlScalar *unused, u_int argc ) const
 	{
 		const SlValue	&value = GetValue(argc);
@@ -172,6 +183,16 @@ public:
 			 value.mpSrcSymbol->mType == Symbol::NORMAL) );
 
 		return (const SlVec3 *)value.Data.pVoidValue;
+	}
+
+	const SlStr *GetVoidRO( const SlStr *unused, u_int argc ) const
+	{
+		const SlValue	&value = GetValue(argc);
+
+		DASSERT(
+			(value.mpSrcSymbol->mType == Symbol::STRING) );
+
+		return (const SlStr *)value.Data.pVoidValue;
 	}
 
 	void InitializeSIMD( size_t samplesN );

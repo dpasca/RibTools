@@ -473,6 +473,8 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	SOP::Inst_1Op<V,S,OBT_MOV>,
 	SOP::Inst_1Op<V,V,OBT_MOV>,
 
+	SOP::Inst_MovXX,
+
 	SOP::Inst_1Op<S,S,OBT_ABS>,
 	SOP::Inst_1Op<V,S,OBT_ABS>,
 	SOP::Inst_1Op<V,V,OBT_ABS>,

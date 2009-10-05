@@ -75,11 +75,6 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 
 		i -= 1;
 
-		if ( 0 == strcmp( pFuncName->GetTokStr(), "faceforward" ) )
-		{
-			int yoyo = 1;
-		}
-
 		pFuncName->mNodeType = TokNode::TYPE_FUNCDEF;	// mark the node as a function definition
 
 		for (size_t j=0; j < pFunc->mpParamsNode->mpChilds.size(); ++j)
