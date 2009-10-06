@@ -17,6 +17,7 @@
 #include "RI_SlShader_Ops_Base.h"
 #include "RI_SlShader_Ops_Lighting.h"
 #include "RI_SlShader_Ops_Noise.h"
+#include "RI_SlShader_Ops_XForm.h"
 #include "RSLCompilerLib/include/RSLCompiler.h"
 #include "DSystem/include/DUtils_Files.h"
 
@@ -522,6 +523,8 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	SOP::Inst_SetVComp<0>,
 	SOP::Inst_SetVComp<1>,
 	SOP::Inst_SetVComp<2>,
+
+	SOP::Inst_XFormname_VXS3,
 
 	Inst_Normalize,
 	Inst_Faceforward,

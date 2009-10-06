@@ -32,7 +32,7 @@ struct OpCodeDef
 	const char	*pName;
 	u_int		OperCnt;
 	u_int		Flags;
-	OperTypeID	Types[4];
+	OperTypeID	Types[5];
 };
 
 //==================================================================
@@ -42,69 +42,71 @@ static const char *gpMainLabelName = "__main";
 //==================================================================
 static OpCodeDef	gsOpCodeDefs[] =
 {
-	"mov.ss"		,		2,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"mov.vs"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"mov.vv"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+	"mov.ss"		,		2,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"mov.vs"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"mov.vv"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"mov.xx"		,		2,						0,	OPRTYPE_STR,OPRTYPE_STR,OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"abs.ss"		,		2,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"abs.vs"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"abs.vv"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"add.sss"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"add.vvs"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"add.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+	"add.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"sub.sss"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"sub.vvs"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"sub.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+	"sub.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"mul.sss"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"mul.vvs"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"mul.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+	"mul.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"div.sss"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"div.vvs"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"div.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+	"div.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
 
-	"mov.xx"		,		2,						0,	OPRTYPE_STR,OPRTYPE_STR,OPRTYPE_NA,	OPRTYPE_NA,
+	"mov.vs3"		,		4,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
 
-	"abs.ss"		,		2,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"abs.vs"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"abs.vv"		,		2,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+	"dot.svv"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
 
-	"add.sss"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
-	"add.vvs"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
-	"add.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
-	"add.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
+	"ld.s"		,		2,							OPC_FLG_RIGHTISIMM,		OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"ld.v"		,		4,							OPC_FLG_RIGHTISIMM,		OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 
-	"sub.sss"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
-	"sub.vvs"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
-	"sub.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
-	"sub.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
+	"cmplt"		,		3,							OPC_FLG_UNIFORMOPERS,	OPRTYPE_F1,	OPRTYPE_F1,OPRTYPE_ADDR,OPRTYPE_NA,OPRTYPE_NA,
 
-	"mul.sss"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
-	"mul.vvs"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
-	"mul.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
-	"mul.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
+	"noise11"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"noise12"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"noise13"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"noise31"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"noise32"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"noise33"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"xcomp.sv"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
+	"ycomp.sv"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
+	"zcomp.sv"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
+	"setxcomp.vs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"setycomp.vs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"setzcomp.vs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 
-	"div.sss"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
-	"div.vvs"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,
-	"div.vsv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,
-	"div.vvv"		,		3,						0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
+	"xformname.vxs3",	5,							0,	OPRTYPE_F3,OPRTYPE_STR, OPRTYPE_F1, OPRTYPE_F1, OPRTYPE_F1,
 
-	"mov.vs3"		,		4,						0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,
-
-	"dot.svv"		,		3,						0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,
-
-	"ld.s"		,		2,							OPC_FLG_RIGHTISIMM,		OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"ld.v"		,		4,							OPC_FLG_RIGHTISIMM,		OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"cmplt"		,		3,							OPC_FLG_UNIFORMOPERS,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_ADDR,	OPRTYPE_NA,
-
-	"noise11"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,
-	"noise12"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,
-	"noise13"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,
-
-	"noise31"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,
-	"noise32"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,
-	"noise33"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,
-
-	"xcomp.sv"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"ycomp.sv"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"zcomp.sv"		,	2,							0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"setxcomp.vs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"setycomp.vs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"setzcomp.vs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"normalize"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"faceforward"	,	3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,
-	"diffuse"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"ambient"		,	1,							0,	OPRTYPE_F3,	OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,
-	"calculatenormal",	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,
-
-	"ret"			,	0,							0,	OPRTYPE_NA,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
-
-	NULL			,	0,							0,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA
+	"normalize"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
+	"faceforward"	,	3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
+	"diffuse"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
+	"ambient"		,	1,							0,	OPRTYPE_F3,	OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"calculatenormal",	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+																									   
+	"ret"			,	0,							0,	OPRTYPE_NA,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
+																									   
+	NULL			,	0,							0,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA
 };
 
 //==================================================================

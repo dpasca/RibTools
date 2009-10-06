@@ -241,13 +241,13 @@ color	color(  float a )	{ color	 tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; 
 normal	normal( float a )	{ normal tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
 point	point(  float a )	{ point	 tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
 
-vector	vector( string coordName, float x, float y, float z )	{ vector tmp; _asm_xformname_vs3( tmp, coordName, x, y, z ); return tmp; }
-color	color(  string coordName, float r, float g, float b )	{ color	 tmp; _asm_xformname_vs3( tmp, coordName, r, g, b ); return tmp; }
-normal	normal( string coordName, float x, float y, float z )	{ normal tmp; _asm_xformname_vs3( tmp, coordName, x, y, z ); return tmp; }
-point	point(  string coordName, float x, float y, float z )	{ point	 tmp; _asm_xformname_vs3( tmp, coordName, x, y, z ); return tmp; }
+vector	vector( string coordName, float x, float y, float z )	{ vector tmp; _asm_xformname_vxs3( tmp, coordName, x, y, z ); return tmp; }
+color	color(  string coordName, float r, float g, float b )	{ color	 tmp; _asm_xformname_vxs3( tmp, coordName, r, g, b ); return tmp; }
+normal	normal( string coordName, float x, float y, float z )	{ normal tmp; _asm_xformname_vxs3( tmp, coordName, x, y, z ); return tmp; }
+point	point(  string coordName, float x, float y, float z )	{ point	 tmp; _asm_xformname_vxs3( tmp, coordName, x, y, z ); return tmp; }
 
-vector	vector( string coordName, float a )	{ vector tmp; _asm_xformname_vs3( tmp, coordName, a, a, a ); return tmp; }
-color	color(  string coordName, float a )	{ color	 tmp; _asm_xformname_vs3( tmp, coordName, a, a, a ); return tmp; }
-normal	normal( string coordName, float a )	{ normal tmp; _asm_xformname_vs3( tmp, coordName, a, a, a ); return tmp; }
-point	point(  string coordName, float a )	{ point	 tmp; _asm_xformname_vs3( tmp, coordName, a, a, a ); return tmp; }
+vector	vector( string coordName, float a )	{ vector tmp; _asm_xformname_vxs3( tmp, coordName, a, a, a ); return tmp; }
+color	color(  string coordName, float a )	{ color	 tmp; _asm_xformname_vxs3( tmp, coordName, a, a, a ); return tmp; }
+normal	normal( string coordName, float a )	{ normal tmp; _asm_xformname_vxs3( tmp, coordName, a, a, a ); return tmp; }
+point	point(  string coordName, float a )	{ point	 tmp; _asm_xformname_vxs3( tmp, coordName, a, a, a ); return tmp; }
                                                                                                     

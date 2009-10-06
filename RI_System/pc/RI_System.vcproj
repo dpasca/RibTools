@@ -334,46 +334,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_SlRunContext.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_SlRunContext.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RI_SlShader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_SlShader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_SlShader_Ops_Base.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RI_SlShader_Ops_Lighting.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_SlShader_Ops_Lighting.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_SlShader_Ops_Noise.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RI_SlShaderAsmParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_SlShaderAsmParser.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RI_State.cpp"
 				>
 			</File>
@@ -421,6 +381,58 @@
 				RelativePath="..\src\Tokenizer.h"
 				>
 			</File>
+			<Filter
+				Name="Shader"
+				>
+				<File
+					RelativePath="..\src\RI_SlRunContext.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlRunContext.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_SlShader.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlShader.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlShader_Ops_Base.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_SlShader_Ops_Lighting.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlShader_Ops_Lighting.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlShader_Ops_Noise.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_SlShader_Ops_XForm.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlShader_Ops_XForm.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_SlShaderAsmParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlShaderAsmParser.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Precompiled Headers"
