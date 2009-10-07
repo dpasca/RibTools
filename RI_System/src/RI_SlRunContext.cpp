@@ -33,6 +33,8 @@ SlRunContext::SlRunContext( const SymbolList &symbols, size_t maxPointsN )
 
 	mMaxPointsN		= maxPointsN;
 	mpSIMDFlags		= DNEW int [ mMaxPointsN ];
+
+	mpGrid			= NULL;
 }
 
 //==================================================================
@@ -46,12 +48,23 @@ SlRunContext::~SlRunContext()
 }
 
 //==================================================================
+// this is called only once and from the end of the grid constructor
+// so to get the pointer of the grid that owns this object
+void SlRunContext::Init( MicroPolygonGrid *pGrid )
+{
+	// make sure it hasn't been set already !
+	DASSERT( mpGrid == NULL );
+
+	mpGrid = pGrid;
+}
+
+//==================================================================
 void SlRunContext::Setup(
-					const Attributes &attribs,
-					const SlShaderInstance *pShaderInst,
-					u_int blocksXN,
-					u_int pointsYN,
-					size_t pointsN )
+			const Attributes		&attribs,
+			const SlShaderInstance	*pShaderInst,
+			u_int					blocksXN,
+			u_int					pointsYN,
+			size_t					pointsN )
 {
 	mBlocksXN	= blocksXN;
 	mPointsYN	= pointsYN;

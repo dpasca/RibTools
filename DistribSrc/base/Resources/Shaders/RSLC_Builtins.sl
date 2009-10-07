@@ -184,25 +184,12 @@ vector	reflect( vector I, N )		{	vector tmp; _asm_reflect( tmp, I, N ); return t
 /*
 vector	refract( vector I, N; float eta ){}
 color	fresnel( vector I, N; float eta; output float Kr, Kt; [output vector R, T] ){}	// color ?
-point	transform( string tospace; point p ){}
-point	transform( string fromspace, tospace; point p ){}
-point	transform( matrix m; point p ){}
-point	transform( string fromspace; matrix m; point p ){}
-vector	vtransform( string tospace; vector v ){}
-vector	vtransform( string fromspace, tospace; vector v ){}
-vector	vtransform( matrix m; vector v ){}
-vector	vtransform( string fromspace; matrix m; vector v ){}
-normal	ntransform( string tospace; normal n ){}
-normal	ntransform( string fromspace, tospace; normal n ){}
-normal	ntransform( matrix m; normal n ){}
-normal	ntransform( string fromspace; matrix m; normal n ){}
 */
+
 normal	calculatenormal( point p )		{	normal tmp;	tmp = _asm_calculatenormal( p ); return tmp;	}
 float	comp( color c; float index ){}
 void	setcomp( output color c; float index, value ){}
 /*
-color	ctransform( string tospace; color C ){}
-color	ctransform( string fromspace, tospace; color C ){}
 float	comp( matrix m; float row, column ){}
 void	setcomp( output matrix m; float row, column, value ){}
 float	determinant( matrix m ){}
@@ -231,23 +218,48 @@ float	shadow( string name[channel]; texture coordinates[, parameterlist] ){}
 float	textureinfo( string texturename, dataname; output type variable ){}
 */
 
-vector	vector( float x, float y, float z )	{ vector tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
-color	color(  float r, float g, float b )	{ color	 tmp; _asm_mov_vs3( tmp, r, g, b ); return tmp; }
-normal	normal( float x, float y, float z )	{ normal tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+/*
+point	transform( string fromspace, tospace; point p ){}
+point	transform( matrix m; point p ){}
+point	transform( string fromspace; matrix m; point p ){}
+
+vector	vtransform( string fromspace, tospace; vector v ){}
+vector	vtransform( matrix m; vector v ){}
+vector	vtransform( string fromspace; matrix m; vector v ){}
+normal	ntransform( string fromspace, tospace; normal n ){}
+normal	ntransform( matrix m; normal n ){}
+normal	ntransform( string fromspace; matrix m; normal n ){}
+
+color	ctransform( string fromspace, tospace; color C ){}
+*/
+
+/* transform() overloads like in RM 13 */
+point	transform(  string tospace; point	p )	{	point	tmp; _asm_pxformname_vxv( tmp, tospace, p ); return tmp; }
+vector	transform(  string tospace; vector	v )	{	vector	tmp; _asm_vxformname_vxv( tmp, tospace, v ); return tmp; }
+normal	transform(  string tospace; normal	n )	{	normal	tmp; _asm_nxformname_vxv( tmp, tospace, n ); return tmp; }
+color	transform(  string tospace; color	c )	{	color	tmp; _asm_cxformname_vxv( tmp, tospace, c ); return tmp; }
+
+/* Specific transform functions */
+vector	vtransform( string tospace; vector	v )	{	vector	tmp; _asm_vxformname_vxv( tmp, tospace, v ); return tmp; }
+normal	ntransform( string tospace; normal	n )	{	normal	tmp; _asm_nxformname_vxv( tmp, tospace, n ); return tmp; }
+color	ctransform( string tospace; color	c )	{	color	tmp; _asm_cxformname_vxv( tmp, tospace, c ); return tmp; }
+
 point	point(  float x, float y, float z )	{ point	 tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+vector	vector( float x, float y, float z )	{ vector tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+normal	normal( float x, float y, float z )	{ normal tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+color	color(  float x, float y, float z )	{ color	 tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
 
-vector	vector( float a )	{ vector tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
-color	color(  float a )	{ color	 tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
-normal	normal( float a )	{ normal tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
 point	point(  float a )	{ point	 tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
+vector	vector( float a )	{ vector tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
+normal	normal( float a )	{ normal tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
+color	color(  float a )	{ color	 tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
 
-vector	vector( string coordName, float x, float y, float z )	{ vector tmp; _asm_xformname_vxv( tmp, coordName, vector( x, y, z ) ); return tmp; }
-color	color(  string coordName, float r, float g, float b )	{ color	 tmp; _asm_xformname_vxv( tmp, coordName, vector( r, g, b ) ); return tmp; }
-normal	normal( string coordName, float x, float y, float z )	{ normal tmp; _asm_xformname_vxv( tmp, coordName, vector( x, y, z ) ); return tmp; }
-point	point(  string coordName, float x, float y, float z )	{ point	 tmp; _asm_xformname_vxv( tmp, coordName, vector( x, y, z ) ); return tmp; }
+point	point(  string tospace, float x, float y, float z )	{ return transform( tospace, point ( x, y, z ) ); }
+vector	vector( string tospace, float x, float y, float z )	{ return transform( tospace, vector( x, y, z ) ); }
+normal	normal( string tospace, float x, float y, float z )	{ return transform( tospace, normal( x, y, z ) ); }
+color	color(  string tospace, float x, float y, float z )	{ return transform( tospace, color ( x, y, z ) ); }
 
-vector	vector( string coordName, float a )	{ vector tmp; _asm_xformname_vxv( tmp, coordName, vector( a ) ); return tmp; }
-color	color(  string coordName, float a )	{ color	 tmp; _asm_xformname_vxv( tmp, coordName, vector( a ) ); return tmp; }
-normal	normal( string coordName, float a )	{ normal tmp; _asm_xformname_vxv( tmp, coordName, vector( a ) ); return tmp; }
-point	point(  string coordName, float a )	{ point	 tmp; _asm_xformname_vxv( tmp, coordName, vector( a ) ); return tmp; }
-                                                                                                    
+point	point(  string tospace, float a )	{ return transform( tospace, point ( a ) ); }
+vector	vector( string tospace, float a )	{ return transform( tospace, vector( a ) ); }
+normal	normal( string tospace, float a )	{ return transform( tospace, normal( a ) ); }
+color	color(  string tospace, float a )	{ return transform( tospace, color ( a ) ); }

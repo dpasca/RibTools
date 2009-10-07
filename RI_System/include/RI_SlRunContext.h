@@ -17,6 +17,7 @@ namespace RI
 
 class Attributes;
 class SymbolList;
+class MicroPolygonGrid;
 
 //==================================================================
 /// SlRunContext
@@ -34,6 +35,8 @@ public:
 	DVec<u_int>				mDefParamValsStartPCs;
 
 public:
+	MicroPolygonGrid		*mpGrid;
+
 	u_int					mBlocksXN;
 	u_int					mPointsYN;
 	u_int					mPointsN;
@@ -57,15 +60,16 @@ public:
 	} mCache;
 
 	SlRunContext( const SymbolList &symbols, size_t maxPointsN );
-
 	~SlRunContext();
 
+	void Init( MicroPolygonGrid *pGrid );
+
 	void Setup(
-			const Attributes &attribs,
-			const SlShaderInstance *pShaderInst,
-			u_int blocksXN,
-			u_int pointsYN,
-			size_t pointsN );
+			const Attributes		&attribs,
+			const SlShaderInstance	*pShaderInst,
+			u_int					blocksXN,
+			u_int					pointsYN,
+			size_t					pointsN );
 
 	SlCPUWord *GetOp( u_int argc )
 	{

@@ -317,6 +317,29 @@ inline _S4 V4__V3W1_Mul_M44( const _S3 &v, const Matrix44 &a )
 }
 
 //==================================================================
+template <class _S4, class _S3, class _T>
+inline _S4 V4__V3W0_Mul_M44( const _S3 &v, const Matrix44 &a )
+{
+	const _T	&x = v.v3[0];
+	const _T	&y = v.v3[1];
+	const _T	&z = v.v3[2];
+
+	return _S4(
+#ifdef DMATRIX44_ROWMTX_MODE
+		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2],
+		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2],
+		x * a.u.m44[2][0] + y * a.u.m44[2][1] + z * a.u.m44[2][2],
+		x * a.u.m44[3][0] + y * a.u.m44[3][1] + z * a.u.m44[3][2]
+#else											 
+		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0],
+		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1],
+		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2],
+		x * a.u.m44[0][3] + y * a.u.m44[1][3] + z * a.u.m44[2][3]
+#endif
+	);
+}
+
+//==================================================================
 template <class _S>
 inline Vec3<_S> V3__V3W1_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
 {
@@ -333,6 +356,27 @@ inline Vec3<_S> V3__V3W1_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
 		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0] + a.u.m44[3][0],
 		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1] + a.u.m44[3][1],
 		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2] + a.u.m44[3][2]
+#endif
+	);
+}
+
+//==================================================================
+template <class _S>
+inline Vec3<_S> V3__V3W0_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
+{
+	const _S	&x = v.v3[0];
+	const _S	&y = v.v3[1];
+	const _S	&z = v.v3[2];
+
+	return Vec3<_S>(
+#ifdef DMATRIX44_ROWMTX_MODE
+		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2],
+		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2],
+		x * a.u.m44[2][0] + y * a.u.m44[2][1] + z * a.u.m44[2][2]
+#else											 
+		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0],
+		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1],
+		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2]
 #endif
 	);
 }

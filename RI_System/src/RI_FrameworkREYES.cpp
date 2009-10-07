@@ -80,9 +80,10 @@ void FrameworkREYES::RenderBucket_s( HiderREYES &hider, Bucket &bucket )
 			pPrim->mDiceGridHe,
 			pPrim->mURange,
 			pPrim->mVRange,
-			pPrim->mpTransform->GetMatrix() );
+			pPrim->mpTransform->GetMatrix(),
+			hider.mMtxWorldCamera );
 
-		pPrim->Dice( grid, hider.mMtxWorldCamera, hider.mParams.mDbgColorCodedGrids );
+		pPrim->Dice( grid, hider.mParams.mDbgColorCodedGrids );
 
 		// should check backface and trim
 		grid.Displace( *pPrim->mpAttribs );

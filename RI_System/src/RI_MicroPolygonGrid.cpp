@@ -106,6 +106,11 @@ MicroPolygonGrid::MicroPolygonGrid() :
 	pSymbol->mName = "Os";
 	pSymbol->mType = Symbol::COLOR;
 	mpDataOs = (SlColor *)pSymbol->AllocData( MAX_SIZE );
+
+	// initialize these.. do it here because it's not proper/safe
+	// to do in the constructor..
+	mSurfRunCtx.Init( this );
+	mDispRunCtx.Init( this );
 }
 
 //==================================================================
@@ -130,7 +135,8 @@ void MicroPolygonGrid::Setup(
 						u_int ydim,
 						const float uRange[2],
 						const float vRange[2],
-						const Matrix44 &mtxLocalWorld )
+						const Matrix44 &mtxLocalWorld,
+						const Matrix44 &mtxWorldCamera )
 {
 	mXDim = xdim;
 	mXBlocks = RI_GET_SIMD_BLOCKS( xdim );
@@ -140,11 +146,15 @@ void MicroPolygonGrid::Setup(
 
 	mYDim = ydim;
 	mPointsN = mXDim * mYDim;
-	mMtxLocalWorld = mtxLocalWorld;
 	mURange[0] = uRange[0];
 	mURange[1] = uRange[1];
 	mVRange[0] = vRange[0];
 	mVRange[1] = vRange[1];
+
+	mMtxLocalWorld	= mtxLocalWorld;
+	mMtxWorldCamera	= mtxWorldCamera;
+
+	mMtxLocalCamera = mMtxLocalWorld * mMtxWorldCamera;
 
 	DASSERT( mPointsN <= MAX_SIZE );
 

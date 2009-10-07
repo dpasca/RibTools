@@ -68,11 +68,14 @@ public:
 	u_int			mYDim;
 	u_int			mPointsN;
 	SlVec3			*mpPointsWS;
-	Matrix44		mMtxLocalWorld;
 	float			mURange[2];
 	float			mVRange[2];
-	SymbolList	mSymbols;
-	
+	SymbolList		mSymbols;
+
+	Matrix44		mMtxLocalWorld;
+	Matrix44		mMtxWorldCamera;
+	Matrix44		mMtxLocalCamera;
+
 	MicroPolygonGrid();
 	~MicroPolygonGrid();
 
@@ -80,7 +83,8 @@ public:
 			   u_int ydim,
 			   const float uRange[2],
 			   const float vRange[2],
-			   const Matrix44 &mtxLocalWorld );
+			   const Matrix44 &mtxLocalWorld,
+			   const Matrix44 &mtxWorldCamera );
 			   
 	u_int GetPointsN() const { return mPointsN; }
 	

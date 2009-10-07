@@ -254,7 +254,6 @@ public:
 
 	virtual void	Dice(
 						MicroPolygonGrid &g,
-						const Matrix44 &mtxWorldCamera,
 						bool doColorCoded ) const;
 
 	inline Vec2f CalcLocalUV( const Vec2f &gridUV ) const

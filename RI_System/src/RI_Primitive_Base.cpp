@@ -149,7 +149,6 @@ void SimplePrimitiveBase::fillUVsArray(
 //==================================================================
 void SimplePrimitiveBase::Dice(
 					MicroPolygonGrid &g,
-					const Matrix44 &mtxWorldCamera,
 					bool doColorCoded ) const
 {
 	//SlVec3	*pPointsWS = g.mpPointsWS;
@@ -168,14 +167,12 @@ void SimplePrimitiveBase::Dice(
 	float	du = 1.0f / g.mXDim;
 	float	dv = 1.0f / g.mYDim;
 
-	Matrix44 mtxLocalCamera		= g.mMtxLocalWorld * mtxWorldCamera;
-
-	Matrix44 mtxLocalCameraNorm = mtxLocalCamera.GetAs33();
+	Matrix44 mtxLocalCameraNorm = g.mMtxLocalCamera.GetAs33();
 
 	if ( mpAttribs->mOrientationFlipped )
 		mtxLocalCameraNorm = mtxLocalCameraNorm * Matrix44::Scale( -1, -1, -1 );
 
-	Vec3f	camPosCS = mtxWorldCamera.GetTranslation();
+	Vec3f	camPosCS = g.mMtxWorldCamera.GetTranslation();
 
 	SlColor	useColor;
 	SlColor	useOpa;
@@ -233,7 +230,7 @@ void SimplePrimitiveBase::Dice(
 
 		SlVec3	norLS = dPdu.GetCross( dPdv ).GetNormalized();
 		SlVec3	posWS = V3__V3W1_Mul_M44<SlScalar>( posLS, g.mMtxLocalWorld );
-		SlVec3	posCS = V3__V3W1_Mul_M44<SlScalar>( posLS, mtxLocalCamera );
+		SlVec3	posCS = V3__V3W1_Mul_M44<SlScalar>( posLS, g.mMtxLocalCamera );
 		SlVec3	norCS = V3__V3W1_Mul_M44<SlScalar>( norLS, mtxLocalCameraNorm ).GetNormalized();
 
 		pPointsWS[blkIdx]	= posWS;
@@ -262,7 +259,7 @@ void SimplePrimitiveBase::Dice(
 
 			Vec3f	norLS = dPdu.GetCross( dPdv ).GetNormalized();
 			Vec3f	posWS = V3__V3W1_Mul_M44<float>( posLS, g.mMtxLocalWorld );
-			Vec3f	posCS = V3__V3W1_Mul_M44<float>( posLS, mtxLocalCamera );
+			Vec3f	posCS = V3__V3W1_Mul_M44<float>( posLS, g.mMtxLocalCamera );
 			Vec3f	norCS = V3__V3W1_Mul_M44<float>( norLS, mtxLocalCameraNorm ).GetNormalized();
 
 			// store in blocked SOA format

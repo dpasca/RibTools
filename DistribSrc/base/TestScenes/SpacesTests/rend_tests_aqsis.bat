@@ -1,3 +1,5 @@
+aqsl *.sl
+
 aqsis SpacesTestCamera.rib
 move ri.pic SpacesTestCamera.pic
 
@@ -12,4 +14,3 @@ move ri.pic SpacesTestScreen.pic
 
 aqsis SpacesTestWorld.rib
 move ri.pic SpacesTestWorld.pic
-
