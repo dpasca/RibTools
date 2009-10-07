@@ -524,7 +524,7 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	SOP::Inst_SetVComp<1>,
 	SOP::Inst_SetVComp<2>,
 
-	SOP::Inst_XFormname_VXS3,
+	SOP::Inst_XFormname_VXV,
 
 	Inst_Normalize,
 	Inst_Faceforward,

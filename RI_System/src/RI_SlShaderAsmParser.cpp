@@ -96,7 +96,7 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"setycomp.vs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 	"setzcomp.vs"	,	2,							0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 
-	"xformname.vxs3",	5,							0,	OPRTYPE_F3,OPRTYPE_STR, OPRTYPE_F1, OPRTYPE_F1, OPRTYPE_F1,
+	"xformname.vxv",	3,							0,	OPRTYPE_F3,OPRTYPE_STR, OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
 
 	"normalize"		,	2,							0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
 	"faceforward"	,	3,							0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,

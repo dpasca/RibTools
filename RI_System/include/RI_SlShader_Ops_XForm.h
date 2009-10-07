@@ -18,7 +18,7 @@ namespace SOP
 {
 
 //==================================================================
-void Inst_XFormname_VXS3( SlRunContext &ctx );
+void Inst_XFormname_VXV( SlRunContext &ctx );
 
 //==================================================================
 }
