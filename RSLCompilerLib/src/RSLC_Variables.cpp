@@ -10,7 +10,6 @@
 #include "RSLC_Tree.h"
 #include "RSLC_Variables.h"
 #include "RSLC_Exceptions.h"
-#include "RSLC_Defs_StdVars.h"
 #include "RSLC_Registers.h"
 
 //==================================================================
@@ -191,6 +190,13 @@ Variable *AddVariable(
 		if ( pVar->mpDetailTok->idType != T_TYPE_DETAIL )
 			throw Exception( "Bad detail type !", pVar->mpDetailTok );
 
+/*
+		// ensure that it's uniform for root parent
+		if ( pNode->GetBlockType() == BLKT_ROOT )
+			if ( pVar->mpDetailTok->id != T_DE_uniform )
+				throw Exception( "Globals must be uniform !", pVar->mpDetailTok );
+*/
+
 		if ( pVar->mpDetailTok->id == T_DE_varying )
 			pVar->mIsVarying = true;
 		else
@@ -200,18 +206,31 @@ Variable *AddVariable(
 	}
 	else
 	{
-		// local variables are varying by default, params uniform by default
-		// ..see RenderMan Companion p.297
-		if ( pNode->GetBlockType() == BLKT_CODEBLOCK || pNode->GetBlockType() == BLKT_EXPRESSION )
-			pVar->mIsVarying = true;
-		else
-		if ( pNode->GetBlockType() == BLKT_SHPARAMS || pNode->GetBlockType() == BLKT_FNPARAMS )
+		// special case for root parent
+		if ( pNode->GetBlockType() == BLKT_ROOT )
+		{
 			pVar->mIsVarying = false;
+			pVar->mIsForcedDetail = true;
+		}
 		else
-			pVar->mIsVarying = true;
+		{
+			// local variables are varying by default, params uniform by default
+			// ..see RenderMan Companion p.297
+			if ( pNode->GetBlockType() == BLKT_CODEBLOCK || pNode->GetBlockType() == BLKT_EXPRESSION )
+				pVar->mIsVarying = true;
+			else
+			if ( pNode->GetBlockType() == BLKT_SHPARAMS || pNode->GetBlockType() == BLKT_FNPARAMS )
+				pVar->mIsVarying = false;
+			else
+				pVar->mIsVarying = true;
 
-		pVar->mIsForcedDetail = false;	// detail temporarily assumed
+			pVar->mIsForcedDetail = false;	// detail temporarily assumed
+		}
 	}
+
+	// if the parent is root, then it's a global
+	if ( pNode->GetBlockType() == BLKT_ROOT )
+		pVar->mIsGlobal = true;
 
 	pVar->mVarType = VarTypeFromToken( pVar->mpDTypeTok );
 
@@ -393,20 +412,14 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	size_t i = 0;
 
-	if ( pNode->mpToken )
+	BlockType	blkType = pNode->GetBlockType();
+
+	//if ( pNode->mpToken || blkType == BLKT_ROOT )
 	{
-		BlockType	blkType = pNode->GetBlockType();
-
-		DASSERT(
-			blkType == BLKT_SHPARAMS ||
-			blkType == BLKT_FNPARAMS ||
-			blkType == BLKT_CODEBLOCK ||
-			blkType == BLKT_EXPRESSION
-			);
-
-		if ( blkType == BLKT_SHPARAMS ||	// $$$ NOT REALLY THE SAME ..but for now, it's ok
-			 blkType == BLKT_FNPARAMS ||
-			 blkType == BLKT_CODEBLOCK )
+		if (	blkType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+			 || blkType == BLKT_FNPARAMS
+			 || blkType == BLKT_CODEBLOCK
+			 || blkType == BLKT_ROOT )
 		{
 			TokNode	*pDTypeNode	= NULL;
 			TokNode	*pDetailNode= NULL;
@@ -443,31 +456,41 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 							continue;
 						}
 						else
-						if ( pChild->IsNonTerminal() )
 						{
-							// no "space cast" in the declaration in the curl braces
-							Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pChild );
-
-							if ( blkType == BLKT_SHPARAMS )
+							// it's a variable declaration if it's non terminal..
+							// ..and it's not followed by an opening bracket
+							// ..or followed by no sibling.. which is the end of params in
+							// a function/shader params block (ehm ?)
+							if ( pChild->IsNonTerminal() )
 							{
-								pVar->mIsSHParam = true;	// mark as shader param
-							}
-						}
-						else
-						{
-							if ( blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS )
-							{
-								// functions and shader params are allowed to change type after
-								// a comma !
+								TokNode	*pChild2 = pNode->GetChildTry( i+1 );
+								if ( !pChild2 || !pChild2->IsTokenID( T_OP_LFT_BRACKET ) )
+								{
+									// no "space cast" in the declaration in the curl braces
+									Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pChild );
 
-								if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
-									pDTypeNode = pChild;
-								else
-								if ( pChild->mpToken->idType == T_TYPE_DETAIL )
-									pDetailNode = pChild;
+									if ( blkType == BLKT_SHPARAMS )
+									{
+										pVar->mIsSHParam = true;	// mark as shader param
+									}
+								}
 							}
-							//else
-							//	throw Exception( "Expecting a variable name !" );
+							else
+							{
+								if ( blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS )
+								{
+									// functions and shader params are allowed to change type after
+									// a comma !
+
+									if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
+										pDTypeNode = pChild;
+									else
+									if ( pChild->mpToken->idType == T_TYPE_DETAIL )
+										pDetailNode = pChild;
+								}
+								//else
+								//	throw Exception( "Expecting a variable name !" );
+							}
 						}
 					}
 
@@ -478,17 +501,14 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 		}
 	}
 
+	if ( blkType == BLKT_ROOT )
+		i = 0;
+
 	for (; i < pNode->mpChilds.size(); ++i)
 	{
 		if ( pNode->mpChilds[i]->mpToken->id == T_OP_LFT_CRL_BRACKET ||
 			 pNode->mpChilds[i]->mpToken->id == T_OP_LFT_BRACKET )
 		{
-			if ( i > 0 && 0 == strcmp( "vector", pNode->mpChilds[i-1]->GetTokStr() ) )
-			{
-				int yoyo = 1;
-			}
-
-
 			DiscoverVariablesDeclarations( pNode->mpChilds[i] );
 		}
 	}
@@ -530,56 +550,23 @@ static TokNode *newVarNode( const char *pStr )
 }
 
 //==================================================================
-void AddStandardVariables( TokNode *pNode )
+static void markUsedGlobals_sub( TokNode *pNode )
 {
-	for (size_t i=0; i < _countof(_gGlobalsDefs); i += 3)
-	{
-		Variable *pVar =
-					AddVariable(
-							pNode,
-							newVarNode( _gGlobalsDefs[i+0] ),
-							newVarNode( _gGlobalsDefs[i+1] ),
-							NULL,
-							newVarNode( _gGlobalsDefs[i+2] ) );
-
-		pVar->mIsGlobal = true;
-	}
-}
-
-//==================================================================
-static size_t findStandardVariable( const char *pName )
-{
-	for (size_t i=0; i < _countof(_gGlobalsDefs); i += 3)
-	{
-		if ( 0 == strcasecmp( _gGlobalsDefs[i+2], pName ) )
-			return i/3;
-	}
-
-	return DNPOS;
-}
-
-//==================================================================
-static void collecedUsedStdVars_sub( TokNode *pNode, DVec<size_t> &io_usedStdVarsList )
-{
-	const Variable	*pVar = pNode->mVarLink.GetVarPtr();
+	Variable	*pVar = pNode->mVarLink.GetVarPtr();
 
 	if ( pVar && pVar->mIsGlobal )
 	{
-		size_t	idx = findStandardVariable( pVar->mpDefNameTok->GetStrChar() );
-
-		DASSERT( idx != DNPOS );
-
-		io_usedStdVarsList.find_or_push_back( idx );
+		pVar->mIsUsed = true;
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		collecedUsedStdVars_sub( pNode->mpChilds[i], io_usedStdVarsList );
+		markUsedGlobals_sub( pNode->mpChilds[i] );
 	}
 }
 
 //==================================================================
-void CollectUsedStdVars( TokNode *pRoot, DVec<size_t> &io_usedStdVarsList )
+void MarkUsedGlobals( TokNode *pRoot )
 {
 	for (size_t i=0; i < pRoot->GetFuncs().size(); ++i)
 	{
@@ -588,7 +575,7 @@ void CollectUsedStdVars( TokNode *pRoot, DVec<size_t> &io_usedStdVarsList )
 		if NOT( func.IsShader() )
 			continue;
 
-		collecedUsedStdVars_sub( func.mpParamsNode, io_usedStdVarsList );
+		markUsedGlobals_sub( func.mpParamsNode );
 	}
 }
 
@@ -657,35 +644,17 @@ static void writeShaderParamVariables( FILE *pFile, TokNode *pNode )
 }
 
 //==================================================================
-void WriteVariables( FILE *pFile, TokNode *pNode, const DVec<size_t> &usedStdVars )
+void WriteVariables( FILE *pFile, TokNode *pNode )
 {
 	const DVec<Variable> &vars = pNode->GetVars();
 
-	// write all used globals
-	for (size_t i=0; i < usedStdVars.size(); ++i)
-	{
-		size_t j = usedStdVars[ i ] * 3;
-
-		const Variable	&var = vars[i];
-
-		DASSERT( var.mIsGlobal && !var.mBaseValNum.size() );
-
-		fprintf_s( pFile, "\t%-12s\tglobal\t%s\t%s\n",
-							_gGlobalsDefs[j+2],
-							_gGlobalsDefs[j+1],
-							_gGlobalsDefs[j+0] );
-	}
-
-	fprintf_s( pFile, "\n" );
-
-	// write all vars that are in the root but that are not actually globals
-	// ..most likely constants !
+	// write all used global vars and constants
 
 	for (size_t i=0; i < vars.size(); ++i)
 	{
 		const Variable	&var = vars[i];
 
-		if ( !var.mIsGlobal && !var.mIsSHParam )
+		if ( !var.mIsSHParam && ((var.mIsGlobal && var.mIsUsed) || !var.mIsGlobal) )
 			writeVariable( pFile, var );
 	}
 

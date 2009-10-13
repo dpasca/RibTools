@@ -23,8 +23,6 @@ class RSLCompiler
 
 	static const char	*mpsVersionString;
 
-	DVec<size_t>		mUsedStdVars;
-
 public:
 	class Params
 	{

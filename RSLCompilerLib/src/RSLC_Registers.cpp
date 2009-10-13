@@ -72,7 +72,11 @@ static void assignRegisters_expr_BiOp( TokNode *pNode )
 	while ( pOperand2 && !pOperand2->GetVarPtr() )
 		pOperand2 = pOperand2->GetChildTry( 0 );
 
-	DASSERT( pOperand1 && pOperand2 );
+	if NOT( pOperand1 )
+		throw Exception( "Unknown 1st operand", pNode );
+
+	if NOT( pOperand2 )
+		throw Exception( "Unknown 2nd operand", pNode );
 
 	// no assignment for function call as it's done above
 	VarType	opResVarType;

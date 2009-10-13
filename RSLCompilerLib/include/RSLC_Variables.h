@@ -97,6 +97,7 @@ public:
 	bool			mIsLValue;
 	bool			mIsGlobal;
 	bool			mIsSHParam;
+	bool			mIsUsed;
 
 	Register		mBuild_Register;
 
@@ -116,6 +117,7 @@ public:
 		mIsLValue(false),
 		mIsGlobal(false),
 		mIsSHParam(false),
+		mIsUsed(false),
 		mHasBaseVal(false)
 	{
 	}
@@ -134,6 +136,7 @@ public:
 		mIsGlobal		(	from.mIsGlobal			),
 		mIsSHParam		(	from.mIsSHParam			),
 		mBaseValNum		(	from.mBaseValNum		),
+		mIsUsed			(	from.mIsUsed			),
 		mHasBaseVal		(	from.mHasBaseVal		)
 	{
 	}
@@ -191,12 +194,11 @@ const char *VarTypeToString( VarType type );
 char VarTypeToLetter( VarType type );
 
 //==================================================================
-void AddStandardVariables( TokNode *pNode );
-void CollectUsedStdVars( TokNode *pNode, DVec<size_t> &io_usedStdVarsList );
+void MarkUsedGlobals( TokNode *pRoot );
 void DiscoverVariablesDeclarations( TokNode *pNode );
 void DiscoverVariablesUsage( TokNode *pNode );
 void DiscoverVariables( TokNode *pNode );
-void WriteVariables( FILE *pFile, TokNode *pNode, const DVec<size_t> &usedStdVars );
+void WriteVariables( FILE *pFile, TokNode *pNode );
 
 //==================================================================
 }

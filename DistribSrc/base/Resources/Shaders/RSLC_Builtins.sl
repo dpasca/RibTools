@@ -4,15 +4,47 @@
 /// Created by Davide Pasca - 2009/07/23
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
-//==================================================================*/
+//================================================================*/
 /* Basic declarations ad found in RenderMan specs and instrumented
 for RibRender */
 
+/*================================================================
+/// Globals from the renderer itself
+///==============================================================*/
+varying		color		Cs	;	/* also uniform ? */
+varying		color		Os	;	/* also uniform ? */
+varying		point		P	;
+varying		point		dPdu;	
+varying		point		dPdv;	
+varying		normal		N	;
+varying		normal		Ng	;	/* also uniform ? */
+varying		float		u	;
+varying		float		v	;
+varying		float		du	;	/* also uniform ? */
+varying		float		dv	;	/* also uniform ? */
+varying		float		s	;	/* also uniform ? */
+varying		float		t	;	/* also uniform ? */
+varying		vector		L	;	/* also uniform ? */
+varying		color		Cl	;	/* also uniform ? */
+varying		vector		I	;
+varying		color		Ci	;
+varying		color		Oi	;
+uniform		point		E	;
+/*
+point		varying		Ps	
+*/
+
+/*================================================================
+/// Common constants
+///==============================================================*/
+uniform float PI = 3.14159265;	/* Should implement "const" for this 8) */
+
+/*================================================================*/
 float	radians( float deg )
 {
 	return deg * 0.0174532925;
 }
-
+/*================================================================*/
 float	degrees( float rad )
 {
 	return rad * 57.29577957855;
@@ -203,7 +235,19 @@ float	match( string pattern, subject ){}
 */
 
 color	ambient()			{	color tmp; _asm_ambient( tmp );		return tmp;	}
+
 color	diffuse( normal N )	{	color tmp; _asm_diffuse( tmp, N );	return tmp;	}
+/*
+color	diffuse( normal Nn )
+{	
+	color C = 0;
+	_asm_illuminance ( P, Nn, PI/2 )
+	{
+		C = C + Cl * (Nn . normalize(L));
+	}
+	return C;
+}
+*/
 
 color	specular( normal N; vector V; float roughness ){}
 color	specularbrdf( vector L; normal N; vector V; float roughness ){}

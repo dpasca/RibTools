@@ -77,7 +77,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 
 		std::string regName = GetRegName( reg );
 
-		fprintf_s( pFile, "\t%s", regName.c_str() );
+		fprintf_s( pFile, " %s", regName.c_str() );
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -90,7 +90,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 		VarType	varType;
 		std::string opStr = getOperand( pChild, varType );
 
-		fprintf_s( pFile, "\t%-6s", opStr.c_str() );
+		fprintf_s( pFile, " %-6s", opStr.c_str() );
 	}
 
 	fprintf_s( pFile, "\n" );
@@ -155,12 +155,12 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 		if ( pChild && pChild->mpToken->id == T_VL_STRING )
 		{
-			fprintf_s( pFile, "\t%s\t%s", asmName.c_str(), pChild->GetTokStr() );
+			fprintf_s( pFile, "\t%-14s %s", asmName.c_str(), pChild->GetTokStr() );
 			pChild = NULL;
 			++nextChild;
 		}
 		else
-			fprintf_s( pFile, "\t%s", asmName.c_str() );
+			fprintf_s( pFile, "\t%-14s", asmName.c_str() );
 
 		TokNode *pBracket = pNode->GetChildTry( nextChild );
 
@@ -192,6 +192,8 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 			char l1 = VarTypeToLetter(varType1);
 			char l2 = VarTypeToLetter(varType2);
 
+			char	instrBuff[256];
+
 			if ( doAssign )
 			{
 				if ( pNode->mpToken->id == T_OP_ASSIGN )
@@ -210,25 +212,28 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 					// rudimentary form of optimization !
 					if NOT( l1 == l2 && o1Str == o2Str )
 					{
+						sprintf_s( instrBuff, "mov.%c%c", l1, l2 );
+
 						fprintf_s(
 								pFile,
-								"\tmov.%c%c\t%-6s\t%-6s\n",
-								l1,
-								l2,
+								"\t%-14s %-6s\t%-6s\n",
+								instrBuff,
 								o1Str.c_str(),
 								o2Str.c_str() );
 					}
 				}
 				else
+				{
+					sprintf_s( instrBuff, "%s.%c%c", asmOpCodeFromOpToken( pNode->mpToken ), l1, l2 );
+
 					fprintf_s(
 							pFile,
-							"\t%s.%c%c\t%-6s\t%-6s\t%-6s\n",
-							asmOpCodeFromOpToken( pNode->mpToken ),
-							l1,
-							l2,
+							"\t%-14s %-6s\t%-6s\t%-6s\n",
+							instrBuff,
 							o1Str.c_str(),
 							o1Str.c_str(),
 							o2Str.c_str() );
+				}
 			}
 			else
 			{
@@ -237,13 +242,12 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 				char		lreg = VarTypeToLetter( reg.GetVarType() );
 
+				sprintf_s( instrBuff, "%s.%c%c%c", asmOpCodeFromOpToken( pNode->mpToken ), lreg, l1, l2 );
+
 				fprintf_s(
 						pFile,
-						"\t%s.%c%c%c\t%-6s\t%-6s\t%-6s\n",
-						asmOpCodeFromOpToken( pNode->mpToken ),
-						lreg,
-						l1,
-						l2,
+						"\t%-14s %-6s\t%-6s\t%-6s\n",
+						instrBuff,
 						regName.c_str(),
 						o1Str.c_str(),
 						o2Str.c_str() );

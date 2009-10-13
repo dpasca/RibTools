@@ -61,9 +61,6 @@ RSLCompiler::RSLCompiler(
 	// make the basic tree with nested blocks based on brackets
 	MakeTree( mpRoot, mTokens );
 
-	//
-	AddStandardVariables( mpRoot );
-
 	// discover variables declarations
 	DiscoverVariablesDeclarations( mpRoot );
 
@@ -92,8 +89,7 @@ RSLCompiler::RSLCompiler(
 
 	AssignRegisters( mpRoot );
 
-	mUsedStdVars.clear();
-	CollectUsedStdVars( mpRoot, mUsedStdVars );
+	MarkUsedGlobals( mpRoot );
 
 	// produce some debug info in the output file
 	if ( params.mDbgOutputTree )
@@ -130,7 +126,7 @@ void RSLCompiler::SaveASM( const char *pFName, const char *pRefSourceName )
 
 	fprintf_s( pFile, "\n.data\n" );
 
-	WriteVariables( pFile, mpRoot, mUsedStdVars );
+	WriteVariables( pFile, mpRoot );
 
 	fprintf_s( pFile, "\n.code\n" );
 
