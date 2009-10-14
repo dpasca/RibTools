@@ -20,6 +20,21 @@ namespace RI
 {
 
 //==================================================================
+void *MicroPolygonGrid::addGlobalSym( const char *pName, Symbol::Type symType, bool isVarying )
+{
+	Symbol *pSymbol;
+
+	// allocate some standard varying params
+	pSymbol = mSymbols.Grow();
+	pSymbol->mIsVarying = isVarying;
+	pSymbol->mStorage = Symbol::GLOBAL;
+	pSymbol->mName = pName;
+	pSymbol->mType = symType;
+	
+	return pSymbol->AllocData( isVarying ? MAX_SIZE : 1 );
+}
+
+//==================================================================
 MicroPolygonGrid::MicroPolygonGrid() :
 	mXDim(0),
 	mYDim(0),
@@ -32,80 +47,29 @@ MicroPolygonGrid::MicroPolygonGrid() :
 	mSurfRunCtx(mSymbols, MAX_SIZE),
 	mDispRunCtx(mSymbols, MAX_SIZE)
 {
-	static const size_t allocN = MAX_SIZE;
+	// symbols added to match globals declared in RSLC_Builtins.sl
 
-	Symbol *pSymbol;
-
-	// allocate some standard varying params
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "P";
-	pSymbol->mType = Symbol::POINT;
-	mpPointsWS = (SlVec3 *)pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "oodu";
-	pSymbol->mType = Symbol::FLOAT;
-	pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "oodv";
-	pSymbol->mType = Symbol::FLOAT;
-	pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "I";
-	pSymbol->mType = Symbol::VECTOR;
-	pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "N";
-	pSymbol->mType = Symbol::NORMAL;
-	pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "Ng";
-	pSymbol->mType = Symbol::NORMAL;
-	pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "Ci";
-	pSymbol->mType = Symbol::COLOR;
-	mpDataCi = (SlColor *)pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "Oi";
-	pSymbol->mType = Symbol::COLOR;
-	mpDataOi = (SlColor *)pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "Cs";
-	pSymbol->mType = Symbol::COLOR;
-	mpDataCs = (SlColor *)pSymbol->AllocData( MAX_SIZE );
-
-	pSymbol = mSymbols.Grow();
-	pSymbol->mIsVarying = true;
-	pSymbol->mStorage = Symbol::GLOBAL;
-	pSymbol->mName = "Os";
-	pSymbol->mType = Symbol::COLOR;
-	mpDataOs = (SlColor *)pSymbol->AllocData( MAX_SIZE );
+	mpDataCs = (SlColor *)	addGlobalSym( "Cs",		Symbol::COLOR );
+	mpDataOs = (SlColor *)	addGlobalSym( "Os",		Symbol::COLOR );
+	mpPointsWS = (SlVec3 *)	addGlobalSym( "P",		Symbol::POINT );
+							//addGlobalSym( "dPdu",	Symbol::VECTOR );	// or point ?
+							//addGlobalSym( "dPdv",	Symbol::VECTOR );	// or point ?
+							addGlobalSym( "oodu",	Symbol::FLOAT );
+							addGlobalSym( "oodv",	Symbol::FLOAT );
+							addGlobalSym( "N",		Symbol::NORMAL );
+							addGlobalSym( "Ng",		Symbol::NORMAL );
+							addGlobalSym( "u",		Symbol::FLOAT );
+							addGlobalSym( "v",		Symbol::FLOAT );
+							addGlobalSym( "du",		Symbol::FLOAT );
+							addGlobalSym( "dv",		Symbol::FLOAT );
+							addGlobalSym( "s",		Symbol::FLOAT );
+							addGlobalSym( "t",		Symbol::FLOAT );
+							addGlobalSym( "L",		Symbol::VECTOR );
+							addGlobalSym( "Cl",		Symbol::COLOR );
+							addGlobalSym( "I",		Symbol::VECTOR );
+	mpDataCi = (SlColor *)	addGlobalSym( "Ci",		Symbol::COLOR );
+	mpDataOi = (SlColor *)	addGlobalSym( "Oi",		Symbol::COLOR );
+							addGlobalSym( "E",		Symbol::POINT, false );
 
 	// initialize these.. do it here because it's not proper/safe
 	// to do in the constructor..

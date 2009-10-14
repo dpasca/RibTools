@@ -137,6 +137,16 @@ void Inst_Ambient( SlRunContext &ctx )
 {
 	SlColor*	lhs	= ctx.GetVoidRW( (SlColor*)0, 1 );
 
+#if 0
+	for (size_t i=0; i < activeLights.size(); ++i)
+	{
+		size_t		li	= activeLights[i];
+
+		const LightSourceT	&light = *pLights[ li ];
+
+		//light.mShaderInst->Bind();
+	}
+#else
 	if NOT( ctx.mCache.mAmbientColDone )
 	{
 		ctx.mCache.mAmbientColDone = true;
@@ -169,6 +179,7 @@ void Inst_Ambient( SlRunContext &ctx )
 		if ( ctx.IsProcessorActive( i ) )
 			lhs[i] = ctx.mCache.mAmbientCol;
 	}
+#endif
 
 	ctx.NextInstruction();
 }

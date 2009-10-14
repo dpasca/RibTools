@@ -90,6 +90,9 @@ public:
 	
 	void Displace( const Attributes &attribs );
 	void Shade( const Attributes &attribs );
+
+private:
+	void *addGlobalSym( const char *pName, Symbol::Type symType, bool isVarying=true );
 };
 
 //==================================================================
