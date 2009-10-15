@@ -108,7 +108,7 @@ void SlRunContext::Setup(
 			DASSERT( slValue.Data.pVoidValue != NULL );
 
 			size_t samplesN =
-				slValue.mpSrcSymbol->mIsVarying ? mMaxPointsN : 1;
+				slValue.mpSrcSymbol->IsVarying() ? mMaxPointsN : 1;
 
 			slValue.mpSrcSymbol->FillDataWithDefault(
 							slValue.Data.pVoidValue, samplesN );

@@ -69,7 +69,7 @@ void FrameworkREYES::RenderBucket_s( HiderREYES &hider, Bucket &bucket )
 
 	bucket.BeginRender();
 
-	MicroPolygonGrid	grid;
+	MicroPolygonGrid	grid( *hider.mpStatics );
 
 	for (size_t i=0; i < pPrimList.size(); ++i)
 	{

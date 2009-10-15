@@ -76,7 +76,7 @@ public:
 	Matrix44		mMtxWorldCamera;
 	Matrix44		mMtxLocalCamera;
 
-	MicroPolygonGrid();
+	MicroPolygonGrid( const SymbolList &globalSymbols );
 	~MicroPolygonGrid();
 
 	void Setup(u_int xdim,
@@ -92,7 +92,7 @@ public:
 	void Shade( const Attributes &attribs );
 
 private:
-	void *addGlobalSym( const char *pName, Symbol::Type symType, bool isVarying=true );
+	void *addGlobalSym( const char *pName, Symbol::Type symType, u_int detail=Symbol::DET_MSK_VARYING );
 };
 
 //==================================================================

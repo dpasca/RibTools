@@ -163,7 +163,7 @@ void Attributes::cmdDetailRange(float	minVisible,
 void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 										   float valueApproximation )
 {
-	mpyTypeApproximation	= mpStatics->LookupVariable( typeApproximation, Symbol::VOIDD );
+	mpyTypeApproximation	= mpStatics->LookupVariable( typeApproximation, Symbol::TYP_VOIDD );
 	mValueApproximation		= valueApproximation;
 	mpRevision->BumpRevision();
 }
@@ -207,7 +207,7 @@ void Attributes::cmdBasis(
 				RtToken vbasis, const float *pCustomVBasis, int vstep )
 {
 	if ( ubasis )
-		mpyUBasis = mpStatics->LookupVariable( ubasis, Symbol::MATRIX );
+		mpyUBasis = mpStatics->LookupVariable( ubasis, Symbol::TYP_MATRIX );
 	else
 	{
 		DSAFE_DELETE( mpCustomUBasis );
@@ -215,7 +215,7 @@ void Attributes::cmdBasis(
 	}
 
 	if ( vbasis )
-		mpyVBasis = mpStatics->LookupVariable( vbasis, Symbol::MATRIX );
+		mpyVBasis = mpStatics->LookupVariable( vbasis, Symbol::TYP_MATRIX );
 	else
 	{
 		DSAFE_DELETE( mpCustomVBasis );
@@ -267,6 +267,7 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 
 	pLight->mShaderInst.Set( pShader );
 
+#if 1
 	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
 	{
 		pLight->mType = LightSourceT::TYPE_AMBIENT;
@@ -300,6 +301,9 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 			printf( "Expecting parameter !" );
 			return false;
 		}
+		
+		// mSymbols.LookupVariable( pName )
+		// or .. mpStatics->LookupVariable( pName )
 
 		if ( 0 == strcasecmp( pName, "from" ) )
 		{
@@ -330,6 +334,7 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		if NOT( hasNextParam )
 			i += 1;
 	}
+#endif
 
 	pLight->UpdateRend( xform, mtxWorldCam );
 

@@ -153,14 +153,14 @@ void SimplePrimitiveBase::Dice(
 {
 	//SlVec3	*pPointsWS = g.mpPointsWS;
 
-	SlVec3	 *pPointsWS = (SlVec3 *)g.mSymbols.LookupVariableData( "P", Symbol::POINT );
-	SlScalar *pOODu	= (SlScalar *)g.mSymbols.LookupVariableData( "oodu", Symbol::FLOAT );
-	SlScalar *pOODv	= (SlScalar *)g.mSymbols.LookupVariableData( "oodv", Symbol::FLOAT );
-	SlVec3	 *pI	= (SlVec3 *)g.mSymbols.LookupVariableData( "I", Symbol::VECTOR );
-	SlVec3	 *pN	= (SlVec3 *)g.mSymbols.LookupVariableData( "N", Symbol::NORMAL );
-	SlVec3	 *pNg	= (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", Symbol::NORMAL );
-	SlColor	 *pOs	= (SlColor *)g.mSymbols.LookupVariableData( "Os", Symbol::COLOR );
-	SlColor	 *pCs	= (SlColor *)g.mSymbols.LookupVariableData( "Cs", Symbol::COLOR );
+	SlVec3	 *pPointsWS = (SlVec3 *)g.mSymbols.LookupVariableData( "P", Symbol::TYP_POINT );
+	SlScalar *pOODu	= (SlScalar *)g.mSymbols.LookupVariableData( "oodu", Symbol::TYP_FLOAT );
+	SlScalar *pOODv	= (SlScalar *)g.mSymbols.LookupVariableData( "oodv", Symbol::TYP_FLOAT );
+	SlVec3	 *pI	= (SlVec3 *)g.mSymbols.LookupVariableData( "I", Symbol::TYP_VECTOR );
+	SlVec3	 *pN	= (SlVec3 *)g.mSymbols.LookupVariableData( "N", Symbol::TYP_NORMAL );
+	SlVec3	 *pNg	= (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", Symbol::TYP_NORMAL );
+	SlColor	 *pOs	= (SlColor *)g.mSymbols.LookupVariableData( "Os", Symbol::TYP_COLOR );
+	SlColor	 *pCs	= (SlColor *)g.mSymbols.LookupVariableData( "Cs", Symbol::TYP_COLOR );
 
 	DASSERT( pPointsWS == g.mpPointsWS );
 

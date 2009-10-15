@@ -413,37 +413,6 @@ void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx )
 	}
 }
 
-/*
-//==================================================================
-void RemoveOpeningExpressionBrackets( TokNode *pNode, int *pParentScanIdx )
-{
-	if ( pNode->mpToken )
-	{
-		switch ( pNode->mpToken->id )
-		{
-		case RSLC::T_OP_LFT_BRACKET		:
-
-			// $$$
-			// right brackets should have no children !
-			DASSERT( pNode->mpChilds.size() == 0 );
-
-			pNode->UnlinkFromParent();
-			DSAFE_DELETE( pNode );
-
-			if ( pParentScanIdx )
-				*pParentScanIdx -= 1;
-
-			return;
-		}
-	}
-
-	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
-	{
-		RemoveOpeningExpressionBrackets( pNode->mpChilds[i], &i );
-	}
-}
-*/
-
 //==================================================================
 void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx )
 {

@@ -179,10 +179,10 @@ static void matchSymbols( const Symbol &a, const Symbol &b )
 					b.mType,
 					a.mName.c_str()) );
 
-	DASSTHROW( a.mIsVarying == b.mIsVarying,
+	DASSTHROW( a.IsVarying() == b.IsVarying(),
 				("Detail is %s but expecting %s for '%s'",
-					a.mIsVarying ? "varying" : "not-varying",
-					b.mIsVarying ? "varying" : "not-varying",
+					a.IsVarying() ? "varying" : "not-varying",
+					b.IsVarying() ? "varying" : "not-varying",
 					a.mName.c_str()) );
 }
 
@@ -205,13 +205,13 @@ SlValue	*SlShaderInstance::Bind(
 
 		switch ( symbol.mStorage )
 		{
-		case Symbol::CONSTANT:
-			DASSERT( symbol.mIsVarying == false );
+		case Symbol::STOR_CONSTANT:
+			DASSERT( symbol.IsUniform() );
 			pDataSegment[i].Flags.mOwnData = 0;
 			pDataSegment[i].SetDataR( symbol.GetConstantData(), &symbol );
 			break;
 
-		case Symbol::GLOBAL:
+		case Symbol::STOR_GLOBAL:
 			{
 				const Symbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
 
@@ -224,7 +224,7 @@ SlValue	*SlShaderInstance::Bind(
 			}
 			break;
 
-		case Symbol::PARAMETER:
+		case Symbol::STOR_PARAMETER:
 			{
 				const Symbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
 
@@ -238,9 +238,10 @@ SlValue	*SlShaderInstance::Bind(
 				}
 				else
 				{
-					DASSTHROW( symbol.mIsVarying == false,
+					DASSTHROW( symbol.IsUniform(),
 								("Currently not supporting varying parameters %s", pFindName) );
 
+					// (Comment below still relevant ? Probably not..)
 					// $$$ when supporting varying, will have to allocate data here and fill with default
 					// at setup time.. like for temporaries with default values..
 
@@ -260,10 +261,9 @@ SlValue	*SlShaderInstance::Bind(
 					{
 						pDataSegment[i].Flags.mOwnData = 1;
 
-						if ( symbol.mIsVarying )
-							pDataSegment[i].SetDataRW( symbol.AllocClone( mMaxPointsN ), &symbol );
-						else
-							pDataSegment[i].SetDataRW( symbol.AllocClone( 1 ), &symbol );
+						size_t	allocN = symbol.IsVarying() ? mMaxPointsN : 1;
+
+						pDataSegment[i].SetDataRW( symbol.AllocClone( allocN ), &symbol );
 
 						if ( symbol.mDefaultValStartPC != INVALID_PC )
 							out_defParamValsStartPCs.push_back( symbol.mDefaultValStartPC );
@@ -286,13 +286,15 @@ SlValue	*SlShaderInstance::Bind(
 			}
 			break;
 
-		case Symbol::TEMPORARY:
-			//DASSERT( symbol.mIsVarying == true );
-			pDataSegment[i].Flags.mOwnData = 1;
-			if ( symbol.mIsVarying )
-				pDataSegment[i].SetDataRW( symbol.AllocClone( mMaxPointsN ), &symbol );
-			else
-				pDataSegment[i].SetDataRW( symbol.AllocClone( 1 ), &symbol );
+		case Symbol::STOR_TEMPORARY:
+			{
+				//DASSERT( symbol.mIsVarying == true );
+				pDataSegment[i].Flags.mOwnData = 1;
+
+				size_t	allocN = symbol.IsVarying() ? mMaxPointsN : 1;
+
+				pDataSegment[i].SetDataRW( symbol.AllocClone( allocN ), &symbol );
+			}
 			break;
 
 		default:
@@ -331,13 +333,13 @@ static void Inst_Faceforward( SlRunContext &ctx )
 	const SlVec3* pN	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 	const SlVec3* pI	= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
 
-	const Symbol*	 pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", Symbol::NORMAL );
+	const Symbol*	 pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", Symbol::TYP_NORMAL );
 	const SlVec3* pNg = (const SlVec3 *)pNgSymbol->GetData();
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	bool	N_step	= ctx.IsSymbolVarying( 2 );
 	bool	I_step	= ctx.IsSymbolVarying( 3 );
-	bool	Ng_step	= pNgSymbol->mIsVarying ? 1 : 0;
+	bool	Ng_step	= pNgSymbol->IsVarying() ? 1 : 0;
 
 	if ( lhs_varying )
 	{
@@ -406,8 +408,8 @@ static void Inst_CalculateNormal( SlRunContext &ctx )
 		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
 	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
-	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodu", Symbol::FLOAT );
-	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodv", Symbol::FLOAT );
+	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodu", Symbol::TYP_FLOAT );
+	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodv", Symbol::TYP_FLOAT );
 
 	// only varying input and output !
 	DASSERT( ctx.IsSymbolVarying( 1 ) && ctx.IsSymbolVarying( 2 ) );

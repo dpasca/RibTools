@@ -213,6 +213,12 @@ void Machine::AddCommand(	const DStr	&cmdName,
 		mState.LightSource( p );
 	}
 	else
+	if ( nm == "Declare" )
+	{
+		exN( 2, p );
+		mState.Declare( p );
+	}
+	else
 	if ( nm == "Surface" )
 	{
 		geN( 1, p );

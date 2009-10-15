@@ -77,9 +77,9 @@ void xFormname_VXV( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				if ( _TYPE == Symbol::POINT )  pDes[i] = V3__V3W1_Mul_M44<SlScalar>( pSrc[src_offset], mat ); else
-				if ( _TYPE == Symbol::VECTOR ) pDes[i] = V3__V3W0_Mul_M44<SlScalar>( pSrc[src_offset], mat ); else
-				if ( _TYPE == Symbol::NORMAL ) pDes[i] = V3__V3W0_Mul_M44<SlScalar>( pSrc[src_offset], mat ).GetNormalized();
+				if ( _TYPE == Symbol::TYP_POINT )  pDes[i] = V3__V3W1_Mul_M44<SlScalar>( pSrc[src_offset], mat ); else
+				if ( _TYPE == Symbol::TYP_VECTOR ) pDes[i] = V3__V3W0_Mul_M44<SlScalar>( pSrc[src_offset], mat ); else
+				if ( _TYPE == Symbol::TYP_NORMAL ) pDes[i] = V3__V3W0_Mul_M44<SlScalar>( pSrc[src_offset], mat ).GetNormalized();
 			}
 
 			src_offset	+= src_step;
@@ -91,9 +91,9 @@ void xFormname_VXV( SlRunContext &ctx )
 
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
-			if ( _TYPE == Symbol::POINT )  pDes[0] = V3__V3W1_Mul_M44<SlScalar>( pSrc[0], mat ); else
-			if ( _TYPE == Symbol::VECTOR ) pDes[0] = V3__V3W0_Mul_M44<SlScalar>( pSrc[0], mat ); else
-			if ( _TYPE == Symbol::NORMAL ) pDes[0] = V3__V3W0_Mul_M44<SlScalar>( pSrc[0], mat ).GetNormalized();
+			if ( _TYPE == Symbol::TYP_POINT )  pDes[0] = V3__V3W1_Mul_M44<SlScalar>( pSrc[0], mat ); else
+			if ( _TYPE == Symbol::TYP_VECTOR ) pDes[0] = V3__V3W0_Mul_M44<SlScalar>( pSrc[0], mat ); else
+			if ( _TYPE == Symbol::TYP_NORMAL ) pDes[0] = V3__V3W0_Mul_M44<SlScalar>( pSrc[0], mat ).GetNormalized();
 		}
 	}
 
@@ -101,9 +101,9 @@ void xFormname_VXV( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_PXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::POINT>( ctx ); }
-void Inst_VXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::VECTOR>( ctx ); }
-void Inst_NXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::NORMAL>( ctx ); }
+void Inst_PXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::TYP_POINT>( ctx ); }
+void Inst_VXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::TYP_VECTOR>( ctx ); }
+void Inst_NXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::TYP_NORMAL>( ctx ); }
 
 //==================================================================
 // quite different for color ?

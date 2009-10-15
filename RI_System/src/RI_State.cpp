@@ -25,9 +25,9 @@ State::State( const Params &params ) :
 	mMtxWorldCamera.Identity();
 
 	SymbolList::SymbolParams symPar;
-	symPar.mType		= Symbol::VOIDD;
-	symPar.mIsVarying	= false;
-	symPar.mStorage		= Symbol::CONSTANT;
+	symPar.mType		= Symbol::TYP_VOIDD;
+	symPar.mDetail		= 0;
+	symPar.mStorage		= Symbol::STOR_CONSTANT;
 
 	symPar.mpName =		RI_FRAMEBUFFER				; mStatics.Add( symPar );
 	symPar.mpName = 	RI_FILE						; mStatics.Add( symPar );
@@ -112,9 +112,9 @@ State::State( const Params &params ) :
 	symPar.mpName = 	RI_HANDLER					; mStatics.Add( symPar );
 	symPar.mpName = 	RI_EMPTY_TOKEN				; mStatics.Add( symPar );
 
-	symPar.mType		= Symbol::MATRIX;
-	symPar.mIsVarying	= false;
-	symPar.mStorage		= Symbol::CONSTANT;
+	symPar.mType		= Symbol::TYP_MATRIX;
+	symPar.mDetail		= 0;
+	symPar.mStorage		= Symbol::STOR_CONSTANT;
 
 	symPar.mpName = RI_BEZIERBASIS				; mStatics.Add( symPar, (const void *)&BezierBasis	);
 	symPar.mpName = RI_BSPLINEBASIS				; mStatics.Add( symPar, (const void *)&BSplineBasis	);
@@ -440,6 +440,13 @@ void State::LightSource( ParamList &params )
 								params,
 								mTransformOpenStack.top(),
 								mMtxWorldCamera );
+}
+
+//==================================================================
+void State::Declare( ParamList &params )
+{
+	//mStatics.Add( );
+	//mAttributesStack.top().cmdSurface( params );
 }
 
 //==================================================================

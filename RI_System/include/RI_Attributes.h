@@ -32,7 +32,7 @@ public:
 	State			*mpState;
 
 private:
-	SymbolList	*mpStatics;
+	SymbolList		*mpStatics;
 	ResourceManager *mpResManager;
 
 public:
@@ -40,7 +40,7 @@ public:
 
 public:
 	//==================================================================
-	SymbolList		mSymbols;
+	SymbolList			mSymbols;
 					
 	Bound				mBound;				// DoBound()
 	Bound				mDetail;			// Detail()

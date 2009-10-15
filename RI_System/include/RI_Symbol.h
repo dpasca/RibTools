@@ -57,30 +57,39 @@ class Symbol
 public:
 	enum Type
 	{
-		UNKNOWN,
-		VOIDD,
-		FLOAT,
-		POINT,
-		VECTOR,
-		NORMAL,
-		COLOR,
-		STRING,
-		MATRIX,
+		TYP_UNKNOWN,
+		TYP_VOIDD,
+		TYP_FLOAT,
+		TYP_POINT,
+		TYP_VECTOR,
+		TYP_NORMAL,
+		TYP_COLOR,
+		TYP_STRING,
+		TYP_MATRIX,
 		TYPES_N
 	};
 
 	enum Storage
 	{
-		CONSTANT,
-		PARAMETER,
-		TEMPORARY,
-		GLOBAL,
+		STOR_CONSTANT,
+		STOR_PARAMETER,
+		STOR_TEMPORARY,
+		STOR_GLOBAL,
 	};
+
+	// Uniform = 0000b
+	// Varying = 0001b
+	// Vertex  = 0011b
+	// Constant= 0100b
+	static const u_int DET_MSK_UNIFORM	= 0;
+	static const u_int DET_MSK_VARYING	= 1;
+	static const u_int DET_MSK_VERTEX	= 3;
+	static const u_int DET_MSK_CONSTANT	= 4;
 
 	DStr	mName;
 	Type	mType;
 	Storage	mStorage;
-	bool	mIsVarying;
+	u_int	mDetail;
 	u_int	mArraySize;
 	void	*mpValArray;
 	void	*mpDefaultVal;
@@ -89,9 +98,9 @@ public:
 	void Reset()
 	{
 		mName.clear();
-		mType = UNKNOWN;
-		mStorage = CONSTANT;
-		mIsVarying = false;
+		mType = TYP_UNKNOWN;
+		mStorage = STOR_CONSTANT;
+		mDetail = 0;
 		mArraySize = 0;
 		mpValArray = NULL;
 		mpDefaultVal = NULL;
@@ -100,9 +109,9 @@ public:
 
 	Symbol()
 	{
-		mType = UNKNOWN;
-		mStorage = CONSTANT;
-		mIsVarying = false;
+		mType = TYP_UNKNOWN;
+		mStorage = STOR_CONSTANT;
+		mDetail = 0;
 		mArraySize = 0;
 		mpValArray = NULL;
 		mpDefaultVal = NULL;
@@ -114,6 +123,12 @@ public:
 		FreeClone( mpValArray );
 		FreeClone( mpDefaultVal );
 	}
+
+	void SetVarying()			{	mDetail |= DET_MSK_VARYING; }
+	void SetUniform()			{	mDetail &= ~(DET_MSK_VARYING | DET_MSK_VERTEX); }
+
+	bool IsVarying() const		{	return !!(mDetail & DET_MSK_VARYING);	}
+	bool IsUniform() const		{	return !(mDetail & DET_MSK_VARYING);	}
 
 	bool IsNameI( const char *pSrc ) const
 	{
@@ -133,19 +148,19 @@ public:
 
 	const void *GetConstantData() const
 	{
-		DASSERT( mStorage == CONSTANT && mIsVarying == false && mpDefaultVal != NULL );
+		DASSERT( mStorage == STOR_CONSTANT && IsUniform() && mpDefaultVal != NULL );
 		return mpDefaultVal;
 	}
 
 	const void *GetUniformParamData() const
 	{
-		DASSERT( mStorage == PARAMETER && mIsVarying == false && mpDefaultVal != NULL );
+		DASSERT( mStorage == STOR_PARAMETER && IsUniform() && mpDefaultVal != NULL );
 		return mpDefaultVal;
 	}
 
 	void *GetRWData()
 	{
-		DASSERT( mIsVarying == true && mpValArray != NULL );
+		DASSERT( IsVarying() && mpValArray != NULL );
 		return mpValArray;
 	}
 };
@@ -161,13 +176,13 @@ public:
 		const char		*mpName;
 		Symbol::Type	mType;
 		Symbol::Storage	mStorage;
-		bool			mIsVarying;
+		u_int			mDetail;
 
 		SymbolParams() :
 			mpName(NULL),
-			mType(Symbol::UNKNOWN),
-			mStorage(Symbol::CONSTANT),
-			mIsVarying(false)
+			mType(Symbol::TYP_UNKNOWN),
+			mStorage(Symbol::STOR_CONSTANT),
+			mDetail(0)
 		{
 		}
 	};
@@ -187,7 +202,7 @@ public:
 	const Symbol *LookupVariable( const char *pName, Symbol::Type type ) const ;
 
 	//	  Symbol *LookupVoid( const char *pName, Symbol::Type type );
-	const Symbol *LookupVoid( const char *pName ) const { return LookupVariable( pName, Symbol::VOIDD ); }
+	const Symbol *LookupVoid( const char *pName ) const { return LookupVariable( pName, Symbol::TYP_VOIDD ); }
 
 	void *LookupVariableData( const char *pName, Symbol::Type type );
 	const void *LookupVariableData( const char *pName, Symbol::Type type ) const;

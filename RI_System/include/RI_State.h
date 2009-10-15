@@ -144,6 +144,7 @@ public:
 	void Opacity( const Color &col );
 	void AreaLightSource( ParamList &params );
 	void LightSource( ParamList &params );
+	void Declare( ParamList &params );
 	void Surface( ParamList &params );
 	void Displacement( ParamList &params );
 

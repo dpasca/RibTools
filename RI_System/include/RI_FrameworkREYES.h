@@ -129,7 +129,7 @@ class FrameworkREYES
 public:
 	RenderOutputBase	*mpRenderOutput;
 	RenderBucketsBase	*mpRenderBuckets;
-	SymbolList		*mpStatics;
+	SymbolList			*mpStatics;
 	HiderREYES			mHider;
 
 private:

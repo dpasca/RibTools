@@ -121,7 +121,7 @@ public:
 	{
 		SlValue	&value = GetValue(argc);
 
-		DASSERT( value.mpSrcSymbol->mType == Symbol::FLOAT &&
+		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT &&
 				 value.Flags.mCanChange != 0 );
 
 		return (SlScalar *)value.Data.pVoidValue;
@@ -131,7 +131,7 @@ public:
 	{
 		SlValue	&value = GetValue(argc);
 
-		DASSERT( value.mpSrcSymbol->mType == Symbol::FLOAT &&
+		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT &&
 				 value.Flags.mCanChange != 0 );
 
 		return (SlVec2 *)value.Data.pVoidValue;
@@ -142,10 +142,10 @@ public:
 		SlValue	&value = GetValue(argc);
 
 		DASSERT(
-			(value.mpSrcSymbol->mType == Symbol::POINT ||
-			 value.mpSrcSymbol->mType == Symbol::COLOR ||
-			 value.mpSrcSymbol->mType == Symbol::VECTOR ||
-			 value.mpSrcSymbol->mType == Symbol::NORMAL) &&
+			(value.mpSrcSymbol->mType == Symbol::TYP_POINT ||
+			 value.mpSrcSymbol->mType == Symbol::TYP_COLOR ||
+			 value.mpSrcSymbol->mType == Symbol::TYP_VECTOR ||
+			 value.mpSrcSymbol->mType == Symbol::TYP_NORMAL) &&
 			 value.Flags.mCanChange != 0 );
 
 		return (SlVec3 *)value.Data.pVoidValue;
@@ -156,7 +156,7 @@ public:
 		SlValue	&value = GetValue(argc);
 
 		DASSERT(
-			(value.mpSrcSymbol->mType == Symbol::STRING) &&
+			(value.mpSrcSymbol->mType == Symbol::TYP_STRING) &&
 			 value.Flags.mCanChange != 0 );
 
 		return (SlStr *)value.Data.pVoidValue;
@@ -165,14 +165,14 @@ public:
 	const SlScalar *GetVoidRO( const SlScalar *unused, u_int argc ) const
 	{
 		const SlValue	&value = GetValue(argc);
-		DASSERT( value.mpSrcSymbol->mType == Symbol::FLOAT );
+		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT );
 		return (const SlScalar *)value.Data.pVoidValue;
 	}
 
 	const SlVec2 *GetVoidRO( const SlVec2 *unused, u_int argc ) const
 	{
 		const SlValue	&value = GetValue(argc);
-		DASSERT( value.mpSrcSymbol->mType == Symbol::FLOAT );
+		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT );
 		return (const SlVec2 *)value.Data.pVoidValue;
 	}
 
@@ -181,10 +181,10 @@ public:
 		const SlValue	&value = GetValue(argc);
 
 		DASSERT(
-			(value.mpSrcSymbol->mType == Symbol::POINT ||
-			 value.mpSrcSymbol->mType == Symbol::COLOR ||
-			 value.mpSrcSymbol->mType == Symbol::VECTOR ||
-			 value.mpSrcSymbol->mType == Symbol::NORMAL) );
+			(value.mpSrcSymbol->mType == Symbol::TYP_POINT ||
+			 value.mpSrcSymbol->mType == Symbol::TYP_COLOR ||
+			 value.mpSrcSymbol->mType == Symbol::TYP_VECTOR ||
+			 value.mpSrcSymbol->mType == Symbol::TYP_NORMAL) );
 
 		return (const SlVec3 *)value.Data.pVoidValue;
 	}
@@ -194,7 +194,7 @@ public:
 		const SlValue	&value = GetValue(argc);
 
 		DASSERT(
-			(value.mpSrcSymbol->mType == Symbol::STRING) );
+			(value.mpSrcSymbol->mType == Symbol::TYP_STRING) );
 
 		return (const SlStr *)value.Data.pVoidValue;
 	}
