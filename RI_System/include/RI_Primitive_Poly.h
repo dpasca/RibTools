@@ -26,7 +26,7 @@ public:
 	ParamList		mParams;
 
 public:
-	Polygon( ParamList &params, const SymbolList &staticSymbols );
+	Polygon( ParamList &params, const SymbolList &globalSymbols );
 
 		void Simplify( HiderREYES &hider );
 };
@@ -40,7 +40,7 @@ public:
 	ParamList		mParams;
 
 public:
-	PointsGeneralPolygons( ParamList &params, const SymbolList &staticSymbols );
+	PointsGeneralPolygons( ParamList &params, const SymbolList &globalSymbols );
 
 		void Simplify( HiderREYES &hider );
 };

@@ -290,7 +290,7 @@ void SimplePrimitiveBase::Dice(
 
 //==================================================================
 bool ParamsFindP(	ParamList &params,
-					const SymbolList &staticSymbols,
+					const SymbolList &globalSymbols,
 					DVec<Vec3f> &out_vectorP,
 					int fromIdx )
 {
@@ -300,8 +300,8 @@ bool ParamsFindP(	ParamList &params,
 	{
 		DASSERT( params[i].type == Param::STR );
 
-		const Symbol* pyToken = staticSymbols.LookupVoid( params[i] );
-		if ( pyToken && pyToken->IsNameI( "P" ) )
+		const Symbol* pSymbol = globalSymbols.LookupVoid( params[i] );
+		if ( pSymbol && pSymbol->IsName( "P" ) )
 		{
 			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );
 			
@@ -323,7 +323,7 @@ bool ParamsFindP(	ParamList &params,
 
 //==================================================================
 bool ParamsFindP(	ParamList &params,
-					const SymbolList &staticSymbols,
+					const SymbolList &globalSymbols,
 					Vec3f	*pOut_vectorP,
 					int	expectedN,
 					int fromIdx )
@@ -334,8 +334,8 @@ bool ParamsFindP(	ParamList &params,
 	{
 		DASSERT( params[i].type == Param::STR );
 		
-		const Symbol* pyToken = staticSymbols.LookupVoid( params[i] );
-		if ( pyToken && pyToken->IsNameI( "P" ) )
+		const Symbol* pSymbol = globalSymbols.LookupVoid( params[i] );
+		if ( pSymbol && pSymbol->IsName( "P" ) )
 		{
 			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );
 			

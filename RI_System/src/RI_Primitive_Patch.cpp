@@ -21,11 +21,11 @@ namespace RI
 //==================================================================
 PatchMesh::PatchMesh( RtToken type,
 					  ParamList &params,
-					  const SymbolList &staticSymbols ) :
+					  const SymbolList &globalSymbols ) :
 	ComplexPrimitiveBase(PATCHMESH),
 	mParams(params)
 {
-	mpyPatchType = staticSymbols.LookupVoid( type );
+	mpyPatchType = globalSymbols.LookupVoid( type );
 }
 
 //==================================================================
@@ -39,8 +39,8 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	int				nv		= mParams[3];
 	const Symbol*	pyVWrap = hider.mpStatics->LookupVoid( mParams[4] );
 
-	bool	uPeriodic = pyUWrap->IsNameI( RI_PERIODIC );
-	bool	vPeriodic = pyVWrap->IsNameI( RI_PERIODIC );
+	bool	uPeriodic = pyUWrap->IsName( RI_PERIODIC );
+	bool	vPeriodic = pyVWrap->IsName( RI_PERIODIC );
 		
 	int	PValuesParIdx = FindParam( "P", Param::FLT_ARR, 5, mParams );
 	if ( PValuesParIdx == -1 )
@@ -49,7 +49,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	int			meshHullSize = 3 * nu * nv;
 	const float	*pMeshHull = mParams[PValuesParIdx].PFlt( meshHullSize );
 
-	if ( mpyPatchType->IsNameI( RI_BILINEAR ) )
+	if ( mpyPatchType->IsName( RI_BILINEAR ) )
 	{
 		int	nUPatches = nu - 1 + uPeriodic ? 1 : 0;
 		int	nVPatches = nv - 1 + vPeriodic ? 1 : 0;
@@ -77,7 +77,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 		}
 	}
 	else
-	if ( mpyPatchType->IsNameI( RI_BICUBIC ) )
+	if ( mpyPatchType->IsName( RI_BICUBIC ) )
 	{
 		const Attributes	&attr = *mpAttribs;
 		
@@ -126,13 +126,13 @@ void PatchMesh::Simplify( HiderREYES &hider )
 }
 
 //==================================================================
-PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &staticSymbols ) :
+PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &globalSymbols ) :
 	SimplePrimitiveBase(PATCHBILINEAR)//,
 	//mParams(params)
 {
 	Vec3f	pos[4];
 
-	bool	gotP = ParamsFindP( params, staticSymbols, pos, 4 );
+	bool	gotP = ParamsFindP( params, globalSymbols, pos, 4 );
 
 	for (int i=0; i < 4; ++i)
 		mHullPos_sca[i] = pos[i];
@@ -202,14 +202,14 @@ void PatchBilinear::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &staticSymbols ) :
+PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &globalSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
 {
 	mpUBasis = &attr.GetUBasis();
 	mpVBasis = &attr.GetVBasis();
 
-	bool	gotP = ParamsFindP( params, staticSymbols, mHullPos, 16 );
+	bool	gotP = ParamsFindP( params, globalSymbols, mHullPos, 16 );
 	
 	DASSTHROW( gotP, ("Missing hull parameter") );
 
@@ -220,7 +220,7 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 PatchBicubic::PatchBicubic( ParamList &params,
 							const Vec3f hull[16],
 						    const Attributes &attr,
-							const SymbolList &staticSymbols ) :
+							const SymbolList &globalSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
 	mParams(params)
 {

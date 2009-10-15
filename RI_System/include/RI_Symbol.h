@@ -130,9 +130,9 @@ public:
 	bool IsVarying() const		{	return !!(mDetail & DET_MSK_VARYING);	}
 	bool IsUniform() const		{	return !(mDetail & DET_MSK_VARYING);	}
 
-	bool IsNameI( const char *pSrc ) const
+	bool IsName( const char *pSrc ) const
 	{
-		return 0 == strcasecmp( mName.c_str(), pSrc );
+		return 0 == strcmp( mName.c_str(), pSrc );
 	}
 
 	void *AllocData( size_t size );
@@ -196,7 +196,6 @@ public:
 
 		  Symbol *LookupVariable( const char *pName );
 	const Symbol *LookupVariable( const char *pName ) const;
-	const Symbol *LookupVariableI( const char *pName ) const;
 
 		  Symbol *LookupVariable( const char *pName, Symbol::Type type );
 	const Symbol *LookupVariable( const char *pName, Symbol::Type type ) const ;

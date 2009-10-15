@@ -63,19 +63,19 @@ void State::Torus( float maxRadius, float minRadius,
 //==================================================================
 void State::Patch( RtToken type, ParamList &params )
 {
-	const Symbol*	pyPatchType = mStatics.LookupVoid( type );
+	const Symbol*	pyPatchType = mGlobalSyms.LookupVoid( type );
 	
-	if ( pyPatchType->IsNameI( RI_BICUBIC ) )
-		insertPrimitive( DNEW RI::PatchBicubic( params, mAttributesStack.top(), mStatics ) );
+	if ( pyPatchType->IsName( RI_BICUBIC ) )
+		insertPrimitive( DNEW RI::PatchBicubic( params, mAttributesStack.top(), mGlobalSyms ) );
 	else
-	if ( pyPatchType->IsNameI( RI_BILINEAR ) )
-		insertPrimitive( DNEW RI::PatchBilinear( params, mStatics ) );
+	if ( pyPatchType->IsName( RI_BILINEAR ) )
+		insertPrimitive( DNEW RI::PatchBilinear( params, mGlobalSyms ) );
 }
 
 //==================================================================
 void State::PatchMesh( RtToken type, ParamList &params )
 {
-	insertPrimitive( DNEW RI::PatchMesh( type, params, mStatics ) );
+	insertPrimitive( DNEW RI::PatchMesh( type, params, mGlobalSyms ) );
 }
 
 //==================================================================
@@ -110,13 +110,13 @@ void State::NuPatch(
 //==================================================================
 void State::Polygon( ParamList &params )
 {
-	insertPrimitive( DNEW RI::Polygon( params, mStatics ) );
+	insertPrimitive( DNEW RI::Polygon( params, mGlobalSyms ) );
 }
 
 //==================================================================
 void State::PointsGeneralPolygons( ParamList &params )
 {
-	insertPrimitive( DNEW RI::PointsGeneralPolygons( params, mStatics ) );
+	insertPrimitive( DNEW RI::PointsGeneralPolygons( params, mGlobalSyms ) );
 }
 	
 //==================================================================

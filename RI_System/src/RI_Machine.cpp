@@ -85,7 +85,6 @@ static RtToken matchToken( const char *pStr, RtToken pAllowedTokens[] )
 {
 	for (int i=0; pAllowedTokens[i] != 0; ++i)
 	{
-		// $$$ maybe case insesitive ?
 		if ( 0 == strcmp( pStr, pAllowedTokens[i] ) )
 			return pAllowedTokens[i];
 	}
@@ -143,7 +142,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 
 	static RtToken tlSolidBegin[]		= { RI_PRIMITIVE, RI_INTERSECTION, RI_UNION, RI_DIFFERENCE, 0 };
 	static RtToken tlGeometricApproximation[]	= { RI_FLATNESS, 0 };
-	static RtToken tlOrientation[]	= { RI_OUTSIDE, RI_INSIDE, RI_LH, RI_RH, 0 };
+	static RtToken tlOrientation[]		= { RI_OUTSIDE, RI_INSIDE, RI_LH, RI_RH, 0 };
 	static RtToken tlBasis[]			= { RI_BEZIERBASIS, RI_BSPLINEBASIS, RI_POWERBASIS, RI_CATMULLROMBASIS, RI_HERMITEBASIS, 0 };
 	static RtToken tlPatch0[]			= { RI_BILINEAR, RI_BICUBIC, 0 };
 

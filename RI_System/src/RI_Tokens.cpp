@@ -1,11 +1,10 @@
-/*
- *  RI_Tokens.cpp
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/22.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Tokens.cpp
+///
+/// Created by Davide Pasca - 2008/12/22
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_Tokens.h"

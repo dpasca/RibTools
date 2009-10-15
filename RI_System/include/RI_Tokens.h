@@ -1,13 +1,15 @@
-/*
- *  RI_Tokens.h
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/22.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- *  Portions from the official RI.h
- *    See: https://renderman.pixar.com/products/rispec/rispec_3_1/appendix.C.html
- */
+//==================================================================
+/// RI_Tokens.h
+///
+/// Created by Davide Pasca - 2008/12/22
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+///
+/// Portions from the official RI.h
+///   See: https://renderman.pixar.com/products/rispec/rispec_3_1/appendix.C.html
+///
+///
+//==================================================================
 
 #ifndef RI_TOKENS_H
 #define RI_TOKENS_H

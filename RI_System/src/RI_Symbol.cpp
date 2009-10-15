@@ -201,22 +201,6 @@ Symbol * SymbolList::LookupVariable( const char *pName )
 }
 
 //==================================================================
-const Symbol * SymbolList::LookupVariableI( const char *pName ) const
-{
-	for (size_t i=0; i < size(); ++i)
-	{
-		const Symbol	&symbol = (*this)[i];
-
-		if ( 0 == strcasecmp( symbol.mName.c_str(), pName ) )
-		{
-			return &symbol;
-		}
-	}
-
-	return NULL;
-}
-
-//==================================================================
 const Symbol * SymbolList::LookupVariable( const char *pName ) const
 {
 	for (size_t i=0; i < size(); ++i)

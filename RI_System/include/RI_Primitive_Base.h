@@ -282,12 +282,12 @@ private:
 
 //==================================================================
 bool ParamsFindP(	ParamList &params,
-					const SymbolList &staticSymbols,
+					const SymbolList &globalSymbols,
 					DVec<Vec3f> &out_vectorP,
 					int fromIdx=1 );
 
 bool ParamsFindP(	ParamList &params,
-					const SymbolList &staticSymbols,
+					const SymbolList &globalSymbols,
 					Vec3f	*pOut_vectorP,
 					int		expectedN,
 					int		fromIdx=1 );
