@@ -118,7 +118,7 @@ static void compileFromMemFile(
 SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 	ResourceBase(params.pName, ResourceBase::TYPE_SHADER),
 	mType(TYPE_UNKNOWN),
-	mStartPC((u_int)-1)
+	mStartPC(INVALID_PC)
 {
 	DUT::MemFile	file;
 
@@ -156,16 +156,6 @@ SlShaderInstance::~SlShaderInstance()
 }
 
 //==================================================================
-void SlShaderInstance::SetParameter(
-			const char		*pParamName,
-			Symbol::Type	type,
-			bool			isVarying,
-			void			*pValue )
-{
-
-}
-
-//==================================================================
 static void matchSymbols( const Symbol &a, const Symbol &b )
 {
 	if ( strcasecmp( a.mName.c_str(), b.mName.c_str() ) )
@@ -188,99 +178,98 @@ static void matchSymbols( const Symbol &a, const Symbol &b )
 
 //==================================================================
 SlValue	*SlShaderInstance::Bind(
-					const SymbolList	&gridSymbols,
-					DVec<u_int>			&out_defParamValsStartPCs ) const
+					SymbolIList		&gridSymIList,
+					DVec<u_int>		&out_defParamValsStartPCs ) const
 {
 	out_defParamValsStartPCs.clear();
 
-	size_t	symbolsN = mpShader->mSymbols.size();
+	size_t	symbolsN = mpShader->mpShaSyms.size();
 
 	SlValue	*pDataSegment = DNEW SlValue [ symbolsN ];
 
 	for (size_t i=0; i < symbolsN; ++i)
 	{
-		const Symbol	&symbol = *mpShader->mSymbols[i];
+		const Symbol		&shaSym			= *mpShader->mpShaSyms[i];
+		const char			*pShaSymName	= shaSym.mName.c_str();
 
-		const char		*pFindName = symbol.mName.c_str();
-
-		switch ( symbol.mStorage )
+		switch ( shaSym.mStorage )
 		{
 		case Symbol::STOR_CONSTANT:
-			DASSERT( symbol.IsUniform() );
+			DASSERT( shaSym.IsUniform() );
 			pDataSegment[i].Flags.mOwnData = 0;
-			pDataSegment[i].SetDataR( symbol.GetConstantData(), &symbol );
+			pDataSegment[i].SetDataR( shaSym.GetConstantData(), &shaSym );
 			break;
 
 		case Symbol::STOR_GLOBAL:
 			{
-				const Symbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
+				SymbolI	*pGridSymI = gridSymIList.LookupVariable( pShaSymName );
 
-				DASSTHROW( pFoundSymbol != NULL, ("Could not find the global %s !\n", pFindName) );
+				DASSTHROW( pGridSymI != NULL, ("Could not find the global %s !\n", pShaSymName) );
 
-				matchSymbols( symbol, *pFoundSymbol );
+				matchSymbols( shaSym, *pGridSymI->mpSrcSymbol );
 
 				pDataSegment[i].Flags.mOwnData = 0;
-				pDataSegment[i].SetDataRW( ((Symbol *)pFoundSymbol)->GetRWData(), pFoundSymbol );
+				pDataSegment[i].SetDataRW( pGridSymI->GetRWData(), pGridSymI->mpSrcSymbol );
 			}
 			break;
 
 		case Symbol::STOR_PARAMETER:
 			{
-				const Symbol	*pFoundSymbol = gridSymbols.LookupVariable( pFindName );
+				SymbolI	*pGridSymI = gridSymIList.LookupVariable( pShaSymName );
 
-				if ( pFoundSymbol )
+				if ( pGridSymI )
 				{
-					// verify symbol type
-					matchSymbols( symbol, *pFoundSymbol );
+					// verify shaSym type
+					matchSymbols( shaSym, *pGridSymI->mpSrcSymbol );
 
 					pDataSegment[i].Flags.mOwnData = 0;
-					pDataSegment[i].SetDataRW( ((Symbol *)pFoundSymbol)->GetRWData(), pFoundSymbol );
+					pDataSegment[i].SetDataRW( pGridSymI->GetRWData(), pGridSymI->mpSrcSymbol );
 				}
 				else
 				{
-					DASSTHROW( symbol.IsUniform(),
-								("Currently not supporting varying parameters %s", pFindName) );
+					DASSTHROW( shaSym.IsUniform(),
+								("Currently not supporting varying parameters %s", pShaSymName) );
 
 					// (Comment below still relevant ? Probably not..)
 					// $$$ when supporting varying, will have to allocate data here and fill with default
 					// at setup time.. like for temporaries with default values..
 
 					// calling params should come from "surface" ?
-					pFoundSymbol = mCallingParams.LookupVariable( pFindName );
+					pGridSymI = NULL;//mCallingParams.LookupVariable( pShaSymName );
 
 					// additionally look into params in attributes ?
 
-					if ( pFoundSymbol )
+					if ( pGridSymI )
 					{
-						matchSymbols( symbol, *pFoundSymbol );
+						matchSymbols( shaSym, *pGridSymI->mpSrcSymbol );
 
 						pDataSegment[i].Flags.mOwnData = 0;
-						pDataSegment[i].SetDataR( pFoundSymbol->GetUniformParamData(), pFoundSymbol );
+						pDataSegment[i].SetDataR( pGridSymI->GetUniformParamData(), pGridSymI->mpSrcSymbol );
 					}
 					else
 					{
 						pDataSegment[i].Flags.mOwnData = 1;
 
-						size_t	allocN = symbol.IsVarying() ? mMaxPointsN : 1;
+						size_t	allocN = shaSym.IsVarying() ? mMaxPointsN : 1;
 
-						pDataSegment[i].SetDataRW( symbol.AllocClone( allocN ), &symbol );
+						pDataSegment[i].SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
 
-						if ( symbol.mDefaultValStartPC != INVALID_PC )
-							out_defParamValsStartPCs.push_back( symbol.mDefaultValStartPC );
+						if ( mpShader->mpShaSymsStartPCs[i] != INVALID_PC )
+							out_defParamValsStartPCs.push_back( mpShader->mpShaSymsStartPCs[i] );
 /*
 						else
-						if ( symbol.GetUniformParamData() )
+						if ( shaSym.GetUniformParamData() )
 							pDataSegment[i].mpSrcSymbol->mpDefaultVal = 
-							pDataSegment[i].SetDataRW( , &symbol );
+							pDataSegment[i].SetDataRW( , &shaSym );
 */
 
 
 /*
 						pDataSegment[i].Flags.mOwnData = 0;
-						pDataSegment[i].SetDataR( symbol.GetUniformParamData(), &symbol );
+						pDataSegment[i].SetDataR( shaSym.GetUniformParamData(), &shaSym );
 */
 
-						//DASSTHROW( 0, ("Could not find symbol %s", pFindName) );
+						//DASSTHROW( 0, ("Could not find shaSym %s", pShaSymName) );
 					}
 				}
 			}
@@ -288,12 +277,12 @@ SlValue	*SlShaderInstance::Bind(
 
 		case Symbol::STOR_TEMPORARY:
 			{
-				//DASSERT( symbol.mIsVarying == true );
+				//DASSERT( shaSym.mIsVarying == true );
 				pDataSegment[i].Flags.mOwnData = 1;
 
-				size_t	allocN = symbol.IsVarying() ? mMaxPointsN : 1;
+				size_t	allocN = shaSym.IsVarying() ? mMaxPointsN : 1;
 
-				pDataSegment[i].SetDataRW( symbol.AllocClone( allocN ), &symbol );
+				pDataSegment[i].SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
 			}
 			break;
 
@@ -309,7 +298,7 @@ SlValue	*SlShaderInstance::Bind(
 //==================================================================
 void SlShaderInstance::Unbind( SlValue * &pDataSegment ) const
 {
-	size_t	symbolsN = mpShader->mSymbols.size();
+	size_t	symbolsN = mpShader->mpShaSyms.size();
 
 /*
 	for (size_t i=0; i < symbolsN; ++i)
@@ -333,13 +322,13 @@ static void Inst_Faceforward( SlRunContext &ctx )
 	const SlVec3* pN	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 	const SlVec3* pI	= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
 
-	const Symbol*	 pNgSymbol = ctx.mpSymbols->LookupVariable( "Ng", Symbol::TYP_NORMAL );
-	const SlVec3* pNg = (const SlVec3 *)pNgSymbol->GetData();
+	const SymbolI*	pNgSymI = ctx.mpGridSymIList->LookupVariable( "Ng" );
+	const SlVec3*	pNg = (const SlVec3 *)pNgSymI->GetData();
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	bool	N_step	= ctx.IsSymbolVarying( 2 );
 	bool	I_step	= ctx.IsSymbolVarying( 3 );
-	bool	Ng_step	= pNgSymbol->IsVarying() ? 1 : 0;
+	bool	Ng_step	= pNgSymI->IsVarying() ? 1 : 0;
 
 	if ( lhs_varying )
 	{
@@ -408,8 +397,8 @@ static void Inst_CalculateNormal( SlRunContext &ctx )
 		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
 	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
-	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodu", Symbol::TYP_FLOAT );
-	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpSymbols->LookupVariableData( "oodv", Symbol::TYP_FLOAT );
+	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpGridSymIList->LookupVariableData( "_oodu" );
+	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpGridSymIList->LookupVariableData( "_oodv" );
 
 	// only varying input and output !
 	DASSERT( ctx.IsSymbolVarying( 1 ) && ctx.IsSymbolVarying( 2 ) );

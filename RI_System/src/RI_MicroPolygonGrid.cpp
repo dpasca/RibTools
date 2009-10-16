@@ -20,22 +20,17 @@ namespace RI
 {
 
 //==================================================================
-void *MicroPolygonGrid::addGlobalSym( const char *pName, Symbol::Type symType, u_int detail )
+void *MicroPolygonGrid::addSymI( const SymbolList &globalSyms, const char *pName )
 {
-	Symbol *pSymbol;
+	const Symbol	*pSrcSym = globalSyms.LookupVariable( pName );
 
-	// allocate some standard varying params
-	pSymbol				= mSymbols.Grow();
-	pSymbol->mDetail	= detail;
-	pSymbol->mStorage	= Symbol::STOR_GLOBAL;
-	pSymbol->mName		= pName;
-	pSymbol->mType		= symType;
-	
-	return pSymbol->AllocData( pSymbol->IsVarying() ? MAX_SIZE : 1 );
+	SymbolI	*pSymI = mSymbolIs.AddInstance( *pSrcSym, MAX_SIZE );
+
+	return pSymI->GetRWData();
 }
 
 //==================================================================
-MicroPolygonGrid::MicroPolygonGrid( const SymbolList &globalSymbols ) :
+MicroPolygonGrid::MicroPolygonGrid( const SymbolList &globalSyms ) :
 	mXDim(0),
 	mYDim(0),
 	mpPointsWS(0),
@@ -44,32 +39,32 @@ MicroPolygonGrid::MicroPolygonGrid( const SymbolList &globalSymbols ) :
 	mpDataOi(0),
 	mpDataCs(0),
 	mpDataOs(0),
-	mSurfRunCtx(mSymbols, MAX_SIZE),
-	mDispRunCtx(mSymbols, MAX_SIZE)
+	mSurfRunCtx(mSymbolIs, MAX_SIZE),
+	mDispRunCtx(mSymbolIs, MAX_SIZE)
 {
 	// symbols added to match globals declared in RSLC_Builtins.sl
 
-	mpDataCs = (SlColor *)	addGlobalSym( "Cs",		Symbol::TYP_COLOR );
-	mpDataOs = (SlColor *)	addGlobalSym( "Os",		Symbol::TYP_COLOR );
-	mpPointsWS = (SlVec3 *)	addGlobalSym( "P",		Symbol::TYP_POINT );
-							//addGlobalSym( "dPdu",	Symbol::TYP_VECTOR );	// or point ?
-							//addGlobalSym( "dPdv",	Symbol::TYP_VECTOR );	// or point ?
-							addGlobalSym( "oodu",	Symbol::TYP_FLOAT );
-							addGlobalSym( "oodv",	Symbol::TYP_FLOAT );
-							addGlobalSym( "N",		Symbol::TYP_NORMAL );
-							addGlobalSym( "Ng",		Symbol::TYP_NORMAL );
-							addGlobalSym( "u",		Symbol::TYP_FLOAT );
-							addGlobalSym( "v",		Symbol::TYP_FLOAT );
-							addGlobalSym( "du",		Symbol::TYP_FLOAT );
-							addGlobalSym( "dv",		Symbol::TYP_FLOAT );
-							addGlobalSym( "s",		Symbol::TYP_FLOAT );
-							addGlobalSym( "t",		Symbol::TYP_FLOAT );
-							addGlobalSym( "L",		Symbol::TYP_VECTOR );
-							addGlobalSym( "Cl",		Symbol::TYP_COLOR );
-							addGlobalSym( "I",		Symbol::TYP_VECTOR );
-	mpDataCi = (SlColor *)	addGlobalSym( "Ci",		Symbol::TYP_COLOR );
-	mpDataOi = (SlColor *)	addGlobalSym( "Oi",		Symbol::TYP_COLOR );
-							addGlobalSym( "E",		Symbol::TYP_POINT, Symbol::DET_MSK_UNIFORM );
+	mpDataCs = (SlColor *)	addSymI( globalSyms, "Cs"	);
+	mpDataOs = (SlColor *)	addSymI( globalSyms, "Os"	);
+	mpPointsWS = (SlVec3 *)	addSymI( globalSyms, "P"	);
+							addSymI( globalSyms, "dPdu"	);
+							addSymI( globalSyms, "dPdv"	);
+							addSymI( globalSyms, "_oodu");
+							addSymI( globalSyms, "_oodv");
+							addSymI( globalSyms, "N"	);
+							addSymI( globalSyms, "Ng"	);
+							addSymI( globalSyms, "u"	);
+							addSymI( globalSyms, "v"	);
+							addSymI( globalSyms, "du"	);
+							addSymI( globalSyms, "dv"	);
+							addSymI( globalSyms, "s"	);
+							addSymI( globalSyms, "t"	);
+							addSymI( globalSyms, "L"	);
+							addSymI( globalSyms, "Cl"	);
+							addSymI( globalSyms, "I"	);
+	mpDataCi = (SlColor *)	addSymI( globalSyms, "Ci"	);
+	mpDataOi = (SlColor *)	addSymI( globalSyms, "Oi"	);
+							addSymI( globalSyms, "E"	);
 
 	// initialize these.. do it here because it's not proper/safe
 	// to do in the constructor..

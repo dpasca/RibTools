@@ -53,23 +53,23 @@ Attributes& Attributes::operator=(const Attributes& rhs)
 void Attributes::copyFrom(const Attributes& rhs)
 {
 	mpState				= rhs.mpState;
-	mpStatics			= rhs.mpStatics;
+	mpGlobalSyms		= rhs.mpGlobalSyms;
 	mpResManager		= rhs.mpResManager;
 
 	mpRevision			= rhs.mpRevision			;
-	mSymbols			= rhs.mSymbols				;
+	//mSymbols			= rhs.mSymbols				;
 	mBound				= rhs.mBound				;
 	mDetail				= rhs.mDetail				;
 	mMinVisible			= rhs.mMinVisible			;
 	mLowerTransition	= rhs.mLowerTransition		;
 	mUpperTransition	= rhs.mUpperTransition		;
 	mMaxVisible			= rhs.mMaxVisible			;
-	mpyTypeApproximation= rhs.mpyTypeApproximation	;
+	mpTypeApproximation= rhs.mpTypeApproximation	;
 	mValueApproximation	= rhs.mValueApproximation	;
 	mOrientationFlipped	= rhs.mOrientationFlipped	;
 	mSides				= rhs.mSides				;
-	mpyUBasis			= rhs.mpyUBasis				;
-	mpyVBasis			= rhs.mpyVBasis				;
+	mpUBasis			= rhs.mpUBasis				;
+	mpVBasis			= rhs.mpVBasis				;
 
 	mpCustomUBasis = NULL;
 	mpCustomVBasis = NULL;
@@ -99,12 +99,12 @@ Attributes::~Attributes()
 //==================================================================
 void Attributes::Init(
 				  State				*pState,
-				  SymbolList		*pStatics,
+				  SymbolList		*pGlobalSyms,
 				  ResourceManager	*pResManager,
 				  RevisionTracker	*pRevision )
 {
 	mpState		= pState;
-	mpStatics	= pStatics;
+	mpGlobalSyms= pGlobalSyms;
 	mpResManager= pResManager;
 	mpRevision	= pRevision;
 
@@ -163,7 +163,7 @@ void Attributes::cmdDetailRange(float	minVisible,
 void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 										   float valueApproximation )
 {
-	mpyTypeApproximation	= mpStatics->LookupVariable( typeApproximation, Symbol::TYP_VOIDD );
+	mpTypeApproximation	= mpGlobalSyms->LookupVariable( typeApproximation );
 	mValueApproximation		= valueApproximation;
 	mpRevision->BumpRevision();
 }
@@ -207,7 +207,7 @@ void Attributes::cmdBasis(
 				RtToken vbasis, const float *pCustomVBasis, int vstep )
 {
 	if ( ubasis )
-		mpyUBasis = mpStatics->LookupVariable( ubasis, Symbol::TYP_MATRIX );
+		mpUBasis = mpGlobalSyms->LookupVariable( ubasis );
 	else
 	{
 		DSAFE_DELETE( mpCustomUBasis );
@@ -215,7 +215,7 @@ void Attributes::cmdBasis(
 	}
 
 	if ( vbasis )
-		mpyVBasis = mpStatics->LookupVariable( vbasis, Symbol::TYP_MATRIX );
+		mpVBasis = mpGlobalSyms->LookupVariable( vbasis );
 	else
 	{
 		DSAFE_DELETE( mpCustomVBasis );
@@ -303,7 +303,7 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		}
 		
 		// mSymbols.LookupVariable( pName )
-		// or .. mpStatics->LookupVariable( pName )
+		// or .. mpGlobalSyms->LookupVariable( pName )
 
 		if ( 0 == strcasecmp( pName, "from" ) )
 		{

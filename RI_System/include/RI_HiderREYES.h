@@ -91,12 +91,13 @@ public:
 class HiderREYES
 {
 public:
-	SymbolList		*mpStatics;
+	const SymbolList	*mpGlobalSyms;
+
 private:
-	Matrix44		mMtxWorldCamera;
-	Matrix44		mMtxWorldProj;
-	float			mHalfXRes;
-	float			mHalfYRes;
+	Matrix44			mMtxWorldCamera;
+	Matrix44			mMtxWorldProj;
+	float				mHalfXRes;
+	float				mHalfYRes;
 
 public:
 	//==================================================================

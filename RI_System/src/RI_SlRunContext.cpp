@@ -18,17 +18,17 @@ namespace RI
 //==================================================================
 /// SlRunContext
 //==================================================================
-SlRunContext::SlRunContext( const SymbolList &symbols, size_t maxPointsN )
+SlRunContext::SlRunContext( SymbolIList &symsIList, size_t maxPointsN )
 {
 	mBlocksXN;
 	mPointsYN;
 
 	mProgramCounterIdx = 0;
 	mPointsN		= 0;
-	mBlocksN	= 0;
+	mBlocksN		= 0;
 	mpDataSegment	= 0;
 	mpShaderInst	= 0;
-	mpSymbols		= &symbols;
+	mpGridSymIList	= &symsIList;
 	mpAttribs		= 0;
 
 	mMaxPointsN		= maxPointsN;
@@ -86,19 +86,19 @@ void SlRunContext::Setup(
 		DASSERT( 0 != mpShaderInst->mpShader );
 		mpDataSegment =
 			mpShaderInst->Bind(
-						*mpSymbols,
+						*mpGridSymIList,
 						mDefParamValsStartPCs );
 	}
 
 	// reset the program counter
 	mProgramCounterIdx = 0;
-	mProgramCounter[ mProgramCounterIdx ] = (u_int)-1;
+	mProgramCounter[ mProgramCounterIdx ] = INVALID_PC;
 
 	// initialize the SIMD state
 	InitializeSIMD( mMaxPointsN );
 
 	// initialize the non uniform/constant values with eventual default data
-	for (size_t i=0; i < mpShaderInst->mpShader->mSymbols.size(); ++i)
+	for (size_t i=0; i < mpShaderInst->mpShader->mpShaSyms.size(); ++i)
 	{
 		SlValue	&slValue = mpDataSegment[i];
 

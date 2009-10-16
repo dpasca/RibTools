@@ -67,7 +67,7 @@ public:
 	};
 
 private:
-	SymbolList			mGlobalSyms;
+	SymbolList				mGlobalSyms;
 	Stack<Mode>				mModeStack;
 	CopyStack<Options	>	mOptionsStack;
 	CopyStack<Attributes>	mAttributesStack;

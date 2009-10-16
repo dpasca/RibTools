@@ -81,8 +81,7 @@ void Inst_Diffuse( SlRunContext &ctx )
 		  SlColor* lhs	= ctx.GetVoidRW( (		SlColor*)0, 1 );
 	const SlVec3 * op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
-	const Symbol*	pPSymbol = ctx.mpSymbols->LookupVariable( "P", Symbol::TYP_POINT );
-	const Point3*	pP = (const Point3 *)pPSymbol->GetData();
+	const Point3*	pP = (const Point3 *)ctx.mpGridSymIList->LookupVariableData( "P" );
 
 	const DVec<LightSourceT *>	&pLights	= ctx.mpAttribs->mpState->GetLightSources();
 	const DVec<U16>				&actLights	= ctx.mpAttribs->mActiveLights;

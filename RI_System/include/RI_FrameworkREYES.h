@@ -129,7 +129,7 @@ class FrameworkREYES
 public:
 	RenderOutputBase	*mpRenderOutput;
 	RenderBucketsBase	*mpRenderBuckets;
-	SymbolList			*mpStatics;
+	const SymbolList	*mpGlobalSyms;
 	HiderREYES			mHider;
 
 private:
@@ -147,11 +147,11 @@ public:
 					RenderBucketsBase *pRenderBuckets,
 					const HiderREYES &hiderParams );
 
-	void SetStatics( SymbolList *pStatics )
+	void SetGlobalSyms( const SymbolList *pGlobalSyms )
 	{
-		mpStatics = pStatics;
+		mpGlobalSyms = pGlobalSyms;
 
-		mHider.mpStatics = pStatics;
+		mHider.mpGlobalSyms = pGlobalSyms;
 	}
 
 	void WorldBegin(

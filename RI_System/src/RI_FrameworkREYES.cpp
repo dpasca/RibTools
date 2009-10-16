@@ -25,7 +25,7 @@ FrameworkREYES::FrameworkREYES(
 						const HiderREYES &hiderParams ) :
 	mpRenderOutput(pRenderOutput),
 	mpRenderBuckets(pRenderBuckets),
-	mpStatics(NULL),
+	mpGlobalSyms(NULL),
 	mHider(hiderParams)
 {
 }
@@ -69,7 +69,7 @@ void FrameworkREYES::RenderBucket_s( HiderREYES &hider, Bucket &bucket )
 
 	bucket.BeginRender();
 
-	MicroPolygonGrid	grid( *hider.mpStatics );
+	MicroPolygonGrid	grid( *hider.mpGlobalSyms );
 
 	for (size_t i=0; i < pPrimList.size(); ++i)
 	{

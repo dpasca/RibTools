@@ -44,7 +44,7 @@ public:
 	int						*mpSIMDFlags;
 	SlValue					*mpDataSegment;
 	const SlShaderInstance	*mpShaderInst;
-	const SymbolList		*mpSymbols;
+	SymbolIList				*mpGridSymIList;
 	const Attributes		*mpAttribs;
 
 	class Cache
@@ -59,7 +59,7 @@ public:
 		}
 	} mCache;
 
-	SlRunContext( const SymbolList &symbols, size_t maxPointsN );
+	SlRunContext( SymbolIList &symsIList, size_t maxPointsN );
 	~SlRunContext();
 
 	void Init( MicroPolygonGrid *pGrid );
@@ -99,7 +99,7 @@ public:
 	Symbol &GetSymbol( u_int argc )
 	{
 		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
-		return *mpShaderInst->mpShader->mSymbols[tableOff ];
+		return *mpShaderInst->mpShader->mpShaSyms[tableOff ];
 	}
 
 	float	GetImmFloat( u_int argc )

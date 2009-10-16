@@ -36,7 +36,7 @@ static void MakeCube( const Bound &b, Vec3f out_box[8] )
 //==================================================================
 HiderREYES::HiderREYES( const Params &params ) :
 	mParams(params),
-	mpStatics(NULL)
+	mpGlobalSyms(NULL)
 {
 }
 
@@ -61,6 +61,7 @@ void HiderREYES::WorldBegin(
 	mFinalBuff.Clear();
 	
 #if 0
+	// DNEW instead ?
 	mpBuckets.push_back(
 			new Bucket( 0, 0, opt.mXRes, opt.mYRes ) );
 #else
@@ -318,8 +319,8 @@ void HiderREYES::Hide(
 
 	const SlVec3	*pPointsWS	= (const SlVec3 *)g.mpPointsWS;
 
-	const SlColor	*pOi = (const SlColor *)g.mSymbols.LookupVariableData( "Oi", Symbol::TYP_COLOR );
-	const SlColor	*pCi = (const SlColor *)g.mSymbols.LookupVariableData( "Ci", Symbol::TYP_COLOR );
+	const SlColor	*pOi = (const SlColor *)g.mSymbolIs.LookupVariableData( "Oi" );
+	const SlColor	*pCi = (const SlColor *)g.mSymbolIs.LookupVariableData( "Ci" );
 
 	size_t	blocksN = RI_GET_SIMD_BLOCKS( g.mPointsN );
 

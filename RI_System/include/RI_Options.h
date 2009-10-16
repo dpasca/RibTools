@@ -23,11 +23,11 @@ namespace RI
 //==================================================================
 class Options
 {
-	SymbolList	*mpStatics;
+	const SymbolList	*mpGlobalSyms;
 
 public:
 	Options();
-	void Init( SymbolList *pStatics, RevisionTracker *pRevision );
+	void Init( const SymbolList *pGlobalSyms, RevisionTracker *pRevision );
 
 	// avoid initialization of default values and just copy..
 	//Options( const Options &options ) {	*this = options; }

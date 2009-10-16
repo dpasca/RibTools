@@ -47,6 +47,7 @@ void *Symbol::AllocClone( size_t size ) const
 	case Symbol::TYP_POINT:
 	case Symbol::TYP_VECTOR:
 	case Symbol::TYP_NORMAL:pOutData = allocStream( sizeof(SlVec3)*blocksN );	break;
+	case Symbol::TYP_HPOINT:pOutData = allocStream( sizeof(SlVec4)*blocksN );	break;
 	case Symbol::TYP_COLOR:	pOutData = allocStream( sizeof(SlColor)*blocksN );	break;
 	case Symbol::TYP_MATRIX:pOutData = allocStream( sizeof(Matrix44)*size );	break;
 	case Symbol::TYP_STRING:pOutData = allocStream( sizeof(SlStr)*size );		break;
@@ -72,6 +73,7 @@ void Symbol::FillDataWithDefault( void *pDestData, size_t size ) const
 	case Symbol::TYP_POINT:	
 	case Symbol::TYP_VECTOR:
 	case Symbol::TYP_NORMAL:for (size_t i=0; i < blocksN; ++i) ((SlVec3	  *)pDestData)[i] = ((const SlVec3   *)mpDefaultVal)[0]; break;
+	case Symbol::TYP_HPOINT:for (size_t i=0; i < blocksN; ++i) ((SlVec4	  *)pDestData)[i] = ((const SlVec4   *)mpDefaultVal)[0]; break;
 	case Symbol::TYP_COLOR:	for (size_t i=0; i < blocksN; ++i) ((SlColor  *)pDestData)[i] = ((const SlColor  *)mpDefaultVal)[0]; break;
 	case Symbol::TYP_MATRIX:for (size_t i=0; i < size; ++i)	   ((Matrix44 *)pDestData)[i] = ((const Matrix44 *)mpDefaultVal)[0]; break;
 	case Symbol::TYP_STRING:for (size_t i=0; i < size; ++i)	   ((SlStr	  *)pDestData)[i] = ((const SlStr	 *)mpDefaultVal)[0]; break;
@@ -96,6 +98,7 @@ void Symbol::FillData( void *pDestData, size_t size, const void *pSrcData ) cons
 	case Symbol::TYP_POINT:	
 	case Symbol::TYP_VECTOR:
 	case Symbol::TYP_NORMAL:{ SlVec3	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlVec3	*)pDestData)[i] = tmp; } break;
+	case Symbol::TYP_HPOINT:{ SlVec4	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlVec4	*)pDestData)[i] = tmp; } break;
 	case Symbol::TYP_COLOR:	{ SlColor	tmp((const float *)pSrcData); for (size_t i=0; i < blocksN; ++i) ((SlColor	*)pDestData)[i] = tmp; } break;
 	case Symbol::TYP_MATRIX:{ Matrix44	tmp((const float *)pSrcData); for (size_t i=0; i < size; ++i)	 ((Matrix44 *)pDestData)[i] = tmp; } break;
 	case Symbol::TYP_STRING:{ SlStr		tmp((const SlStr *)pSrcData); for (size_t i=0; i < size; ++i)	 ((SlStr	*)pDestData)[i] = tmp; } break;
@@ -106,6 +109,7 @@ void Symbol::FillData( void *pDestData, size_t size, const void *pSrcData ) cons
 	}
 }
 
+/*
 //==================================================================
 void *Symbol::AllocData( size_t size )
 {
@@ -115,11 +119,12 @@ void *Symbol::AllocData( size_t size )
 	mpValArray = AllocClone( mArraySize );
 	return mpValArray;
 }
+*/
 
 //==================================================================
 void Symbol::AllocDefault( const void *pSrcData )
 {
-	DASSTHROW( mpValArray == NULL && mpDefaultVal == NULL, ("Already allocated !!!") );
+	DASSTHROW( mpDefaultVal == NULL, ("Already allocated !!!") );
 
 	mpDefaultVal = AllocClone( 1 );
 
@@ -135,6 +140,13 @@ void Symbol::AllocDefault( const void *pSrcData )
 			((SlVec3 *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
 			((SlVec3 *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
 			((SlVec3 *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
+			break;
+
+	case Symbol::TYP_HPOINT:
+			((SlVec4 *)mpDefaultVal)[0][0] = ((const float *)pSrcData)[0];
+			((SlVec4 *)mpDefaultVal)[0][1] = ((const float *)pSrcData)[1];
+			((SlVec4 *)mpDefaultVal)[0][2] = ((const float *)pSrcData)[2];
+			((SlVec4 *)mpDefaultVal)[0][3] = ((const float *)pSrcData)[3];
 			break;
 
 	case Symbol::TYP_COLOR :
@@ -182,22 +194,10 @@ void SymbolList::operator=( const SymbolList &from )
 //==================================================================
 SymbolList::~SymbolList()
 {
-}
-
-//==================================================================
-Symbol * SymbolList::LookupVariable( const char *pName )
-{
-	for (size_t i=0; i < size(); ++i)
+	for (size_t i=0; i < mpSymbols.size(); ++i)
 	{
-		Symbol	&symbol = (*this)[i];
-
-		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
-		{
-			return &symbol;
-		}
+		DSAFE_DELETE( mpSymbols[i] );
 	}
-
-	return NULL;
 }
 
 //==================================================================
@@ -217,78 +217,18 @@ const Symbol * SymbolList::LookupVariable( const char *pName ) const
 }
 
 //==================================================================
-Symbol * SymbolList::LookupVariable( const char *pName, Symbol::Type type )
-{
-	for (size_t i=0; i < size(); ++i)
-	{
-		Symbol	&symbol = (*this)[i];
-
-		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
-		{
-			DASSTHROW( symbol.mType == type,
-						("%s type not matching ! It's %i, but expecting %i",
-								__FUNCTION__,
-								symbol.mType,
-								type ) );
-
-			return &symbol;
-		}
-	}
-
-	return NULL;
-}
-
-//==================================================================
-const Symbol * SymbolList::LookupVariable( const char *pName, Symbol::Type type ) const
-{
-	for (size_t i=0; i < size(); ++i)
-	{
-		const Symbol	&symbol = (*this)[i];
-
-		if ( 0 == strcmp( symbol.mName.c_str(), pName ) )
-		{
-			DASSTHROW( symbol.mType == type,
-						("%s type not matching ! It's %i, but expecting %i",
-								__FUNCTION__,
-								symbol.mType,
-								type ) );
-
-			return &symbol;
-		}
-	}
-
-	return NULL;
-}
-
-//==================================================================
-void *SymbolList::LookupVariableData( const char *pName, Symbol::Type type )
-{
-	Symbol	*pSym = LookupVariable( pName, type );
-	if NOT( pSym )
-		return NULL;
-	else
-		return pSym->mpValArray;
-}
-
-//==================================================================
-const void *SymbolList::LookupVariableData( const char *pName, Symbol::Type type ) const
-{
-	const Symbol	*pSym = LookupVariable( pName, type );
-	if NOT( pSym )
-		return NULL;
-	else
-		return pSym->mpValArray;
-}
-
-//==================================================================
-Symbol *SymbolList::Add( const SymbolParams &params, const void *pSrcData )
+Symbol *SymbolList::Add( const Symbol::CtorParams &params, const void *pSrcData )
 {
 	if ( LookupVariable( params.mpName ) )
 	{
 		DASSERT( 0 );
 		return NULL;
 	}
-	Symbol	*pSym = Grow();
+
+	Symbol	*pSym;
+
+	mpSymbols.push_back( pSym = DNEW Symbol() );
+
 	pSym->mName			= params.mpName;
 	pSym->mType			= params.mType;
 	pSym->mStorage		= params.mStorage;
@@ -296,23 +236,135 @@ Symbol *SymbolList::Add( const SymbolParams &params, const void *pSrcData )
 
 	if ( pSrcData )
 	{
-		pSym->FillData( pSym->AllocData( 1 ), 1, pSrcData );
+		pSym->mpDefaultVal = pSym->AllocClone( 1 );
+
+		pSym->FillData( pSym->mpDefaultVal, 1, pSrcData );
 	}
 
 	return pSym;
 }
 
 //==================================================================
-void SymbolList::AddVoid( const char *pName )
+Symbol *SymbolList::Add( const char *pName )
 {
-	if ( LookupVariable( pName ) )
+	Symbol::CtorParams	params;
+
+	params.mpName	= pName;
+	params.mStorage	= Symbol::STOR_GLOBAL;	// this is decided here.. for now
+	params.mType	= Symbol::TYP_VOIDD;
+	params.mDetail	= Symbol::DET_MSK_CONSTANT;
+
+	return Add( params );
+}
+
+//==================================================================
+static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pDecl )
+{
+	char buff[ 1024 ];
+	strcpy_s( buff, pDecl );
+
+	char *pTokCtx;
+	char *pTok;
+
+	int	typCnt = 0;
+	int	detCnt = 0;
+
+	// TODO: not supporting arrays yet !!
+	if ( pTok = strtok_r( buff, " \t", &pTokCtx ) )
 	{
-		DASSERT( 0 );
-		return;
+		do
+		{
+			// type ..
+			if ( 0 == strcmp( pTok, "float"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_FLOAT	;	}	else
+			if ( 0 == strcmp( pTok, "point"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_POINT	;	}	else
+			if ( 0 == strcmp( pTok, "vector" ) ) { ++typCnt; out_params.mType = Symbol::TYP_VECTOR	;	}	else
+			if ( 0 == strcmp( pTok, "normal" ) ) { ++typCnt; out_params.mType = Symbol::TYP_NORMAL	;	}	else
+			if ( 0 == strcmp( pTok, "hpoint" ) ) { ++typCnt; out_params.mType = Symbol::TYP_HPOINT	;	}	else
+			if ( 0 == strcmp( pTok, "color"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_COLOR	;	}	else
+			if ( 0 == strcmp( pTok, "string" ) ) { ++typCnt; out_params.mType = Symbol::TYP_STRING	;	}	else
+			if ( 0 == strcmp( pTok, "matrix" ) ) { ++typCnt; out_params.mType = Symbol::TYP_MATRIX	;	}	else
+			// storage ..
+			if ( 0 == strcmp( pTok, "uniform") ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_UNIFORM	;	}	else
+			if ( 0 == strcmp( pTok, "varying") ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_VARYING	;	}	else
+			if ( 0 == strcmp( pTok, "vertex" ) ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_VERTEX	;	}	else
+			if ( 0 == strcmp( pTok, "constant") ){ ++detCnt; out_params.mDetail = Symbol::DET_MSK_CONSTANT	;	}
+
+		} while ( pTok = strtok_r(NULL, " \t", &pTokCtx) );
 	}
-	Symbol	*pSym = Grow();
-	pSym->mName = pName;
-	pSym->mType	= Symbol::TYP_VOIDD;
+
+	if ( typCnt == 0 )	{ DASSTHROW( 0, ("Bad declaration, missing type") );	} else
+	if ( typCnt >  1 )	{ DASSTHROW( 0, ("Bad declaration, multiple types") );	}
+
+	if ( detCnt == 0 )	{ DASSTHROW( 0, ("Bad declaration, missing storage indentifier") );		} else
+	if ( detCnt >  1 )	{ DASSTHROW( 0, ("Bad declaration, multiple storage indentifiers") );	}
+}
+
+//==================================================================
+Symbol *SymbolList::Add( const char *pName, const char *pDecl, const void *pSrcData )
+{
+	Symbol::CtorParams	params;
+	
+	params.mpName	= pName;
+	params.mStorage	= Symbol::STOR_GLOBAL;	// this is decided here.. for now
+
+	// fill up type and details..
+	newSymParamsFromDecl( params, pDecl );
+
+	return Add( params, pSrcData );
+}
+
+//==================================================================
+/// SymbolIList
+//==================================================================
+SymbolI * SymbolIList::LookupVariable( const char *pName )
+{
+	for (size_t i=0; i < size(); ++i)
+	{
+		SymbolI	&inst = (*this)[i];
+
+		if ( 0 == strcmp( inst.mpSrcSymbol->mName.c_str(), pName ) )
+		{
+			return &inst;
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
+const SymbolI * SymbolIList::LookupVariable( const char *pName ) const
+{
+	for (size_t i=0; i < size(); ++i)
+	{
+		const SymbolI	&inst = (*this)[i];
+
+		if ( 0 == strcmp( inst.mpSrcSymbol->mName.c_str(), pName ) )
+		{
+			return &inst;
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
+void *SymbolIList::LookupVariableData( const char *pName )
+{
+	SymbolI	*pSym = LookupVariable( pName );
+	if NOT( pSym )
+		return NULL;
+	else
+		return pSym->mpValArray;
+}
+
+//==================================================================
+const void *SymbolIList::LookupVariableData( const char *pName ) const
+{
+	const SymbolI	*pSym = LookupVariable( pName );
+	if NOT( pSym )
+		return NULL;
+	else
+		return pSym->mpValArray;
 }
 
 //==================================================================

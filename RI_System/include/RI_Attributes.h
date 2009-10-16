@@ -29,18 +29,18 @@ class State;
 class Attributes
 {
 public:
-	State			*mpState;
+	State				*mpState;
 
 private:
-	SymbolList		*mpStatics;
-	ResourceManager *mpResManager;
+	const SymbolList	*mpGlobalSyms;
+	ResourceManager		*mpResManager;
 
 public:
-	RevisionTracker	*mpRevision;
+	RevisionTracker		*mpRevision;
 
 public:
 	//==================================================================
-	SymbolList			mSymbols;
+	//SymbolList			mSymbols;
 					
 	Bound				mBound;				// DoBound()
 	Bound				mDetail;			// Detail()
@@ -50,17 +50,17 @@ public:
 	float				mUpperTransition;	//
 	float				mMaxVisible;		//
 					
-	Symbol*			mpyTypeApproximation;	// GeometricApproximation()
+	const Symbol		*mpTypeApproximation;	// GeometricApproximation()
 	float				mValueApproximation;
-					
+
 	bool				mOrientationFlipped;// Orientation()
 	int					mSides;				// Sides()
 
-	const Symbol*		mpyUBasis;			// Basis()
-	const Symbol*		mpyVBasis;
+	const Symbol		*mpUBasis;			// Basis()
+	const Symbol		*mpVBasis;
 	const RtBasis		*mpCustomUBasis;
 	const RtBasis		*mpCustomVBasis;
-	
+
 	int					mUSteps;
 	int					mVSteps;
 
@@ -79,7 +79,7 @@ public:
 
 	void Init(
 			State			*pState,
-			SymbolList	*pStatics,
+			SymbolList		*pGlobalSyms,
 			ResourceManager	*pResManager,
 			RevisionTracker	*pRevision );
 
@@ -103,8 +103,8 @@ public:
 	void cmdBasis(RtToken ubasis, const float *pCustomUBasis, int ustep,
 				  RtToken vbasis, const float *pCustomVBasis, int vstep );
 				  
-	const RtBasis &GetUBasis() const { return mpCustomUBasis ? *mpCustomUBasis : *(const RtBasis *)mpyUBasis->GetData(); }
-	const RtBasis &GetVBasis() const { return mpCustomVBasis ? *mpCustomVBasis : *(const RtBasis *)mpyVBasis->GetData(); }
+	const RtBasis &GetUBasis() const { return mpCustomUBasis ? *mpCustomUBasis : *(const RtBasis *)mpUBasis->GetConstantData(); }
+	const RtBasis &GetVBasis() const { return mpCustomVBasis ? *mpCustomVBasis : *(const RtBasis *)mpVBasis->GetConstantData(); }
 
 	void cmdColor( const Color &color );
 	void cmdOpacity( const Color &color );

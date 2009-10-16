@@ -70,7 +70,7 @@ public:
 	SlVec3			*mpPointsWS;
 	float			mURange[2];
 	float			mVRange[2];
-	SymbolList		mSymbols;
+	SymbolIList		mSymbolIs;
 
 	Matrix44		mMtxLocalWorld;
 	Matrix44		mMtxWorldCamera;
@@ -92,7 +92,7 @@ public:
 	void Shade( const Attributes &attribs );
 
 private:
-	void *addGlobalSym( const char *pName, Symbol::Type symType, u_int detail=Symbol::DET_MSK_VARYING );
+	void *addSymI( const SymbolList &globalSyms, const char *pName );
 };
 
 //==================================================================

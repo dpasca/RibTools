@@ -63,6 +63,7 @@ public:
 		TYP_POINT,
 		TYP_VECTOR,
 		TYP_NORMAL,
+		TYP_HPOINT,
 		TYP_COLOR,
 		TYP_STRING,
 		TYP_MATRIX,
@@ -90,21 +91,34 @@ public:
 	Type	mType;
 	Storage	mStorage;
 	u_int	mDetail;
-	u_int	mArraySize;
-	void	*mpValArray;
 	void	*mpDefaultVal;
-	u_int	mDefaultValStartPC;
 
-	void Reset()
+public:
+	//==================================================================
+	struct CtorParams
 	{
-		mName.clear();
-		mType = TYP_UNKNOWN;
-		mStorage = STOR_CONSTANT;
-		mDetail = 0;
-		mArraySize = 0;
-		mpValArray = NULL;
+		const char		*mpName;
+		Symbol::Type	mType;
+		Symbol::Storage	mStorage;
+		u_int			mDetail;
+
+		CtorParams() :
+			mpName(NULL),
+			mType(Symbol::TYP_UNKNOWN),
+			mStorage(Symbol::STOR_CONSTANT),
+			mDetail(0)
+		{
+		}
+	};
+
+	//==================================================================
+	Symbol( const CtorParams &params )
+	{
+		mName		= params.mpName;
+		mType		= params.mType;
+		mStorage	= params.mStorage;
+		mDetail		= params.mDetail;
 		mpDefaultVal = NULL;
-		mDefaultValStartPC = (u_int)-1;
 	}
 
 	Symbol()
@@ -112,16 +126,21 @@ public:
 		mType = TYP_UNKNOWN;
 		mStorage = STOR_CONSTANT;
 		mDetail = 0;
-		mArraySize = 0;
-		mpValArray = NULL;
 		mpDefaultVal = NULL;
-		mDefaultValStartPC = (u_int)-1;
 	}
 
 	~Symbol()
 	{
-		FreeClone( mpValArray );
 		FreeClone( mpDefaultVal );
+	}
+
+	void Reset()
+	{
+		mName.clear();
+		mType = TYP_UNKNOWN;
+		mStorage = STOR_CONSTANT;
+		mDetail = 0;
+		mpDefaultVal = NULL;
 	}
 
 	void SetVarying()			{	mDetail |= DET_MSK_VARYING; }
@@ -135,7 +154,7 @@ public:
 		return 0 == strcmp( mName.c_str(), pSrc );
 	}
 
-	void *AllocData( size_t size );
+	//void *AllocData( size_t size );
 	void AllocDefault( const void *pSrcData );
 
 	void *AllocClone( size_t size ) const;
@@ -144,84 +163,136 @@ public:
 	void FillDataWithDefault( void *pDestData, size_t size ) const;
 	void FillData( void *pDestData, size_t size, const void *pSrcData ) const;
 
-	const void *GetData() const { return mpValArray; }
-
-	const void *GetConstantData() const
-	{
-		DASSERT( mStorage == STOR_CONSTANT && IsUniform() && mpDefaultVal != NULL );
-		return mpDefaultVal;
-	}
-
-	const void *GetUniformParamData() const
-	{
-		DASSERT( mStorage == STOR_PARAMETER && IsUniform() && mpDefaultVal != NULL );
-		return mpDefaultVal;
-	}
-
-	void *GetRWData()
-	{
-		DASSERT( IsVarying() && mpValArray != NULL );
-		return mpValArray;
-	}
+	const void *GetConstantData() const { return mpDefaultVal;	}
 };
 
 //==================================================================
 class SymbolList
 {
-	DVec<Symbol> mpSymbols;
-
-public:
-	struct SymbolParams
-	{
-		const char		*mpName;
-		Symbol::Type	mType;
-		Symbol::Storage	mStorage;
-		u_int			mDetail;
-
-		SymbolParams() :
-			mpName(NULL),
-			mType(Symbol::TYP_UNKNOWN),
-			mStorage(Symbol::STOR_CONSTANT),
-			mDetail(0)
-		{
-		}
-	};
+	DVec<Symbol *>		mpSymbols;
 
 public:
 	SymbolList();
 	~SymbolList();
 
-	SymbolList( const SymbolList &from );
-	void operator = ( const SymbolList &from );
-
-		  Symbol *LookupVariable( const char *pName );
+	//	  Symbol *LookupVariable( const char *pName );
 	const Symbol *LookupVariable( const char *pName ) const;
 
-		  Symbol *LookupVariable( const char *pName, Symbol::Type type );
-	const Symbol *LookupVariable( const char *pName, Symbol::Type type ) const ;
-
-	//	  Symbol *LookupVoid( const char *pName, Symbol::Type type );
-	const Symbol *LookupVoid( const char *pName ) const { return LookupVariable( pName, Symbol::TYP_VOIDD ); }
-
-	void *LookupVariableData( const char *pName, Symbol::Type type );
-	const void *LookupVariableData( const char *pName, Symbol::Type type ) const;
-
-	Symbol *Grow()
-	{
-		return mpSymbols.grow();
-	}
-
-	Symbol *Add( const SymbolParams &params, const void *pSrcData=NULL );
-
-	void AddVoid( const char *pName );
+	Symbol *Add( const Symbol::CtorParams &params, const void *pSrcData=NULL );
+	Symbol *Add( const char *pName, const char *pDecl, const void *pSrcData=NULL );
+	Symbol *Add( const char *pName );
 
 	size_t size() const
 	{
 		return mpSymbols.size();
 	}
 
-	const Symbol &operator [] (size_t i) const{ return mpSymbols[i]; }
-		  Symbol &operator [] (size_t i)		{ return mpSymbols[i]; }
+	const Symbol &operator [] (size_t i) const	{ return *mpSymbols[i]; }
+		  Symbol &operator [] (size_t i)		{ return *mpSymbols[i]; }
+
+private:
+	SymbolList( const SymbolList &from );
+	void operator = ( const SymbolList &from );
+};
+
+//==================================================================
+class SymbolI
+{
+public:
+	const Symbol	*mpSrcSymbol;
+	size_t			mArraySize;
+	void			*mpValArray;
+	//u_int			mDefaultValStartPC;
+
+	SymbolI( const Symbol &symbol, size_t varyingAllocN ) :
+		mpSrcSymbol(&symbol),
+		mArraySize(0),
+		mpValArray(NULL)
+		//, mDefaultValStartPC(INVALID_PC)
+	{
+		mpValArray = 
+			mpSrcSymbol->AllocClone(
+					mpSrcSymbol->IsVarying() ? varyingAllocN : 1 );
+	}
+
+	~SymbolI()
+	{
+		mpSrcSymbol->FreeClone( mpValArray );
+	}
+
+	bool IsVarying() const	{	return mpSrcSymbol->IsVarying();	}
+
+	const void *GetConstantData() const
+	{
+		DASSERT( mpSrcSymbol->mStorage == Symbol::STOR_CONSTANT && mpSrcSymbol->IsUniform() );
+		return mpSrcSymbol->mpDefaultVal;
+	}
+
+	const void *GetUniformParamData() const
+	{
+		DASSERT( mpSrcSymbol->mStorage == Symbol::STOR_PARAMETER && mpSrcSymbol->IsUniform() );
+		return mpSrcSymbol->mpDefaultVal;
+	}
+
+	const void *GetData() const { return mpValArray; }
+
+	void *GetRWData()
+	{
+		DASSERT( mpValArray != NULL ); // IsVarying()
+		return mpValArray;
+	}
+};
+
+//==================================================================
+class SymbolIList
+{
+	DVec<SymbolI *>	mpList;
+
+public:
+	SymbolIList()
+	{
+	}
+
+	SymbolIList( const SymbolIList &from )
+	{
+	}
+
+	~SymbolIList()
+	{
+		for (size_t i=0; i < mpList.size(); ++i)
+		{
+			DSAFE_DELETE( mpList[i] );
+		}
+	}
+
+		  SymbolI *LookupVariable( const char *pName );
+	const SymbolI *LookupVariable( const char *pName ) const;
+
+		  void *LookupVariableData( const char *pName );
+	const void *LookupVariableData( const char *pName ) const;
+
+	SymbolI *AddInstance( const Symbol &srcSymbol, size_t varyingAllocN )
+	{
+		SymbolI	*pSymI = DNEW SymbolI( srcSymbol, varyingAllocN );
+
+		mpList.push_back( pSymI );
+
+		return pSymI;
+	}
+
+	size_t size() const
+	{
+		return mpList.size();
+	}
+
+	const SymbolI &operator [] (size_t i) const	{ return *mpList[i]; }
+		  SymbolI &operator [] (size_t i)		{ return *mpList[i]; }
+
+private:
+
+	void operator = ( const SymbolIList &from )
+	{
+	}
 };
 
 //==================================================================

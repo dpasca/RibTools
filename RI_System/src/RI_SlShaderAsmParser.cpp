@@ -283,7 +283,11 @@ void ShaderAsmParser::processSpecialLabel( const Label &label )
 		if ( idx == -1 )
 			return;
 
-		mpShader->mSymbols[ idx ]->mDefaultValStartPC = labelAddr;
+		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+		// mDefaultValStartPC should be in a separate list in the shader.. without
+		// being either in the symbol or symbol instance structure
+
+		mpShader->mpShaSymsStartPCs[ idx ] = labelAddr;
 	}
 	else
 	// is main/entry point label ?
@@ -304,7 +308,7 @@ void ShaderAsmParser::resolveLabels()
 	}
 
 	// did we find the special label for the entry point ?
-	if ( mpShader->mStartPC == (u_int)-1 )
+	if ( mpShader->mStartPC == INVALID_PC )
 	{
 		onError( "Entry point is missing !" );
 	}
@@ -451,6 +455,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 
 	if ( 0 == strcmp( pTok, "float"  ) ) pSymbol->mType = Symbol::TYP_FLOAT ; else
 	if ( 0 == strcmp( pTok, "point"  ) ) pSymbol->mType = Symbol::TYP_POINT ; else
+	if ( 0 == strcmp( pTok, "hpoint"  ) )pSymbol->mType = Symbol::TYP_HPOINT; else
 	if ( 0 == strcmp( pTok, "color"  ) ) pSymbol->mType = Symbol::TYP_COLOR ; else
 	if ( 0 == strcmp( pTok, "string" ) ) pSymbol->mType = Symbol::TYP_STRING; else
 	if ( 0 == strcmp( pTok, "vector" ) ) pSymbol->mType = Symbol::TYP_VECTOR; else
@@ -480,7 +485,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 		case Symbol::TYP_COLOR :
 			{
 				float	tmp[4];
-				getVector( pDefaultValueStr, tmp, 1 );
+				getVector( pDefaultValueStr, tmp, 3 );	// assumes color is 3 components
 				pSymbol->AllocDefault( tmp );
 			}
 			break;
@@ -490,7 +495,15 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 		case Symbol::TYP_NORMAL:
 			{
 				float	tmp[4];
-				getVector( pDefaultValueStr, tmp, 1 );
+				getVector( pDefaultValueStr, tmp, 3 );
+				pSymbol->AllocDefault( tmp );
+			}
+			break;
+
+		case Symbol::TYP_HPOINT :
+			{
+				float	tmp[4];
+				getVector( pDefaultValueStr, tmp, 4 );
 				pSymbol->AllocDefault( tmp );
 			}
 			break;
@@ -515,7 +528,8 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 			onError( "Missing constant value for '%s'", pTok );
 	}
 
-	mpShader->mSymbols.push_back( pSymbol.release() );
+	mpShader->mpShaSyms.push_back( pSymbol.release() );
+	mpShader->mpShaSymsStartPCs.push_back( INVALID_PC );
 }
 
 //==================================================================
@@ -534,9 +548,9 @@ const OpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &opCodeI
 //==================================================================
 int ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
 {
-	for (size_t i=0; i < mpShader->mSymbols.size(); ++i)
+	for (size_t i=0; i < mpShader->mpShaSyms.size(); ++i)
 	{
-		const char *pShaderSymName = mpShader->mSymbols[i]->mName.c_str();
+		const char *pShaderSymName = mpShader->mpShaSyms[i]->mName.c_str();
 
 		if ( ignoreCase )
 		{
@@ -571,7 +585,7 @@ int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 			typeLower == 'x' )
 		return -1;
 
-	int	retIdx = (int)mpShader->mSymbols.size();
+	int	retIdx = (int)mpShader->mpShaSyms.size();
 
 	bool	isVarying = true;
 
@@ -593,9 +607,6 @@ int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 	else
 		pSymbol->SetUniform();
 
-	pSymbol->mArraySize	= 0;
-	pSymbol->mpValArray	= NULL;
-
 	if ( typeLower == 's' )
 	{
 		// scalar base
@@ -613,7 +624,8 @@ int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 		pSymbol->mType	= Symbol::TYP_STRING;
 	}
 
-	mpShader->mSymbols.push_back( pSymbol.release() );
+	mpShader->mpShaSyms.push_back( pSymbol.release() );
+	mpShader->mpShaSymsStartPCs.push_back( INVALID_PC );
 
 	return retIdx;
 }
@@ -631,6 +643,8 @@ static OperTypeID getOperTypeFromSlSymbolType( Symbol::Type slSymType, bool &out
 	case Symbol::TYP_POINT:
 	case Symbol::TYP_VECTOR:
 	case Symbol::TYP_NORMAL:	return OPRTYPE_F3 ;
+
+	case Symbol::TYP_HPOINT:	return OPRTYPE_F4 ;
 
 	case Symbol::TYP_COLOR:		return OPRTYPE_F3 ;
 
@@ -713,8 +727,8 @@ void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCode
 		}
 
 		word.mSymbol.mTableOffset	= (u_int)symbolIdx;
-		word.mSymbol.mIsVarying		= mpShader->mSymbols[symbolIdx]->IsVarying();
-		word.mSymbol.mpOrigSymbol	= mpShader->mSymbols[symbolIdx];
+		word.mSymbol.mIsVarying		= mpShader->mpShaSyms[symbolIdx]->IsVarying();
+		word.mSymbol.mpOrigSymbol	= mpShader->mpShaSyms[symbolIdx];
 
 		if ( pOpDef->Flags & OPC_FLG_UNIFORMOPERS )
 		{
@@ -726,7 +740,7 @@ void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCode
 
 		// verify that the symbol type matches with the operator type
 		verifySymbolType(
-					mpShader->mSymbols[symbolIdx]->mType,
+					mpShader->mpShaSyms[symbolIdx]->mType,
 					expectedOperType,
 					operIdx,
 					pTok );

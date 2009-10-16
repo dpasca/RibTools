@@ -23,15 +23,15 @@ namespace RI
 
 //==================================================================
 Options::Options() :
-	mpStatics(NULL),
+	mpGlobalSyms(NULL),
 	mpRevision(NULL)
 {
 }
 
 //==================================================================
-void Options::Init( SymbolList *pStatics, RevisionTracker *pRevision )
+void Options::Init( const SymbolList *pGlobalSyms, RevisionTracker *pRevision )
 {
-	mpStatics = pStatics;
+	mpGlobalSyms = pGlobalSyms;
 	mpRevision = pRevision;
 	mXRes = 640;
 	mYRes = 480;
@@ -190,7 +190,7 @@ void Options::Finalize()
 
 	if ( mProjectionParams[0].u.stringVal == RI_PERSPECTIVE )
 	{
-		mpyProjection	= mpStatics->LookupVoid( RI_PERSPECTIVE );
+		mpyProjection	= mpGlobalSyms->LookupVariable( RI_PERSPECTIVE );
 		
 		for (size_t i=1; i < mProjectionParams.size(); ++i)
 		{
@@ -218,7 +218,7 @@ void Options::Finalize()
 	else
 	if ( mProjectionParams[0].u.stringVal == RI_ORTHOGRAPHIC )
 	{
-		mpyProjection	= mpStatics->LookupVoid( RI_ORTHOGRAPHIC );
+		mpyProjection	= mpGlobalSyms->LookupVariable( RI_ORTHOGRAPHIC );
 	}
 }
 

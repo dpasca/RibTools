@@ -25,7 +25,7 @@ PatchMesh::PatchMesh( RtToken type,
 	ComplexPrimitiveBase(PATCHMESH),
 	mParams(params)
 {
-	mpyPatchType = globalSymbols.LookupVoid( type );
+	mpyPatchType = globalSymbols.LookupVariable( type );
 }
 
 //==================================================================
@@ -35,9 +35,9 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	//               0      1       2       3       4        5     6
 
 	int				nu		= mParams[1];
-	const Symbol*	pyUWrap = hider.mpStatics->LookupVoid( mParams[2] );
+	const Symbol*	pyUWrap = hider.mpGlobalSyms->LookupVariable( mParams[2] );
 	int				nv		= mParams[3];
-	const Symbol*	pyVWrap = hider.mpStatics->LookupVoid( mParams[4] );
+	const Symbol*	pyVWrap = hider.mpGlobalSyms->LookupVariable( mParams[4] );
 
 	bool	uPeriodic = pyUWrap->IsName( RI_PERIODIC );
 	bool	vPeriodic = pyVWrap->IsName( RI_PERIODIC );
@@ -112,7 +112,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 				}
 
 				hider.InsertSimple(
-						DNEW RI::PatchBicubic( mParams, hullv3, attr, *hider.mpStatics ),
+						DNEW RI::PatchBicubic( mParams, hullv3, attr, *hider.mpGlobalSyms ),
 						*this
 						);
 			}

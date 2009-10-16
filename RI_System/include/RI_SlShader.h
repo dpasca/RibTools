@@ -33,9 +33,6 @@ enum OperTypeID
 };
 
 //==================================================================
-static const u_int OPERANDS_VEC_MSK	= 0x00000003;
-
-//==================================================================
 enum OpBaseTypeID
 {
 	OBT_MOV	,
@@ -218,11 +215,12 @@ public:
 		TYPE_N
 	};
 public:
-	Type			mType;
-	DStr			mShaderName;
-	DVec<Symbol*>	mSymbols;
-	u_int			mStartPC;
-	DVec<SlCPUWord>	mCode;
+	Type				mType;
+	DStr				mShaderName;
+	DVec<Symbol	*>		mpShaSyms;
+	DVec<u_int>			mpShaSymsStartPCs;
+	u_int				mStartPC;
+	DVec<SlCPUWord>		mCode;
 
 	struct CtorParams
 	{
@@ -255,12 +253,25 @@ class SlShaderInstance
 	size_t				mMaxPointsN;
 
 public:
-	//DVec<SlParameter>	mCallingParams;
-	SymbolList		mCallingParams;	// $$$ should get these from attributes and Surface params at some point !!
+	//SymbolIList			mCallingParams;	// $$$ should get these from attributes and Surface params at some point !!
 
 public:
 	SlShaderInstance( size_t maxPointsN );
 	~SlShaderInstance();
+
+	SlShaderInstance( const SlShaderInstance &right )
+	{
+		moShader.Borrow( right.moShader.Use() );
+		mpShader		= right.mpShader;
+		//mCallingParams	= right.mCallingParams;
+	}
+
+	void operator = ( const SlShaderInstance &right )
+	{
+		moShader.Borrow( right.moShader.Use() );
+		mpShader		= right.mpShader;
+		//mCallingParams	= right.mCallingParams;
+	}
 
 	void Set( SlShader *pShader )
 	{
@@ -273,29 +284,9 @@ public:
 		return mpShader != NULL;
 	}
 
-	SlShaderInstance( const SlShaderInstance &right )
-	{
-		moShader.Borrow( right.moShader.Use() );
-		mpShader		= right.mpShader;
-		mCallingParams	= right.mCallingParams;
-	}
-
-	void operator = ( const SlShaderInstance &right )
-	{
-		moShader.Borrow( right.moShader.Use() );
-		mpShader		= right.mpShader;
-		mCallingParams	= right.mCallingParams;
-	}
-
-	void SetParameter(
-				const char		*pParamName,
-				Symbol::Type	type,
-				bool			isVarying,
-				void			*pValue );
-
 	SlValue	*Bind(
-			const SymbolList	&gridSymbols,
-			DVec<u_int>			&out_defParamValsStartPCs ) const;
+			SymbolIList		&gridSymIList,
+			DVec<u_int>		&out_defParamValsStartPCs ) const;
 
 	void Unbind( SlValue * &pDataSegment ) const;
 

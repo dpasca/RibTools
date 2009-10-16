@@ -153,14 +153,14 @@ void SimplePrimitiveBase::Dice(
 {
 	//SlVec3	*pPointsWS = g.mpPointsWS;
 
-	SlVec3	 *pPointsWS = (SlVec3 *)g.mSymbols.LookupVariableData( "P", Symbol::TYP_POINT );
-	SlScalar *pOODu	= (SlScalar *)g.mSymbols.LookupVariableData( "oodu", Symbol::TYP_FLOAT );
-	SlScalar *pOODv	= (SlScalar *)g.mSymbols.LookupVariableData( "oodv", Symbol::TYP_FLOAT );
-	SlVec3	 *pI	= (SlVec3 *)g.mSymbols.LookupVariableData( "I", Symbol::TYP_VECTOR );
-	SlVec3	 *pN	= (SlVec3 *)g.mSymbols.LookupVariableData( "N", Symbol::TYP_NORMAL );
-	SlVec3	 *pNg	= (SlVec3 *)g.mSymbols.LookupVariableData( "Ng", Symbol::TYP_NORMAL );
-	SlColor	 *pOs	= (SlColor *)g.mSymbols.LookupVariableData( "Os", Symbol::TYP_COLOR );
-	SlColor	 *pCs	= (SlColor *)g.mSymbols.LookupVariableData( "Cs", Symbol::TYP_COLOR );
+	SlVec3	 *pPointsWS = (SlVec3	*)g.mSymbolIs.LookupVariableData( "P"	);
+	SlScalar *pOODu		= (SlScalar *)g.mSymbolIs.LookupVariableData( "_oodu" );
+	SlScalar *pOODv		= (SlScalar *)g.mSymbolIs.LookupVariableData( "_oodv" );
+	SlVec3	 *pI		= (SlVec3	*)g.mSymbolIs.LookupVariableData( "I"	);
+	SlVec3	 *pN		= (SlVec3	*)g.mSymbolIs.LookupVariableData( "N"	);
+	SlVec3	 *pNg		= (SlVec3	*)g.mSymbolIs.LookupVariableData( "Ng"	);
+	SlColor	 *pOs		= (SlColor	*)g.mSymbolIs.LookupVariableData( "Os"	);
+	SlColor	 *pCs		= (SlColor	*)g.mSymbolIs.LookupVariableData( "Cs"	);
 
 	DASSERT( pPointsWS == g.mpPointsWS );
 
@@ -300,7 +300,7 @@ bool ParamsFindP(	ParamList &params,
 	{
 		DASSERT( params[i].type == Param::STR );
 
-		const Symbol* pSymbol = globalSymbols.LookupVoid( params[i] );
+		const Symbol* pSymbol = globalSymbols.LookupVariable( params[i] );
 		if ( pSymbol && pSymbol->IsName( "P" ) )
 		{
 			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );
@@ -334,7 +334,7 @@ bool ParamsFindP(	ParamList &params,
 	{
 		DASSERT( params[i].type == Param::STR );
 		
-		const Symbol* pSymbol = globalSymbols.LookupVoid( params[i] );
+		const Symbol* pSymbol = globalSymbols.LookupVariable( params[i] );
 		if ( pSymbol && pSymbol->IsName( "P" ) )
 		{
 			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );
