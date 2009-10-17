@@ -26,7 +26,7 @@ class SlRunContext
 {
 	static const u_int		MAX_PROG_STACK = 32;
 
-	size_t					mMaxPointsN;
+	const size_t			mMaxPointsN;
 
 public:
 	u_int					mProgramCounterIdx;
@@ -71,13 +71,9 @@ public:
 			u_int					pointsYN,
 			size_t					pointsN );
 
-	SlCPUWord *GetOp( u_int argc )
-	{
-		return &mpShaderInst->mpShader->mCode[mProgramCounter[mProgramCounterIdx] + argc];
-	}
 	const SlCPUWord *GetOp( u_int argc ) const
 	{
-		return &mpShaderInst->mpShader->mCode[mProgramCounter[mProgramCounterIdx] + argc];
+		return &mpShaderInst->moShader->mCode[mProgramCounter[mProgramCounterIdx] + argc];
 	}
 	
 	u_int	GetOpCount() const
@@ -99,7 +95,7 @@ public:
 	Symbol &GetSymbol( u_int argc )
 	{
 		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
-		return *mpShaderInst->mpShader->mpShaSyms[tableOff ];
+		return *mpShaderInst->moShader->mpShaSyms[tableOff ];
 	}
 
 	float	GetImmFloat( u_int argc )
@@ -210,7 +206,7 @@ public:
 	
 	void GotoInstruction( u_int address )
 	{
-		DASSERT( address < mpShaderInst->mpShader->mCode.size() );
+		DASSERT( address < mpShaderInst->moShader->mCode.size() );
 		mProgramCounter[mProgramCounterIdx] = address;
 	}
 };

@@ -145,7 +145,6 @@ SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 /// SlShaderInstance
 //==================================================================
 SlShaderInstance::SlShaderInstance( size_t maxPointsN ) :
-	mpShader(NULL),
 	mMaxPointsN(maxPointsN)
 {
 }
@@ -183,13 +182,13 @@ SlValue	*SlShaderInstance::Bind(
 {
 	out_defParamValsStartPCs.clear();
 
-	size_t	symbolsN = mpShader->mpShaSyms.size();
+	size_t	symbolsN = moShader->mpShaSyms.size();
 
 	SlValue	*pDataSegment = DNEW SlValue [ symbolsN ];
 
 	for (size_t i=0; i < symbolsN; ++i)
 	{
-		const Symbol		&shaSym			= *mpShader->mpShaSyms[i];
+		const Symbol		&shaSym			= *moShader->mpShaSyms[i];
 		const char			*pShaSymName	= shaSym.mName.c_str();
 
 		switch ( shaSym.mStorage )
@@ -202,7 +201,7 @@ SlValue	*SlShaderInstance::Bind(
 
 		case Symbol::STOR_GLOBAL:
 			{
-				SymbolI	*pGridSymI = gridSymIList.LookupVariable( pShaSymName );
+				SymbolI	*pGridSymI = gridSymIList.FindSymbolI( pShaSymName );
 
 				DASSTHROW( pGridSymI != NULL, ("Could not find the global %s !\n", pShaSymName) );
 
@@ -215,7 +214,7 @@ SlValue	*SlShaderInstance::Bind(
 
 		case Symbol::STOR_PARAMETER:
 			{
-				SymbolI	*pGridSymI = gridSymIList.LookupVariable( pShaSymName );
+				SymbolI	*pGridSymI = gridSymIList.FindSymbolI( pShaSymName );
 
 				if ( pGridSymI )
 				{
@@ -235,16 +234,16 @@ SlValue	*SlShaderInstance::Bind(
 					// at setup time.. like for temporaries with default values..
 
 					// calling params should come from "surface" ?
-					pGridSymI = NULL;//mCallingParams.LookupVariable( pShaSymName );
+					const SymbolI	*pParamSymI = mCallingParams.FindSymbolI( pShaSymName );
 
 					// additionally look into params in attributes ?
 
-					if ( pGridSymI )
+					if ( pParamSymI )
 					{
-						matchSymbols( shaSym, *pGridSymI->mpSrcSymbol );
+						matchSymbols( shaSym, *pParamSymI->mpSrcSymbol );
 
 						pDataSegment[i].Flags.mOwnData = 0;
-						pDataSegment[i].SetDataR( pGridSymI->GetUniformParamData(), pGridSymI->mpSrcSymbol );
+						pDataSegment[i].SetDataR( pParamSymI->GetUniformParamData(), pParamSymI->mpSrcSymbol );
 					}
 					else
 					{
@@ -254,8 +253,8 @@ SlValue	*SlShaderInstance::Bind(
 
 						pDataSegment[i].SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
 
-						if ( mpShader->mpShaSymsStartPCs[i] != INVALID_PC )
-							out_defParamValsStartPCs.push_back( mpShader->mpShaSymsStartPCs[i] );
+						if ( moShader->mpShaSymsStartPCs[i] != INVALID_PC )
+							out_defParamValsStartPCs.push_back( moShader->mpShaSymsStartPCs[i] );
 /*
 						else
 						if ( shaSym.GetUniformParamData() )
@@ -298,15 +297,13 @@ SlValue	*SlShaderInstance::Bind(
 //==================================================================
 void SlShaderInstance::Unbind( SlValue * &pDataSegment ) const
 {
-	size_t	symbolsN = mpShader->mpShaSyms.size();
+	size_t	symbolsN = moShader->mpShaSyms.size();
 
-/*
 	for (size_t i=0; i < symbolsN; ++i)
 	{
 		if ( pDataSegment[i].Flags.mOwnData )
 			pDataSegment[i].mpSrcSymbol->FreeClone( pDataSegment[i].Data.pVoidValue );
 	}
-*/
 
 	DSAFE_DELETE_ARRAY( pDataSegment );
 	pDataSegment = NULL;
@@ -322,7 +319,7 @@ static void Inst_Faceforward( SlRunContext &ctx )
 	const SlVec3* pN	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 	const SlVec3* pI	= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
 
-	const SymbolI*	pNgSymI = ctx.mpGridSymIList->LookupVariable( "Ng" );
+	const SymbolI*	pNgSymI = ctx.mpGridSymIList->FindSymbolI( "Ng" );
 	const SlVec3*	pNg = (const SlVec3 *)pNgSymI->GetData();
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
@@ -397,8 +394,8 @@ static void Inst_CalculateNormal( SlRunContext &ctx )
 		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
 	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
-	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpGridSymIList->LookupVariableData( "_oodu" );
-	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpGridSymIList->LookupVariableData( "_oodv" );
+	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpGridSymIList->FindSymbolIData( "_oodu" );
+	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpGridSymIList->FindSymbolIData( "_oodv" );
 
 	// only varying input and output !
 	DASSERT( ctx.IsSymbolVarying( 1 ) && ctx.IsSymbolVarying( 2 ) );
@@ -543,7 +540,7 @@ void SlShaderInstance::runFrom( SlRunContext &ctx, u_int startPC ) const
 	try {
 		while ( true )
 		{
-			if ( ctx.mProgramCounter[ctx.mProgramCounterIdx] >= mpShader->mCode.size() )
+			if ( ctx.mProgramCounter[ctx.mProgramCounterIdx] >= moShader->mCode.size() )
 				return;
 
 			pWord = ctx.GetOp( 0 );
@@ -569,7 +566,7 @@ void SlShaderInstance::runFrom( SlRunContext &ctx, u_int startPC ) const
 	catch ( ... )
 	{
 		printf( "SHADER ERROR: %s failed at line %i !!\n",
-					mpShader->mShaderName.c_str(),
+					moShader->mShaderName.c_str(),
 						pWord->mOpCode.mDbgLineNum );
 	}
 }
@@ -577,6 +574,31 @@ void SlShaderInstance::runFrom( SlRunContext &ctx, u_int startPC ) const
 //==================================================================
 void SlShaderInstance::Run( SlRunContext &ctx ) const
 {
+	// reset the program counter
+	ctx.mProgramCounterIdx = 0;
+	ctx.mProgramCounter[ 0 ] = INVALID_PC;
+
+	// initialize the SIMD state
+	ctx.InitializeSIMD( mMaxPointsN );
+
+	// initialize the non uniform/constant values with eventual default data
+	for (size_t i=0; i < ctx.mpShaderInst->moShader->mpShaSyms.size(); ++i)
+	{
+		SlValue	&slValue = ctx.mpDataSegment[i];
+
+		if ( slValue.Flags.mOwnData &&
+			 slValue.mpSrcSymbol->mpDefaultVal != NULL )
+		{
+			DASSERT( slValue.Data.pVoidValue != NULL );
+
+			size_t samplesN =
+				slValue.mpSrcSymbol->IsVarying() ? mMaxPointsN : 1;
+
+			slValue.mpSrcSymbol->FillDataWithDefault(
+							slValue.Data.pVoidValue, samplesN );
+		}
+	}
+
 	// run the default params fill subroutines (the instance
 	// determines which need to be called)
 	for (size_t i=0; i < ctx.mDefParamValsStartPCs.size(); ++i)
@@ -585,7 +607,7 @@ void SlShaderInstance::Run( SlRunContext &ctx ) const
 	}
 
 	// run the main
-	runFrom( ctx, mpShader->mStartPC );
+	runFrom( ctx, moShader->mStartPC );
 }
 
 //==================================================================

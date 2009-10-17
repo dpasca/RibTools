@@ -163,7 +163,7 @@ void Attributes::cmdDetailRange(float	minVisible,
 void Attributes::cmdGeometricApproximation(RtToken typeApproximation,
 										   float valueApproximation )
 {
-	mpTypeApproximation	= mpGlobalSyms->LookupVariable( typeApproximation );
+	mpTypeApproximation	= mpGlobalSyms->FindSymbol( typeApproximation );
 	mValueApproximation		= valueApproximation;
 	mpRevision->BumpRevision();
 }
@@ -207,7 +207,7 @@ void Attributes::cmdBasis(
 				RtToken vbasis, const float *pCustomVBasis, int vstep )
 {
 	if ( ubasis )
-		mpUBasis = mpGlobalSyms->LookupVariable( ubasis );
+		mpUBasis = mpGlobalSyms->FindSymbol( ubasis );
 	else
 	{
 		DSAFE_DELETE( mpCustomUBasis );
@@ -215,7 +215,7 @@ void Attributes::cmdBasis(
 	}
 
 	if ( vbasis )
-		mpVBasis = mpGlobalSyms->LookupVariable( vbasis );
+		mpVBasis = mpGlobalSyms->FindSymbol( vbasis );
 	else
 	{
 		DSAFE_DELETE( mpCustomVBasis );
@@ -242,18 +242,16 @@ void Attributes::cmdOpacity( const Color &color )
 }
 
 //==================================================================
-bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam )
+void Attributes::cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam )
 {
 	const char	*pLightTypeName = "";
 
 	// get type and ID
 	if ( params.size() < 2 || !params[0].IsString() || !params[1].IsIntVal() )
 	{
-		printf( "Error: bad LightSource definition !\n" );
-		return false;
+		mpState->EXCEPTPrintf( "Bad LightSource definition !" );
+		//return;
 	}
-
-	LightSourceT	*pLight = DNEW LightSourceT();
 
 	SlShader *pShader =
 		(SlShader *)mpResManager->FindResource( params[0].PChar(),
@@ -261,10 +259,11 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 
 	if NOT( pShader )
 	{
-		printf( "Could not find the light shader '%s' !\n", params[0].PChar() );
-		return false;
+		mpState->EXCEPTPrintf( "Could not find the light shader '%s' !", params[0].PChar() );
+		//return;
 	}
 
+	LightSourceT	*pLight = DNEW LightSourceT();
 	pLight->mShaderInst.Set( pShader );
 
 #if 1
@@ -298,13 +297,30 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		bool	hasNextParam = ((i+1) < params.size());
 		if NOT( hasNextParam )
 		{
-			printf( "Expecting parameter !" );
-			return false;
+			mpState->EXCEPTPrintf( "Expecting parameter !" );
+			//return;
 		}
-		
-		// mSymbols.LookupVariable( pName )
-		// or .. mpGlobalSyms->LookupVariable( pName )
+/*
+		const Symbol *pSym = mpGlobalSyms->FindSymbol( pName );
 
+/*		// No such a thing ? Should have been declared ?
+		if NOT( pSym )
+			pSym = pShader->mpShaSyms->FindSymbol( pName );
+* /
+
+		if NOT( pSym )
+		{
+			mpState->WarnPrintf( "Parameter %s not found", pName );
+		}
+		else
+		{
+			pLight->mShaderInst->mCallingParams.AddInstance( pSym );
+		}
+
+
+		// mSymbols.FindSymbol( pName )
+		// or .. mpGlobalSyms->FindSymbol( pName )
+*/
 		if ( 0 == strcasecmp( pName, "from" ) )
 		{
 			pLight->mLocFromPos = params[i+1].PFlt( 3 );
@@ -331,6 +347,7 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 			pLight->mColor = Color( params[i+1].PFlt( 3 ) );
 		}
 
+
 		if NOT( hasNextParam )
 			i += 1;
 	}
@@ -342,8 +359,6 @@ bool Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 	mActiveLights.find_or_push_back( listIdx );
 
 	mpRevision->BumpRevision();
-
-	return true;
 }
 
 //==================================================================

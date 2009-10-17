@@ -209,7 +209,7 @@ private:
 class PatchMesh : public ComplexPrimitiveBase
 {
 public:
-	const Symbol*	mpyPatchType;
+	const Symbol*	mpPatchType;
 	ParamList		mParams;
 
 public:

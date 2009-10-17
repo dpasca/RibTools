@@ -175,12 +175,32 @@ public:
 	SymbolList();
 	~SymbolList();
 
-	//	  Symbol *LookupVariable( const char *pName );
-	const Symbol *LookupVariable( const char *pName ) const;
+	//	  Symbol *FindSymbol( const char *pName );
+	const Symbol *FindSymbol( const char *pName ) const;
 
 	Symbol *Add( const Symbol::CtorParams &params, const void *pSrcData=NULL );
-	Symbol *Add( const char *pName, const char *pDecl, const void *pSrcData=NULL );
-	Symbol *Add( const char *pName );
+	Symbol *Add( const char *pDecl, const char *pName, Symbol::Storage storage, const void *pSrcData=NULL );
+	Symbol *Add( const char *pDeclName, Symbol::Storage storage, const void *pSrcData=NULL );
+
+	Symbol *AddGlob( const char *pDeclName, const void *pSrcData=NULL )
+	{
+		return Add( pDeclName, Symbol::STOR_GLOBAL, pSrcData );
+	}
+
+	Symbol *AddGlob( const char *pDecl, const char *pName, const void *pSrcData=NULL )
+	{
+		return Add( pDecl, pName, Symbol::STOR_GLOBAL, pSrcData );
+	}
+
+	Symbol *AddGVoid( const char *pName )
+	{
+		Symbol::CtorParams params;
+		params.mpName	= pName;
+		params.mType	= Symbol::TYP_VOIDD;
+		params.mDetail	= Symbol::DET_MSK_CONSTANT;
+		params.mStorage	= Symbol::STOR_GLOBAL;
+		return Add( params );
+	}
 
 	size_t size() const
 	{
@@ -265,11 +285,11 @@ public:
 		}
 	}
 
-		  SymbolI *LookupVariable( const char *pName );
-	const SymbolI *LookupVariable( const char *pName ) const;
+		  SymbolI *FindSymbolI( const char *pName );
+	const SymbolI *FindSymbolI( const char *pName ) const;
 
-		  void *LookupVariableData( const char *pName );
-	const void *LookupVariableData( const char *pName ) const;
+		  void *FindSymbolIData( const char *pName );
+	const void *FindSymbolIData( const char *pName ) const;
 
 	SymbolI *AddInstance( const Symbol &srcSymbol, size_t varyingAllocN )
 	{

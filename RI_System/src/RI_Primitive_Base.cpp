@@ -153,14 +153,14 @@ void SimplePrimitiveBase::Dice(
 {
 	//SlVec3	*pPointsWS = g.mpPointsWS;
 
-	SlVec3	 *pPointsWS = (SlVec3	*)g.mSymbolIs.LookupVariableData( "P"	);
-	SlScalar *pOODu		= (SlScalar *)g.mSymbolIs.LookupVariableData( "_oodu" );
-	SlScalar *pOODv		= (SlScalar *)g.mSymbolIs.LookupVariableData( "_oodv" );
-	SlVec3	 *pI		= (SlVec3	*)g.mSymbolIs.LookupVariableData( "I"	);
-	SlVec3	 *pN		= (SlVec3	*)g.mSymbolIs.LookupVariableData( "N"	);
-	SlVec3	 *pNg		= (SlVec3	*)g.mSymbolIs.LookupVariableData( "Ng"	);
-	SlColor	 *pOs		= (SlColor	*)g.mSymbolIs.LookupVariableData( "Os"	);
-	SlColor	 *pCs		= (SlColor	*)g.mSymbolIs.LookupVariableData( "Cs"	);
+	SlVec3	 *pPointsWS = (SlVec3	*)g.mSymbolIs.FindSymbolIData( "P"	);
+	SlScalar *pOODu		= (SlScalar *)g.mSymbolIs.FindSymbolIData( "_oodu" );
+	SlScalar *pOODv		= (SlScalar *)g.mSymbolIs.FindSymbolIData( "_oodv" );
+	SlVec3	 *pI		= (SlVec3	*)g.mSymbolIs.FindSymbolIData( "I"	);
+	SlVec3	 *pN		= (SlVec3	*)g.mSymbolIs.FindSymbolIData( "N"	);
+	SlVec3	 *pNg		= (SlVec3	*)g.mSymbolIs.FindSymbolIData( "Ng"	);
+	SlColor	 *pOs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Os"	);
+	SlColor	 *pCs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Cs"	);
 
 	DASSERT( pPointsWS == g.mpPointsWS );
 
@@ -300,7 +300,7 @@ bool ParamsFindP(	ParamList &params,
 	{
 		DASSERT( params[i].type == Param::STR );
 
-		const Symbol* pSymbol = globalSymbols.LookupVariable( params[i] );
+		const Symbol* pSymbol = globalSymbols.FindSymbol( params[i] );
 		if ( pSymbol && pSymbol->IsName( "P" ) )
 		{
 			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );
@@ -334,7 +334,7 @@ bool ParamsFindP(	ParamList &params,
 	{
 		DASSERT( params[i].type == Param::STR );
 		
-		const Symbol* pSymbol = globalSymbols.LookupVariable( params[i] );
+		const Symbol* pSymbol = globalSymbols.FindSymbol( params[i] );
 		if ( pSymbol && pSymbol->IsName( "P" ) )
 		{
 			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );

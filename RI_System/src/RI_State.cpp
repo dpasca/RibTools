@@ -24,117 +24,111 @@ State::State( const Params &params ) :
 
 	mMtxWorldCamera.Identity();
 
-	Symbol::CtorParams symPar;
-	symPar.mType		= Symbol::TYP_VOIDD;
-	symPar.mDetail		= 0;
-	symPar.mStorage		= Symbol::STOR_CONSTANT;
+	mGlobalSyms.AddGVoid(	RI_FRAMEBUFFER		);
+	mGlobalSyms.AddGVoid( 	RI_FILE				);
+	mGlobalSyms.AddGVoid( 	RI_RGB				);
+	mGlobalSyms.AddGVoid( 	RI_RGBA				);
+	mGlobalSyms.AddGVoid( 	RI_RGBZ				);
+	mGlobalSyms.AddGVoid( 	RI_RGBAZ			);
+	mGlobalSyms.AddGVoid( 	RI_A				);
+	mGlobalSyms.AddGVoid( 	RI_Z				);
+	mGlobalSyms.AddGVoid( 	RI_AZ				);
+	mGlobalSyms.AddGVoid( 	RI_PERSPECTIVE		);
+	mGlobalSyms.AddGVoid( 	RI_ORTHOGRAPHIC		);
+	mGlobalSyms.AddGVoid( 	RI_HIDDEN			);
+	mGlobalSyms.AddGVoid( 	RI_PAINT			);
+	mGlobalSyms.AddGVoid( 	RI_CONSTANT			);
+	mGlobalSyms.AddGVoid( 	RI_SMOOTH			);
+	mGlobalSyms.AddGVoid( 	RI_FLATNESS			);
+	mGlobalSyms.AddGVoid( 	RI_FOV				);
+	mGlobalSyms.AddGVoid( 	RI_AMBIENTLIGHT		);
+	mGlobalSyms.AddGVoid( 	RI_POINTLIGHT		);
+	mGlobalSyms.AddGVoid( 	RI_DISTANTLIGHT		);
+	mGlobalSyms.AddGVoid( 	RI_SPOTLIGHT 		);
+	mGlobalSyms.AddGlob( 	"uniform float ", RI_INTENSITY		 );
+	mGlobalSyms.AddGlob( 	"uniform color ", RI_LIGHTCOLOR		 );
+	mGlobalSyms.AddGlob( 	"uniform point ", RI_FROM			 );
+	mGlobalSyms.AddGlob( 	"uniform point ", RI_TO				 );
+	mGlobalSyms.AddGlob( 	"uniform float ", RI_CONEANGLE		 );
+	mGlobalSyms.AddGlob( 	"uniform float ", RI_CONEDELTAANGLE	 );
+	mGlobalSyms.AddGlob( 	"uniform float ", RI_BEAMDISTRIBUTION );
+	mGlobalSyms.AddGVoid( 	RI_MATTE			);
+	mGlobalSyms.AddGVoid( 	RI_METAL			);
+	mGlobalSyms.AddGVoid( 	RI_SHINYMETAL		);
+	mGlobalSyms.AddGVoid( 	RI_PLASTIC			);
+	mGlobalSyms.AddGVoid( 	RI_PAINTEDPLASTIC	);
+	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KA			);
+	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KD			);
+	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KS			);
+	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_ROUGHNESS		);
+	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KR			);
+	mGlobalSyms.AddGlob( 	"uniform string ",  RI_TEXTURENAME	);
+	mGlobalSyms.AddGlob( 	"uniform color  ",  RI_SPECULARCOLOR	);
+	mGlobalSyms.AddGVoid( 	RI_DEPTHCUE			);
+	mGlobalSyms.AddGVoid( 	RI_FOG				);
+	mGlobalSyms.AddGVoid( 	RI_BUMPY			);
+	mGlobalSyms.AddGlob( 	"uniform float ", RI_MINDISTANCE );
+	mGlobalSyms.AddGlob( 	"uniform float ", RI_MAXDISTANCE );
+	mGlobalSyms.AddGlob( 	"uniform color ", RI_BACKGROUND  );
+	mGlobalSyms.AddGlob( 	"uniform float ", RI_DISTANCE	);
+	mGlobalSyms.AddGlob( 	"uniform float ", RI_AMPLITUDE   );
+	mGlobalSyms.AddGVoid( 	RI_RASTER			);
+	mGlobalSyms.AddGVoid( 	RI_SCREEN			);
+	mGlobalSyms.AddGVoid( 	RI_CAMERA			);
+	mGlobalSyms.AddGVoid( 	RI_WORLD			);
+	mGlobalSyms.AddGVoid( 	RI_OBJECT			);
+	mGlobalSyms.AddGVoid( 	RI_INSIDE			);
+	mGlobalSyms.AddGVoid( 	RI_OUTSIDE			);
+	mGlobalSyms.AddGVoid( 	RI_LH				);
+	mGlobalSyms.AddGVoid( 	RI_RH				);
+	mGlobalSyms.AddGlob( 	"vertex point     ", RI_P	);		// verified
+	mGlobalSyms.AddGlob( 	"vertex float     ", RI_PZ	);		// verified
+	mGlobalSyms.AddGlob( 	"vertex hpoint    ", RI_PW	);		// verified
+	mGlobalSyms.AddGlob( 	"varying normal   ", RI_N	);		// verified
+	mGlobalSyms.AddGlob( 	"uniform point    ", RI_NP	);
+	mGlobalSyms.AddGlob( 	"varying color    ", RI_CS	);		// verified
+	mGlobalSyms.AddGlob( 	"varying color    ", RI_OS	);		// verified
+	mGlobalSyms.AddGlob( 	"varying float    ", RI_S	);		// verified
+	mGlobalSyms.AddGlob( 	"varying float    ", RI_T    );		// verified
+	//mGlobalSyms.AddGlob( 	"varying float[2] ", RI_ST	);		// verified
+	mGlobalSyms.AddGVoid( 	RI_BILINEAR			);
+	mGlobalSyms.AddGVoid( 	RI_BICUBIC			);
+	mGlobalSyms.AddGVoid( 	RI_PRIMITIVE		);
+	mGlobalSyms.AddGVoid( 	RI_INTERSECTION		);
+	mGlobalSyms.AddGVoid( 	RI_UNION			);
+	mGlobalSyms.AddGVoid( 	RI_DIFFERENCE		);
+	mGlobalSyms.AddGVoid( 	RI_PERIODIC			);
+	mGlobalSyms.AddGVoid( 	RI_NONPERIODIC		);
+	mGlobalSyms.AddGVoid( 	RI_CLAMP			);
+	mGlobalSyms.AddGVoid( 	RI_BLACK			);
+	mGlobalSyms.AddGVoid( 	RI_IGNORE			);
+	mGlobalSyms.AddGVoid( 	RI_PRINT			);
+	mGlobalSyms.AddGVoid( 	RI_ABORT			);
+	mGlobalSyms.AddGVoid( 	RI_HANDLER			);
+	mGlobalSyms.AddGVoid( 	RI_EMPTY_TOKEN		);
 
-	mGlobalSyms.Add(	RI_FRAMEBUFFER		);
-	mGlobalSyms.Add( 	RI_FILE				);
-	mGlobalSyms.Add( 	RI_RGB				);
-	mGlobalSyms.Add( 	RI_RGBA				);
-	mGlobalSyms.Add( 	RI_RGBZ				);
-	mGlobalSyms.Add( 	RI_RGBAZ			);
-	mGlobalSyms.Add( 	RI_A				);
-	mGlobalSyms.Add( 	RI_Z				);
-	mGlobalSyms.Add( 	RI_AZ				);
-	mGlobalSyms.Add( 	RI_PERSPECTIVE		);
-	mGlobalSyms.Add( 	RI_ORTHOGRAPHIC		);
-	mGlobalSyms.Add( 	RI_HIDDEN			);
-	mGlobalSyms.Add( 	RI_PAINT			);
-	mGlobalSyms.Add( 	RI_CONSTANT			);
-	mGlobalSyms.Add( 	RI_SMOOTH			);
-	mGlobalSyms.Add( 	RI_FLATNESS			);
-	mGlobalSyms.Add( 	RI_FOV				);
-	mGlobalSyms.Add( 	RI_AMBIENTLIGHT		);
-	mGlobalSyms.Add( 	RI_POINTLIGHT		);
-	mGlobalSyms.Add( 	RI_DISTANTLIGHT		);
-	mGlobalSyms.Add( 	RI_SPOTLIGHT 		);
-	mGlobalSyms.Add( 	RI_INTENSITY		, "uniform float" );
-	mGlobalSyms.Add( 	RI_LIGHTCOLOR		, "uniform color" );
-	mGlobalSyms.Add( 	RI_FROM				, "uniform point" );
-	mGlobalSyms.Add( 	RI_TO				, "uniform point" );
-	mGlobalSyms.Add( 	RI_CONEANGLE		, "uniform float" );
-	mGlobalSyms.Add( 	RI_CONEDELTAANGLE	, "uniform float" );
-	mGlobalSyms.Add( 	RI_BEAMDISTRIBUTION	, "uniform float" );
-	mGlobalSyms.Add( 	RI_MATTE			);
-	mGlobalSyms.Add( 	RI_METAL			);
-	mGlobalSyms.Add( 	RI_SHINYMETAL		);
-	mGlobalSyms.Add( 	RI_PLASTIC			);
-	mGlobalSyms.Add( 	RI_PAINTEDPLASTIC	);
-	mGlobalSyms.Add( 	RI_KA				, "uniform float" );
-	mGlobalSyms.Add( 	RI_KD				, "uniform float" );
-	mGlobalSyms.Add( 	RI_KS				, "uniform float" );
-	mGlobalSyms.Add( 	RI_ROUGHNESS		, "uniform float" );
-	mGlobalSyms.Add( 	RI_KR				, "uniform float" );
-	mGlobalSyms.Add( 	RI_TEXTURENAME		, "uniform string" );
-	mGlobalSyms.Add( 	RI_SPECULARCOLOR	, "uniform color" );
-	mGlobalSyms.Add( 	RI_DEPTHCUE			);
-	mGlobalSyms.Add( 	RI_FOG				);
-	mGlobalSyms.Add( 	RI_BUMPY			);
-	mGlobalSyms.Add( 	RI_MINDISTANCE		, "uniform float" );
-	mGlobalSyms.Add( 	RI_MAXDISTANCE		, "uniform float" );
-	mGlobalSyms.Add( 	RI_BACKGROUND		, "uniform color" );
-	mGlobalSyms.Add( 	RI_DISTANCE			, "uniform float" );
-	mGlobalSyms.Add( 	RI_AMPLITUDE		, "uniform float" );
-	mGlobalSyms.Add( 	RI_RASTER			);
-	mGlobalSyms.Add( 	RI_SCREEN			);
-	mGlobalSyms.Add( 	RI_CAMERA			);
-	mGlobalSyms.Add( 	RI_WORLD			);
-	mGlobalSyms.Add( 	RI_OBJECT			);
-	mGlobalSyms.Add( 	RI_INSIDE			);
-	mGlobalSyms.Add( 	RI_OUTSIDE			);
-	mGlobalSyms.Add( 	RI_LH				);
-	mGlobalSyms.Add( 	RI_RH				);
-	mGlobalSyms.Add( 	RI_P				, "vertex point" );		// verified
-	mGlobalSyms.Add( 	RI_PZ				, "vertex float" );		// verified
-	mGlobalSyms.Add( 	RI_PW				, "vertex hpoint" );		// verified
-	mGlobalSyms.Add( 	RI_N				, "varying normal" );		// verified
-	mGlobalSyms.Add( 	RI_NP				, "uniform point" );
-	mGlobalSyms.Add( 	RI_CS				, "varying color" );		// verified
-	mGlobalSyms.Add( 	RI_OS				, "varying color" );		// verified
-	mGlobalSyms.Add( 	RI_S				, "varying float" );		// verified
-	mGlobalSyms.Add( 	RI_T				, "varying float" );		// verified
-	//mGlobalSyms.Add( 	RI_ST				, "varying float[2]" );		// verified
-	mGlobalSyms.Add( 	RI_BILINEAR			);
-	mGlobalSyms.Add( 	RI_BICUBIC			);
-	mGlobalSyms.Add( 	RI_PRIMITIVE		);
-	mGlobalSyms.Add( 	RI_INTERSECTION		);
-	mGlobalSyms.Add( 	RI_UNION			);
-	mGlobalSyms.Add( 	RI_DIFFERENCE		);
-	mGlobalSyms.Add( 	RI_PERIODIC			);
-	mGlobalSyms.Add( 	RI_NONPERIODIC		);
-	mGlobalSyms.Add( 	RI_CLAMP			);
-	mGlobalSyms.Add( 	RI_BLACK			);
-	mGlobalSyms.Add( 	RI_IGNORE			);
-	mGlobalSyms.Add( 	RI_PRINT			);
-	mGlobalSyms.Add( 	RI_ABORT			);
-	mGlobalSyms.Add( 	RI_HANDLER			);
-	mGlobalSyms.Add( 	RI_EMPTY_TOKEN		);
-
-	mGlobalSyms.Add( RI_BEZIERBASIS			, "constant matrix" , (const void *)&BezierBasis	 );
-	mGlobalSyms.Add( RI_BSPLINEBASIS		, "constant matrix" , (const void *)&BSplineBasis	 );
-	mGlobalSyms.Add( RI_CATMULLROMBASIS		, "constant matrix" , (const void *)&CatmullRomBasis );
-	mGlobalSyms.Add( RI_HERMITEBASIS		, "constant matrix" , (const void *)&HermiteBasis	 );
-	mGlobalSyms.Add( RI_POWERBASIS			, "constant matrix" , (const void *)&PowerBasis		 );	
+	mGlobalSyms.AddGlob( "constant matrix ", RI_BEZIERBASIS		, (const void *)&BezierBasis	);
+	mGlobalSyms.AddGlob( "constant matrix ", RI_BSPLINEBASIS	, (const void *)&BSplineBasis	);
+	mGlobalSyms.AddGlob( "constant matrix ", RI_CATMULLROMBASIS	, (const void *)&CatmullRomBasis);
+	mGlobalSyms.AddGlob( "constant matrix ", RI_HERMITEBASIS	, (const void *)&HermiteBasis	);
+	mGlobalSyms.AddGlob( "constant matrix ", RI_POWERBASIS		, (const void *)&PowerBasis		);
 	
 	// add shader-specific globals that for some reasons are not listed in ri.h
-	mGlobalSyms.Add( "dPdu",	"varying point"		);
-	mGlobalSyms.Add( "dPdv",	"varying point"		);
-	mGlobalSyms.Add( "_oodu",	"varying float"		);
-	mGlobalSyms.Add( "_oodv",	"varying float"		);
-	mGlobalSyms.Add( "Ng",		"varying normal"	);
-	mGlobalSyms.Add( "u",		"varying float"		);
-	mGlobalSyms.Add( "v",		"varying float"		);
-	mGlobalSyms.Add( "du",		"varying float"		);
-	mGlobalSyms.Add( "dv",		"varying float"		);
-	mGlobalSyms.Add( "L",		"varying vector"	);
-	mGlobalSyms.Add( "Cl",		"varying color"		);
-	mGlobalSyms.Add( "I",		"varying vector"	);
-	mGlobalSyms.Add( "Ci",		"varying color"		);
-	mGlobalSyms.Add( "Oi",		"varying color"		);
-	mGlobalSyms.Add( "E",		"uniform point"		);
-
+	mGlobalSyms.AddGlob( "varying point  "	"dPdu"	);
+	mGlobalSyms.AddGlob( "varying point  "	"dPdv"	);
+	mGlobalSyms.AddGlob( "varying float  "	"_oodu"	);
+	mGlobalSyms.AddGlob( "varying float  "	"_oodv"	);
+	mGlobalSyms.AddGlob( "varying normal "	"Ng"	);
+	mGlobalSyms.AddGlob( "varying float  "	"u"		);
+	mGlobalSyms.AddGlob( "varying float  "	"v"		);
+	mGlobalSyms.AddGlob( "varying float  "	"du"	);
+	mGlobalSyms.AddGlob( "varying float  "	"dv"	);
+	mGlobalSyms.AddGlob( "varying vector "	"L"		);
+	mGlobalSyms.AddGlob( "varying color  "	"Cl"	);
+	mGlobalSyms.AddGlob( "varying vector "	"I"		);
+	mGlobalSyms.AddGlob( "varying color  "	"Ci"	);
+	mGlobalSyms.AddGlob( "varying color  "	"Oi"	);
+	mGlobalSyms.AddGlob( "uniform point  "	"E"		);
 
 	makeDefaultShaders( mParams.mDefaultShadersDir.c_str() );
 

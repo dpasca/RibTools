@@ -25,7 +25,7 @@ PatchMesh::PatchMesh( RtToken type,
 	ComplexPrimitiveBase(PATCHMESH),
 	mParams(params)
 {
-	mpyPatchType = globalSymbols.LookupVariable( type );
+	mpPatchType = globalSymbols.FindSymbol( type );
 }
 
 //==================================================================
@@ -35,9 +35,9 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	//               0      1       2       3       4        5     6
 
 	int				nu		= mParams[1];
-	const Symbol*	pyUWrap = hider.mpGlobalSyms->LookupVariable( mParams[2] );
+	const Symbol*	pyUWrap = hider.mpGlobalSyms->FindSymbol( mParams[2] );
 	int				nv		= mParams[3];
-	const Symbol*	pyVWrap = hider.mpGlobalSyms->LookupVariable( mParams[4] );
+	const Symbol*	pyVWrap = hider.mpGlobalSyms->FindSymbol( mParams[4] );
 
 	bool	uPeriodic = pyUWrap->IsName( RI_PERIODIC );
 	bool	vPeriodic = pyVWrap->IsName( RI_PERIODIC );
@@ -49,7 +49,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	int			meshHullSize = 3 * nu * nv;
 	const float	*pMeshHull = mParams[PValuesParIdx].PFlt( meshHullSize );
 
-	if ( mpyPatchType->IsName( RI_BILINEAR ) )
+	if ( mpPatchType->IsName( RI_BILINEAR ) )
 	{
 		int	nUPatches = nu - 1 + uPeriodic ? 1 : 0;
 		int	nVPatches = nv - 1 + vPeriodic ? 1 : 0;
@@ -77,7 +77,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 		}
 	}
 	else
-	if ( mpyPatchType->IsName( RI_BICUBIC ) )
+	if ( mpPatchType->IsName( RI_BICUBIC ) )
 	{
 		const Attributes	&attr = *mpAttribs;
 		
@@ -120,7 +120,7 @@ void PatchMesh::Simplify( HiderREYES &hider )
 	}
 	else
 	{
-		DASSTHROW( 0, ("Unrecognized Patch type %s", mpyPatchType->mName ) );
+		DASSTHROW( 0, ("Unrecognized Patch type %s", mpPatchType->mName ) );
 		//ErrHandler( E_BADARGUMENT );
 	}	
 }

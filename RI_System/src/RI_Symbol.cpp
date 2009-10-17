@@ -201,7 +201,7 @@ SymbolList::~SymbolList()
 }
 
 //==================================================================
-const Symbol * SymbolList::LookupVariable( const char *pName ) const
+const Symbol * SymbolList::FindSymbol( const char *pName ) const
 {
 	for (size_t i=0; i < size(); ++i)
 	{
@@ -219,7 +219,7 @@ const Symbol * SymbolList::LookupVariable( const char *pName ) const
 //==================================================================
 Symbol *SymbolList::Add( const Symbol::CtorParams &params, const void *pSrcData )
 {
-	if ( LookupVariable( params.mpName ) )
+	if ( FindSymbol( params.mpName ) )
 	{
 		DASSERT( 0 );
 		return NULL;
@@ -245,20 +245,7 @@ Symbol *SymbolList::Add( const Symbol::CtorParams &params, const void *pSrcData 
 }
 
 //==================================================================
-Symbol *SymbolList::Add( const char *pName )
-{
-	Symbol::CtorParams	params;
-
-	params.mpName	= pName;
-	params.mStorage	= Symbol::STOR_GLOBAL;	// this is decided here.. for now
-	params.mType	= Symbol::TYP_VOIDD;
-	params.mDetail	= Symbol::DET_MSK_CONSTANT;
-
-	return Add( params );
-}
-
-//==================================================================
-static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pDecl )
+static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pDecl, std::string &out_name )
 {
 	char buff[ 1024 ];
 	strcpy_s( buff, pDecl );
@@ -268,6 +255,7 @@ static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pD
 
 	int	typCnt = 0;
 	int	detCnt = 0;
+	int	namCnt = 0;
 
 	// TODO: not supporting arrays yet !!
 	if ( pTok = strtok_r( buff, " \t", &pTokCtx ) )
@@ -287,28 +275,63 @@ static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pD
 			if ( 0 == strcmp( pTok, "uniform") ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_UNIFORM	;	}	else
 			if ( 0 == strcmp( pTok, "varying") ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_VARYING	;	}	else
 			if ( 0 == strcmp( pTok, "vertex" ) ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_VERTEX	;	}	else
-			if ( 0 == strcmp( pTok, "constant") ){ ++detCnt; out_params.mDetail = Symbol::DET_MSK_CONSTANT	;	}
+			if ( 0 == strcmp( pTok, "constant") ){ ++detCnt; out_params.mDetail = Symbol::DET_MSK_CONSTANT	;	}	else
+			{
+				++namCnt;
+				out_name = pTok;
+				out_params.mpName = out_name.c_str();
+			}
 
 		} while ( pTok = strtok_r(NULL, " \t", &pTokCtx) );
 	}
 
-	if ( typCnt == 0 )	{ DASSTHROW( 0, ("Bad declaration, missing type") );	} else
-	if ( typCnt >  1 )	{ DASSTHROW( 0, ("Bad declaration, multiple types") );	}
+	if ( namCnt > 1 )	{ DASSTHROW( 0, ("Bad declaration, too many names ?!") );		}
 
-	if ( detCnt == 0 )	{ DASSTHROW( 0, ("Bad declaration, missing storage indentifier") );		} else
-	if ( detCnt >  1 )	{ DASSTHROW( 0, ("Bad declaration, multiple storage indentifiers") );	}
+	// declaring a void ?
+	if ( namCnt == 1 && typCnt == 0 && detCnt == 0 )
+	{
+		out_params.mType	= Symbol::TYP_VOIDD;
+		out_params.mDetail	= Symbol::DET_MSK_CONSTANT;
+	}
+	else
+	{
+		if ( typCnt == 0 )	{ DASSTHROW( 0, ("Bad declaration, missing type") );	} else
+		if ( typCnt >  1 )	{ DASSTHROW( 0, ("Bad declaration, multiple types") );	}
+
+		if ( detCnt == 0 )	{ DASSTHROW( 0, ("Bad declaration, missing storage indentifier") );		} else
+		if ( detCnt >  1 )	{ DASSTHROW( 0, ("Bad declaration, multiple storage indentifiers") );	}
+	}
 }
 
 //==================================================================
-Symbol *SymbolList::Add( const char *pName, const char *pDecl, const void *pSrcData )
+Symbol *SymbolList::Add( const char *pDecl, const char *pName, Symbol::Storage storage, const void *pSrcData )
 {
 	Symbol::CtorParams	params;
 	
 	params.mpName	= pName;
-	params.mStorage	= Symbol::STOR_GLOBAL;	// this is decided here.. for now
+	params.mStorage	= storage;
 
 	// fill up type and details..
-	newSymParamsFromDecl( params, pDecl );
+	std::string	name;
+	newSymParamsFromDecl( params, pDecl, name );
+
+	DASSTHROW( name.length() == 0, ("Bad declaration, multiple names ?") );
+
+	return Add( params, pSrcData );
+}
+
+//==================================================================
+Symbol *SymbolList::Add( const char *pDeclName, Symbol::Storage storage, const void *pSrcData )
+{
+	Symbol::CtorParams	params;
+	
+	params.mStorage	= storage;
+
+	// fill up type and details..
+	std::string	name;
+	newSymParamsFromDecl( params, pDeclName, name );
+
+	DASSTHROW( name.length() != 0, ("Bad declaration, no name ?") );
 
 	return Add( params, pSrcData );
 }
@@ -316,7 +339,7 @@ Symbol *SymbolList::Add( const char *pName, const char *pDecl, const void *pSrcD
 //==================================================================
 /// SymbolIList
 //==================================================================
-SymbolI * SymbolIList::LookupVariable( const char *pName )
+SymbolI * SymbolIList::FindSymbolI( const char *pName )
 {
 	for (size_t i=0; i < size(); ++i)
 	{
@@ -332,7 +355,7 @@ SymbolI * SymbolIList::LookupVariable( const char *pName )
 }
 
 //==================================================================
-const SymbolI * SymbolIList::LookupVariable( const char *pName ) const
+const SymbolI * SymbolIList::FindSymbolI( const char *pName ) const
 {
 	for (size_t i=0; i < size(); ++i)
 	{
@@ -348,9 +371,9 @@ const SymbolI * SymbolIList::LookupVariable( const char *pName ) const
 }
 
 //==================================================================
-void *SymbolIList::LookupVariableData( const char *pName )
+void *SymbolIList::FindSymbolIData( const char *pName )
 {
-	SymbolI	*pSym = LookupVariable( pName );
+	SymbolI	*pSym = FindSymbolI( pName );
 	if NOT( pSym )
 		return NULL;
 	else
@@ -358,9 +381,9 @@ void *SymbolIList::LookupVariableData( const char *pName )
 }
 
 //==================================================================
-const void *SymbolIList::LookupVariableData( const char *pName ) const
+const void *SymbolIList::FindSymbolIData( const char *pName ) const
 {
-	const SymbolI	*pSym = LookupVariable( pName );
+	const SymbolI	*pSym = FindSymbolI( pName );
 	if NOT( pSym )
 		return NULL;
 	else

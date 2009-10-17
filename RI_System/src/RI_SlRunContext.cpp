@@ -18,7 +18,8 @@ namespace RI
 //==================================================================
 /// SlRunContext
 //==================================================================
-SlRunContext::SlRunContext( SymbolIList &symsIList, size_t maxPointsN )
+SlRunContext::SlRunContext( SymbolIList &symsIList, size_t maxPointsN ) :
+	mMaxPointsN(maxPointsN)
 {
 	mBlocksXN;
 	mPointsYN;
@@ -31,7 +32,6 @@ SlRunContext::SlRunContext( SymbolIList &symsIList, size_t maxPointsN )
 	mpGridSymIList	= &symsIList;
 	mpAttribs		= 0;
 
-	mMaxPointsN		= maxPointsN;
 	mpSIMDFlags		= DNEW int [ mMaxPointsN ];
 
 	mpGrid			= NULL;
@@ -68,7 +68,8 @@ void SlRunContext::Setup(
 {
 	mBlocksXN	= blocksXN;
 	mPointsYN	= pointsYN;
-	mMaxPointsN	= pointsN;
+
+	DASSERT( pointsN <= mMaxPointsN );
 
 	// only do a new bind if the attributes have changed
 	if ( &attribs != mpAttribs || mpShaderInst != pShaderInst )
@@ -83,36 +84,11 @@ void SlRunContext::Setup(
 		mpShaderInst	= pShaderInst;
 		mpAttribs		= &attribs;
 
-		DASSERT( 0 != mpShaderInst->mpShader );
+		DASSERT( 0 != mpShaderInst->moShader.Use() );
 		mpDataSegment =
 			mpShaderInst->Bind(
 						*mpGridSymIList,
 						mDefParamValsStartPCs );
-	}
-
-	// reset the program counter
-	mProgramCounterIdx = 0;
-	mProgramCounter[ mProgramCounterIdx ] = INVALID_PC;
-
-	// initialize the SIMD state
-	InitializeSIMD( mMaxPointsN );
-
-	// initialize the non uniform/constant values with eventual default data
-	for (size_t i=0; i < mpShaderInst->mpShader->mpShaSyms.size(); ++i)
-	{
-		SlValue	&slValue = mpDataSegment[i];
-
-		if ( slValue.Flags.mOwnData &&
-			 slValue.mpSrcSymbol->mpDefaultVal != NULL )
-		{
-			DASSERT( slValue.Data.pVoidValue != NULL );
-
-			size_t samplesN =
-				slValue.mpSrcSymbol->IsVarying() ? mMaxPointsN : 1;
-
-			slValue.mpSrcSymbol->FillDataWithDefault(
-							slValue.Data.pVoidValue, samplesN );
-		}
 	}
 }
 

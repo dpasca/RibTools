@@ -22,7 +22,7 @@ namespace RI
 //==================================================================
 void *MicroPolygonGrid::addSymI( const SymbolList &globalSyms, const char *pName )
 {
-	const Symbol	*pSrcSym = globalSyms.LookupVariable( pName );
+	const Symbol	*pSrcSym = globalSyms.FindSymbol( pName );
 
 	SymbolI	*pSymI = mSymbolIs.AddInstance( *pSrcSym, MAX_SIZE );
 

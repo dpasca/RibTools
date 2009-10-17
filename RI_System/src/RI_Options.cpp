@@ -190,7 +190,7 @@ void Options::Finalize()
 
 	if ( mProjectionParams[0].u.stringVal == RI_PERSPECTIVE )
 	{
-		mpyProjection	= mpGlobalSyms->LookupVariable( RI_PERSPECTIVE );
+		mpyProjection	= mpGlobalSyms->FindSymbol( RI_PERSPECTIVE );
 		
 		for (size_t i=1; i < mProjectionParams.size(); ++i)
 		{
@@ -218,7 +218,7 @@ void Options::Finalize()
 	else
 	if ( mProjectionParams[0].u.stringVal == RI_ORTHOGRAPHIC )
 	{
-		mpyProjection	= mpGlobalSyms->LookupVariable( RI_ORTHOGRAPHIC );
+		mpyProjection	= mpGlobalSyms->FindSymbol( RI_ORTHOGRAPHIC );
 	}
 }
 

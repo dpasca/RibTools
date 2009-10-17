@@ -38,6 +38,36 @@ void State::ErrHandler( Error errCode, const char *pFmt, ... )
 }
 
 //==================================================================
+void State::WarnPrintf( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	printf( "* Warning: %s\n", buff );
+}
+
+//==================================================================
+void State::EXCEPTPrintf( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	printf( "* ERROR: %s\n", buff );
+
+	throw std::runtime_error( buff );
+}
+
+//==================================================================
 bool State::checkPopMode( Mode expectedMode )
 {
 	if ( mModeStack.top() != expectedMode )

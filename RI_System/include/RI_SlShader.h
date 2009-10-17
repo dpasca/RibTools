@@ -249,11 +249,10 @@ class SlShaderInstance
 	friend class SlRunContext;
 
 	ResOwn<SlShader>	moShader;
-	SlShader			*mpShader;	// direct pointer for convenience
 	size_t				mMaxPointsN;
 
 public:
-	//SymbolIList			mCallingParams;	// $$$ should get these from attributes and Surface params at some point !!
+	SymbolIList			mCallingParams;
 
 public:
 	SlShaderInstance( size_t maxPointsN );
@@ -262,26 +261,23 @@ public:
 	SlShaderInstance( const SlShaderInstance &right )
 	{
 		moShader.Borrow( right.moShader.Use() );
-		mpShader		= right.mpShader;
 		//mCallingParams	= right.mCallingParams;
 	}
 
 	void operator = ( const SlShaderInstance &right )
 	{
 		moShader.Borrow( right.moShader.Use() );
-		mpShader		= right.mpShader;
 		//mCallingParams	= right.mCallingParams;
 	}
 
 	void Set( SlShader *pShader )
 	{
 		moShader.Borrow( pShader );
-		mpShader = pShader;
 	}
 
 	bool IsSet() const
 	{
-		return mpShader != NULL;
+		return moShader.Use() != NULL;
 	}
 
 	SlValue	*Bind(

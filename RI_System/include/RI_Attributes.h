@@ -40,8 +40,6 @@ public:
 
 public:
 	//==================================================================
-	//SymbolList			mSymbols;
-					
 	Bound				mBound;				// DoBound()
 	Bound				mDetail;			// Detail()
 				
@@ -108,7 +106,7 @@ public:
 
 	void cmdColor( const Color &color );
 	void cmdOpacity( const Color &color );
-	bool cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam );
+	void cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam );
 	void cmdSurface( ParamList &params );
 	void cmdDisplacement( ParamList &params );
 
