@@ -279,8 +279,8 @@ void ShaderAsmParser::processSpecialLabel( const Label &label )
 
 		const char *pVarName = pLabelName + strlen( gpDefParamBaseLabelName );
 
-		int	idx = findSymbol( pVarName, false );
-		if ( idx == -1 )
+		size_t	idx = findSymbol( pVarName, false );
+		if ( idx == DNPOS )
 			return;
 
 		// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -467,26 +467,29 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 
 	int	defParamCnt = 0;
 
-	const char *pDefaultValueStr = pTok + strlen(pTok) + 1;
-	if ( pDefaultValueStr < pLineEnd )
+	const char *pConstValueStr = pTok + strlen(pTok) + 1;
+	if ( pConstValueStr < pLineEnd )
 	{
-		//printf( "Default value '%s'\n", pDefaultValueStr );
+		if ( pSymbol->mStorage != Symbol::STOR_CONSTANT )
+			onError( "Explicit value supported only for constants. '%s' is not constant.", pTok );
+
+		//printf( "Default value '%s'\n", pConstValueStr );
 
 		switch ( pSymbol->mType )
 		{
 		case Symbol::TYP_FLOAT :
 			{
 				float	tmp[4];
-				getVector( pDefaultValueStr, tmp, 1 );
-				pSymbol->AllocDefault( tmp );
+				getVector( pConstValueStr, tmp, 1 );
+				pSymbol->InitConstValue( tmp );
 			}
 			break;
 
 		case Symbol::TYP_COLOR :
 			{
 				float	tmp[4];
-				getVector( pDefaultValueStr, tmp, 3 );	// assumes color is 3 components
-				pSymbol->AllocDefault( tmp );
+				getVector( pConstValueStr, tmp, 3 );	// assumes color is 3 components
+				pSymbol->InitConstValue( tmp );
 			}
 			break;
 
@@ -495,16 +498,16 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 		case Symbol::TYP_NORMAL:
 			{
 				float	tmp[4];
-				getVector( pDefaultValueStr, tmp, 3 );
-				pSymbol->AllocDefault( tmp );
+				getVector( pConstValueStr, tmp, 3 );
+				pSymbol->InitConstValue( tmp );
 			}
 			break;
 
 		case Symbol::TYP_HPOINT :
 			{
 				float	tmp[4];
-				getVector( pDefaultValueStr, tmp, 4 );
-				pSymbol->AllocDefault( tmp );
+				getVector( pConstValueStr, tmp, 4 );
+				pSymbol->InitConstValue( tmp );
 			}
 			break;
 
@@ -512,8 +515,8 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 			{
 				SlStr	str;
 
-				getString( pDefaultValueStr, str );
-				pSymbol->AllocDefault( &str );
+				getString( pConstValueStr, str );
+				pSymbol->InitConstValue( &str );
 			}
 			break;
 
@@ -538,7 +541,7 @@ const OpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &opCodeI
 	for (size_t i=0; gsOpCodeDefs[i].pName != NULL; ++i)
 		if ( 0 == strcasecmp( pOpName, gsOpCodeDefs[i].pName ) )
 		{
-			opCodeIdx = i;
+			opCodeIdx = (u_int)i;
 			return gsOpCodeDefs + i;
 		}
 
@@ -546,7 +549,7 @@ const OpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &opCodeI
 }
 
 //==================================================================
-int ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
+size_t ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
 {
 	for (size_t i=0; i < mpShader->mpShaSyms.size(); ++i)
 	{
@@ -564,14 +567,14 @@ int ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
 		}
 	}
 
-	return -1;
+	return DNPOS;
 }
 
 //==================================================================
-int ShaderAsmParser::findOrAddTempSymbol( const char *pName )
+size_t ShaderAsmParser::findOrAddTempSymbol( const char *pName )
 {
-	int	idx = findSymbol( pName, true );
-	if ( idx != -1 )
+	size_t	idx = findSymbol( pName, true );
+	if ( idx != DNPOS )
 		return idx;
 
 	size_t	len = strlen( pName );
@@ -705,13 +708,13 @@ void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCode
 	{
 		// look for a label
 		Label	*pLabel = mLabelRefs.grow();
-		pLabel->mAddress = mpShader->mCode.size();	// pointer to the CPU word that needs to be resolved later
+		pLabel->mAddress = (u_int)mpShader->mCode.size();	// pointer to the CPU word that needs to be resolved later
 		pLabel->mName	 = pTok;
 		word.mAddress.mOffset = 0xcfcfcfcf;	// dummy value for now..
 	}
 	else
 	{
-		int	symbolIdx;
+		size_t	symbolIdx;
 		if ( isTempSymbol( pTok ) )
 		{
 			symbolIdx = findOrAddTempSymbol( pTok );
@@ -721,7 +724,7 @@ void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCode
 			symbolIdx = findSymbol( pTok, false );
 		}
 
-		if ( symbolIdx == -1 )
+		if ( symbolIdx == DNPOS )
 		{
 			onError( "Symbol '%s' unknown !", pTok );
 		}
@@ -764,7 +767,7 @@ bool ShaderAsmParser::parseLabelDef( const char *pTok )
 		pLabel->mName = pTok;	// copy without the colon..
 		pLabel->mName.resize( len - 1 );
 
-		pLabel->mAddress = mpShader->mCode.size();	// pointer to the CPU word of this label
+		pLabel->mAddress = (u_int)mpShader->mCode.size();	// pointer to the CPU word of this label
 
 		return true;
 	}

@@ -21,9 +21,7 @@ namespace RI
 //==================================================================
 /// Attributes
 //==================================================================
-Attributes::Attributes() :
-	mSurfaceSHI(MicroPolygonGrid::MAX_SIZE),
-	mDisplaceSHI(MicroPolygonGrid::MAX_SIZE)
+Attributes::Attributes()
 {
 	mpCustomUBasis	= NULL;
 	mpCustomVBasis	= NULL;
@@ -31,9 +29,7 @@ Attributes::Attributes() :
 }
 
 //==================================================================
-Attributes::Attributes( const Attributes &attributes ) :
-	mSurfaceSHI(MicroPolygonGrid::MAX_SIZE),
-	mDisplaceSHI(MicroPolygonGrid::MAX_SIZE)
+Attributes::Attributes( const Attributes &attributes )
 {
 	copyFrom( attributes );
 }
@@ -57,14 +53,13 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mpResManager		= rhs.mpResManager;
 
 	mpRevision			= rhs.mpRevision			;
-	//mSymbols			= rhs.mSymbols				;
 	mBound				= rhs.mBound				;
 	mDetail				= rhs.mDetail				;
 	mMinVisible			= rhs.mMinVisible			;
 	mLowerTransition	= rhs.mLowerTransition		;
 	mUpperTransition	= rhs.mUpperTransition		;
 	mMaxVisible			= rhs.mMaxVisible			;
-	mpTypeApproximation= rhs.mpTypeApproximation	;
+	mpTypeApproximation	= rhs.mpTypeApproximation	;
 	mValueApproximation	= rhs.mValueApproximation	;
 	mOrientationFlipped	= rhs.mOrientationFlipped	;
 	mSides				= rhs.mSides				;
@@ -84,8 +79,8 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mVSteps				= rhs.mVSteps				;
 	mColor				= rhs.mColor				;
 	mOpacity			= rhs.mOpacity				;
-	mSurfaceSHI			= rhs.mSurfaceSHI			;
-	mDisplaceSHI		= rhs.mDisplaceSHI			;
+	moSurfaceSHI.Borrow(  rhs.moSurfaceSHI )			;
+	moDisplaceSHI.Borrow( rhs.moDisplaceSHI )		;
 	mActiveLights		= rhs.mActiveLights			;
 }
 
@@ -127,7 +122,7 @@ void Attributes::Init(
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
 
-	mSurfaceSHI.Set(
+	moSurfaceSHI = DNEW SlShaderInst( 
 		(SlShader *)pResManager->FindResource( "dbg_normal_col",
 													ResourceBase::TYPE_SHADER ) );
 }
@@ -264,9 +259,9 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 	}
 
 	LightSourceT	*pLight = DNEW LightSourceT();
-	pLight->mShaderInst.Set( pShader );
 
-#if 1
+	pLight->moShaderInst = DNEW SlShaderInst( pShader, MP_GRID_MAX_SIZE );
+
 	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
 	{
 		pLight->mType = LightSourceT::TYPE_AMBIENT;
@@ -300,13 +295,14 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 			mpState->EXCEPTPrintf( "Expecting parameter !" );
 			//return;
 		}
-/*
+
+#if 0
 		const Symbol *pSym = mpGlobalSyms->FindSymbol( pName );
 
 /*		// No such a thing ? Should have been declared ?
 		if NOT( pSym )
 			pSym = pShader->mpShaSyms->FindSymbol( pName );
-* /
+*/
 
 		if NOT( pSym )
 		{
@@ -314,13 +310,12 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		}
 		else
 		{
-			pLight->mShaderInst->mCallingParams.AddInstance( pSym );
+			pLight->moShaderInst->mCallingParams.AddInstance( pSym );
 		}
-
 
 		// mSymbols.FindSymbol( pName )
 		// or .. mpGlobalSyms->FindSymbol( pName )
-*/
+#else
 		if ( 0 == strcasecmp( pName, "from" ) )
 		{
 			pLight->mLocFromPos = params[i+1].PFlt( 3 );
@@ -346,17 +341,19 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		{
 			pLight->mColor = Color( params[i+1].PFlt( 3 ) );
 		}
-
+#endif
 
 		if NOT( hasNextParam )
 			i += 1;
 	}
-#endif
 
 	pLight->UpdateRend( xform, mtxWorldCam );
 
 	size_t listIdx = mpState->AddLightSource( pLight );
-	mActiveLights.find_or_push_back( listIdx );
+
+	DASSERT( listIdx < 65536 );	// 16 bit limit..
+
+	mActiveLights.find_or_push_back( (U16)listIdx );
 
 	mpRevision->BumpRevision();
 }
@@ -489,7 +486,11 @@ void Attributes::cmdSurface( ParamList &params )
 	SlShader	*pShader = getShader( pShaderName, "matte" );
 
 	if ( pShader )
-		mSurfaceSHI.Set( pShader );
+	{
+		moSurfaceSHI = DNEW SlShaderInst( pShader );
+
+		// $$$ handle the params !
+	}
 
 	// $$$ should really check if the shader or any params really changed
 	mpRevision->BumpRevision();
@@ -508,7 +509,11 @@ void Attributes::cmdDisplacement( ParamList &params )
 	SlShader	*pShader = getShader( pShaderName, NULL );
 
 	if ( pShader )
-		mDisplaceSHI.Set( pShader );
+	{
+		moDisplaceSHI = DNEW SlShaderInst( pShader );
+
+		// $$$ handle the params !
+	}
 
 	// $$$ should really check if the shader or any params really changed
 	mpRevision->BumpRevision();

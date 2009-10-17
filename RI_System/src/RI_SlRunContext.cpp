@@ -61,7 +61,7 @@ void SlRunContext::Init( MicroPolygonGrid *pGrid )
 //==================================================================
 void SlRunContext::Setup(
 			const Attributes		&attribs,
-			const SlShaderInstance	*pShaderInst,
+			const SlShaderInst	*pShaderInst,
 			u_int					blocksXN,
 			u_int					pointsYN,
 			size_t					pointsN )

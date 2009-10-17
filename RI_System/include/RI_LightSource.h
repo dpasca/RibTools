@@ -26,7 +26,7 @@ class Transform;
 class LightSourceT
 {
 public:
-	SlShaderInstance	mShaderInst;
+	RCOwn<SlShaderInst>	moShaderInst;
 
 public:
 	enum Type

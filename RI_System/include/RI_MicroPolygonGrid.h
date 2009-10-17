@@ -60,9 +60,6 @@ class MicroPolygonGrid
 	SlRunContext	mDispRunCtx;
 
 public:
-	static const u_int	MAX_SIZE = RI_GET_SIMD_PAD_SUBS( 48 ) * 48;
-	static const u_int	MAX_SIMD_BLKS = RI_GET_SIMD_BLOCKS( MAX_SIZE );
-
 	u_int			mXDim;
 	u_int			mXBlocks;
 	u_int			mYDim;

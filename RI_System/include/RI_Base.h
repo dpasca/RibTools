@@ -27,6 +27,10 @@ namespace RI
 #define	RI_GET_SIMD_PAD_SUBS(_X_)	(((unsigned)(_X_) + (RI_SIMD_BLK_LEN-1)) & ~(RI_SIMD_BLK_LEN-1))
 
 //==================================================================
+static const u_int	MP_GRID_MAX_SIZE = RI_GET_SIMD_PAD_SUBS( 48 ) * 48;
+static const u_int	MP_GRID_MAX_SIMD_BLKS = RI_GET_SIMD_BLOCKS( MP_GRID_MAX_SIZE );
+
+//==================================================================
 enum Mode
 {
 	MD_UNDEFINED,
@@ -118,6 +122,175 @@ public:
 	{
 		return mRefCount;
 	}
+};
+
+//==================================================================
+/// RCBase
+//==================================================================
+class RCBase
+{
+	int		mCount;
+	
+public:
+	RCBase() :
+		mCount(0)
+	{
+	}
+	
+	virtual ~RCBase()
+	{
+		DASSERT( mCount == 0 );
+	}
+
+	void AddRef()
+	{
+		mCount += 1;
+	}
+
+	int SubRef()
+	{
+		DASSERT( mCount >= 1 );
+		mCount -= 1;
+		int retVal = mCount;
+
+		if ( retVal == 0 )
+		{
+			DDELETE( this );
+		}
+
+		return retVal;
+	}
+
+	int GetRef() const
+	{
+		return mCount;
+	}
+
+private:
+	RCBase( const RCBase &from ) :	mCount(0)
+	{
+	}
+	
+	RCBase &operator=( const RCBase &from )
+	{
+		mCount = 0;
+	}
+};
+
+//==================================================================
+class RCBaseNoDel
+{
+	int		mCount;
+	
+public:
+	RCBaseNoDel() :
+		mCount(0)
+	{
+	}
+	
+	virtual ~RCBaseNoDel()
+	{
+		DASSERT( mCount == 0 );
+	}
+
+	void AddRef()
+	{
+		mCount += 1;
+	}
+
+	int SubRef()
+	{
+		DASSERT( mCount >= 1 );
+		mCount -= 1;
+		int retVal = mCount;
+
+		return retVal;
+	}
+
+	int GetRef() const
+	{
+		return mCount;
+	}
+
+private:
+	RCBaseNoDel( const RCBaseNoDel &from ) :	mCount(0)
+	{
+	}
+	
+	RCBaseNoDel &operator=( const RCBaseNoDel &from )
+	{
+		mCount = 0;
+	}
+};
+
+//==================================================================
+/// RefCount
+//==================================================================
+template <class T>
+class RCOwn
+{
+	T	*mPtr;
+
+public:
+	RCOwn()						: mPtr(NULL)	{ }
+	RCOwn( T *ptr )				: mPtr(NULL)	{ Borrow( ptr ); }
+	RCOwn( const RCOwn &from )	: mPtr(NULL)	{ Borrow( from ); }
+
+	virtual ~RCOwn()
+	{
+		if ( mPtr )
+			mPtr->SubRef();
+	}
+
+	RCOwn &operator=( const RCOwn &from )	{	Borrow( from );	return *this; }
+	RCOwn &operator=( T *ptr )				{	Borrow( ptr );	return *this; }
+	RCOwn &operator=( const T *ptr )		{	Borrow( ptr );	return *this; }
+
+	void Borrow( T *ptr )
+	{
+		if ( ptr == mPtr )
+			return;
+
+		if ( mPtr )
+			mPtr->SubRef();
+
+		if ( mPtr = ptr )
+			mPtr->AddRef();
+	}
+
+	void Borrow( const T *ptr )
+	{
+		if ( ptr == mPtr )
+			return;
+
+		if ( mPtr )
+			mPtr->SubRef();
+
+		if ( mPtr = (T *)ptr )
+			mPtr->AddRef();
+	}
+
+	void Borrow( const RCOwn &from )
+	{
+		Borrow( from.Use() );
+	}
+
+	const T *Use() const
+	{
+		DASSERT( !mPtr || mPtr->GetRef() > 0 );
+
+		return mPtr;
+	}
+
+	T *Use()
+	{
+		DASSERT( !mPtr || mPtr->GetRef() > 0 );
+
+		return mPtr;
+	}
+
+	const T *operator->() const	{ return mPtr; }
+		  T *operator->()		{ return mPtr; }
 };
 
 //==================================================================

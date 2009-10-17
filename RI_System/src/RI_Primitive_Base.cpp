@@ -205,8 +205,8 @@ void SimplePrimitiveBase::Dice(
 	}
 
 	// build the UVs
-	SlVec2	locUV[ MicroPolygonGrid::MAX_SIMD_BLKS ];
-	SlVec2	locDUDV[ MicroPolygonGrid::MAX_SIMD_BLKS ];
+	SlVec2	locUV[ MP_GRID_MAX_SIMD_BLKS ];
+	SlVec2	locDUDV[ MP_GRID_MAX_SIMD_BLKS ];
 
 	fillUVsArray( locUV, locDUDV, du, dv, g.mXDim, g.mYDim );
 
@@ -377,7 +377,7 @@ SimplePrimitiveBase::DosRes
 
 	float pixelArea = hider.RasterEstimate( bound, mtxLocalWorld );
 	
-	if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
+	if ( pixelArea <= MP_GRID_MAX_SIZE )
 	{
 		if ( pixelArea < RI_EPSILON )
 		{
@@ -421,7 +421,7 @@ bool SimplePrimitiveBase::IsDiceable(
 
 		float pixelArea = pHider->RasterEstimate( bound, mtxLocalWorld );
 		
-		if ( pixelArea <= MicroPolygonGrid::MAX_SIZE )
+		if ( pixelArea <= MicroPolygonGrid::MP_GRID_MAX_SIZE )
 		{
 			float	dim = sqrtf( pixelArea );
 			if ( dim > 0 )

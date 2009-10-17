@@ -91,7 +91,7 @@ public:
 	Type	mType;
 	Storage	mStorage;
 	u_int	mDetail;
-	void	*mpDefaultVal;
+	void	*mpConstVal;
 
 public:
 	//==================================================================
@@ -118,7 +118,7 @@ public:
 		mType		= params.mType;
 		mStorage	= params.mStorage;
 		mDetail		= params.mDetail;
-		mpDefaultVal = NULL;
+		mpConstVal = NULL;
 	}
 
 	Symbol()
@@ -126,12 +126,12 @@ public:
 		mType = TYP_UNKNOWN;
 		mStorage = STOR_CONSTANT;
 		mDetail = 0;
-		mpDefaultVal = NULL;
+		mpConstVal = NULL;
 	}
 
 	~Symbol()
 	{
-		FreeClone( mpDefaultVal );
+		FreeClone( mpConstVal );
 	}
 
 	void Reset()
@@ -140,7 +140,7 @@ public:
 		mType = TYP_UNKNOWN;
 		mStorage = STOR_CONSTANT;
 		mDetail = 0;
-		mpDefaultVal = NULL;
+		mpConstVal = NULL;
 	}
 
 	void SetVarying()			{	mDetail |= DET_MSK_VARYING; }
@@ -149,21 +149,23 @@ public:
 	bool IsVarying() const		{	return !!(mDetail & DET_MSK_VARYING);	}
 	bool IsUniform() const		{	return !(mDetail & DET_MSK_VARYING);	}
 
+	bool IsConstant() const		{	return !!(mDetail & DET_MSK_CONSTANT);	}
+
 	bool IsName( const char *pSrc ) const
 	{
 		return 0 == strcmp( mName.c_str(), pSrc );
 	}
 
-	//void *AllocData( size_t size );
-	void AllocDefault( const void *pSrcData );
-
 	void *AllocClone( size_t size ) const;
 	void FreeClone( void *pData ) const;
 
-	void FillDataWithDefault( void *pDestData, size_t size ) const;
-	void FillData( void *pDestData, size_t size, const void *pSrcData ) const;
+	void CopyConstValue( void *pDestData ) const;
+	void InitConstValue( const void *pSrcData );
 
-	const void *GetConstantData() const { return mpDefaultVal;	}
+	const void *GetConstantData() const { return mpConstVal;	}
+
+private:
+	void fillData( void *pDestData, size_t size, const void *pSrcData ) const;
 };
 
 //==================================================================
@@ -245,20 +247,20 @@ public:
 	const void *GetConstantData() const
 	{
 		DASSERT( mpSrcSymbol->mStorage == Symbol::STOR_CONSTANT && mpSrcSymbol->IsUniform() );
-		return mpSrcSymbol->mpDefaultVal;
+		return mpSrcSymbol->mpConstVal;
 	}
 
 	const void *GetUniformParamData() const
 	{
 		DASSERT( mpSrcSymbol->mStorage == Symbol::STOR_PARAMETER && mpSrcSymbol->IsUniform() );
-		return mpSrcSymbol->mpDefaultVal;
+		return mpSrcSymbol->mpConstVal;
 	}
 
-	const void *GetData() const { return mpValArray; }
+	const void *GetData() const { DASSERT( mpValArray != NULL ); return mpValArray; }
 
 	void *GetRWData()
 	{
-		DASSERT( mpValArray != NULL ); // IsVarying()
+		DASSERT( mpValArray != NULL );
 		return mpValArray;
 	}
 };

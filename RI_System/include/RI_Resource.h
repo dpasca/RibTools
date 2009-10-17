@@ -16,7 +16,7 @@ namespace RI
 {
 
 //==================================================================
-class ResourceBase
+class ResourceBase : public RCBaseNoDel
 {
 public:
 	enum Type
@@ -27,100 +27,19 @@ public:
 private:
 	std::string	mName;
 	Type		mType;
-	size_t		mRefCount;
 	
 	friend class ResourceManager;
 
 public:
 	ResourceBase( const char *pName, Type type ) :
 		mName(pName),
-		mType(type),
-		mRefCount(0)
+		mType(type)
 	{
 	}
 	
 	virtual ~ResourceBase()
 	{
-		DASSERT( mRefCount == 0 );
 	}
-	
-	void AddRef()
-	{
-		mRefCount += 1;
-	}
-
-	void SubRef()
-	{
-		DASSERT( mRefCount >= 1 );
-		mRefCount -= 1;
-	}
-
-	size_t GetRef() const
-	{
-		return mRefCount;
-	}
-};
-
-//==================================================================
-template <class T>
-class ResOwn
-{
-	T	*mPtr;
-
-public:
-	ResOwn() :
-		mPtr(NULL)
-	{
-	}
-
-	virtual ~ResOwn()
-	{
-		if ( mPtr )
-			mPtr->SubRef();
-	}
-
-	void Borrow( T *ptr )
-	{
-		if ( mPtr )
-			mPtr->SubRef();
-
-		if ( mPtr = ptr )
-			mPtr->AddRef();
-	}
-
-	void Borrow( const T *ptr )
-	{
-		if ( mPtr )
-			mPtr->SubRef();
-
-		if ( mPtr = (T *)ptr )
-			mPtr->AddRef();
-	}
-
-	const T *Use() const
-	{
-	#ifdef _DEBUG
-		if ( mPtr )
-		{
-			DASSERT( mPtr->GetRef() > 0 );
-		}
-	#endif
-		return mPtr;
-	}
-
-	T *Use()
-	{
-	#ifdef _DEBUG
-		if ( mPtr )
-		{
-			DASSERT( mPtr->GetRef() > 0 );
-		}
-	#endif
-		return mPtr;
-	}
-
-	const T *operator->() const	{ return mPtr; }
-		  T *operator->()		{ return mPtr; }
 };
 
 //==================================================================

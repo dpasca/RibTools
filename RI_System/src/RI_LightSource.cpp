@@ -16,8 +16,7 @@ namespace RI
 {
 
 //==================================================================
-LightSourceT::LightSourceT() :
-	mShaderInst(MicroPolygonGrid::MAX_SIZE)
+LightSourceT::LightSourceT()
 {
 	mIntesity	= 1;
 	mColor		= Color( 1 );

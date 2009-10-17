@@ -142,15 +142,16 @@ SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 }
 
 //==================================================================
-/// SlShaderInstance
+/// SlShaderInst
 //==================================================================
-SlShaderInstance::SlShaderInstance( size_t maxPointsN ) :
+SlShaderInst::SlShaderInst( SlShader *pShader, size_t maxPointsN ) :
+	moShader(pShader),
 	mMaxPointsN(maxPointsN)
 {
 }
 
 //==================================================================
-SlShaderInstance::~SlShaderInstance()
+SlShaderInst::~SlShaderInst()
 {
 }
 
@@ -176,7 +177,7 @@ static void matchSymbols( const Symbol &a, const Symbol &b )
 }
 
 //==================================================================
-SlValue	*SlShaderInstance::Bind(
+SlValue	*SlShaderInst::Bind(
 					SymbolIList		&gridSymIList,
 					DVec<u_int>		&out_defParamValsStartPCs ) const
 {
@@ -258,7 +259,7 @@ SlValue	*SlShaderInstance::Bind(
 /*
 						else
 						if ( shaSym.GetUniformParamData() )
-							pDataSegment[i].mpSrcSymbol->mpDefaultVal = 
+							pDataSegment[i].mpSrcSymbol->mpConstVal = 
 							pDataSegment[i].SetDataRW( , &shaSym );
 */
 
@@ -295,7 +296,7 @@ SlValue	*SlShaderInstance::Bind(
 }
 
 //==================================================================
-void SlShaderInstance::Unbind( SlValue * &pDataSegment ) const
+void SlShaderInst::Unbind( SlValue * &pDataSegment ) const
 {
 	size_t	symbolsN = moShader->mpShaSyms.size();
 
@@ -404,7 +405,7 @@ static void Inst_CalculateNormal( SlRunContext &ctx )
 
 	//if ( ctx.IsProcessorActive( i ) )
 
-	SlVec3	dPDu[ MicroPolygonGrid::MAX_SIMD_BLKS ];
+	SlVec3	dPDu[ MP_GRID_MAX_SIMD_BLKS ];
 
 	{
 		u_int	blk = 0;
@@ -530,7 +531,7 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 #undef V
 
 //==================================================================
-void SlShaderInstance::runFrom( SlRunContext &ctx, u_int startPC ) const
+void SlShaderInst::runFrom( SlRunContext &ctx, u_int startPC ) const
 {
 	ctx.mProgramCounterIdx = 0;
 	ctx.mProgramCounter[ ctx.mProgramCounterIdx ] = startPC;
@@ -572,7 +573,7 @@ void SlShaderInstance::runFrom( SlRunContext &ctx, u_int startPC ) const
 }
 
 //==================================================================
-void SlShaderInstance::Run( SlRunContext &ctx ) const
+void SlShaderInst::Run( SlRunContext &ctx ) const
 {
 	// reset the program counter
 	ctx.mProgramCounterIdx = 0;
@@ -587,15 +588,13 @@ void SlShaderInstance::Run( SlRunContext &ctx ) const
 		SlValue	&slValue = ctx.mpDataSegment[i];
 
 		if ( slValue.Flags.mOwnData &&
-			 slValue.mpSrcSymbol->mpDefaultVal != NULL )
+			 slValue.mpSrcSymbol->mpConstVal != NULL )
 		{
-			DASSERT( slValue.Data.pVoidValue != NULL );
+			DASSERT(
+				slValue.Data.pVoidValue != NULL &&
+				slValue.mpSrcSymbol->IsConstant() );
 
-			size_t samplesN =
-				slValue.mpSrcSymbol->IsVarying() ? mMaxPointsN : 1;
-
-			slValue.mpSrcSymbol->FillDataWithDefault(
-							slValue.Data.pVoidValue, samplesN );
+			slValue.mpSrcSymbol->CopyConstValue( slValue.Data.pVoidValue );
 		}
 	}
 

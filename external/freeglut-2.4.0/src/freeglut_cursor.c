@@ -159,6 +159,28 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
     /*
      * This is a temporary solution only...
      */
+
+	// DAVIDE - adding 64 bit version
+#ifdef _WIN64
+    /* Set the cursor AND change it for this window class. */
+#       define MAP_CURSOR(a,b)                                   \
+        case a:                                                  \
+            SetCursor( LoadCursor( NULL, b ) );                  \
+            SetClassLongPtr( window->Window.Handle,                 \
+                          GCLP_HCURSOR,                           \
+                          (LONG_PTR)LoadCursor( NULL, b ) );       \
+        break;
+
+    /* Nuke the cursor AND change it for this window class. */
+#       define ZAP_CURSOR(a,b)                                   \
+        case a:                                                  \
+            SetCursor( NULL );                                   \
+            SetClassLongPtr( window->Window.Handle,                 \
+                          GCLP_HCURSOR, (LONG_PTR)NULL );           \
+        break;
+
+#else
+
     /* Set the cursor AND change it for this window class. */
 #       define MAP_CURSOR(a,b)                                   \
         case a:                                                  \
@@ -175,6 +197,8 @@ void fgSetCursor ( SFG_Window *window, int cursorID )
             SetClassLong( window->Window.Handle,                 \
                           GCL_HCURSOR, ( LONG )NULL );           \
         break;
+
+#endif
 
     switch( cursorID )
     {

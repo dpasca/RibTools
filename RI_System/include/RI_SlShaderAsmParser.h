@@ -55,8 +55,8 @@ private:
 
 	void parseDataLine( char lineBuff[], int lineCnt );
 	const OpCodeDef	*findOpDef( const char *pOpName, u_int &opCodeIdx );
-	int findSymbol( const char *pName, bool ignoreCase ) const;
-	int findOrAddTempSymbol( const char *pName );
+	size_t findSymbol( const char *pName, bool ignoreCase ) const;
+	size_t findOrAddTempSymbol( const char *pName );
 	void parseCodeLine( char lineBuff[], int lineCnt );
 	void parseCode_handleOperImmediate( const char *pTok );
 	void parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx );

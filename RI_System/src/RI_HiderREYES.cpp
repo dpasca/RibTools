@@ -262,7 +262,7 @@ float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld 
 {
 	if NOT( b.IsValid() )
 	{
-		return MicroPolygonGrid::MAX_SIZE / 4;
+		return MP_GRID_MAX_SIZE / 4;
 	}
 
 	float	bound2d[4];

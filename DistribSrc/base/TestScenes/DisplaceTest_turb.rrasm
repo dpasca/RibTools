@@ -20,23 +20,35 @@
 	P				global varying point
 	N				global varying normal
 
-	Km				parameter uniform float 0.1
+	Km				parameter uniform float
 
-	hump			temporary varying float 0
-	totalFrequency	temporary varying float 1.2
-	crinckle		temporary varying float 4
+	hump			temporary varying float
+	totalFrequency	temporary uniform float
+	crinckle		temporary uniform float
 
 	n				temporary varying normal
 
 	_const1			constant uniform float	0.5
 	_const2			constant uniform float	1.2
 
+	_const_km_init	constant uniform float	0.1
+	
 .code
 
 displacement
 
+	;==== Begin Def Params
+__defparam_Km:
+	mov.ss         Km    	_const_km_init 
+	ret
+	;==== End Def Params 
+
 __main:
 	normalize	n		N
+	
+	ld.s		hump			0
+	ld.s		totalFrequency	1.2
+	ld.s		crinckle		4
 	
 	ld.s		$su1		0
 	ld.s		$su2		2

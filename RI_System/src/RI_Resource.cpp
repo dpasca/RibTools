@@ -21,7 +21,7 @@ void ResourceManager::Collect()
 	size_t	wi = 0;
 	for (size_t ri=0; ri < mpList.size(); ++ri)
 	{
-		if ( mpList[ri]->mRefCount == 0 )
+		if ( mpList[ri]->GetRef() == 0 )
 		{
 			DDELETE( mpList[ri] );
 			mpList[ri] = NULL;

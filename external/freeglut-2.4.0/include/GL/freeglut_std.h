@@ -57,7 +57,11 @@
 
         /* Link with Win32 static freeglut lib */
 #       if defined(_MSC_VER)
+#ifdef _WIN64	// DAVIDE - 
+#           pragma comment (lib, "freeglut_static64.lib")
+#else
 #           pragma comment (lib, "freeglut_static.lib")
+#endif
 #       endif
 
 /* Windows shared library (DLL) */

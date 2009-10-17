@@ -43,7 +43,7 @@ public:
 	u_int					mBlocksN;
 	int						*mpSIMDFlags;
 	SlValue					*mpDataSegment;
-	const SlShaderInstance	*mpShaderInst;
+	const SlShaderInst		*mpShaderInst;
 	SymbolIList				*mpGridSymIList;
 	const Attributes		*mpAttribs;
 
@@ -66,7 +66,7 @@ public:
 
 	void Setup(
 			const Attributes		&attribs,
-			const SlShaderInstance	*pShaderInst,
+			const SlShaderInst	*pShaderInst,
 			u_int					blocksXN,
 			u_int					pointsYN,
 			size_t					pointsN );

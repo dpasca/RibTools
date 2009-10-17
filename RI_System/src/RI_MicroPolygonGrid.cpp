@@ -24,7 +24,7 @@ void *MicroPolygonGrid::addSymI( const SymbolList &globalSyms, const char *pName
 {
 	const Symbol	*pSrcSym = globalSyms.FindSymbol( pName );
 
-	SymbolI	*pSymI = mSymbolIs.AddInstance( *pSrcSym, MAX_SIZE );
+	SymbolI	*pSymI = mSymbolIs.AddInstance( *pSrcSym, MP_GRID_MAX_SIZE );
 
 	return pSymI->GetRWData();
 }
@@ -39,8 +39,8 @@ MicroPolygonGrid::MicroPolygonGrid( const SymbolList &globalSyms ) :
 	mpDataOi(0),
 	mpDataCs(0),
 	mpDataOs(0),
-	mSurfRunCtx(mSymbolIs, MAX_SIZE),
-	mDispRunCtx(mSymbolIs, MAX_SIZE)
+	mSurfRunCtx(mSymbolIs, MP_GRID_MAX_SIZE),
+	mDispRunCtx(mSymbolIs, MP_GRID_MAX_SIZE)
 {
 	// symbols added to match globals declared in RSLC_Builtins.sl
 
@@ -115,7 +115,7 @@ void MicroPolygonGrid::Setup(
 
 	mMtxLocalCamera = mMtxLocalWorld * mMtxWorldCamera;
 
-	DASSERT( mPointsN <= MAX_SIZE );
+	DASSERT( mPointsN <= MP_GRID_MAX_SIZE );
 
 	// $$$ why +1 ? For derivatives ?
 	//mpPoints = new Point3[ (xdim+1) * (ydim+1) ];
@@ -129,11 +129,11 @@ void MicroPolygonGrid::Setup(
 //==================================================================
 void MicroPolygonGrid::Displace( const Attributes &attribs )
 {
-	if ( attribs.mDisplaceSHI.IsSet() )
+	if ( attribs.moDisplaceSHI.Use() )
 	{
 		mDispRunCtx.Setup(
 						attribs,
-						&attribs.mDisplaceSHI,
+						attribs.moDisplaceSHI.Use(),
 						RI_GET_SIMD_BLOCKS( mYDim ),
 						mYDim,
 						mPointsN );
@@ -147,7 +147,7 @@ void MicroPolygonGrid::Shade( const Attributes &attribs )
 {
 	mSurfRunCtx.Setup(
 					attribs,
-					&attribs.mSurfaceSHI,
+					attribs.moSurfaceSHI.Use(),
 					RI_GET_SIMD_BLOCKS( mYDim ),
 					mYDim,
 					mPointsN );

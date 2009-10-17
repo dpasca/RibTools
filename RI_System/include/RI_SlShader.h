@@ -242,42 +242,32 @@ public:
 };
 
 //==================================================================
-/// SlShaderInstance
+/// SlShaderInst
 //==================================================================
-class SlShaderInstance
+class SlShaderInst : public RCBase
 {
 	friend class SlRunContext;
 
-	ResOwn<SlShader>	moShader;
+	RCOwn<SlShader>		moShader;
 	size_t				mMaxPointsN;
 
 public:
 	SymbolIList			mCallingParams;
 
 public:
-	SlShaderInstance( size_t maxPointsN );
-	~SlShaderInstance();
+	SlShaderInst( SlShader *pShader, size_t maxPointsN=MP_GRID_MAX_SIZE );
+	~SlShaderInst();
 
-	SlShaderInstance( const SlShaderInstance &right )
+	SlShaderInst( const SlShaderInst &right )
 	{
 		moShader.Borrow( right.moShader.Use() );
 		//mCallingParams	= right.mCallingParams;
 	}
 
-	void operator = ( const SlShaderInstance &right )
+	void operator = ( const SlShaderInst &right )
 	{
 		moShader.Borrow( right.moShader.Use() );
 		//mCallingParams	= right.mCallingParams;
-	}
-
-	void Set( SlShader *pShader )
-	{
-		moShader.Borrow( pShader );
-	}
-
-	bool IsSet() const
-	{
-		return moShader.Use() != NULL;
 	}
 
 	SlValue	*Bind(

@@ -164,7 +164,7 @@ Variable *AddVariable(
 	{
 		if ( 0 == strcmp( pVar->mpDefNameTok->str.c_str(), "(" ) )
 		{
-			u_int	tmpID = pNode->GetVars().size() - 1;
+			u_int	tmpID = (u_int)pNode->GetVars().size() - 1;
 
 			pVar->mInternalName =
 					DUT::SSPrintFS( "_%i@_brkt%i", pNode->mBlockID, tmpID );
@@ -179,7 +179,7 @@ Variable *AddVariable(
 	}
 	else
 	{
-		u_int	tmpID = pNode->GetVars().size() - 1;
+		u_int	tmpID = (u_int)pNode->GetVars().size() - 1;
 
 		pVar->mInternalName =
 				DUT::SSPrintFS( "_%i@_tmp%i", pNode->mBlockID, tmpID );

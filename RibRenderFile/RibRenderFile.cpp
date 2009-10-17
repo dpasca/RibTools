@@ -43,6 +43,8 @@ int main( int argc, char **argv )
 					_CRTDBG_CHECK_CRT_DF );
 #endif
 
+	printf( "%s\n", argv[0] );
+
 	DNET::InitializeSocket();	// bha !
 
 	// enough params ?

@@ -64,8 +64,8 @@ public:
 
 	Color				mColor;
 	Color				mOpacity;
-	SlShaderInstance	mSurfaceSHI;
-	SlShaderInstance	mDisplaceSHI;
+	RCOwn<SlShaderInst>	moSurfaceSHI;
+	RCOwn<SlShaderInst>	moDisplaceSHI;
 
 	DVec<U16>			mActiveLights;
 

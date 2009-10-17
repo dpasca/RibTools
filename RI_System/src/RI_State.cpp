@@ -114,21 +114,21 @@ State::State( const Params &params ) :
 	mGlobalSyms.AddGlob( "constant matrix ", RI_POWERBASIS		, (const void *)&PowerBasis		);
 	
 	// add shader-specific globals that for some reasons are not listed in ri.h
-	mGlobalSyms.AddGlob( "varying point  "	"dPdu"	);
-	mGlobalSyms.AddGlob( "varying point  "	"dPdv"	);
-	mGlobalSyms.AddGlob( "varying float  "	"_oodu"	);
-	mGlobalSyms.AddGlob( "varying float  "	"_oodv"	);
-	mGlobalSyms.AddGlob( "varying normal "	"Ng"	);
-	mGlobalSyms.AddGlob( "varying float  "	"u"		);
-	mGlobalSyms.AddGlob( "varying float  "	"v"		);
-	mGlobalSyms.AddGlob( "varying float  "	"du"	);
-	mGlobalSyms.AddGlob( "varying float  "	"dv"	);
-	mGlobalSyms.AddGlob( "varying vector "	"L"		);
-	mGlobalSyms.AddGlob( "varying color  "	"Cl"	);
-	mGlobalSyms.AddGlob( "varying vector "	"I"		);
-	mGlobalSyms.AddGlob( "varying color  "	"Ci"	);
-	mGlobalSyms.AddGlob( "varying color  "	"Oi"	);
-	mGlobalSyms.AddGlob( "uniform point  "	"E"		);
+	mGlobalSyms.AddGlob( "varying point  dPdu"	);
+	mGlobalSyms.AddGlob( "varying point  dPdv"	);
+	mGlobalSyms.AddGlob( "varying float  _oodu"	);
+	mGlobalSyms.AddGlob( "varying float  _oodv"	);
+	mGlobalSyms.AddGlob( "varying normal Ng"	);
+	mGlobalSyms.AddGlob( "varying float  u"		);
+	mGlobalSyms.AddGlob( "varying float  v"		);
+	mGlobalSyms.AddGlob( "varying float  du"	);
+	mGlobalSyms.AddGlob( "varying float  dv"	);
+	mGlobalSyms.AddGlob( "varying vector L"		);
+	mGlobalSyms.AddGlob( "varying color  Cl"	);
+	mGlobalSyms.AddGlob( "varying vector I"		);
+	mGlobalSyms.AddGlob( "varying color  Ci"	);
+	mGlobalSyms.AddGlob( "varying color  Oi"	);
+	mGlobalSyms.AddGlob( "uniform point  E"		);
 
 	makeDefaultShaders( mParams.mDefaultShadersDir.c_str() );
 
