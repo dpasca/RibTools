@@ -326,10 +326,14 @@ static bool handleComment(
 					const char	*pSource,
 					size_t		&i,
 					size_t		sourceSize,
-					bool		&isInComment )
+					bool		&isInComment,
+					int			&io_lineCnt )
 {
 	if ( isInComment )
 	{
+		if ( pSource[i] == '\n' )
+			++io_lineCnt;
+
 		if ( matches( pSource, i, sourceSize, "*/" ) )
 		{
 			isInComment = false;
@@ -600,7 +604,7 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 
 	for (size_t i=0; i < sourceSize; )
 	{
-		if ( handleComment( pSource, i, sourceSize, isInComment ) )
+		if ( handleComment( pSource, i, sourceSize, isInComment, lineCnt ) )
 			continue;
 
 		if ( findSkipWhites( pSource, i, sourceSize, lineCnt ) )
