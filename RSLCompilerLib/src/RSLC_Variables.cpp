@@ -586,21 +586,38 @@ static void writeVariable( FILE *pFile, const Variable &var )
 
 	fprintf_s( pFile, "%-12s\t", var.GetUseName().c_str() );
 
+	//--- write storage
 	const char *pStorage = "ERROR!!!";
 
 	if ( var.mIsGlobal )	pStorage = "global"; else
 	if ( var.mIsSHParam )	pStorage = "parameter"; else
-	if ( var.mHasBaseVal )	pStorage = "constant";
+	if ( var.mHasBaseVal )	pStorage = "temporary";
 
 	fprintf_s( pFile, "%-9s ", pStorage );
 
+	//--- write class (constant, uniform, varying (no "vertex" for now))
+	const char *pClass;
 	if ( var.mIsVarying )
-		fprintf_s( pFile, "varying " );
-	else
-		fprintf_s( pFile, "uniform " );
+	{
+		DASSTHROW( var.mHasBaseVal == false,
+				("Internal error ! Variable '%s' is varying but has a base value !",
+					var.GetUseName().c_str()) );
 
+		pClass = "varying";
+	}
+	else
+	{
+		if ( var.mHasBaseVal )
+			pClass = "constant";
+		else
+			pClass = "uniform";
+	}
+	fprintf_s( pFile, "%-8s ", pClass );
+
+	//--- write the name
 	fprintf_s( pFile, "%-7s ", VarTypeToString( var.GetVarType() ) );
 
+	//--- write the eventual constant value
 	if ( var.mHasBaseVal )
 	{
 		// should be either numbers or a string.. but enough asserts for now !!

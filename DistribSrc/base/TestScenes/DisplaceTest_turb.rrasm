@@ -28,10 +28,10 @@
 
 	n				temporary varying normal
 
-	_const1			constant uniform float	0.5
-	_const2			constant uniform float	1.2
+	_const1			temporary constant float	0.5
+	_const2			temporary constant float	1.2
 
-	_const_km_init	constant uniform float	0.1
+	_const_km_init	temporary constant float	0.1
 	
 .code
 

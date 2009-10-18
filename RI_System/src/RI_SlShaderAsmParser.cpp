@@ -397,83 +397,64 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	char *pTokCtx;
 	char *pTok;
 
-	auto_ptr<Symbol>	pSymbol( DNEW Symbol() );
-	pSymbol->Reset();
+	Symbol::CtorParams	params;
+
 
 	if NOT( pTok = strtok_r( lineBuff, " \t", &pTokCtx ) )
 		return;
 
-	pSymbol->mName = pTok;
+	params.mpName = pTok;
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 	{
 		onError( "Expecting storage definition" );
 	}
 
-	if ( 0 == strcmp( pTok, "constant"  ) ) pSymbol->mStorage = Symbol::STOR_CONSTANT ; else
-	if ( 0 == strcmp( pTok, "parameter" ) ) pSymbol->mStorage = Symbol::STOR_PARAMETER; else
-	if ( 0 == strcmp( pTok, "temporary" ) ) pSymbol->mStorage = Symbol::STOR_TEMPORARY; else
-	if ( 0 == strcmp( pTok, "global"	) ) pSymbol->mStorage = Symbol::STOR_GLOBAL   ; else
+	if ( 0 == strcmp( pTok, "parameter" ) ) params.mStorage = Symbol::STOR_PARAMETER; else
+	if ( 0 == strcmp( pTok, "temporary" ) ) params.mStorage = Symbol::STOR_TEMPORARY; else
+	if ( 0 == strcmp( pTok, "global"	) ) params.mStorage = Symbol::STOR_GLOBAL   ; else
 	{
 		onError( "Invalid storage definition: '%s'", pTok );
 	}
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
-	{
-		onError( "Expecting variability definition" );
-	}
+		onError( "Expecting class definition" );
 
-	if ( 0 == strcmp( pTok, "varying"	) )
+	if ( 0 == strcmp( pTok, "uniform"	) )	{ params.mClass	= Symbol::CLASS_MSK_UNIFORM;	} else
+	if ( 0 == strcmp( pTok, "varying"	) )	{ params.mClass	= Symbol::CLASS_MSK_VARYING;	} else
+	if ( 0 == strcmp( pTok, "vertex"	) )	{ params.mClass	= Symbol::CLASS_MSK_VERTEX;		} else
+	if ( 0 == strcmp( pTok, "constant"  ) )	{ params.mClass	= Symbol::CLASS_MSK_CONSTANT;	} else
 	{
-		pSymbol->SetVarying();
-
-		if ( pSymbol->mStorage == Symbol::STOR_CONSTANT )
-		{
-			onError( "constant variables cannot be varying: '%s'", pTok );
-		}
+		onError( "Invalid class definition: '%s'", pTok );
 	}
-	else
-	if ( 0 == strcmp( pTok, "uniform"	) )
-	{
-		pSymbol->SetUniform();
-	}
-	else
-	{
-		onError( "Invalid variability definition: '%s'", pTok );
-	}
-
-/*
-	if NOT( pSymbol->mIsVarying )
-		if ( pSymbol->mStorage == Symbol::STOR_TEMPORARY )
-			onError( "Use 'temporary' only for varying values !" );
-*/
 
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
-	{
 		onError( "Expecting type definition" );
-	}
 
-	if ( 0 == strcmp( pTok, "float"  ) ) pSymbol->mType = Symbol::TYP_FLOAT ; else
-	if ( 0 == strcmp( pTok, "point"  ) ) pSymbol->mType = Symbol::TYP_POINT ; else
-	if ( 0 == strcmp( pTok, "hpoint"  ) )pSymbol->mType = Symbol::TYP_HPOINT; else
-	if ( 0 == strcmp( pTok, "color"  ) ) pSymbol->mType = Symbol::TYP_COLOR ; else
-	if ( 0 == strcmp( pTok, "string" ) ) pSymbol->mType = Symbol::TYP_STRING; else
-	if ( 0 == strcmp( pTok, "vector" ) ) pSymbol->mType = Symbol::TYP_VECTOR; else
-	if ( 0 == strcmp( pTok, "normal" ) ) pSymbol->mType = Symbol::TYP_NORMAL; else
-	if ( 0 == strcmp( pTok, "matrix" ) ) pSymbol->mType = Symbol::TYP_MATRIX; else
+	if ( 0 == strcmp( pTok, "float"  ) ) params.mType = Symbol::TYP_FLOAT ; else
+	if ( 0 == strcmp( pTok, "point"  ) ) params.mType = Symbol::TYP_POINT ; else
+	if ( 0 == strcmp( pTok, "hpoint"  ) )params.mType = Symbol::TYP_HPOINT; else
+	if ( 0 == strcmp( pTok, "color"  ) ) params.mType = Symbol::TYP_COLOR ; else
+	if ( 0 == strcmp( pTok, "string" ) ) params.mType = Symbol::TYP_STRING; else
+	if ( 0 == strcmp( pTok, "vector" ) ) params.mType = Symbol::TYP_VECTOR; else
+	if ( 0 == strcmp( pTok, "normal" ) ) params.mType = Symbol::TYP_NORMAL; else
+	if ( 0 == strcmp( pTok, "matrix" ) ) params.mType = Symbol::TYP_MATRIX; else
 	{
 		onError( "Invalid type definition: '%s'", pTok );
 	}
+
+	auto_ptr<Symbol>	pSymbol( DNEW Symbol( params ) );
 
 	int	defParamCnt = 0;
 
 	const char *pConstValueStr = pTok + strlen(pTok) + 1;
 	if ( pConstValueStr < pLineEnd )
 	{
-		if ( pSymbol->mStorage != Symbol::STOR_CONSTANT )
+		if NOT( pSymbol->IsConstant() )
 			onError( "Explicit value supported only for constants. '%s' is not constant.", pTok );
 
-		//printf( "Default value '%s'\n", pConstValueStr );
+		if ( pSymbol->mStorage == Symbol::STOR_GLOBAL )
+			onError( "Global storage constants ('%s') should not define constant values themselves !", pTok );
 
 		switch ( pSymbol->mType )
 		{
@@ -527,7 +508,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 	}
 	else
 	{
-		if ( pSymbol->mStorage == Symbol::STOR_CONSTANT )
+		if ( pSymbol->IsConstant() && pSymbol->mStorage != Symbol::STOR_GLOBAL )
 			onError( "Missing constant value for '%s'", pTok );
 	}
 

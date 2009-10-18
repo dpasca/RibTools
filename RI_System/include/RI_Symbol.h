@@ -72,7 +72,6 @@ public:
 
 	enum Storage
 	{
-		STOR_CONSTANT,
 		STOR_PARAMETER,
 		STOR_TEMPORARY,
 		STOR_GLOBAL,
@@ -82,15 +81,15 @@ public:
 	// Varying = 0001b
 	// Vertex  = 0011b
 	// Constant= 0100b
-	static const u_int DET_MSK_UNIFORM	= 0;
-	static const u_int DET_MSK_VARYING	= 1;
-	static const u_int DET_MSK_VERTEX	= 3;
-	static const u_int DET_MSK_CONSTANT	= 4;
+	static const u_int CLASS_MSK_UNIFORM	= 0;
+	static const u_int CLASS_MSK_VARYING	= 1;
+	static const u_int CLASS_MSK_VERTEX		= 3;
+	static const u_int CLASS_MSK_CONSTANT	= 4;
 
 	DStr	mName;
 	Type	mType;
 	Storage	mStorage;
-	u_int	mDetail;
+	u_int	mClass;
 	void	*mpConstVal;
 
 public:
@@ -100,13 +99,13 @@ public:
 		const char		*mpName;
 		Symbol::Type	mType;
 		Symbol::Storage	mStorage;
-		u_int			mDetail;
+		u_int			mClass;
 
 		CtorParams() :
 			mpName(NULL),
 			mType(Symbol::TYP_UNKNOWN),
-			mStorage(Symbol::STOR_CONSTANT),
-			mDetail(0)
+			mStorage(Symbol::STOR_TEMPORARY),
+			mClass(0)
 		{
 		}
 	};
@@ -117,15 +116,15 @@ public:
 		mName		= params.mpName;
 		mType		= params.mType;
 		mStorage	= params.mStorage;
-		mDetail		= params.mDetail;
+		mClass		= params.mClass;
 		mpConstVal = NULL;
 	}
 
 	Symbol()
 	{
 		mType = TYP_UNKNOWN;
-		mStorage = STOR_CONSTANT;
-		mDetail = 0;
+		mStorage = STOR_TEMPORARY;
+		mClass = 0;
 		mpConstVal = NULL;
 	}
 
@@ -134,27 +133,20 @@ public:
 		FreeClone( mpConstVal );
 	}
 
-	void Reset()
-	{
-		mName.clear();
-		mType = TYP_UNKNOWN;
-		mStorage = STOR_CONSTANT;
-		mDetail = 0;
-		mpConstVal = NULL;
-	}
+	void SetVarying()			{	mClass |= CLASS_MSK_VARYING; }
+	void SetUniform()			{	mClass &= ~(CLASS_MSK_VARYING | CLASS_MSK_VERTEX); }
 
-	void SetVarying()			{	mDetail |= DET_MSK_VARYING; }
-	void SetUniform()			{	mDetail &= ~(DET_MSK_VARYING | DET_MSK_VERTEX); }
+	bool IsVarying() const		{	return !!(mClass & CLASS_MSK_VARYING);	}
+	bool IsUniform() const		{	return !(mClass & CLASS_MSK_VARYING);	}
 
-	bool IsVarying() const		{	return !!(mDetail & DET_MSK_VARYING);	}
-	bool IsUniform() const		{	return !(mDetail & DET_MSK_VARYING);	}
-
-	bool IsConstant() const		{	return !!(mDetail & DET_MSK_CONSTANT);	}
+	bool IsConstant() const		{	return !!(mClass & CLASS_MSK_CONSTANT);	}
 
 	bool IsName( const char *pSrc ) const
 	{
 		return 0 == strcmp( mName.c_str(), pSrc );
 	}
+
+	const char *GetNameChr() const	{	return mName.c_str(); }
 
 	void *AllocClone( size_t size ) const;
 	void FreeClone( void *pData ) const;
@@ -199,7 +191,7 @@ public:
 		Symbol::CtorParams params;
 		params.mpName	= pName;
 		params.mType	= Symbol::TYP_VOIDD;
-		params.mDetail	= Symbol::DET_MSK_CONSTANT;
+		params.mClass	= Symbol::CLASS_MSK_CONSTANT;
 		params.mStorage	= Symbol::STOR_GLOBAL;
 		return Add( params );
 	}
@@ -246,15 +238,17 @@ public:
 
 	const void *GetConstantData() const
 	{
-		DASSERT( mpSrcSymbol->mStorage == Symbol::STOR_CONSTANT && mpSrcSymbol->IsUniform() );
+		DASSERT( mpSrcSymbol->IsConstant() );
 		return mpSrcSymbol->mpConstVal;
 	}
 
+/*
 	const void *GetUniformParamData() const
 	{
 		DASSERT( mpSrcSymbol->mStorage == Symbol::STOR_PARAMETER && mpSrcSymbol->IsUniform() );
 		return mpSrcSymbol->mpConstVal;
 	}
+*/
 
 	const void *GetData() const { DASSERT( mpValArray != NULL ); return mpValArray; }
 

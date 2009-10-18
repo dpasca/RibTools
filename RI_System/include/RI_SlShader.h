@@ -252,7 +252,8 @@ class SlShaderInst : public RCBase
 	size_t				mMaxPointsN;
 
 public:
-	SymbolIList			mCallingParams;
+	SymbolList			mCallSymList;
+	SymbolIList			mCallSymIList;
 
 public:
 	SlShaderInst( SlShader *pShader, size_t maxPointsN=MP_GRID_MAX_SIZE );
@@ -261,18 +262,19 @@ public:
 	SlShaderInst( const SlShaderInst &right )
 	{
 		moShader.Borrow( right.moShader.Use() );
-		//mCallingParams	= right.mCallingParams;
+		//mCallSymIList	= right.mCallSymIList;
 	}
 
 	void operator = ( const SlShaderInst &right )
 	{
 		moShader.Borrow( right.moShader.Use() );
-		//mCallingParams	= right.mCallingParams;
+		//mCallSymIList	= right.mCallSymIList;
 	}
 
 	SlValue	*Bind(
-			SymbolIList		&gridSymIList,
-			DVec<u_int>		&out_defParamValsStartPCs ) const;
+			const SymbolList	&globalSyms,
+			SymbolIList			&gridSymIList,
+			DVec<u_int>			&out_defParamValsStartPCs ) const;
 
 	void Unbind( SlValue * &pDataSegment ) const;
 

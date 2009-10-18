@@ -183,7 +183,7 @@ Symbol *SymbolList::Add( const Symbol::CtorParams &params, const void *pSrcData 
 	pSym->mName			= params.mpName;
 	pSym->mType			= params.mType;
 	pSym->mStorage		= params.mStorage;
-	pSym->mDetail		= params.mDetail;
+	pSym->mClass		= params.mClass;
 
 	if ( pSrcData )
 		pSym->InitConstValue( pSrcData );
@@ -192,7 +192,7 @@ Symbol *SymbolList::Add( const Symbol::CtorParams &params, const void *pSrcData 
 }
 
 //==================================================================
-static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pDecl, std::string &out_name )
+static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pDecl, std::string *out_name )
 {
 	char buff[ 1024 ];
 	strcpy_s( buff, pDecl );
@@ -204,49 +204,70 @@ static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pD
 	int	detCnt = 0;
 	int	namCnt = 0;
 
-	// TODO: not supporting arrays yet !!
-	if ( pTok = strtok_r( buff, " \t", &pTokCtx ) )
-	{
-		do
-		{
-			// type ..
-			if ( 0 == strcmp( pTok, "float"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_FLOAT	;	}	else
-			if ( 0 == strcmp( pTok, "point"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_POINT	;	}	else
-			if ( 0 == strcmp( pTok, "vector" ) ) { ++typCnt; out_params.mType = Symbol::TYP_VECTOR	;	}	else
-			if ( 0 == strcmp( pTok, "normal" ) ) { ++typCnt; out_params.mType = Symbol::TYP_NORMAL	;	}	else
-			if ( 0 == strcmp( pTok, "hpoint" ) ) { ++typCnt; out_params.mType = Symbol::TYP_HPOINT	;	}	else
-			if ( 0 == strcmp( pTok, "color"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_COLOR	;	}	else
-			if ( 0 == strcmp( pTok, "string" ) ) { ++typCnt; out_params.mType = Symbol::TYP_STRING	;	}	else
-			if ( 0 == strcmp( pTok, "matrix" ) ) { ++typCnt; out_params.mType = Symbol::TYP_MATRIX	;	}	else
-			// storage ..
-			if ( 0 == strcmp( pTok, "uniform") ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_UNIFORM	;	}	else
-			if ( 0 == strcmp( pTok, "varying") ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_VARYING	;	}	else
-			if ( 0 == strcmp( pTok, "vertex" ) ) { ++detCnt; out_params.mDetail = Symbol::DET_MSK_VERTEX	;	}	else
-			if ( 0 == strcmp( pTok, "constant") ){ ++detCnt; out_params.mDetail = Symbol::DET_MSK_CONSTANT	;	}	else
-			{
-				++namCnt;
-				out_name = pTok;
-				out_params.mpName = out_name.c_str();
-			}
+	bool	expectingName = (out_name != NULL);
 
-		} while ( pTok = strtok_r(NULL, " \t", &pTokCtx) );
+	// TODO: not supporting arrays yet !!
+
+	pTok = strtok_r( buff, " \t", &pTokCtx );
+	if NOT( pTok )
+		DASSTHROW( 0, ("Nothing to declare ?!") );
+
+	// class ..
+	if ( 0 == strcmp( pTok, "uniform") ) { ++detCnt; out_params.mClass = Symbol::CLASS_MSK_UNIFORM	;	}	else
+	if ( 0 == strcmp( pTok, "varying") ) { ++detCnt; out_params.mClass = Symbol::CLASS_MSK_VARYING	;	}	else
+	if ( 0 == strcmp( pTok, "vertex" ) ) { ++detCnt; out_params.mClass = Symbol::CLASS_MSK_VERTEX	;	}	else
+	if ( 0 == strcmp( pTok, "constant") ){ ++detCnt; out_params.mClass = Symbol::CLASS_MSK_CONSTANT	;	}	else
+	{
+		if ( expectingName )
+		{
+			*out_name = pTok;
+
+			// we got a non-terminal symbol.. then we expect nothing else to follow !
+			if ( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+				DASSTHROW( 0, ("Bad declaration: '%s'", pDecl) );
+
+			return;
+		}
+		else
+		{
+			DASSTHROW( 0, ("Bad declaration, expecting symbol class: '%s'", pDecl) );
+		}
 	}
 
-	if ( namCnt > 1 )	{ DASSTHROW( 0, ("Bad declaration, too many names ?!") );		}
+	pTok = strtok_r(NULL, " \t", &pTokCtx);
+	if NOT( pTok )
+		DASSTHROW( 0, ("Bad declaration, expecting symbol type: '%s'", pDecl) );
 
-	// declaring a void ?
-	if ( namCnt == 1 && typCnt == 0 && detCnt == 0 )
+	// type ..
+	if ( 0 == strcmp( pTok, "float"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_FLOAT	;	}	else
+	if ( 0 == strcmp( pTok, "point"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_POINT	;	}	else
+	if ( 0 == strcmp( pTok, "vector" ) ) { ++typCnt; out_params.mType = Symbol::TYP_VECTOR	;	}	else
+	if ( 0 == strcmp( pTok, "normal" ) ) { ++typCnt; out_params.mType = Symbol::TYP_NORMAL	;	}	else
+	if ( 0 == strcmp( pTok, "hpoint" ) ) { ++typCnt; out_params.mType = Symbol::TYP_HPOINT	;	}	else
+	if ( 0 == strcmp( pTok, "color"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_COLOR	;	}	else
+	if ( 0 == strcmp( pTok, "string" ) ) { ++typCnt; out_params.mType = Symbol::TYP_STRING	;	}	else
+	if ( 0 == strcmp( pTok, "matrix" ) ) { ++typCnt; out_params.mType = Symbol::TYP_MATRIX	;	}	else
 	{
-		out_params.mType	= Symbol::TYP_VOIDD;
-		out_params.mDetail	= Symbol::DET_MSK_CONSTANT;
+		DASSTHROW( 0, ("Bad declaration, expecting symbol type: '%s'", pDecl) );
+	}
+
+	pTok = strtok_r(NULL, " \t", &pTokCtx);
+
+	if ( expectingName )
+	{
+		if NOT( pTok )
+			DASSTHROW( 0, ("Bad declaration, expecting symbol name: '%s'", pDecl) );
+
+		// found symbol name
+		*out_name = pTok;
+
+		// trailing trash ?
+		if ( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+			DASSTHROW( 0, ("Bad declaration, what's after the symbol name ?: '%s'", pDecl) );
 	}
 	else
 	{
-		if ( typCnt == 0 )	{ DASSTHROW( 0, ("Bad declaration, missing type") );	} else
-		if ( typCnt >  1 )	{ DASSTHROW( 0, ("Bad declaration, multiple types") );	}
-
-		if ( detCnt == 0 )	{ DASSTHROW( 0, ("Bad declaration, missing storage indentifier") );		} else
-		if ( detCnt >  1 )	{ DASSTHROW( 0, ("Bad declaration, multiple storage indentifiers") );	}
+		DASSTHROW( pTok == NULL, ("Bad declaration, what's after the symbol class ?: '%s'", pDecl) );
 	}
 }
 
@@ -258,11 +279,8 @@ Symbol *SymbolList::Add( const char *pDecl, const char *pName, Symbol::Storage s
 	params.mpName	= pName;
 	params.mStorage	= storage;
 
-	// fill up type and details..
-	std::string	name;
-	newSymParamsFromDecl( params, pDecl, name );
-
-	DASSTHROW( name.length() == 0, ("Bad declaration, multiple names ?") );
+	// fill up type and details.. (expect no name..)
+	newSymParamsFromDecl( params, pDecl, NULL );
 
 	return Add( params, pSrcData );
 }
@@ -274,11 +292,11 @@ Symbol *SymbolList::Add( const char *pDeclName, Symbol::Storage storage, const v
 	
 	params.mStorage	= storage;
 
-	// fill up type and details..
+	// fill up type and details.. (expects name as well)
 	std::string	name;
-	newSymParamsFromDecl( params, pDeclName, name );
+	newSymParamsFromDecl( params, pDeclName, &name );
 
-	DASSTHROW( name.length() != 0, ("Bad declaration, no name ?") );
+	params.mpName	= name.c_str();
 
 	return Add( params, pSrcData );
 }

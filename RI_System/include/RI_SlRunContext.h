@@ -65,11 +65,11 @@ public:
 	void Init( MicroPolygonGrid *pGrid );
 
 	void Setup(
-			const Attributes		&attribs,
+			const Attributes	&attribs,
 			const SlShaderInst	*pShaderInst,
-			u_int					blocksXN,
-			u_int					pointsYN,
-			size_t					pointsN );
+			u_int				blocksXN,
+			u_int				pointsYN,
+			size_t				pointsN );
 
 	const SlCPUWord *GetOp( u_int argc ) const
 	{

@@ -60,11 +60,11 @@ void SlRunContext::Init( MicroPolygonGrid *pGrid )
 
 //==================================================================
 void SlRunContext::Setup(
-			const Attributes		&attribs,
+			const Attributes	&attribs,
 			const SlShaderInst	*pShaderInst,
-			u_int					blocksXN,
-			u_int					pointsYN,
-			size_t					pointsN )
+			u_int				blocksXN,
+			u_int				pointsYN,
+			size_t				pointsN )
 {
 	mBlocksXN	= blocksXN;
 	mPointsYN	= pointsYN;
@@ -87,6 +87,7 @@ void SlRunContext::Setup(
 		DASSERT( 0 != mpShaderInst->moShader.Use() );
 		mpDataSegment =
 			mpShaderInst->Bind(
+						mpAttribs->GetGlobalSymList(),
 						*mpGridSymIList,
 						mDefParamValsStartPCs );
 	}

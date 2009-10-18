@@ -236,6 +236,47 @@ void Attributes::cmdOpacity( const Color &color )
 	mpRevision->BumpRevision();
 }
 
+/*
+//==================================================================
+static void addShaderParam(
+					SlShaderInst		&shaInst,
+					const SymbolList	&globalSyms,
+					ParamList			&params,
+					size_t				fromIdx,
+					State				&state )
+{
+	const char *pName = params[ fromIdx ].PChar();
+
+	// check for strings that require no extra param here.. if any ! (???)
+
+	// follow for params that require a following param
+	bool	hasNextParam = ( ( fromIdx + 1 ) < params.size() );
+	if NOT( hasNextParam )
+	{
+		state.EXCEPTPrintf( "Expecting parameter !" );
+	}
+
+	// is it a global symbol ?
+	const Symbol *pSym = globalSyms.FindSymbol( pName );
+
+	// if not, then see if it's a new symbol declaration in the form
+	// <class> <type> <name>
+	if NOT( pSym )
+	{
+		pSym = shaInst.mCallSymList.Add( pName );
+			
+			//pLight->moShaderInst->mCallSymList.Add( pName, Symbol::STOR_PARAMETER );
+		
+
+		mpState->WarnPrintf( "Parameter %s not found", pName );
+	}
+	else
+	{
+		pLight->moShaderInst->mCallSymIList.AddInstance( pSym );
+	}
+}
+*/
+
 //==================================================================
 void Attributes::cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam )
 {
@@ -297,7 +338,14 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		}
 
 #if 0
-		const Symbol *pSym = mpGlobalSyms->FindSymbol( pName );
+
+		addShaderParam(
+					pLight->moShaderInst,
+					*mpGlobalSyms,
+					params,
+					i,
+					*mpState );
+
 
 /*		// No such a thing ? Should have been declared ?
 		if NOT( pSym )
@@ -306,11 +354,13 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 
 		if NOT( pSym )
 		{
+			
+
 			mpState->WarnPrintf( "Parameter %s not found", pName );
 		}
 		else
 		{
-			pLight->moShaderInst->mCallingParams.AddInstance( pSym );
+			pLight->moShaderInst->mCallSymIList.AddInstance( pSym );
 		}
 
 		// mSymbols.FindSymbol( pName )

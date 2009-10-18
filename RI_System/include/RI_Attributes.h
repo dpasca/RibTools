@@ -83,6 +83,12 @@ public:
 
 	~Attributes();
 
+	// for conveninece
+	const SymbolList &GetGlobalSymList() const
+	{
+		return *mpGlobalSyms;
+	}
+
 private:
 	void copyFrom(const Attributes& rhs);
 

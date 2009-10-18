@@ -5,7 +5,7 @@
 	Ci		global varying color
 	Oi		global varying color
 
-	_const1	constant uniform float 10
+	_const1	temporary constant float 10
 
 .code
 

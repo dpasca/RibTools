@@ -158,10 +158,9 @@ SlShaderInst::~SlShaderInst()
 //==================================================================
 static void matchSymbols( const Symbol &a, const Symbol &b )
 {
-	if ( strcasecmp( a.mName.c_str(), b.mName.c_str() ) )
-	{
-		DASSTHROW( 0, ("Names not matching ! %s != %s", a.mName.c_str(), b.mName.c_str()) );
-	}
+	// this shouldn't really happen at this stage
+	DASSTHROW( a.IsName( b.GetNameChr() ),
+		("Names not matching ! %s != %s", a.GetNameChr(), b.GetNameChr()) );
 
 	DASSTHROW( a.mType == b.mType,
 				("Type is %i but expecting %i for '%s'",
@@ -170,16 +169,103 @@ static void matchSymbols( const Symbol &a, const Symbol &b )
 					a.mName.c_str()) );
 
 	DASSTHROW( a.IsVarying() == b.IsVarying(),
-				("Detail is %s but expecting %s for '%s'",
+				("Class is %s but expecting %s for '%s'",
 					a.IsVarying() ? "varying" : "not-varying",
 					b.IsVarying() ? "varying" : "not-varying",
+					a.mName.c_str()) );
+
+	DASSTHROW( a.IsConstant() == b.IsConstant(),
+				("Class is %s but expecting %s for '%s'",
+					a.IsConstant() ? "constant" : "not-constant",
+					b.IsConstant() ? "constant" : "not-constant",
 					a.mName.c_str()) );
 }
 
 //==================================================================
+static void bindGlobalStorageSymbol(
+						SlValue				&destValue	,
+						const Symbol		&shaSym		,
+						SymbolIList			&gridSymIList,
+						const SymbolList	&globalSyms
+						)
+{
+	// instances of all symbols considered as globals for the shader are already
+	// in the grid, therefore we look into the grid
+	// Notice that in the state machine, symbols such as "Ka" are marked as global,
+	// but in fact, those are considered as parameters in the shader.. while they
+	// are global in the context of the state machine.. basically a different kind
+	// of globals !
+
+	if ( shaSym.IsConstant() )
+	{
+		// Example symbols: PI
+
+		// find the global symbol in the globals from the state machine
+
+		const Symbol	*pGlobalSym = globalSyms.FindSymbol( shaSym.GetNameChr() );
+
+		DASSTHROW( pGlobalSym != NULL, ("Could not find the global symbol %s !\n", shaSym.GetNameChr()) );
+
+		matchSymbols( shaSym, *pGlobalSym );
+
+		// grab the constant data from the global in the state machine.. not from the
+		// symbol in the shader.. which is not supposed to exist 8)
+		destValue.Flags.mOwnData = 0;
+		destValue.SetDataR( pGlobalSym->GetConstantData(), pGlobalSym );
+	}
+	else
+	{
+		// Example symbols: P, Cs, N, Ng ...
+
+		// find the global symbol's instance in the grid
+
+		SymbolI	*pGridGlobalSymI = gridSymIList.FindSymbolI( shaSym.GetNameChr() );
+
+		DASSTHROW( pGridGlobalSymI != NULL, ("Could not find the global symbol %s !\n", shaSym.GetNameChr()) );
+
+		matchSymbols( shaSym, *pGridGlobalSymI->mpSrcSymbol );
+
+		// grab the data from the symbol the symbol instance in the grid
+		destValue.Flags.mOwnData = 0;
+		destValue.SetDataRW( pGridGlobalSymI->GetRWData(), pGridGlobalSymI->mpSrcSymbol );
+	}
+}
+
+//==================================================================
+static void bindTemporaryStorageSymbol(
+						SlValue				&destValue	,
+						const Symbol		&shaSym		,
+						size_t				maxPoints
+						)
+{
+	if ( shaSym.IsConstant() )
+	{
+		// Example symbols: MY_FACTOR ...
+
+		// temporary const is a local const ..grab it from the shader
+
+		destValue.Flags.mOwnData = 0;
+		destValue.SetDataR( shaSym.GetConstantData(), &shaSym );
+	}
+	else
+	{
+		// Example symbols: temp2, $su1, $v1 ...
+		// Note: Indeed, $ registers are considered as temporaries
+
+		// temporary non-const requires local allocation
+
+		size_t	allocN = shaSym.IsVarying() ? maxPoints : 1;
+
+		destValue.Flags.mOwnData = 1;
+		destValue.SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
+	}
+}
+
+//==================================================================
 SlValue	*SlShaderInst::Bind(
-					SymbolIList		&gridSymIList,
-					DVec<u_int>		&out_defParamValsStartPCs ) const
+					const SymbolList	&globalSyms,
+					SymbolIList			&gridSymIList,
+					DVec<u_int>			&out_defParamValsStartPCs ) const
 {
 	out_defParamValsStartPCs.clear();
 
@@ -190,100 +276,66 @@ SlValue	*SlShaderInst::Bind(
 	for (size_t i=0; i < symbolsN; ++i)
 	{
 		const Symbol		&shaSym			= *moShader->mpShaSyms[i];
-		const char			*pShaSymName	= shaSym.mName.c_str();
 
 		switch ( shaSym.mStorage )
 		{
-		case Symbol::STOR_CONSTANT:
-			DASSERT( shaSym.IsUniform() );
-			pDataSegment[i].Flags.mOwnData = 0;
-			pDataSegment[i].SetDataR( shaSym.GetConstantData(), &shaSym );
-			break;
-
 		case Symbol::STOR_GLOBAL:
-			{
-				SymbolI	*pGridSymI = gridSymIList.FindSymbolI( pShaSymName );
-
-				DASSTHROW( pGridSymI != NULL, ("Could not find the global %s !\n", pShaSymName) );
-
-				matchSymbols( shaSym, *pGridSymI->mpSrcSymbol );
-
-				pDataSegment[i].Flags.mOwnData = 0;
-				pDataSegment[i].SetDataRW( pGridSymI->GetRWData(), pGridSymI->mpSrcSymbol );
-			}
+			bindGlobalStorageSymbol(
+						pDataSegment[i],
+						shaSym,
+						gridSymIList,
+						globalSyms );
 			break;
 
 		case Symbol::STOR_PARAMETER:
 			{
-				SymbolI	*pGridSymI = gridSymIList.FindSymbolI( pShaSymName );
+				// paranoia check for the moment..
+				DASSERT( NULL == gridSymIList.FindSymbolI( shaSym.GetNameChr() ) );
 
-				if ( pGridSymI )
+				/*
+				//---- Handle in-line params
+
+				// will need to ensure that in-line params are uniform and constant !
+
+				const SymbolI	*pParamSymI = mCallSymIList.FindSymbolI( pShaSymName );
+
+				// additionally look into params in attributes ?
+
+				if ( pParamSymI )
 				{
-					// verify shaSym type
-					matchSymbols( shaSym, *pGridSymI->mpSrcSymbol );
+					matchSymbols( shaSym, *pParamSymI->mpSrcSymbol );
 
 					pDataSegment[i].Flags.mOwnData = 0;
-					pDataSegment[i].SetDataRW( pGridSymI->GetRWData(), pGridSymI->mpSrcSymbol );
+					pDataSegment[i].SetDataR( pParamSymI->GetUniformParamData(), pParamSymI->mpSrcSymbol );
+				}
+				*/
+
+				SlValue	&destValue = pDataSegment[i];
+
+				// is the param constant ?  ..odd, but...
+				if ( shaSym.IsConstant() )
+				{
+					// parameter const is a local const ..grab it from the shader
+					destValue.Flags.mOwnData = 0;
+					destValue.SetDataR( shaSym.GetConstantData(), &shaSym );
 				}
 				else
 				{
-					DASSTHROW( shaSym.IsUniform(),
-								("Currently not supporting varying parameters %s", pShaSymName) );
+					// allocate storage for the param
+					size_t	allocN = shaSym.IsVarying() ? mMaxPointsN : 1;
 
-					// (Comment below still relevant ? Probably not..)
-					// $$$ when supporting varying, will have to allocate data here and fill with default
-					// at setup time.. like for temporaries with default values..
+					pDataSegment[i].Flags.mOwnData = 1;
+					pDataSegment[i].SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
 
-					// calling params should come from "surface" ?
-					const SymbolI	*pParamSymI = mCallingParams.FindSymbolI( pShaSymName );
-
-					// additionally look into params in attributes ?
-
-					if ( pParamSymI )
-					{
-						matchSymbols( shaSym, *pParamSymI->mpSrcSymbol );
-
-						pDataSegment[i].Flags.mOwnData = 0;
-						pDataSegment[i].SetDataR( pParamSymI->GetUniformParamData(), pParamSymI->mpSrcSymbol );
-					}
-					else
-					{
-						pDataSegment[i].Flags.mOwnData = 1;
-
-						size_t	allocN = shaSym.IsVarying() ? mMaxPointsN : 1;
-
-						pDataSegment[i].SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
-
-						if ( moShader->mpShaSymsStartPCs[i] != INVALID_PC )
-							out_defParamValsStartPCs.push_back( moShader->mpShaSymsStartPCs[i] );
-/*
-						else
-						if ( shaSym.GetUniformParamData() )
-							pDataSegment[i].mpSrcSymbol->mpConstVal = 
-							pDataSegment[i].SetDataRW( , &shaSym );
-*/
-
-
-/*
-						pDataSegment[i].Flags.mOwnData = 0;
-						pDataSegment[i].SetDataR( shaSym.GetUniformParamData(), &shaSym );
-*/
-
-						//DASSTHROW( 0, ("Could not find shaSym %s", pShaSymName) );
-					}
+					// setup init code !
+					if ( moShader->mpShaSymsStartPCs[i] != INVALID_PC )
+						out_defParamValsStartPCs.push_back( moShader->mpShaSymsStartPCs[i] );
 				}
 			}
 			break;
 
 		case Symbol::STOR_TEMPORARY:
-			{
-				//DASSERT( shaSym.mIsVarying == true );
-				pDataSegment[i].Flags.mOwnData = 1;
-
-				size_t	allocN = shaSym.IsVarying() ? mMaxPointsN : 1;
-
-				pDataSegment[i].SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
-			}
+			bindTemporaryStorageSymbol( pDataSegment[i], shaSym, mMaxPointsN );
 			break;
 
 		default:
