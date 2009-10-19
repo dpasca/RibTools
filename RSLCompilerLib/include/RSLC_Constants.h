@@ -1,29 +1,20 @@
 //==================================================================
-/// RSLC_Operators.h
+/// RSLC_Constants.h
 ///
-/// Created by Davide Pasca - 2009/6/7
+/// Created by Davide Pasca - 2009/10/19
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RSLC_OPERATORS_H
-#define RSLC_OPERATORS_H
+#ifndef RSLC_CONSTANTS_H
+#define RSLC_CONSTANTS_H
 
 //==================================================================
 namespace RSLC
 {
 
-class TokNode;
+void RealizeConstants( TokNode *pRoot );
 
-void ReparentOperators( TokNode *pNode );
-
-bool SolveBiOpType(
-					const TokNode *pOperator,
-					const TokNode *pOperand1,
-					const TokNode *pOperand2,
-					VarType &out_varType,
-					bool &out_isVarying,
-					bool mustSucceed );
 
 //==================================================================
 }

@@ -206,6 +206,43 @@ static inline void Inst_MovXX( SlRunContext &ctx )
 }
 
 //==================================================================
+template <class TA, class TB>
+void Inst_Sign( SlRunContext &ctx )
+{
+		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
+	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				lhs[i] = DSign( op1[op1_offset] );
+			}
+
+			op1_offset	+= op1_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0] = DSign( op1[0] );
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 template <class TA, class TB, class TC, const OpBaseTypeID opBaseTypeID>
 void Inst_2Op( SlRunContext &ctx )
 {

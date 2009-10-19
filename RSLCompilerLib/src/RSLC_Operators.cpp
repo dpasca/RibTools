@@ -35,12 +35,13 @@ static bool areTypesCompatible( VarType vt1, VarType vt2 )
 }
 
 //==================================================================
-void SolveBiOpType(
+bool SolveBiOpType(
 					const TokNode *pOperator,
 					const TokNode *pOperand1,
 					const TokNode *pOperand2,
 					VarType &out_varType,
-					bool &out_isVarying )
+					bool &out_isVarying,
+					bool mustSucceed )
 {
 	out_varType		= VT_UNKNOWN;
 	out_isVarying	= false;
@@ -53,7 +54,12 @@ void SolveBiOpType(
 	DASSERT( vt1 != VT_UNKNOWN && vt2 != VT_UNKNOWN );
 
 	if ( (vt1 == VT_STRING) != (vt2 == VT_STRING) )
-		throw Exception( "Strings can only operate with other strings !", pOperator );
+	{
+		if NOT( mustSucceed )
+			return false;
+		else
+			throw Exception( "Strings can only operate with other strings !", pOperator );
+	}
 
 	if ( vt1 == VT_STRING )
 	{
@@ -97,15 +103,22 @@ void SolveBiOpType(
 
 		if ( out_varType == VT_UNKNOWN )
 		{
-			throw Exception(
-				DUT::SSPrintFS(
-						"Could not resolve operation. Incompatible types [ '%s' %s '%s' ] ?",
-							VarTypeToString( vt1 ),
-							pOperator->GetTokStr(),
-							VarTypeToString( vt2 ) )
-						, pOperator );
+			if ( mustSucceed )
+			{
+				throw Exception(
+					DUT::SSPrintFS(
+							"Could not resolve operation. Incompatible types [ '%s' %s '%s' ] ?",
+								VarTypeToString( vt1 ),
+								pOperator->GetTokStr(),
+								VarTypeToString( vt2 ) )
+							, pOperator );
+			}
+			else
+				return false;
 		}
 	}
+
+	return true;
 }
 
 //==================================================================

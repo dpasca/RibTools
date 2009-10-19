@@ -37,6 +37,7 @@ enum OpBaseTypeID
 {
 	OBT_MOV	,
 	OBT_ABS	,
+	OBT_SIGN,
 	OBT_ADD	,
 	OBT_SUB	,
 	OBT_MUL	,
@@ -48,6 +49,9 @@ enum OpBaseTypeID
 //==================================================================
 enum OpCodeID
 {
+	OP_RET		,
+/*
+
 	OP_SS_MOV	,
 	OP_VS_MOV	,
 	OP_VV_MOV	,
@@ -109,13 +113,12 @@ enum OpCodeID
 
 	OP_NRM		,
 	OP_FCFWD	,
-	OP_DIFS		,
-	OP_AMB		,
+	OP_DIFFUSE	,
+	OP_AMBIENT	,
 	OP_CALCNORM	,
 
-	OP_RET		,
-
 	OP_N
+*/
 };
 
 //==================================================================

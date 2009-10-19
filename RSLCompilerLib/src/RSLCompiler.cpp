@@ -18,6 +18,7 @@
 #include "RSLC_Operators.h"
 #include "RSLC_Registers.h"
 #include "RSLC_Builtins.h"
+#include "RSLC_Constants.h"
 #include "RSLCompiler.h"
 
 //==================================================================
@@ -78,16 +79,20 @@ RSLCompiler::RSLCompiler(
 	ReparentOperators( mpRoot );
 
 	// here should handle default params expressions
-	DiscoverDefaultParamValues( mpRoot );
+	//DiscoverDefaultParamValues( mpRoot );
 
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
 
-	ResolveFunctionCalls( mpRoot );
-
 	RealizeConstants( mpRoot );
 
-	AssignRegisters( mpRoot );
+	SolveExpressions( mpRoot, false, false );
+
+	ResolveFunctionCalls( mpRoot );
+
+	SolveExpressions( mpRoot, true, true );
+
+	AssignRegisters( mpRoot, 0 );
 
 	MarkUsedGlobals( mpRoot );
 
@@ -134,4 +139,3 @@ void RSLCompiler::SaveASM( const char *pFName, const char *pRefSourceName )
 
 	fclose( pFile );
 }
-

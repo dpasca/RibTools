@@ -186,8 +186,6 @@ void AddSelfVariable(
 			bool	isVarying,
 			bool	isDetailForced );
 
-void AddConstVariable( TokNode *pNode, TokNode *pRoot );
-
 //==================================================================
 VarType VarTypeFromToken( const Token *pTok );
 const char *VarTypeToString( VarType type );

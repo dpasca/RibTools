@@ -509,8 +509,10 @@ static void Inst_CalculateNormal( SlRunContext &ctx )
 //#define MATRIX	Matrix44
 
 //==================================================================
-static ShaderInstruction	sInstructionTable[OP_N] =
+static ShaderInstruction	sInstructionTable[] =
 {
+	NULL,	// ret
+
 	SOP::Inst_1Op<S,S,OBT_MOV>,
 	SOP::Inst_1Op<V,S,OBT_MOV>,
 	SOP::Inst_1Op<V,V,OBT_MOV>,
@@ -520,6 +522,8 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	SOP::Inst_1Op<S,S,OBT_ABS>,
 	SOP::Inst_1Op<V,S,OBT_ABS>,
 	SOP::Inst_1Op<V,V,OBT_ABS>,
+
+	SOP::Inst_Sign<S,S>,
 
 	SOP::Inst_2Op<S,S,S,OBT_ADD>,
 	SOP::Inst_2Op<V,V,S,OBT_ADD>,
@@ -575,8 +579,6 @@ static ShaderInstruction	sInstructionTable[OP_N] =
 	SOP::Inst_Diffuse,
 	SOP::Inst_Ambient,
 	Inst_CalculateNormal,
-
-	NULL,	// ret
 };
 
 #undef S

@@ -17,28 +17,4 @@ namespace RSLC
 {
 
 //==================================================================
-void DiscoverDefaultParamValues( TokNode *pNode )
-{
-	if (
-		pNode->mNodeType == TokNode::TYPE_BLOCK &&
-		pNode->GetBlockType() == BLKT_SHPARAMS )
-	{
-		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-		{
-			TokNode *pChild = pNode->mpChilds[i];
-
-			if ( pChild->mpToken->id == T_OP_ASSIGN )
-			{
-				//int yoyo = 1;
-			}
-		}
-	}
-
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-	{
-		DiscoverDefaultParamValues( pNode->mpChilds[i] );
-	}
-}
-
-//==================================================================
 }

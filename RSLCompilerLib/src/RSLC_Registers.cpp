@@ -11,56 +11,14 @@
 #include "RSLC_Operators.h"
 #include "RSLC_Exceptions.h"
 
+#define PROCESS_ALL_FUNCS
+
 //==================================================================
 namespace RSLC
 {
 
 //==================================================================
-static void realizeConstants_rec( TokNode *pNode, TokNode *pRoot )
-{
-	if ( pNode->mpToken && pNode->mpToken->idType == T_TYPE_VALUE )
-	{
-		AddConstVariable( pNode, pRoot );
-	}
-
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-	{
-		realizeConstants_rec( pNode->mpChilds[i], pRoot );
-	}
-}
-
-//==================================================================
-void RealizeConstants( TokNode *pRoot )
-{
-	const DVec<Function> &funcs = pRoot->GetFuncs();
-
-	for (size_t i=0; i < funcs.size(); ++i)
-	{
-		const Function	&func = funcs[i];
-
-		if NOT( func.IsShader() )
-			continue;
-
-		if ( func.mpParamsNode )
-		{
-			for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
-			{
-				TokNode	*pParamNode = func.mpParamsNode->mpChilds[j];
-				realizeConstants_rec( pParamNode, pRoot );
-			}
-		}
-
-		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
-		{
-			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[j];
-
-			realizeConstants_rec( pNode, pRoot );
-		}
-	}
-}
-
-//==================================================================
-static void assignRegisters_expr_BiOp( TokNode *pNode )
+static void solveExpressions_sub_BiOp( TokNode *pNode, bool mustSucceed )
 {
 	TokNode *pOperand1 = pNode->GetChildTry( 0 );
 	TokNode *pOperand2 = pNode->GetChildTry( 1 );
@@ -73,15 +31,33 @@ static void assignRegisters_expr_BiOp( TokNode *pNode )
 		pOperand2 = pOperand2->GetChildTry( 0 );
 
 	if NOT( pOperand1 )
-		throw Exception( "Unknown 1st operand", pNode );
+	{
+		if ( mustSucceed )
+			throw Exception( "Unknown 1st operand", pNode );
+		else
+			return;
+	}
 
 	if NOT( pOperand2 )
-		throw Exception( "Unknown 2nd operand", pNode );
+	{
+		if ( mustSucceed )
+			throw Exception( "Unknown 2nd operand", pNode );
+		else
+			return;
+	}
 
 	// no assignment for function call as it's done above
 	VarType	opResVarType;
 	bool	opResIsVarying;
-	SolveBiOpType( pNode, pOperand1, pOperand2, opResVarType, opResIsVarying );
+
+	if NOT( SolveBiOpType(
+					pNode,
+					pOperand1,
+					pOperand2,
+					opResVarType,
+					opResIsVarying,
+					mustSucceed ) )
+		return;
 
 	// $$$ was here for a purpose !(?) - DASSERT( pNode->mVarLink.IsValid() == false );
 
@@ -116,23 +92,45 @@ static void assignRegisters_expr_BiOp( TokNode *pNode )
 }
 
 //==================================================================
-static bool assignRegisters_expr( TokNode *pNode, int regIdx )
+static void solveExpressions_sub( TokNode *pNode, bool mustSucceed )
+{
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		solveExpressions_sub( pNode->mpChilds[i], mustSucceed );
+
+	if ( pNode->mpToken->IsBiOp() )
+		solveExpressions_sub_BiOp( pNode, mustSucceed );
+}
+
+//==================================================================
+void SolveExpressions( TokNode *pNode, bool mustSucceed, bool processShaderOnly )
+{
+	const DVec<Function> &funcs = pNode->GetFuncs();
+
+	for (size_t i=0; i < funcs.size(); ++i)
+	{
+		const Function	&func = funcs[i];
+
+		// pre-pass ?
+		if ( processShaderOnly )
+			if NOT( func.IsShader() )
+				continue;
+
+		if ( func.mpParamsNode )
+			solveExpressions_sub( func.mpParamsNode, mustSucceed );
+		else
+			solveExpressions_sub( func.mpCodeBlkNode, mustSucceed );
+	}
+}
+
+//==================================================================
+static bool assignRegisters_sub( TokNode *pNode, int regIdx )
 {
 	int runRegIdx = regIdx;
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		if ( assignRegisters_expr( pNode->mpChilds[i], runRegIdx ) )
-		{
+		if ( assignRegisters_sub( pNode->mpChilds[i], runRegIdx ) )
 			runRegIdx += 1;
-		}
-	}
-
-	bool usedReg = false;
-	if ( pNode->mpToken->IsBiOp() )
-	{
-		assignRegisters_expr_BiOp( pNode );
-		usedReg = true;
 	}
 
 	const Variable	*pVar = pNode->GetVarPtr();
@@ -144,15 +142,14 @@ static bool assignRegisters_expr( TokNode *pNode, int regIdx )
 			!pVar->IsRegisterAssigned() )
 		{
 			pNode->GetVarPtr()->AssignRegister( regIdx );
-			//return true;
 		}
 	}
 
-	return usedReg;
+	return pNode->mpToken->IsBiOp();
 }
 
 //==================================================================
-void AssignRegisters( TokNode *pNode )
+void AssignRegisters( TokNode *pNode, int regIdx )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
 
@@ -163,33 +160,10 @@ void AssignRegisters( TokNode *pNode )
 		if NOT( func.IsShader() )
 			continue;
 
-/*
 		if ( func.mpParamsNode )
-		{
-			for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
-			{
-				TokNode	*pParamNode = func.mpParamsNode->mpChilds[j];
-
-				int	tempIdx = 0;
-
-				assignRegisters_expr( pParamNode, tempIdx );
-			}
-		}
-
-		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
-		{
-			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[j];
-
-			int	tempIdx = 1000;
-
-			assignRegisters_expr( pNode, tempIdx );
-		}
-*/
-
-		if ( func.mpParamsNode )
-			assignRegisters_expr( func.mpParamsNode, 0 );
+			assignRegisters_sub( func.mpParamsNode, regIdx );
 		else
-			assignRegisters_expr( func.mpCodeBlkNode, 0 );
+			assignRegisters_sub( func.mpCodeBlkNode, regIdx );
 	}
 }
 

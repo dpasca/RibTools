@@ -15,7 +15,8 @@ namespace RSLC
 
 //==================================================================
 void RealizeConstants( TokNode *pRoot );
-void AssignRegisters( class TokNode *pNode );
+void SolveExpressions( class TokNode *pNode, bool mustSucceed, bool processShaderOnly );
+void AssignRegisters( TokNode *pNode, int regIdx );
 std::string GetRegName( const Register &reg );
 
 //==================================================================

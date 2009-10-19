@@ -50,22 +50,22 @@ float	degrees( float rad )
 	return rad * 57.29577957855;
 }
 
-float	sin( float a ){}
-float	asin( float a ){}
-float	cos( float a ){}
-float	acos( float a ){}
-float	tan( float a ){}
-float	atan( float yoverx ){}
-float	atan( float y, x ){}
-float	pow( float x, y ){}
-float	exp( float x ){}
-float	sqrt( float x ){}
-float	inversesqrt( float x ){}
-float	log( float x ){}
-float	log( float x, base ){}
-float	mod( float a, b ){}
-float	abs( float x )		{	_asm_abs( x ); }
-float	sign( float x ){}
+float	sin( float a )			{}
+float	asin( float a )			{}
+float	cos( float a )			{}
+float	acos( float a )			{}
+float	tan( float a )			{}
+float	atan( float yoverx )	{}
+float	atan( float y, x )		{}
+float	pow( float x, y )		{	return x ^ y; }
+float	exp( float x )			{			}
+float	sqrt( float x )			{}
+float	inversesqrt( float x )	{}
+float	log( float x )			{}
+float	log( float x, base )	{}
+float	mod( float a, b )		{}
+float	abs( float x )			{	float tmp;	_asm_abs( tmp, x ); return tmp; }
+float	sign( float x )			{	float tmp;	_asm_sign( tmp, x ); return tmp; }
 
 float	min( float	a, b )		{	float	tmp; _asm_min( tmp, a, b ); return tmp; }
 point	min( point	a, b )		{	point	tmp; _asm_min( tmp, a, b ); return tmp; }
@@ -249,9 +249,46 @@ color	diffuse( normal Nn )
 }
 */
 
-color	specular( normal N; vector V; float roughness ){}
-color	specularbrdf( vector L; normal N; vector V; float roughness ){}
-color	phong( normal N; vector V; float size ){}
+/*================================================================*/
+color specular( normal N; vector V; float roughness )
+{
+/*
+	color C = 0;
+	illuminance( P, N, PI/2 )
+	C += Cl * specularbrdf (normalize(L), N, V, roughness);
+	return C;
+*/
+	return color( 0.1 );
+}
+
+/*================================================================*/
+color specularbrdf( vector L, N, V; float roughness )
+{
+	vector H = normalize( L + V );
+
+	return pow( max( 0, N . H ), 1 / roughness );
+}
+
+/*================================================================*/
+color phong( normal N; vector V; float size )
+{
+/*
+	color C = 0;
+	
+	vector R = reflect( vector(0) - normalize(V), normalize(N) );
+	
+	illuminance( P, N, PI/2 )
+	{
+		vector Ln = normalize(L);
+
+		C += Cl * pow(max(0.0,R.Ln), size);
+	}
+
+	return C;
+*/
+	return vector( 0.1 );
+}
+
 /*
 color	trace( point P, point R ){}
 float	texture( string name[channel]; [texture coordinates,] [parameterlist] ){}
