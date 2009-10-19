@@ -97,8 +97,6 @@ static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
 {
 	bool	isDataType = pFuncCallNode->IsDataType();
 
-	const char *pStr = pFuncCallNode->GetTokStr();
-
 	TokNode *pRightNode = pFuncCallNode->GetRight();
 
 	if ( pRightNode && pRightNode->mpToken->id == T_VL_STRING )
@@ -144,7 +142,7 @@ static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
 				(
 				)
 
-			..the loop above will skip one, so we need to backpedal..
+			..the parent loop will skip one, so we need to backpedal..
 		*/
 
 		out_parentIdx -= 1;
@@ -186,6 +184,105 @@ void DiscoverFunctions( TokNode *pRoot )
 	int	idx = 0;
 	discoverFuncsUsage( pRoot, pRoot->GetFuncs(), idx );
 }
+
+//==================================================================
+//==================================================================
+//==================================================================
+static void discoverFuncopsUsage_sub( TokNode *pNode, int &out_parentIdx )
+{
+	if (!pNode->IsParentRoot() &&  // parent cannot be root !!
+			pNode->IsFuncOp() &&
+				pNode->mNodeType == TokNode::TYPE_STANDARD )
+	{
+		TokNode *pRightNode = pNode->GetRight();
+
+		if ( pRightNode && pRightNode->mpToken->id == T_OP_LFT_BRACKET )
+		{
+			// set the block type as a function call
+			pRightNode->UpdateBlockTypeToFuncOpExpression();
+
+			/*
+				b
+				(
+
+				..becomes..
+
+				b
+					(
+
+				..the parent loop will skip one, so we need to backpedal..
+			*/
+
+			out_parentIdx -= 1;
+
+			// set the expression block as parent of the node with our funcop
+			pRightNode->Reparent( pNode );
+			pNode->mpChilds.push_back( pRightNode );
+
+			// remove separating commas as we don't need them anymore
+			removeCommasFromParams( pRightNode );
+
+			pNode->mNodeType = TokNode::TYPE_FUNCOP;
+		}
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		discoverFuncopsUsage_sub( pNode->mpChilds[i], out_parentIdx );
+	}
+}
+
+//==================================================================
+void DiscoverFuncopsUsage( TokNode *pRoot )
+{
+	int	idx = 0;
+	discoverFuncopsUsage_sub( pRoot, idx );
+}
+
+//==================================================================
+static void reparentFuncopsStatements_sub( TokNode *pNode, int &out_parentIdx )
+{
+	if ( pNode->GetBlockType() == BLKT_FUNCOPEXPR )
+	{
+		/*
+			b
+				(
+			statement
+
+			..becomes..
+
+			b
+				(
+					statement
+
+			..the parent loop will skip one, so we need to backpedal..
+		*/
+
+		out_parentIdx -= 1;
+
+		TokNode *pStmtNode = pNode->mpParent->GetRight();
+
+		if NOT( pStmtNode )
+			throw Exception( "Missing statement ?",  pNode );
+
+		// set statement as child of the expression block
+		pStmtNode->Reparent( pNode );
+		pNode->mpChilds.push_back( pStmtNode );
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		reparentFuncopsStatements_sub( pNode->mpChilds[i], out_parentIdx );
+	}
+}
+
+//==================================================================
+void ReparentFuncopsStatements( TokNode *pRoot )
+{
+	int	idx = 0;
+	reparentFuncopsStatements_sub( pRoot, idx );
+}
+
 
 //==================================================================
 }

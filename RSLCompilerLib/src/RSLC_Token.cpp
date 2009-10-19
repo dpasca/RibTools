@@ -29,6 +29,7 @@ struct TokenDef
 #define DE_DEF(_X_)			#_X_, T_TYPE_DETAIL,	T_DE_##_X_
 #define KW_DEF(_X_)			#_X_, T_TYPE_KEYWORD,	T_KW_##_X_
 #define SF_DEF(_X_)			#_X_, T_TYPE_STDFUNC,	T_SF_##_X_
+#define FO_DEF(_X_)			#_X_, T_TYPE_FUNCOP,	T_FO_##_X_
 
 //==================================================================
 static TokenDef _sTokenDefs[TOKEN_N] =
@@ -49,7 +50,7 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	OP_DEF(	"=="	,	EQ			)	,
 	OP_DEF(	"!="	,	NEQ			)	,
 	OP_DEF(	"+="	,	PLUSASS		)	,
-	OP_DEF(	"-="	,	MINUSASS		)	,
+	OP_DEF(	"-="	,	MINUSASS	)	,
 	OP_DEF(	"*="	,	MULASS		)	,
 	OP_DEF(	"/="	,	DIVASS		)	,
 	OP_DEF(	"+"		,	PLUS		)	,
@@ -82,12 +83,13 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	DE_DEF( varying			)	,
 	DE_DEF( uniform			)	,
 
-	KW_DEF( if				)	,
-	KW_DEF( for				)	,
-	KW_DEF( while			)	,
-	KW_DEF( solar			)	,
-	KW_DEF( illuminate		)	,
-	KW_DEF( illuminance		)	,
+	FO_DEF( if				)	,
+	FO_DEF( for				)	,
+	FO_DEF( while			)	,
+	FO_DEF( solar			)	,
+	FO_DEF( illuminate		)	,
+	FO_DEF( illuminance		)	,
+
 	KW_DEF( break			)	,
 	KW_DEF( continue		)	,
 	KW_DEF( return			)	,
@@ -191,6 +193,7 @@ static size_t _sTokenDefsIdxInvSortLen[TOKEN_N];
 #undef DE_DEF
 #undef KW_DEF
 #undef SF_DEF
+#undef FO_DEF
 
 //==================================================================
 static bool matches( const char *pStr, size_t i, size_t strSize, const char *pFindStr )

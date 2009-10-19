@@ -72,14 +72,18 @@ RSLCompiler::RSLCompiler(
 	// ..since the tree has already been defined at this point
 	RemoveClosingBrackets( mpRoot );
 
+	// discover if, while, solar, etc..
+	DiscoverFuncopsUsage( mpRoot );
+
 	// remove semicolons as they serve no additional purpose
 	RemoveSemicolons( mpRoot );
 
 	// develop the tree based on operators with the proper precedence
 	ReparentOperators( mpRoot );
 
-	// here should handle default params expressions
-	//DiscoverDefaultParamValues( mpRoot );
+	// reparent the funcops (e.g. the statement becomes a childen in cases as
+	// "solar(expr) stmt"
+	ReparentFuncopsStatements( mpRoot );
 
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );

@@ -127,17 +127,39 @@ static void reparentBiOperators(
 						const TokenID *pMatchingIDs,
 						size_t matchIDsN,
 						size_t &out_parentIdx,
-						bool excludeIfFuncParam=false )
+						bool excludeIfFuncParam=false,
+						TokenID	*pExcludeParentTokens=NULL,
+						size_t excludeParentTokensSize=0 )
 {
 	if ( pNode->mpToken )
 	{
 		bool	dontProcess = false;
-		if ( excludeIfFuncParam && pNode->mpParent )
-		{
-			BlockType	blkType = pNode->mpParent->GetBlockType();
 
-			if ( blkType == BLKT_FUNCCALL || blkType == BLKT_FNPARAMS )
-				dontProcess = true;
+		if ( pNode->mpParent )
+		{
+			if ( excludeIfFuncParam )
+			{
+				BlockType	blkType = pNode->mpParent->GetBlockType();
+
+				if (   blkType == BLKT_FUNCCALL
+					|| blkType == BLKT_FUNCOPEXPR
+					|| blkType == BLKT_FNPARAMS )
+					dontProcess = true;
+			}
+
+/*
+			if ( pExcludeParentTokens && pNode->mpToken )
+			{
+				for (size_t i=0; i < excludeParentTokensSize; ++i)
+				{
+					if ( pNode->mpToken->id == pExcludeParentTokens[i] )
+					{
+						dontProcess = true;
+						break;
+					}
+				}
+			}
+*/
 		}
 
 		if NOT( dontProcess )
@@ -185,7 +207,12 @@ static void reparentBiOperators(
 	//if ( pNode->GetBlockType() != BLKT_UNKNOWN )
 		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 		{
-			reparentBiOperators( pNode->mpChilds[i], pMatchingIDs, matchIDsN, i, excludeIfFuncParam );
+			reparentBiOperators(
+						pNode->mpChilds[i],
+						pMatchingIDs,
+						matchIDsN,
+						i,
+						excludeIfFuncParam );
 		}
 }
 
@@ -259,7 +286,7 @@ void ReparentOperators( TokNode *pNode )
 
 	size_t	idx;
 
-	reparentBiOperators( pNode, priority0, _countof(priority0),	idx, true );
+	reparentBiOperators( pNode, priority0, _countof(priority0), idx, true );
 
 	reparentBiOperators( pNode, priority1, _countof(priority1),	idx );
 	reparentBiOperators( pNode, priority2, _countof(priority2),	idx );

@@ -35,6 +35,7 @@ public:
 		TYPE_BLOCK,
 		TYPE_FUNCDEF,
 		TYPE_FUNCCALL,
+		TYPE_FUNCOP,
 		TYPE_N
 	};
 public:
@@ -82,6 +83,13 @@ public:
 		DASSERT( mBlockType == BLKT_EXPRESSION && mNodeType == TYPE_BLOCK );
 
 		mBlockType	= BLKT_FUNCCALL;
+	}
+
+	void UpdateBlockTypeToFuncOpExpression()
+	{
+		DASSERT( mBlockType == BLKT_EXPRESSION && mNodeType == TYPE_BLOCK );
+
+		mBlockType	= BLKT_FUNCOPEXPR;
 	}
 
 	BlockType GetBlockType() const
@@ -144,7 +152,8 @@ public:
 	bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
 	bool IsNonTerminal() const			{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : false; }
 	bool IsStdFunction() const			{ return mpToken ? mpToken->idType == T_TYPE_STDFUNC : false; }
-	bool IsDataType() const			{ return mpToken ? mpToken->idType == T_TYPE_DATATYPE : false; }
+	bool IsFuncOp() const				{ return mpToken ? mpToken->idType == T_TYPE_FUNCOP : false; }
+	bool IsDataType() const				{ return mpToken ? mpToken->idType == T_TYPE_DATATYPE : false; }
 	bool IsTokenID( TokenID id ) const	{ return mpToken ? mpToken->id == id : false; }
 
 	bool IsParentRoot() const			{ return mpParent && mpParent->mpParent == NULL;	}

@@ -12,6 +12,6 @@ light distantlight(
 			point to	= point "shader"(0, 0, 1);
 			)
 {
-	solar (to - from, 0)
+	solar ( to - from, 0 )
 		Cl = intensity * lightcolor;
 }

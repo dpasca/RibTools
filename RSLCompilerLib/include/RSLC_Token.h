@@ -33,6 +33,8 @@ enum TokenIDType
 	T_TYPE_KEYWORD		,
 	T_TYPE_STDFUNC		,
 
+	T_TYPE_FUNCOP		,
+
 	T_TYPE_N
 };
 
@@ -46,6 +48,7 @@ enum BlockType
 	BLKT_CODEBLOCK,
 	BLKT_EXPRESSION,
 	BLKT_FUNCCALL,
+	BLKT_FUNCOPEXPR,
 	BLKT_N
 };
 
@@ -56,6 +59,7 @@ enum BlockType
 #define DE_DEF(_X_)			T_DE_##_X_
 #define KW_DEF(_X_)			T_KW_##_X_
 #define SF_DEF(_X_)			T_SF_##_X_
+#define FO_DEF(_X_)			T_FO_##_X_
 
 //==================================================================
 enum TokenID
@@ -109,12 +113,13 @@ enum TokenID
 	DE_DEF( varying			)	,
 	DE_DEF( uniform			)	,
 
-	KW_DEF( if				)	,
-	KW_DEF( for				)	,
-	KW_DEF( while			)	,
-	KW_DEF( solar			)	,
-	KW_DEF( illuminate		)	,
-	KW_DEF( illuminance		)	,
+	FO_DEF( if				)	,
+	FO_DEF( for				)	,
+	FO_DEF( while			)	,
+	FO_DEF( solar			)	,
+	FO_DEF( illuminate		)	,
+	FO_DEF( illuminance		)	,
+
 	KW_DEF( break			)	,
 	KW_DEF( continue		)	,
 	KW_DEF( return			)	,
