@@ -179,6 +179,7 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 	return NULL;
 }
 
+/*
 //==================================================================
 static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
 {
@@ -205,6 +206,7 @@ static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
 		instrumentFuncsCallsParams( pNode->mpChilds[i], i );
 	}
 }
+*/
 
 //==================================================================
 /*
@@ -250,34 +252,15 @@ static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassPara
 }
 
 //==================================================================
-#ifdef _DEBUG
-static void verifyVarLinks( TokNode *pNode )
-{
-	DASSERT( pNode->mVarLink.IsNodeValid() );
-
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-	{
-		verifyVarLinks( pNode->mpChilds[i] );
-	}
-}
-#endif
-
-//==================================================================
-static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, size_t &parentIdx )
+static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		resolveFunctionCalls( pNode->mpChilds[i], funcs, i );
-		//if NOT( resolveFunctionCalls( pNode->mpChilds[i], funcs, i ) )
-		//	return false;
+		resolveFunctionCalls( pNode->mpChilds[i], funcs );
 	}
 
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
-#ifdef _DEBUG
-		TokNode *pParent = pNode->mpParent;
-#endif
-
 		const Function	*pFunc = matchFunctionByParams( pNode, funcs );
 
 		if ( pFunc )
@@ -298,20 +281,6 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 			const TokNode	*pPassParams = pNode->GetChildTry( 0 );
 
 			assignPassingParams( pClonedParamsHooks, pPassParams );
-
-/*
-		#ifdef _DEBUG
-			verifyVarLinks( pParent );
-		#endif
-			DSAFE_DELETE( pNode );
-		#ifdef _DEBUG
-			verifyVarLinks( pParent );
-		#endif
-*/
-			//return;
-			//pNode = pClonedParamsHooks;
-
-			//return false;
 		}
 		else
 		{
@@ -328,8 +297,6 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs, s
 			}
 		}
 	}
-
-	//return true;
 }
 
 //==================================================================
@@ -422,8 +389,7 @@ void ResolveFunctionCalls( TokNode *pNode )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
 
-	size_t	curIdx = 0;
-	resolveFunctionCalls( pNode, funcs, curIdx );
+	resolveFunctionCalls( pNode, funcs );
 
 	DVec<TokNode *>	pAssignOpsToRemove;
 	resolveFunctionReturns( pNode, pAssignOpsToRemove );
