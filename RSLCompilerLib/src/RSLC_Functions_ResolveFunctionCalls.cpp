@@ -220,7 +220,7 @@ dest
 */
 static void insertAssignTo( TokNode *pDestNode, const TokNode *pSrcNode )
 {
-	TokNode	*pAssgnNode = DNEW TokNode( DNEW Token( "=", T_OP_ASSIGN, T_TYPE_OPERATOR ) );
+	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR );
 
 	TokNode *pCloneSrcNode = cloneBranch( pSrcNode );
 
@@ -274,7 +274,7 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs )
 			AddVariable(
 				pClonedParamsHooks->mpParent,
 				DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
-				DNEW TokNode( DNEW Token( "varying", T_DE_varying, T_TYPE_DETAIL ) ),	// %%% forced varying for now !
+				DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL ),	// %%% forced varying for now !
 				NULL,
 				pClonedParamsHooks );
 
@@ -304,11 +304,9 @@ static TokNode *insertAssignToNode(
 						const VarLink	&destVLink,
 						const TokNode	*pSrcNode )
 {
-	TokNode	*pAssgnNode = DNEW TokNode(
-								DNEW Token( "=", T_OP_ASSIGN, T_TYPE_OPERATOR )
-								);
+	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR );
 
-	TokNode	*pNewDest = DNEW TokNode( DNEW Token( "ReturnDest", T_TD_TEMPDEST, T_TYPE_TEMPDEST ) );
+	TokNode	*pNewDest = DNEW TokNode( "ReturnDest", T_TD_TEMPDEST, T_TYPE_TEMPDEST );
 
 	pNewDest->mVarLink = destVLink;
 

@@ -66,6 +66,8 @@ public:
 public:
 	TokNode( Token *pObj );
 
+	TokNode( const char *pTokStr, TokenID tokId, TokenIDType tokIdType );
+
 	TokNode( const TokNode &from );
 
 	~TokNode();

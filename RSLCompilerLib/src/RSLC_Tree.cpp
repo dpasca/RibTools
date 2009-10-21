@@ -33,6 +33,19 @@ TokNode::TokNode( Token *pObj ) :
 }
 
 //==================================================================
+TokNode::TokNode( const char *pTokStr, TokenID tokId, TokenIDType tokIdType ) :
+	mpToken( DNEW Token( pTokStr, tokId, tokIdType ) ),
+	mpParent(NULL),
+	mNodeType(TYPE_STANDARD),
+	mBlockType(BLKT_UNKNOWN),
+	mBlockID(0)
+{
+#ifdef _DEBUG
+	mUIDCnt = sUIDCnt++;
+#endif
+}
+
+//==================================================================
 TokNode::TokNode( const TokNode &from ) :
 	mpToken			(from.mpToken),
 	mVariables		(from.mVariables),

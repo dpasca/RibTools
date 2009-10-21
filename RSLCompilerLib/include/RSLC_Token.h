@@ -222,6 +222,7 @@ enum TokenID
 #undef DE_DEF
 #undef KW_DEF
 #undef SF_DEF
+#undef FO_DEF
 
 //==================================================================
 class Token
