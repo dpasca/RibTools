@@ -179,55 +179,42 @@ static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Fu
 	return NULL;
 }
 
-/*
-//==================================================================
-static void instrumentFuncsCallsParams( TokNode *pNode, int &out_parentIdx )
-{
-	bool	isDataType = pNode->IsDataType();
-
-	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
-	{
-		TokNode	*pParamsNode = pNode->GetChildTry( 0 );
-
-		// skip eventual space-cast string
-		if ( pParamsNode && pParamsNode->mpToken->id == T_VL_STRING )
-		{
-			pParamsNode = pNode->GetChildTry( 1 );
-		}
-
-		// do we have params ?
-		if ( pParamsNode )
-		{
-		}
-	}
-
-	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
-	{
-		instrumentFuncsCallsParams( pNode->mpChilds[i], i );
-	}
-}
-*/
-
 //==================================================================
 /*
-dest
-
----------
-
-=
-	dest
-	src
+node1           node1    
+	dest     	    =   
+           ->  		  dest 
+			 		  src
 */
-static void insertAssignTo( TokNode *pDestNode, const TokNode *pSrcNode )
+static void insertAssignToNode( TokNode *pDestNode, const TokNode *pSrcNode )
 {
 	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR );
-
-	TokNode *pCloneSrcNode = cloneBranch( pSrcNode );
+	TokNode *pSrcClone = cloneBranch( pSrcNode );
 
 	pAssgnNode->ReplaceNode( pDestNode );
 
 	pAssgnNode->AddChild( pDestNode );
-	pAssgnNode->AddChild( pCloneSrcNode );
+	pAssgnNode->AddChild( pSrcClone );
+}
+
+//==================================================================
+static TokNode *insertAssignToVar(
+						const VarLink	&destVLink,
+						const TokNode	*pSrcNode )
+{
+	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR );
+	TokNode	*pSrcClone = cloneBranch( pSrcNode );
+	
+	TokNode	*pNewDest = DNEW TokNode(
+								destVLink.GetVarPtr()->GetUseName().c_str(),
+								T_TD_TEMPDEST,
+								T_TYPE_TEMPDEST );
+	pNewDest->mVarLink = destVLink;
+
+	pAssgnNode->AddChild( pNewDest );
+	pAssgnNode->AddChild( pSrcClone );
+
+	return pAssgnNode;
 }
 
 //==================================================================
@@ -243,7 +230,7 @@ static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassPara
 		if NOT( pPassParam )
 			throw Exception( "Missing parameter ?", pPassParams );
 
-		insertAssignTo( pParamsHooks->mpChilds[i], pPassParam );
+		insertAssignToNode( pParamsHooks->mpChilds[i], pPassParam );
 		//printf( "PASSSS %s = %s\n", pClonedParamsHooks->mpChilds[i]->GetTokStr(), pPassParam->GetTokStr() );
 
 		// $$$ need to get the function params types from definition here..
@@ -270,13 +257,17 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs )
 			// place the params block where the function call (name) currently is
 			pClonedParamsHooks->ReplaceNode( pNode );
 
-			// add a return node/variable
-			AddVariable(
-				pClonedParamsHooks->mpParent,
-				DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
-				DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL ),	// %%% forced varying for now !
-				NULL,
-				pClonedParamsHooks );
+			// don't add the return value for "void" functions !
+			if NOT( pFunc->mpRetTypeTok->id == T_DT_void )
+			{
+				// add a return node/variable
+				AddVariable(
+					pClonedParamsHooks->mpParent,
+					DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
+					DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL ),	// %%% forced varying for now !
+					NULL,
+					pClonedParamsHooks );
+			}
 
 			const TokNode	*pPassParams = pNode->GetChildTry( 0 );
 
@@ -300,30 +291,11 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs )
 }
 
 //==================================================================
-static TokNode *insertAssignToNode(
-						const VarLink	&destVLink,
-						const TokNode	*pSrcNode )
-{
-	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR );
-
-	TokNode	*pNewDest = DNEW TokNode( "ReturnDest", T_TD_TEMPDEST, T_TYPE_TEMPDEST );
-
-	pNewDest->mVarLink = destVLink;
-
-	TokNode	*pSrcClone = cloneBranch( pSrcNode );
-
-	pAssgnNode->AddChild( pNewDest );
-	pAssgnNode->AddChild( pSrcClone );
-
-	return pAssgnNode;
-}
-
-//==================================================================
 static TokNode *instrumentFCallReturn( TokNode *pReturnNode, const VarLink &destVLink )
 {
 	TokNode	*pRetNode = pReturnNode->GetRight();
 
-	TokNode	*pAssign = insertAssignToNode( destVLink, pRetNode );
+	TokNode	*pAssign = insertAssignToVar( destVLink, pRetNode );
 
 	pAssign->ReplaceNode( pReturnNode );
 	DSAFE_DELETE( pReturnNode );
@@ -335,6 +307,27 @@ static TokNode *instrumentFCallReturn( TokNode *pReturnNode, const VarLink &dest
 }
 
 //==================================================================
+/*
+BLKT_FNPARAMS individuates the parameters.. however, after previous
+processing, the first node in the params is he "return value" node
+..there may not be one, so we have to be careful about the validity
+of pFnParams->mVarLink
+
+	(					-- BLKT_FNPARAMS
+		{
+			return
+			+
+				1
+				2
+
+	(->ReturnDest		-- BLKT_FNPARAMS
+		{
+			=
+				ReturnDest
+				+
+					1
+					2
+*/
 static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsToRemove )
 {
 	if ( pNode->mpToken && pNode->mpToken->id == T_KW_return )
@@ -352,11 +345,15 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsT
 		}
 		DASSERT( pFnParams->GetBlockType() == BLKT_FNPARAMS );
 
-		pNode = instrumentFCallReturn( pReturnNode, pFnParams->mVarLink );
+		// do we actually have any params in input ?
+		if ( pFnParams->mVarLink.IsValid() )
+		{
+			pNode = instrumentFCallReturn( pReturnNode, pFnParams->mVarLink );
 
-		// pNode points to the next node to be used to continue dig recursively
-		pNode = pNode->GetChildTry( 1 );
-		DASSERT( pNode != NULL );
+			// pNode points to the next node to be used to continue dig recursively
+			pNode = pNode->GetChildTry( 1 );
+			DASSERT( pNode != NULL );
+		}
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -364,23 +361,6 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsT
 		resolveFunctionReturns( pNode->mpChilds[i], pAssignOpsToRemove );
 	}
 }
-
-/*
-	(
-		{
-			return
-			+
-				1
-				2
-
-	(->ReturnDest
-		{
-			=
-				ReturnDest
-				+
-					1
-					2
-*/
 
 //==================================================================
 void ResolveFunctionCalls( TokNode *pNode )

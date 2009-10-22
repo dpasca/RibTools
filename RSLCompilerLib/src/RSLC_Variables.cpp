@@ -345,6 +345,15 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 
 			for (; i < pNode->mpChilds.size(); ++i)
 			{
+				TokNode	*pTokNode = pNode->GetChildTry( i + 0 );
+
+				if (pTokNode->mpToken->idType != T_TYPE_DATATYPE &&
+					pTokNode->mpToken->idType != T_TYPE_DETAIL &&
+					pTokNode->mpToken->idType != T_KW_output )
+				{
+					continue;
+				}
+
 				while ( fndVarDefBeginInBlock(
 								i,
 								pNode,
@@ -357,6 +366,8 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 				{
 					if ( pOutputNode && blkType == BLKT_CODEBLOCK )
 						throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pOutputNode );
+
+					bool	isFunctionName = false;
 
 					for (; i < pNode->mpChilds.size(); ++i)
 					{
@@ -382,8 +393,16 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 							if ( pChild->IsNonTerminal() )
 							{
 								TokNode	*pChild2 = pNode->GetChildTry( i+1 );
-								if ( !pChild2 || !pChild2->IsTokenID( T_OP_LFT_BRACKET ) )
+
+								isFunctionName = (pChild2 && pChild2->IsTokenID( T_OP_LFT_BRACKET ));
+								if ( isFunctionName )
+									break;
+
+								if ( !isFunctionName )
 								{
+									if NOT( pDTypeNode )
+										throw Exception( "Missing type for definition ?", pChild );
+
 									// no "space cast" in the declaration in the curl braces
 									Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pChild );
 
@@ -412,7 +431,7 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 						}
 					}
 
-					if NOT( i < pNode->mpChilds.size() )
+					if ( i >= pNode->mpChilds.size() || isFunctionName )
 						break;
 				}
 			}

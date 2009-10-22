@@ -86,7 +86,7 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	FO_DEF( if				)	,
 	FO_DEF( for				)	,
 	FO_DEF( while			)	,
-	FO_DEF( solar			)	,
+	//FO_DEF( solar			)	,
 	FO_DEF( illuminate		)	,
 	FO_DEF( illuminance		)	,
 
