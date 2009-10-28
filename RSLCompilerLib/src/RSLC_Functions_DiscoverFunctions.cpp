@@ -77,6 +77,11 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 
 		pFuncName->mNodeType = TokNode::TYPE_FUNCDEF;	// mark the node as a function definition
 
+		if ( pRetType->mpToken->id == T_DT___funcop )
+		{
+			pFuncName->mIsFuncOp = true;
+		}
+
 		for (size_t j=0; j < pFunc->mpParamsNode->mpChilds.size(); ++j)
 		{
 			const TokNode	*pParamNode = pFunc->mpParamsNode->mpChilds[j];
@@ -95,6 +100,7 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 //==================================================================
 static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
 {
+	// constructor ?
 	bool	isDataType = pFuncCallNode->IsDataType();
 
 	TokNode *pRightNode = pFuncCallNode->GetRight();
@@ -185,6 +191,7 @@ void DiscoverFunctions( TokNode *pRoot )
 	discoverFuncsUsage( pRoot, pRoot->GetFuncs(), idx );
 }
 
+#if 0
 //==================================================================
 //==================================================================
 //==================================================================
@@ -242,7 +249,8 @@ void DiscoverFuncopsUsage( TokNode *pRoot )
 //==================================================================
 static void reparentFuncopsStatements_sub( TokNode *pNode, int &out_parentIdx )
 {
-	if ( pNode->GetBlockType() == BLKT_FUNCOPEXPR )
+	//if ( pNode->GetBlockType() == BLKT_FUNCOPEXPR )
+	if ( pNode->mIsFuncOp )
 	{
 		/*
 			b
@@ -258,16 +266,23 @@ static void reparentFuncopsStatements_sub( TokNode *pNode, int &out_parentIdx )
 			..the parent loop will skip one, so we need to backpedal..
 		*/
 
-		out_parentIdx -= 1;
+		//out_parentIdx -= 1;
 
-		TokNode *pStmtNode = pNode->mpParent->GetRight();
+		TokNode *pParamsBracket = pNode->GetRight();
 
-		if NOT( pStmtNode )
+		if NOT( pParamsBracket )
+			throw Exception( "Missing statement ?",  pNode );
+
+		TokNode *pStmtNode = pParamsBracket->GetRight();
+		
+		TokNode *pNewParent = pParamsBracket->mpChilds.back();
+
+		if ( !pStmtNode || !pNewParent )
 			throw Exception( "Missing statement ?",  pNode );
 
 		// set statement as child of the expression block
-		pStmtNode->Reparent( pNode );
-		pNode->mpChilds.push_back( pStmtNode );
+		pStmtNode->Reparent( pNewParent );
+		pNewParent->mpChilds.push_back( pStmtNode );
 	}
 
 	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
@@ -282,7 +297,7 @@ void ReparentFuncopsStatements( TokNode *pRoot )
 	int	idx = 0;
 	reparentFuncopsStatements_sub( pRoot, idx );
 }
-
+#endif
 
 //==================================================================
 }

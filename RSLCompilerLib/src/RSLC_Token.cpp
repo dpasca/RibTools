@@ -79,6 +79,7 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	DT_DEF( matrix			)	,
 	DT_DEF( string			)	,
 	DT_DEF( void			)	,
+	DT_DEF( __funcop		)	,
 
 	DE_DEF( varying			)	,
 	DE_DEF( uniform			)	,

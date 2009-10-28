@@ -20,6 +20,50 @@ class SymbolList;
 class MicroPolygonGrid;
 
 //==================================================================
+/// SlSolarCtx
+//==================================================================
+class SlSolarCtx
+{
+public:
+	u_int			mBodyStartAddr;
+	const SlVec3	*mpAxis	;
+	const SlScalar	*mpAngle;
+
+	SlVec3			*mpL;
+
+	int				mLightIdx;
+
+	SlSolarCtx() :
+		mpAxis(NULL),
+		mpAngle(NULL),
+		mpL(NULL),
+		mLightIdx(-1)
+	{
+	}
+
+	void Init(
+		u_int			bodyStartAddr,
+		const SlVec3	*pAxis	,
+		const SlScalar	*pAngle,
+		SlVec3			*pL
+		)
+	{
+		mLightIdx = 0;
+	
+		mBodyStartAddr	= bodyStartAddr;
+
+		mpAxis	= pAxis	;
+		mpAngle	= pAngle;
+		mpL		= pL	;
+	}
+
+	bool IsActive() const
+	{
+		return mLightIdx != -1;
+	}
+};
+
+//==================================================================
 /// SlRunContext
 //==================================================================
 class SlRunContext
@@ -36,6 +80,8 @@ public:
 
 public:
 	MicroPolygonGrid		*mpGrid;
+
+	SlSolarCtx				mSolarCtx;
 
 	u_int					mBlocksXN;
 	u_int					mPointsYN;
@@ -203,6 +249,7 @@ public:
 	void DisableProcessor( u_int i )		{ mpSIMDFlags[i] += 1; }
 	u_int GetProcessorsN() const			{ return mPointsN; }
 	void NextInstruction()					{ mProgramCounter[mProgramCounterIdx] += GetOpCount() + 1; }
+	u_int GetCurPC() const					{ return mProgramCounter[mProgramCounterIdx]; }
 	
 	void GotoInstruction( u_int address )
 	{

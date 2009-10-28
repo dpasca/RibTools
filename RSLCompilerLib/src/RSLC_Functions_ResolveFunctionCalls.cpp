@@ -248,17 +248,29 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs )
 
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
+		if ( pNode->mpToken && 0 == strcmp( "solar", pNode->GetTokStr() ) )
+		{
+			int yoyo = 1;
+		}
+
 		const Function	*pFunc = matchFunctionByParams( pNode, funcs );
 
 		if ( pFunc )
 		{
 			TokNode	*pClonedParamsHooks = cloneBranch( pFunc->mpParamsNode );
 
+			TokNode	*pFollowingStatement = NULL;
+			if ( pFunc->mpRetTypeTok->id == T_DT___funcop )
+			{
+				pFollowingStatement = pNode->GetRight();
+			}
+
 			// place the params block where the function call (name) currently is
 			pClonedParamsHooks->ReplaceNode( pNode );
 
-			// don't add the return value for "void" functions !
-			if NOT( pFunc->mpRetTypeTok->id == T_DT_void )
+			// don't add the return value for "void" or "__funcop" functions !
+			if ( pFunc->mpRetTypeTok->id != T_DT_void &&
+				 pFunc->mpRetTypeTok->id != T_DT___funcop )
 			{
 				// add a return node/variable
 				AddVariable(
@@ -272,6 +284,24 @@ static void resolveFunctionCalls( TokNode *pNode, const DVec<Function> &funcs )
 			const TokNode	*pPassParams = pNode->GetChildTry( 0 );
 
 			assignPassingParams( pClonedParamsHooks, pPassParams );
+
+			// a funcop ?
+			if ( pFunc->mpRetTypeTok->id == T_DT___funcop )
+			{
+				// NOTE: do re really need to do this reparenting ??!
+
+				if NOT( pFollowingStatement )
+					throw Exception( "Missing statement !", pNode );
+
+				// following statement becomes parent of the function
+				pFollowingStatement->Reparent( pClonedParamsHooks );
+				pClonedParamsHooks->AddChild( pFollowingStatement );
+
+				TokNode	*pFuncOpEndMarker = DNEW TokNode( "_asm_funcopend", T_NONTERM, T_TYPE_NONTERM );
+				pFuncOpEndMarker->mNodeType = TokNode::TYPE_FUNCCALL;
+
+				pClonedParamsHooks->AddChild( pFuncOpEndMarker );
+			}
 		}
 		else
 		{

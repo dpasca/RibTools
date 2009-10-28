@@ -35,10 +35,11 @@ point		varying		Ps
 */
 
 /*================================================================
-/// Common constants
+/// FuncOps
 ///==============================================================*/
-void solar( vector axis, float angle )
+__funcop solar( vector axis, float angle )
 {
+	_asm_solarbegin_vs( axis, angle );
 }
 
 /*================================================================

@@ -326,116 +326,121 @@ static Function *findFunctionByNameNode( DVec<Function> &funcs, TokNode *pFindNo
 }
 
 //==================================================================
+static void discoverVariablesDeclarations_sub( TokNode *pNode, size_t &i )
+{
+	BlockType	blkType = pNode->GetBlockType();
+
+	TokNode	*pDTypeNode	= NULL;
+	TokNode	*pDetailNode= NULL;
+	TokNode	*pOutputNode= NULL;
+
+	for (; i < pNode->mpChilds.size(); ++i)
+	{
+		TokNode	*pTokNode = pNode->GetChildTry( i + 0 );
+
+		if (pTokNode->mpToken->idType != T_TYPE_DATATYPE &&
+			pTokNode->mpToken->idType != T_TYPE_DETAIL &&
+			pTokNode->mpToken->idType != T_KW_output )
+		{
+			continue;
+		}
+
+		while ( fndVarDefBeginInBlock(
+						i,
+						pNode,
+						pNode->GetChildTry( i + 0 ),
+						pNode->GetChildTry( i + 1 ),
+						pNode->GetChildTry( i + 2 ),
+						pDTypeNode,
+						pDetailNode,
+						pOutputNode ) )
+		{
+			if ( pOutputNode && blkType == BLKT_CODEBLOCK )
+				throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pOutputNode );
+
+			bool	isFunctionName = false;
+
+			for (; i < pNode->mpChilds.size(); ++i)
+			{
+				TokNode	*pChild = pNode->GetChildTry( i );
+
+				if ( pChild->IsTokenID( T_OP_SEMICOL ) ||
+					 pChild->IsTokenID( T_OP_RGT_BRACKET ) )
+				{
+					++i;
+					break;
+				}
+				else
+				if ( pChild->IsTokenID( T_OP_COMMA ) )
+				{
+					continue;
+				}
+				else
+				{
+					// it's a variable declaration if it's non terminal..
+					// ..and it's not followed by an opening bracket
+					// ..or followed by no sibling.. which is the end of params in
+					// a function/shader params block (ehm ?)
+					if ( pChild->IsNonTerminal() )
+					{
+						TokNode	*pChild2 = pNode->GetChildTry( i+1 );
+
+						isFunctionName = (pChild2 && pChild2->IsTokenID( T_OP_LFT_BRACKET ));
+						if ( isFunctionName )
+							break;
+
+						if ( !isFunctionName )
+						{
+							if NOT( pDTypeNode )
+								throw Exception( "Missing type for definition ?", pChild );
+
+							// no "space cast" in the declaration in the curl braces
+							Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pChild );
+
+							if ( blkType == BLKT_SHPARAMS )
+							{
+								pVar->mIsSHParam = true;	// mark as shader param
+							}
+						}
+					}
+					else
+					{
+						if ( blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS )
+						{
+							// functions and shader params are allowed to change type after
+							// a comma !
+
+							if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
+								pDTypeNode = pChild;
+							else
+							if ( pChild->mpToken->idType == T_TYPE_DETAIL )
+								pDetailNode = pChild;
+						}
+						//else
+						//	throw Exception( "Expecting a variable name !" );
+					}
+				}
+			}
+
+			if ( i >= pNode->mpChilds.size() || isFunctionName )
+				break;
+		}
+	}
+}
+
+//==================================================================
 void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	size_t i = 0;
 
 	BlockType	blkType = pNode->GetBlockType();
 
-	//if ( pNode->mpToken || blkType == BLKT_ROOT )
+	if (	blkType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+		 || blkType == BLKT_FNPARAMS
+		 || blkType == BLKT_CODEBLOCK
+		 || blkType == BLKT_ROOT )
 	{
-		if (	blkType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
-			 || blkType == BLKT_FNPARAMS
-			 || blkType == BLKT_CODEBLOCK
-			 || blkType == BLKT_ROOT )
-		{
-			TokNode	*pDTypeNode	= NULL;
-			TokNode	*pDetailNode= NULL;
-			TokNode	*pOutputNode= NULL;
-
-			for (; i < pNode->mpChilds.size(); ++i)
-			{
-				TokNode	*pTokNode = pNode->GetChildTry( i + 0 );
-
-				if (pTokNode->mpToken->idType != T_TYPE_DATATYPE &&
-					pTokNode->mpToken->idType != T_TYPE_DETAIL &&
-					pTokNode->mpToken->idType != T_KW_output )
-				{
-					continue;
-				}
-
-				while ( fndVarDefBeginInBlock(
-								i,
-								pNode,
-								pNode->GetChildTry( i + 0 ),
-								pNode->GetChildTry( i + 1 ),
-								pNode->GetChildTry( i + 2 ),
-								pDTypeNode,
-								pDetailNode,
-								pOutputNode ) )
-				{
-					if ( pOutputNode && blkType == BLKT_CODEBLOCK )
-						throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pOutputNode );
-
-					bool	isFunctionName = false;
-
-					for (; i < pNode->mpChilds.size(); ++i)
-					{
-						TokNode	*pChild = pNode->GetChildTry( i );
-
-						if ( pChild->IsTokenID( T_OP_SEMICOL ) ||
-							 pChild->IsTokenID( T_OP_RGT_BRACKET ) )
-						{
-							++i;
-							break;
-						}
-						else
-						if ( pChild->IsTokenID( T_OP_COMMA ) )
-						{
-							continue;
-						}
-						else
-						{
-							// it's a variable declaration if it's non terminal..
-							// ..and it's not followed by an opening bracket
-							// ..or followed by no sibling.. which is the end of params in
-							// a function/shader params block (ehm ?)
-							if ( pChild->IsNonTerminal() )
-							{
-								TokNode	*pChild2 = pNode->GetChildTry( i+1 );
-
-								isFunctionName = (pChild2 && pChild2->IsTokenID( T_OP_LFT_BRACKET ));
-								if ( isFunctionName )
-									break;
-
-								if ( !isFunctionName )
-								{
-									if NOT( pDTypeNode )
-										throw Exception( "Missing type for definition ?", pChild );
-
-									// no "space cast" in the declaration in the curl braces
-									Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pChild );
-
-									if ( blkType == BLKT_SHPARAMS )
-									{
-										pVar->mIsSHParam = true;	// mark as shader param
-									}
-								}
-							}
-							else
-							{
-								if ( blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS )
-								{
-									// functions and shader params are allowed to change type after
-									// a comma !
-
-									if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
-										pDTypeNode = pChild;
-									else
-									if ( pChild->mpToken->idType == T_TYPE_DETAIL )
-										pDetailNode = pChild;
-								}
-								//else
-								//	throw Exception( "Expecting a variable name !" );
-							}
-						}
-					}
-
-					if ( i >= pNode->mpChilds.size() || isFunctionName )
-						break;
-				}
-			}
-		}
+		discoverVariablesDeclarations_sub( pNode, i );
 	}
 
 	if ( blkType == BLKT_ROOT )

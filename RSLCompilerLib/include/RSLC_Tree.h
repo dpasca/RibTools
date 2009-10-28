@@ -48,6 +48,7 @@ private:
 public:
 	TokNode			*mpParent;
 	Type			mNodeType;
+	bool			mIsFuncOp;
 
 private:
 	BlockType		mBlockType;

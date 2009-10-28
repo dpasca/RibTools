@@ -164,9 +164,12 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 		TokNode *pBracket = pNode->GetChildTry( nextChild );
 
-		DASSERT( pBracket->mpToken->id == T_OP_LFT_BRACKET );
-
-		writeFuncParams( pFile, pBracket );
+		// get the params bracket.. if any !
+		if ( pBracket )
+		{
+			DASSERT( pBracket->mpToken->id == T_OP_LFT_BRACKET );
+			writeFuncParams( pFile, pBracket );
+		}
 	}
 	else
 	if ( pNode->mpToken->IsBiOp() )

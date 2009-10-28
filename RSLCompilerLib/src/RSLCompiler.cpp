@@ -73,7 +73,7 @@ RSLCompiler::RSLCompiler(
 	RemoveClosingBrackets( mpRoot );
 
 	// discover if, while, solar, etc..
-	DiscoverFuncopsUsage( mpRoot );
+	//DiscoverFuncopsUsage( mpRoot );
 
 	// remove semicolons as they serve no additional purpose
 	RemoveSemicolons( mpRoot );
@@ -83,7 +83,7 @@ RSLCompiler::RSLCompiler(
 
 	// reparent the funcops (e.g. the statement becomes a childen in cases as
 	// "solar(expr) stmt"
-	ReparentFuncopsStatements( mpRoot );
+	//ReparentFuncopsStatements( mpRoot );
 
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
