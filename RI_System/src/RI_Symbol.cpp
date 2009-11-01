@@ -298,6 +298,9 @@ Symbol *SymbolList::Add( const char *pDeclName, Symbol::Storage storage, const v
 
 	params.mpName	= name.c_str();
 
+	DASSTHROW( params.mType != Symbol::TYP_UNKNOWN,
+			("Bad symbol declaration. Type is missing: '%s'", pDeclName) );
+
 	return Add( params, pSrcData );
 }
 

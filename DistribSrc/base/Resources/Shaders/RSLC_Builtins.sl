@@ -35,17 +35,27 @@ point		varying		Ps
 */
 
 /*================================================================
-/// FuncOps
-///==============================================================*/
-__funcop solar( vector axis, float angle )
-{
-	_asm_solarbegin_vs( axis, angle );
-}
-
-/*================================================================
 /// Common constants
 ///==============================================================*/
 uniform float PI = 3.14159265;	/* Should implement "const" for this 8) */
+
+/*================================================================
+/// FuncOps
+///==============================================================*/
+__funcop solar( vector axis; float angle )
+{
+	_asm_solarbegin_vs( axis, angle );
+}
+/*===============================================================*/
+__funcop illuminance( point pos; vector axis; float angle )
+{
+	_asm_illuminance_vvs( pos, axis, angle );
+}
+/*===============================================================*/
+__funcop illuminance( point pos )
+{
+	_asm_illuminance_v( pos );
+}
 
 /*================================================================*/
 float	radians( float deg )
@@ -244,18 +254,19 @@ float	match( string pattern, subject ){}
 
 color	ambient()			{	color tmp; _asm_ambient( tmp );		return tmp;	}
 
-color	diffuse( normal N )	{	color tmp; _asm_diffuse( tmp, N );	return tmp;	}
-/*
 color	diffuse( normal Nn )
 {	
 	color C = 0;
-	_asm_illuminance ( P, Nn, PI/2 )
+
+	_asm_diffuse( C, N );
+/*
+	illuminance ( P, Nn, PI/2 )
 	{
 		C = C + Cl * (Nn . normalize(L));
 	}
+*/
 	return C;
 }
-*/
 
 /*================================================================*/
 color specular( normal N; vector V; float roughness )
@@ -333,10 +344,10 @@ vector	vtransform( string tospace; vector	v )	{	vector	tmp; _asm_vxformname_vxv(
 normal	ntransform( string tospace; normal	n )	{	normal	tmp; _asm_nxformname_vxv( tmp, tospace, n ); return tmp; }
 color	ctransform( string tospace; color	c )	{	color	tmp; _asm_cxformname_vxv( tmp, tospace, c ); return tmp; }
 
-point	point(  float x, float y, float z )	{ point	 tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
-vector	vector( float x, float y, float z )	{ vector tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
-normal	normal( float x, float y, float z )	{ normal tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
-color	color(  float x, float y, float z )	{ color	 tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+point	point(  float x, y, z )	{ point	 tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+vector	vector( float x, y, z )	{ vector tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+normal	normal( float x, y, z )	{ normal tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
+color	color(  float x, y, z )	{ color	 tmp; _asm_mov_vs3( tmp, x, y, z ); return tmp; }
 
 point	point(  float a )	{ point	 tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }
 vector	vector( float a )	{ vector tmp; _asm_mov_vs3( tmp, a, a, a ); return tmp; }

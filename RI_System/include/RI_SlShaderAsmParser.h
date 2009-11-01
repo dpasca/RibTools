@@ -42,6 +42,8 @@ class ShaderAsmParser
 	const char		*mpName;
 	DVec<Label>		mLabelDefs;
 	DVec<Label>		mLabelRefs;
+
+	size_t			mFuncOpBeginIdx;
 	
 public:
 	//==================================================================

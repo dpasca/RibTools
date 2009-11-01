@@ -28,7 +28,7 @@ struct TokenDef
 #define ST_DEF(_X_)			#_X_, T_TYPE_SHADERTYPE,T_ST_##_X_
 #define DE_DEF(_X_)			#_X_, T_TYPE_DETAIL,	T_DE_##_X_
 #define KW_DEF(_X_)			#_X_, T_TYPE_KEYWORD,	T_KW_##_X_
-#define SF_DEF(_X_)			#_X_, T_TYPE_STDFUNC,	T_SF_##_X_
+//#define SF_DEF(_X_)			#_X_, T_TYPE_STDFUNC,	T_SF_##_X_
 #define FO_DEF(_X_)			#_X_, T_TYPE_FUNCOP,	T_FO_##_X_
 
 //==================================================================
@@ -63,8 +63,8 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	OP_DEF(	":"		,	COLON		)	,
 	OP_DEF(	","		,	COMMA		)	,
 	OP_DEF(	";"		,	SEMICOL		)	,
-	OP_DEF(	"("		,	LFT_BRACKET		)	,
-	OP_DEF(	")"		,	RGT_BRACKET		)	,
+	OP_DEF(	"("		,	LFT_BRACKET			)	,
+	OP_DEF(	")"		,	RGT_BRACKET			)	,
 	OP_DEF(	"["		,	LFT_SQ_BRACKET		)	,
 	OP_DEF(	"]"		,	RGT_SQ_BRACKET		)	,
 	OP_DEF(	"{"		,	LFT_CRL_BRACKET		)	,
@@ -87,9 +87,6 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	FO_DEF( if				)	,
 	FO_DEF( for				)	,
 	FO_DEF( while			)	,
-	//FO_DEF( solar			)	,
-	FO_DEF( illuminate		)	,
-	FO_DEF( illuminance		)	,
 
 	KW_DEF( break			)	,
 	KW_DEF( continue		)	,
@@ -107,81 +104,6 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	ST_DEF( displacement	)	,
 	ST_DEF( transformation	)	,
 	ST_DEF( imager			)	,
-
-	SF_DEF( radians				)	,
-	SF_DEF( degrees				)	,
-	SF_DEF( sin					)	,
-	SF_DEF( asin				)	,
-	SF_DEF( cos					)	,
-	SF_DEF( acos				)	,
-	SF_DEF( tan					)	,
-	SF_DEF( atan				)	,
-	SF_DEF( pow					)	,
-	SF_DEF( exp					)	,
-	SF_DEF( sqrt				)	,
-	SF_DEF( inversesqrt			)	,
-	SF_DEF( log					)	,
-	SF_DEF( mod					)	,
-	SF_DEF( abs					)	,
-	SF_DEF( sign				)	,
-	SF_DEF( min					)	,
-	SF_DEF( max					)	,
-	SF_DEF( clamp				)	,
-	SF_DEF( mix					)	,
-	SF_DEF( floor				)	,
-	SF_DEF( ceil				)	,
-	SF_DEF( round				)	,
-	SF_DEF( step				)	,
-	SF_DEF( smoothstep			)	,
-	SF_DEF( filterstep			)	,
-	SF_DEF( spline				)	,
-	SF_DEF( Du					)	,
-	SF_DEF( Dv					)	,
-	SF_DEF( Deriv				)	,
-	SF_DEF( random				)	,
-	SF_DEF( noise				)	,
-	SF_DEF( pnoise				)	,
-	SF_DEF( cellnoise			)	,
-	SF_DEF( xcomp				)	,
-	SF_DEF( ycomp				)	,
-	SF_DEF( zcomp				)	,
-	SF_DEF( setxcomp			)	,
-	SF_DEF( setycomp			)	,
-	SF_DEF( setzcomp			)	,
-	SF_DEF( length				)	,
-	SF_DEF( normalize			)	,
-	SF_DEF( distance			)	,
-	SF_DEF( ptlined				)	,
-	SF_DEF( area				)	,
-	SF_DEF( faceforward			)	,
-	SF_DEF( reflect				)	,
-	SF_DEF( refract				)	,
-	SF_DEF( fresnel				)	,
-	SF_DEF( transform			)	,
-	SF_DEF( vtransform			)	,
-	SF_DEF( ntransform			)	,
-	SF_DEF( calculatenormal		)	,
-	SF_DEF( comp				)	,
-	SF_DEF( setcomp				)	,
-	SF_DEF( ctransform			)	,
-	SF_DEF( determinant			)	,
-	SF_DEF( translate			)	,
-	SF_DEF( rotate				)	,
-	SF_DEF( scale				)	,
-	SF_DEF( concat				)	,
-	SF_DEF( printf				)	,
-	SF_DEF( format				)	,
-	SF_DEF( match				)	,
-	SF_DEF( ambient				)	,
-	SF_DEF( diffuse				)	,
-	SF_DEF( specular			)	,
-	SF_DEF( specularbrdf		)	,
-	SF_DEF( phong				)	,
-	SF_DEF( trace				)	,
-	SF_DEF( texture				)	,
-	SF_DEF( environment			)	,
-	SF_DEF( shadow				)	,
-	SF_DEF( textureinfo			)	,
 };
 
 //==================================================================
@@ -193,7 +115,7 @@ static size_t _sTokenDefsIdxInvSortLen[TOKEN_N];
 #undef ST_DEF
 #undef DE_DEF
 #undef KW_DEF
-#undef SF_DEF
+//#undef SF_DEF
 #undef FO_DEF
 
 //==================================================================
@@ -259,6 +181,7 @@ static bool isAlphaNumStrFirstChar( char ch )
 		ch == '_';
 }
 
+/*
 //==================================================================
 Token *TokenFromDefOrNTerm( const char *pTokenStr, int lineCnt )
 {
@@ -272,6 +195,7 @@ Token *TokenFromDefOrNTerm( const char *pTokenStr, int lineCnt )
 
 	return DNEW Token( pTokenStr, T_NONTERM, T_TYPE_NONTERM );
 }
+*/
 
 
 //==================================================================
@@ -283,7 +207,7 @@ static bool matchTokenDef(
 					bool wasPrecededByWS,
 					int lineCnt )
 {
-	for (size_t j=T_VL_STRING+1; j < TOKEN_N; ++j)
+	for (size_t j=0; j < TOKEN_N; ++j)
 	{
 		const TokenDef &tokDef = _sTokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
 

@@ -369,40 +369,89 @@ typedef void (*ShaderInstruction)( SlRunContext &ctx );
 //==================================================================
 void Inst_SolarBegin_VS( SlRunContext &ctx )
 {
-	const SlVec3*	pAxis	= ctx.GetVoidRO( (		SlVec3 *)0, 1 );
-	const SlScalar*	pAngle	= ctx.GetVoidRO( (const SlScalar *)0, 2 );
+	DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
 
-	// SlColor*	pCl	= (		SlColor	*)ctx.mpGridSymIList->FindSymbolIData( "Cl" );
+	const SlVec3	*pAxis	= ctx.GetVoidRO( (		  SlVec3 *)0, 1 );
+	const SlScalar	*pAngle	= ctx.GetVoidRO( (const SlScalar *)0, 2 );
 
-	SlVec3		*pL	= (SlVec3 *)ctx.mpGridSymIList->FindSymbolIData( "L" );
+	SlVec3		*pL		= (SlVec3 *)ctx.mpGridSymIList->FindSymbolIData( "L" );
 
-	DASSTHROW( !ctx.mSolarCtx.IsActive(), ("Nested solar ?!") );
+	// 'L' becomes the normalized axis
+	*pL = pAxis->GetNormalized();
+
+	// TODO: check with angle to see if we need to skip this
+	// start looping by the funcop end
+	if ( 0 )
+	{
+		// if we are skipping then Cl = 0 (do we really need it ?)
+
+		SlColor	*pCl = (SlColor *)ctx.mpGridSymIList->FindSymbolIData( "Cl" );
+		*pCl = SlColor( 0 );
+
+		ctx.GotoInstruction( ctx.GetOp(0)->mOpCode.mFuncopEndAddr );
+	}
 
 	ctx.NextInstruction();
+}
 
+//==================================================================
+template<bool INCLUDES_AXIS_ANGLE>
+void Inst_Illuminance( SlRunContext &ctx )
+{
+	// any lights ?
+	if NOT( ctx.mpAttribs->mActiveLights.size() )
+	{
+		// no ? Skip the whole thing
+		ctx.GotoInstruction( ctx.GetOp(0)->mOpCode.mFuncopEndAddr );
+		ctx.NextInstruction();
+		return;
+	}
+
+	const SlVec3*	pPos	= ctx.GetVoidRO( (		SlVec3 *)0, 1 );
+	const SlVec3*	pAxis	;
+	const SlScalar*	pAngle	;
+
+	if ( INCLUDES_AXIS_ANGLE )
+	{
+		pAxis	= ctx.GetVoidRO( (		  SlVec3 *)0, 2 );
+		pAngle	= ctx.GetVoidRO( (const SlScalar *)0, 3 );
+	}
+	else
+	{
+		pAxis	= NULL;
+		pAngle	= NULL;
+	}
+
+	SlColor	*pCl	= (	SlColor	*)ctx.mpGridSymIList->FindSymbolIData( "Cl" );
+	SlVec3	*pL		= (	 SlVec3 *)ctx.mpGridSymIList->FindSymbolIData( "L" );
+
+	DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
+
+	ctx.NextInstruction();
 	u_int bodyStartAddr = ctx.GetCurPC();
 
-	ctx.mSolarCtx.Init(
+	ctx.mSlIlluminanceCtx.Init(
 			bodyStartAddr,
 			pAxis,
 			pAngle,
-			pL
+			pL,
+			ctx.mpAttribs->mActiveLights.size()
 			);
 
-	// TODO: setup L and increase light idx
+	// start looping by the funcop end
+	ctx.GotoInstruction( ctx.GetOp(0)->mOpCode.mFuncopEndAddr );
 }
 
 //==================================================================
 void Inst_FuncopEnd( SlRunContext &ctx )
 {
-	// are we doing solar ?
-	if ( ctx.mSolarCtx.IsActive() )
+	// are we doing illuminance ?
+	if ( ctx.mSlIlluminanceCtx.IsActive() )
 	{
-		// TODO: check light idx, and eventually setup the new L
-		// and go back to beginning of statement (or else fall through)
-		//ctx.GotoInstruction( ctx.mSolarCtx.mBodyStartAddr );
-
-		ctx.NextInstruction();
+		if ( ctx.mSlIlluminanceCtx.Next() )
+			ctx.NextInstruction();
+		else
+			ctx.GotoInstruction( ctx.mSlIlluminanceCtx.mBodyStartAddr );
 	}
 	else
 	{
@@ -488,6 +537,8 @@ static ShaderInstruction	sInstructionTable[] =
 	SOP::Inst_CalculateNormal,
 
 	Inst_SolarBegin_VS,
+	Inst_Illuminance<true>,
+	Inst_Illuminance<false>,
 	Inst_FuncopEnd,
 };
 

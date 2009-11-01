@@ -49,9 +49,6 @@ public:
 //==================================================================
 void DiscoverFunctions( TokNode *pRoot );
 
-//void DiscoverFuncopsUsage( TokNode *pRoot );
-//void ReparentFuncopsStatements( TokNode *pRoot );
-
 void ResolveFunctionCalls( TokNode *pNode );
 
 void WriteFunctions( FILE *pFile, TokNode *pNode );

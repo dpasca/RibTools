@@ -49,6 +49,11 @@ public:
 	{
 		strcpy_s( mStr, pFrom->mStr );
 	}
+
+	SlStr( const char *pFromCStr )
+	{
+		strcpy_s( mStr, pFromCStr );
+	}
 };
 
 //==================================================================

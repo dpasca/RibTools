@@ -19,13 +19,14 @@
 #include "RSLC_Registers.h"
 #include "RSLC_Builtins.h"
 #include "RSLC_Constants.h"
+#include "RSLC_Expressions.h"
 #include "RSLCompiler.h"
 
 //==================================================================
 using namespace	RSLC;
 
 //==================================================================
-const char	*RSLCompiler::mpsVersionString = "0.2a";
+const char	*RSLCompiler::mpsVersionString = "0.3a";
 
 //==================================================================
 RSLCompiler::RSLCompiler(
@@ -72,18 +73,11 @@ RSLCompiler::RSLCompiler(
 	// ..since the tree has already been defined at this point
 	RemoveClosingBrackets( mpRoot );
 
-	// discover if, while, solar, etc..
-	//DiscoverFuncopsUsage( mpRoot );
-
 	// remove semicolons as they serve no additional purpose
 	RemoveSemicolons( mpRoot );
 
 	// develop the tree based on operators with the proper precedence
 	ReparentOperators( mpRoot );
-
-	// reparent the funcops (e.g. the statement becomes a childen in cases as
-	// "solar(expr) stmt"
-	//ReparentFuncopsStatements( mpRoot );
 
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
@@ -96,9 +90,11 @@ RSLCompiler::RSLCompiler(
 
 	SolveExpressions( mpRoot, true, true );
 
-	AssignRegisters( mpRoot, 0 );
-
 	MarkUsedGlobals( mpRoot );
+
+	SolveGlobalConstants( mpRoot );
+
+	AssignRegisters( mpRoot, 0 );
 
 	// produce some debug info in the output file
 	if ( params.mDbgOutputTree )

@@ -139,6 +139,94 @@ static std::string resolveIntrinsics( const char *pIntrName )
 }
 
 //==================================================================
+static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
+{
+	TokNode *pOperand1 = pNode->GetChildTry( 0 );
+	TokNode *pOperand2 = pNode->GetChildTry( 1 );
+
+	// no assignment for function call as it's done above
+	if ( pNode->mpToken->id == T_OP_ASSIGN &&
+		 pOperand1->mNodeType == TokNode::TYPE_FUNCCALL )
+		return;
+
+	if ( pOperand1 && pOperand2 )
+	{
+		VarType	varType1;
+		VarType	varType2;
+
+		std::string	o1Str = getOperand( pOperand1, varType1 );
+		std::string	o2Str = getOperand( pOperand2, varType2 );
+
+		bool	doAssign = pNode->mpToken->IsAssignOp();
+
+		char l1 = VarTypeToLetter(varType1);
+		char l2 = VarTypeToLetter(varType2);
+
+		char	instrBuff[256];
+
+		if ( doAssign )
+		{
+			if ( pNode->mpToken->id == T_OP_ASSIGN )
+			{
+				// build either a load instruction or a move
+/*
+				if ( isValue2 )
+					fprintf_s(
+							pFile,
+							"\tld%c\t%s\t%s\n",
+							l1,
+							o1Str.c_str(),
+							o2Str.c_str() );
+				else
+*/
+				// rudimentary form of optimization !
+				// WARNING: careful with jumps ?
+				if NOT( l1 == l2 && o1Str == o2Str )
+				{
+					sprintf_s( instrBuff, "mov.%c%c", l1, l2 );
+
+					fprintf_s(
+							pFile,
+							"\t%-14s %-6s\t%-6s\n",
+							instrBuff,
+							o1Str.c_str(),
+							o2Str.c_str() );
+				}
+			}
+			else
+			{
+				sprintf_s( instrBuff, "%s.%c%c", asmOpCodeFromOpToken( pNode->mpToken ), l1, l2 );
+
+				fprintf_s(
+						pFile,
+						"\t%-14s %-6s\t%-6s\t%-6s\n",
+						instrBuff,
+						o1Str.c_str(),
+						o1Str.c_str(),
+						o2Str.c_str() );
+			}
+		}
+		else
+		{
+			Register	reg = pNode->GetRegister();
+			std::string regName = GetRegName( reg );
+
+			char		lreg = VarTypeToLetter( reg.GetVarType() );
+
+			sprintf_s( instrBuff, "%s.%c%c%c", asmOpCodeFromOpToken( pNode->mpToken ), lreg, l1, l2 );
+
+			fprintf_s(
+					pFile,
+					"\t%-14s %-6s\t%-6s\t%-6s\n",
+					instrBuff,
+					regName.c_str(),
+					o1Str.c_str(),
+					o2Str.c_str() );
+		}
+	}
+}
+
+//==================================================================
 static void buildExpression( FILE *pFile, TokNode *pNode )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -170,92 +258,13 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 			DASSERT( pBracket->mpToken->id == T_OP_LFT_BRACKET );
 			writeFuncParams( pFile, pBracket );
 		}
+		else
+			fprintf_s( pFile, "\n" );
 	}
 	else
 	if ( pNode->mpToken->IsBiOp() )
 	{
-		TokNode *pOperand1 = pNode->GetChildTry( 0 );
-		TokNode *pOperand2 = pNode->GetChildTry( 1 );
-
-		// no assignment for function call as it's done above
-		if ( pNode->mpToken->id == T_OP_ASSIGN &&
-			 pOperand1->mNodeType == TokNode::TYPE_FUNCCALL )
-			return;
-
-		if ( pOperand1 && pOperand2 )
-		{
-			VarType	varType1;
-			VarType	varType2;
-
-			std::string	o1Str = getOperand( pOperand1, varType1 );
-			std::string	o2Str = getOperand( pOperand2, varType2 );
-
-			bool	doAssign = pNode->mpToken->IsAssignOp();
-
-			char l1 = VarTypeToLetter(varType1);
-			char l2 = VarTypeToLetter(varType2);
-
-			char	instrBuff[256];
-
-			if ( doAssign )
-			{
-				if ( pNode->mpToken->id == T_OP_ASSIGN )
-				{
-					// build either a load instruction or a move
-/*
-					if ( isValue2 )
-						fprintf_s(
-								pFile,
-								"\tld%c\t%s\t%s\n",
-								l1,
-								o1Str.c_str(),
-								o2Str.c_str() );
-					else
-*/
-					// rudimentary form of optimization !
-					if NOT( l1 == l2 && o1Str == o2Str )
-					{
-						sprintf_s( instrBuff, "mov.%c%c", l1, l2 );
-
-						fprintf_s(
-								pFile,
-								"\t%-14s %-6s\t%-6s\n",
-								instrBuff,
-								o1Str.c_str(),
-								o2Str.c_str() );
-					}
-				}
-				else
-				{
-					sprintf_s( instrBuff, "%s.%c%c", asmOpCodeFromOpToken( pNode->mpToken ), l1, l2 );
-
-					fprintf_s(
-							pFile,
-							"\t%-14s %-6s\t%-6s\t%-6s\n",
-							instrBuff,
-							o1Str.c_str(),
-							o1Str.c_str(),
-							o2Str.c_str() );
-				}
-			}
-			else
-			{
-				Register	reg = pNode->GetRegister();
-				std::string regName = GetRegName( reg );
-
-				char		lreg = VarTypeToLetter( reg.GetVarType() );
-
-				sprintf_s( instrBuff, "%s.%c%c%c", asmOpCodeFromOpToken( pNode->mpToken ), lreg, l1, l2 );
-
-				fprintf_s(
-						pFile,
-						"\t%-14s %-6s\t%-6s\t%-6s\n",
-						instrBuff,
-						regName.c_str(),
-						o1Str.c_str(),
-						o2Str.c_str() );
-			}
-		}
+		buildExpression_biOp( pFile, pNode );
 	}
 }
 

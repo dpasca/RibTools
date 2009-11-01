@@ -115,6 +115,7 @@ static void realizeConstants_rec( TokNode *pNode, TokNode *pRoot )
 //==================================================================
 void RealizeConstants( TokNode *pRoot )
 {
+#if 0
 	const DVec<Function> &funcs = pRoot->GetFuncs();
 
 	for (size_t i=0; i < funcs.size(); ++i)
@@ -142,6 +143,12 @@ void RealizeConstants( TokNode *pRoot )
 			realizeConstants_rec( pNode, pRoot );
 		}
 	}
+
+#else
+
+	realizeConstants_rec( pRoot, pRoot );
+
+#endif
 }
 
 //==================================================================

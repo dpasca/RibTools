@@ -317,6 +317,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_Expressions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Expressions.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Functions.cpp"
 				>
 			</File>

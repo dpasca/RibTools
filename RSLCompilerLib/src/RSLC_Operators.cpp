@@ -99,6 +99,7 @@ bool SolveBiOpType(
 				continue;
 
 			out_varType = _gBiOpConvertRules[i].mResType;
+			break;
 		}
 
 		if ( out_varType == VT_UNKNOWN )

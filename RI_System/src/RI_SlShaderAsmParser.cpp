@@ -25,6 +25,8 @@ namespace RI
 //==================================================================
 #define OPC_FLG_RIGHTISIMM		1
 #define OPC_FLG_UNIFORMOPERS	2
+#define OPC_FLG_FUNCOP_BEGIN	4
+#define OPC_FLG_FUNCOP_END		8
 
 //==================================================================
 struct OpCodeDef
@@ -111,8 +113,10 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"ambient"		,	1,			0,	OPRTYPE_F3,	OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 	"calculatenormal",	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 
-	"solarbegin.vs",	2,			0,	OPRTYPE_F3, OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"funcopend"		,	0,			0,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"solarbegin.vs",	2,			OPC_FLG_FUNCOP_BEGIN, OPRTYPE_F3, OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"illuminance.vvs",	3,			OPC_FLG_FUNCOP_BEGIN, OPRTYPE_F3, OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"illuminance.v",	1,			OPC_FLG_FUNCOP_BEGIN, OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
+	"funcopend"		,	0,			OPC_FLG_FUNCOP_END,	  OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 
 	NULL			,	0,			0,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA
 };
@@ -122,7 +126,8 @@ static OpCodeDef	gsOpCodeDefs[] =
 //==================================================================
 ShaderAsmParser::ShaderAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName ) :
 	mpShader(pShader),
-	mpName(pName)
+	mpName(pName),
+	mFuncOpBeginIdx(DNPOS)
 {
 	doParse( file );
 
@@ -187,7 +192,7 @@ bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSec
 	{
 		if (
 			beginsWithTokenI( pLineWork, "light" ) 			||
-			beginsWithTokenI( pLineWork, "surface" )			||
+			beginsWithTokenI( pLineWork, "surface" )		||
 			beginsWithTokenI( pLineWork, "volume" )			||
 			beginsWithTokenI( pLineWork, "displacement" )	||
 			beginsWithTokenI( pLineWork, "transformation" )	||
@@ -785,13 +790,35 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 		onError( "Unknown opcode '%s' !\n", pTok );
 	}
 
+	size_t	instrIdx = mpShader->mCode.size();
+
+	if ( pOpDef->Flags & OPC_FLG_FUNCOP_BEGIN )
+	{
+		if ( mFuncOpBeginIdx != DNPOS )
+		{
+			onError( "Instruction %s cannot be nested !", pOpDef->pName );
+		}
+		else
+			mFuncOpBeginIdx = instrIdx;
+	}
+	else
+	if ( pOpDef->Flags & OPC_FLG_FUNCOP_END )
+	{
+		if ( mFuncOpBeginIdx == DNPOS )
+		{
+			onError( "Missing matching instruction for %s ", pOpDef->pName );
+		}
+
+		mpShader->mCode[mFuncOpBeginIdx].mOpCode.mFuncopEndAddr = mFuncOpBeginIdx;
+		mFuncOpBeginIdx = DNPOS;
+	}
+
 	SlCPUWord		instruction;
 	instruction.mOpCode.mTableOffset	= opCodeIdx;
 	instruction.mOpCode.mOperandCount	= pOpDef->OperCnt;
-	instruction.mOpCode.mDestOpType		= 0;
+	instruction.mOpCode.mFuncopEndAddr	= 0;
 	instruction.mOpCode.mDbgLineNum		= lineCnt;
 
-	size_t	instrIdx = mpShader->mCode.size();
 	mpShader->mCode.push_back( instruction );
 
 	for (u_int i=0; i < pOpDef->OperCnt; ++i)
@@ -810,12 +837,6 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 			parseCode_handleOperImmediate( pTok );
 		else
 			parseCode_handleOperSymbol( pTok, pOpDef, i );
-
-		// copy the type of the first operator into the opcode
-		if ( i == 0 )
-		{
-			instruction.mOpCode.mDestOpType = pOpDef->Types[i];
-		}
 	}
 
 	// write again

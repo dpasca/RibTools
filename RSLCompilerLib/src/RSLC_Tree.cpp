@@ -298,15 +298,24 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 					TokNode	*pFnType = pFnName->GetLeft();
 					if ( pFnType )
 					{
-						// shader
-						if ( pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
-							pNode->SetBlockType( BLKT_SHPARAMS );
-						else	// function
-						if ( pFnType->mpToken->idType == T_TYPE_DATATYPE )
-							pNode->SetBlockType( BLKT_FNPARAMS );
+						// do we have something like.. ?
+						// uniform vector AA = vector(1,2,3);
+						if ( pFnType->mpToken->id == T_OP_ASSIGN )
+						{
+							//pFnType = pFnType->GetLeft();
+						}
 						else
 						{
-							throw Exception( "Return type unknown", pNode );
+							// shader
+							if ( pFnType && pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
+								pNode->SetBlockType( BLKT_SHPARAMS );
+							else	// function
+							if ( pFnType && pFnType->mpToken->idType == T_TYPE_DATATYPE )
+								pNode->SetBlockType( BLKT_FNPARAMS );
+							else
+							{
+								throw Exception( "Return type unknown", pNode );
+							}
 						}
 					}
 				}

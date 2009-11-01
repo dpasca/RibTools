@@ -236,7 +236,6 @@ void Attributes::cmdOpacity( const Color &color )
 	mpRevision->BumpRevision();
 }
 
-/*
 //==================================================================
 static void addShaderParam(
 					SlShaderInst		&shaInst,
@@ -259,23 +258,38 @@ static void addShaderParam(
 	// is it a global symbol ?
 	const Symbol *pSym = globalSyms.FindSymbol( pName );
 
-	// if not, then see if it's a new symbol declaration in the form
-	// <class> <type> <name>
-	if NOT( pSym )
+	// if it is, then add an instance of the symbol
+	if ( pSym )
 	{
-		pSym = shaInst.mCallSymList.Add( pName );
-			
-			//pLight->moShaderInst->mCallSymList.Add( pName, Symbol::STOR_PARAMETER );
-		
-
-		mpState->WarnPrintf( "Parameter %s not found", pName );
+		if NOT( pSym->IsUniform() )
+			state.EXCEPTPrintf( "Inline params must be uniform ! (for now.. 8)" );
 	}
 	else
 	{
-		pLight->moShaderInst->mCallSymIList.AddInstance( pSym );
+		// if not, then see if it's a new symbol declaration in the form
+		// <class> <type> <name>
+		pSym = shaInst.mCallSymList.Add( pName, Symbol::STOR_PARAMETER );
+	}
+
+	SymbolI *pSymI = shaInst.mCallSymIList.AddInstance( *pSym, 1 );	// 1... uniform only !
+
+	void *pData = pSymI->GetRWData();
+
+	switch ( pSym->mType )
+	{
+	case Symbol::TYP_FLOAT:	*((SlScalar *)pData) = SlScalar	(params[fromIdx+1].Flt()		); break;
+	case Symbol::TYP_POINT:	*((SlVec3	*)pData) = SlVec3	(params[fromIdx+1].PFlt( 3 )	); break;
+	case Symbol::TYP_VECTOR:*((SlVec3	*)pData) = SlVec3	(params[fromIdx+1].PFlt( 3 )	); break;
+	case Symbol::TYP_NORMAL:*((SlVec3	*)pData) = SlVec3	(params[fromIdx+1].PFlt( 3 )	); break;
+  //case Symbol::TYP_HPOINT:*((SlScalar *)pData) = SlScalar	(params[fromIdx+1].PFlt( 4 )	); break;
+	case Symbol::TYP_COLOR:	*((SlColor	*)pData) = SlColor	(params[fromIdx+1].PFlt( NCOLS )); break;
+	case Symbol::TYP_STRING:*((SlStr	*)pData) = SlStr	(params[fromIdx+1].PChar()		); break;
+	case Symbol::TYP_MATRIX:*((Matrix44 *)pData) = Matrix44	(params[fromIdx+1].PFlt( 16 )	); break;
+	default:
+		state.EXCEPTPrintf( "Unsupported data type or this operation (?)" );
+		break;
 	}
 }
-*/
 
 //==================================================================
 void Attributes::cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam )
@@ -337,34 +351,14 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 			//return;
 		}
 
-#if 0
-
+#if 1
 		addShaderParam(
-					pLight->moShaderInst,
+					*pLight->moShaderInst.Use(),
 					*mpGlobalSyms,
 					params,
 					i,
 					*mpState );
 
-
-/*		// No such a thing ? Should have been declared ?
-		if NOT( pSym )
-			pSym = pShader->mpShaSyms->FindSymbol( pName );
-*/
-
-		if NOT( pSym )
-		{
-			
-
-			mpState->WarnPrintf( "Parameter %s not found", pName );
-		}
-		else
-		{
-			pLight->moShaderInst->mCallSymIList.AddInstance( pSym );
-		}
-
-		// mSymbols.FindSymbol( pName )
-		// or .. mpGlobalSyms->FindSymbol( pName )
 #else
 		if ( 0 == strcasecmp( pName, "from" ) )
 		{
@@ -393,7 +387,7 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 		}
 #endif
 
-		if NOT( hasNextParam )
+		//if NOT( hasNextParam )
 			i += 1;
 	}
 

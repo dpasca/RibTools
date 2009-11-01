@@ -20,9 +20,9 @@ class SymbolList;
 class MicroPolygonGrid;
 
 //==================================================================
-/// SlSolarCtx
+/// SlIlluminanceCtx
 //==================================================================
-class SlSolarCtx
+class SlIlluminanceCtx
 {
 public:
 	u_int			mBodyStartAddr;
@@ -31,13 +31,15 @@ public:
 
 	SlVec3			*mpL;
 
-	int				mLightIdx;
+	size_t			mLightIdx;
+	size_t			mLightsN;
 
-	SlSolarCtx() :
+	SlIlluminanceCtx() :
 		mpAxis(NULL),
 		mpAngle(NULL),
 		mpL(NULL),
-		mLightIdx(-1)
+		mLightIdx(DNPOS),
+		mLightsN(0)
 	{
 	}
 
@@ -45,22 +47,22 @@ public:
 		u_int			bodyStartAddr,
 		const SlVec3	*pAxis	,
 		const SlScalar	*pAngle,
-		SlVec3			*pL
+		SlVec3			*pL,
+		size_t			lightsN
 		)
 	{
 		mLightIdx = 0;
 	
 		mBodyStartAddr	= bodyStartAddr;
 
-		mpAxis	= pAxis	;
-		mpAngle	= pAngle;
-		mpL		= pL	;
+		mpAxis		= pAxis	;
+		mpAngle		= pAngle;
+		mpL			= pL	;
+		mLightsN	= lightsN;
 	}
 
-	bool IsActive() const
-	{
-		return mLightIdx != -1;
-	}
+	bool Next()				{	mLightIdx += 1;	return mLightIdx < mLightsN;	}
+	bool IsActive() const	{	return mLightIdx != DNPOS;	}
 };
 
 //==================================================================
@@ -81,7 +83,11 @@ public:
 public:
 	MicroPolygonGrid		*mpGrid;
 
-	SlSolarCtx				mSolarCtx;
+	// for light shaders only
+	//SlSolarCtx				mSolarCtx;
+
+	// for surface shaders only
+	SlIlluminanceCtx		mSlIlluminanceCtx;
 
 	u_int					mBlocksXN;
 	u_int					mPointsYN;
@@ -116,6 +122,13 @@ public:
 			u_int				blocksXN,
 			u_int				pointsYN,
 			size_t				pointsN );
+
+	bool IsInFuncop() const
+	{
+		return
+			//mSolarCtx.IsActive() ||
+			mSlIlluminanceCtx.IsActive();
+	}
 
 	const SlCPUWord *GetOp( u_int argc ) const
 	{

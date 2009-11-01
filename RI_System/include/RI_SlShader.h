@@ -167,7 +167,7 @@ struct SlOpCode
 {
 	u_int	mTableOffset;
 	u_short	mOperandCount;
-	u_short	mDestOpType;
+	u_short	mFuncopEndAddr;
 	u_int	mDbgLineNum;
 };
 
