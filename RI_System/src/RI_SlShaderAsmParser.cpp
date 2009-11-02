@@ -809,7 +809,7 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 			onError( "Missing matching instruction for %s ", pOpDef->pName );
 		}
 
-		mpShader->mCode[mFuncOpBeginIdx].mOpCode.mFuncopEndAddr = mFuncOpBeginIdx;
+		mpShader->mCode[mFuncOpBeginIdx].mOpCode.mFuncopEndAddr = instrIdx;
 		mFuncOpBeginIdx = DNPOS;
 	}
 

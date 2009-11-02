@@ -398,11 +398,13 @@ void Inst_SolarBegin_VS( SlRunContext &ctx )
 template<bool INCLUDES_AXIS_ANGLE>
 void Inst_Illuminance( SlRunContext &ctx )
 {
+	u_short funcOpEndAddr = ctx.GetOp(0)->mOpCode.mFuncopEndAddr;
+
 	// any lights ?
 	if NOT( ctx.mpAttribs->mActiveLights.size() )
 	{
 		// no ? Skip the whole thing
-		ctx.GotoInstruction( ctx.GetOp(0)->mOpCode.mFuncopEndAddr );
+		ctx.GotoInstruction( funcOpEndAddr );
 		ctx.NextInstruction();
 		return;
 	}
@@ -439,7 +441,7 @@ void Inst_Illuminance( SlRunContext &ctx )
 			);
 
 	// start looping by the funcop end
-	ctx.GotoInstruction( ctx.GetOp(0)->mOpCode.mFuncopEndAddr );
+	ctx.GotoInstruction( funcOpEndAddr );
 }
 
 //==================================================================
@@ -449,7 +451,10 @@ void Inst_FuncopEnd( SlRunContext &ctx )
 	if ( ctx.mSlIlluminanceCtx.IsActive() )
 	{
 		if ( ctx.mSlIlluminanceCtx.Next() )
+		{
+			ctx.mSlIlluminanceCtx.Reset();
 			ctx.NextInstruction();
+		}
 		else
 			ctx.GotoInstruction( ctx.mSlIlluminanceCtx.mBodyStartAddr );
 	}

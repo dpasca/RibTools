@@ -624,9 +624,9 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	//--- write storage
 	const char *pStorage = "ERROR!!!";
 
+	if ( var.mHasBaseVal )	pStorage = "temporary"; else
 	if ( var.mIsGlobal )	pStorage = "global"; else
-	if ( var.mIsSHParam )	pStorage = "parameter"; else
-	if ( var.mHasBaseVal )	pStorage = "temporary";
+	if ( var.mIsSHParam )	pStorage = "parameter";
 
 	fprintf_s( pFile, "%-9s ", pStorage );
 
