@@ -76,72 +76,6 @@ char VarTypeToLetter( VarType type )
 }
 
 //==================================================================
-void Variable::AssignRegister( int regIdx )
-{
-	DASSERT( !mBuild_Register.IsValid() );
-
-	mBuild_Register.SetType( mVarType, mIsVarying, mIsForcedDetail );
-	mBuild_Register.SetRegIdx( regIdx );
-}
-
-//==================================================================
-bool Variable::IsRegisterAssigned() const
-{
-	return mBuild_Register.IsAssigned();
-}
-
-//==================================================================
-RSLC::VarType Variable::GetVarType() const
-{
-	DASSERT( !mBuild_Register.IsValid() || mBuild_Register.GetVarType() == mVarType );
-
-	return mVarType;
-}
-
-//==================================================================
-bool Variable::IsVarying() const
-{
-	DASSERT( !mBuild_Register.IsValid() || mBuild_Register.IsVarying() == mIsVarying );
-
-	return mIsVarying;
-}
-
-//==================================================================
-bool Variable::IsForcedDetail() const
-{
-	DASSERT( mBuild_Register.IsForcedDetail() == mIsForcedDetail );
-
-	return mIsForcedDetail;
-}
-
-//==================================================================
-void Variable::SetVarying( bool varying )
-{
-	DASSERT( mIsForcedDetail == false );
-
-	mIsVarying = varying;
-
-	if ( mBuild_Register.IsValid() )
-	{
-		mBuild_Register.SetVarying( varying );
-	}
-}
-
-//==================================================================
-std::string Variable::GetUseName() const
-{
-	if ( mIsGlobal || mIsSHParam )
-		return mpDefNameTok->str;
-	else
-	if ( mBuild_Register.IsValid() )
-	{
-		return GetRegName( mBuild_Register );
-	}
-	else
-		return mInternalName;
-}
-
-//==================================================================
 Variable *AddVariable(
 			TokNode *pNode,
 			TokNode *pDTypeNode,
@@ -461,7 +395,9 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 
 				if NOT( pDTypeNode )
 					throw Exception( "Missing type for definition in variable declaration.", pChild );
-				AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+
+				DASSERT( !!pLastNonTerm );
+				//AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
 			}
 			else
 			if ( pChild->mpToken->id == T_OP_COMMA )
@@ -606,23 +542,23 @@ void DiscoverVariablesUsage( TokNode *pNode )
 }
 
 //==================================================================
-static void markUsedGlobals_sub( TokNode *pNode )
+static void markUsedVariables_sub( TokNode *pNode )
 {
 	Variable	*pVar = pNode->mVarLink.GetVarPtr();
 
-	if ( pVar && pVar->mIsGlobal )
+	if ( pVar )
 	{
 		pVar->mIsUsed = true;
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		markUsedGlobals_sub( pNode->mpChilds[i] );
+		markUsedVariables_sub( pNode->mpChilds[i] );
 	}
 }
 
 //==================================================================
-void MarkUsedGlobals( TokNode *pRoot )
+void MarkUsedVariables( TokNode *pRoot )
 {
 	for (size_t i=0; i < pRoot->GetFuncs().size(); ++i)
 	{
@@ -631,7 +567,7 @@ void MarkUsedGlobals( TokNode *pRoot )
 		if NOT( func.IsShader() )
 			continue;
 
-		markUsedGlobals_sub( func.mpParamsNode );
+		markUsedVariables_sub( func.mpParamsNode );
 	}
 }
 
@@ -650,6 +586,31 @@ void SolveGlobalConstants( TokNode *pRoot )
 
 		DASSERT( pDest->mVarLink.IsValid() );
 		DASSERT( pExpr->mVarLink.IsValid() );
+
+		// TODO: support constants defined by actual constant expression
+		// solvable at compile time !
+
+		if ( pExpr->mpChilds.size() )
+			throw Exception( "Sorry constant values only, no expressions for now !", pExpr );
+
+		const Variable *pExprVar = pExpr->mVarLink.GetVarPtr();
+			  Variable *pDestVar = pDest->mVarLink.GetVarPtr();
+
+		if ( pDestVar->GetVarType() == VT_FLOAT )
+		{
+			DASSERT(
+				pDestVar->mBaseValNum.size() == 0 &&
+				pExprVar->mBaseValNum.size() == 1
+				);
+
+			pDestVar->mBaseValNum.push_back(
+						pExprVar->mBaseValNum[0] );
+			pDestVar->mHasBaseVal = true;
+		}
+		else
+		{
+			throw Exception( "Sorry constant float values only !", pExpr );
+		}
 	}
 }
 
@@ -745,7 +706,8 @@ void WriteVariables( FILE *pFile, TokNode *pNode )
 	{
 		const Variable	&var = vars[i];
 
-		if ( !var.mIsSHParam && ((var.mIsGlobal && var.mIsUsed) || !var.mIsGlobal) )
+		//if ( !var.mIsSHParam && ((var.mIsGlobal && var.mIsUsed) || !var.mIsGlobal) )
+		if ( !var.mIsSHParam && var.mIsUsed )
 			writeVariable( pFile, var );
 	}
 

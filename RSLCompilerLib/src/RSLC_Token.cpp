@@ -28,7 +28,6 @@ struct TokenDef
 #define ST_DEF(_X_)			#_X_, T_TYPE_SHADERTYPE,T_ST_##_X_
 #define DE_DEF(_X_)			#_X_, T_TYPE_DETAIL,	T_DE_##_X_
 #define KW_DEF(_X_)			#_X_, T_TYPE_KEYWORD,	T_KW_##_X_
-//#define SF_DEF(_X_)			#_X_, T_TYPE_STDFUNC,	T_SF_##_X_
 #define FO_DEF(_X_)			#_X_, T_TYPE_FUNCOP,	T_FO_##_X_
 
 //==================================================================
@@ -458,7 +457,6 @@ const char *GetTokenTypeStr( TokenIDType tokidtype )
 	case T_TYPE_DATATYPE:	return "Data Type";
 	case T_TYPE_SHADERTYPE:	return "Shader Type";
 	case T_TYPE_KEYWORD:	return "Keyword";
-	case T_TYPE_STDFUNC:	return "Std Func";
 
 	default:
 		return "SYMBOL NOT FOUND ?!!";
@@ -558,6 +556,7 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 		throw Exception( DUT::SSPrintFS( "Invalid character '%c' at line %i !", pSource[i], lineCnt+1 ) );
 	}
 
+/*
 	// solve ambiguities about variables named like standard functions !
 	size_t	n = tokens.size();
 	if ( n-- )
@@ -572,6 +571,7 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 			}	
 		}
 	}
+*/
 }
 
 //==================================================================

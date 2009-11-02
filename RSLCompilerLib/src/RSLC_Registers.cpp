@@ -63,31 +63,4 @@ void AssignRegisters( TokNode *pNode, int regIdx )
 }
 
 //==================================================================
-std::string GetRegName( const Register &reg )
-{
-	char	regBase[16] = {0};
-
-	switch ( reg.GetVarType() )
-	{
-	case VT_FLOAT:	regBase[0] = 's'; break;
-	case VT_POINT:	regBase[0] = 'v'; break;
-	case VT_COLOR:	regBase[0] = 'v'; break;
-	case VT_STRING:	regBase[0] = 'x'; break;
-	case VT_VECTOR:	regBase[0] = 'v'; break;
-	case VT_NORMAL:	regBase[0] = 'v'; break;
-	case VT_MATRIX:	regBase[0] = 'm'; break;
-	case VT_BOOL:	regBase[0] = 'b'; break;
-	default:
-		strcpy_s( regBase, "UNK_" );
-		//DASSERT( 0 );
-		break;
-	}
-
-	if NOT( reg.IsVarying() )
-		strcat_s( regBase, "u" );
-
-	return DUT::SSPrintFS( "$%s%i", regBase, reg.GetRegIdx() );
-}
-
-//==================================================================
 }

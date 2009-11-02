@@ -1,21 +1,33 @@
 //==================================================================
-/// RSLC_Registers.h
+/// RSLC_VarType.h
 ///
-/// Created by Davide Pasca - 2009/6/29
+/// Created by Davide Pasca - 2009/11/3
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RSLC_REGISTERS_H
-#define RSLC_REGISTERS_H
+#ifndef RSLC_VARTYPE_H
+#define RSLC_VARTYPE_H
 
 //==================================================================
 namespace RSLC
 {
 
 //==================================================================
-void RealizeConstants( TokNode *pRoot );
-void AssignRegisters( TokNode *pNode, int regIdx );
+enum VarType
+{
+	VT_UNKNOWN	,
+	VT_FLOAT	,
+	VT_POINT	,
+	VT_COLOR	,
+	VT_VECTOR	,
+	VT_NORMAL	,
+	VT_MATRIX	,
+	VT_STRING	,
+	VT_BOOL		,
+	VT_N
+};
+
 
 //==================================================================
 }

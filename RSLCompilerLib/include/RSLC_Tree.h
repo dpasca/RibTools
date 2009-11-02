@@ -154,7 +154,6 @@ public:
 	bool IsCodeBlock() const			{ return mBlockType == BLKT_CODEBLOCK; }
 	bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
 	bool IsNonTerminal() const			{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : false; }
-	bool IsStdFunction() const			{ return mpToken ? mpToken->idType == T_TYPE_STDFUNC : false; }
 	bool IsFuncOp() const				{ return mpToken ? mpToken->idType == T_TYPE_FUNCOP : false; }
 	bool IsDataType() const				{ return mpToken ? mpToken->idType == T_TYPE_DATATYPE : false; }
 	bool IsTokenID( TokenID id ) const	{ return mpToken ? mpToken->id == id : false; }

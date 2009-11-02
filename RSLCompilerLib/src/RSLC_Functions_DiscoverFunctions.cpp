@@ -167,9 +167,15 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 {
 	bool	isDataType = pNode->IsDataType();
 
+/*
 	if ( !pNode->IsParentRoot() &&  // parent cannot be root !!
 		 (pNode->IsNonTerminal() ||
 		  pNode->IsStdFunction() ||
+		  isDataType) &&
+			pNode->mNodeType == TokNode::TYPE_STANDARD )
+*/
+
+	if ( (pNode->IsNonTerminal() ||
 		  isDataType) &&
 			pNode->mNodeType == TokNode::TYPE_STANDARD )
 	{

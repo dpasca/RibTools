@@ -75,7 +75,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 
 		Register	reg = pChild->GetRegister();
 
-		std::string regName = GetRegName( reg );
+		std::string regName = reg.GetName();
 
 		fprintf_s( pFile, " %s", regName.c_str() );
 	}
@@ -209,7 +209,7 @@ static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
 		else
 		{
 			Register	reg = pNode->GetRegister();
-			std::string regName = GetRegName( reg );
+			std::string regName = reg.GetName();
 
 			char		lreg = VarTypeToLetter( reg.GetVarType() );
 

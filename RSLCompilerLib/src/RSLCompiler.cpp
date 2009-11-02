@@ -90,7 +90,7 @@ RSLCompiler::RSLCompiler(
 
 	SolveExpressions( mpRoot, true, true );
 
-	MarkUsedGlobals( mpRoot );
+	MarkUsedVariables( mpRoot );
 
 	SolveGlobalConstants( mpRoot );
 
