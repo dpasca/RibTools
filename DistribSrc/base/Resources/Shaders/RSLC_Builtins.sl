@@ -8,18 +8,6 @@
 /* Basic declarations ad found in RenderMan specs and instrumented
 for RibRender */
 
-/*================================================================*/
-color phing( normal N; vector V; float size )
-{
-	color C = 0;
-	
-	{
-	vector Ln = normalize(L);
-	}
-
-	return C;
-}
-
 /*================================================================
 /// Globals from the renderer itself
 ///==============================================================*/
@@ -282,6 +270,14 @@ color	diffuse( normal Nn )
 }
 
 /*================================================================*/
+color specularbrdf( vector L, N, V; float roughness )
+{
+	vector H = normalize( L + V );
+
+	return pow( max( 0, N . H ), 1 / roughness );
+}
+
+/*================================================================*/
 color specular( normal N; vector V; float roughness )
 {
 	color C = 0;
@@ -291,14 +287,6 @@ color specular( normal N; vector V; float roughness )
 /*
 	return color( 0.1 );
 */
-}
-
-/*================================================================*/
-color specularbrdf( vector L, N, V; float roughness )
-{
-	vector H = normalize( L + V );
-
-	return pow( max( 0, N . H ), 1 / roughness );
 }
 
 /*================================================================*/

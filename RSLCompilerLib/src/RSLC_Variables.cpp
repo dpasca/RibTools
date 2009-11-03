@@ -400,11 +400,7 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 
 				if ( pDTypeNode )
 				{
-					if NOT( pDTypeNode )
-						throw Exception( "Missing type for definition in variable declaration.", pChild );
-
 					DASSERT( !!pLastNonTerm );
-					//AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
 				}
 			}
 			else
@@ -416,9 +412,11 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 
 				if ( pDTypeNode )
 				{
-					if NOT( pDTypeNode )
-						throw Exception( "Missing type for definition in variable declaration.", pChild );
-					AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+					Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+					if ( blkType == BLKT_SHPARAMS )
+					{
+						pVar->mIsSHParam = true;	// mark as shader param
+					}
 				}
 			}
 			else
@@ -431,9 +429,11 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 
 				if ( pDTypeNode )
 				{
-					if NOT( pDTypeNode )
-						throw Exception( "Missing type for definition in variable declaration.", pChild );
-					AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+					Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+					if ( blkType == BLKT_SHPARAMS )
+					{
+						pVar->mIsSHParam = true;	// mark as shader param
+					}
 				}
 
 				pDTypeNode	= NULL;
@@ -475,7 +475,11 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 	// check for last declaration in case of shadow or function params
 	if ( (blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS) && pLastNonTerm && pDTypeNode )
 	{
-		AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );		
+		Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );		
+		if ( blkType == BLKT_SHPARAMS )
+		{
+			pVar->mIsSHParam = true;	// mark as shader param
+		}
 	}
 
 	return i;
@@ -645,7 +649,10 @@ static void writeVariable( FILE *pFile, const Variable &var )
 
 	if ( var.mHasBaseVal )	pStorage = "temporary"; else
 	if ( var.mIsGlobal )	pStorage = "global"; else
-	if ( var.mIsSHParam )	pStorage = "parameter";
+	if ( var.mIsSHParam )	pStorage = "parameter"; else
+	{
+		DASSERT( 0 );
+	}
 
 	fprintf_s( pFile, "%-9s ", pStorage );
 
