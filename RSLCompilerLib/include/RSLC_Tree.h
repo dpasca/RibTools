@@ -49,6 +49,9 @@ public:
 	TokNode			*mpParent;
 	Type			mNodeType;
 	bool			mIsFuncOp;
+	
+	// TODO: ummmmm !!
+	const Function	*mpNodeTypeFuncCall_pFunc;
 
 private:
 	BlockType		mBlockType;

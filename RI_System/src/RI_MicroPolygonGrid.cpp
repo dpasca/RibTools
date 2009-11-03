@@ -134,7 +134,7 @@ void MicroPolygonGrid::Displace( const Attributes &attribs )
 		mDispRunCtx.Setup(
 						attribs,
 						attribs.moDisplaceSHI.Use(),
-						RI_GET_SIMD_BLOCKS( mYDim ),
+						RI_GET_SIMD_BLOCKS( mXDim ),
 						mYDim,
 						mPointsN );
 
@@ -148,7 +148,7 @@ void MicroPolygonGrid::Shade( const Attributes &attribs )
 	mSurfRunCtx.Setup(
 					attribs,
 					attribs.moSurfaceSHI.Use(),
-					RI_GET_SIMD_BLOCKS( mYDim ),
+					RI_GET_SIMD_BLOCKS( mXDim ),
 					mYDim,
 					mPointsN );
 

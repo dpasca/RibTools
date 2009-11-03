@@ -119,6 +119,7 @@ public:
 private:
 	SlShader *loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName );
 	SlShader *getShader( const char *pShaderName, const char *pAlternateName );
+	void getShaderParams( ParamList &params, size_t fromIdx, SlShaderInst &shaderInst );
 };
 
 //==================================================================

@@ -13,7 +13,7 @@
 namespace RSLC
 {
 
-void SolveExpressions( class TokNode *pNode, bool mustSucceed, bool processShaderOnly );
+void SolveExpressions( class TokNode *pNode, bool processShaderOnly );
 void SolveGlobalConstants( TokNode *pRoot );
 
 //==================================================================

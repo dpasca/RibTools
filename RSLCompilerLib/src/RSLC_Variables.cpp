@@ -30,6 +30,7 @@ VarType VarTypeFromToken( const Token *pTok )
 	case T_DT_color	: return VT_COLOR;
 	case T_DT_matrix: return VT_MATRIX;
 	case T_DT_string: return VT_STRING;
+	case T_DT_void:	  return VT_VOID;
 	}
 
 	DASSERT( 0 );
@@ -49,6 +50,7 @@ const char *VarTypeToString( VarType type )
 	case VT_MATRIX	: return "matrix"	;
 	case VT_STRING	: return "string"	;
 	case VT_BOOL	: return "bool"		;
+	case VT_VOID	: return "void"	;
 
 	default:
 	case VT_UNKNOWN	: return "UNKNOWN"	;
@@ -353,6 +355,7 @@ static size_t discoverVariablesDeclarations_sub2( TokNode *pNode, size_t i )
 	return i;
 }
 
+// TODO: functions and shader params are allowed to change type after a comma !
 //==================================================================
 static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i )
 {
@@ -363,6 +366,8 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 
 	int		bracketCnt = 0;
 	bool	intoRValue = false;
+
+	BlockType	blkType = pNode->GetBlockType();
 
 	for (; i < pNode->mpChilds.size(); ++i)
 	{
@@ -393,11 +398,14 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 
 				intoRValue = true;
 
-				if NOT( pDTypeNode )
-					throw Exception( "Missing type for definition in variable declaration.", pChild );
+				if ( pDTypeNode )
+				{
+					if NOT( pDTypeNode )
+						throw Exception( "Missing type for definition in variable declaration.", pChild );
 
-				DASSERT( !!pLastNonTerm );
-				//AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+					DASSERT( !!pLastNonTerm );
+					//AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+				}
 			}
 			else
 			if ( pChild->mpToken->id == T_OP_COMMA )
@@ -406,9 +414,12 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 				// e.g. float a = 4, c ...
 				intoRValue = false;
 
-				if NOT( pDTypeNode )
-					throw Exception( "Missing type for definition in variable declaration.", pChild );
-				AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+				if ( pDTypeNode )
+				{
+					if NOT( pDTypeNode )
+						throw Exception( "Missing type for definition in variable declaration.", pChild );
+					AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+				}
 			}
 			else
 			if ( pChild->mpToken->id == T_OP_SEMICOL )
@@ -418,9 +429,12 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 				// e.g. float a = 4, c;
 				intoRValue = false;
 
-				if NOT( pDTypeNode )
-					throw Exception( "Missing type for definition in variable declaration.", pChild );
-				AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+				if ( pDTypeNode )
+				{
+					if NOT( pDTypeNode )
+						throw Exception( "Missing type for definition in variable declaration.", pChild );
+					AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+				}
 
 				pDTypeNode	= NULL;
 				pDetailNode	= NULL;
@@ -444,8 +458,8 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 				else
 				if ( pChild->mpToken->id == T_KW_output )
 				{
-					if ( pOutputNode )
-						throw Exception( "Broken variable declaration", pChild );
+					if ( pOutputNode && (blkType != BLKT_SHPARAMS && blkType != BLKT_FNPARAMS) )
+						throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pChild );
 
 					pOutputNode = pChild;
 				}
@@ -456,6 +470,12 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 				}
 			}
 		}
+	}
+
+	// check for last declaration in case of shadow or function params
+	if ( (blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS) && pLastNonTerm && pDTypeNode )
+	{
+		AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );		
 	}
 
 	return i;
@@ -478,7 +498,8 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 		if ( pNode->GetBlockType() == BLKT_ROOT )
 			i = discoverVariablesDeclarations_rootBlock( pNode, i );
 		else
-			i = discoverVariablesDeclarations_sub2( pNode, i );
+			i = discoverVariablesDeclarations_rootBlock( pNode, i );
+			//i = discoverVariablesDeclarations_sub2( pNode, i );
 	}
 
 	return i;
@@ -487,7 +508,14 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 //==================================================================
 void DiscoverVariablesDeclarations( TokNode *pNode )
 {
-	size_t i = 0;
+	for (size_t i = 0; i < pNode->mpChilds.size(); ++i)
+	{
+		if ( pNode->mpChilds[i]->mpToken->id == T_OP_LFT_CRL_BRACKET ||
+			 pNode->mpChilds[i]->mpToken->id == T_OP_LFT_BRACKET )
+		{
+			DiscoverVariablesDeclarations( pNode->mpChilds[i] );
+		}
+	}
 
 	BlockType	blkType = pNode->GetBlockType();
 
@@ -496,18 +524,9 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 		 || blkType == BLKT_CODEBLOCK
 		 || blkType == BLKT_ROOT )
 	{
-		i = discoverVariablesDeclarations_sub( pNode, i );
-	}
-
-	if ( blkType == BLKT_ROOT )
-		i = 0;
-
-	for (; i < pNode->mpChilds.size(); ++i)
-	{
-		if ( pNode->mpChilds[i]->mpToken->id == T_OP_LFT_CRL_BRACKET ||
-			 pNode->mpChilds[i]->mpToken->id == T_OP_LFT_BRACKET )
+		for (size_t i=0; i < pNode->mpChilds.size();)
 		{
-			DiscoverVariablesDeclarations( pNode->mpChilds[i] );
+			i = discoverVariablesDeclarations_sub( pNode, i );
 		}
 	}
 }

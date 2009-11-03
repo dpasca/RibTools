@@ -103,6 +103,8 @@ static bool doVTypesMatch( const Function &func, const TokNode &callNode, bool l
 	{
 		VarType	vtype = callNode.mpChilds[i]->GetVarType();
 
+		DASSERT( vtype != VT_UNKNOWN );
+
 		if ( laxTypes )
 		{
 			if ( isVecNorPoint( func.mParamsVarTypes[i] ) )
@@ -127,7 +129,7 @@ static bool doVTypesMatch( const Function &func, const TokNode &callNode, bool l
 }
 
 //==================================================================
-static const Function *matchFunctionByParams( TokNode *pFCallNode, const DVec<Function> &funcs )
+const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function> &funcs )
 {
 	Function	*pFound = NULL;
 
@@ -241,31 +243,35 @@ static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassPara
 //==================================================================
 static void resolveFunctionCalls(
 						TokNode *pNode,
-						const DVec<Function> &funcs,
-						DVec<TokNode *> &out_pFuncOpUsageNodes )
+						const DVec<Function> &funcs )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		resolveFunctionCalls( pNode->mpChilds[i], funcs, out_pFuncOpUsageNodes );
+		resolveFunctionCalls( pNode->mpChilds[i], funcs );
 	}
 
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
-/*
-		if ( pNode->mpToken && 0 == strcmp( "illuminance", pNode->GetTokStr() ) )
-		{
-			int yoyo = 1;
-		}
-*/
+		const Function	*pFunc = NULL;
 
-		const Function	*pFunc = matchFunctionByParams( pNode, funcs );
+		// bogus params ?
+		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		{
+			VarType vtype = pNode->mpChilds[i]->GetVarType();
+			if ( vtype == VT_UNKNOWN )
+			{
+				break;
+			}
+		}
+
+		pFunc = MatchFunctionByParams( pNode, funcs );
 
 		if ( pFunc )
 		{
 			TokNode	*pClonedParamsHooks = cloneBranch( pFunc->mpParamsNode );
 
 			TokNode	*pFollowingStatement = NULL;
-			if ( pFunc->mpRetTypeTok->id == T_DT___funcop )
+			if ( pFunc->mpRetTypeTok->id == T_KW___funcop )
 			{
 				pFollowingStatement = pNode->GetRight();
 			}
@@ -273,9 +279,8 @@ static void resolveFunctionCalls(
 			// place the params block where the function call (name) currently is
 			pClonedParamsHooks->ReplaceNode( pNode );
 
-			// don't add the return value for "void" or "__funcop" functions !
-			if ( pFunc->mpRetTypeTok->id != T_DT_void &&
-				 pFunc->mpRetTypeTok->id != T_DT___funcop )
+			// don't add the return value for "void" functions !
+			if ( pFunc->mRetVarType != VT_VOID )
 			{
 				// add a return node/variable
 				AddVariable(
@@ -291,7 +296,7 @@ static void resolveFunctionCalls(
 			assignPassingParams( pClonedParamsHooks, pPassParams );
 
 			// a funcop ?
-			if ( pFunc->mpRetTypeTok->id == T_DT___funcop )
+			if ( pFunc->mpRetTypeTok->id == T_KW___funcop )
 			{
 				// NOTE: do re really need to do this reparenting ??!
 
@@ -299,15 +304,6 @@ static void resolveFunctionCalls(
 					throw Exception( "Missing statement !", pNode );
 
 				pClonedParamsHooks->mIsFuncOp = true;
-
-				out_pFuncOpUsageNodes.push_back( pClonedParamsHooks );
-				// following statement becomes parent of the function
-				//pFollowingStatement->Reparent( pClonedParamsHooks );
-				//pClonedParamsHooks->AddChild( pFollowingStatement );
-
-				//TokNode	*pFuncOpEndMarker = DNEW TokNode( "_asm_funcopend", T_NONTERM, T_TYPE_NONTERM );
-				//pFuncOpEndMarker->mNodeType = TokNode::TYPE_FUNCCALL;
-				//pClonedParamsHooks->GetRight()->AddChild( pFuncOpEndMarker );
 			}
 		}
 		else
@@ -400,7 +396,18 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsT
 }
 
 //==================================================================
-static void closeFuncOps( TokNode *pNode )
+void ResolveFunctionCalls( TokNode *pNode )
+{
+	const DVec<Function> &funcs = pNode->GetFuncs();
+
+	resolveFunctionCalls( pNode, funcs );
+
+	DVec<TokNode *>	pAssignOpsToRemove;
+	resolveFunctionReturns( pNode, pAssignOpsToRemove );
+}
+
+//==================================================================
+static void closeFuncOps_sub( TokNode *pNode )
 {
 	if ( pNode->mIsFuncOp )
 	{
@@ -411,41 +418,25 @@ static void closeFuncOps( TokNode *pNode )
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		closeFuncOps( pNode->mpChilds[i] );
+		closeFuncOps_sub( pNode->mpChilds[i] );
 	}
 
 }
 
 //==================================================================
-void ResolveFunctionCalls( TokNode *pNode )
+void CloseFuncOps( TokNode *pNode )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
-
-	DVec<TokNode *>		pFuncOpUsageNodes;
-
-	resolveFunctionCalls( pNode, funcs, pFuncOpUsageNodes );
 
 	for (size_t i=0; i < funcs.size(); ++i)
 	{
 		// for every shader (should be just 1, maybe ?)
 		if ( funcs[i].IsShader() )
 		{
-			closeFuncOps( funcs[i].mpCodeBlkNode );
+			closeFuncOps_sub( funcs[i].mpCodeBlkNode );
 		}
 	}
-/*
-	for (size_t i=0; i < pFuncOpUsageNodes.size(); ++i)
-	{
-		TokNode	*pFuncOpEndMarker = DNEW TokNode( "_asm_funcopend", T_NONTERM, T_TYPE_NONTERM );
-		pFuncOpEndMarker->mNodeType = TokNode::TYPE_FUNCCALL;
-		pFuncOpUsageNodes[i]->GetRight()->AddChild( pFuncOpEndMarker );
-	}
-*/
-
-	DVec<TokNode *>	pAssignOpsToRemove;
-	resolveFunctionReturns( pNode, pAssignOpsToRemove );
 }
-
 
 //==================================================================
 }

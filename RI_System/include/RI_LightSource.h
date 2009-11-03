@@ -36,8 +36,9 @@ public:
 	};
 public:
 
-	Type	mType;
 	u_int	mID;
+/*
+	Type	mType;
 	float	mIntesity;
 	Color	mColor;
 	Point3	mLocFromPos;
@@ -58,14 +59,14 @@ public:
 		} mCone;
 
 	} mRend;
+*/
 
 	LightSourceT();
 	~LightSourceT()
 	{
-		//if ( mShaderInst
 	}
 
-	void UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam );
+//	void UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam );
 };
 
 //==================================================================

@@ -22,6 +22,7 @@ namespace RI
 namespace SOP
 {
 
+/*
 //==================================================================
 static inline void illuminate(
 				SlColor &accCol,
@@ -65,6 +66,7 @@ static inline Color specularbrdf(
 	
 	return Color( 1, 0, 0 );
 }
+*/
 
 //==================================================================
 // this is a simplified version.. until lights become available 8)
@@ -78,6 +80,7 @@ return C;
 
 void Inst_Diffuse( SlRunContext &ctx )
 {
+/*
 		  SlColor* lhs	= ctx.GetVoidRW( (		SlColor*)0, 1 );
 	const SlVec3 * op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
@@ -126,6 +129,7 @@ void Inst_Diffuse( SlRunContext &ctx )
 			lhs[0] = col;
 		}
 	}
+*/
 
 	ctx.NextInstruction();
 }
@@ -134,6 +138,7 @@ void Inst_Diffuse( SlRunContext &ctx )
 // this is a simplified version.. until lights become available 8)
 void Inst_Ambient( SlRunContext &ctx )
 {
+/*
 	SlColor*	lhs	= ctx.GetVoidRW( (SlColor*)0, 1 );
 
 #if 0
@@ -179,6 +184,7 @@ void Inst_Ambient( SlRunContext &ctx )
 			lhs[i] = ctx.mCache.mAmbientCol;
 	}
 #endif
+*/
 
 	ctx.NextInstruction();
 }

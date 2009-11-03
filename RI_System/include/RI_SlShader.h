@@ -49,76 +49,7 @@ enum OpBaseTypeID
 //==================================================================
 enum OpCodeID
 {
-	OP_RET		,
-/*
-
-	OP_SS_MOV	,
-	OP_VS_MOV	,
-	OP_VV_MOV	,
-
-	OP_XX_MOV	,
-
-	OP_SS_ABS	,
-	OP_VS_ABS	,
-	OP_VV_ABS	,
-
-	OP_SSS_ADD	,
-	OP_VVS_ADD	,
-	OP_VSV_ADD	,
-	OP_VVV_ADD	,
-
-	OP_SSS_SUB	,
-	OP_VVS_SUB	,
-	OP_VSV_SUB	,
-	OP_VVV_SUB	,
-
-	OP_SSS_MUL	,
-	OP_VVS_MUL	,
-	OP_VSV_MUL	,
-	OP_VVV_MUL	,
-
-	OP_SSS_DIV	,
-	OP_VVS_DIV	,
-	OP_VSV_DIV	,
-	OP_VVV_DIV	,
-
-	OP_VS3_MOV	,
-
-	OP_SVV_DOT	,
-
-	OP_LDS	,
-	OP_LDV	,
-
-	OP_CMPLT	,
-
-	OP_VV_NOISE11	,
-	OP_VV_NOISE12	,
-	OP_VV_NOISE13	,
-
-	OP_VV_NOISE31	,
-	OP_VV_NOISE32	,
-	OP_VV_NOISE33	,
-
-	OP_SV_XCOMP	,
-	OP_SV_YCOMP	,
-	OP_SV_ZCOMP	,
-	OP_VS_SETXCOMP	,
-	OP_VS_SETYCOMP	,
-	OP_VS_SETZCOMP	,
-
-	OP_VXV_PXFORMNAME,
-	OP_VXV_VXFORMNAME,
-	OP_VXV_NXFORMNAME,
-	OP_VXV_CXFORMNAME,
-
-	OP_NRM		,
-	OP_FCFWD	,
-	OP_DIFFUSE	,
-	OP_AMBIENT	,
-	OP_CALCNORM	,
-
-	OP_N
-*/
+	OP_RET
 };
 
 //==================================================================

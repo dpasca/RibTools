@@ -35,47 +35,30 @@ static bool areTypesCompatible( VarType vt1, VarType vt2 )
 }
 
 //==================================================================
-bool SolveBiOpType(
-					const TokNode *pOperator,
-					const TokNode *pOperand1,
-					const TokNode *pOperand2,
-					VarType &out_varType,
-					bool &out_isVarying,
-					bool mustSucceed )
+void SolveBiOpType(	const TokNode *pOperator,
+					VarType	vt1,
+					VarType	vt2,
+					VarType &out_varType )
 {
 	out_varType		= VT_UNKNOWN;
-	out_isVarying	= false;
 
 	DASSERT( pOperator->mpToken->IsBiOp() );
-
-	VarType	vt1 = pOperand1->GetVarType();
-	VarType	vt2 = pOperand2->GetVarType();
 
 	DASSERT( vt1 != VT_UNKNOWN && vt2 != VT_UNKNOWN );
 
 	if ( (vt1 == VT_STRING) != (vt2 == VT_STRING) )
 	{
-		if NOT( mustSucceed )
-			return false;
-		else
-			throw Exception( "Strings can only operate with other strings !", pOperator );
+		throw Exception( "Strings can only operate with other strings !", pOperator );
 	}
 
 	if ( vt1 == VT_STRING )
 	{
-		// strings are always uniform !!!
-		DASSERT( pOperand1->IsVarying() == false );
-		DASSERT( pOperand2->IsVarying() == false );
-
 		if ( pOperator->mpToken->id != T_OP_ASSIGN &&
 			 pOperator->mpToken->id != T_OP_EQ &&
 			 pOperator->mpToken->id != T_OP_NEQ
 			 )
 			throw Exception( "Invalid operator between strings !", pOperator );
 	}
-
-	// varying is easy.. out is varying if even one of the two is
-	out_isVarying = (pOperand1->IsVarying() || pOperand2->IsVarying() );
 
 	// handle comparison operators
 	if ( pOperator->mpToken->IsCmpOp() )
@@ -104,22 +87,15 @@ bool SolveBiOpType(
 
 		if ( out_varType == VT_UNKNOWN )
 		{
-			if ( mustSucceed )
-			{
-				throw Exception(
-					DUT::SSPrintFS(
-							"Could not resolve operation. Incompatible types [ '%s' %s '%s' ] ?",
-								VarTypeToString( vt1 ),
-								pOperator->GetTokStr(),
-								VarTypeToString( vt2 ) )
-							, pOperator );
-			}
-			else
-				return false;
+			throw Exception(
+				DUT::SSPrintFS(
+						"Could not resolve operation. Incompatible types [ '%s' %s '%s' ] ?",
+							VarTypeToString( vt1 ),
+							pOperator->GetTokStr(),
+							VarTypeToString( vt2 ) )
+						, pOperator );
 		}
 	}
-
-	return true;
 }
 
 //==================================================================

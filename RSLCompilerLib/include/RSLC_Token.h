@@ -108,7 +108,6 @@ enum TokenID
 	DT_DEF( matrix			)	,
 	DT_DEF( string			)	,
 	DT_DEF( void			)	,
-	DT_DEF( __funcop		)	,
 
 	DE_DEF( varying			)	,
 	DE_DEF( uniform			)	,
@@ -121,6 +120,7 @@ enum TokenID
 	KW_DEF( continue		)	,
 	KW_DEF( return			)	,
 	KW_DEF( output			)	,
+	KW_DEF( __funcop		)	,
 
 	//KW_DEF( texture			)	,	// texture_type
 	//KW_DEF( environment		)	,

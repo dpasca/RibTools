@@ -25,6 +25,7 @@ enum VarType
 	VT_MATRIX	,
 	VT_STRING	,
 	VT_BOOL		,
+	VT_VOID		,
 	VT_N
 };
 

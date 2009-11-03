@@ -28,9 +28,18 @@ std::string Register::GetName() const
 	case VT_NORMAL:	regBase[0] = 'v'; break;
 	case VT_MATRIX:	regBase[0] = 'm'; break;
 	case VT_BOOL:	regBase[0] = 'b'; break;
+
+	case VT_UNKNOWN:
+		strcpy_s( regBase, "VT_UNKNOWN_" );
+		break;
+
+	case VT_VOID:
+		strcpy_s( regBase, "VT_VOID_" );
+		break;
+
 	default:
 		strcpy_s( regBase, "UNK_" );
-		//DASSERT( 0 );
+		DASSERT( 0 );
 		break;
 	}
 

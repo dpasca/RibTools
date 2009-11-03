@@ -25,13 +25,15 @@ public:
 	TokNode			*mpCodeBlkNode;
 	Token			*mpRetTypeTok;
 	TokNode			*mpNameNode;
+	VarType			mRetVarType;
 	DVec<VarType>	mParamsVarTypes;
 
 	Function() :
 		mpParamsNode(NULL),
 		mpCodeBlkNode(NULL),
 		mpRetTypeTok(NULL),
-		mpNameNode(NULL)
+		mpNameNode(NULL),
+		mRetVarType(VT_UNKNOWN)
 	{
 	}
 
@@ -49,7 +51,11 @@ public:
 //==================================================================
 void DiscoverFunctions( TokNode *pRoot );
 
+const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function> &funcs );
+
 void ResolveFunctionCalls( TokNode *pNode );
+
+void CloseFuncOps( TokNode *pNode );
 
 void WriteFunctions( FILE *pFile, TokNode *pNode );
 

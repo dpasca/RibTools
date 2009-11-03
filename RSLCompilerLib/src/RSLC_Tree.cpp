@@ -26,7 +26,8 @@ TokNode::TokNode( Token *pObj ) :
 	mNodeType(TYPE_STANDARD),
 	mBlockType(BLKT_UNKNOWN),
 	mIsFuncOp(false),
-	mBlockID(0)
+	mBlockID(0),
+	mpNodeTypeFuncCall_pFunc(NULL)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
@@ -40,7 +41,8 @@ TokNode::TokNode( const char *pTokStr, TokenID tokId, TokenIDType tokIdType ) :
 	mNodeType(TYPE_STANDARD),
 	mBlockType(BLKT_UNKNOWN),
 	mIsFuncOp(false),
-	mBlockID(0)
+	mBlockID(0),
+	mpNodeTypeFuncCall_pFunc(NULL)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
@@ -57,7 +59,8 @@ TokNode::TokNode( const TokNode &from ) :
 	mBlockType		(from.mBlockType),
 	mIsFuncOp		(from.mIsFuncOp),
 	mBlockID		(0),
-	mVarLink		(from.mVarLink)
+	mVarLink		(from.mVarLink),
+	mpNodeTypeFuncCall_pFunc(from.mpNodeTypeFuncCall_pFunc)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
@@ -261,8 +264,13 @@ RSLC::VarType TokNode::GetVarType() const
 	if ( mVarLink.IsValid() )
 		return mVarLink.GetVarPtr()->GetVarType();
 	else
+	if ( mpNodeTypeFuncCall_pFunc )
 	{
-		DASSERT( 0 );
+		return mpNodeTypeFuncCall_pFunc->mRetVarType;
+	}
+	else
+	{
+		//DASSERT( 0 );
 		return VT_UNKNOWN;
 	}
 }
@@ -310,8 +318,12 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 							if ( pFnType && pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
 								pNode->SetBlockType( BLKT_SHPARAMS );
 							else	// function
-							if ( pFnType && pFnType->mpToken->idType == T_TYPE_DATATYPE )
+							if ( pFnType &&
+									(pFnType->mpToken->idType == T_TYPE_DATATYPE ||
+									 pFnType->mpToken->id == T_KW___funcop) )
+							{
 								pNode->SetBlockType( BLKT_FNPARAMS );
+							}
 							else
 							{
 								throw Exception( "Return type unknown", pNode );

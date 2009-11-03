@@ -15,50 +15,14 @@
 namespace RSLC
 {
 
-//==================================================================
-static void solveExpressions_sub_BiOp( TokNode *pNode, bool mustSucceed )
-{
-	TokNode *pOperand1 = pNode->GetChildTry( 0 );
-	TokNode *pOperand2 = pNode->GetChildTry( 1 );
+/*
+About varying ...
 
-	// scan down to find a variable
-	while ( pOperand1 && !pOperand1->GetVarPtr() )
-		pOperand1 = pOperand1->GetChildTry( 0 );
+	// strings are always uniform !!!
+	DASSERT( pOperand1->IsVarying() == false );
+	DASSERT( pOperand2->IsVarying() == false );
 
-	while ( pOperand2 && !pOperand2->GetVarPtr() )
-		pOperand2 = pOperand2->GetChildTry( 0 );
-
-	if NOT( pOperand1 )
-	{
-		if ( mustSucceed )
-			throw Exception( "Unknown 1st operand", pNode );
-		else
-			return;
-	}
-
-	if NOT( pOperand2 )
-	{
-		if ( mustSucceed )
-			throw Exception( "Unknown 2nd operand", pNode );
-		else
-			return;
-	}
-
-	// no assignment for function call as it's done above
-	VarType	opResVarType;
-	bool	opResIsVarying;
-
-	if NOT( SolveBiOpType(
-					pNode,
-					pOperand1,
-					pOperand2,
-					opResVarType,
-					opResIsVarying,
-					mustSucceed ) )
-		return;
-
-	// $$$ was here for a purpose !(?) - DASSERT( pNode->mVarLink.IsValid() == false );
-
+	
 	// is this an assignment ?
 	if ( pNode->mpToken->IsAssignOp() )
 	{
@@ -82,30 +46,78 @@ static void solveExpressions_sub_BiOp( TokNode *pNode, bool mustSucceed )
 			}
 		}			
 	}
-	else
+*/
+
+//==================================================================
+static void solveExpressions_sub_BiOp( TokNode *pNode, const DVec<Function> &funcs )
+{
+	TokNode *pOperands[2];
+	VarType	vtypes[2] = { VT_UNKNOWN, VT_UNKNOWN };
+
+	for (size_t opIdx=0; opIdx < 2; ++opIdx)
 	{
-		if NOT( pNode->mpToken->idType == T_TYPE_VALUE )
-			AddSelfVariable( pNode, opResVarType, opResIsVarying, false );
+		for (pOperands[opIdx] = pNode->GetChildTry( opIdx );
+				true;
+			pOperands[opIdx] = pOperands[opIdx]->GetChildTry( 0 ))
+		{
+			if NOT( pOperands[opIdx] )
+				throw Exception( "Unknown operand", pNode );
+
+			VarType	vtype = pOperands[opIdx]->GetVarType();
+			if ( vtype != VT_UNKNOWN )
+			{
+				vtypes[opIdx] = vtype;
+				break;
+			}
+		}
+	}
+
+	VarType	opResVarType;
+
+	SolveBiOpType(	pNode,
+					vtypes[0],
+					vtypes[1],
+					opResVarType );
+
+	if ( !pNode->mpToken->IsAssignOp() && pNode->mpToken->idType != T_TYPE_VALUE )
+	{
+		// if it's not an assignment nor an immediate value
+		AddSelfVariable( pNode, opResVarType, false, false );
 	}
 }
 
 //==================================================================
-static void solveExpressions_sub( TokNode *pNode, bool mustSucceed )
+static void solveExpressions_sub( TokNode *pNode, const DVec<Function> &funcs )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-		solveExpressions_sub( pNode->mpChilds[i], mustSucceed );
+		solveExpressions_sub( pNode->mpChilds[i], funcs );
 
-	if ( pNode->mpToken && pNode->mpToken->IsBiOp() )
-		solveExpressions_sub_BiOp( pNode, mustSucceed );
+	if NOT( pNode->mpToken )
+		return;
+
+	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
+	{
+		const Function	*pFunc = MatchFunctionByParams( pNode, funcs );
+
+		if ( pFunc )
+		{
+			pNode->mpNodeTypeFuncCall_pFunc = pFunc;
+		}
+	}
+	else
+	if ( pNode->mpToken->IsBiOp() )
+	{
+		solveExpressions_sub_BiOp( pNode, funcs );
+	}
 }
 
 //==================================================================
-void SolveExpressions( TokNode *pNode, bool mustSucceed, bool processShaderOnly )
+void SolveExpressions( TokNode *pRoot, bool processShaderOnly )
 {
+	const DVec<Function> &funcs = pRoot->GetFuncs();
+
 	if ( processShaderOnly )
 	{
-		const DVec<Function> &funcs = pNode->GetFuncs();
-
 		for (size_t i=0; i < funcs.size(); ++i)
 		{
 			const Function	&func = funcs[i];
@@ -116,14 +128,14 @@ void SolveExpressions( TokNode *pNode, bool mustSucceed, bool processShaderOnly 
 					continue;
 
 			if ( func.mpParamsNode )
-				solveExpressions_sub( func.mpParamsNode, mustSucceed );
+				solveExpressions_sub( func.mpParamsNode, funcs );
 			else
-				solveExpressions_sub( func.mpCodeBlkNode, mustSucceed );
+				solveExpressions_sub( func.mpCodeBlkNode, funcs );
 		}
 	}
 	else
 	{
-		solveExpressions_sub( pNode, mustSucceed );
+		solveExpressions_sub( pRoot, funcs );
 	}
 }
 

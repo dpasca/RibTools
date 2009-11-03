@@ -77,9 +77,22 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 
 		pFuncName->mNodeType = TokNode::TYPE_FUNCDEF;	// mark the node as a function definition
 
-		if ( pRetType->mpToken->id == T_DT___funcop )
+		// is it a funcop ?
+		if ( pRetType->mpToken->id == T_KW___funcop )
 		{
 			pFuncName->mIsFuncOp = true;
+		}
+
+		// what's the retun value ?
+		if ( pRetType->mpToken->idType == T_TYPE_DATATYPE )
+		{
+			// something properly specified ?
+			pFunc->mRetVarType = VarTypeFromToken( pRetType->mpToken );
+		}
+		else
+		{
+			// otherwise it's just "void"
+			pFunc->mRetVarType = VT_VOID;
 		}
 
 		for (size_t j=0; j < pFunc->mpParamsNode->mpChilds.size(); ++j)

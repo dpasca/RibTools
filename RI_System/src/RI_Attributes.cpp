@@ -79,7 +79,7 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mVSteps				= rhs.mVSteps				;
 	mColor				= rhs.mColor				;
 	mOpacity			= rhs.mOpacity				;
-	moSurfaceSHI.Borrow(  rhs.moSurfaceSHI )			;
+	moSurfaceSHI.Borrow(  rhs.moSurfaceSHI )		;
 	moDisplaceSHI.Borrow( rhs.moDisplaceSHI )		;
 	mActiveLights		= rhs.mActiveLights			;
 }
@@ -292,117 +292,6 @@ static void addShaderParam(
 }
 
 //==================================================================
-void Attributes::cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam )
-{
-	const char	*pLightTypeName = "";
-
-	// get type and ID
-	if ( params.size() < 2 || !params[0].IsString() || !params[1].IsIntVal() )
-	{
-		mpState->EXCEPTPrintf( "Bad LightSource definition !" );
-		//return;
-	}
-
-	SlShader *pShader =
-		(SlShader *)mpResManager->FindResource( params[0].PChar(),
-													ResourceBase::TYPE_SHADER );
-
-	if NOT( pShader )
-	{
-		mpState->EXCEPTPrintf( "Could not find the light shader '%s' !", params[0].PChar() );
-		//return;
-	}
-
-	LightSourceT	*pLight = DNEW LightSourceT();
-
-	pLight->moShaderInst = DNEW SlShaderInst( pShader, MP_GRID_MAX_SIZE );
-
-	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
-	{
-		pLight->mType = LightSourceT::TYPE_AMBIENT;
-	}
-	else
-	if ( 0 == strcasecmp( "distantlight", params[0].PChar() ) )
-	{
-		pLight->mType = LightSourceT::TYPE_DISTANT;
-	}
-	else
-	if ( 0 == strcasecmp( "arealight", params[0].PChar() ) )
-	{
-		pLight->mType = LightSourceT::TYPE_DISTANT;
-	}
-
-	pLight->mID = params[1].Int();
-
-	for (size_t i=2; i < params.size(); ++i)
-	{
-		if NOT( params[i].IsString() )
-			continue;
-
-		const char *pName = params[i].PChar();
-
-		// check for strings that require no extra param here.. if any !
-
-		// follow for params that require a following param
-		bool	hasNextParam = ((i+1) < params.size());
-		if NOT( hasNextParam )
-		{
-			mpState->EXCEPTPrintf( "Expecting parameter !" );
-			//return;
-		}
-
-#if 1
-		addShaderParam(
-					*pLight->moShaderInst.Use(),
-					*mpGlobalSyms,
-					params,
-					i,
-					*mpState );
-
-#else
-		if ( 0 == strcasecmp( pName, "from" ) )
-		{
-			pLight->mLocFromPos = params[i+1].PFlt( 3 );
-		}
-		else
-		if ( 0 == strcasecmp( pName, "to" ) )
-		{
-			pLight->mLocToPos = params[i+1].PFlt( 3 );
-		}
-		else
-		if ( 0 == strcasecmp( pName, "direction" ) )
-		{
-			pLight->mLocFromPos = Point3( 0, 0, 0 );
-			pLight->mLocToPos = params[i+1].PFlt( 3 );
-		}
-		else
-		if ( 0 == strcasecmp( pName, "intensity" ) )
-		{
-			pLight->mIntesity = params[i+1].Flt();
-		}
-		else
-		if ( 0 == strcasecmp( pName, "lightcolor" ) )
-		{
-			pLight->mColor = Color( params[i+1].PFlt( 3 ) );
-		}
-#endif
-
-		//if NOT( hasNextParam )
-			i += 1;
-	}
-
-	pLight->UpdateRend( xform, mtxWorldCam );
-
-	size_t listIdx = mpState->AddLightSource( pLight );
-
-	DASSERT( listIdx < 65536 );	// 16 bit limit..
-
-	mActiveLights.find_or_push_back( (U16)listIdx );
-
-	mpRevision->BumpRevision();
-}
-
-//==================================================================
 static void onError( const char *pFmt, ... )
 {
 	va_list	vl;
@@ -513,6 +402,97 @@ SlShader *Attributes::getShader( const char *pShaderName, const char *pAlternate
 }
 
 //==================================================================
+void Attributes::getShaderParams(
+						ParamList		&params,
+						size_t			fromIdx,
+						SlShaderInst	&shaderInst )
+{
+	for (size_t i=fromIdx; i < params.size(); ++i)
+	{
+		if NOT( params[i].IsString() )
+			continue;
+
+		const char *pName = params[i].PChar();
+
+		// check for strings that require no extra param here.. if any !
+
+		// follow for params that require a following param
+		bool	hasNextParam = ((i+1) < params.size());
+		if NOT( hasNextParam )
+		{
+			mpState->EXCEPTPrintf( "Expecting parameter !" );
+			//return;
+		}
+
+		addShaderParam(
+					shaderInst,
+					*mpGlobalSyms,
+					params,
+					i,
+					*mpState );
+		i += 1;
+	}
+}
+
+//==================================================================
+void Attributes::cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam )
+{
+	const char	*pLightTypeName = "";
+
+	// get type and ID
+	if ( params.size() < 2 || !params[0].IsString() || !params[1].IsIntVal() )
+	{
+		mpState->EXCEPTPrintf( "Bad LightSource definition !" );
+		//return;
+	}
+
+	const char *pShaderName = params[0].PChar();
+
+	SlShader	*pShader = getShader( pShaderName, NULL );
+
+	if NOT( pShader )
+	{
+		mpState->EXCEPTPrintf( "Could not find the light shader '%s' !", params[0].PChar() );
+		//return;
+	}
+
+	LightSourceT	*pLight = DNEW LightSourceT();
+
+/*
+	if ( 0 == strcasecmp( "ambientlight", params[0].PChar() ) )
+	{
+		pLight->mType = LightSourceT::TYPE_AMBIENT;
+	}
+	else
+	if ( 0 == strcasecmp( "distantlight", params[0].PChar() ) )
+	{
+		pLight->mType = LightSourceT::TYPE_DISTANT;
+	}
+	else
+	if ( 0 == strcasecmp( "arealight", params[0].PChar() ) )
+	{
+		pLight->mType = LightSourceT::TYPE_DISTANT;
+	}
+*/
+
+	pLight->moShaderInst = DNEW SlShaderInst( pShader, MP_GRID_MAX_SIZE );
+
+	pLight->mID = params[1].Int();
+
+	getShaderParams( params, 2, *pLight->moShaderInst.Use() );
+
+	//pLight->UpdateRend( xform, mtxWorldCam );
+
+	size_t listIdx = mpState->AddLightSource( pLight );
+
+	DASSERT( listIdx < 65536 );	// 16 bit limit..
+
+	mActiveLights.find_or_push_back( (U16)listIdx );
+
+	mpRevision->BumpRevision();
+}
+
+//==================================================================
 void Attributes::cmdSurface( ParamList &params )
 {
 	if ( params.size() < 1 )
@@ -533,7 +513,7 @@ void Attributes::cmdSurface( ParamList &params )
 	{
 		moSurfaceSHI = DNEW SlShaderInst( pShader );
 
-		// $$$ handle the params !
+		getShaderParams( params, 1, *moSurfaceSHI.Use() );
 	}
 
 	// $$$ should really check if the shader or any params really changed
@@ -556,7 +536,7 @@ void Attributes::cmdDisplacement( ParamList &params )
 	{
 		moDisplaceSHI = DNEW SlShaderInst( pShader );
 
-		// $$$ handle the params !
+		getShaderParams( params, 1, *moDisplaceSHI.Use() );
 	}
 
 	// $$$ should really check if the shader or any params really changed

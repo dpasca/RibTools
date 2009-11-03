@@ -184,9 +184,9 @@ void State::makeDefaultShaders( const char *pBasePath )
 	addDefShader( pBasePath, "matte"			);
 	addDefShader( pBasePath, "dbg_normal_col"	);
 	addDefShader( pBasePath, "test"				);
-	addDefShader( pBasePath, "ambientlight"		);
-	addDefShader( pBasePath, "distantlight"		);
-	addDefShader( pBasePath, "arealight"		);
+	//addDefShader( pBasePath, "ambientlight"		);
+	//addDefShader( pBasePath, "distantlight"		);
+	//addDefShader( pBasePath, "arealight"		);
 }
 
 //==================================================================

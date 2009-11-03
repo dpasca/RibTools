@@ -18,12 +18,15 @@ namespace RI
 //==================================================================
 LightSourceT::LightSourceT()
 {
+/*
 	mIntesity	= 1;
 	mColor		= Color( 1 );
 	mLocFromPos	= Point3( 0, 0, 0 );
 	mLocToPos	= Point3( 0, 0, 1 );
+*/
 }
 
+/*
 //==================================================================
 void LightSourceT::UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam )
 {
@@ -48,6 +51,7 @@ void LightSourceT::UpdateRend( const Transform &xform, const Matrix44 &mtxWorldC
 #endif
 	}
 }
+*/
 
 //==================================================================
 }

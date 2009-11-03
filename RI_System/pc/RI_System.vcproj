@@ -552,6 +552,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\RI_SlShader_Binding.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\RI_SlShader_Ops_Base.h"
 					>
 				</File>

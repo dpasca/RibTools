@@ -84,17 +84,17 @@ RSLCompiler::RSLCompiler(
 
 	RealizeConstants( mpRoot );
 
-	SolveExpressions( mpRoot, false, false );
+	SolveExpressions( mpRoot, false );
 
 	ResolveFunctionCalls( mpRoot );
-
-	SolveExpressions( mpRoot, true, true );
 
 	MarkUsedVariables( mpRoot );
 
 	SolveGlobalConstants( mpRoot );
 
 	AssignRegisters( mpRoot, 0 );
+
+	CloseFuncOps( mpRoot );
 
 	// produce some debug info in the output file
 	if ( params.mDbgOutputTree )

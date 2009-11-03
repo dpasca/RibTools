@@ -8,6 +8,18 @@
 /* Basic declarations ad found in RenderMan specs and instrumented
 for RibRender */
 
+/*================================================================*/
+color phing( normal N; vector V; float size )
+{
+	color C = 0;
+	
+	{
+	vector Ln = normalize(L);
+	}
+
+	return C;
+}
+
 /*================================================================
 /// Globals from the renderer itself
 ///==============================================================*/
@@ -236,7 +248,7 @@ vector	refract( vector I, N; float eta ){}
 color	fresnel( vector I, N; float eta; output float Kr, Kt; [output vector R, T] ){}	// color ?
 */
 
-normal	calculatenormal( point p )		{	normal tmp;	tmp = _asm_calculatenormal( p ); return tmp;	}
+normal	calculatenormal( point p )		{	normal tmp;	_asm_calculatenormal( tmp, p ); return tmp;	}
 float	comp( color c; float index ){}
 void	setcomp( output color c; float index, value ){}
 /*
@@ -254,6 +266,7 @@ float	match( string pattern, subject ){}
 
 color	ambient()			{	color tmp; _asm_ambient( tmp );		return tmp;	}
 
+/*================================================================*/
 color	diffuse( normal Nn )
 {	
 	color C = 0;
@@ -271,13 +284,13 @@ color	diffuse( normal Nn )
 /*================================================================*/
 color specular( normal N; vector V; float roughness )
 {
-/*
 	color C = 0;
 	illuminance( P, N, PI/2 )
-	C += Cl * specularbrdf (normalize(L), N, V, roughness);
+		C = C + Cl * specularbrdf (normalize(L), N, V, roughness);
 	return C;
-*/
+/*
 	return color( 0.1 );
+*/
 }
 
 /*================================================================*/
@@ -291,7 +304,6 @@ color specularbrdf( vector L, N, V; float roughness )
 /*================================================================*/
 color phong( normal N; vector V; float size )
 {
-/*
 	color C = 0;
 	
 	vector R = reflect( vector(0) - normalize(V), normalize(N) );
@@ -300,12 +312,10 @@ color phong( normal N; vector V; float size )
 	{
 		vector Ln = normalize(L);
 
-		C += Cl * pow(max(0.0,R.Ln), size);
+		C = C + Cl * pow(max(0.0,R.Ln), size);
 	}
 
 	return C;
-*/
-	return vector( 0.1 );
 }
 
 /*
