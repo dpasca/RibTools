@@ -70,25 +70,28 @@ enum TokenID
 	T_VL_NUMBER,
 	T_VL_STRING,
 
-	OP_DEF(	"<="	,	LSEQ		)	,
-	OP_DEF(	">="	,	GEEQ		)	,
-	OP_DEF(	"<"		,	LSTH		)	,
-	OP_DEF(	">"		,	GRTH		)	,
-	OP_DEF(	"&&"	,	LOGIC_AND	)	,
-	OP_DEF(	"||"	,	LOGIC_OR	)	,
-	OP_DEF(	"=="	,	EQ			)	,
-	OP_DEF(	"!="	,	NEQ			)	,
+	OP_DEF(	"="		,	ASSIGN		)	,	// assign ops
 	OP_DEF(	"+="	,	PLUSASS		)	,
 	OP_DEF(	"-="	,	MINUSASS	)	,
 	OP_DEF(	"*="	,	MULASS		)	,
 	OP_DEF(	"/="	,	DIVASS		)	,
+
+	OP_DEF(	"<="	,	LSEQ		)	,	// cmp ops
+	OP_DEF(	">="	,	GEEQ		)	,
+	OP_DEF(	"<"		,	LSTH		)	,
+	OP_DEF(	">"		,	GRTH		)	,
+	OP_DEF(	"=="	,	EQ			)	,
+	OP_DEF(	"!="	,	NEQ			)	,
+
+	OP_DEF(	"&&"	,	LOGIC_AND	)	,	// general bi-ops
+	OP_DEF(	"||"	,	LOGIC_OR	)	,
 	OP_DEF(	"+"		,	PLUS		)	,
 	OP_DEF(	"-"		,	MINUS		)	,
 	OP_DEF(	"*"		,	MUL			)	,
 	OP_DEF(	"/"		,	DIV			)	,
-	OP_DEF(	"="		,	ASSIGN		)	,
 	OP_DEF(	"^"		,	POW			)	,
 	OP_DEF(	"."		,	DOT			)	,
+
 	OP_DEF(	":"		,	COLON		)	,
 	OP_DEF(	","		,	COMMA		)	,
 	OP_DEF(	";"		,	SEMICOL		)	,

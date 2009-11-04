@@ -181,6 +181,7 @@ public:
 	VarType GetVarType() const;
 
 	bool IsVarying() const;
+	bool TrySetVarying( bool onoff );
 };
 
 //==================================================================

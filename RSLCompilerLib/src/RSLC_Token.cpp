@@ -40,25 +40,28 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	NULL	,	T_TYPE_VALUE	,	T_VL_NUMBER	,
 	NULL	,	T_TYPE_VALUE	,	T_VL_STRING	,
 
-	OP_DEF(	"<="	,	LSEQ		)	,
-	OP_DEF(	">="	,	GEEQ		)	,
-	OP_DEF(	"<"		,	LSTH		)	,
-	OP_DEF(	">"		,	GRTH		)	,
-	OP_DEF(	"&&"	,	LOGIC_AND	)	,
-	OP_DEF(	"||"	,	LOGIC_OR	)	,
-	OP_DEF(	"=="	,	EQ			)	,
-	OP_DEF(	"!="	,	NEQ			)	,
+	OP_DEF(	"="		,	ASSIGN		)	,	// assign ops
 	OP_DEF(	"+="	,	PLUSASS		)	,
 	OP_DEF(	"-="	,	MINUSASS	)	,
 	OP_DEF(	"*="	,	MULASS		)	,
 	OP_DEF(	"/="	,	DIVASS		)	,
+
+	OP_DEF(	"<="	,	LSEQ		)	,	// cmp ops
+	OP_DEF(	">="	,	GEEQ		)	,
+	OP_DEF(	"<"		,	LSTH		)	,
+	OP_DEF(	">"		,	GRTH		)	,
+	OP_DEF(	"=="	,	EQ			)	,
+	OP_DEF(	"!="	,	NEQ			)	,
+
+	OP_DEF(	"&&"	,	LOGIC_AND	)	,	// general bi-ops
+	OP_DEF(	"||"	,	LOGIC_OR	)	,
 	OP_DEF(	"+"		,	PLUS		)	,
 	OP_DEF(	"-"		,	MINUS		)	,
 	OP_DEF(	"*"		,	MUL			)	,
 	OP_DEF(	"/"		,	DIV			)	,
-	OP_DEF(	"="		,	ASSIGN		)	,
 	OP_DEF(	"^"		,	POW			)	,
 	OP_DEF(	"."		,	DOT			)	,
+
 	OP_DEF(	":"		,	COLON		)	,
 	OP_DEF(	","		,	COMMA		)	,
 	OP_DEF(	";"		,	SEMICOL		)	,
@@ -579,21 +582,15 @@ bool Token::IsBiOp() const
 {
 	return
 		IsAssignOp()			||
+		IsCmpOp()				||
+		id == T_OP_LOGIC_AND	|| // general bi-ops
+		id == T_OP_LOGIC_OR		||
 		id == T_OP_PLUS			||
 		id == T_OP_MINUS		||
 		id == T_OP_MUL			||
 		id == T_OP_DIV			||
-		id == T_OP_ASSIGN		||
 		id == T_OP_POW			||
-		id == T_OP_DOT			||
-		id == T_OP_LSEQ			||
-		id == T_OP_GEEQ			||
-		id == T_OP_LSTH			||
-		id == T_OP_GRTH			||
-		id == T_OP_LOGIC_AND	||
-		id == T_OP_LOGIC_OR		||
-		id == T_OP_EQ			||
-		id == T_OP_NEQ			;
+		id == T_OP_DOT			;
 }
 
 //==================================================================

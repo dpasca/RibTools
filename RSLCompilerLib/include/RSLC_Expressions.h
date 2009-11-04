@@ -15,6 +15,7 @@ namespace RSLC
 
 void SolveExpressions( class TokNode *pNode, bool processShaderOnly );
 void SolveGlobalConstants( TokNode *pRoot );
+void SolveVariablesDetail( TokNode *pRoot );
 
 //==================================================================
 }

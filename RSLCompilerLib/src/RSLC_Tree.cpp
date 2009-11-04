@@ -285,7 +285,42 @@ bool TokNode::IsVarying() const
 		return mVarLink.GetVarPtr()->IsVarying();
 	else
 	{
-		DASSERT( 0 );
+		//DASSERT( 0 );
+		return false;
+	}
+}
+
+//==================================================================
+bool TokNode::TrySetVarying( bool onoff )
+{
+	if ( mpToken->idType == T_TYPE_VALUE )
+		return !onoff;	// if it's a value then it's ok if "uniform" is expected
+	else
+	if ( mVarLink.IsValid() )
+	{
+		Variable	*pVar = mVarLink.GetVarPtr();
+
+		// are we changing ?
+		if ( pVar->IsVarying() != onoff )
+		{
+			if ( pVar->IsForcedDetail() )
+				return false;	// detail is forced ? Failure..
+			else
+			{
+				// ..all good, we can change the detail
+				pVar->SetVarying( onoff );
+				return true;
+			}
+		}
+		else
+		{
+			// not changing.. all fine then..
+			return true;
+		}
+	}
+	else
+	{
+		//DASSERT( 0 );
 		return false;
 	}
 }

@@ -46,7 +46,7 @@ bool Variable::IsVarying() const
 //==================================================================
 bool Variable::IsForcedDetail() const
 {
-	DASSERT( mBuild_Register.IsForcedDetail() == mIsForcedDetail );
+	//DASSERT( mBuild_Register.IsForcedDetail() == mIsForcedDetail );
 
 	return mIsForcedDetail;
 }

@@ -140,4 +140,62 @@ void SolveExpressions( TokNode *pRoot, bool processShaderOnly )
 }
 
 //==================================================================
+static bool isBranchVarying( TokNode *pNode )
+{
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		if ( isBranchVarying( pNode->mpChilds[i] ) )
+			return true;
+
+	return pNode->IsVarying();
+}
+
+//==================================================================
+static void solveVariablesDetail_sub( TokNode *pNode )
+{
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		solveVariablesDetail_sub( pNode->mpChilds[i] );
+
+	if ( pNode->mpToken->IsBiOp() )
+	{
+		TokNode	*pDest		= pNode->GetChildTry( 0 );
+		TokNode	*pSrcBranch	= pNode->GetChildTry( 1 );
+
+		bool srcIsVarying = isBranchVarying( pSrcBranch );
+
+		if ( srcIsVarying != pDest->IsVarying() )
+		{
+			if NOT( pDest->TrySetVarying( srcIsVarying ) )
+			{
+				// failure to change.. ?
+				if ( srcIsVarying == true )
+				{
+					// if source is varying, then it's mandatory that destination
+					// is varying too..
+					throw Exception( "Expression destination must be varying, too.", pDest );
+				}
+			}
+		}
+	}
+}
+
+//==================================================================
+void SolveVariablesDetail( TokNode *pRoot )
+{
+	const DVec<Function> &funcs = pRoot->GetFuncs();
+
+	for (size_t i=0; i < funcs.size(); ++i)
+	{
+		const Function	&func = funcs[i];
+
+		if NOT( func.IsShader() )
+			continue;
+
+		if ( func.mpParamsNode )
+			solveVariablesDetail_sub( func.mpParamsNode );
+		else
+			solveVariablesDetail_sub( func.mpCodeBlkNode );
+	}
+}
+
+//==================================================================
 }

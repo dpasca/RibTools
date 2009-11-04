@@ -92,6 +92,8 @@ RSLCompiler::RSLCompiler(
 
 	SolveGlobalConstants( mpRoot );
 
+	SolveVariablesDetail( mpRoot );
+
 	AssignRegisters( mpRoot, 0 );
 
 	CloseFuncOps( mpRoot );
