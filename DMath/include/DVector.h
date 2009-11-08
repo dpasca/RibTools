@@ -144,11 +144,23 @@ public:
 
 	friend Vec3	DAbs( const Vec3 &a )
 	{
-		return Vec3(
-					DAbs( a.v3[0] ),
+		return Vec3(DAbs( a.v3[0] ),
 					DAbs( a.v3[1] ),
-					DAbs( a.v3[2] )
-				);
+					DAbs( a.v3[2] ) );
+	}
+
+	friend Vec3	DMin( const Vec3 &a, const Vec3 &b )
+	{
+		return Vec3(DMin( a.v3[0], b.v3[0] ),
+					DMin( a.v3[1], b.v3[1] ),
+					DMin( a.v3[2], b.v3[2] ) );
+	}
+
+	friend Vec3	DMax( const Vec3 &a, const Vec3 &b )
+	{
+		return Vec3(DMax( a.v3[0], b.v3[0] ),
+					DMax( a.v3[1], b.v3[1] ),
+					DMax( a.v3[2], b.v3[2] ) );
 	}
 
 	const _S &x() const { return v3[0];	}

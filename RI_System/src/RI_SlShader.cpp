@@ -303,6 +303,12 @@ static ShaderInstruction	sInstructionTable[] =
 
 	SOP::Inst_Dot_SVV,
 
+	SOP::Inst_Min_Max<S,OBT_MIN>,
+	SOP::Inst_Min_Max<V,OBT_MIN>,
+
+	SOP::Inst_Min_Max<S,OBT_MAX>,
+	SOP::Inst_Min_Max<V,OBT_MAX>,
+
 	SOP::Inst_LD1<S>,
 	SOP::Inst_LD3<V>,
 

@@ -42,6 +42,7 @@ static const char *gpDefParamBaseLabelName = "__defparam_";
 static const char *gpMainLabelName = "__main";
 
 //==================================================================
+// NOTE: this table must match the order of callbacks in sInstructionTable in RI_SlShader.cpp
 static OpCodeDef	gsOpCodeDefs[] =
 {
 	"ret"			,	0,			0,	OPRTYPE_NA,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
@@ -81,6 +82,12 @@ static OpCodeDef	gsOpCodeDefs[] =
 	"mov.vs3"		,	4,			0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
 
 	"dot.svv"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+
+	"min.sss"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"min.vvv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
+
+	"max.sss"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
+	"max.vvv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
 
 	"ld.s"			,	2,			OPC_FLG_RIGHTISIMM,		OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
 	"ld.v"			,	4,			OPC_FLG_RIGHTISIMM,		OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,

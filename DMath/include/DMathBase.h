@@ -80,6 +80,20 @@ template <class T>	inline T		DAbs( const T &a )
 					return  a;
 }
 
+//==================================================================
+template <class T>	inline T		DMin( const T &a, const T &b )
+{
+	if ( a < b )	return a;	else
+					return b;
+}
+
+//==================================================================
+template <class T>	inline T		DMax( const T &a, const T &b )
+{
+	if ( a > b )	return a;	else
+					return b;
+}
+
 #define FM_E        ((float)M_E       )
 #define FM_LOG2E    ((float)M_LOG2E   )
 #define FM_LOG10E   ((float)M_LOG10E  )

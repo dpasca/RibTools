@@ -85,30 +85,30 @@ float	mod( float a, b )		{}
 float	abs( float x )			{	float tmp;	_asm_abs( tmp, x ); return tmp; }
 float	sign( float x )			{	float tmp;	_asm_sign( tmp, x ); return tmp; }
 
-float	min( float	a, b )		{	float	tmp; _asm_min( tmp, a, b ); return tmp; }
-point	min( point	a, b )		{	point	tmp; _asm_min( tmp, a, b ); return tmp; }
-vector	min( vector	a, b )		{	vector	tmp; _asm_min( tmp, a, b ); return tmp; }
-normal	min( normal	a, b )		{	normal	tmp; _asm_min( tmp, a, b ); return tmp; }
-color	min( color	a, b )		{	color	tmp; _asm_min( tmp, a, b ); return tmp; }
+float	min( float	a, b )		{	float	tmp; _asm_min_sss( tmp, a, b ); return tmp; }
+point	min( point	a, b )		{	point	tmp; _asm_min_vvv( tmp, a, b ); return tmp; }
+vector	min( vector	a, b )		{	vector	tmp; _asm_min_vvv( tmp, a, b ); return tmp; }
+normal	min( normal	a, b )		{	normal	tmp; _asm_min_vvv( tmp, a, b ); return tmp; }
+color	min( color	a, b )		{	color	tmp; _asm_min_vvv( tmp, a, b ); return tmp; }
+                                                          
+float	max( float	a, b )		{	float	tmp; _asm_max_sss( tmp, a, b ); return tmp; }
+point	max( point	a, b )		{	point	tmp; _asm_max_vvv( tmp, a, b ); return tmp; }
+vector	max( vector	a, b )		{	vector	tmp; _asm_max_vvv( tmp, a, b ); return tmp; }
+normal	max( normal	a, b )		{	normal	tmp; _asm_max_vvv( tmp, a, b ); return tmp; }
+color	max( color	a, b )		{	color	tmp; _asm_max_vvv( tmp, a, b ); return tmp; }
 
-float	max( float	a, b )		{	float	tmp; _asm_max( tmp, a, b ); return tmp; }
-point	max( point	a, b )		{	point	tmp; _asm_max( tmp, a, b ); return tmp; }
-vector	max( vector	a, b )		{	vector	tmp; _asm_max( tmp, a, b ); return tmp; }
-normal	max( normal	a, b )		{	normal	tmp; _asm_max( tmp, a, b ); return tmp; }
-color	max( color	a, b )		{	color	tmp; _asm_max( tmp, a, b ); return tmp; }
-
-float	clamp( float	a, b )	{	float	tmp; _asm_clamp( tmp, a, b ); return tmp; }
-point	clamp( point	a, b )	{	point	tmp; _asm_clamp( tmp, a, b ); return tmp; }
-vector	clamp( vector	a, b )	{	vector	tmp; _asm_clamp( tmp, a, b ); return tmp; }
-normal	clamp( normal	a, b )	{	normal	tmp; _asm_clamp( tmp, a, b ); return tmp; }
-color	clamp( color	a, b )	{	color	tmp; _asm_clamp( tmp, a, b ); return tmp; }
+float	clamp( float	a, b )	{	float	tmp; _asm_clamp_sss( tmp, a, b ); return tmp; }
+point	clamp( point	a, b )	{	point	tmp; _asm_clamp_vvv( tmp, a, b ); return tmp; }
+vector	clamp( vector	a, b )	{	vector	tmp; _asm_clamp_vvv( tmp, a, b ); return tmp; }
+normal	clamp( normal	a, b )	{	normal	tmp; _asm_clamp_vvv( tmp, a, b ); return tmp; }
+color	clamp( color	a, b )	{	color	tmp; _asm_clamp_vvv( tmp, a, b ); return tmp; }
                                                    
-float	mix(float	x, y; float alpha )	{	float	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
-point	mix(point	x, y; float alpha )	{	point	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
-vector	mix(vector	x, y; float alpha )	{	vector	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
-normal	mix(normal	x, y; float alpha )	{	normal	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
-color	mix(color	x, y; float alpha )	{	color	tmp; _asm_mix( tmp, x, y, alpha ); return tmp; }
-                                                                            
+float	mix(float	x, y; float alpha )	{	float	tmp; _asm_mix_sss( tmp, x, y, alpha ); return tmp; }
+point	mix(point	x, y; float alpha )	{	point	tmp; _asm_mix_vvv( tmp, x, y, alpha ); return tmp; }
+vector	mix(vector	x, y; float alpha )	{	vector	tmp; _asm_mix_vvv( tmp, x, y, alpha ); return tmp; }
+normal	mix(normal	x, y; float alpha )	{	normal	tmp; _asm_mix_vvv( tmp, x, y, alpha ); return tmp; }
+color	mix(color	x, y; float alpha )	{	color	tmp; _asm_mix_vvv( tmp, x, y, alpha ); return tmp; }
+
 float	floor( float x ){}
 float	ceil( float x ){}
 float	round( float x ){}

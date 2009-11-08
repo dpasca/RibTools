@@ -49,12 +49,14 @@ public:
 	const _S &operator [] (size_t i) const	{ return v[i]; }
 		  _S &operator [] (size_t i)		{ return v[i]; }
 
-	friend VecN	DSqrt( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
-	friend VecN	DRSqrt( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
-	friend VecN	DSign( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp; }
-	friend VecN	DAbs( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
-	friend VecN	DSin( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
-	friend VecN	DCos( const VecN &a )	{ VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
+	friend VecN	DSqrt( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
+	friend VecN	DRSqrt( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
+	friend VecN	DSign( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp; }
+	friend VecN	DAbs( const VecN &a	)				{ VecN tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
+	friend VecN	DMin( const VecN &a, const VecN &b ){ VecN tmp; FOR_I_N tmp[i] = DMin( a[i], b[i] ); return tmp; }
+	friend VecN	DMax( const VecN &a, const VecN &b ){ VecN tmp; FOR_I_N tmp[i] = DMax( a[i], b[i] ); return tmp; }
+	friend VecN	DSin( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
+	friend VecN	DCos( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
 };
 
 template <class _S, size_t _N> inline VecN<_S,_N> operator + (const _S &lval, const VecN<_S,_N> &rval) { return rval + lval; }
@@ -131,6 +133,9 @@ public:
 		return _mm_and_ps( a.v, _mm_set_ps1( *(float *)&notSignBitMask ) );
 	}
 
+	friend VecN	DMin( const VecN &a, const VecN &b )	{	return _mm_min_ps( a.v, b.v );	}
+	friend VecN	DMax( const VecN &a, const VecN &b )	{	return _mm_max_ps( a.v, b.v );	}
+
 	friend VecN	DSin( const VecN &a ) { VecN tmp; for (size_t i=0; i<4; ++i) tmp[i] = DSin( a[i] ); return tmp; }
 	friend VecN	DCos( const VecN &a ) { VecN tmp; for (size_t i=0; i<4; ++i) tmp[i] = DCos( a[i] ); return tmp; }
 	//friend VecN operator * (const _S &lval, const VecN &rval) { return rval * lval; }
@@ -199,6 +204,9 @@ public:
 	{
 		return _mm512_maxabs_ps( a.v, a.v );
 	}
+
+	friend VecN	DMin( const VecN &a, const VecN &b )	{	return _mm512_min_ps( a.v, b.v );	}
+	friend VecN	DMax( const VecN &a, const VecN &b )	{	return _mm512_max_ps( a.v, b.v );	}
 
 	friend VecN	DSin( const VecN &a ) { VecN tmp; for (size_t i=0; i<16; ++i) tmp.v.v[i] = DSin( a[i] ); return tmp; }
 	friend VecN	DCos( const VecN &a ) { VecN tmp; for (size_t i=0; i<16; ++i) tmp.v.v[i] = DCos( a[i] ); return tmp; }

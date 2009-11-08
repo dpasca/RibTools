@@ -43,6 +43,9 @@ enum OpBaseTypeID
 	OBT_MUL	,
 	OBT_DIV	,
 
+	OBT_MIN	,
+	OBT_MAX	,
+
 	OBT_N
 };
 

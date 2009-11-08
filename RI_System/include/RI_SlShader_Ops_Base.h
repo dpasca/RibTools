@@ -334,6 +334,52 @@ void Inst_Dot_SVV( SlRunContext &ctx )
 }
 
 //==================================================================
+template <class T, const OpBaseTypeID opBaseTypeID>
+void Inst_Min_Max( SlRunContext &ctx )
+{
+		  T*	lhs	= ctx.GetVoidRW( (	    T *)0, 1 );
+	const T*	op1	= ctx.GetVoidRO( (const T *)0, 2 );
+	const T*	op2	= ctx.GetVoidRO( (const T *)0, 3 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op2_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+		int		op2_step = ctx.GetSymbolVaryingStep( 3 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				if ( opBaseTypeID == OBT_MIN ) lhs[i] = DMin( op1[op1_offset], op2[op2_offset] ); else
+				if ( opBaseTypeID == OBT_MAX ) lhs[i] = DMax( op1[op1_offset], op2[op2_offset] ); else
+				{ DASSERT( 0 ); }
+			}
+			
+			op1_offset	+= op1_step;
+			op2_offset	+= op2_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
+				 !ctx.IsSymbolVarying( 3 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			if ( opBaseTypeID == OBT_MIN ) lhs[0] = DMin( op1[0], op2[0] ); else
+			if ( opBaseTypeID == OBT_MAX ) lhs[0] = DMax( op1[0], op2[0] ); else
+			{ DASSERT( 0 ); }
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 template <const size_t COMP_IDX>
 void Inst_GetVComp( SlRunContext &ctx )
 {
