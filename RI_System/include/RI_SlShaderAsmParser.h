@@ -18,7 +18,7 @@ namespace RI
 {
 
 //==================================================================
-struct OpCodeDef;
+struct SlAsmOpCodeDef;
 
 //==================================================================
 /// ShaderAsmParser
@@ -56,12 +56,12 @@ private:
 	bool handleShaderTypeDef( const char *pLineWork, Section curSection );
 
 	void parseDataLine( char lineBuff[], int lineCnt );
-	const OpCodeDef	*findOpDef( const char *pOpName, u_int &opCodeIdx );
+	const SlAsmOpCodeDef	*findOpDef( const char *pOpName, u_int &opCodeIdx );
 	size_t findSymbol( const char *pName, bool ignoreCase ) const;
 	size_t findOrAddTempSymbol( const char *pName );
 	void parseCodeLine( char lineBuff[], int lineCnt );
 	void parseCode_handleOperImmediate( const char *pTok );
-	void parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx );
+	void parseCode_handleOperSymbol( const char *pTok, const SlAsmOpCodeDef *pOpDef, int operIdx );
 	bool parseLabelDef( const char *pTok );
 	void getVector( const char *pStr, float out_val[], int n );
 	void getString( const char *pStr, SlStr &out_str );

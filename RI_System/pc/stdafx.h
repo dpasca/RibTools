@@ -17,5 +17,6 @@
 #include "DSystem/include/DMemory.h"
 #include "RI_Base.h"
 #include "RI_Resource.h"
+#include "RI_Attributes.h"
 
 //#define DISABLE_SL_SHADERS

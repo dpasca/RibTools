@@ -536,6 +536,14 @@
 				Name="Shader"
 				>
 				<File
+					RelativePath="..\src\RI_SlAsm_OpCodeDefs.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlAsm_OpCodeDefs.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\RI_SlRunContext.cpp"
 					>
 				</File>
@@ -553,6 +561,14 @@
 				</File>
 				<File
 					RelativePath="..\src\RI_SlShader_Binding.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_SlShader_OpCodeFuncs.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlShader_OpCodeFuncs.h"
 					>
 				</File>
 				<File

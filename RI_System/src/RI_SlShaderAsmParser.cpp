@@ -11,9 +11,10 @@
 #include <stdexcept>
 #include <stdarg.h>
 #include "DUtils.h"
+#include "RI_MicroPolygonGrid.h"
 #include "RI_SlRunContext.h"
 #include "RI_SlShaderAsmParser.h"
-#include "RI_MicroPolygonGrid.h"
+#include "RI_SlAsm_OpCodeDefs.h"
 
 //==================================================================
 using std::auto_ptr;
@@ -23,110 +24,8 @@ namespace RI
 {
 
 //==================================================================
-#define OPC_FLG_RIGHTISIMM		1
-#define OPC_FLG_UNIFORMOPERS	2
-#define OPC_FLG_FUNCOP_BEGIN	4
-#define OPC_FLG_FUNCOP_END		8
-
-//==================================================================
-struct OpCodeDef
-{
-	const char	*pName;
-	u_int		OperCnt;
-	u_int		Flags;
-	OperTypeID	Types[5];
-};
-
-//==================================================================
 static const char *gpDefParamBaseLabelName = "__defparam_";
 static const char *gpMainLabelName = "__main";
-
-//==================================================================
-// NOTE: this table must match the order of callbacks in sInstructionTable in RI_SlShader.cpp
-static OpCodeDef	gsOpCodeDefs[] =
-{
-	"ret"			,	0,			0,	OPRTYPE_NA,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
-																					   
-	"mov.ss"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"mov.vs"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"mov.vv"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-																					   
-	"mov.xx"		,	2,			0,	OPRTYPE_STR,OPRTYPE_STR,OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-																					   
-	"abs.ss"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"abs.vs"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"abs.vv"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"sign.ss"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"add.sss"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"add.vvs"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"add.vsv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-	"add.vvv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-																					   
-	"sub.sss"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"sub.vvs"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"sub.vsv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-	"sub.vvv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-																					   
-	"mul.sss"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"mul.vvs"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"mul.vsv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-	"mul.vvv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-																					   
-	"div.sss"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"div.vvs"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"div.vsv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-	"div.vvv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"mov.vs3"		,	4,			0,	OPRTYPE_F3,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,
-
-	"dot.svv"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"min.sss"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"min.vvv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"max.sss"		,	3,			0,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"max.vvv"		,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"ld.s"			,	2,			OPC_FLG_RIGHTISIMM,		OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"ld.v"			,	4,			OPC_FLG_RIGHTISIMM,		OPRTYPE_F3,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"cmplt"			,	3,			OPC_FLG_UNIFORMOPERS,	OPRTYPE_F1,	OPRTYPE_F1,OPRTYPE_ADDR,OPRTYPE_NA,OPRTYPE_NA,
-
-	"noise11"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"noise12"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"noise13"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-																					   
-	"noise31"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"noise32"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"noise33"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-																					   
-	"xcomp.sv"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
-	"ycomp.sv"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
-	"zcomp.sv"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
-	"setxcomp.vs"	,	2,			0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"setycomp.vs"	,	2,			0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"setzcomp.vs"	,	2,			0,	OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"pxformname.vxv",	3,			0,	OPRTYPE_F3,OPRTYPE_STR, OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"vxformname.vxv",	3,			0,	OPRTYPE_F3,OPRTYPE_STR, OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"nxformname.vxv",	3,			0,	OPRTYPE_F3,OPRTYPE_STR, OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"cxformname.vxv",	3,			0,	OPRTYPE_F3,OPRTYPE_STR, OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-
-	"normalize"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
-	"faceforward"	,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,
-	"diffuse"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,
-	"ambient"		,	1,			0,	OPRTYPE_F3,	OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"calculatenormal",	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	"solarbegin.vs",	2,			OPC_FLG_FUNCOP_BEGIN, OPRTYPE_F3, OPRTYPE_F1, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"illuminance.vvs",	3,			OPC_FLG_FUNCOP_BEGIN, OPRTYPE_F3, OPRTYPE_F3, OPRTYPE_F1,	OPRTYPE_NA,	OPRTYPE_NA,
-	"illuminance.v",	1,			OPC_FLG_FUNCOP_BEGIN, OPRTYPE_F3, OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-	"funcopend"		,	0,			OPC_FLG_FUNCOP_END,	  OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA,	OPRTYPE_NA,	OPRTYPE_NA,
-
-	NULL			,	0,			0,	OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA, OPRTYPE_NA
-};
 
 //==================================================================
 /// ShaderAsmParser
@@ -534,13 +433,13 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 }
 
 //==================================================================
-const OpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &opCodeIdx )
+const SlAsmOpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &opCodeIdx )
 {
-	for (size_t i=0; gsOpCodeDefs[i].pName != NULL; ++i)
-		if ( 0 == strcasecmp( pOpName, gsOpCodeDefs[i].pName ) )
+	for (size_t i=0; _gSlAsmOpCodeDefs[i].pName != NULL; ++i)
+		if ( 0 == strcasecmp( pOpName, _gSlAsmOpCodeDefs[i].pName ) )
 		{
 			opCodeIdx = (u_int)i;
-			return gsOpCodeDefs + i;
+			return _gSlAsmOpCodeDefs + i;
 		}
 
 	return NULL;
@@ -696,7 +595,7 @@ void ShaderAsmParser::parseCode_handleOperImmediate( const char *pTok )
 }
 
 //==================================================================
-void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx )
+void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const SlAsmOpCodeDef *pOpDef, int operIdx )
 {
 	OperTypeID	expectedOperType = pOpDef->Types[operIdx];
 
@@ -790,7 +689,7 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 		return;
 
 	u_int	opCodeIdx;
-	const OpCodeDef	*pOpDef = findOpDef( pTok, opCodeIdx );
+	const SlAsmOpCodeDef	*pOpDef = findOpDef( pTok, opCodeIdx );
 
 	if NOT( pOpDef )
 	{

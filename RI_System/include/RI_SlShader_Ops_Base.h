@@ -9,6 +9,8 @@
 #ifndef RI_SLSHADER_OPS_BASE_H
 #define RI_SLSHADER_OPS_BASE_H
 
+#include "RI_SlRunContext.h"
+
 //==================================================================
 namespace RI
 {
