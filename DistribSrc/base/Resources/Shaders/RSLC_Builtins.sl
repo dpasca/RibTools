@@ -75,7 +75,7 @@ float	acos( float a )			{}
 float	tan( float a )			{}
 float	atan( float yoverx )	{}
 float	atan( float y, x )		{}
-float	pow( float x, y )		{	return x ^ y; }
+float	pow( float x, y )		{	float tmp;	_asm_pow( tmp, x, y ); return tmp; }
 float	exp( float x )			{			}
 float	sqrt( float x )			{}
 float	inversesqrt( float x )	{}
@@ -90,7 +90,7 @@ point	min( point	a, b )		{	point	tmp; _asm_min_vvv( tmp, a, b ); return tmp; }
 vector	min( vector	a, b )		{	vector	tmp; _asm_min_vvv( tmp, a, b ); return tmp; }
 normal	min( normal	a, b )		{	normal	tmp; _asm_min_vvv( tmp, a, b ); return tmp; }
 color	min( color	a, b )		{	color	tmp; _asm_min_vvv( tmp, a, b ); return tmp; }
-                                                          
+
 float	max( float	a, b )		{	float	tmp; _asm_max_sss( tmp, a, b ); return tmp; }
 point	max( point	a, b )		{	point	tmp; _asm_max_vvv( tmp, a, b ); return tmp; }
 vector	max( vector	a, b )		{	vector	tmp; _asm_max_vvv( tmp, a, b ); return tmp; }

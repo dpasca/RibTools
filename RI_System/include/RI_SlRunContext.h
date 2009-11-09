@@ -61,7 +61,7 @@ public:
 		mLightsN	= lightsN;
 	}
 
-	bool Next()				{	mLightIdx += 1;	return mLightIdx < mLightsN;	}
+	bool Next()				{	if ( mLightIdx < mLightsN ) { mLightIdx += 1; return true; } else { return false; }	}
 	void Reset()			{	mLightIdx = DNPOS;	}
 	bool IsActive() const	{	return mLightIdx != DNPOS;	}
 };
