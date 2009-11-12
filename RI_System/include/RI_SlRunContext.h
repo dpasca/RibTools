@@ -31,15 +31,15 @@ public:
 
 	SlVec3			*mpL;
 
-	size_t			mLightIdx;
-	size_t			mLightsN;
+	size_t			mActLightIdx;
+	size_t			mActLightsN;
 
 	SlIlluminanceCtx() :
 		mpAxis(NULL),
 		mpAngle(NULL),
 		mpL(NULL),
-		mLightIdx(DNPOS),
-		mLightsN(0)
+		mActLightIdx(DNPOS),
+		mActLightsN(0)
 	{
 	}
 
@@ -51,19 +51,19 @@ public:
 		size_t			lightsN
 		)
 	{
-		mLightIdx = 0;
+		mActLightIdx = 0;
 	
 		mBodyStartAddr	= bodyStartAddr;
 
 		mpAxis		= pAxis	;
 		mpAngle		= pAngle;
 		mpL			= pL	;
-		mLightsN	= lightsN;
+		mActLightsN	= lightsN;
 	}
 
-	bool Next()				{	if ( mLightIdx < mLightsN ) { mLightIdx += 1; return true; } else { return false; }	}
-	void Reset()			{	mLightIdx = DNPOS;	}
-	bool IsActive() const	{	return mLightIdx != DNPOS;	}
+	void Increment()		{	mActLightIdx += 1;				}
+	void Reset()			{	mActLightIdx = DNPOS;			}
+	bool IsActive() const	{	return mActLightIdx != DNPOS;	}
 };
 
 //==================================================================
@@ -100,6 +100,8 @@ public:
 	SymbolIList				*mpGridSymIList;
 	const Attributes		*mpAttribs;
 
+	DVec<SlRunContext *>	mpActLightsCtxs;
+
 	class Cache
 	{
 	public:
@@ -117,12 +119,16 @@ public:
 
 	void Init( MicroPolygonGrid *pGrid );
 
-	void Setup(
+	void SetupIfChanged(
 			const Attributes	&attribs,
 			const SlShaderInst	*pShaderInst,
 			u_int				blocksXN,
 			u_int				pointsYN,
-			size_t				pointsN );
+			size_t				pointsN=0 );
+
+	void ActLightsCtxs_CheckInit();
+
+	void FreeActLightsCtxs();
 
 	bool IsInFuncop() const
 	{

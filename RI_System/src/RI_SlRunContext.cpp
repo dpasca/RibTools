@@ -45,6 +45,9 @@ SlRunContext::~SlRunContext()
 	// unbind the last used data segment
 	if ( mpDataSegment )
 		mpShaderInst->Unbind( mpDataSegment );
+
+	// delete eventual sub-contextes 8)
+	FreeActLightsCtxs();
 }
 
 //==================================================================
@@ -59,7 +62,7 @@ void SlRunContext::Init( MicroPolygonGrid *pGrid )
 }
 
 //==================================================================
-void SlRunContext::Setup(
+void SlRunContext::SetupIfChanged(
 			const Attributes	&attribs,
 			const SlShaderInst	*pShaderInst,
 			u_int				blocksXN,
@@ -80,6 +83,10 @@ void SlRunContext::Setup(
 			mpShaderInst->Unbind( mpDataSegment );
 			mpDataSegment = NULL;
 		}
+
+		// also delete eventual lights subcontextes.. they'll be built again
+		// if necessary during the shading
+		FreeActLightsCtxs();
 
 		mpShaderInst	= pShaderInst;
 		mpAttribs		= &attribs;
@@ -102,6 +109,42 @@ void SlRunContext::InitializeSIMD( size_t samplesN )
 
 	for (u_int i=0; i < mPointsN; ++i)
 		mpSIMDFlags[i] = 0;
+}
+
+//==================================================================
+void SlRunContext::ActLightsCtxs_CheckInit()
+{
+	// already allocated ? ..then just return
+	if ( mpActLightsCtxs.size() )
+		return;
+
+	size_t	n = mpAttribs->mActiveLights.size();
+
+	mpActLightsCtxs.reserve( n );
+
+	for (size_t i=0; i < n; ++i)
+	{
+		SlRunContext *pCtx = DNEW SlRunContext( mpGrid->mSymbolIs, MP_GRID_MAX_SIZE );
+
+		// add the context to the list of light contextes
+		mpActLightsCtxs.push_back( pCtx );
+
+		// init the context (bind to this grid)
+		pCtx->Init( mpGrid );
+	}
+}
+
+//==================================================================
+void SlRunContext::FreeActLightsCtxs()
+{
+	for (size_t i=0; i < mpActLightsCtxs.size(); ++i)
+	{
+		DSAFE_DELETE( mpActLightsCtxs[i] );
+	}
+
+	// clear the vector.. important as we check for the vector
+	// size to determine if the contextes are allocated or not
+	mpActLightsCtxs.clear();
 }
 
 //==================================================================

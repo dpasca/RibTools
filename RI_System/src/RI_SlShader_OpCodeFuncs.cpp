@@ -105,8 +105,31 @@ void Inst_FuncopEnd( SlRunContext &ctx )
 	// are we doing illuminance ?
 	if ( ctx.mSlIlluminanceCtx.IsActive() )
 	{
-		if ( ctx.mSlIlluminanceCtx.Next() )
+		if ( ctx.mSlIlluminanceCtx.mActLightIdx < ctx.mSlIlluminanceCtx.mActLightsN )
+		{
+			// make sure that the subcontextes for the lights are initialized
+			ctx.ActLightsCtxs_CheckInit();
+
+			size_t	actLightIdx = ctx.mSlIlluminanceCtx.mActLightIdx;
+
+			SlRunContext *pCtx = ctx.mpActLightsCtxs[ actLightIdx ];
+
+			// get the light from the attributes (though attributes takes them from "State")
+			const LightSourceT	*pLight = ctx.mpAttribs->GetLight( actLightIdx );
+
+			// setup the new context
+			pCtx->SetupIfChanged(
+						*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
+						pLight->moShaderInst.Use(),	// shader instance from the light source
+						ctx.mBlocksXN,				// same dimensions as the current shader
+						ctx.mPointsYN );			// ...
+
+			// run the light shader !!
+			pCtx->mpShaderInst->Run( *pCtx );
+
+			ctx.mSlIlluminanceCtx.Increment();
 			ctx.GotoInstruction( ctx.mSlIlluminanceCtx.mBodyStartAddr );
+		}
 		else
 		{
 			ctx.mSlIlluminanceCtx.Reset();

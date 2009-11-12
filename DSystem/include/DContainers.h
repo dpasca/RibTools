@@ -92,14 +92,16 @@ public:
 		resize( 0 );
 	}
 
-	void force_reserve( size_t reserveSize )
+	void reserve( size_t newSizeAlloc )
 	{
-		size_t newSizeAlloc = mSize + reserveSize;
-
 		if ( newSizeAlloc <= mSizeAlloc )
 			return;
 
 		T *newPData = (T *)DNEW u_char [ sizeof(T) * newSizeAlloc ];
+
+		// return silently on failure
+		if NOT( newPData )
+			return;
 
 		if ( mpData )
 		{

@@ -89,6 +89,9 @@ public:
 		return *mpGlobalSyms;
 	}
 
+	// get a light source given the index in the active lights list
+	const LightSourceT *GetLight( size_t actLightIdx ) const;
+
 private:
 	void copyFrom(const Attributes& rhs);
 

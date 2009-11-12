@@ -128,6 +128,14 @@ void Attributes::Init(
 }
 
 //==================================================================
+const LightSourceT * Attributes::GetLight( size_t actLightIdx ) const
+{
+	size_t	lightIdx = (size_t)mActiveLights[ actLightIdx ];
+
+	return mpState->GetLightSources()[ lightIdx ];
+}
+
+//==================================================================
 void Attributes::cmdBound( const Bound &bound )
 {
 	mBound = bound;
