@@ -85,10 +85,10 @@ public:
 	MicroPolygonGrid		*mpGrid;
 
 	// for light shaders only
-	//SlSolarCtx				mSolarCtx;
+	bool					mIsInSolar;
 
 	// for surface shaders only
-	SlIlluminanceCtx		mSlIlluminanceCtx;
+	SlIlluminanceCtx		mIlluminanceCtx;
 
 	u_int					mBlocksXN;
 	u_int					mPointsYN;
@@ -143,11 +143,16 @@ public:
 	void ActLightsCtxs_CheckInit();
 	void FreeActLightsCtxs();
 
+	const SlShader *GetShader() const
+	{
+		return mpShaderInst->moShader.Use();
+	}
+
 	bool IsInFuncop() const
 	{
 		return
-			//mSolarCtx.IsActive() ||
-			mSlIlluminanceCtx.IsActive();
+			mIsInSolar ||
+			mIlluminanceCtx.IsActive();
 	}
 
 	const SlCPUWord *GetOp( u_int argc ) const

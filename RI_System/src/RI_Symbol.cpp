@@ -95,11 +95,11 @@ void Symbol::InitConstValue( const void *pSrcData )
 
 	mpConstVal = AllocClone( 1 );
 
-	fillData( mpConstVal, 1, pSrcData );	
+	FillData( mpConstVal, 1, pSrcData );	
 }
 
 //==================================================================
-void Symbol::fillData( void *pDestData, size_t size, const void *pSrcData ) const
+void Symbol::FillData( void *pDestData, size_t size, const void *pSrcData ) const
 {
 	size_t	blksN = RI_GET_SIMD_BLOCKS( size );
 
@@ -313,7 +313,7 @@ SymbolI * SymbolIList::FindSymbolI( const char *pName )
 	{
 		SymbolI	&inst = (*this)[i];
 
-		if ( 0 == strcmp( inst.mpSrcSymbol->mName.c_str(), pName ) )
+		if ( inst.IsName( pName ) )
 		{
 			return &inst;
 		}
@@ -329,7 +329,7 @@ const SymbolI * SymbolIList::FindSymbolI( const char *pName ) const
 	{
 		const SymbolI	&inst = (*this)[i];
 
-		if ( 0 == strcmp( inst.mpSrcSymbol->mName.c_str(), pName ) )
+		if ( inst.IsName( pName ) )
 		{
 			return &inst;
 		}

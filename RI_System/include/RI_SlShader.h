@@ -88,6 +88,15 @@ public:
 		mpSrcSymbol				= pSrcSymbol;
 	}
 
+	void AllocFillConstData( const Symbol *pSrcSymbol, size_t samplesN, const void *pSrcConstData )
+	{
+		void *pVaryingData = pSrcSymbol->AllocClone( samplesN );
+
+		Flags.mOwnData = 1;
+		SetDataR( pVaryingData, pSrcSymbol );
+		pSrcSymbol->FillData( pVaryingData, samplesN, pSrcConstData );
+	}
+
 	void SetDataRW( void *pData, const Symbol *pSrcSymbol )
 	{
 		Flags.mCanChange	= 1;

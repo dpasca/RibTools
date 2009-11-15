@@ -157,6 +157,8 @@ void SlShaderInst::runFrom( SlRunContext &ctx, u_int startPC ) const
 {
 	ctx.mProgramCounterIdx = 0;
 	ctx.mProgramCounter[ ctx.mProgramCounterIdx ] = startPC;
+	ctx.mIlluminanceCtx.Reset();
+	ctx.mIsInSolar = false;
 
 	const SlCPUWord	*pWord = NULL;
 

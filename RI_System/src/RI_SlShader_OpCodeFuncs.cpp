@@ -22,136 +22,6 @@ namespace RI
 
 //==================================================================
 //==================================================================
-void Inst_SolarBegin_VS( SlRunContext &ctx )
-{
-	DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
-
-	const SlVec3	*pAxis	= ctx.GetVoidRO( (		  SlVec3 *)0, 1 );
-	const SlScalar	*pAngle	= ctx.GetVoidRO( (const SlScalar *)0, 2 );
-
-	SlVec3		*pL		= (SlVec3 *)ctx.mpGridSymIList->FindSymbolIData( "L" );
-
-	// 'L' becomes the normalized axis
-	*pL = pAxis->GetNormalized();
-
-	// TODO: check with angle to see if we need to skip this
-	// start looping by the funcop end
-	if ( 0 )
-	{
-		// if we are skipping then Cl = 0 (do we really need it ?)
-
-		SlColor	*pCl = (SlColor *)ctx.mpGridSymIList->FindSymbolIData( "Cl" );
-		*pCl = SlColor( 0 );
-
-		ctx.GotoInstruction( ctx.GetOp(0)->mOpCode.mFuncopEndAddr );
-	}
-
-	ctx.NextInstruction();
-}
-
-//==================================================================
-template<bool INCLUDES_AXIS_ANGLE>
-void Inst_Illuminance( SlRunContext &ctx )
-{
-	u_short funcOpEndAddr = ctx.GetOp(0)->mOpCode.mFuncopEndAddr;
-
-	// any lights ?
-	if NOT( ctx.mpAttribs->mActiveLights.size() )
-	{
-		// no ? Skip the whole thing
-		ctx.GotoInstruction( funcOpEndAddr );
-		ctx.NextInstruction();
-		return;
-	}
-
-	const SlVec3*	pPos	= ctx.GetVoidRO( (		SlVec3 *)0, 1 );
-	const SlVec3*	pAxis	;
-	const SlScalar*	pAngle	;
-
-	if ( INCLUDES_AXIS_ANGLE )
-	{
-		pAxis	= ctx.GetVoidRO( (		  SlVec3 *)0, 2 );
-		pAngle	= ctx.GetVoidRO( (const SlScalar *)0, 3 );
-	}
-	else
-	{
-		pAxis	= NULL;
-		pAngle	= NULL;
-	}
-
-	SlColor	*pCl	= (	SlColor	*)ctx.mpGridSymIList->FindSymbolIData( "Cl" );
-	SlVec3	*pL		= (	 SlVec3 *)ctx.mpGridSymIList->FindSymbolIData( "L" );
-
-	DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
-
-	ctx.NextInstruction();
-	u_int bodyStartAddr = ctx.GetCurPC();
-
-	ctx.mSlIlluminanceCtx.Init(
-			bodyStartAddr,
-			pAxis,
-			pAngle,
-			pL,
-			ctx.mpAttribs->mActiveLights.size()
-			);
-
-	// start looping by the funcop end
-	ctx.GotoInstruction( funcOpEndAddr );
-}
-
-//==================================================================
-void Inst_FuncopEnd( SlRunContext &ctx )
-{
-	// are we doing illuminance ?
-	if ( ctx.mSlIlluminanceCtx.IsActive() )
-	{
-		if ( ctx.mSlIlluminanceCtx.mActLightIdx < ctx.mSlIlluminanceCtx.mActLightsN )
-		{
-			const LightSourceT	*pLight = NULL;
-
-			// find the next non-ambient light
-			for (;
-				ctx.mSlIlluminanceCtx.mActLightIdx < ctx.mSlIlluminanceCtx.mActLightsN;
-				++ctx.mSlIlluminanceCtx.mActLightIdx )
-			{
-				// get the light from the attributes (though attributes takes them from "State")
-				pLight = ctx.mpAttribs->GetLight( ctx.mSlIlluminanceCtx.mActLightIdx );
-
-				if ( pLight->mIsAmbient )
-					continue;
-
-				// make sure that the subcontextes for the lights are initialized
-				ctx.ActLightsCtxs_CheckInit();
-
-				SlRunContext *pCtx = ctx.GetActLightCtx( ctx.mSlIlluminanceCtx.mActLightIdx );
-
-				// setup the new context
-				pCtx->SetupIfChanged(
-							*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
-							pLight->moShaderInst.Use(),	// shader instance from the light source
-							ctx.mBlocksXN,				// same dimensions as the current shader
-							ctx.mPointsYN );			// ...
-
-				// run the light shader !!
-				pCtx->mpShaderInst->Run( *pCtx );
-
-				ctx.mSlIlluminanceCtx.Increment();
-				ctx.GotoInstruction( ctx.mSlIlluminanceCtx.mBodyStartAddr );
-				return;
-			}
-		}
-
-		ctx.mSlIlluminanceCtx.Reset();
-		ctx.NextInstruction();
-	}
-	else
-	{
-		DASSTHROW( 0, ("'funcop' not matching !") );
-	}
-}
-
-//==================================================================
-//==================================================================
 #define S SlScalar
 #define V SlVec3
 //#define MATRIX	Matrix44
@@ -234,10 +104,13 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 	SOP::Inst_Ambient,
 	SOP::Inst_CalculateNormal,
 
-	Inst_SolarBegin_VS,
-	Inst_Illuminance<true>,
-	Inst_Illuminance<false>,
-	Inst_FuncopEnd,
+	SOP::Inst_Solar<false	>,
+	SOP::Inst_Solar<true		>,
+
+	SOP::Inst_Illuminance<false >,
+	SOP::Inst_Illuminance<true  >,
+
+	SOP::Inst_FuncopEnd,
 };
 
 #undef S

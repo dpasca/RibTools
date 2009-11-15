@@ -161,8 +161,7 @@ public:
 
 	const void *GetConstantData() const { return mpConstVal;	}
 
-private:
-	void fillData( void *pDestData, size_t size, const void *pSrcData ) const;
+	void FillData( void *pDestData, size_t size, const void *pSrcData ) const;
 };
 
 //==================================================================
@@ -217,8 +216,8 @@ private:
 //==================================================================
 class SymbolI
 {
-public:
 	const Symbol	*mpSrcSymbol;
+public:
 	size_t			mArraySize;
 	void			*mpValArray;
 	//u_int			mDefaultValStartPC;
@@ -241,10 +240,29 @@ public:
 
 	bool IsVarying() const	{	return mpSrcSymbol->IsVarying();	}
 
+	const Symbol *GetSrcSymbol() const
+	{
+		return mpSrcSymbol;
+	}
+
+	bool IsName( const char *pSrc ) const
+	{
+		return 0 == strcmp( mpSrcSymbol->mName.c_str(), pSrc );
+	}
+
 	const void *GetConstantData() const
 	{
-		DASSERT( mpSrcSymbol->IsConstant() );
-		return mpSrcSymbol->mpConstVal;
+		if ( mpValArray )
+		{
+			// an assert similar to this should happen if we decide to add a specific data
+			// class for instanced symbols as well - DASSERT( mpSrcSymbol->IsConstant() );
+			return mpValArray;
+		}
+		else
+		{
+			DASSERT( mpSrcSymbol->IsConstant() );
+			return mpSrcSymbol->mpConstVal;
+		}
 	}
 
 /*

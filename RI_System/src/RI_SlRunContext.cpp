@@ -35,6 +35,8 @@ SlRunContext::SlRunContext( SymbolIList &symsIList, size_t maxPointsN ) :
 	mpSIMDFlags		= DNEW int [ mMaxPointsN ];
 
 	mpGrid			= NULL;
+
+	mIsInSolar		= false;
 }
 
 //==================================================================

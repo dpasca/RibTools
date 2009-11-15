@@ -14,29 +14,46 @@ namespace RI
 {
 
 //==================================================================
-static void matchSymbols( const Symbol &a, const Symbol &b )
+static void matchSymbols( const Symbol &dst, const Symbol &src, bool &out_needConvertToVarying )
 {
+	out_needConvertToVarying = false;
+
 	// this shouldn't really happen at this stage
-	DASSTHROW( a.IsName( b.GetNameChr() ),
-		("Names not matching ! %s != %s", a.GetNameChr(), b.GetNameChr()) );
+	DASSTHROW( dst.IsName( src.GetNameChr() ),
+		("Names not matching ! %s != %s", dst.GetNameChr(), src.GetNameChr()) );
 
-	DASSTHROW( a.mType == b.mType,
+	DASSTHROW( dst.mType == src.mType,
 				("Type is %i but expecting %i for '%s'",
-					a.mType,
-					b.mType,
-					a.mName.c_str()) );
+					dst.mType,
+					src.mType,
+					dst.GetNameChr()) );
 
-	DASSTHROW( a.IsVarying() == b.IsVarying(),
-				("Class is %s but expecting %s for '%s'",
-					a.IsVarying() ? "varying" : "not-varying",
-					b.IsVarying() ? "varying" : "not-varying",
-					a.mName.c_str()) );
+	if ( src.IsVarying() )
+	{
+		if NOT( dst.IsVarying() )
+		{
+			DASSTHROW( 0,
+				("Cannot assign a varying value to a non varying one for '%s'",
+					dst.GetNameChr()) );
+		}
+	}
+	else
+	{
+		if ( dst.IsVarying() )
+		{
+			out_needConvertToVarying = true;
+		}
+	}
 
-	DASSTHROW( a.IsConstant() == b.IsConstant(),
-				("Class is %s but expecting %s for '%s'",
-					a.IsConstant() ? "constant" : "not-constant",
-					b.IsConstant() ? "constant" : "not-constant",
-					a.mName.c_str()) );
+	if ( dst.IsConstant() )
+	{
+		if NOT( src.IsConstant() )
+		{
+			DASSTHROW( 0,
+				("Cannot assign a non-constant value to a constant one '%s'",
+					dst.GetNameChr()) );
+		}
+	}
 }
 
 //==================================================================
@@ -51,7 +68,7 @@ static void bindGlobalStorageSymbol(
 	// in the grid, therefore we look into the grid
 	// Notice that in the state machine, symbols such as "Ka" are marked as global,
 	// but in fact, those are considered as parameters in the shader.. while they
-	// are global in the context of the state machine.. basically a different kind
+	// are global in the context of the state machine.. basically dst different kind
 	// of globals !
 
 	if ( shaSym.IsConstant() )
@@ -64,7 +81,8 @@ static void bindGlobalStorageSymbol(
 
 		DASSTHROW( pGlobalSym != NULL, ("Could not find the global symbol %s !\n", shaSym.GetNameChr()) );
 
-		matchSymbols( shaSym, *pGlobalSym );
+		bool needConvertToVarying;
+		matchSymbols( shaSym, *pGlobalSym, needConvertToVarying );
 
 		// grab the constant data from the global in the state machine.. not from the
 		// symbol in the shader.. which is not supposed to exist 8)
@@ -81,11 +99,12 @@ static void bindGlobalStorageSymbol(
 
 		DASSTHROW( pGridGlobalSymI != NULL, ("Could not find the global symbol %s !\n", shaSym.GetNameChr()) );
 
-		matchSymbols( shaSym, *pGridGlobalSymI->mpSrcSymbol );
+		bool needConvertToVarying;
+		matchSymbols( shaSym, *pGridGlobalSymI->GetSrcSymbol(), needConvertToVarying );
 
 		// grab the data from the symbol the symbol instance in the grid
 		destValue.Flags.mOwnData = 0;
-		destValue.SetDataRW( pGridGlobalSymI->GetRWData(), pGridGlobalSymI->mpSrcSymbol );
+		destValue.SetDataRW( pGridGlobalSymI->GetRWData(), pGridGlobalSymI->GetSrcSymbol() );
 	}
 }
 
@@ -100,7 +119,7 @@ static void bindTemporaryStorageSymbol(
 	{
 		// Example symbols: MY_FACTOR ...
 
-		// temporary const is a local const ..grab it from the shader
+		// temporary const is dst local const ..grab it from the shader
 
 		destValue.Flags.mOwnData = 0;
 		destValue.SetDataR( shaSym.GetConstantData(), &shaSym );
@@ -150,44 +169,55 @@ SlValue	*SlShaderInst::Bind(
 				// paranoia check for the moment..
 				DASSERT( NULL == gridSymIList.FindSymbolI( shaSym.GetNameChr() ) );
 
-				/*
 				//---- Handle in-line params
 
 				// will need to ensure that in-line params are uniform and constant !
 
-				const SymbolI	*pParamSymI = mCallSymIList.FindSymbolI( pShaSymName );
+				const SymbolI	*pParamSymI = mCallSymIList.FindSymbolI( shaSym.GetNameChr() );
 
 				// additionally look into params in attributes ?
 
 				if ( pParamSymI )
 				{
-					matchSymbols( shaSym, *pParamSymI->mpSrcSymbol );
+					const Symbol	*pSrcSymbol = pParamSymI->GetSrcSymbol();
 
-					pDataSegment[i].Flags.mOwnData = 0;
-					pDataSegment[i].SetDataR( pParamSymI->GetUniformParamData(), pParamSymI->mpSrcSymbol );
-				}
-				*/
+					bool needConvertToVarying;
+					matchSymbols( shaSym, *pSrcSymbol, needConvertToVarying );
 
-				SlValue	&destValue = pDataSegment[i];
-
-				// is the param constant ?  ..odd, but...
-				if ( shaSym.IsConstant() )
-				{
-					// parameter const is a local const ..grab it from the shader
-					destValue.Flags.mOwnData = 0;
-					destValue.SetDataR( shaSym.GetConstantData(), &shaSym );
+					if ( needConvertToVarying )
+					{
+						pDataSegment[i].AllocFillConstData( &shaSym, mMaxPointsN, pParamSymI->GetConstantData() );
+					}
+					else
+					{
+						// as is..
+						pDataSegment[i].Flags.mOwnData = 0;
+						pDataSegment[i].SetDataR( pParamSymI->GetConstantData(), pSrcSymbol );
+					}
 				}
 				else
 				{
-					// allocate storage for the param
-					size_t	allocN = shaSym.IsVarying() ? mMaxPointsN : 1;
+					SlValue	&destValue = pDataSegment[i];
 
-					pDataSegment[i].Flags.mOwnData = 1;
-					pDataSegment[i].SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
+					// is the param constant ?  ..odd, but...
+					if ( shaSym.IsConstant() )
+					{
+						// parameter const is dst local const ..grab it from the shader
+						destValue.Flags.mOwnData = 0;
+						destValue.SetDataR( shaSym.GetConstantData(), &shaSym );
+					}
+					else
+					{
+						// allocate storage for the param
+						size_t	allocN = shaSym.IsVarying() ? mMaxPointsN : 1;
 
-					// setup init code !
-					if ( moShader->mpShaSymsStartPCs[i] != INVALID_PC )
-						out_defParamValsStartPCs.push_back( moShader->mpShaSymsStartPCs[i] );
+						pDataSegment[i].Flags.mOwnData = 1;
+						pDataSegment[i].SetDataRW( shaSym.AllocClone( allocN ), &shaSym );
+
+						// setup init code !
+						if ( moShader->mpShaSymsStartPCs[i] != INVALID_PC )
+							out_defParamValsStartPCs.push_back( moShader->mpShaSymsStartPCs[i] );
+					}
 				}
 			}
 			break;

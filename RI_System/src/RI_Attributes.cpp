@@ -281,6 +281,7 @@ static void addShaderParam(
 
 	SymbolI *pSymI = shaInst.mCallSymIList.AddInstance( *pSym, 1 );	// 1... uniform only !
 
+
 	void *pData = pSymI->GetRWData();
 
 	switch ( pSym->mType )

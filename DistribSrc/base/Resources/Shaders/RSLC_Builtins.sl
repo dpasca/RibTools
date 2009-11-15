@@ -47,6 +47,11 @@ __funcop solar( vector axis; float angle )
 	_asm_solarbegin_vs( axis, angle );
 }
 /*===============================================================*/
+__funcop solar()
+{
+	_asm_solarbegin();
+}
+/*===============================================================*/
 __funcop illuminance( point pos; vector axis; float angle )
 {
 	_asm_illuminance_vvs( pos, axis, angle );
