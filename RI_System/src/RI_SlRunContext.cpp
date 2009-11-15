@@ -88,6 +88,10 @@ void SlRunContext::SetupIfChanged(
 		// if necessary during the shading
 		FreeActLightsCtxs();
 
+		// reset the cache (where, for example, return value for
+		// ambient() is stored)
+		mCache.Reset( mpAttribs );
+
 		mpShaderInst	= pShaderInst;
 		mpAttribs		= &attribs;
 

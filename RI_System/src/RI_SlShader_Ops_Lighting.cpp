@@ -138,53 +138,53 @@ void Inst_Diffuse( SlRunContext &ctx )
 // this is a simplified version.. until lights become available 8)
 void Inst_Ambient( SlRunContext &ctx )
 {
-/*
-	SlColor*	lhs	= ctx.GetVoidRW( (SlColor*)0, 1 );
-
-#if 0
-	for (size_t i=0; i < activeLights.size(); ++i)
-	{
-		size_t		li	= activeLights[i];
-
-		const LightSourceT	&light = *pLights[ li ];
-
-		//light.mShaderInst->Bind();
-	}
-#else
 	if NOT( ctx.mCache.mAmbientColDone )
 	{
 		ctx.mCache.mAmbientColDone = true;
 
 		SlColor	ambCol( 0.f );
 
+		SlColor	*pCl = (SlColor *)ctx.mpGridSymIList->FindSymbolIData( "Cl" );
+
 		const DVec<LightSourceT *>	&pLights	= ctx.mpAttribs->mpState->GetLightSources();
 		const DVec<U16>				&actLights	= ctx.mpAttribs->mActiveLights;
 
+		// make sure that the subcontextes for the lights are initialized
+		ctx.ActLightsCtxs_CheckInit();
+
 		for (size_t i=0; i < actLights.size(); ++i)
 		{
-			size_t		li	= actLights[i];
+			// get the light from the attributes (though attributes takes them from "State")
+			const LightSourceT	*pLight = ctx.mpAttribs->GetLight( i );
 
-			const LightSourceT	&light = *pLights[ li ];
+			if NOT( pLight->mIsAmbient )
+				continue;
 
-			SlColor	lightCol( light.mColor.x(), light.mColor.y(), light.mColor.z() );
-			SlScalar	lightInt( light.mIntesity );
+			SlRunContext *pCtx = ctx.GetActLightCtx( i );
 
-			if ( light.mType == LightSourceT::TYPE_AMBIENT )
-				ambCol += lightCol * lightInt;
+			// setup the new context
+			pCtx->SetupIfChanged(
+						*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
+						pLight->moShaderInst.Use(),	// shader instance from the light source
+						ctx.mBlocksXN,				// same dimensions as the current shader
+						ctx.mPointsYN );			// ...
+
+			// run the light shader !!
+			pCtx->mpShaderInst->Run( *pCtx );
+
+			ambCol += *pCl;
 		}
 
 		ctx.mCache.mAmbientCol = ambCol;
 	}
 
-	//DASSERT( ambCol.x >= 0 && ambCol.y >= 0 && ambCol.z >= 0 );
+	SlColor	*lhs	= ctx.GetVoidRW( (SlColor*)0, 1 );
 
 	for (u_int i=0; i < ctx.mBlocksN; ++i)
 	{
 		if ( ctx.IsProcessorActive( i ) )
 			lhs[i] = ctx.mCache.mAmbientCol;
 	}
-#endif
-*/
 
 	ctx.NextInstruction();
 }

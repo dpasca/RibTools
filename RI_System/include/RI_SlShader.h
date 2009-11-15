@@ -158,6 +158,7 @@ public:
 	DVec<u_int>			mpShaSymsStartPCs;
 	u_int				mStartPC;
 	DVec<SlCPUWord>		mCode;
+	bool				mHasDirPosInstructions;
 
 	struct CtorParams
 	{

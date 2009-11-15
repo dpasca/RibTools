@@ -16,7 +16,8 @@ namespace RI
 {
 
 //==================================================================
-LightSourceT::LightSourceT()
+LightSourceT::LightSourceT() :
+	mIsAmbient(false)
 {
 /*
 	mIntesity	= 1;

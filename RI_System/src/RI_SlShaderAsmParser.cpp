@@ -719,6 +719,11 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 		mFuncOpBeginIdx = DNPOS;
 	}
 
+	if ( pOpDef->Flags & OPC_FLG_DIRPOSLIGHT_INSTR )
+	{
+		mpShader->mHasDirPosInstructions = true;
+	}
+
 	SlCPUWord		instruction;
 	instruction.mOpCode.mTableOffset	= opCodeIdx;
 	instruction.mOpCode.mOperandCount	= pOpDef->OperCnt;

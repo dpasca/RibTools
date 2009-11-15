@@ -114,7 +114,8 @@ static void compileFromMemFile(
 SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 	ResourceBase(params.pName, ResourceBase::TYPE_SHADER),
 	mType(TYPE_UNKNOWN),
-	mStartPC(INVALID_PC)
+	mStartPC(INVALID_PC),
+	mHasDirPosInstructions(false)
 {
 	DUT::MemFile	file;
 

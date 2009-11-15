@@ -105,13 +105,22 @@ public:
 	class Cache
 	{
 	public:
-		bool	mAmbientColDone;
-		SlColor	mAmbientCol;
+		const Attributes	*mpAttribs;
+		bool				mAmbientColDone;
+		SlColor				mAmbientCol;
 
-		Cache()
+		Cache() :
+			mpAttribs(NULL)
 		{
 			mAmbientColDone = false;
 		}
+
+		void Reset( const Attributes *pAttribs )
+		{
+			mpAttribs		= pAttribs;
+			mAmbientColDone = false;
+		}
+
 	} mCache;
 
 	SlRunContext( SymbolIList &symsIList, size_t maxPointsN );
@@ -126,8 +135,12 @@ public:
 			u_int				pointsYN,
 			size_t				pointsN=0 );
 
-	void ActLightsCtxs_CheckInit();
+	SlRunContext *GetActLightCtx( size_t actLightIdx )
+	{
+		return mpActLightsCtxs[ actLightIdx ];
+	}
 
+	void ActLightsCtxs_CheckInit();
 	void FreeActLightsCtxs();
 
 	bool IsInFuncop() const

@@ -37,6 +37,7 @@ public:
 public:
 
 	u_int	mID;
+	bool	mIsAmbient;
 /*
 	Type	mType;
 	float	mIntesity;

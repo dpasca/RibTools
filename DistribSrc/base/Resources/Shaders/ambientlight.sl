@@ -11,4 +11,5 @@ light ambientlight(
 		)
 {
 	Cl = intensity * lightcolor;
+	L = 0;
 }

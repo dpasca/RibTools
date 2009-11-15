@@ -107,34 +107,42 @@ void Inst_FuncopEnd( SlRunContext &ctx )
 	{
 		if ( ctx.mSlIlluminanceCtx.mActLightIdx < ctx.mSlIlluminanceCtx.mActLightsN )
 		{
-			// make sure that the subcontextes for the lights are initialized
-			ctx.ActLightsCtxs_CheckInit();
+			const LightSourceT	*pLight = NULL;
 
-			size_t	actLightIdx = ctx.mSlIlluminanceCtx.mActLightIdx;
+			// find the next non-ambient light
+			for (;
+				ctx.mSlIlluminanceCtx.mActLightIdx < ctx.mSlIlluminanceCtx.mActLightsN;
+				++ctx.mSlIlluminanceCtx.mActLightIdx )
+			{
+				// get the light from the attributes (though attributes takes them from "State")
+				pLight = ctx.mpAttribs->GetLight( ctx.mSlIlluminanceCtx.mActLightIdx );
 
-			SlRunContext *pCtx = ctx.mpActLightsCtxs[ actLightIdx ];
+				if ( pLight->mIsAmbient )
+					continue;
 
-			// get the light from the attributes (though attributes takes them from "State")
-			const LightSourceT	*pLight = ctx.mpAttribs->GetLight( actLightIdx );
+				// make sure that the subcontextes for the lights are initialized
+				ctx.ActLightsCtxs_CheckInit();
 
-			// setup the new context
-			pCtx->SetupIfChanged(
-						*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
-						pLight->moShaderInst.Use(),	// shader instance from the light source
-						ctx.mBlocksXN,				// same dimensions as the current shader
-						ctx.mPointsYN );			// ...
+				SlRunContext *pCtx = ctx.GetActLightCtx( ctx.mSlIlluminanceCtx.mActLightIdx );
 
-			// run the light shader !!
-			pCtx->mpShaderInst->Run( *pCtx );
+				// setup the new context
+				pCtx->SetupIfChanged(
+							*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
+							pLight->moShaderInst.Use(),	// shader instance from the light source
+							ctx.mBlocksXN,				// same dimensions as the current shader
+							ctx.mPointsYN );			// ...
 
-			ctx.mSlIlluminanceCtx.Increment();
-			ctx.GotoInstruction( ctx.mSlIlluminanceCtx.mBodyStartAddr );
+				// run the light shader !!
+				pCtx->mpShaderInst->Run( *pCtx );
+
+				ctx.mSlIlluminanceCtx.Increment();
+				ctx.GotoInstruction( ctx.mSlIlluminanceCtx.mBodyStartAddr );
+				return;
+			}
 		}
-		else
-		{
-			ctx.mSlIlluminanceCtx.Reset();
-			ctx.NextInstruction();
-		}
+
+		ctx.mSlIlluminanceCtx.Reset();
+		ctx.NextInstruction();
 	}
 	else
 	{

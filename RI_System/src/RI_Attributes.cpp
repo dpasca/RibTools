@@ -487,6 +487,8 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 
 	pLight->mID = params[1].Int();
 
+	pLight->mIsAmbient = !pShader->mHasDirPosInstructions;
+
 	getShaderParams( params, 2, *pLight->moShaderInst.Use() );
 
 	//pLight->UpdateRend( xform, mtxWorldCam );
