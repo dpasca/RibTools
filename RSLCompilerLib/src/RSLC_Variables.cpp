@@ -86,7 +86,14 @@ Variable *AddVariable(
 			TokNode *pNameNode )
 {
 	// setup the var link
-	pNameNode->mVarLink.Setup( pNode, pNode->GetVars().size() );
+	if ( pNameNode )
+	{
+		pNameNode->mVarLink.Setup( pNode, pNode->GetVars().size() );
+	}
+	else
+	{
+		int yoyo = 1;
+	}
 
 	Variable	*pVar = pNode->GetVars().grow();
 
@@ -364,7 +371,8 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 	TokNode	*pOutputNode= NULL;
 	TokNode *pLastNonTerm=NULL;
 
-	int		bracketCnt = 0;
+	int		rndBracketCnt = 0;
+	int		crlBracketCnt = 0;
 	bool	intoRValue = false;
 
 	BlockType	blkType = pNode->GetBlockType();
@@ -373,101 +381,121 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 	{
 		TokNode	*pChild = pNode->mpChilds[i];
 
-		if ( pChild->mpToken->id == T_OP_LFT_BRACKET || pChild->mpToken->id == T_OP_LFT_CRL_BRACKET )
+		if ( pChild->mpToken->id == T_OP_LFT_BRACKET )
 		{
-			++bracketCnt;
+			++rndBracketCnt;
+			continue;
+		}
+		if ( pChild->mpToken->id == T_OP_LFT_CRL_BRACKET )
+		{
+			++crlBracketCnt;
+			continue;
 		}
 		else
-		if ( pChild->mpToken->id == T_OP_RGT_BRACKET || pChild->mpToken->id == T_OP_RGT_CRL_BRACKET )
+		if ( pChild->mpToken->id == T_OP_RGT_BRACKET )
 		{
-			--bracketCnt;
+			--rndBracketCnt;
+			continue;
+		}
+		if ( pChild->mpToken->id == T_OP_RGT_CRL_BRACKET )
+		{
+			--crlBracketCnt;
+			continue;
 		}
 		else
-		if NOT( bracketCnt )
 		{
-			// if we are not into some block..
+			// no variable declarations possible inside any expression (round brackets)
+			if ( rndBracketCnt )
+				continue;
 
-			// NOTE: a valid variable declaration must be followed by any of the following symbols
-			// ',', ';', '='
-
-			if ( pChild->mpToken->id == T_OP_ASSIGN )
+			// only inside code block, curl bracket allow for variables declaration
+			if ( crlBracketCnt )
 			{
-				// except in cases like: float a = (b = 3)
-				if ( intoRValue )
+				if ( blkType != BLKT_CODEBLOCK )
+					continue;
+			}
+		}
+
+		// NOTE: a valid variable declaration must be followed by any of the following symbols
+		// ',', ';', '='
+
+		if ( pChild->mpToken->id == T_OP_ASSIGN )
+		{
+			// except in cases like: float a = (b = 3)
+			if ( intoRValue )
+				throw Exception( "Broken variable declaration", pChild );
+
+			intoRValue = true;
+
+			if ( pDTypeNode )
+			{
+				DASSERT( !!pLastNonTerm );
+			}
+		}
+		else
+		if ( pChild->mpToken->id == T_OP_COMMA )
+		{
+			// comma brings out of "right value" state.
+			// e.g. float a = 4, c ...
+			intoRValue = false;
+
+			if ( pDTypeNode && pLastNonTerm )
+			{
+				Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+				if ( blkType == BLKT_SHPARAMS )
+				{
+					pVar->mIsSHParam = true;	// mark as shader param
+				}
+			}
+		}
+		else
+		if ( pChild->mpToken->id == T_OP_SEMICOL )
+		{
+			// semi-colon brings out of "right value" state and resets
+			// all types, detail..
+			// e.g. float a = 4, c;
+			intoRValue = false;
+
+			if ( pDTypeNode && pLastNonTerm )
+			{
+				Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
+				if ( blkType == BLKT_SHPARAMS )
+				{
+					pVar->mIsSHParam = true;	// mark as shader param
+				}
+			}
+
+			pDTypeNode	= NULL;
+			pDetailNode	= NULL;
+			pOutputNode	= NULL;
+		}
+		else
+		if NOT( intoRValue )
+		{
+			if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
+			{
+				pDTypeNode = pChild;
+			}
+			else
+			if ( pChild->mpToken->idType == T_TYPE_DETAIL )
+			{
+				if ( pDetailNode )
 					throw Exception( "Broken variable declaration", pChild );
 
-				intoRValue = true;
-
-				if ( pDTypeNode )
-				{
-					DASSERT( !!pLastNonTerm );
-				}
+				pDetailNode = pChild;
 			}
 			else
-			if ( pChild->mpToken->id == T_OP_COMMA )
+			if ( pChild->mpToken->id == T_KW_output )
 			{
-				// comma brings out of "right value" state.
-				// e.g. float a = 4, c ...
-				intoRValue = false;
+				if ( pOutputNode && (blkType != BLKT_SHPARAMS && blkType != BLKT_FNPARAMS) )
+					throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pChild );
 
-				if ( pDTypeNode )
-				{
-					Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
-					if ( blkType == BLKT_SHPARAMS )
-					{
-						pVar->mIsSHParam = true;	// mark as shader param
-					}
-				}
+				pOutputNode = pChild;
 			}
 			else
-			if ( pChild->mpToken->id == T_OP_SEMICOL )
+			if ( pChild->IsNonTerminal() )
 			{
-				// semi-colon brings out of "right value" state and resets
-				// all types, detail..
-				// e.g. float a = 4, c;
-				intoRValue = false;
-
-				if ( pDTypeNode )
-				{
-					Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
-					if ( blkType == BLKT_SHPARAMS )
-					{
-						pVar->mIsSHParam = true;	// mark as shader param
-					}
-				}
-
-				pDTypeNode	= NULL;
-				pDetailNode	= NULL;
-				pOutputNode	= NULL;
-			}
-			else
-			if NOT( intoRValue )
-			{
-				if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
-				{
-					pDTypeNode = pChild;
-				}
-				else
-				if ( pChild->mpToken->idType == T_TYPE_DETAIL )
-				{
-					if ( pDetailNode )
-						throw Exception( "Broken variable declaration", pChild );
-
-					pDetailNode = pChild;
-				}
-				else
-				if ( pChild->mpToken->id == T_KW_output )
-				{
-					if ( pOutputNode && (blkType != BLKT_SHPARAMS && blkType != BLKT_FNPARAMS) )
-						throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pChild );
-
-					pOutputNode = pChild;
-				}
-				else
-				if ( pChild->IsNonTerminal() )
-				{
-					pLastNonTerm = pChild;
-				}
+				pLastNonTerm = pChild;
 			}
 		}
 	}
