@@ -263,9 +263,7 @@ color	ambient()			{	color tmp; _asm_ambient( tmp );		return tmp;	}
 color	diffuse( normal Nn )
 {	
 	color C = 0;
-/*
-	_asm_diffuse( C, N );
-*/
+
 	illuminance ( P, Nn, PI/2 )
 	{
 		C = C + Cl * (Nn . normalize(L));

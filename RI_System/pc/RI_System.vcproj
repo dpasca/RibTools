@@ -544,6 +544,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\RI_SlAsmParser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SlAsmParser.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\RI_SlRunContext.cpp"
 					>
 				</File>
@@ -601,14 +609,6 @@
 				</File>
 				<File
 					RelativePath="..\include\RI_SlShader_Ops_XForm.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\RI_SlShaderAsmParser.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\include\RI_SlShaderAsmParser.h"
 					>
 				</File>
 			</Filter>

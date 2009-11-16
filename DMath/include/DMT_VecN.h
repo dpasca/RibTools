@@ -85,9 +85,9 @@ public:
 	VecN( const __m128 &v_ )	{ v = v_; }
 	VecN( const VecN &v_ )		{ v = v_.v; }
 	VecN( const float& a_ )		{ v = _mm_set_ps1( a_ );	}
-	VecN( const float *p_ )		{ v = _mm_loadu_ps( p_ );	}	// unaligned
+	//VecN( const float *p_ )		{ v = _mm_loadu_ps( p_ );	}	// unaligned
 
-	void Set( const float *p_ )	{ v = _mm_loadu_ps( p_ );	}	// unaligned
+	//void Set( const float *p_ )	{ v = _mm_loadu_ps( p_ );	}	// unaligned
 	void SetZero()				{ v = _mm_setzero_ps();		}
 
 	VecN operator + (const float& rval) const	{ return _mm_add_ps( v, _mm_set_ps1( rval )	); }

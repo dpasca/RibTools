@@ -1,13 +1,13 @@
 //==================================================================
-/// RI_SlShaderAsmParser.h
+/// RI_SlAsmParser.h
 ///
 /// Created by Davide Pasca - 2009/3/4
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_SLSHADERASMPARSER_H
-#define RI_SLSHADERASMPARSER_H
+#ifndef RI_SLASMPARSER_H
+#define RI_SLASMPARSER_H
 
 #include "RI_Base.h"
 #include "RI_SlShader.h"
@@ -21,9 +21,9 @@ namespace RI
 struct SlAsmOpCodeDef;
 
 //==================================================================
-/// ShaderAsmParser
+/// SlAsmParser
 //==================================================================
-class ShaderAsmParser
+class SlAsmParser
 {
 	enum Section
 	{
@@ -47,7 +47,7 @@ class ShaderAsmParser
 	
 public:
 	//==================================================================
-	ShaderAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName );
+	SlAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName );
 
 private:
 	void doParse( DUT::MemFile &file );

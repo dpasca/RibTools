@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_SlShaderAsmParser.cpp
+/// RI_SlAsmParser.cpp
 ///
 /// Created by Davide Pasca - 2009/3/4
 /// See the file "license.txt" that comes with this project for
@@ -13,7 +13,7 @@
 #include "DUtils.h"
 #include "RI_MicroPolygonGrid.h"
 #include "RI_SlRunContext.h"
-#include "RI_SlShaderAsmParser.h"
+#include "RI_SlAsmParser.h"
 #include "RI_SlAsm_OpCodeDefs.h"
 
 //==================================================================
@@ -28,9 +28,9 @@ static const char *gpDefParamBaseLabelName = "__defparam_";
 static const char *gpMainLabelName = "__main";
 
 //==================================================================
-/// ShaderAsmParser
+/// SlAsmParser
 //==================================================================
-ShaderAsmParser::ShaderAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName ) :
+SlAsmParser::SlAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName ) :
 	mpShader(pShader),
 	mpName(pName),
 	mFuncOpBeginIdx(DNPOS)
@@ -83,7 +83,7 @@ static bool beginsWithTokenI( const char *pStr, const char *pMatch )
 }
 
 //==================================================================
-bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSection )
+bool SlAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSection )
 {
 	SlShader::Type	type = SlShader::TYPE_UNKNOWN;
 
@@ -124,7 +124,7 @@ bool ShaderAsmParser::handleShaderTypeDef( const char *pLineWork, Section curSec
 }
 
 //==================================================================
-void ShaderAsmParser::doParse( DUT::MemFile &file )
+void SlAsmParser::doParse( DUT::MemFile &file )
 {
 	char		lineBuff[1024];
 	Section		curSection = SEC_UNDEF;
@@ -184,7 +184,7 @@ void ShaderAsmParser::doParse( DUT::MemFile &file )
 }
 
 //==================================================================
-void ShaderAsmParser::processSpecialLabel( const Label &label )
+void SlAsmParser::processSpecialLabel( const Label &label )
 {
 	const char *pLabelName	= label.mName.c_str();
 
@@ -216,7 +216,7 @@ void ShaderAsmParser::processSpecialLabel( const Label &label )
 }
 
 //==================================================================
-void ShaderAsmParser::resolveLabels()
+void SlAsmParser::resolveLabels()
 {
 	for (size_t j=0; j < mLabelDefs.size(); ++j)
 	{
@@ -251,7 +251,7 @@ void ShaderAsmParser::resolveLabels()
 }
 
 //==================================================================
-void ShaderAsmParser::getVector( const char *pStr, float out_val[], int n )
+void SlAsmParser::getVector( const char *pStr, float out_val[], int n )
 {
 	int	gotN;
 
@@ -272,7 +272,7 @@ void ShaderAsmParser::getVector( const char *pStr, float out_val[], int n )
 }
 
 //==================================================================
-void ShaderAsmParser::getString( const char *pStr, SlStr &out_str )
+void SlAsmParser::getString( const char *pStr, SlStr &out_str )
 {
 	const char *pStart = strstr( pStr, "\"" );
 
@@ -304,7 +304,7 @@ void ShaderAsmParser::getString( const char *pStr, SlStr &out_str )
 
 
 //==================================================================
-void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
+void SlAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 {
 	//printf( "SEC_DATA: %s\n", lineBuff );
 
@@ -433,7 +433,7 @@ void ShaderAsmParser::parseDataLine( char lineBuff[], int lineCnt )
 }
 
 //==================================================================
-const SlAsmOpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &opCodeIdx )
+const SlAsmOpCodeDef	*SlAsmParser::findOpDef( const char *pOpName, u_int &opCodeIdx )
 {
 	for (size_t i=0; _gSlAsmOpCodeDefs[i].pName != NULL; ++i)
 		if ( 0 == strcasecmp( pOpName, _gSlAsmOpCodeDefs[i].pName ) )
@@ -446,7 +446,7 @@ const SlAsmOpCodeDef	*ShaderAsmParser::findOpDef( const char *pOpName, u_int &op
 }
 
 //==================================================================
-size_t ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
+size_t SlAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
 {
 	for (size_t i=0; i < mpShader->mpShaSyms.size(); ++i)
 	{
@@ -468,7 +468,7 @@ size_t ShaderAsmParser::findSymbol( const char *pName, bool ignoreCase ) const
 }
 
 //==================================================================
-size_t ShaderAsmParser::findOrAddTempSymbol( const char *pName )
+size_t SlAsmParser::findOrAddTempSymbol( const char *pName )
 {
 	size_t	idx = findSymbol( pName, true );
 	if ( idx != DNPOS )
@@ -564,7 +564,7 @@ static bool isTempSymbol( const char *pTok )
 }
 
 //==================================================================
-void ShaderAsmParser::verifySymbolType(
+void SlAsmParser::verifySymbolType(
 								Symbol::Type slSymType,
 								OperTypeID otExpected,
 								int reportOpIdx,
@@ -581,7 +581,7 @@ void ShaderAsmParser::verifySymbolType(
 }
 
 //==================================================================
-void ShaderAsmParser::parseCode_handleOperImmediate( const char *pTok )
+void SlAsmParser::parseCode_handleOperImmediate( const char *pTok )
 {
 	SlCPUWord	word;
 
@@ -595,7 +595,7 @@ void ShaderAsmParser::parseCode_handleOperImmediate( const char *pTok )
 }
 
 //==================================================================
-void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const SlAsmOpCodeDef *pOpDef, int operIdx )
+void SlAsmParser::parseCode_handleOperSymbol( const char *pTok, const SlAsmOpCodeDef *pOpDef, int operIdx )
 {
 	OperTypeID	expectedOperType = pOpDef->Types[operIdx];
 
@@ -650,7 +650,7 @@ void ShaderAsmParser::parseCode_handleOperSymbol( const char *pTok, const SlAsmO
 }
 
 //==================================================================
-bool ShaderAsmParser::parseLabelDef( const char *pTok )
+bool SlAsmParser::parseLabelDef( const char *pTok )
 {
 	size_t	len = strlen( pTok );
 
@@ -673,7 +673,7 @@ bool ShaderAsmParser::parseLabelDef( const char *pTok )
 }
 
 //==================================================================
-void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
+void SlAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 {
 	//printf( "SEC_CODE: %s\n", lineBuff );
 
@@ -755,7 +755,7 @@ void ShaderAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 }
 
 //==================================================================
-void ShaderAsmParser::onError( const char *pFmt, ... ) const
+void SlAsmParser::onError( const char *pFmt, ... ) const
 {
 	va_list	vl;
 	va_start( vl, pFmt );

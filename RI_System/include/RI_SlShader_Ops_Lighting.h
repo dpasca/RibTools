@@ -92,12 +92,21 @@ void Inst_Solar( SlRunContext &ctx )
 
 		// set to the value of the axis..
 		// NOTE: ignoring the angle for now !
-		*pL = *pAxis;
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			// not checking for active processor ?
+			pL[i] = *pAxis;
+		}		
 	}
 	else
 	{
 		// set light direction as 0,0,0
-		*pL = SlVec3( 0 );
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			// not checking for active processor ?
+			pL[i] = SlVec3( 0 );
+		}
 	}
 
 	// yes.. we are in a solar() block 8)

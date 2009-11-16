@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "RI_SlShader.h"
 #include "RI_SlRunContext.h"
-#include "RI_SlShaderAsmParser.h"
+#include "RI_SlAsmParser.h"
 #include "RI_Attributes.h"
 #include "RI_State.h"
 #include "DUtils.h"
@@ -78,7 +78,7 @@ static void compileFromMemFile(
 	if NOT( isSL )
 	{
 		// compile/parse the rrasm file and return right away
-		ShaderAsmParser	parser( file, pShader, pShaderName );
+		SlAsmParser	parser( file, pShader, pShaderName );
 		return;
 	}
 
@@ -105,7 +105,7 @@ static void compileFromMemFile(
 	}
 
 	// now parse/compile the rrasm file
-	ShaderAsmParser	parser( autogenAsmFile, pShader, pShaderName );
+	SlAsmParser	parser( autogenAsmFile, pShader, pShaderName );
 }
 
 //==================================================================

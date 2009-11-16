@@ -108,14 +108,71 @@ void Symbol::FillData( void *pDestData, size_t size, const void *pSrcData ) cons
 
 	switch ( mType )
 	{
-	case Symbol::TYP_FLOAT:	{ SlScalar	tmp(*(const float *)pSrcData);for (size_t i=0; i < blksN; ++i)	((SlScalar	*)pDestData)[i] = tmp; } break;
+	case Symbol::TYP_FLOAT:
+		{
+			const float *pFlt = (const float *)pSrcData;
+			
+			SlScalar	tmp( pFlt[0] );
+			
+			for (size_t i=0; i < blksN; ++i)
+				((SlScalar	*)pDestData)[i] = tmp;
+		}
+		break;
+
 	case Symbol::TYP_POINT:	
 	case Symbol::TYP_VECTOR:
-	case Symbol::TYP_NORMAL:{ SlVec3	tmp((const float *)pSrcData); for (size_t i=0; i < blksN; ++i)	((SlVec3	*)pDestData)[i] = tmp; } break;
-	case Symbol::TYP_HPOINT:{ SlVec4	tmp((const float *)pSrcData); for (size_t i=0; i < blksN; ++i)	((SlVec4	*)pDestData)[i] = tmp; } break;
-	case Symbol::TYP_COLOR:	{ SlColor	tmp((const float *)pSrcData); for (size_t i=0; i < blksN; ++i)	((SlColor	*)pDestData)[i] = tmp; } break;
-	case Symbol::TYP_MATRIX:{ Matrix44	tmp((const float *)pSrcData); for (size_t i=0; i < size; ++i)	((Matrix44	*)pDestData)[i] = tmp; } break;
-	case Symbol::TYP_STRING:{ SlStr		tmp((const SlStr *)pSrcData); for (size_t i=0; i < size; ++i)	((SlStr		*)pDestData)[i] = tmp; } break;
+	case Symbol::TYP_NORMAL:
+		{
+			const float *pFlt = (const float *)pSrcData;
+
+			SlVec3	tmp( pFlt[0], pFlt[1], pFlt[2] );
+
+			for (size_t i=0; i < blksN; ++i)
+				((SlVec3	*)pDestData)[i] = tmp;
+		}
+		break;
+
+	case Symbol::TYP_HPOINT:
+		{
+			const float *pFlt = (const float *)pSrcData;
+
+			SlVec4	tmp( pFlt[0], pFlt[1], pFlt[2], pFlt[3] );
+
+			for (size_t i=0; i < blksN; ++i)
+				((SlVec4	*)pDestData)[i] = tmp;
+		}
+		break;
+
+	case Symbol::TYP_COLOR:
+		{
+			DASSERT( NCOLS == 3 );
+
+			const float *pFlt = (const float *)pSrcData;
+
+			SlColor	tmp( pFlt[0], pFlt[1], pFlt[2] );
+
+			for (size_t i=0; i < blksN; ++i)
+				((SlColor	*)pDestData)[i] = tmp;
+		}
+		break;
+
+	case Symbol::TYP_MATRIX:
+		{ 
+			Matrix44	tmp((const float *)pSrcData);
+			
+			for (size_t i=0; i < size; ++i)
+				((Matrix44	*)pDestData)[i] = tmp;
+		}
+		break;
+
+	case Symbol::TYP_STRING:
+		{
+			SlStr		tmp((const SlStr *)pSrcData);
+			
+			for (size_t i=0; i < size; ++i)
+				((SlStr		*)pDestData)[i] = tmp;
+		}
+		break;
 
 	default:
 		DASSERT( 0 );
