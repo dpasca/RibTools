@@ -161,7 +161,8 @@ public:
 
 	const void *GetConstantData() const { return mpConstVal;	}
 
-	void FillData( void *pDestData, size_t size, const void *pSrcData ) const;
+	void FillDataFromSISD( void *pDestData, size_t size, const void *pSrcData ) const;
+	void FillDataFromSIMD( void *pDestData, size_t size, const void *pSrcData ) const;
 };
 
 //==================================================================

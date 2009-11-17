@@ -95,11 +95,11 @@ void Symbol::InitConstValue( const void *pSrcData )
 
 	mpConstVal = AllocClone( 1 );
 
-	FillData( mpConstVal, 1, pSrcData );	
+	FillDataFromSISD( mpConstVal, 1, pSrcData );	
 }
 
 //==================================================================
-void Symbol::FillData( void *pDestData, size_t size, const void *pSrcData ) const
+void Symbol::FillDataFromSISD( void *pDestData, size_t size, const void *pSrcData ) const
 {
 	size_t	blksN = RI_GET_SIMD_BLOCKS( size );
 
@@ -173,6 +173,31 @@ void Symbol::FillData( void *pDestData, size_t size, const void *pSrcData ) cons
 				((SlStr		*)pDestData)[i] = tmp;
 		}
 		break;
+
+	default:
+		DASSERT( 0 );
+		break;
+	}
+}
+
+//==================================================================
+void Symbol::FillDataFromSIMD( void *pDestData, size_t size, const void *pSrcData ) const
+{
+	size_t	blksN = RI_GET_SIMD_BLOCKS( size );
+
+	// for now, matrix and string can only be uniform (dunno someday about matrices ?)
+	DASSERT( !(mType == Symbol::TYP_MATRIX || mType == Symbol::TYP_STRING) || size == 1 );
+
+	switch ( mType )
+	{
+	case Symbol::TYP_FLOAT:		for (size_t i=0; i < blksN; ++i)((SlScalar	*)pDestData)[i] = ((SlScalar	*)pSrcData)[0];	break;
+	case Symbol::TYP_POINT:	
+	case Symbol::TYP_VECTOR:
+	case Symbol::TYP_NORMAL:	for (size_t i=0; i < blksN; ++i)((SlVec3	*)pDestData)[i] = ((SlVec3		*)pSrcData)[0];	break;
+	case Symbol::TYP_HPOINT:	for (size_t i=0; i < blksN; ++i)((SlVec4	*)pDestData)[i] = ((SlVec4		*)pSrcData)[0];	break;
+	case Symbol::TYP_COLOR:		for (size_t i=0; i < blksN; ++i)((SlColor	*)pDestData)[i] = ((SlColor		*)pSrcData)[0];	break;
+	case Symbol::TYP_MATRIX:	for (size_t i=0; i < size; ++i)	((Matrix44	*)pDestData)[i] = ((Matrix44	*)pSrcData)[0];	break;
+	case Symbol::TYP_STRING:	for (size_t i=0; i < size; ++i)	((SlStr		*)pDestData)[i] = ((SlStr		*)pSrcData)[0];	break;
 
 	default:
 		DASSERT( 0 );

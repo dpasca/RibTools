@@ -94,7 +94,7 @@ public:
 
 		Flags.mOwnData = 1;
 		SetDataR( pVaryingData, pSrcSymbol );
-		pSrcSymbol->FillData( pVaryingData, samplesN, pSrcConstData );
+		pSrcSymbol->FillDataFromSIMD( pVaryingData, samplesN, pSrcConstData );
 	}
 
 	void SetDataRW( void *pData, const Symbol *pSrcSymbol )

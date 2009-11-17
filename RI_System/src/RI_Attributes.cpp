@@ -286,14 +286,14 @@ static void addShaderParam(
 
 	switch ( pSym->mType )
 	{
-	case Symbol::TYP_FLOAT:	{float tmp = params[fromIdx+1].Flt(); pSym->FillData( pData, 1, &tmp ); } break;
-	case Symbol::TYP_POINT:	pSym->FillData( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
-	case Symbol::TYP_VECTOR:pSym->FillData( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
-	case Symbol::TYP_NORMAL:pSym->FillData( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
-    case Symbol::TYP_HPOINT:pSym->FillData( pData, 1, params[fromIdx+1].PFlt( 4 )	 ); break;
-	case Symbol::TYP_COLOR:	pSym->FillData( pData, 1, params[fromIdx+1].PFlt( NCOLS )); break;
-	case Symbol::TYP_STRING:pSym->FillData( pData, 1, params[fromIdx+1].PChar()		 ); break;
-	case Symbol::TYP_MATRIX:pSym->FillData( pData, 1, params[fromIdx+1].PFlt( 16 )	 ); break;
+	case Symbol::TYP_FLOAT:	{float tmp = params[fromIdx+1].Flt(); pSym->FillDataFromSISD( pData, 1, &tmp ); } break;
+	case Symbol::TYP_POINT:	pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
+	case Symbol::TYP_VECTOR:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
+	case Symbol::TYP_NORMAL:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
+    case Symbol::TYP_HPOINT:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 4 )	 ); break;
+	case Symbol::TYP_COLOR:	pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( NCOLS )); break;
+	case Symbol::TYP_STRING:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PChar()		 ); break;
+	case Symbol::TYP_MATRIX:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 16 )	 ); break;
 	default:
 		state.EXCEPTPrintf( "Unsupported data type or this operation (?)" );
 		break;

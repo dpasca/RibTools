@@ -90,10 +90,6 @@ Variable *AddVariable(
 	{
 		pNameNode->mVarLink.Setup( pNode, pNode->GetVars().size() );
 	}
-	else
-	{
-		int yoyo = 1;
-	}
 
 	Variable	*pVar = pNode->GetVars().grow();
 

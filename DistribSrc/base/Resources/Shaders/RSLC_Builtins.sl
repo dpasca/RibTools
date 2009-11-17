@@ -260,13 +260,15 @@ float	match( string pattern, subject ){}
 color	ambient()			{	color tmp; _asm_ambient( tmp );		return tmp;	}
 
 /*================================================================*/
-color	diffuse( normal Nn )
+color	diffuse( normal nor )
 {	
-	color C = 0;
+	color 	C = 0;
 
-	illuminance ( P, Nn, PI/2 )
+	normal	nn = normalize( nor );
+
+	illuminance ( P, nn, PI/2 )
 	{
-		C = C + Cl * (Nn . normalize(L));
+		C = C + Cl * (normalize(L) . nn);
 	}
 
 	return C;

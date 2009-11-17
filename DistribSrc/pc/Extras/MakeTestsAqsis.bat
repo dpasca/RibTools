@@ -6,6 +6,18 @@ mkdir ..\TestsOutputAqsis
 
 pushd ..\TestScenes
 
+pushd SpacesTests
+aqsl *.sl
+for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\..\TestsOutputAqsis\ & move *.tiff ..\..\TestsOutputAqsis\ )
+del *.slx
+popd
+
+pushd LightsTests
+aqsl *.sl
+for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\..\TestsOutputAqsis\ & move *.tiff ..\..\TestsOutputAqsis\ )
+del *.slx
+popd
+
 aqsl *.sl
 for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\TestsOutputAqsis\ & move *.tiff ..\TestsOutputAqsis\ )
 del *.slx
@@ -15,10 +27,5 @@ aqsl *.sl
 for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\TestsOutputAqsis\ & move *.tiff ..\TestsOutputAqsis\ )
 del *.slx
 cd ..
-
-cd SpacesTests
-aqsl *.sl
-for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\..\TestsOutputAqsis\ & move *.tiff ..\..\TestsOutputAqsis\ )
-del *.slx
 
 popd
