@@ -66,6 +66,11 @@ template <>			inline float	DRSqrt<float>( const float &a )	 { return 1.0f / sqrt
 template <>			inline double	DRSqrt<double>( const double &a ){ return 1.0 / sqrt( a );	}
 
 //==================================================================
+template <class T>	inline T		DPow( const T &a,  const T &b )					 { assert( 0 );	return T();	}
+template <>			inline float	DPow<float>( const float &a,  const float &b )	 { return powf( a, b );	}
+template <>			inline double	DPow<double>( const double &a,  const double &b ){ return pow( a, b );	}
+
+//==================================================================
 template <class T>	inline T		DSign( const T &a )
 {
 	if ( a < 0 )	return T( -1 ); else

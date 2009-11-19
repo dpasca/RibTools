@@ -63,6 +63,8 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 	SOP::Inst_2Op<V,V,S,OBT_DIV>,
 	SOP::Inst_2Op<V,V,V,OBT_DIV>,
 
+	SOP::Inst_Pow_SSS,
+
 	SOP::Inst_MOVVS3<SlVec3,SlScalar>,
 
 	SOP::Inst_Dot_SVV,

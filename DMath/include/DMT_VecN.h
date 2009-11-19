@@ -49,14 +49,15 @@ public:
 	const _S &operator [] (size_t i) const	{ return v[i]; }
 		  _S &operator [] (size_t i)		{ return v[i]; }
 
-	friend VecN	DSqrt( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
-	friend VecN	DRSqrt( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
-	friend VecN	DSign( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp; }
-	friend VecN	DAbs( const VecN &a	)				{ VecN tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
-	friend VecN	DMin( const VecN &a, const VecN &b ){ VecN tmp; FOR_I_N tmp[i] = DMin( a[i], b[i] ); return tmp; }
-	friend VecN	DMax( const VecN &a, const VecN &b ){ VecN tmp; FOR_I_N tmp[i] = DMax( a[i], b[i] ); return tmp; }
-	friend VecN	DSin( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
-	friend VecN	DCos( const VecN &a )				{ VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
+	friend VecN	DSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
+	friend VecN	DRSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
+	friend VecN	DPow( const VecN &a,  const VecN &b ){ VecN tmp; FOR_I_N tmp[i] = DPow( a[i], b[i] ); return tmp; }
+	friend VecN	DSign( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp; }
+	friend VecN	DAbs( const VecN &a	)				 { VecN tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
+	friend VecN	DMin( const VecN &a, const VecN &b ) { VecN tmp; FOR_I_N tmp[i] = DMin( a[i], b[i] ); return tmp; }
+	friend VecN	DMax( const VecN &a, const VecN &b ) { VecN tmp; FOR_I_N tmp[i] = DMax( a[i], b[i] ); return tmp; }
+	friend VecN	DSin( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
+	friend VecN	DCos( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
 };
 
 template <class _S, size_t _N> inline VecN<_S,_N> operator + (const _S &lval, const VecN<_S,_N> &rval) { return rval + lval; }
@@ -113,6 +114,10 @@ public:
 
 	friend VecN	DSqrt( const VecN &a )	{ return _mm_sqrt_ps( a.v );	}
 	friend VecN	DRSqrt( const VecN &a )	{ return _mm_rsqrt_ps( a.v );	}
+
+	// TODO: get a proper _mm_pow_ps !!!
+	//friend VecN	DPow( const VecN &a, const VecN &b ){ return _mm_pow_ps( a.v, b.v );	}
+	friend VecN	DPow( const VecN &a, const VecN &b ){ VecN tmp; for (size_t i=0; i < 4; ++i) tmp[i] = powf( a[i], b[i] ); return tmp; }
 
 	//==================================================================
 	friend VecN	DSign( const VecN &a )
@@ -186,6 +191,8 @@ public:
 
 	friend VecN	DSqrt( const VecN &a )	{ return _mm512_sqrt_ps( a.v );	}
 	friend VecN	DRSqrt( const VecN &a )	{ return _mm512_rsqrt_ps( a.v );	}
+
+	friend VecN	DPow( const VecN &a, const VecN &b ){ return _mm512_pow_ps( a.v, b.v );	}
 
 	//==================================================================
 	friend VecN	DSign( const VecN &a )

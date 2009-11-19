@@ -80,7 +80,7 @@ float	acos( float a )			{}
 float	tan( float a )			{}
 float	atan( float yoverx )	{}
 float	atan( float y, x )		{}
-float	pow( float x, y )		{	float tmp;	_asm_pow( tmp, x, y ); return tmp; }
+float	pow( float x, y )		{	return x ^ y; }
 float	exp( float x )			{			}
 float	sqrt( float x )			{}
 float	inversesqrt( float x )	{}
@@ -286,12 +286,13 @@ color specularbrdf( vector L, N, V; float roughness )
 color specular( normal N; vector V; float roughness )
 {
 	color C = 0;
+
 	illuminance( P, N, PI/2 )
-		C = C + Cl * specularbrdf (normalize(L), N, V, roughness);
+	{
+		C = C + Cl * specularbrdf( normalize(L), N, V, roughness );
+	}
+
 	return C;
-/*
-	return color( 0.1 );
-*/
 }
 
 /*================================================================*/

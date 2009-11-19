@@ -336,6 +336,47 @@ void Inst_Dot_SVV( SlRunContext &ctx )
 }
 
 //==================================================================
+void Inst_Pow_SSS( SlRunContext &ctx )
+{
+		  SlScalar*	lhs	= ctx.GetVoidRW( (		SlScalar *)0, 1 );
+	const SlScalar*	op1	= ctx.GetVoidRO( (const SlScalar *)0, 2 );
+	const SlScalar*	op2	= ctx.GetVoidRO( (const SlScalar *)0, 3 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op2_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+		int		op2_step = ctx.GetSymbolVaryingStep( 3 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			if ( ctx.IsProcessorActive( i ) )
+			{
+				lhs[i] = DPow( op1[op1_offset], op2[op2_offset] );
+			}
+			
+			op1_offset	+= op1_step;
+			op2_offset	+= op2_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
+				 !ctx.IsSymbolVarying( 3 ) );
+
+		if ( ctx.IsProcessorActive( 0 ) )
+		{
+			lhs[0] = DPow( op1[0], op2[0] );
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 template <class T, const OpBaseTypeID opBaseTypeID>
 void Inst_Min_Max( SlRunContext &ctx )
 {
