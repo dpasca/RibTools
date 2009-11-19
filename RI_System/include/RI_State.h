@@ -204,6 +204,9 @@ public:
 	size_t AddLightSource( LightSourceT *pLSource );
 	const DVec<LightSourceT *>	&GetLightSources()	{	return mpLightSources;	}
 
+	const Matrix44 &GetCurTransformOpenMtx() const	{	return mTransformOpenStack.top().GetMatrix();	}
+	const Matrix44 &GetCurTransformCloseMtx() const	{	return mTransformCloseStack.top().GetMatrix();	}
+
 private:
 	bool checkPopMode( Mode expectedMode );
 	bool verifyOpType( OpType optype );

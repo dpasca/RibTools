@@ -287,10 +287,48 @@ static void addShaderParam(
 	switch ( pSym->mType )
 	{
 	case Symbol::TYP_FLOAT:	{float tmp = params[fromIdx+1].Flt(); pSym->FillDataFromSISD( pData, 1, &tmp ); } break;
-	case Symbol::TYP_POINT:	pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
-	case Symbol::TYP_VECTOR:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
-	case Symbol::TYP_NORMAL:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 3 )	 ); break;
-    case Symbol::TYP_HPOINT:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 4 )	 ); break;
+
+	// NOTE: Still just using the Transform Open.. this means not working for motion blur...
+	case Symbol::TYP_POINT:
+		{
+			const float *p = params[fromIdx+1].PFlt( 3 );
+			SlVec3	vec( p[0], p[1], p[2] );
+			// xyz1 * mtx
+			vec = V3__V3W0_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
+			*((SlVec3 *)pData) = vec;
+		}
+		break;
+
+	case Symbol::TYP_VECTOR:
+		{
+			const float *p = params[fromIdx+1].PFlt( 3 );
+			SlVec3	vec( p[0], p[1], p[2] );
+			// xyz0 * mtx
+			vec = V3__V3W0_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
+			*((SlVec3 *)pData) = vec;
+		}
+		break;
+
+	case Symbol::TYP_NORMAL:
+		{
+			const float *p = params[fromIdx+1].PFlt( 3 );
+			SlVec3	vec( p[0], p[1], p[2] );
+			// xyz0 * mtx
+			vec = V3__V3W0_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
+			*((SlVec3 *)pData) = vec;
+		}
+		break;
+
+	case Symbol::TYP_HPOINT:
+		{
+			const float *p = params[fromIdx+1].PFlt( 4 );
+			SlVec4	vec( p[0], p[1], p[2], p[3] );
+			// xyzw * mtx
+			vec = V4__V4_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
+			*((SlVec4 *)pData) = vec;
+		}
+		break;
+
 	case Symbol::TYP_COLOR:	pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( NCOLS )); break;
 	case Symbol::TYP_STRING:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PChar()		 ); break;
 	case Symbol::TYP_MATRIX:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 16 )	 ); break;

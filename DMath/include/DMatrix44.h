@@ -294,14 +294,14 @@ inline Vec3f V3__M44_Mul_V3W1( const Matrix44 &a, const Vec3f &v )
 }
 
 //==================================================================
-template <class _S4, class _S3, class _T>
-inline _S4 V4__V3W1_Mul_M44( const _S3 &v, const Matrix44 &a )
+template <class _T>
+inline Vec4<_T> V4__V3W1_Mul_M44( const Vec3<_T> &v, const Matrix44 &a )
 {
 	const _T	&x = v.v3[0];
 	const _T	&y = v.v3[1];
 	const _T	&z = v.v3[2];
 
-	return _S4(
+	return Vec4<_T>(
 #ifdef DMATRIX44_ROWMTX_MODE
 		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2] + a.u.m44[0][3],
 		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2] + a.u.m44[1][3],
@@ -312,6 +312,30 @@ inline _S4 V4__V3W1_Mul_M44( const _S3 &v, const Matrix44 &a )
 		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1] + a.u.m44[3][1],
 		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2] + a.u.m44[3][2],
 		x * a.u.m44[0][3] + y * a.u.m44[1][3] + z * a.u.m44[2][3] + a.u.m44[3][3]
+#endif
+	);
+}
+
+//==================================================================
+template <class _T>
+inline Vec4<_T> V4__V4_Mul_M44( const Vec4<_T> &v, const Matrix44 &a )
+{
+	const _T	&x = v.v4[0];
+	const _T	&y = v.v4[1];
+	const _T	&z = v.v4[2];
+	const _T	&w = v.v4[3];
+
+	return Vec4<_T>(
+#ifdef DMATRIX44_ROWMTX_MODE
+		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2] + w * a.u.m44[0][3],
+		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2] + w * a.u.m44[1][3],
+		x * a.u.m44[2][0] + y * a.u.m44[2][1] + z * a.u.m44[2][2] + w * a.u.m44[2][3],
+		x * a.u.m44[3][0] + y * a.u.m44[3][1] + z * a.u.m44[3][2] + w * a.u.m44[3][3]
+#else											 
+		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0] + w * a.u.m44[3][0],
+		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1] + w * a.u.m44[3][1],
+		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2] + w * a.u.m44[3][2],
+		x * a.u.m44[0][3] + y * a.u.m44[1][3] + z * a.u.m44[2][3] + w * a.u.m44[3][3]
 #endif
 	);
 }

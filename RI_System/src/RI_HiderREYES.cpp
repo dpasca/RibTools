@@ -207,7 +207,7 @@ bool HiderREYES::makeRasterBound(
 
 	for (size_t i=0; i < 8; ++i)
 	{
-		Vec4f	Pproj = V4__V3W1_Mul_M44<Vec4f,Vec3f,float>( boxVerts[i], mtxLocalProj );
+		Vec4f	Pproj = V4__V3W1_Mul_M44<float>( boxVerts[i], mtxLocalProj );
 
 		float	x = Pproj.x();
 		float	y = Pproj.y();
@@ -333,7 +333,7 @@ void HiderREYES::Hide(
 
 		static const SlScalar	one( 1 );
 
-		SlVec4		Pproj = V4__V3W1_Mul_M44<SlVec4,SlVec3,SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
+		SlVec4		Pproj = V4__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
 		SlScalar	oow = one / Pproj.w();
 
 		SlScalar	vWinX =  Pproj.x() * screenHWd * oow + screenCx;
