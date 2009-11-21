@@ -20,6 +20,15 @@ namespace RI
 State::State( const Params &params ) :
 	mParams(params)
 {
+	// normalize the directories in input...
+	// to simplify the usage later on, the current directory
+	// needs to be explicitly "."
+	if ( mParams.mBaseDir == "" )
+		mParams.mBaseDir = ".";
+
+	if ( mParams.mDefaultShadersDir == "" )
+		mParams.mDefaultShadersDir = ".";
+
 	mModeStack.push( MD_UNDEFINED );
 
 	mMtxWorldCamera.Identity();

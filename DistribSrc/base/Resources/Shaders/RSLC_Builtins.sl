@@ -279,7 +279,11 @@ color specularbrdf( vector L, N, V; float roughness )
 {
 	vector H = normalize( L + V );
 
-	return pow( max( 0, N . H ), 1 / roughness );
+	/* DAVIDE - RMan Standard - float power = 1 / roughness; */
+	/* DAVIDE - Following is more like PRMan/BMRT/Aqsis */
+	float power = 8 / roughness;
+
+	return pow( max( 0, N . H ), power );
 }
 
 /*================================================================*/

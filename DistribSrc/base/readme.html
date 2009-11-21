@@ -1,19 +1,19 @@
 <html>
 <head>
-<title>RibTools 0.3</title>
+<title>RibTools 0.4</title>
 </head>
 <body>
-<h2>RibTools 0.3</h2>
+<h2>RibTools 0.4</h2>
 <h3>Overview</h3>
 <p>RibTools is a hobby project developed by me (Davide Pasca).<br>
-The project main goal is to write RibRender, a RenderMan-compliant-wannabe
+The project's main goal is to write RibRender, a RenderMan-compliant-wannabe
 renderer.<br>
 The focus of RibRender is towards speed and high scalability, it
 aims to achieve this by utilizing parallelism at all levels:</p>
 <ul>
  <li>Instruction level parallelism (Adaptive N-way SIMD)
- <li>Many-cores hardware (OpenMP)
- <li>Network-distributed rendering (Custom protocol over TCP/IP)
+ <li>Many-cores hardware (Currently OpenMP)
+ <li>Per-bucket (same-frame) network-distributed rendering (Custom protocol over TCP/IP)
 </ul>
 <p>Please notice that this project is still in a very early phase. It will only process selected .rib files and the rendering quality is very poor at best.<br>
 Nothing malicious comes with the executables included but, nonetheless, I cannot be held responsible for any direct or indirect damage that may derive from anything related to this project.</p>
@@ -25,14 +25,20 @@ Nothing malicious comes with the executables included but, nonetheless, I cannot
 <p>Three executables are currently distributed: <b>RibRenderTool</b>, <b>RibRenderFile</b> and <b>RSLCompilerCmd</b>.</p>
 <h4>RibRenderTool</h4>
 <p>This is a minimally interactive application that will render any .rib file present in the 'TestScenes' folder.<br>
-Launch the application, right click in the window and choose a .rib file to render.</p>
+Launch the application, right click in the window to open a menu from which to choose a .rib file to render.</p>
 <h4>RibRenderFile</h4>
-<p>This command will render a .rib file in input to a JPEG file in output.<br>
+<p>This command will render a .rib file in input to a JPEG file in output. It can also work as a rendering server for network distributed rendering.<br>
 For usage instructions, type <code>RibRenderFile -help</code></p>
 <h4>RSLCompilerCmd</h4>
-<p>This command is included only for internal testing purposes.<br>
+<p>This command is included only for <i>internal testing purposes</i>.<br>
 It compiles a .sl file into a RibRender .rrasm file type. Such operation is done internally by the renderer, and the user doesn't normally need to run this command explicitly.</p>
 
+<h3>Building</h3>
+<strong>...for programmers...</strong>
+<ul>
+<li>Use the build.bat script to copy all data files in place (from the dir <code>DistribSrc</code> to <code>Distrib</code>)
+<li>Open the solution <code>pc\RibRender.sln</code> with <i>Visual Studio</i> and compile from there to get the executables
+</ul>
 
 <h3>Additional Credits</h3>
 RibTools includes code from the following libraries:
@@ -58,6 +64,9 @@ me personally:
 </ul>
 
 <p>Enjoy !</p>
+<hr>
+<p>RibTools and RibRender are: Copyright 2008, 2009, Davide Pasca. All rights reserved.</p>
+
+<p>The RenderMan (R) Interface Procedures and RIB Protocol are: Copyright 1988, 1989, Pixar. All rights reserved. RenderMan (R) is a registered trademark of Pixar.</p>
 </body>
 </html>
-

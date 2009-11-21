@@ -117,7 +117,14 @@ public:
 
 	// TODO: get a proper _mm_pow_ps !!!
 	//friend VecN	DPow( const VecN &a, const VecN &b ){ return _mm_pow_ps( a.v, b.v );	}
-	friend VecN	DPow( const VecN &a, const VecN &b ){ VecN tmp; for (size_t i=0; i < 4; ++i) tmp[i] = powf( a[i], b[i] ); return tmp; }
+	friend VecN	DPow( const VecN &a, const VecN &b )
+	{
+		VecN tmp;
+		for (size_t i=0; i < 4; ++i)
+			tmp[i] = powf( a[i], b[i] );
+		
+		return tmp;
+	}
 
 	//==================================================================
 	friend VecN	DSign( const VecN &a )

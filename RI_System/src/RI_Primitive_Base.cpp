@@ -235,7 +235,7 @@ void SimplePrimitiveBase::Dice(
 
 		pPointsWS[blkIdx]	= posWS;
 
-		pI[blkIdx]		= (posCS - -camPosCS).GetNormalized();
+		pI[blkIdx]		= (posCS - -camPosCS);//.GetNormalized();
 		pOODu[blkIdx]	= one / locDUDV[blkIdx][0];
 		pOODv[blkIdx]	= one / locDUDV[blkIdx][1];
 		pN[blkIdx]		= norCS;

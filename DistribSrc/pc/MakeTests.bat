@@ -1,5 +1,9 @@
 mkdir TestsOutput
 
+pushd TestScenes\ValuesTests
+call render
+popd
+
 for /f %%a IN ('dir /b TestScenes\*.rib') do RibRenderFile.exe clientmode TestScenes\%%a TestsOutput\%%~na.jpg
 for /f %%a IN ('dir /b TestScenes\SpacesTests\*.rib') do RibRenderFile.exe clientmode TestScenes\SpacesTests\%%a TestsOutput\%%~na.jpg
 for /f %%a IN ('dir /b TestScenes\LightsTests\*.rib') do RibRenderFile.exe clientmode TestScenes\LightsTests\%%a TestsOutput\%%~na.jpg

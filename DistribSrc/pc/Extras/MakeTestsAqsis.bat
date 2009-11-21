@@ -6,6 +6,10 @@ mkdir ..\TestsOutputAqsis
 
 pushd ..\TestScenes
 
+pushd ValuesTests
+call render_aqsis
+popd
+
 pushd SpacesTests
 aqsl *.sl
 for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\..\TestsOutputAqsis\ & move *.tiff ..\..\TestsOutputAqsis\ )

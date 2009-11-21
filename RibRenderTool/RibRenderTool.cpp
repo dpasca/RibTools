@@ -173,6 +173,7 @@ void RibRendTool::RebuildMenu()
 	addDirToMenu( "TestScenes", "rib" );
 	addDirToMenu( "TestScenes/Sponza", "rib" );
 	addDirToMenu( "TestScenes/LightsTests", "rib" );
+	addDirToMenu( "TestScenes/ValuesTests", "rib" );
 }
 
 //==================================================================
