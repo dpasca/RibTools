@@ -313,6 +313,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_Attributes_Shaders.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_Base.cpp"
 				>
 			</File>
