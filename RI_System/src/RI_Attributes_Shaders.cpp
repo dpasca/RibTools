@@ -34,6 +34,14 @@ static void addShaderParam(
 		state.EXCEPTPrintf( "Expecting parameter !" );
 	}
 
+	// HACK: "direction" becomes "to" ..for distant light annotation..
+	bool paramIsDirection = false;
+	if ( 0 == strcmp( pName, "direction" ) )
+	{
+		pName = "to";
+		paramIsDirection = true;
+	}
+
 	// is it a global symbol ?
 	const Symbol *pSym = globalSyms.FindSymbol( pName );
 
@@ -64,8 +72,18 @@ static void addShaderParam(
 		{
 			const float *p = params[fromIdx+1].PFlt( 3 );
 			SlVec3	vec( p[0], p[1], p[2] );
-			// xyz1 * mtx
-			vec = V3__V3W1_Mul_M44<SlScalar>( vec, mtxLocalCam );
+
+			if ( paramIsDirection )
+			{
+				// xyz1 * mtx
+				vec = V3__V3W1_Mul_M44<SlScalar>( vec, mtxLocalCam );
+			}
+			else
+			{
+				// xyz1 * mtx
+				vec = V3__V3W1_Mul_M44<SlScalar>( vec, mtxLocalCam );
+			}
+
 			*((SlVec3 *)pData) = vec;
 		}
 		break;
