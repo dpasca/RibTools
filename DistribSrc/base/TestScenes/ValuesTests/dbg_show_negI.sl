@@ -1,7 +1,7 @@
 /*==================================================================
 /// dbg_show_I.sl
 ///
-/// This is a basic shader found in the RenderMan specs
+/// Simple shader for testing
 //================================================================*/
 
 surface dbg_show_negI()
