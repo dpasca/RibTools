@@ -207,6 +207,8 @@ public:
 	const Matrix44 &GetCurTransformOpenMtx() const	{	return mTransformOpenStack.top().GetMatrix();	}
 	const Matrix44 &GetCurTransformCloseMtx() const	{	return mTransformCloseStack.top().GetMatrix();	}
 
+	const Matrix44 &GetWorldCameraMtx() const		{	return mMtxWorldCamera;	}
+
 private:
 	bool checkPopMode( Mode expectedMode );
 	bool verifyOpType( OpType optype );

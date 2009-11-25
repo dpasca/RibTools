@@ -534,7 +534,7 @@ void Attributes::cmdLightSource( ParamList &params )
 
 	pLight->mIsAmbient = !pShader->mHasDirPosInstructions;
 
-	Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->mMtxWorldCamera;
+	Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
 	getShaderParams( params, 2, *pLight->moShaderInst.Use(), mtxLocalCam );
 
 	size_t listIdx = mpState->AddLightSource( pLight );
@@ -567,7 +567,7 @@ void Attributes::cmdSurface( ParamList &params )
 	{
 		moSurfaceSHI = DNEW SlShaderInst( pShader );
 
-		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->mMtxWorldCamera;
+		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
 		getShaderParams( params, 1, *moSurfaceSHI.Use(), mtxLocalCam );
 	}
 
@@ -591,7 +591,7 @@ void Attributes::cmdDisplacement( ParamList &params )
 	{
 		moDisplaceSHI = DNEW SlShaderInst( pShader );
 
-		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->mMtxWorldCamera;
+		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
 		getShaderParams( params, 1, *moDisplaceSHI.Use(), mtxLocalCam );
 	}
 
