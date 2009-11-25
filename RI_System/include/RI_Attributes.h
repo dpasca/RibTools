@@ -115,14 +115,14 @@ public:
 
 	void cmdColor( const Color &color );
 	void cmdOpacity( const Color &color );
-	void cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam );
+	void cmdLightSource( ParamList &params );
 	void cmdSurface( ParamList &params );
 	void cmdDisplacement( ParamList &params );
 
 private:
 	SlShader *loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName );
 	SlShader *getShader( const char *pShaderName, const char *pAlternateName );
-	void getShaderParams( ParamList &params, size_t fromIdx, SlShaderInst &shaderInst );
+	void getShaderParams( ParamList &params, size_t fromIdx, SlShaderInst &shaderInst, const Matrix44 &mtxLocalCam );
 };
 
 //==================================================================

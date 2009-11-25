@@ -441,10 +441,7 @@ void State::AreaLightSource( ParamList &params )
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
 
-	mAttributesStack.top().cmdLightSource(
-								params,
-								mTransformOpenStack.top(),
-								mMtxWorldCamera );
+	mAttributesStack.top().cmdLightSource( params );
 }
 
 //==================================================================
@@ -453,10 +450,7 @@ void State::LightSource( ParamList &params )
 	if NOT( verifyOpType( OPTYPE_ATRB ) )
 		return;
 
-	mAttributesStack.top().cmdLightSource(
-								params,
-								mTransformOpenStack.top(),
-								mMtxWorldCamera );
+	mAttributesStack.top().cmdLightSource( params );
 }
 
 //==================================================================

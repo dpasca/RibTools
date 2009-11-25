@@ -250,6 +250,7 @@ static void addShaderParam(
 					const SymbolList	&globalSyms,
 					ParamList			&params,
 					size_t				fromIdx,
+					const Matrix44		&mtxLocalCam,
 					State				&state )
 {
 	const char *pName = params[ fromIdx ].PChar();
@@ -294,7 +295,7 @@ static void addShaderParam(
 			const float *p = params[fromIdx+1].PFlt( 3 );
 			SlVec3	vec( p[0], p[1], p[2] );
 			// xyz1 * mtx
-			vec = V3__V3W0_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
+			vec = V3__V3W1_Mul_M44<SlScalar>( vec, mtxLocalCam );
 			*((SlVec3 *)pData) = vec;
 		}
 		break;
@@ -304,6 +305,7 @@ static void addShaderParam(
 			const float *p = params[fromIdx+1].PFlt( 3 );
 			SlVec3	vec( p[0], p[1], p[2] );
 			// xyz0 * mtx
+			// TODO: confirm it really is W0 !
 			vec = V3__V3W0_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
 			*((SlVec3 *)pData) = vec;
 		}
@@ -314,6 +316,7 @@ static void addShaderParam(
 			const float *p = params[fromIdx+1].PFlt( 3 );
 			SlVec3	vec( p[0], p[1], p[2] );
 			// xyz0 * mtx
+			// TODO: confirm it really is W0 !
 			vec = V3__V3W0_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
 			*((SlVec3 *)pData) = vec;
 		}
@@ -452,7 +455,8 @@ SlShader *Attributes::getShader( const char *pShaderName, const char *pAlternate
 void Attributes::getShaderParams(
 						ParamList		&params,
 						size_t			fromIdx,
-						SlShaderInst	&shaderInst )
+						SlShaderInst	&shaderInst,
+						const Matrix44	&mtxLocalCam )
 {
 	for (size_t i=fromIdx; i < params.size(); ++i)
 	{
@@ -476,13 +480,14 @@ void Attributes::getShaderParams(
 					*mpGlobalSyms,
 					params,
 					i,
+					mtxLocalCam,
 					*mpState );
 		i += 1;
 	}
 }
 
 //==================================================================
-void Attributes::cmdLightSource( ParamList &params, const Transform &xform, const Matrix44 &mtxWorldCam )
+void Attributes::cmdLightSource( ParamList &params )
 {
 	const char	*pLightTypeName = "";
 
@@ -523,14 +528,14 @@ void Attributes::cmdLightSource( ParamList &params, const Transform &xform, cons
 */
 
 	pLight->moShaderInst = DNEW SlShaderInst( pShader, MP_GRID_MAX_SIZE );
+	//pLight->moShaderInst->mMtxLocalCam = xform.GetMatrix() * mtxWorldCam;
 
 	pLight->mID = params[1].Int();
 
 	pLight->mIsAmbient = !pShader->mHasDirPosInstructions;
 
-	getShaderParams( params, 2, *pLight->moShaderInst.Use() );
-
-	//pLight->UpdateRend( xform, mtxWorldCam );
+	Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->mMtxWorldCamera;
+	getShaderParams( params, 2, *pLight->moShaderInst.Use(), mtxLocalCam );
 
 	size_t listIdx = mpState->AddLightSource( pLight );
 
@@ -562,7 +567,8 @@ void Attributes::cmdSurface( ParamList &params )
 	{
 		moSurfaceSHI = DNEW SlShaderInst( pShader );
 
-		getShaderParams( params, 1, *moSurfaceSHI.Use() );
+		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->mMtxWorldCamera;
+		getShaderParams( params, 1, *moSurfaceSHI.Use(), mtxLocalCam );
 	}
 
 	// $$$ should really check if the shader or any params really changed
@@ -585,7 +591,8 @@ void Attributes::cmdDisplacement( ParamList &params )
 	{
 		moDisplaceSHI = DNEW SlShaderInst( pShader );
 
-		getShaderParams( params, 1, *moDisplaceSHI.Use() );
+		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->mMtxWorldCamera;
+		getShaderParams( params, 1, *moDisplaceSHI.Use(), mtxLocalCam );
 	}
 
 	// $$$ should really check if the shader or any params really changed

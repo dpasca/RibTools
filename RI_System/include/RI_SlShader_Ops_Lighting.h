@@ -96,7 +96,7 @@ void Inst_Solar( SlRunContext &ctx )
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
 			// not checking for active processor ?
-			pL[i] = -*pAxis;	// why '-' ?! ..just because ?
+			pL[i] = -pAxis->GetNormalized();	// why '-' ?! ..just because ?
 		}		
 	}
 	else
@@ -105,7 +105,7 @@ void Inst_Solar( SlRunContext &ctx )
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
 			// not checking for active processor ?
-			pL[i] = SlVec3( 0 );
+			pL[i] = SlVec3( 0.f );
 		}
 	}
 
