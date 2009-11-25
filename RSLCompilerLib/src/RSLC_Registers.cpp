@@ -18,14 +18,11 @@ namespace RSLC
 {
 
 //==================================================================
-static bool assignRegisters_sub( TokNode *pNode, int regIdx )
+static void assignRegisters_sub( TokNode *pNode, int &io_regIdx )
 {
-	int runRegIdx = regIdx;
-
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
-		if ( assignRegisters_sub( pNode->mpChilds[i], runRegIdx ) )
-			runRegIdx += 1;
+		assignRegisters_sub( pNode->mpChilds[i], io_regIdx );
 	}
 
 	const Variable	*pVar = pNode->GetVarPtr();
@@ -36,11 +33,10 @@ static bool assignRegisters_sub( TokNode *pNode, int regIdx )
 			!pVar->mIsGlobal &&
 			!pVar->IsRegisterAssigned() )
 		{
-			pNode->GetVarPtr()->AssignRegister( regIdx );
+			pNode->GetVarPtr()->AssignRegister( io_regIdx );
+			++io_regIdx;
 		}
 	}
-
-	return pNode->mpToken->IsBiOp();
 }
 
 //==================================================================
