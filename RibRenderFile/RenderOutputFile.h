@@ -9,7 +9,7 @@
 #ifndef RENDEROUTPUTFILE_H
 #define RENDEROUTPUTFILE_H
 
-#include "RI_System/include/RI_FrameworkREYES.h"
+#include "RI_System/include/RI_Framework.h"
 
 //==================================================================
 // RenderOutputFile

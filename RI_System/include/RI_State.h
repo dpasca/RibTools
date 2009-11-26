@@ -14,7 +14,7 @@
 #include "RI_Options.h"
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
-#include "RI_FrameworkREYES.h"
+#include "RI_Framework.h"
 #include "RI_Primitive.h"
 #include "RI_LightSource.h"
 #include "RI_FileManager.h"

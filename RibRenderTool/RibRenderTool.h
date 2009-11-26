@@ -9,7 +9,7 @@
 #ifndef RIBRENDERTOOL_H
 #define RIBRENDERTOOL_H
 
-#include "RI_System/include/RI_HiderREYES.h"
+#include "RI_System/include/RI_Hider.h"
 
 //==================================================================
 class RibRendTool
@@ -24,7 +24,7 @@ public:
 	DVec<DStr>			mTestRibFiles;
 	DVec<DStr>			mTestRibFilesPaths;
 
-	RI::Hider::Params	mREYESParams;
+	RI::Hider::Params	mHiderParams;
 
 	std::string			mLastFileName;
 	int					mLastUsedWd;

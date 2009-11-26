@@ -1,13 +1,13 @@
 //==================================================================
-/// RI_HiderREYES.h
+/// RI_Hider.h
 ///
 /// Created by Davide Pasca - 2009/4/27
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_HIDERREYES_H
-#define RI_HIDERREYES_H
+#ifndef RI_HIDER_H
+#define RI_HIDER_H
 
 #include "RI_Options.h"
 #include "RI_Buffer2D.h"

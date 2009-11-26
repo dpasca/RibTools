@@ -15,7 +15,7 @@
 #include "RI_System/include/RI_Render.h"
 #include "RI_System/include/RI_Net_Protocol.h"
 #include "RI_System/include/RI_Machine.h"
-#include "RI_System/include/RI_FrameworkREYES.h"
+#include "RI_System/include/RI_Framework.h"
 
 #include "RibRenderLib_Net.h"
 

@@ -161,8 +161,8 @@ void RibRendTool::RebuildMenu()
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	glutAddMenuEntry( "-- Debug --", -1 );
-	addBoolMenuItem( "Pick Bucket Mode", mREYESParams.mDbgShowBuckets, MENUID_DBG_PICK_BUCKET );
-	addBoolMenuItem( "Color Coded Grids", mREYESParams.mDbgColorCodedGrids, MENUID_DBG_COLOR_CODE_GRIDS );
+	addBoolMenuItem( "Pick Bucket Mode", mHiderParams.mDbgShowBuckets, MENUID_DBG_PICK_BUCKET );
+	addBoolMenuItem( "Color Coded Grids", mHiderParams.mDbgColorCodedGrids, MENUID_DBG_COLOR_CODE_GRIDS );
 	glutAddMenuEntry( "", -1 );
 
 	glutAddMenuEntry( "-- Test Files --", -1 );
@@ -182,14 +182,14 @@ void RibRendTool::MenuFunc( int id )
 	switch ( id )
 	{
 	case MENUID_DBG_PICK_BUCKET:
-		mREYESParams.mDbgShowBuckets = !mREYESParams.mDbgShowBuckets;
+		mHiderParams.mDbgShowBuckets = !mHiderParams.mDbgShowBuckets;
 		RenderFile( true );
 		glutPostRedisplay();
 		RebuildMenu();
 		return;
 
 	case MENUID_DBG_COLOR_CODE_GRIDS:
-		mREYESParams.mDbgColorCodedGrids = !mREYESParams.mDbgColorCodedGrids;
+		mHiderParams.mDbgColorCodedGrids = !mHiderParams.mDbgColorCodedGrids;
 		RenderFile( true );
 		glutPostRedisplay();
 		RebuildMenu();
@@ -253,7 +253,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	printf( "Base Dir: %s\n", baseDir.c_str() );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
-	RI::Framework	framework( mpRenderOutput, NULL, mREYESParams );
+	RI::Framework	framework( mpRenderOutput, NULL, mHiderParams );
 	RI::FileManagerDisk	fileManager;
 
 	RI::Machine::Params	params;
@@ -262,7 +262,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	params.mState.mBaseDir				= baseDir;
 	params.mState.mDefaultShadersDir	= defaultShadersDir;
 
-	if ( mREYESParams.mDbgColorCodedGrids )
+	if ( mHiderParams.mDbgColorCodedGrids )
 		params.mState.mForcedSurfaceShader = "constant";
 
 	params.mForcedWd					= forcedWd;
@@ -335,14 +335,14 @@ void RibRendTool::MouseFunc( int button, int butState, int mx, int my )
 	{
 		if ( butState == GLUT_DOWN )
 		{
-			if ( mREYESParams.mDbgShowBuckets )
+			if ( mHiderParams.mDbgShowBuckets )
 			{
-				mREYESParams.mDbgOnlyBucketAtX = mx;
-				mREYESParams.mDbgOnlyBucketAtY = my;
+				mHiderParams.mDbgOnlyBucketAtX = mx;
+				mHiderParams.mDbgOnlyBucketAtY = my;
 				RenderFile( true );
 				glutPostRedisplay();
-				mREYESParams.mDbgOnlyBucketAtX = -1;
-				mREYESParams.mDbgOnlyBucketAtY = -1;
+				mHiderParams.mDbgOnlyBucketAtX = -1;
+				mHiderParams.mDbgOnlyBucketAtY = -1;
 			}
 		}
 	}

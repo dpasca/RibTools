@@ -337,35 +337,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_FrameworkREYES.cpp"
+				RelativePath="..\src\RI_Framework.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_FrameworkREYES.h"
+				RelativePath="..\include\RI_Framework.h"
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_HiderREYES.cpp"
+				RelativePath="..\src\RI_Hider.cpp"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AssemblerOutput="4"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AssemblerOutput="4"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\include\RI_HiderREYES.h"
+				RelativePath="..\include\RI_Hider.h"
 				>
 			</File>
 			<File

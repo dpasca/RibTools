@@ -12,7 +12,7 @@
 #include "DSystem/include/DTypes.h"
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DUtils.h"
-#include "RI_System/include/RI_FrameworkREYES.h"
+#include "RI_System/include/RI_Framework.h"
 
 #include "RibRenderLib_Net.h"
 

@@ -1,18 +1,18 @@
 //==================================================================
-/// RI_FrameworkREYES.h
+/// RI_Framework.h
 ///
 /// Created by Davide Pasca - 2009/02/08
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_FRAMEWORKREYES_H
-#define RI_FRAMEWORKREYES_H
+#ifndef RI_FRAMEWORK_H
+#define RI_FRAMEWORK_H
 
 #include "RI_Base.h"
 #include "RI_Primitive.h"
 #include "RI_Options.h"
-#include "RI_HiderREYES.h"
+#include "RI_Hider.h"
 
 //==================================================================
 namespace RI

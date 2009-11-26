@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_FrameworkREYES.cpp
+/// RI_Framework.cpp
 ///
 /// Created by Davide Pasca - 2009/2/8
 /// See the file "license.txt" that comes with this project for
@@ -9,7 +9,7 @@
 #include "stdafx.h"
 #include "RI_Base.h"
 #include "RI_State.h"
-#include "RI_FrameworkREYES.h"
+#include "RI_Framework.h"
 #include <omp.h>
 
 //==================================================================

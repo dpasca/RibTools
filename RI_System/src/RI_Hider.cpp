@@ -1,15 +1,14 @@
-/*
- *  RI_HiderREYES.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/02/08.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Hider.cpp
+///
+/// Created by Davide Pasca - 2009/02/08
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "RI_Primitive.h"
-#include "RI_HiderREYES.h"
+#include "RI_Hider.h"
 #include "RI_Transform.h"
 
 static const u_int	BUCKET_SIZE = 128;
