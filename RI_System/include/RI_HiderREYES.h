@@ -21,9 +21,9 @@ class Transform;
 class PrimitiveBase;
 
 //==================================================================
-/// Bucket
+/// HiderBucket
 //==================================================================
-class Bucket
+class HiderBucket
 {
 public:
 	int							mX1;
@@ -35,7 +35,7 @@ public:
 	DVec<SimplePrimitiveBase *>	mpPrims;
 
 public:
-	Bucket( int x1, int y1, int x2, int y2 ) :
+	HiderBucket( int x1, int y1, int x2, int y2 ) :
 		mX1(x1),
 		mY1(y1),
 		mX2(x2),
@@ -43,7 +43,7 @@ public:
 	{
 	}
 
-	~Bucket()
+	~HiderBucket()
 	{
 		for (size_t i=0; i < mpPrims.size(); ++i)
 			if ( mpPrims[i] )
@@ -122,7 +122,7 @@ private:
 
 	Options					mOptions;
 	Buffer2D<NCOLS>			mFinalBuff;
-	DVec<Bucket *>			mpBuckets;
+	DVec<HiderBucket *>		mpBuckets;
 	Params					mParams;
 	DVec<PrimitiveBase *>	mpPrims;
 
@@ -175,7 +175,7 @@ public:
 		return mFinalBuff.GetSamplePtrRW( (int)x1, (int)y1 );
 	}
 
-	const DVec<Bucket *>	&GetBuckets() {	return mpBuckets; }
+	const DVec<HiderBucket *>	&GetBuckets() {	return mpBuckets; }
 
 	size_t	GetOutputBucketMemSize( size_t buckIdx ) const;
 	void	CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize ) const;

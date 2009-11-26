@@ -68,7 +68,7 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 //==================================================================
 void RenderBucketsServer::rendBucketsRange( RI::HiderREYES &hider, int buckRangeX1, int buckRangeX2 )
 {
-	const DVec<RI::Bucket *> &buckets = hider.GetBuckets();
+	const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
 
 	DASSERT(
 		buckRangeX1 >= 0 &&
@@ -83,7 +83,7 @@ void RenderBucketsServer::rendBucketsRange( RI::HiderREYES &hider, int buckRange
 //==================================================================
 void RenderBucketsServer::sendBucketsData( RI::HiderREYES &hider, int buckRangeX1, int buckRangeX2 )
 {
-	const DVec<RI::Bucket *> &buckets = hider.GetBuckets();
+	const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
 
 	for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
 	{

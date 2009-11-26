@@ -82,7 +82,7 @@ void HiderREYES::WorldBegin(
 				 mParams.mDbgOnlyBucketAtY < y2 )
 			{
 				mpBuckets.push_back(
-						DNEW Bucket( x, y, x2, y2 ) );
+						DNEW HiderBucket( x, y, x2, y2 ) );
 			}
 		}
 	}
@@ -160,7 +160,7 @@ void HiderREYES::WorldEnd()
 		float borderCol[] = { 1, 0, 0 };
 		for (size_t bi=0; bi < mpBuckets.size(); ++bi)
 		{
-			const Bucket	*pBucket = mpBuckets[bi];
+			const HiderBucket	*pBucket = mpBuckets[bi];
 
 			mFinalBuff.DrawHLine( pBucket->mX1, pBucket->mY1, pBucket->mX2, borderCol );
 			mFinalBuff.DrawHLine( pBucket->mX1, pBucket->mY2, pBucket->mX2, borderCol );
@@ -378,7 +378,7 @@ void HiderREYES::Hide(
 //==================================================================
 size_t HiderREYES::GetOutputBucketMemSize( size_t buckIdx ) const
 {
-	const Bucket	&buck = *mpBuckets[ buckIdx ];
+	const HiderBucket	&buck = *mpBuckets[ buckIdx ];
 
 	u_int	wd = (u_int)(buck.mX2 - buck.mX1);
 	u_int	he = (u_int)(buck.mY2 - buck.mY1);
@@ -389,7 +389,7 @@ size_t HiderREYES::GetOutputBucketMemSize( size_t buckIdx ) const
 //==================================================================
 void HiderREYES::CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize ) const
 {
-	const Bucket	&buck = *mpBuckets[ buckIdx ];
+	const HiderBucket	&buck = *mpBuckets[ buckIdx ];
 
 	u_int	wd	= (u_int)(buck.mX2 - buck.mX1);
 	u_int	he	= (u_int)(buck.mY2 - buck.mY1);
@@ -414,7 +414,7 @@ void HiderREYES::CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxS
 //==================================================================
 void HiderREYES::StoreOutputBucket( size_t buckIdx, const float *pSrc, size_t srcSize )
 {
-	const Bucket	&buck = *mpBuckets[ buckIdx ];
+	const HiderBucket	&buck = *mpBuckets[ buckIdx ];
 
 	u_int	wd	= (u_int)(buck.mX2 - buck.mX1);
 	u_int	he	= (u_int)(buck.mY2 - buck.mY1);

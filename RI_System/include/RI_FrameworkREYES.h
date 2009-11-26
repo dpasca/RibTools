@@ -164,7 +164,7 @@ public:
 
 	void WorldEnd();
 
-	static void RenderBucket_s( HiderREYES &hider, Bucket &bucket );
+	static void RenderBucket_s( HiderREYES &hider, HiderBucket &bucket );
 
 private:
 

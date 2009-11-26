@@ -46,7 +46,7 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 {
 	DUT::QuickProf	prof( __FUNCTION__ );
 
-	const DVec<RI::Bucket *> &buckets = hider.GetBuckets();
+	const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
 
 	int		bucketsN = (int)buckets.size();
 

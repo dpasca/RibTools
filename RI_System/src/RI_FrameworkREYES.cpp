@@ -63,7 +63,7 @@ void FrameworkREYES::Insert(
 }
 
 //==================================================================
-void FrameworkREYES::RenderBucket_s( HiderREYES &hider, Bucket &bucket )
+void FrameworkREYES::RenderBucket_s( HiderREYES &hider, HiderBucket &bucket )
 {
 	DVec<SimplePrimitiveBase *>	&pPrimList = bucket.GetPrimList();
 
@@ -172,7 +172,7 @@ public:
 	{
 		DUT::QuickProf	prof( __FUNCTION__ );
 
-		const DVec<Bucket *>	buckets = hider.GetBuckets();
+		const DVec<HiderBucket *>	buckets = hider.GetBuckets();
 	
 		int	bucketsN = (int)buckets.size();
 
