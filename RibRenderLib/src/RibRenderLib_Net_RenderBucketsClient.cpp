@@ -42,7 +42,7 @@ bool RenderBucketsClient::isAnyServerAvailable() const
 }
 
 //==================================================================
-void RenderBucketsClient::Render( RI::HiderREYES &hider )
+void RenderBucketsClient::Render( RI::Hider &hider )
 {
 	DUT::QuickProf	prof( __FUNCTION__ );
 
@@ -77,7 +77,7 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 			// otherwise render locally..
 			#pragma omp parallel for
 			for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
-				RI::FrameworkREYES::RenderBucket_s( hider, *buckets[ bi ] );
+				RI::Framework::RenderBucket_s( hider, *buckets[ bi ] );
 		}
 	#endif
 
@@ -97,7 +97,7 @@ void RenderBucketsClient::Render( RI::HiderREYES &hider )
 
 //==================================================================
 bool RenderBucketsClient::checkServersData(
-								RI::HiderREYES &hider,
+								RI::Hider &hider,
 								bool replyDoneIfNotbusy )
 {
 	bool	allDone = true;

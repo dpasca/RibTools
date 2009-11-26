@@ -53,7 +53,7 @@ class State
 public:
 	struct Params
 	{
-		FrameworkREYES	*mpFramework		;
+		Framework	*mpFramework		;
 		FileManagerBase	*mpFileManager		;
 		DStr			mBaseDir			;
 		DStr			mDefaultShadersDir	;

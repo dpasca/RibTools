@@ -86,9 +86,9 @@ public:
 };
 
 //==================================================================
-/// HiderREYES
+/// Hider
 //==================================================================
-class HiderREYES
+class Hider
 {
 public:
 	const SymbolList	*mpGlobalSyms;
@@ -118,7 +118,7 @@ public:
 	};
 
 private:
-	friend class FrameworkREYES;
+	friend class Framework;
 
 	Options					mOptions;
 	Buffer2D<NCOLS>			mFinalBuff;
@@ -127,8 +127,8 @@ private:
 	DVec<PrimitiveBase *>	mpPrims;
 
 public:
-	HiderREYES( const Params &params );
-	~HiderREYES();
+	Hider( const Params &params );
+	~Hider();
 
 	void WorldBegin(
 			const Options &opt,

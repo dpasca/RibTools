@@ -175,14 +175,14 @@ int ClientMain( int argc, char **argv )
 	sprintf_s( defaultShadersDir, "%s/Shaders", defaultResDir );
 
 	RenderOutputFile		rendOut( cmdPars.pOutFileName );
-	RI::HiderREYES::Params	hiderParams;
+	RI::Hider::Params	hiderParams;
 	RI::FileManagerDisk		fileManagerDisk;
 
 	if NOT( cmdPars.servList.size() )
 	{
 		try
 		{
-			RI::FrameworkREYES		framework( &rendOut, NULL, hiderParams );
+			RI::Framework		framework( &rendOut, NULL, hiderParams );
 
 			RI::Machine::Params	params;
 			params.mState.mpFramework			= &framework;
@@ -212,7 +212,7 @@ int ClientMain( int argc, char **argv )
 		{
 			RRL::NET::RenderBucketsClient	rendBuckets( cmdPars.servList );
 	
-			RI::FrameworkREYES				framework( &rendOut, &rendBuckets, hiderParams );
+			RI::Framework				framework( &rendOut, &rendBuckets, hiderParams );
 
 			RI::Machine::Params	params;
 			params.mState.mpFramework			= &framework;

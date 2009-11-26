@@ -32,23 +32,23 @@ static void MakeCube( const Bound &b, Vec3f out_box[8] )
 }
 
 //==================================================================
-/// HiderREYES
+/// Hider
 //==================================================================
-HiderREYES::HiderREYES( const Params &params ) :
+Hider::Hider( const Params &params ) :
 	mParams(params),
 	mpGlobalSyms(NULL)
 {
 }
 
 //==================================================================
-HiderREYES::~HiderREYES()
+Hider::~Hider()
 {
 	for (size_t i=0; i < mpBuckets.size(); ++i)
 		DDELETE( mpBuckets[i] );
 }
 
 //==================================================================
-void HiderREYES::WorldBegin(
+void Hider::WorldBegin(
 					const Options &opt,
 					const Matrix44 &mtxWorldCamera )
 {
@@ -90,13 +90,13 @@ void HiderREYES::WorldBegin(
 }
 
 //==================================================================
-void HiderREYES::Insert( PrimitiveBase *pPrim )
+void Hider::Insert( PrimitiveBase *pPrim )
 {
 	mpPrims.push_back( pPrim->Borrow() );
 }
 
 //==================================================================
-void HiderREYES::InsertSimple(	
+void Hider::InsertSimple(	
 					SimplePrimitiveBase		*pSimplePrim,
 					ComplexPrimitiveBase	&srcPrim
 					)
@@ -107,7 +107,7 @@ void HiderREYES::InsertSimple(
 }
 
 //==================================================================
-void HiderREYES::InsertSplitted(	
+void Hider::InsertSplitted(	
 				SimplePrimitiveBase	*pDesPrim,
 				SimplePrimitiveBase	&srcPrim
 				)
@@ -120,7 +120,7 @@ void HiderREYES::InsertSplitted(
 }
 
 //==================================================================
-void HiderREYES::InsertForDicing( SimplePrimitiveBase *pPrim )
+void Hider::InsertForDicing( SimplePrimitiveBase *pPrim )
 {
 	Bound	bound;
 	if NOT( pPrim->MakeBound( bound ) )
@@ -153,7 +153,7 @@ void HiderREYES::InsertForDicing( SimplePrimitiveBase *pPrim )
 }
 
 //==================================================================
-void HiderREYES::WorldEnd()
+void Hider::WorldEnd()
 {
 	if ( mParams.mDbgShowBuckets )
 	{
@@ -177,7 +177,7 @@ void HiderREYES::WorldEnd()
 }
 
 //==================================================================
-bool HiderREYES::makeRasterBound(
+bool Hider::makeRasterBound(
 						const Bound &b,
 						const Matrix44 &mtxLocalWorld,
 						float out_bound2d[4] ) const
@@ -258,7 +258,7 @@ bool HiderREYES::makeRasterBound(
 }
 
 //==================================================================
-float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const
+float Hider::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const
 {
 	if NOT( b.IsValid() )
 	{
@@ -280,7 +280,7 @@ float HiderREYES::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld 
 
 /*
 //==================================================================
-void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
+void Hider::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 {
 	float destHalfWd	= (float)mDestBuff.mWd * 0.5f;
 	float destHalfHe	= (float)mDestBuff.mHe * 0.5f;
@@ -300,7 +300,7 @@ void HiderREYES::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 */
 
 //==================================================================
-void HiderREYES::Hide(
+void Hider::Hide(
 				MicroPolygonGrid	&g,
 				float				destOffX,
 				float				destOffY,
@@ -376,7 +376,7 @@ void HiderREYES::Hide(
 }
 
 //==================================================================
-size_t HiderREYES::GetOutputBucketMemSize( size_t buckIdx ) const
+size_t Hider::GetOutputBucketMemSize( size_t buckIdx ) const
 {
 	const HiderBucket	&buck = *mpBuckets[ buckIdx ];
 
@@ -387,7 +387,7 @@ size_t HiderREYES::GetOutputBucketMemSize( size_t buckIdx ) const
 }
 
 //==================================================================
-void HiderREYES::CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize ) const
+void Hider::CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize ) const
 {
 	const HiderBucket	&buck = *mpBuckets[ buckIdx ];
 
@@ -412,7 +412,7 @@ void HiderREYES::CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxS
 }
 
 //==================================================================
-void HiderREYES::StoreOutputBucket( size_t buckIdx, const float *pSrc, size_t srcSize )
+void Hider::StoreOutputBucket( size_t buckIdx, const float *pSrc, size_t srcSize )
 {
 	const HiderBucket	&buck = *mpBuckets[ buckIdx ];
 

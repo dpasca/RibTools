@@ -29,7 +29,7 @@ PatchMesh::PatchMesh( RtToken type,
 }
 
 //==================================================================
-void PatchMesh::Simplify( HiderREYES &hider )
+void PatchMesh::Simplify( Hider &hider )
 {
 	// PatchMesh "bilinear" 2 "nonperiodic" 5 "nonperiodic" "P"  [ -0.995625 2 -0.495465 ...
 	//               0      1       2       3       4        5     6

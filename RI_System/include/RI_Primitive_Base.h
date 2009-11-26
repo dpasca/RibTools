@@ -21,7 +21,7 @@ namespace RI
 class Options;
 class Attributes;
 class Transform;
-class HiderREYES;
+class Hider;
 class MicroPolygonGrid;
 
 //==================================================================
@@ -132,7 +132,7 @@ public:
 		bool	IsComplex() const		{ return true;	}
 		bool	IsSplitable() const		{ return false;	}
 
-	virtual void	Simplify( HiderREYES &hider ) = 0;
+	virtual void	Simplify( Hider &hider ) = 0;
 };
 
 //==================================================================
@@ -174,11 +174,11 @@ public:
 		DOSRES_SPLIT,
 	};
 
-	DosRes SetupForDiceOrSplit(	const HiderREYES &hider,
+	DosRes SetupForDiceOrSplit(	const Hider &hider,
 								bool &out_uSplit,
 								bool &out_vSplit );
 
-	void	Split( HiderREYES &hider, bool uSplit, bool vSplit );
+	void	Split( Hider &hider, bool uSplit, bool vSplit );
 
 	// make a 3D bound, return false if the bound cannot be made
 	virtual bool	MakeBound( Bound &out_bound ) const = 0;

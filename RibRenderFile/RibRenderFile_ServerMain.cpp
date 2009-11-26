@@ -49,8 +49,8 @@ static int serverTask( SOCKET clientSock )
 	RRL::NET::RenderBucketsServer	rendBuckets( packetManager );
 
 	RI::RenderOutputNull	rendOutNull;
-	RI::HiderREYES::Params	hiderParams;
-	RI::FrameworkREYES		framework( &rendOutNull, &rendBuckets, hiderParams );
+	RI::Hider::Params	hiderParams;
+	RI::Framework		framework( &rendOutNull, &rendBuckets, hiderParams );
 
 	RI::Machine::Params	params;
 	params.mState.mpFramework			= &framework;

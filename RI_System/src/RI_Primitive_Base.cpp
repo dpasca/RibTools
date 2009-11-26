@@ -21,7 +21,7 @@ namespace RI
 {
 
 //==================================================================
-void SimplePrimitiveBase::Split( HiderREYES &hider, bool uSplit, bool vSplit )
+void SimplePrimitiveBase::Split( Hider &hider, bool uSplit, bool vSplit )
 {
 	DASSERT( IsUsed() );
 
@@ -364,7 +364,7 @@ bool ParamsFindP(	ParamList &params,
 //==================================================================
 SimplePrimitiveBase::DosRes
 	SimplePrimitiveBase::SetupForDiceOrSplit(
-							const HiderREYES &hider,
+							const Hider &hider,
 							bool &out_uSplit,
 							bool &out_vSplit )
 {
@@ -407,7 +407,7 @@ SimplePrimitiveBase::DosRes
 //==================================================================
 bool SimplePrimitiveBase::IsDiceable(
 						MicroPolygonGrid &g,
-						HiderREYES *pHider,
+						Hider *pHider,
 						bool &out_uSplit,
 						bool &out_vSplit )
 {

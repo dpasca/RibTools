@@ -17,12 +17,12 @@ namespace RI
 {
 
 //==================================================================
-/// FrameworkREYES
+/// Framework
 //==================================================================
-FrameworkREYES::FrameworkREYES(
+Framework::Framework(
 						RenderOutputBase *pRenderOutput,
 						RenderBucketsBase *pRenderBuckets,
-						const HiderREYES &hiderParams ) :
+						const Hider &hiderParams ) :
 	mpRenderOutput(pRenderOutput),
 	mpRenderBuckets(pRenderBuckets),
 	mpGlobalSyms(NULL),
@@ -31,7 +31,7 @@ FrameworkREYES::FrameworkREYES(
 }
 
 //==================================================================
-void FrameworkREYES::WorldBegin(
+void Framework::WorldBegin(
 						const Options &opt,
 						const Matrix44 &mtxWorldCamera )
 {
@@ -40,7 +40,7 @@ void FrameworkREYES::WorldBegin(
 }
 
 //==================================================================
-void FrameworkREYES::Insert(
+void Framework::Insert(
 						PrimitiveBase		*pPrim,
 						const Attributes	&attr,
 						const Transform		&xform )
@@ -63,7 +63,7 @@ void FrameworkREYES::Insert(
 }
 
 //==================================================================
-void FrameworkREYES::RenderBucket_s( HiderREYES &hider, HiderBucket &bucket )
+void Framework::RenderBucket_s( Hider &hider, HiderBucket &bucket )
 {
 	DVec<SimplePrimitiveBase *>	&pPrimList = bucket.GetPrimList();
 
@@ -108,7 +108,7 @@ void FrameworkREYES::RenderBucket_s( HiderREYES &hider, HiderBucket &bucket )
 }
 
 //==================================================================
-void FrameworkREYES::worldEnd_simplify()
+void Framework::worldEnd_simplify()
 {
 	DUT::QuickProf	prof( __FUNCTION__ );
 
@@ -128,7 +128,7 @@ void FrameworkREYES::worldEnd_simplify()
 }
 
 //==================================================================
-void FrameworkREYES::worldEnd_splitAndAddToBuckets()
+void Framework::worldEnd_splitAndAddToBuckets()
 {
 	DUT::QuickProf	prof( __FUNCTION__ );
 
@@ -168,7 +168,7 @@ void FrameworkREYES::worldEnd_splitAndAddToBuckets()
 class RenderBucketsStd : public RenderBucketsBase
 {
 public:
-	void Render( HiderREYES &hider )
+	void Render( Hider &hider )
 	{
 		DUT::QuickProf	prof( __FUNCTION__ );
 
@@ -180,13 +180,13 @@ public:
 		#pragma omp parallel for
 		for (int bi=0; bi < bucketsN; ++bi)
 		{
-			FrameworkREYES::RenderBucket_s( hider, *buckets[ bi ] );
+			Framework::RenderBucket_s( hider, *buckets[ bi ] );
 		}
 	}
 };
 
 //==================================================================
-void FrameworkREYES::WorldEnd()
+void Framework::WorldEnd()
 {
 #if 0
 	Point3	camPosWS =

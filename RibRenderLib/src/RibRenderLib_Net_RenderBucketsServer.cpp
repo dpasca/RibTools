@@ -24,7 +24,7 @@ RenderBucketsServer::RenderBucketsServer( DNET::PacketManager &pakMan ) :
 }
 
 //==================================================================
-void RenderBucketsServer::Render( RI::HiderREYES &hider )
+void RenderBucketsServer::Render( RI::Hider &hider )
 {
 	while ( true )
 	{
@@ -66,7 +66,7 @@ void RenderBucketsServer::Render( RI::HiderREYES &hider )
 }
 
 //==================================================================
-void RenderBucketsServer::rendBucketsRange( RI::HiderREYES &hider, int buckRangeX1, int buckRangeX2 )
+void RenderBucketsServer::rendBucketsRange( RI::Hider &hider, int buckRangeX1, int buckRangeX2 )
 {
 	const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
 
@@ -77,11 +77,11 @@ void RenderBucketsServer::rendBucketsRange( RI::HiderREYES &hider, int buckRange
 
 	#pragma omp parallel for
 	for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
-		RI::FrameworkREYES::RenderBucket_s( hider, *buckets[ bi ] );
+		RI::Framework::RenderBucket_s( hider, *buckets[ bi ] );
 }
 
 //==================================================================
-void RenderBucketsServer::sendBucketsData( RI::HiderREYES &hider, int buckRangeX1, int buckRangeX2 )
+void RenderBucketsServer::sendBucketsData( RI::Hider &hider, int buckRangeX1, int buckRangeX2 )
 {
 	const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
 

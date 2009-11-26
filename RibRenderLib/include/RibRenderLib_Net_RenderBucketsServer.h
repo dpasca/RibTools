@@ -32,11 +32,11 @@ class RenderBucketsServer : public RI::RenderBucketsBase
 
 public:
 	RenderBucketsServer( DNET::PacketManager &pakMan );
-	void Render( RI::HiderREYES &hider );
+	void Render( RI::Hider &hider );
 
 private:
-	void rendBucketsRange( RI::HiderREYES &hider, int buckRangeX1, int buckRangeX2 );
-	void sendBucketsData( RI::HiderREYES &hider, int buckRangeX1, int buckRangeX2 );
+	void rendBucketsRange( RI::Hider &hider, int buckRangeX1, int buckRangeX2 );
+	void sendBucketsData( RI::Hider &hider, int buckRangeX1, int buckRangeX2 );
 };
 
 //==================================================================

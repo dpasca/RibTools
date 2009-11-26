@@ -113,7 +113,7 @@ class RenderBucketsBase
 public:
 	virtual ~RenderBucketsBase() {}
 
-	virtual void Render( HiderREYES &hider ) = 0;
+	virtual void Render( Hider &hider ) = 0;
 /*
 private:
 	RenderBucketsBase( const RenderBucketsBase &from ) {}
@@ -122,15 +122,15 @@ private:
 };
 
 //==================================================================
-/// FrameworkREYES
+/// Framework
 //==================================================================
-class FrameworkREYES
+class Framework
 {
 public:
 	RenderOutputBase	*mpRenderOutput;
 	RenderBucketsBase	*mpRenderBuckets;
 	const SymbolList	*mpGlobalSyms;
-	HiderREYES			mHider;
+	Hider			mHider;
 
 private:
 	Options				mOptions;	//temporary, will remove
@@ -143,9 +143,9 @@ private:
 	RevisionChecker		mTransRev;
 
 public:
-	FrameworkREYES(	RenderOutputBase *pRenderOutput,
-					RenderBucketsBase *pRenderBuckets,
-					const HiderREYES &hiderParams );
+	Framework(	RenderOutputBase *pRenderOutput,
+				RenderBucketsBase *pRenderBuckets,
+				const Hider &hiderParams );
 
 	void SetGlobalSyms( const SymbolList *pGlobalSyms )
 	{
@@ -164,7 +164,7 @@ public:
 
 	void WorldEnd();
 
-	static void RenderBucket_s( HiderREYES &hider, HiderBucket &bucket );
+	static void RenderBucket_s( Hider &hider, HiderBucket &bucket );
 
 private:
 

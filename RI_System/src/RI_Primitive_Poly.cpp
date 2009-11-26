@@ -30,7 +30,7 @@ Polygon::Polygon( ParamList &params, const SymbolList &globalSymbols ) :
 
 //==================================================================
 static void simplifyAddTriangle(
-				HiderREYES &hider,
+				Hider &hider,
 				const Vec3f &v1,
 				const Vec3f &v2,
 				const Vec3f &v3,
@@ -62,7 +62,7 @@ static void simplifyAddTriangle(
 }
 
 //==================================================================
-void Polygon::Simplify( HiderREYES &hider )
+void Polygon::Simplify( Hider &hider )
 {
 	int	PValuesParIdx = FindParam( "P", Param::FLT_ARR, 0, mParams );
 	if ( PValuesParIdx == -1 )
@@ -126,7 +126,7 @@ struct VertInfo
 
 //==================================================================
 static void tessellateToBilinearPatches(
-							HiderREYES	 &hider,
+							Hider	 &hider,
 							const FltVec &paramP,
 							const int	 *pIndices,
 							int			 indicesN,
@@ -168,7 +168,7 @@ static void tessellateToBilinearPatches(
 }
 
 //==================================================================
-void PointsGeneralPolygons::Simplify( HiderREYES &hider )
+void PointsGeneralPolygons::Simplify( Hider &hider )
 {
 	size_t		nloopsN = mParams[0].IntArrSize();
 	const int	*pNLoops = mParams[0].PInt();

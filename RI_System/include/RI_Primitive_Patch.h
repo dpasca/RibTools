@@ -217,7 +217,7 @@ public:
 			  ParamList &params,
 			  const SymbolList &globalSymbols );
 
-		void Simplify( HiderREYES &hider );
+		void Simplify( Hider &hider );
 };
 
 //==================================================================

@@ -15,7 +15,7 @@
 namespace RI
 {
 
-class HiderREYES;
+class Hider;
 
 //==================================================================
 /// Polygon
@@ -28,7 +28,7 @@ public:
 public:
 	Polygon( ParamList &params, const SymbolList &globalSymbols );
 
-		void Simplify( HiderREYES &hider );
+		void Simplify( Hider &hider );
 };
 
 //==================================================================
@@ -42,7 +42,7 @@ public:
 public:
 	PointsGeneralPolygons( ParamList &params, const SymbolList &globalSymbols );
 
-		void Simplify( HiderREYES &hider );
+		void Simplify( Hider &hider );
 };
 
 //==================================================================

@@ -33,14 +33,14 @@ class RenderBucketsClient : public RI::RenderBucketsBase
 
 public:
 	RenderBucketsClient( DVec<Server> &servList );
-	void Render( RI::HiderREYES &hider );
+	void Render( RI::Hider &hider );
 
 private:
 	Server *findFreeServer();
 	bool dispatchToServer( int buckRangeX1, int buckRangeX2 );
 
 	bool checkServersData(
-					RI::HiderREYES &hider,
+					RI::Hider &hider,
 					bool replyDoneIfNotbusy );
 
 	bool isAnyServerAvailable() const;

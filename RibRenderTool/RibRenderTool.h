@@ -24,7 +24,7 @@ public:
 	DVec<DStr>			mTestRibFiles;
 	DVec<DStr>			mTestRibFilesPaths;
 
-	RI::HiderREYES::Params	mREYESParams;
+	RI::Hider::Params	mREYESParams;
 
 	std::string			mLastFileName;
 	int					mLastUsedWd;
