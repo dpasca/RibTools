@@ -353,6 +353,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\RI_HiderBucket.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_LightSource.cpp"
 				>
 			</File>
