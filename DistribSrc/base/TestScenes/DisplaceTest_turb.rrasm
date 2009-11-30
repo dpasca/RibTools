@@ -57,14 +57,14 @@ __main:
 loop1:
 	mul.vvs		$v0		P	totalFrequency	// $v0 = (P * totalFrequency
 	mul.vvs		$v0		$v0	crinckle		//  * crinckle
-	noise13		$s0		$v0					//  ).noise
+	noise.sv	$s0		$v0					//  ).noise
 	sub.sss		$s0		_const1	$s0			// (0.5 - $v0
 	abs.ss		$s0		$s0					//  ).abs
 	add.sss		hump	hump	$s0	
 	mul.sss		totalFrequency	totalFrequency	_const2
 	
 	add.sss		$su1	$su1	$su3
-	cmplt		$su1	$su2	loop1
+	cmplt.ssl	$su1	$su2	loop1
 
 	mul.sss		$s0		hump	Km			// hump * Km
 	mul.vvs		$v0		n		$s0			// * n

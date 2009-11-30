@@ -13,7 +13,7 @@ surface
 
 __main:
 	mul.vvs		$v0	P	_const1
-	noise33		Ci	$v0
+	noise.vv	Ci	$v0
 	mov.vv		Oi	Os
 
 	ret
