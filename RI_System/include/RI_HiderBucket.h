@@ -10,6 +10,7 @@
 #define RI_HIDERBUCKET_H
 
 #include "RI_Buffer2D.h"
+#include "RI_HiderSampleCoordsBuffer.h"
 
 //==================================================================
 namespace RI
@@ -45,6 +46,13 @@ public:
 		for (size_t i=0; i < mpPrims.size(); ++i)
 			if ( mpPrims[i] )
 				mpPrims[i]->Release();
+	}
+
+	HiderPixel *InitBaseSamples_s( u_int wd, u_int he, u_int subs )
+	{
+		HiderPixel	*pPixels = DNEW HiderPixel [ wd * he ];
+
+
 	}
 
 	void BeginRender()

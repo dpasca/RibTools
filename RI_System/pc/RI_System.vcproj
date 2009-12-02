@@ -357,6 +357,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_HiderSampleCoordsBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_HiderSampleCoordsBuffer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_LightSource.cpp"
 				>
 			</File>
