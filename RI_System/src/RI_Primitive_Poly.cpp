@@ -13,7 +13,7 @@
 #include "RI_Transform.h"
 #include "RI_Primitive_Poly.h"
 #include "RI_Primitive_Patch.h"
-#include "RI_HiderREYES.h"
+#include "RI_Hider.h"
 
 //==================================================================
 namespace RI

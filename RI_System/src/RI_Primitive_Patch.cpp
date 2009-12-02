@@ -12,7 +12,7 @@
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
 #include "RI_Primitive_Patch.h"
-#include "RI_FrameworkREYES.h"
+#include "RI_Hider.h"
 
 //==================================================================
 namespace RI
