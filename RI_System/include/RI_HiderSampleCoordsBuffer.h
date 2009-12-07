@@ -39,6 +39,13 @@ public:
 };
 
 //==================================================================
+class HiderBaseSampleCoords
+{
+public:
+	float			mTime;
+};
+
+//==================================================================
 /// HiderPixel
 //==================================================================
 class HiderPixel
@@ -55,18 +62,32 @@ public:
 class HiderSampleCoordsBuffer
 {
 public:
-	u_int				mWd;
-	u_int				mHe;
-	HiderSampleCoords	*mpSampCoords;
+	u_int					mWd;
+	u_int					mHe;
+	u_int					mSubPixelDimLog2;
+	HiderSampleCoords		*mpSampCoords;
+	HiderBaseSampleCoords	*mpBaseSampCoords;
 
 	HiderSampleCoordsBuffer();
 
 	~HiderSampleCoordsBuffer();
 
-	void Setup( u_int wd, u_int he, u_int subPixelDimLog2 );
+	void Init( u_int wd, u_int he, u_int subPixelDimLog2 );
+
+	void Setup( float openTime, float closeTime );
 
 private:
-	void setupPixel( HiderSampleCoords *pSampCoods, u_int subPixelDimLog2 );
+	void initPixel(
+				HiderSampleCoords		*pSampCoods,
+				HiderBaseSampleCoords	*pBaseSampleCoords,
+				u_int					subPixelDimLog2,
+				DRandom					&randGen );
+
+	void setupPixel(
+				HiderSampleCoords		*pSampCoods,
+				HiderBaseSampleCoords	*pBaseSampleCoords,
+				float					openTime,
+				float					dtime );
 };
 
 //==================================================================

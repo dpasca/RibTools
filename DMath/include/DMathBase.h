@@ -113,4 +113,7 @@ template <class T>	inline T		DMax( const T &a, const T &b )
 #define FM_SQRT2    ((float)M_SQRT2   )
 #define FM_SQRT1_2  ((float)M_SQRT1_2 )
 
+typedef unsigned int		DU32;
+typedef unsigned __int64	DU64;
+
 #endif

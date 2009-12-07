@@ -12,5 +12,6 @@
 #include "DMathBase.h"
 #include "DVector.h"
 #include "DMatrix44.h"
+#include "DRandom.h"
 
 #endif

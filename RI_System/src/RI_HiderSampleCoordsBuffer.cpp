@@ -17,7 +17,8 @@ namespace RI
 HiderSampleCoordsBuffer::HiderSampleCoordsBuffer() :
 	mWd(0),
 	mHe(0),
-	mpSampCoords(NULL)
+	mpSampCoords(NULL),
+	mpBaseSampCoords(NULL)
 {
 }
 
@@ -25,36 +26,66 @@ HiderSampleCoordsBuffer::HiderSampleCoordsBuffer() :
 HiderSampleCoordsBuffer::~HiderSampleCoordsBuffer()
 {
 	DSAFE_DELETE_ARRAY( mpSampCoords );
+	DSAFE_DELETE_ARRAY( mpBaseSampCoords );
 }
 
 //==================================================================
-void HiderSampleCoordsBuffer::Setup( u_int wd, u_int he, u_int subPixelDimLog2 )
+void HiderSampleCoordsBuffer::Init( u_int wd, u_int he, u_int subPixelDimLog2 )
 {
 	mWd = wd;
 	mHe = he;
+	mSubPixelDimLog2 = subPixelDimLog2;
 
 	u_int	sampsPerPixel = 1 << (subPixelDimLog2*2);
 
-	mpSampCoords = DNEW HiderSampleCoords [ (size_t)mWd * (size_t)mHe * sampsPerPixel ];
+	size_t	sampArrSize = (size_t)mWd * (size_t)mHe * sampsPerPixel;
+
+	mpSampCoords = DNEW HiderSampleCoords [ sampArrSize ];
+	mpBaseSampCoords = DNEW HiderBaseSampleCoords [ sampArrSize ];
+
+	DRandom	randGen( 0x11112222 );
 
 	size_t sampsCnt = 0;
 	for (u_int y=0; y < mHe; ++y)
 	{
 		for (u_int x=0; x < mWd; ++x, sampsCnt += sampsPerPixel)
 		{
-			setupPixel( mpSampCoords + sampsCnt, subPixelDimLog2 );
+			initPixel(
+				mpSampCoords + sampsCnt,
+				mpBaseSampCoords + sampsCnt,
+				subPixelDimLog2,
+				randGen );
 		}
 	}
 }
 
 //==================================================================
-static int randomN( int n )
+void HiderSampleCoordsBuffer::Setup( float openTime, float closeTime )
 {
-	return rand() % n;
+	u_int	sampsPerPixel = 1 << (mSubPixelDimLog2*2);
+
+	float dtime = closeTime - openTime;
+
+	size_t sampsCnt = 0;
+	for (u_int y=0; y < mHe; ++y)
+	{
+		for (u_int x=0; x < mWd; ++x, sampsCnt += sampsPerPixel)
+		{
+			setupPixel(
+				mpSampCoords + sampsCnt,
+				mpBaseSampCoords + sampsCnt,
+				openTime,
+				dtime );
+		}
+	}
 }
 
 //==================================================================
-void HiderSampleCoordsBuffer::setupPixel( HiderSampleCoords *pSampCoods, u_int subPixelDimLog2 )
+void HiderSampleCoordsBuffer::initPixel(
+							HiderSampleCoords		*pSampCoods,
+							HiderBaseSampleCoords	*pBaseSampleCoords,
+							u_int					subPixelDimLog2,
+							DRandom					&randGen )
 {
 	u_int subPixelDim = 1 << subPixelDimLog2;
 	u_int randPosMask = (1 << subPixelDimLog2) - 1;
@@ -75,11 +106,66 @@ void HiderSampleCoordsBuffer::setupPixel( HiderSampleCoords *pSampCoods, u_int s
 	{
 		for (u_int x=0; x < subPixelDim; ++x)
 		{
-			int	k = randomN( subPixelDim-1-y );
+			int	k = randGen.Next32Range( 0, subPixelDim-1-y );
 
-			float t = pSampCoods[ (y << subPixelDimLog2) + x ].mY;
-			pSampCoods[ (y << subPixelDimLog2) + x ].mY = pSampCoods[ (k << subPixelDimLog2) + x ].mY;
-			pSampCoods[ (k << subPixelDimLog2) + x ].mY = t;
+			u_int idx = (y << subPixelDimLog2) + x;
+			u_int idxK = (k << subPixelDimLog2) + x;
+
+			float t = pSampCoods[ idx ].mY;
+			pSampCoods[ idx ].mY = pSampCoods[ idxK ].mY;
+			pSampCoods[ idxK ].mY = t;
+		}
+	}
+
+	// time
+	float timeRun = 0;
+	float dtime = 1.0f / (subPixelDim * subPixelDim);
+	for (u_int y=0; y < subPixelDim; ++y)
+	{
+		for (u_int x=0; x < subPixelDim; ++x)
+		{
+			u_int idx = (y << subPixelDimLog2) + x;
+
+			float t = timeRun + randGen.NextF0_1() * dtime;
+			
+			pSampCoods[ idx ].mTime			= 0;
+			pBaseSampleCoords[ idx ].mTime	= t;
+
+			timeRun += dtime;
+		}
+	}
+
+	for (u_int y=0; y < subPixelDim; ++y)
+	{
+		for (u_int x=0; x < subPixelDim; ++x)
+		{
+			u_int idx = (y << subPixelDimLog2) + x;
+
+			pSampCoods[ idx ].mLensX	= 0;
+			pSampCoods[ idx ].mLensY	= 0;
+		}
+	}
+}
+
+//==================================================================
+void HiderSampleCoordsBuffer::setupPixel(
+			HiderSampleCoords		*pSampCoods,
+			HiderBaseSampleCoords	*pBaseSampleCoords,
+			float					openTime,
+			float					dtime )
+{
+	u_int subPixelDim = 1 << mSubPixelDimLog2;
+
+	for (u_int y=0; y < subPixelDim; ++y)
+	{
+		for (u_int x=0; x < subPixelDim; ++x)
+		{
+			u_int idx = (y << mSubPixelDimLog2) + x;
+
+			const HiderBaseSampleCoords	&baseCoords	= pBaseSampleCoords[ idx];
+			HiderSampleCoords			&coords		= pSampCoods[ idx ];
+
+			coords.mTime = openTime + dtime * baseCoords.mTime;
 		}
 	}
 }
