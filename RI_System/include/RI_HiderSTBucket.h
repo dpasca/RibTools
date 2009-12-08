@@ -1,13 +1,13 @@
 //==================================================================
-/// RI_HiderBucket.h
+/// RI_HiderSTBucket.h
 ///
 /// Created by Davide Pasca - 2009/11/27
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_HIDERBUCKET_H
-#define RI_HIDERBUCKET_H
+#ifndef RI_HIDERSTBUCKET_H
+#define RI_HIDERSTBUCKET_H
 
 #include "RI_Buffer2D.h"
 #include "RI_HiderSampleCoordsBuffer.h"

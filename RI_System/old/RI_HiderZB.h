@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_Hider.h
+/// RI_HiderZB.h
 ///
 /// Created by Davide Pasca - 2009/4/27
 /// See the file "license.txt" that comes with this project for

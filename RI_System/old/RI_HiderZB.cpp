@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_Hider.cpp
+/// RI_HiderZB.cpp
 ///
 /// Created by Davide Pasca - 2009/02/08
 /// See the file "license.txt" that comes with this project for
@@ -8,7 +8,7 @@
 
 #include "stdafx.h"
 #include "RI_Primitive.h"
-#include "RI_Hider.h"
+#include "RI_HiderZB.h"
 #include "RI_Transform.h"
 
 static const u_int	BUCKET_SIZE = 128;

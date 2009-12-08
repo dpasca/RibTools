@@ -9,7 +9,7 @@
 #ifndef RIBRENDERTOOL_H
 #define RIBRENDERTOOL_H
 
-#include "RI_System/include/RI_Hider.h"
+#include "RI_System/include/RI_HiderST.h"
 
 //==================================================================
 class RibRendTool

@@ -345,23 +345,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Hider.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Hider.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_HiderBucket.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RI_HiderSampleCoordsBuffer.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\include\RI_HiderSampleCoordsBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RI_HiderST.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_HiderST.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_HiderSTBucket.h"
 				>
 			</File>
 			<File

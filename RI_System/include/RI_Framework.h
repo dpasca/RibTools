@@ -12,7 +12,7 @@
 #include "RI_Base.h"
 #include "RI_Primitive.h"
 #include "RI_Options.h"
-#include "RI_Hider.h"
+#include "RI_HiderST.h"
 
 //==================================================================
 namespace RI
