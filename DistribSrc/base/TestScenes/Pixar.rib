@@ -1,0 +1,72 @@
+##RenderMan RIB-Structure 1.0
+Format 512 256 1
+Projection "perspective" "fov" 40
+##CameraOrientation -2.501 3.702 -0.21  -1.931 2.881 -0.237  0.02752 -0.013765 0.999527
+# The above CameraOrientation produces this camera transform:
+Transform  [  0.821118  0.02752   0.570094 0 0.570567 -0.013765 -0.821135 0 -0.01475   0.999527 -0.027004 0 -0.061721  0.329685  4.459978 1  ] 
+
+WorldBegin
+#SurfaceToCurve "parametric" 8 8
+Scale .8 .8 .8
+Translate -1.5 0 0
+# P
+TransformBegin
+    Translate 0 0 -0.5 # lower
+    TransformBegin
+    Cylinder 0.1 -0.5 0.5 360
+    TransformEnd
+	TransformBegin
+	Translate .25 0 .25
+	Scale .2 .2 .2
+	Rotate 90.0 1 0 0
+	Torus 1.0 0.5 0 360 360
+	TransformEnd
+TransformEnd
+
+Translate .9 0 0
+
+# I
+TransformBegin
+    Cylinder 0.15 -0.5 0.05 360
+    Scale .15 .15 .15
+    Translate 0 0 2.0
+    Sphere 1 -1 1 360
+TransformEnd
+
+Translate .85 0 0
+
+# X
+TransformBegin
+	Scale .8 1 .5
+	Scale .5 .5 .5
+    Translate  0 0  -1 
+    Hyperboloid 1 0.3 -1 -1 0.3 1 360 
+TransformEnd
+
+Translate .9 0 0
+
+ # A
+TransformBegin
+    Scale 1 1 .5
+    Scale .8  1 1
+    Translate 0 0  -1
+    Cone 1.0 0.5 360
+TransformEnd
+
+Translate .7 0 0
+
+# R
+TransformBegin
+    Scale 1 1 .5
+    Translate 0 0 -.4
+	TransformBegin
+	Cylinder 0.1 -0.6 0.3 360
+	TransformEnd
+    Translate 0 0 .15
+    Rotate 90.0 0 1 0
+    Rotate 90.0 0 0 1
+    Paraboloid .25 0 0.5 180
+TransformEnd
+WorldEnd
+
+

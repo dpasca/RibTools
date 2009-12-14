@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="freeglut_static" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="./DebugStatic/libfreeglut_static" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="DebugStatic" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-O0" />
+					<Add option="-D_DEBUG" />
+					<Add option="-DFREEGLUT_STATIC" />
+					<Add option="-D_LIB" />
+					<Add directory="include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="include" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release">
+				<Option output="./ReleaseStatic/libfreeglut_static" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="ReleaseStatic" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DNDEBUG" />
+					<Add option="-DFREEGLUT_STATIC" />
+					<Add option="-D_LIB" />
+					<Add option="-W" />
+					<Add option="-O2" />
+					<Add directory="include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="include" />
+				</ResourceCompiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-DTARGET_HOST_UNIX_X11" />
+			<Add option="-DHAVE_FCNTL_H" />
+		</Compiler>
+		<Unit filename="include/GL/freeglut.h" />
+		<Unit filename="include/GL/freeglut_ext.h" />
+		<Unit filename="include/GL/freeglut_std.h" />
+		<Unit filename="include/GL/glut.h" />
+		<Unit filename="src/freeglut_callbacks.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_cursor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_display.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_ext.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_font.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_font_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_gamemode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_geometry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_glutfont_definitions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_internal.h" />
+		<Unit filename="src/freeglut_joystick.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_misc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_overlay.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_state.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_stroke_mono_roman.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_stroke_roman.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_structure.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_teapot.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_teapot_data.h" />
+		<Unit filename="src/freeglut_videoresize.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/freeglut_window.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

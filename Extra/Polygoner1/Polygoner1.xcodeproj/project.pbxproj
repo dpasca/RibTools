@@ -1,0 +1,292 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6B1C19E20F5124A000D56A54 /* libDSystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B3ECEF30F5064EB00315C53 /* libDSystem.a */; };
+		6B1C1A520F512D9B00D56A54 /* cessna.obj in Resources */ = {isa = PBXBuildFile; fileRef = 6B3ECFE70F508FED00315C53 /* cessna.obj */; };
+		6B3ECE260F5060DF00315C53 /* DU_RenderOutput.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B3ECE220F5060DF00315C53 /* DU_RenderOutput.cpp */; };
+		6B3ECE270F5060DF00315C53 /* Polygoner1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B3ECE240F5060DF00315C53 /* Polygoner1.cpp */; };
+		6B3ECF830F508BD200315C53 /* Engine1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B3ECF820F508BD200315C53 /* Engine1.cpp */; };
+		6B9EB65A0F505DBC006676C5 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B9EB6580F505DBC006676C5 /* GLUT.framework */; };
+		6B9EB65B0F505DBC006676C5 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B9EB6590F505DBC006676C5 /* OpenGL.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6B3ECEF20F5064EB00315C53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6B3ECEEE0F5064EB00315C53 /* DSystem.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC06F0554671400DB518D;
+			remoteInfo = DSystem;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6B3ECE220F5060DF00315C53 /* DU_RenderOutput.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DU_RenderOutput.cpp; sourceTree = "<group>"; };
+		6B3ECE230F5060DF00315C53 /* DU_RenderOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DU_RenderOutput.h; sourceTree = "<group>"; };
+		6B3ECE240F5060DF00315C53 /* Polygoner1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Polygoner1.cpp; sourceTree = "<group>"; };
+		6B3ECE250F5060DF00315C53 /* Polygoner1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Polygoner1.h; sourceTree = "<group>"; };
+		6B3ECEEE0F5064EB00315C53 /* DSystem.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DSystem.xcodeproj; path = ../../DSystem/osx/DSystem.xcodeproj; sourceTree = SOURCE_ROOT; };
+		6B3ECF810F508BD200315C53 /* Engine1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine1.h; sourceTree = "<group>"; };
+		6B3ECF820F508BD200315C53 /* Engine1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Engine1.cpp; sourceTree = "<group>"; };
+		6B3ECFE70F508FED00315C53 /* cessna.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cessna.obj; sourceTree = "<group>"; };
+		6B9EB6500F505D4F006676C5 /* Polygoner1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Polygoner1.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B9EB6530F505D4F006676C5 /* Polygoner1-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Polygoner1-Info.plist"; sourceTree = "<group>"; };
+		6B9EB6580F505DBC006676C5 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		6B9EB6590F505DBC006676C5 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		6B9EB6730F505E3E006676C5 /* DMath */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DMath; path = ../../DMath; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6B9EB64E0F505D4F006676C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B1C19E20F5124A000D56A54 /* libDSystem.a in Frameworks */,
+				6B9EB65A0F505DBC006676C5 /* GLUT.framework in Frameworks */,
+				6B9EB65B0F505DBC006676C5 /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6B3ECE200F5060DF00315C53 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6B3ECE240F5060DF00315C53 /* Polygoner1.cpp */,
+				6B3ECE250F5060DF00315C53 /* Polygoner1.h */,
+				6B3ECF820F508BD200315C53 /* Engine1.cpp */,
+				6B3ECF810F508BD200315C53 /* Engine1.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		6B3ECE210F5060DF00315C53 /* DisplayUtils */ = {
+			isa = PBXGroup;
+			children = (
+				6B3ECE220F5060DF00315C53 /* DU_RenderOutput.cpp */,
+				6B3ECE230F5060DF00315C53 /* DU_RenderOutput.h */,
+			);
+			name = DisplayUtils;
+			path = src/DisplayUtils;
+			sourceTree = "<group>";
+		};
+		6B3ECEEF0F5064EB00315C53 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6B3ECEF30F5064EB00315C53 /* libDSystem.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6B3ECFE60F508FED00315C53 /* TestData */ = {
+			isa = PBXGroup;
+			children = (
+				6B3ECFE70F508FED00315C53 /* cessna.obj */,
+			);
+			path = TestData;
+			sourceTree = "<group>";
+		};
+		6B9EB63D0F505CFA006676C5 = {
+			isa = PBXGroup;
+			children = (
+				6B3ECEEE0F5064EB00315C53 /* DSystem.xcodeproj */,
+				6B9EB6580F505DBC006676C5 /* GLUT.framework */,
+				6B9EB6590F505DBC006676C5 /* OpenGL.framework */,
+				6B9EB6510F505D4F006676C5 /* Products */,
+				6B3ECE200F5060DF00315C53 /* src */,
+				6B3ECE210F5060DF00315C53 /* DisplayUtils */,
+				6B9EB6730F505E3E006676C5 /* DMath */,
+				6B3ECFE60F508FED00315C53 /* TestData */,
+				6B9EB6530F505D4F006676C5 /* Polygoner1-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		6B9EB6510F505D4F006676C5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6B9EB6500F505D4F006676C5 /* Polygoner1.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6B9EB64F0F505D4F006676C5 /* Polygoner1 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6B9EB6560F505D51006676C5 /* Build configuration list for PBXNativeTarget "Polygoner1" */;
+			buildPhases = (
+				6B9EB64C0F505D4F006676C5 /* Resources */,
+				6B9EB64D0F505D4F006676C5 /* Sources */,
+				6B9EB64E0F505D4F006676C5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Polygoner1;
+			productName = Polygoner1;
+			productReference = 6B9EB6500F505D4F006676C5 /* Polygoner1.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6B9EB63F0F505CFA006676C5 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 6B9EB6420F505CFA006676C5 /* Build configuration list for PBXProject "Polygoner1" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 0;
+			mainGroup = 6B9EB63D0F505CFA006676C5;
+			productRefGroup = 6B9EB6510F505D4F006676C5 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 6B3ECEEF0F5064EB00315C53 /* Products */;
+					ProjectRef = 6B3ECEEE0F5064EB00315C53 /* DSystem.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				6B9EB64F0F505D4F006676C5 /* Polygoner1 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		6B3ECEF30F5064EB00315C53 /* libDSystem.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libDSystem.a;
+			remoteRef = 6B3ECEF20F5064EB00315C53 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6B9EB64C0F505D4F006676C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B1C1A520F512D9B00D56A54 /* cessna.obj in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6B9EB64D0F505D4F006676C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B3ECE260F5060DF00315C53 /* DU_RenderOutput.cpp in Sources */,
+				6B3ECE270F5060DF00315C53 /* Polygoner1.cpp in Sources */,
+				6B3ECF830F508BD200315C53 /* Engine1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6B9EB6400F505CFA006676C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				HEADER_SEARCH_PATHS = (
+					"../../DSystem/include/**",
+					"../../DMath/include/**",
+				);
+			};
+			name = Debug;
+		};
+		6B9EB6410F505CFA006676C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../DSystem/include/**",
+					"../../DMath/include/**",
+				);
+			};
+			name = Release;
+		};
+		6B9EB6540F505D51006676C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "Polygoner1-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Polygoner1;
+			};
+			name = Debug;
+		};
+		6B9EB6550F505D51006676C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "Polygoner1-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Polygoner1;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6B9EB6420F505CFA006676C5 /* Build configuration list for PBXProject "Polygoner1" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6B9EB6400F505CFA006676C5 /* Debug */,
+				6B9EB6410F505CFA006676C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6B9EB6560F505D51006676C5 /* Build configuration list for PBXNativeTarget "Polygoner1" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6B9EB6540F505D51006676C5 /* Debug */,
+				6B9EB6550F505D51006676C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6B9EB63F0F505CFA006676C5 /* Project object */;
+}

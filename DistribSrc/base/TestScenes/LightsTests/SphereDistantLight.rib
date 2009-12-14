@@ -1,0 +1,15 @@
+##RenderMan RIB-Structure 1.0
+Format 400 400 1
+Projection "perspective" "fov" 30
+
+Translate 0 0 5.0
+
+WorldBegin
+
+	LightSource "ambientlight" 1  "intensity"  [ .3 ] 
+	LightSource "distantlight" 2  "from"  [ 0 0 0 ] "to"  [ 0 0 1 ]  "intensity"  [ 0.7 ] 
+
+	Surface "matte"
+	Sphere 1 -1 1 360
+
+WorldEnd

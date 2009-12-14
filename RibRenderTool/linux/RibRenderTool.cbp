@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="RibRenderTool" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../distrib/RibRenderTool/RibRenderTool" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../distrib/RibRenderTool/RibRenderTool" />
+				<Option object_output="Debug" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add directory="../" />
+					<Add directory="../../" />
+					<Add directory="../../external/freeglut-2.4.0/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../" />
+					<Add directory="../../" />
+					<Add directory="../../external/freeglut-2.4.0/include" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../../distrib/RibRenderTool/RibRenderTool" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../distrib/RibRenderTool/RibRenderTool" />
+				<Option object_output="Release" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-W" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add directory="../" />
+					<Add directory="../../" />
+					<Add directory="../../external/freeglut-2.4.0/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../" />
+					<Add directory="../../" />
+					<Add directory="../../external/freeglut-2.4.0/include" />
+				</ResourceCompiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-march=pentium4" />
+		</Compiler>
+		<Linker>
+			<Add library="../../DMath/linux/lib.a" />
+			<Add library="../../external/jpeg-6b/linux/lib.a" />
+			<Add library="../../RI_System/linux/lib.a" />
+			<Add library="../../RSLCompilerLib/linux/lib.a" />
+			<Add library="libX11.a" />
+			<Add library="libXext.a" />
+			<Add library="libGLU.a" />
+			<Add library="libglut.a" />
+			<Add library="libGL.a" />
+			<Add library="../../DSystem/linux/lib.a" />
+		</Linker>
+		<ExtraCommands>
+			<Add before="mkdir -p ../../distrib" />
+			<Add before="mkdir -p ../../distrib/RibRenderTool" />
+			<Add after="rsync -aC ../../Resources ../../distrib/RibRenderTool/" />
+			<Add after="rsync -aC ../../Tests ../../distrib/RibRenderTool/" />
+		</ExtraCommands>
+		<Unit filename="../RenderOutputOpenGL.cpp" />
+		<Unit filename="../RenderOutputOpenGL.h" />
+		<Unit filename="../RibRenderTool.cpp" />
+		<Unit filename="../RibRenderTool.h" />
+		<Unit filename="../../Tests/Airplane.rib" />
+		<Unit filename="../../Tests/Bag.rib" />
+		<Unit filename="../../Tests/Chair.rib" />
+		<Unit filename="../../Tests/DisplaceTest.rib" />
+		<Unit filename="../../Tests/DisplaceTest_turb.rrasm" />
+		<Unit filename="../../Tests/Elephant.rib" />
+		<Unit filename="../../Tests/Enterprise_ncc1701d.rib" />
+		<Unit filename="../../Tests/Pixar.rib" />
+		<Unit filename="../../Tests/SimpleMug.rib" />
+		<Unit filename="../../Tests/SphereNoise.rib" />
+		<Unit filename="../../Tests/SphereNoiseShader.rrasm" />
+		<Unit filename="../../Tests/WarBird.rib" />
+		<Unit filename="../../Tests/dragonhead.rib" />
+		<Unit filename="../../Tests/sebtest.rib" />
+		<Unit filename="../../Tests/uteapot.rib" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

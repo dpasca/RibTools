@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="RSLCompilerCmd" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../distrib/RSLCompilerCmd/RSLCompilerCmd" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../distrib/RSLCompilerCmd/RSLCompilerCmd" />
+				<Option object_output="Debug" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="tests/matte.sl dude.rrasm &gt; dude.c" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add directory="../../" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../../distrib/RSLCompilerCmd/RSLCompilerCmd" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../distrib/RSLCompilerCmd/RSLCompilerCmd" />
+				<Option object_output="Release" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-W" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add directory="../../" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../../" />
+				</ResourceCompiler>
+			</Target>
+		</Build>
+		<Linker>
+			<Add library="../../RSLCompilerLib/linux/lib.a" />
+			<Add library="../../DSystem/linux/lib.a" />
+		</Linker>
+		<ExtraCommands>
+			<Add before="mkdir -p ../../distrib" />
+			<Add before="mkdir -p ../../distrib/RSLCompilerCmd" />
+			<Add after="rsync -aC ../../Resources ../../distrib/RSLCompilerCmd/" />
+			<Add after="rsync -aC ../../Tests ../../distrib/RSLCompilerCmd/" />
+		</ExtraCommands>
+		<Unit filename="../src/RSLCompilerCmd.cpp" />
+		<Unit filename="../tests/matte.sl" />
+		<Unit filename="../tests/shinimetal_test.sl" />
+		<Unit filename="../tests/test1.sl" />
+		<Unit filename="../tests/test2.sl" />
+		<Unit filename="../tests/test3.sl" />
+		<Unit filename="../tests/test4.sl" />
+		<Unit filename="../tests/test5.sl" />
+		<Unit filename="../tests/test6.sl" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

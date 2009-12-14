@@ -1,0 +1,53 @@
+;	surface
+;	metal(
+;		float Ka = 1;
+;		float Ks = 1;
+;		float roughness =.1;)
+;	{
+;		normal Nf = faceforward(normalize(N), I);
+;		vector V = -normalize(I);
+;		Oi = Os;
+;		Ci = Os * Cs * (Ka*ambient()+Ks*specular(Nf, V, roughness));
+;	}
+
+.data
+	Cs		global varying color
+	Os		global varying color
+	Ci		global varying color
+	Oi		global varying color
+	N		global varying normal
+	I		global varying vector
+
+	Ka			parameter uniform float 1
+	Ks			parameter uniform float 1
+	roughness	parameter uniform float 1
+
+	Nf		temporary varying normal
+	V		temporary varying vector
+
+.code
+
+surface
+
+__main:
+	normalize	$v0		N
+	faceforward	Nf	$v0	I
+
+	normalize	$v0		I
+	ld.v		$vu1	0 0 0
+	sub.vvv		V	$vu1	$v0
+
+	mov.vv		Oi	Os		// Oi = Os
+	
+	specular	$v0	Nf	V	roughness
+	mul.vvs		$v0	$v0	Ks
+
+	ambient		$v1			// -- Ka * ambient()
+	mul.vvs		$v1	$v1	Ka
+
+	add.vvv		$v0	$v0	$v1	// +
+
+	mul.vvv		$v0	$v0	Cs	// * Cs
+	mul.vvv		Ci	$v0	Os	// * Os -> Ci
+
+	ret

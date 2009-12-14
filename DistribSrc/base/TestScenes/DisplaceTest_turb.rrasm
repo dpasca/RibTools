@@ -1,0 +1,75 @@
+// Copied from - http://www.fundza.com/rman_shaders/displacement/sl_displacement.html
+//
+//displacement turb (float  Km = 0.1)
+//{
+//	float   hump = 0, totalFrequency = 1.2, crinckle = 4, i;
+//	normal	n = normalize(N);
+//
+//	for(i = 0; i < 2; i = i + 1)
+//	{
+//		hump = hump + abs(0.5 - noise(crinckle *
+//				totalFrequency * P))/totalFrequency;
+//		totalFrequency *= 1.2;
+//	}
+//
+//	P = P - n * hump * Km;
+//	N = calculatenormal(P);
+//}
+
+.data
+	P				global varying point
+	N				global varying normal
+
+	Km				parameter uniform float
+
+	hump			temporary varying float
+	totalFrequency	temporary uniform float
+	crinckle		temporary uniform float
+
+	n				temporary varying normal
+
+	_const1			temporary constant float	0.5
+	_const2			temporary constant float	1.2
+
+	_const_km_init	temporary constant float	0.1
+	
+.code
+
+displacement
+
+	;==== Begin Def Params
+__defparam_Km:
+	mov.ss         Km    	_const_km_init 
+	ret
+	;==== End Def Params 
+
+__main:
+	normalize	n		N
+	
+	ld.s		hump			0
+	ld.s		totalFrequency	1.2
+	ld.s		crinckle		4
+	
+	ld.s		$su1		0
+	ld.s		$su2		2
+	ld.s		$su3		1
+
+loop1:
+	mul.vvs		$v0		P	totalFrequency	// $v0 = (P * totalFrequency
+	mul.vvs		$v0		$v0	crinckle		//  * crinckle
+	noise.sv	$s0		$v0					//  ).noise
+	sub.sss		$s0		_const1	$s0			// (0.5 - $v0
+	abs.ss		$s0		$s0					//  ).abs
+	add.sss		hump	hump	$s0	
+	mul.sss		totalFrequency	totalFrequency	_const2
+	
+	add.sss		$su1	$su1	$su3
+	cmplt.ssl	$su1	$su2	loop1
+
+	mul.sss		$s0		hump	Km			// hump * Km
+	mul.vvs		$v0		n		$s0			// * n
+	sub.vvv		P		P		$v0			// P = P - $v0
+
+	calculatenormal	N	P
+
+	ret

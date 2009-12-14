@@ -1,0 +1,14 @@
+.data
+	Cl			global varying color
+	lightcolor	parameter uniform color 1
+
+.code
+
+light
+
+__main:
+	; temporary
+
+	mov.vv		Cl lightcolor
+
+	ret
