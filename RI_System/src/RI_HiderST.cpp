@@ -289,17 +289,25 @@ void Hider::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 
 	for (size_t i=0; i < n; ++i)
 	{
-		Vec4f	Pproj = MultiplyV3W1M( pSrc[i], mMtxCamProj );
+		Vec4f	homoP = MultiplyV3W1M( pSrc[i], mMtxCamProj );
 		
-		float	oow = 1.0f / Pproj.w;
+		float	oow = 1.0f / homoP.w;
 		
 		pDes[i].Set( 
-				destHalfWd + destHalfWd * Pproj.x * oow,
-				destHalfHe - destHalfHe * Pproj.y * oow
+				destHalfWd + destHalfWd * homoP.x * oow,
+				destHalfHe - destHalfHe * homoP.y * oow
 				);
 	}
 }
 */
+
+//==================================================================
+#define CCODE_X1	1
+#define CCODE_X2	2
+#define CCODE_Y1	4
+#define CCODE_Y2	8
+#define CCODE_Z1	16
+#define CCODE_Z2	32
 
 //==================================================================
 void Hider::Bust(
@@ -320,15 +328,41 @@ void Hider::Bust(
 	const SlColor	*pOi = (const SlColor *)workGrid.mSymbolIs.FindSymbolIData( "Oi" );
 	const SlColor	*pCi = (const SlColor *)workGrid.mSymbolIs.FindSymbolIData( "Ci" );
 
+	const SlVec3	 *pN = (const SlVec3  *)workGrid.mSymbolIs.FindSymbolIData( "N"	);
+
+
 	size_t	sampleIdx = 0;
 
 	static const SlScalar	one( 1 );
 
+	U8	ccodes[ MP_GRID_MAX_SIZE ];
+	U8	gridORCCodes = 0;
+
 	size_t	blocksN = RI_GET_SIMD_BLOCKS( workGrid.mPointsN );
 	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
-		SlVec4		Pproj = V4__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
-		SlScalar	oow = one / Pproj.w();
+		SlVec4		homoP = V4__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
+
+		// would be nice to simdfy this one too
+		for (size_t i=0; i < RI_SIMD_BLK_LEN; ++i)
+		{
+			float	x = homoP.x()[i];
+			float	y = homoP.x()[i];
+			float	z = homoP.x()[i];
+			float	w = homoP.x()[i];
+
+			U8	ccode = 0;
+			if ( x < -w )	ccode |= CCODE_X1;
+			if ( x >  w )	ccode |= CCODE_X2;
+			if ( y < -w )	ccode |= CCODE_Y1;
+			if ( y >  w )	ccode |= CCODE_Y2;
+			if ( z < -w )	ccode |= CCODE_Z1;
+			if ( z >  w )	ccode |= CCODE_Z2;
+			ccodes[i] = ccode;
+			gridORCCodes |= ccode;
+		}
+
+		SlVec4		projP = homoP / homoP.w();
 
 		// TODO: should replace pPointsWS with pPointsCS... ..to avoid this and also because
 		// perhaps P should indeed be in "current" space (camera)
@@ -337,11 +371,21 @@ void Hider::Bust(
 		shadGrid.mpPointsCS[ blkIdx ]			= PtCS;
 		//shadGrid.mpPointsCloseCS[ blkIdx ]	= 0;
 
-		shadGrid.mpPosWin[ blkIdx ][0] =  Pproj.x() * screenHWd * oow + screenCx;
-		shadGrid.mpPosWin[ blkIdx ][1] = -Pproj.y() * screenHHe * oow + screenCy;
+		shadGrid.mpPosWin[ blkIdx ][0] =  projP.x() * screenHWd + screenCx;
+		shadGrid.mpPosWin[ blkIdx ][1] = -projP.y() * screenHHe + screenCy;
 
 		shadGrid.mpCi[ blkIdx ] = pCi[ blkIdx ];
 		shadGrid.mpOi[ blkIdx ] = pOi[ blkIdx ];
+	}
+
+	// is any vertex actually at least partially clipped out ?
+	if ( gridORCCodes )
+	{
+		// check further for actual number of micro-polys..
+	}
+	else
+	{
+		// use full number of micro-polys..
 	}
 }
 
