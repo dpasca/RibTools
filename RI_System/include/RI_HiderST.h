@@ -12,6 +12,7 @@
 #include "RI_Options.h"
 #include "RI_Buffer2D.h"
 #include "RI_HiderSTBucket.h"
+#include "RI_MicroPolygon.h"
 
 //==================================================================
 namespace RI
@@ -88,14 +89,15 @@ public:
 	
 	float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const;
 
-	void Bust(	ShadedGrid		&shadGrid,
-				const WorkGrid	&workGrid,
-				float			destOffX,
-				float			destOffY,
-				u_int			screenWd,
-				u_int			screenHe ) const;
+	void Bust(	DVec<MicroPolygon>	&mpolys,
+				const HiderBucket	&bucket,
+				ShadedGrid			&shadGrid,
+				const WorkGrid		&workGrid,
+				DVec<u_int>			&out_pixelsSamplesCount,
+				u_int				screenWd,
+				u_int				screenHe ) const;
 
-	void HideCountBegin(
+	void HideAllocSampsBegin(
 					DVec<u_int> &out_pixelsSamplesCount,
 					HiderBucket &buck );
 
@@ -104,10 +106,9 @@ public:
 					HiderBucket			&buck,
 					const ShadedGrid	&shadGrid );
 
-	void HideCountEnd(
+	void HideAllocSampsEnd(
 					DVec<HiderPixel>		&out_pixels,
 					DVec<HiderSampleData>	&out_sampData,
-					HiderBucket				&buck,
 					const DVec<u_int>		&pixelsSamplesCount );
 
 	void HideAddSamplesSetup(

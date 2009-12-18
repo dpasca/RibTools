@@ -10,6 +10,7 @@
 #include "RI_Primitive.h"
 #include "RI_HiderST.h"
 #include "RI_Transform.h"
+#include "RI_MicroPolygon.h"
 
 static const u_int	BUCKET_SIZE = 128;
 
@@ -302,21 +303,14 @@ void Hider::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 */
 
 //==================================================================
-#define CCODE_X1	1
-#define CCODE_X2	2
-#define CCODE_Y1	4
-#define CCODE_Y2	8
-#define CCODE_Z1	16
-#define CCODE_Z2	32
-
-//==================================================================
 void Hider::Bust(
-				ShadedGrid		&shadGrid,
-				const WorkGrid	&workGrid,
-				float			destOffX,
-				float			destOffY,
-				u_int			screenWd,
-				u_int			screenHe ) const
+				DVec<MicroPolygon>	&mpolys,
+				const HiderBucket	&bucket,
+				ShadedGrid			&shadGrid,
+				const WorkGrid		&workGrid,
+				DVec<u_int>			&pixelsSamplesCount,
+				u_int				screenWd,
+				u_int				screenHe ) const
 {
 	SlScalar screenCx  = SlScalar( screenWd * 0.5f );
 	SlScalar screenCy  = SlScalar( screenHe * 0.5f );
@@ -330,37 +324,12 @@ void Hider::Bust(
 
 	const SlVec3	 *pN = (const SlVec3  *)workGrid.mSymbolIs.FindSymbolIData( "N"	);
 
-
-	size_t	sampleIdx = 0;
-
 	static const SlScalar	one( 1 );
-
-	U8	ccodes[ MP_GRID_MAX_SIZE ];
-	U8	gridORCCodes = 0;
 
 	size_t	blocksN = RI_GET_SIMD_BLOCKS( workGrid.mPointsN );
 	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
 		SlVec4		homoP = V4__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
-
-		// would be nice to simdfy this one too
-		for (size_t i=0; i < RI_SIMD_BLK_LEN; ++i)
-		{
-			float	x = homoP.x()[i];
-			float	y = homoP.x()[i];
-			float	z = homoP.x()[i];
-			float	w = homoP.x()[i];
-
-			U8	ccode = 0;
-			if ( x < -w )	ccode |= CCODE_X1;
-			if ( x >  w )	ccode |= CCODE_X2;
-			if ( y < -w )	ccode |= CCODE_Y1;
-			if ( y >  w )	ccode |= CCODE_Y2;
-			if ( z < -w )	ccode |= CCODE_Z1;
-			if ( z >  w )	ccode |= CCODE_Z2;
-			ccodes[i] = ccode;
-			gridORCCodes |= ccode;
-		}
 
 		SlVec4		projP = homoP / homoP.w();
 
@@ -378,19 +347,149 @@ void Hider::Bust(
 		shadGrid.mpOi[ blkIdx ] = pOi[ blkIdx ];
 	}
 
-	// is any vertex actually at least partially clipped out ?
-	if ( gridORCCodes )
+	DASSERT( workGrid.mXDim == RI_GET_SIMD_BLOCKS( workGrid.mXDim ) * RI_SIMD_BLK_LEN );
+
+	// try to reserve enough polys so that the loop below won't have to
+	// actually allocate more..
+	size_t	maxMPolys = (workGrid.mYDim+1) * (workGrid.mXDim+1);
+	mpolys.reserve( mpolys.size() + maxMPolys );
+
+	size_t	sampIdx = 0;
+	u_int	xDim	= workGrid.mXDim;
+	u_int	yDim	= workGrid.mYDim;
+	u_int	xN		= workGrid.mXDim - 1;
+	u_int	yN		= workGrid.mYDim - 1;
+
+	u_int	buckWd	= bucket.GetWd();
+
+	for (u_int i=0; i < yN; ++i)
 	{
-		// check further for actual number of micro-polys..
-	}
-	else
-	{
-		// use full number of micro-polys..
+		for (u_int j=0; j < xN; ++j, ++sampIdx)
+		{
+			u_int	vidx[4] = {
+						sampIdx+0,
+						sampIdx+1,
+						sampIdx+xDim,
+						sampIdx+xDim+1 };
+
+			float	minf[3] = {  FLT_MAX,  FLT_MAX,  FLT_MAX };
+			float	maxf[3] = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+
+			size_t	blk[4];
+			size_t	sub[4];
+			for (size_t k=0; k < 4; ++k)
+			{
+				blk[k] = vidx[k] / RI_SIMD_BLK_LEN;
+				sub[k] = vidx[k] & (RI_SIMD_BLK_LEN-1);
+
+				float winX = shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ];
+				float winY = shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ];
+				float winZ = shadGrid.mpPosWin[ blk[k] ][2][ sub[k] ];
+
+				minf[0] = DMIN( minf[0], winX );
+				minf[1] = DMIN( minf[1], winY );
+				minf[2] = DMIN( minf[2], winZ );
+
+				maxf[0] = DMAX( maxf[0], winX );
+				maxf[1] = DMAX( maxf[1], winY );
+				maxf[2] = DMAX( maxf[2], winZ );
+			}
+
+			int	minxi = (int)floor( minf[0] );
+			int	maxxi = (int)ceil(	maxf[0] );
+			int	minyi = (int)floor( minf[1] );
+			int	maxyi = (int)ceil(	maxf[1] );
+
+			if (
+				maxxi <  bucket.mX1 ||
+				maxyi <  bucket.mY1 || 
+				minxi >= bucket.mX2 ||
+				minyi >= bucket.mY2
+				)
+			{
+				// out !
+				continue;
+			}
+
+			if ( minxi < bucket.mX1 ) minxi = bucket.mX1;
+			if ( maxxi > bucket.mX2 ) maxxi = bucket.mX2;
+			if ( minyi < bucket.mY1 ) minyi = bucket.mY1;
+			if ( maxyi > bucket.mY2 ) maxyi = bucket.mY2;
+
+			u_int	*pPixSampsCnt =
+						&pixelsSamplesCount[
+									(minyi - bucket.mY1) * buckWd +
+											(minxi - bucket.mX1) ];
+
+			int		mpolyBBoxWd = maxxi - minxi;
+
+			for (int yCnt=maxyi - minyi; yCnt; --yCnt)
+			{
+				for (int xCnt=0; xCnt < mpolyBBoxWd; ++xCnt)
+					pPixSampsCnt[xCnt] += 1;
+
+				pPixSampsCnt += buckWd;
+			}
+
+			MicroPolygon	&mpoly = *mpolys.grow();
+			mpoly.mVertIdx0 = vidx[0];
+			mpoly.mVertIdx1 = vidx[1];
+			mpoly.mVertIdx2 = vidx[2];
+			mpoly.mVertIdx3 = vidx[3];
+			mpoly.mXMin		= minxi;
+			mpoly.mXMax		= maxxi;
+			mpoly.mYMin		= minyi;
+			mpoly.mYMax		= maxyi;
+			mpoly.mZMin		= minf[2];
+			mpoly.mZMax		= maxf[2];
+		}
+
+		sampIdx += 1;
 	}
 }
 
+/*
 //==================================================================
-void Hider::HideCountBegin(
+#define CCODE_X1	1
+#define CCODE_X2	2
+#define CCODE_Y1	4
+#define CCODE_Y2	8
+#define CCODE_Z1	16
+#define CCODE_Z2	32
+
+U8	ccodes[ MP_GRID_MAX_SIZE ];
+U8	gridORCCodes = 0;
+// would be nice to simdfy this one too
+for (size_t i=0; i < RI_SIMD_BLK_LEN; ++i)
+{
+	float	x = homoP.x()[i];
+	float	y = homoP.y()[i];
+	float	z = homoP.z()[i];
+	float	w = homoP.w()[i];
+
+	U8	ccode = 0;
+	if ( x < -w )	ccode |= CCODE_X1;
+	if ( x >  w )	ccode |= CCODE_X2;
+	if ( y < -w )	ccode |= CCODE_Y1;
+	if ( y >  w )	ccode |= CCODE_Y2;
+	if ( z < -w )	ccode |= CCODE_Z1;
+	if ( z >  w )	ccode |= CCODE_Z2;
+	ccodes[i] = ccode;
+	gridORCCodes |= ccode;
+}
+
+U8	andCode = 0xff;
+andCode &= ccodes[ sampIdx+0 ];
+andCode &= ccodes[ sampIdx+1 ];
+andCode &= ccodes[ sampIdx+xDim ];
+andCode &= ccodes[ sampIdx+xDim+1 ];
+// all out ? Skip this
+if ( andCode )
+	continue;
+*/
+
+//==================================================================
+void Hider::HideAllocSampsBegin(
 					DVec<u_int> &out_pixelsSamplesCount,
 					HiderBucket &buck )
 {
@@ -403,36 +502,9 @@ void Hider::HideCountBegin(
 }
 
 //==================================================================
-void Hider::HideCountGrid(
-					DVec<u_int>			&inout_pixelsSamplesCount,
-					HiderBucket			&buck,
-					const ShadedGrid	&shadGrid )
-{
-	size_t	blocksN = RI_GET_SIMD_BLOCKS( shadGrid.mPointsN );
-
-	int	buckWd = buck.GetWd();
-	int	buckHe = buck.GetHe();
-
-	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
-	{
-		for (size_t	itmIdx=0; itmIdx < RI_SIMD_BLK_LEN; ++itmIdx)
-		{
-			int	x = (int)(shadGrid.mpPosWin[ blkIdx ][0][ itmIdx ]) - buck.mX1;
-			int	y = (int)(shadGrid.mpPosWin[ blkIdx ][1][ itmIdx ]) - buck.mY1;
-
-			if ( x >= 0 && y >= 0 && x < buckWd && y < buckHe )
-			{
-				inout_pixelsSamplesCount[ y * buckWd + x ] += 1;
-			}
-		}
-	}
-}
-
-//==================================================================
-void Hider::HideCountEnd(
+void Hider::HideAllocSampsEnd(
 					DVec<HiderPixel>		&out_pixels,
 					DVec<HiderSampleData>	&out_sampData,
-					HiderBucket				&buck,
 					const DVec<u_int>		&pixelsSamplesCount )
 {
 	size_t	totSamples = 0;

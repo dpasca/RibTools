@@ -12,7 +12,6 @@
 #include "DSystem/include/DTypes.h"
 #include "DSystem/include/DContainers.h"
 #include "DMath/include/DMath.h"
-#include "RI_Symbol.h"
 
 //==================================================================
 namespace RI
@@ -28,6 +27,10 @@ public:
 	int			mYMax;
 	float		mZMin;
 	float		mZMax;
+	u_int		mVertIdx0;
+	u_int		mVertIdx1;
+	u_int		mVertIdx2;
+	u_int		mVertIdx3;
 };
 
 //==================================================================

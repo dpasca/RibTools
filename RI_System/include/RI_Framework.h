@@ -166,13 +166,6 @@ public:
 
 	static void RenderBucket_s( Hider &hider, HiderBucket &bucket );
 
-	static void RenderBucket_AllocPixels_s(
-						DVec<HiderPixel>		&out_pixels,
-						DVec<HiderSampleData>	&out_sampData,
-						Hider					&hider,
-						HiderBucket				&bucket,
-						const DVec<ShadedGrid>	&shadedGrids );
-
 private:
 
 	void	worldEnd_simplify();

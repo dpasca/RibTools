@@ -75,6 +75,15 @@ void Framework::RenderBucket_s( Hider &hider, HiderBucket &bucket )
 
 	size_t				primsN = pPrimList.size();
 
+	DVec<MicroPolygon>	mpolys;
+
+	size_t	apporxMPolysUsage = bucket.GetWd() * bucket.GetHe() * 8;
+
+	mpolys.reserve( apporxMPolysUsage );
+
+	DVec<u_int>	pixelsSamplesCount;
+	hider.HideAllocSampsBegin( pixelsSamplesCount, bucket );
+
 	shadedGrids.resize( primsN );
 	for (size_t i=0; i < primsN; ++i)
 	{
@@ -98,54 +107,28 @@ void Framework::RenderBucket_s( Hider &hider, HiderBucket &bucket )
 		shadedGrids[ i ].Init( workGrid.mPointsN );
 
 		hider.Bust(
+				mpolys,
+				bucket,
 				shadedGrids[ i ],
 				workGrid,
-				(float)-bucket.mX1,
-				(float)-bucket.mY1,
+				pixelsSamplesCount,
 				hider.mFinalBuff.mWd,
 				hider.mFinalBuff.mHe );
 	}
 
 	DVec<HiderPixel>		pixels;
 	DVec<HiderSampleData>	sampData;
-
-	RenderBucket_AllocPixels_s(
-						pixels,
-						sampData,
-						hider,
-						bucket,
-						shadedGrids );
+	hider.HideAllocSampsEnd( pixels, sampData, pixelsSamplesCount );
 
 	DVec<u_int>		pixelsSampsIdxs;
 	hider.HideAddSamplesSetup( pixelsSampsIdxs, bucket );
 
-	for (size_t i=0; i < shadedGrids.size(); ++i)
-		hider.HideAddSamples( pixels, pixelsSampsIdxs, bucket, shadedGrids[i] );
+	//for (size_t i=0; i < shadedGrids.size(); ++i)
+	//	hider.HideAddSamples( pixels, pixelsSampsIdxs, bucket, shadedGrids[i] );
 
 	hider.Hide( pixels, bucket );
 
 	bucket.EndRender( hider.mFinalBuff );
-}
-
-//==================================================================
-void Framework::RenderBucket_AllocPixels_s(
-						DVec<HiderPixel>		&out_pixels,
-						DVec<HiderSampleData>	&out_sampData,
-						Hider					&hider,
-						HiderBucket				&bucket,
-						const DVec<ShadedGrid>	&shadedGrids )
-{
-	DVec<u_int>	pixelsSamplesCount;
-	hider.HideCountBegin( pixelsSamplesCount, bucket );
-
-	for (size_t i=0; i < shadedGrids.size(); ++i)
-		hider.HideCountGrid( pixelsSamplesCount, bucket, shadedGrids[i] );
-
-	hider.HideCountEnd(
-				out_pixels,
-				out_sampData,
-				bucket,
-				pixelsSamplesCount );
 }
 
 //==================================================================
