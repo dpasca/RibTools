@@ -96,8 +96,8 @@ void HiderSampleCoordsBuffer::initPixel(
 		for (u_int x=0; x < subPixelDim; ++x)
 		{
 			HiderSampleCoords *pCoords = &pSampCoods[ (y << subPixelDimLog2) + x ];
-			pCoords->mX = (float)y;
-			pCoords->mY = (float)x;
+			pCoords->mX = (int)y;
+			pCoords->mY = (int)x;
 		}
 	}
 

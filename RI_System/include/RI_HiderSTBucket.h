@@ -30,13 +30,15 @@ public:
 	int							mY2;
 	Buffer2D<NCOLS>				mCBuff;
 	DVec<SimplePrimitiveBase *>	mpPrims;
+	HiderSampleCoordsBuffer		*mpSampCoordsBuff;
 
 public:
-	HiderBucket( int x1, int y1, int x2, int y2 ) :
+	HiderBucket( int x1, int y1, int x2, int y2, HiderSampleCoordsBuffer *pSampCoordsBuff ) :
 		mX1(x1),
 		mY1(y1),
 		mX2(x2),
-		mY2(y2)
+		mY2(y2),
+		mpSampCoordsBuff(pSampCoordsBuff)
 	{
 	}
 

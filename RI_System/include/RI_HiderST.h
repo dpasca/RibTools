@@ -60,6 +60,7 @@ private:
 	Options					mOptions;
 	Buffer2D<NCOLS>			mFinalBuff;
 	DVec<HiderBucket *>		mpBuckets;
+	HiderSampleCoordsBuffer	mSampCoordBuffs[4];
 	Params					mParams;
 	DVec<PrimitiveBase *>	mpPrims;
 
@@ -89,37 +90,20 @@ public:
 	
 	float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const;
 
-	void Bust(	DVec<MicroPolygon>	&mpolys,
-				const HiderBucket	&bucket,
+	void Bust(	const HiderBucket	&bucket,
 				ShadedGrid			&shadGrid,
 				const WorkGrid		&workGrid,
-				DVec<u_int>			&out_pixelsSamplesCount,
+				DVec<HiderPixel>	&pixels,
 				u_int				screenWd,
 				u_int				screenHe ) const;
 
-	void HideAllocSampsBegin(
-					DVec<u_int> &out_pixelsSamplesCount,
-					HiderBucket &buck );
-
-	void HideCountGrid(
-					DVec<u_int>			&inout_pixelsSamplesCount,
-					HiderBucket			&buck,
-					const ShadedGrid	&shadGrid );
-
-	void HideAllocSampsEnd(
-					DVec<HiderPixel>		&out_pixels,
-					DVec<HiderSampleData>	&out_sampData,
-					const DVec<u_int>		&pixelsSamplesCount );
-
-	void HideAddSamplesSetup(
-					DVec<u_int>			&out_pixelsSampsIdxs,
-					HiderBucket			&buck );
-
+/*
 	void HideAddSamples(
 					DVec<HiderPixel>	&pixels,
 					DVec<u_int>			&pixelsSampsIdxs,
 					HiderBucket			&buck,
 					const ShadedGrid	&shadGrid );
+*/
 
 	void Hide(
 					DVec<HiderPixel>	&pixels,
@@ -151,6 +135,8 @@ private:
 						const Bound &b,
 						const Matrix44 &mtxLocalWorld,
 						float out_bound2d[4] ) const;
+
+	HiderSampleCoordsBuffer *findOrAddSampCoordBuff( u_int wd, u_int he, u_int subPixelDimLog2 );
 
 	//void pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n );
 };

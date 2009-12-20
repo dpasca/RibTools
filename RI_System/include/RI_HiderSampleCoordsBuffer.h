@@ -30,7 +30,7 @@ public:
 class HiderSampleCoords
 {
 public:
-	float			mX, mY;
+	int				mX, mY;
 	float			mTime;
 	float			mLensX;
 	float			mLensY;
@@ -51,8 +51,7 @@ class HiderPixel
 public:
 	int						mX, mY;
 	const HiderSampleCoords	*mpSampCoords;
-	u_int					mSampDataN;
-	HiderSampleData			*mpSampData;
+	DVec<HiderSampleData>	mSampData;
 };
 
 //==================================================================
@@ -74,6 +73,14 @@ public:
 	void Init( u_int wd, u_int he, u_int subPixelDimLog2 );
 
 	void Setup( float openTime, float closeTime );
+
+	bool IsInitialized() const		{ return mpSampCoords != NULL; }
+
+	u_int GetWd() const				{ return mWd; }
+	u_int GetHe() const				{ return mHe; }
+
+	u_int GetSampsPerDim() const	{ return 1 << mSubPixelDimLog2;			}
+	u_int GetSampsPerPixel() const	{ return 1 << (mSubPixelDimLog2 << 1);	}
 
 private:
 	void initPixel(

@@ -63,6 +63,35 @@ void Framework::Insert(
 }
 
 //==================================================================
+static void initAllocPixels( DVec<HiderPixel> &pixels, HiderBucket &bucket )
+{
+	size_t	buckPixelsN		= bucket.GetWd() * bucket.GetHe();
+
+	pixels.resize( buckPixelsN );
+
+	u_int	wd = bucket.GetWd();
+	u_int	he = bucket.GetHe();
+
+	HiderPixel			*pPixel = &pixels[0];
+	HiderSampleCoords	*pSampCoords = bucket.mpSampCoordsBuff->mpSampCoords;
+	u_int				sampsPerPix = bucket.mpSampCoordsBuff->GetSampsPerPixel();
+
+	for (u_int y=0; y < he; ++y)
+	{
+		for (u_int x=0; x < wd; ++x)
+		{
+			pPixel->mX = 0;
+			pPixel->mY = 0;
+			pPixel->mpSampCoords = pSampCoords;
+			pPixel->mSampData.clear();
+
+			pSampCoords += sampsPerPix;
+			pPixel += 1;
+		}
+	}	
+}
+
+//==================================================================
 void Framework::RenderBucket_s( Hider &hider, HiderBucket &bucket )
 {
 	DVec<SimplePrimitiveBase *>	&pPrimList = bucket.GetPrimList();
@@ -73,16 +102,10 @@ void Framework::RenderBucket_s( Hider &hider, HiderBucket &bucket )
 
 	DVec<ShadedGrid>	shadedGrids;
 
-	size_t				primsN = pPrimList.size();
+	DVec<HiderPixel>	pixels;
+	initAllocPixels( pixels, bucket );
 
-	DVec<MicroPolygon>	mpolys;
-
-	size_t	apporxMPolysUsage = bucket.GetWd() * bucket.GetHe() * 8;
-
-	mpolys.reserve( apporxMPolysUsage );
-
-	DVec<u_int>	pixelsSamplesCount;
-	hider.HideAllocSampsBegin( pixelsSamplesCount, bucket );
+	size_t	primsN	= pPrimList.size();
 
 	shadedGrids.resize( primsN );
 	for (size_t i=0; i < primsN; ++i)
@@ -107,24 +130,13 @@ void Framework::RenderBucket_s( Hider &hider, HiderBucket &bucket )
 		shadedGrids[ i ].Init( workGrid.mPointsN );
 
 		hider.Bust(
-				mpolys,
 				bucket,
 				shadedGrids[ i ],
 				workGrid,
-				pixelsSamplesCount,
+				pixels,
 				hider.mFinalBuff.mWd,
 				hider.mFinalBuff.mHe );
 	}
-
-	DVec<HiderPixel>		pixels;
-	DVec<HiderSampleData>	sampData;
-	hider.HideAllocSampsEnd( pixels, sampData, pixelsSamplesCount );
-
-	DVec<u_int>		pixelsSampsIdxs;
-	hider.HideAddSamplesSetup( pixelsSampsIdxs, bucket );
-
-	//for (size_t i=0; i < shadedGrids.size(); ++i)
-	//	hider.HideAddSamples( pixels, pixelsSampsIdxs, bucket, shadedGrids[i] );
 
 	hider.Hide( pixels, bucket );
 
