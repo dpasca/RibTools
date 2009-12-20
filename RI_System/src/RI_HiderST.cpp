@@ -107,7 +107,7 @@ void Hider::WorldBegin(
 				 mParams.mDbgOnlyBucketAtY < y2 )
 			{
 				HiderSampleCoordsBuffer	*pSampCoordsBuff =
-						findOrAddSampCoordBuff( x2 - x, y2 - y, 4 );
+						findOrAddSampCoordBuff( x2 - x, y2 - y, 1 );
 
 				mpBuckets.push_back(
 						DNEW HiderBucket( x, y, x2, y2, pSampCoordsBuff ) );
@@ -356,6 +356,9 @@ inline void addMPSamples(
 				int minY,
 				int maxX,
 				int maxY,
+				const float winPos[4][3],
+				float buckX1,
+				float buckY1,
 				const float *valOi,
 				const float *valCi
 				)
@@ -367,6 +370,18 @@ inline void addMPSamples(
 	int minSubY = (int)floor( getFractional( minGlob[1] ) * sampsPerDimF );
 	int maxSubX =  (int)ceil( getFractional( maxGlob[0] ) * sampsPerDimF );
 	int maxSubY =  (int)ceil( getFractional( maxGlob[1] ) * sampsPerDimF );
+
+	float dxa = winPos[1][0] - winPos[0][0];
+	float dxb = winPos[3][0] - winPos[1][0];
+	float dxc = winPos[2][0] - winPos[3][0];
+	float dxd = winPos[0][0] - winPos[2][0];
+
+	float dya = winPos[1][1] - winPos[0][1];
+	float dyb = winPos[3][1] - winPos[1][1];
+	float dyc = winPos[2][1] - winPos[3][1];
+	float dyd = winPos[0][1] - winPos[2][1];
+
+	float subSampToPixFrac = 1.0f / (1 << subPixDimLog2);
 
 	// for every pixel touched by the micro-polygon
 	int	sy		= minSubY;
@@ -390,9 +405,15 @@ inline void addMPSamples(
 					const HiderSampleCoords *pSampCoords =
 							&pPixels2->mpSampCoords[ (ssy << subPixDimLog2) + ssx ];
 
-					int sampX = pSampCoords->mX;
-					int sampY = pSampCoords->mY;
+					float sampX = x + pSampCoords->mX * subSampToPixFrac + buckX1;
+					float sampY = y + pSampCoords->mY * subSampToPixFrac + buckY1;
 
+					if ( ((sampY-winPos[0][1]) * dxa - (sampX-winPos[0][0]) * dya) <= 0 ) continue;
+					if ( ((sampY-winPos[1][1]) * dxb - (sampX-winPos[1][0]) * dyb) <= 0 ) continue;
+					if ( ((sampY-winPos[3][1]) * dxc - (sampX-winPos[3][0]) * dyc) <= 0 ) continue;
+					if ( ((sampY-winPos[2][1]) * dxd - (sampX-winPos[2][0]) * dyd) <= 0 ) continue;
+
+/*
 					if (sampX < minX ||
 						sampX > maxX ||
 						sampY < minY ||
@@ -400,6 +421,7 @@ inline void addMPSamples(
 					{
 						continue;
 					}
+*/
 
 					HiderSampleData *pSampData = pPixels2->mSampData.grow();
 
@@ -509,19 +531,17 @@ void Hider::Bust(
 			//	--------
 			size_t	blk[4];
 			size_t	sub[4];
+			float winPos[4][3];
 			for (size_t k=0; k < 4; ++k)
 			{
 				blk[k] = vidx[k] / RI_SIMD_BLK_LEN;
 				sub[k] = vidx[k] & (RI_SIMD_BLK_LEN-1);
 
-				float winPos[3] =
-					{
-						shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ],
-						shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ],
-						shadGrid.mpPosWin[ blk[k] ][2][ sub[k] ]
-					};
+				winPos[k][0] = shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ];
+				winPos[k][1] = shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ];
+				winPos[k][2] = shadGrid.mpPosWin[ blk[k] ][2][ sub[k] ];
 
-				updateMinMax( minGlob, maxGlob, winPos );
+				updateMinMax( minGlob, maxGlob, winPos[k] );
 			}
 
 			// integer bounding box of the micro-poly
@@ -576,6 +596,9 @@ void Hider::Bust(
 					minY,
 					maxX,
 					maxY,
+					winPos,
+					(float)bucket.mX1,
+					(float)bucket.mY1,
 					valOi,
 					valCi );
 		}

@@ -111,7 +111,7 @@ void HiderSampleCoordsBuffer::initPixel(
 			u_int idx = (y << subPixelDimLog2) + x;
 			u_int idxK = (k << subPixelDimLog2) + x;
 
-			float t = pSampCoods[ idx ].mY;
+			int t = pSampCoods[ idx ].mY;
 			pSampCoods[ idx ].mY = pSampCoods[ idxK ].mY;
 			pSampCoods[ idxK ].mY = t;
 		}
