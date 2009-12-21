@@ -327,7 +327,7 @@ void Hider::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 */
 
 //==================================================================
-inline void updateMinMax( float minf[3], float maxf[3], const float val[3] )
+inline void updateMinMax( Vec3f &minf, Vec3f &maxf, const Vec3f &val )
 {
 	if ( val[0] < minf[0] ) minf[0] = val[0];
 	if ( val[1] < minf[1] ) minf[1] = val[1];
@@ -345,41 +345,137 @@ inline float getFractional( float a )
 }
 
 //==================================================================
+// NOTE: all coords here are in bucket and subsample space..
+//       so, (0,0) is the top left pos of the bucket
+//       and pixels 0 .. 1 -> 0 .. sampsPerDim
 inline void addMPSamples(
 				HiderPixel	*pPixels,
 				u_int		pixPerRow,
-				const float *minGlob,
-				const float *maxGlob,
-				int sampsPerDim,
-				int subPixDimLog2,
-				int minX,	// micro-poly bounds in bucket space
-				int minY,
-				int maxX,
-				int maxY,
-				const float winPos[4][3],
-				float buckX1,
-				float buckY1,
+				const Vec3f &minPos,
+				const Vec3f	&maxPos,
+				int			sampsPerDim,
+				int			subPixDimLog2,
+				int			buckWd,
+				int			buckHe,
+				const Vec3f microquad[4],
 				const float *valOi,
 				const float *valCi
 				)
 {
+
+/*
+0    1    2    3    4
+minX
+| .25
+| minSubX
+|_|_________________
+|.|  |.   |.   |.   |
+| |. |  . |  . |  . |
+| | .|   .|   .|   .|
+|_.__|_.__|_.__|_.__|
+|.|  |.   |.   |.   |
+| |. |  . |  . |  . |
+| | .|   .|   .|   .|
+|_.__|_.__|_.__|_.__|
+|.   |.   |.   |.   |
+|  . |  . |  . |  . |
+|   .|   .|   .|   .|
+|_.__|_.__|_.__|_.__|
+*/
+
+	u_int	fraMask = sampsPerDim - 1;	// 0000 0000 0000 1111	..if subPixDimLog2 == 4 
+	u_int	intMask = ~fraMask;			// 1111 1111 1111 0000
+
+	int	minX = (int)floor( minPos[0] ) & intMask;
+	int	maxX = (int)((ceil( maxPos[0] )) + (sampsPerDim-1)) & intMask;
+
+	int	minY = (int)floor( minPos[1] ) & intMask;
+	int	maxY = (int)((ceil( maxPos[1] )) + (sampsPerDim-1)) & intMask;
+
+	// completely out ?
+	if ( maxX < 0 || maxY < 0 || minX >= buckWd || minY >= buckHe )
+		return;
+
+	// clip
+	if ( minX < 0 )	minX = 0;
+	if ( minY < 0 )	minY = 0;
+	if ( maxX >= buckWd )	maxX = buckWd-1;
+	if ( maxY >= buckHe )	maxY = buckHe-1;
+
+/*
+   0__
+   /  --
+  /     -- 1
+ /__      /
+2   --   /
+      --/
+	    3
+*/
+	Vec3f d10 = microquad[1] - microquad[0];
+	Vec3f d31 = microquad[3] - microquad[1];
+	Vec3f d23 = microquad[2] - microquad[3];
+	Vec3f d02 = microquad[0] - microquad[2];
+
+	for (int y=minY; y <= maxY; ++y)
+	{
+		//int	subY = y & fraMask;
+
+		HiderPixel	*pPixelsRow = pPixels + (y >> subPixDimLog2) * pixPerRow;
+
+		for (int x=minX; x <= maxX; ++x)
+		{
+			HiderPixel	&pixel = pPixelsRow[ x >> subPixDimLog2 ];
+
+			//int	subX = x & fraMask;
+
+/*
+			const HiderSampleCoords
+							*pSampCoords =
+								&pixel.mpSampCoords[
+											(subY << subPixDimLog2) +
+											 subX ];
+
+			// we do all these in float because float muls are faster and more reliable (no crazy overflow)
+
+			float sampX = (float)((x & intMask) + pSampCoords->mX);
+			float sampY = (float)((y & intMask) + pSampCoords->mY);
+*/
+			float sampX = (float)x + sampsPerDim*.5f;
+			float sampY = (float)y + sampsPerDim*.5f;
+
+			float crs0 = ((sampY-microquad[0][1]) * d10[0] - (sampX-microquad[0][0]) * d10[1]);
+			float crs1 = ((sampY-microquad[1][1]) * d31[0] - (sampX-microquad[1][0]) * d31[1]);
+			float crs2 = ((sampY-microquad[3][1]) * d23[0] - (sampX-microquad[3][0]) * d23[1]);
+			float crs3 = ((sampY-microquad[2][1]) * d02[0] - (sampX-microquad[2][0]) * d02[1]);
+
+			if (
+				(crs0 <= 0 && crs1 <= 0 && crs2 <= 0 && crs3 <= 0) ||
+				(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 && crs3 >= 0)
+				)
+			{
+				HiderSampleData *pSampData = pixel.mSampData.grow();
+
+				pSampData->mOi[0] = valOi[0];
+				pSampData->mOi[1] = valOi[1];
+				pSampData->mOi[2] = valOi[2];
+
+				pSampData->mCi[0] = valCi[0];
+				pSampData->mCi[1] = valCi[1];
+				pSampData->mCi[2] = valCi[2];
+
+				pSampData->mDepth = microquad[0][2];
+			}
+		}
+	}
+
+#if 0
 	float sampsPerDimF = (float)sampsPerDim;
 
 	// calculate the sub-samples touched by the micro-poly
-	int minSubX = (int)floor( getFractional( minGlob[0] ) * sampsPerDimF );
-	int minSubY = (int)floor( getFractional( minGlob[1] ) * sampsPerDimF );
-	int maxSubX =  (int)ceil( getFractional( maxGlob[0] ) * sampsPerDimF );
-	int maxSubY =  (int)ceil( getFractional( maxGlob[1] ) * sampsPerDimF );
-
-	float dxa = winPos[1][0] - winPos[0][0];
-	float dxb = winPos[3][0] - winPos[1][0];
-	float dxc = winPos[2][0] - winPos[3][0];
-	float dxd = winPos[0][0] - winPos[2][0];
-
-	float dya = winPos[1][1] - winPos[0][1];
-	float dyb = winPos[3][1] - winPos[1][1];
-	float dyc = winPos[2][1] - winPos[3][1];
-	float dyd = winPos[0][1] - winPos[2][1];
+	int minSubX = (int)floor( getFractional( minPos[0] ) * sampsPerDimF );
+	int minSubY = (int)floor( getFractional( minPos[1] ) * sampsPerDimF );
+	int maxSubX =  (int)ceil( getFractional( maxPos[0] ) * sampsPerDimF );
+	int maxSubY =  (int)ceil( getFractional( maxPos[1] ) * sampsPerDimF );
 
 	float subSampToPixFrac = 1.0f / (1 << subPixDimLog2);
 
@@ -405,13 +501,13 @@ inline void addMPSamples(
 					const HiderSampleCoords *pSampCoords =
 							&pPixels2->mpSampCoords[ (ssy << subPixDimLog2) + ssx ];
 
-					float sampX = x + pSampCoords->mX * subSampToPixFrac + buckX1;
-					float sampY = y + pSampCoords->mY * subSampToPixFrac + buckY1;
+					float sampX = x + pSampCoords->mX * subSampToPixFrac;
+					float sampY = y + pSampCoords->mY * subSampToPixFrac;
 
-					if ( ((sampY-winPos[0][1]) * dxa - (sampX-winPos[0][0]) * dya) <= 0 ) continue;
-					if ( ((sampY-winPos[1][1]) * dxb - (sampX-winPos[1][0]) * dyb) <= 0 ) continue;
-					if ( ((sampY-winPos[3][1]) * dxc - (sampX-winPos[3][0]) * dyc) <= 0 ) continue;
-					if ( ((sampY-winPos[2][1]) * dxd - (sampX-winPos[2][0]) * dyd) <= 0 ) continue;
+					if ( ((sampY-microquad[0][1]) * d10[0] - (sampX-microquad[0][0]) * d10[1]) <= 0 ) continue;
+					if ( ((sampY-microquad[1][1]) * d31[0] - (sampX-microquad[1][0]) * d31[1]) <= 0 ) continue;
+					if ( ((sampY-microquad[3][1]) * d23[0] - (sampX-microquad[3][0]) * d23[1]) <= 0 ) continue;
+					if ( ((sampY-microquad[2][1]) * d02[0] - (sampX-microquad[2][0]) * d02[1]) <= 0 ) continue;
 
 /*
 					if (sampX < minX ||
@@ -433,7 +529,7 @@ inline void addMPSamples(
 					pSampData->mCi[1] = valCi[1];
 					pSampData->mCi[2] = valCi[2];
 
-					pSampData->mDepth = minGlob[2];
+					pSampData->mDepth = minPos[2];
 				}
 			}
 
@@ -446,6 +542,7 @@ inline void addMPSamples(
 
 		sy = 0;
 	}
+#endif
 }
 
 //==================================================================
@@ -501,6 +598,7 @@ void Hider::Bust(
 	u_int	yN		= workGrid.mYDim - 1;
 
 	u_int	buckWd	= bucket.GetWd();
+	u_int	buckHe	= bucket.GetHe();
 
 	int	sampsPerDim = (int)bucket.mpSampCoordsBuff->GetSampsPerDim();
 	int subPixDimLog2 = (int)bucket.mpSampCoordsBuff->mSubPixelDimLog2;
@@ -519,8 +617,8 @@ void Hider::Bust(
 						sampIdx+xDim,
 						sampIdx+xDim+1 };
 
-			float	minGlob[3] = {  FLT_MAX,  FLT_MAX,  FLT_MAX };
-			float	maxGlob[3] = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+			Vec3f	minPos(  FLT_MAX,  FLT_MAX,  FLT_MAX );
+			Vec3f	maxPos( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 
 			// calculate the bounds in window space and orientation
 			//	--------
@@ -531,44 +629,19 @@ void Hider::Bust(
 			//	--------
 			size_t	blk[4];
 			size_t	sub[4];
-			float winPos[4][3];
+			Vec3f	buckPos[4];
+
 			for (size_t k=0; k < 4; ++k)
 			{
 				blk[k] = vidx[k] / RI_SIMD_BLK_LEN;
 				sub[k] = vidx[k] & (RI_SIMD_BLK_LEN-1);
 
-				winPos[k][0] = shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ];
-				winPos[k][1] = shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ];
-				winPos[k][2] = shadGrid.mpPosWin[ blk[k] ][2][ sub[k] ];
+				buckPos[k][0] = sampsPerDim * (shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ] - (float)bucket.mX1);
+				buckPos[k][1] = sampsPerDim * (shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ] - (float)bucket.mY1);
+				buckPos[k][2] = shadGrid.mpPosWin[ blk[k] ][2][ sub[k] ];
 
-				updateMinMax( minGlob, maxGlob, winPos[k] );
+				updateMinMax( minPos, maxPos, buckPos[k] );
 			}
-
-			// integer bounding box of the micro-poly
-			int	minX = (int)floor( minGlob[0] );
-			int	maxX = (int)ceil(  maxGlob[0] );
-			int	minY = (int)floor( minGlob[1] );
-			int	maxY = (int)ceil(  maxGlob[1] );
-
-			// is the micro-poly bound outside the bucket ?
-			if (minX <  bucket.mX1 ||
-				minY <  bucket.mY1 || 
-				maxX >= bucket.mX2 ||
-				maxY >= bucket.mY2 )
-			{
-				// if not, then simply skip it
-				continue;
-			}
-
-			// move the micro-poly bounding box in bucket coordinates space
-			minX -= bucket.mX1;
-			maxX -= bucket.mX1;
-			minY -= bucket.mY1;
-			maxY -= bucket.mY1;
-
-			DASSERT( minX >= 0 && minY >= 0 && maxX < bucket.mX2 && maxY < bucket.mY2 );
-
-			HiderPixel	*pFirstPixel = &pixels[ minY * pixPerRow + minX ];
 
 			// sample only from the first vertex.. no bilinear
 			// interpolation in the micro-poly !
@@ -586,19 +659,15 @@ void Hider::Bust(
 				};
 
 			addMPSamples(
-					pFirstPixel,
+					&pixels[0],
 					pixPerRow,
-					minGlob,
-					maxGlob,
+					minPos,
+					maxPos,
 					sampsPerDim,
 					subPixDimLog2,
-					minX,
-					minY,
-					maxX,
-					maxY,
-					winPos,
-					(float)bucket.mX1,
-					(float)bucket.mY1,
+					(int)buckWd << subPixDimLog2,
+					(int)buckHe << subPixDimLog2,
+					buckPos,
 					valOi,
 					valCi );
 		}
