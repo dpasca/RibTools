@@ -162,8 +162,8 @@ void SimplePrimitiveBase::Dice(
 
 	DASSERT( pPointsWS == g.mpPointsWS );
 
-	float	du = 1.0f / g.mXDim;
-	float	dv = 1.0f / g.mYDim;
+	float	du = 1.0f / (g.mXDim-1);
+	float	dv = 1.0f / (g.mYDim-1);
 
 	Matrix44 mtxLocalCameraNorm = g.mMtxLocalCamera.GetAs33();
 

@@ -97,14 +97,6 @@ public:
 				u_int				screenWd,
 				u_int				screenHe ) const;
 
-/*
-	void HideAddSamples(
-					DVec<HiderPixel>	&pixels,
-					DVec<u_int>			&pixelsSampsIdxs,
-					HiderBucket			&buck,
-					const ShadedGrid	&shadGrid );
-*/
-
 	void Hide(
 					DVec<HiderPixel>	&pixels,
 					HiderBucket			&buck );

@@ -440,8 +440,8 @@ minX
 			float sampX = (float)((x & intMask) + pSampCoords->mX);
 			float sampY = (float)((y & intMask) + pSampCoords->mY);
 */
-			float sampX = (float)x + sampsPerDim*.5f;
-			float sampY = (float)y + sampsPerDim*.5f;
+			float sampX = (float)x;// + sampsPerDim*.5f;
+			float sampY = (float)y;// + sampsPerDim*.5f;
 
 			float crs0 = ((sampY-microquad[0][1]) * d10[0] - (sampX-microquad[0][0]) * d10[1]);
 			float crs1 = ((sampY-microquad[1][1]) * d31[0] - (sampX-microquad[1][0]) * d31[1]);
@@ -638,7 +638,7 @@ void Hider::Bust(
 
 				buckPos[k][0] = sampsPerDim * (shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ] - (float)bucket.mX1);
 				buckPos[k][1] = sampsPerDim * (shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ] - (float)bucket.mY1);
-				buckPos[k][2] = shadGrid.mpPosWin[ blk[k] ][2][ sub[k] ];
+				buckPos[k][2] = shadGrid.mpPointsCS[ blk[k] ][2][ sub[k] ];
 
 				updateMinMax( minPos, maxPos, buckPos[k] );
 			}
