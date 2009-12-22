@@ -30,10 +30,10 @@ public:
 class HiderSampleCoords
 {
 public:
-	int				mX, mY;
-	float			mTime;
-	float			mLensX;
-	float			mLensY;
+	float		mX, mY;
+	float		mTime;
+	float		mLensX;
+	float		mLensY;
 };
 
 //==================================================================

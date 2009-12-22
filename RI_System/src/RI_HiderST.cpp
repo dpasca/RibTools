@@ -345,22 +345,18 @@ inline float getFractional( float a )
 }
 
 //==================================================================
-// NOTE: all coords here are in bucket and subsample space..
-//       so, (0,0) is the top left pos of the bucket
-//       and pixels 0 .. 1 -> 0 .. sampsPerDim
+// NOTE: all coords here are in bucket space
 inline void addMPSamples(
-				HiderPixel	*pPixels,
-				u_int		pixPerRow,
-				const Vec3f &minPos,
-				const Vec3f	&maxPos,
-				int			sampsPerDim,
-				int			subPixDimLog2,
-				int			buckWd,
-				int			buckHe,
-				const Vec3f microquad[4],
-				const float *valOi,
-				const float *valCi
-				)
+				const HiderSampleCoordsBuffer	&sampCoordsBuff,
+				HiderPixel			*pPixels,
+				const Vec3f			&minPos,
+				const Vec3f			&maxPos,
+				int					buckWd,
+				int					buckHe,
+				const Vec3f			microquad[4],
+				const float			*valOi,
+				const float			*valCi
+			)
 {
 
 /*
@@ -383,14 +379,11 @@ minX
 |_.__|_.__|_.__|_.__|
 */
 
-	u_int	fraMask = sampsPerDim - 1;	// 0000 0000 0000 1111	..if subPixDimLog2 == 4 
-	u_int	intMask = ~fraMask;			// 1111 1111 1111 0000
+	int	minX = (int)floor( minPos[0] );
+	int	maxX = (int) ceil( maxPos[0] );
 
-	int	minX = (int)floor( minPos[0] ) & intMask;
-	int	maxX = (int)((ceil( maxPos[0] )) + (sampsPerDim-1)) & intMask;
-
-	int	minY = (int)floor( minPos[1] ) & intMask;
-	int	maxY = (int)((ceil( maxPos[1] )) + (sampsPerDim-1)) & intMask;
+	int	minY = (int)floor( minPos[1] );
+	int	maxY = (int) ceil( maxPos[1] );
 
 	// completely out ?
 	if ( maxX < 0 || maxY < 0 || minX >= buckWd || minY >= buckHe )
@@ -416,110 +409,34 @@ minX
 	Vec3f d23 = microquad[2] - microquad[3];
 	Vec3f d02 = microquad[0] - microquad[2];
 
+	u_int sampsPerPixel = sampCoordsBuff.GetSampsPerPixel();
+
+	HiderPixel	*pPixelsRow = pPixels + minY * buckWd;
+
 	for (int y=minY; y <= maxY; ++y)
 	{
-		//int	subY = y & fraMask;
-
-		HiderPixel	*pPixelsRow = pPixels + (y >> subPixDimLog2) * pixPerRow;
-
 		for (int x=minX; x <= maxX; ++x)
 		{
-			HiderPixel	&pixel = pPixelsRow[ x >> subPixDimLog2 ];
+			HiderPixel	&pixel = pPixelsRow[ x ];
 
-			//int	subX = x & fraMask;
-
-/*
-			const HiderSampleCoords
-							*pSampCoords =
-								&pixel.mpSampCoords[
-											(subY << subPixDimLog2) +
-											 subX ];
-
-			// we do all these in float because float muls are faster and more reliable (no crazy overflow)
-
-			float sampX = (float)((x & intMask) + pSampCoords->mX);
-			float sampY = (float)((y & intMask) + pSampCoords->mY);
-*/
-			float sampX = (float)x;// + sampsPerDim*.5f;
-			float sampY = (float)y;// + sampsPerDim*.5f;
-
-			float crs0 = ((sampY-microquad[0][1]) * d10[0] - (sampX-microquad[0][0]) * d10[1]);
-			float crs1 = ((sampY-microquad[1][1]) * d31[0] - (sampX-microquad[1][0]) * d31[1]);
-			float crs2 = ((sampY-microquad[3][1]) * d23[0] - (sampX-microquad[3][0]) * d23[1]);
-			float crs3 = ((sampY-microquad[2][1]) * d02[0] - (sampX-microquad[2][0]) * d02[1]);
-
-			if (
-				(crs0 <= 0 && crs1 <= 0 && crs2 <= 0 && crs3 <= 0) ||
-				(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 && crs3 >= 0)
-				)
+			for (u_int i=0; i < sampsPerPixel; ++i)
 			{
-				HiderSampleData *pSampData = pixel.mSampData.grow();
+				const HiderSampleCoords &sampCoords = pixel.mpSampCoords[i];
 
-				pSampData->mOi[0] = valOi[0];
-				pSampData->mOi[1] = valOi[1];
-				pSampData->mOi[2] = valOi[2];
+				float sampX = (float)x + sampCoords.mX;
+				float sampY = (float)y + sampCoords.mY;
 
-				pSampData->mCi[0] = valCi[0];
-				pSampData->mCi[1] = valCi[1];
-				pSampData->mCi[2] = valCi[2];
+				float crs0 = ((sampY-microquad[0][1]) * d10[0] - (sampX-microquad[0][0]) * d10[1]);
+				float crs1 = ((sampY-microquad[1][1]) * d31[0] - (sampX-microquad[1][0]) * d31[1]);
+				float crs2 = ((sampY-microquad[3][1]) * d23[0] - (sampX-microquad[3][0]) * d23[1]);
+				float crs3 = ((sampY-microquad[2][1]) * d02[0] - (sampX-microquad[2][0]) * d02[1]);
 
-				pSampData->mDepth = microquad[0][2];
-			}
-		}
-	}
-
-#if 0
-	float sampsPerDimF = (float)sampsPerDim;
-
-	// calculate the sub-samples touched by the micro-poly
-	int minSubX = (int)floor( getFractional( minPos[0] ) * sampsPerDimF );
-	int minSubY = (int)floor( getFractional( minPos[1] ) * sampsPerDimF );
-	int maxSubX =  (int)ceil( getFractional( maxPos[0] ) * sampsPerDimF );
-	int maxSubY =  (int)ceil( getFractional( maxPos[1] ) * sampsPerDimF );
-
-	float subSampToPixFrac = 1.0f / (1 << subPixDimLog2);
-
-	// for every pixel touched by the micro-polygon
-	int	sy		= minSubY;
-	int	syMax	= maxSubY - 1;
-	for (int y=minY; y <= maxY; ++y)
-	{
-		if ( y == maxY )	syMax = maxSubY;
-
-		HiderPixel	*pPixels2 = pPixels;
-
-		int	sx		= minSubX;
-		int	sxMax	= maxSubX - 1;
-		for (int x=minX; x <= maxX; ++x)
-		{
-			if ( x == maxX )	sxMax = maxSubX;
-
-			for (int ssy=sy; ssy <= syMax; ++ssy)
-			{
-				for (int ssx=sx; ssx <= sxMax; ++ssx)
+				if (
+					(crs0 <= 0 && crs1 <= 0 && crs2 <= 0 && crs3 <= 0) ||
+					(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 && crs3 >= 0)
+					)
 				{
-					const HiderSampleCoords *pSampCoords =
-							&pPixels2->mpSampCoords[ (ssy << subPixDimLog2) + ssx ];
-
-					float sampX = x + pSampCoords->mX * subSampToPixFrac;
-					float sampY = y + pSampCoords->mY * subSampToPixFrac;
-
-					if ( ((sampY-microquad[0][1]) * d10[0] - (sampX-microquad[0][0]) * d10[1]) <= 0 ) continue;
-					if ( ((sampY-microquad[1][1]) * d31[0] - (sampX-microquad[1][0]) * d31[1]) <= 0 ) continue;
-					if ( ((sampY-microquad[3][1]) * d23[0] - (sampX-microquad[3][0]) * d23[1]) <= 0 ) continue;
-					if ( ((sampY-microquad[2][1]) * d02[0] - (sampX-microquad[2][0]) * d02[1]) <= 0 ) continue;
-
-/*
-					if (sampX < minX ||
-						sampX > maxX ||
-						sampY < minY ||
-						sampY > maxY )
-					{
-						continue;
-					}
-*/
-
-					HiderSampleData *pSampData = pPixels2->mSampData.grow();
+					HiderSampleData *pSampData = pixel.mSampData.grow();
 
 					pSampData->mOi[0] = valOi[0];
 					pSampData->mOi[1] = valOi[1];
@@ -529,20 +446,13 @@ minX
 					pSampData->mCi[1] = valCi[1];
 					pSampData->mCi[2] = valCi[2];
 
-					pSampData->mDepth = minPos[2];
+					pSampData->mDepth = microquad[0][2];
 				}
 			}
-
-			pPixels2 += 1;
-
-			sx = 0;
 		}
 
-		pPixels += pixPerRow;
-
-		sy = 0;
+		pPixelsRow += buckWd;
 	}
-#endif
 }
 
 //==================================================================
@@ -600,11 +510,6 @@ void Hider::Bust(
 	u_int	buckWd	= bucket.GetWd();
 	u_int	buckHe	= bucket.GetHe();
 
-	int	sampsPerDim = (int)bucket.mpSampCoordsBuff->GetSampsPerDim();
-	int subPixDimLog2 = (int)bucket.mpSampCoordsBuff->mSubPixelDimLog2;
-
-	u_int	pixPerRow = bucket.GetWd();
-
 	// scan the grid.. for every potential micro-polygon
 	for (u_int i=0; i < yN; ++i)
 	{
@@ -636,8 +541,8 @@ void Hider::Bust(
 				blk[k] = vidx[k] / RI_SIMD_BLK_LEN;
 				sub[k] = vidx[k] & (RI_SIMD_BLK_LEN-1);
 
-				buckPos[k][0] = sampsPerDim * (shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ] - (float)bucket.mX1);
-				buckPos[k][1] = sampsPerDim * (shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ] - (float)bucket.mY1);
+				buckPos[k][0] = shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ] - (float)bucket.mX1;
+				buckPos[k][1] = shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ] - (float)bucket.mY1;
 				buckPos[k][2] = shadGrid.mpPointsCS[ blk[k] ][2][ sub[k] ];
 
 				updateMinMax( minPos, maxPos, buckPos[k] );
@@ -659,14 +564,12 @@ void Hider::Bust(
 				};
 
 			addMPSamples(
+					*bucket.mpSampCoordsBuff,
 					&pixels[0],
-					pixPerRow,
 					minPos,
 					maxPos,
-					sampsPerDim,
-					subPixDimLog2,
-					(int)buckWd << subPixDimLog2,
-					(int)buckHe << subPixDimLog2,
+					(int)buckWd,
+					(int)buckHe,
 					buckPos,
 					valOi,
 					valCi );

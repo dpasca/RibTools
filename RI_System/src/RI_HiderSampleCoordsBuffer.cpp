@@ -90,14 +90,16 @@ void HiderSampleCoordsBuffer::initPixel(
 	u_int subPixelDim = 1 << subPixelDimLog2;
 	u_int randPosMask = (1 << subPixelDimLog2) - 1;
 
+	u_int subPixelDim2 = subPixelDim * subPixelDim;
+
 	// fill
 	for (u_int y=0; y < subPixelDim; ++y)
 	{
 		for (u_int x=0; x < subPixelDim; ++x)
 		{
 			HiderSampleCoords *pCoords = &pSampCoods[ (y << subPixelDimLog2) + x ];
-			pCoords->mX = (int)y;
-			pCoords->mY = (int)x;
+			pCoords->mX = (float)y;
+			pCoords->mY = (float)x;
 		}
 	}
 
@@ -111,10 +113,18 @@ void HiderSampleCoordsBuffer::initPixel(
 			u_int idx = (y << subPixelDimLog2) + x;
 			u_int idxK = (k << subPixelDimLog2) + x;
 
-			int t = pSampCoods[ idx ].mY;
+			int t = (int)pSampCoods[ idx ].mY;
 			pSampCoods[ idx ].mY = pSampCoods[ idxK ].mY;
-			pSampCoods[ idxK ].mY = t;
+			pSampCoods[ idxK ].mY = (float)t;
 		}
+	}
+
+	// normalize the subpix values to [0..1)
+	float	coe = 1.0f / subPixelDim;
+	for (u_int i=0; i < subPixelDim2; ++i)
+	{
+		pSampCoods[i].mX *= coe;
+		pSampCoods[i].mY *= coe;
 	}
 
 	// time
