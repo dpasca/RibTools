@@ -15,7 +15,8 @@
 static const u_int	BUCKET_SIZE = 128;
 
 //==================================================================
-#define MAX_SAMP_DATA_PER_PIXEL	1024
+#define MAX_DATA_PER_SAMPLE	1024
+#define SUB_SAMP_DIM_LOG2	2		// 4 x 4
 
 //==================================================================
 namespace RI
@@ -107,7 +108,7 @@ void Hider::WorldBegin(
 				 mParams.mDbgOnlyBucketAtY < y2 )
 			{
 				HiderSampleCoordsBuffer	*pSampCoordsBuff =
-						findOrAddSampCoordBuff( x2 - x, y2 - y, 1 );
+						findOrAddSampCoordBuff( x2 - x, y2 - y, SUB_SAMP_DIM_LOG2 );
 
 				mpBuckets.push_back(
 						DNEW HiderBucket( x, y, x2, y2, pSampCoordsBuff ) );
@@ -339,12 +340,6 @@ inline void updateMinMax( Vec3f &minf, Vec3f &maxf, const Vec3f &val )
 }
 
 //==================================================================
-inline float getFractional( float a )
-{
-	return a - floor( a );
-}
-
-//==================================================================
 // NOTE: all coords here are in bucket space
 inline void addMPSamples(
 				const HiderSampleCoordsBuffer	&sampCoordsBuff,
@@ -436,7 +431,7 @@ minX
 					(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 && crs3 >= 0)
 					)
 				{
-					HiderSampleData *pSampData = pixel.mSampData.grow();
+					HiderSampleData *pSampData = pixel.mpSampDataLists[i].grow();
 
 					pSampData->mOi[0] = valOi[0];
 					pSampData->mOi[1] = valOi[1];
@@ -619,56 +614,11 @@ if ( andCode )
 	continue;
 */
 
-/*
 //==================================================================
-void Hider::HideAddSamples(
-					DVec<HiderPixel>	&pixels,
-					DVec<u_int>			&pixelsSampsIdxs,
-					HiderBucket			&buck,
-					const ShadedGrid	&shadGrid )
-{
-	size_t	blocksN = RI_GET_SIMD_BLOCKS( shadGrid.mPointsN );
-
-	int	buckWd = buck.GetWd();
-	int	buckHe = buck.GetHe();
-
-	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
-	{
-		for (size_t	itmIdx=0; itmIdx < RI_SIMD_BLK_LEN; ++itmIdx)
-		{
-			int	x = (int)(shadGrid.mpPosWin[ blkIdx ][0][ itmIdx ]) - buck.mX1;
-			int	y = (int)(shadGrid.mpPosWin[ blkIdx ][1][ itmIdx ]) - buck.mY1;
-
-			if ( x >= 0 && y >= 0 && x < buckWd && y < buckHe )
-			{
-				float	rgb[3];
-
-				rgb[0] = shadGrid.mpCi[blkIdx][0][itmIdx];
-				rgb[1] = shadGrid.mpCi[blkIdx][1][itmIdx];
-				rgb[2] = shadGrid.mpCi[blkIdx][2][itmIdx];
-
-				size_t		pixIdx = buckWd * y + x;
-				size_t		sampIdx = pixelsSampsIdxs[ pixIdx ]++;
-
-				HiderSampleData	*pSampData = &pixels[ pixIdx ].mSampData[ sampIdx ];
-
-				pSampData->mDepth = shadGrid.mpPointsCS[blkIdx][2][itmIdx];
-
-				pSampData->mCi[0] = shadGrid.mpCi[blkIdx][0][itmIdx];
-				pSampData->mCi[1] = shadGrid.mpCi[blkIdx][1][itmIdx];
-				pSampData->mCi[2] = shadGrid.mpCi[blkIdx][2][itmIdx];
-
-				pSampData->mOi[0] = shadGrid.mpOi[blkIdx][0][itmIdx];
-				pSampData->mOi[1] = shadGrid.mpOi[blkIdx][1][itmIdx];
-				pSampData->mOi[2] = shadGrid.mpOi[blkIdx][2][itmIdx];
-			}
-		}
-	}
-}
-*/
-
-//==================================================================
-static void sortSampData( HiderSampleData *pSampDataListSort[], HiderSampleData *pData, u_int dataN )
+static void sortSampData(
+				const HiderSampleData	**pSampDataListSort,
+				const HiderSampleData	*pData,
+				u_int					dataN )
 {
 	if ( dataN == 1 )
 	{
@@ -703,6 +653,51 @@ static void sortSampData( HiderSampleData *pSampDataListSort[], HiderSampleData 
 }
 
 //==================================================================
+inline void samplePixelBox(
+				Vec3f				&pixCol,
+				const HiderPixel	&pixel,
+				u_int				sampsPerPixel,
+				float				ooSampsPerPixel )
+{
+	static Vec3<float>	one( 1 );
+
+	for (u_int si=0; si < sampsPerPixel; ++si)
+	{
+		const DVec<HiderSampleData> &sampDataList = pixel.mpSampDataLists[si];
+
+		u_int	dataN = sampDataList.size();
+		if NOT( dataN )
+			continue;
+
+		DASSERT( dataN <= MAX_DATA_PER_SAMPLE );
+		dataN = DMIN( dataN, MAX_DATA_PER_SAMPLE );
+
+		const HiderSampleData	*pData = &sampDataList[0];
+
+		const HiderSampleData *pSampDataListSort[ MAX_DATA_PER_SAMPLE ];
+
+		sortSampData( pSampDataListSort, pData, dataN );
+
+		// TODO: optimize by considering only until the first fully
+		//       opaque sample from front
+
+		Vec3<float>	accCol( 0.f );
+
+		for (int i=(int)dataN-1; i >= 0; --i)
+		{
+			Vec3<float>	col = Vec3<float>( pSampDataListSort[i]->mCi );
+			Vec3<float>	opa = Vec3<float>( pSampDataListSort[i]->mOi );
+
+			accCol = accCol * (one - opa) + col;
+		}
+
+		pixCol += accCol;
+	}
+
+	pixCol = pixCol * ooSampsPerPixel;
+}
+
+//==================================================================
 void Hider::Hide(
 				DVec<HiderPixel>	&pixels,
 				HiderBucket			&buck )
@@ -710,41 +705,19 @@ void Hider::Hide(
 	u_int	buckWd = buck.GetWd();
 	u_int	buckHe = buck.GetHe();
 
+	u_int	sampsPerPixel	= buck.mpSampCoordsBuff->GetSampsPerPixel();
+	float	ooSampsPerPixel = 1.0f / sampsPerPixel;
+
 	size_t	pixIdx = 0;
 	for (u_int y=0; y < buckHe; ++y)
 	{
 		for (u_int x=0; x < buckWd; ++x, ++pixIdx)
 		{
-			u_int			dataN = pixels[pixIdx].mSampData.size();
+			Vec3f	pixCol( 0.f );
 
-			if NOT( dataN )
-				continue;
+			samplePixelBox( pixCol, pixels[pixIdx], sampsPerPixel, ooSampsPerPixel );
 
-			DASSERT( dataN <= MAX_SAMP_DATA_PER_PIXEL );
-			dataN = DMIN( dataN, MAX_SAMP_DATA_PER_PIXEL );
-
-			HiderSampleData	*pData = &pixels[pixIdx].mSampData[0];
-
-			HiderSampleData *pSampDataListSort[ MAX_SAMP_DATA_PER_PIXEL ];
-
-			sortSampData( pSampDataListSort, pData, dataN );
-
-			static Vec3<float>	one( 1 );
-
-			if ( dataN > 0 )
-			{
-				Vec3<float>	accCol( 0.f );
-
-				for (int i=(int)dataN-1; i >= 0; --i)
-				{
-					Vec3<float>	col = Vec3<float>( pSampDataListSort[i]->mCi );
-					Vec3<float>	opa = Vec3<float>( pSampDataListSort[i]->mOi );
-
-					accCol = accCol * (one - opa) + col;
-				}
-
-				buck.mCBuff.SetSample( x, y, &accCol.x() );
-			}
+			buck.mCBuff.SetSample( x, y, &pixCol.x() );
 		}
 	}
 }

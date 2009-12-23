@@ -63,7 +63,10 @@ void Framework::Insert(
 }
 
 //==================================================================
-static void initAllocPixels( DVec<HiderPixel> &pixels, HiderBucket &bucket )
+static void initAllocPixels(
+				DVec<HiderPixel>			&pixels,
+				DVec<DVec<HiderSampleData>>	&sampDataLists,
+				HiderBucket					&bucket )
 {
 	size_t	buckPixelsN		= bucket.GetWd() * bucket.GetHe();
 
@@ -76,17 +79,17 @@ static void initAllocPixels( DVec<HiderPixel> &pixels, HiderBucket &bucket )
 	HiderSampleCoords	*pSampCoords = bucket.mpSampCoordsBuff->mpSampCoords;
 	u_int				sampsPerPix = bucket.mpSampCoordsBuff->GetSampsPerPixel();
 
+	sampDataLists.resize( wd * he * sampsPerPix );
+
+	size_t	sampIdx = 0;
 	for (u_int y=0; y < he; ++y)
 	{
-		for (u_int x=0; x < wd; ++x)
+		for (u_int x=0; x < wd; ++x, sampIdx += sampsPerPix, pPixel += 1)
 		{
 			pPixel->mX = 0;
 			pPixel->mY = 0;
-			pPixel->mpSampCoords = pSampCoords;
-			pPixel->mSampData.clear();
-
-			pSampCoords += sampsPerPix;
-			pPixel += 1;
+			pPixel->mpSampCoords = &pSampCoords[ sampIdx ];
+			pPixel->mpSampDataLists	 = &sampDataLists[ sampIdx ];
 		}
 	}	
 }
@@ -102,8 +105,9 @@ void Framework::RenderBucket_s( Hider &hider, HiderBucket &bucket )
 
 	DVec<ShadedGrid>	shadedGrids;
 
-	DVec<HiderPixel>	pixels;
-	initAllocPixels( pixels, bucket );
+	DVec<HiderPixel>			pixels;
+	DVec<DVec<HiderSampleData>>	sampDataLists;
+	initAllocPixels( pixels, sampDataLists, bucket );
 
 	size_t	primsN	= pPrimList.size();
 

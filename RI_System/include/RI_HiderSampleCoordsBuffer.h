@@ -50,8 +50,8 @@ class HiderPixel
 {
 public:
 	int						mX, mY;
-	const HiderSampleCoords	*mpSampCoords;
-	DVec<HiderSampleData>	mSampData;
+	const HiderSampleCoords	*mpSampCoords;	// one per sub-sample
+	DVec<HiderSampleData>	*mpSampDataLists;	// one per sub-sample
 };
 
 //==================================================================
