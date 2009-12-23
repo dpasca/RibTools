@@ -17,6 +17,15 @@
 
 	#define DMT_SIMD_FLEN	4
 
+	// better reciprocal square root found on the Internet 8)
+	inline __m128 _mm_rsqrtnr_ps( __m128 x )
+	{
+	  __m128 t = _mm_rsqrt_ps(x);
+	  return _mm_mul_ps(  _mm_set_ps1( 0.5f ),
+						  _mm_mul_ps(_mm_sub_ps(  _mm_set_ps1( 3.0f ),
+												  _mm_mul_ps(_mm_mul_ps(x,t),t) ),t)  );
+	}
+
 #elif defined(DMATH_USE_M512)
 
 	#define USE_C_PROTOTYPE_PRIMITIVES 0

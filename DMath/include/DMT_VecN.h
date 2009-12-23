@@ -113,7 +113,8 @@ public:
 #endif
 
 	friend VecN	DSqrt( const VecN &a )	{ return _mm_sqrt_ps( a.v );	}
-	friend VecN	DRSqrt( const VecN &a )	{ return _mm_rsqrt_ps( a.v );	}
+	friend VecN	DRSqrt( const VecN &a )	{ return _mm_rsqrtnr_ps( a.v );	}
+	//friend VecN	DRSqrt( const VecN &a )	{ return _mm_rsqrt_ps( a.v );	}
 
 	// TODO: get a proper _mm_pow_ps !!!
 	//friend VecN	DPow( const VecN &a, const VecN &b ){ return _mm_pow_ps( a.v, b.v );	}
