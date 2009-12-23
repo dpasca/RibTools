@@ -44,12 +44,14 @@ public:
 		int		mDbgOnlyBucketAtY;
 		bool	mDbgShowBuckets;
 		bool	mDbgColorCodedGrids;
+		bool	mDbgRasterizeVerts;
 
 		Params() :
 			mDbgOnlyBucketAtX(-1),
 			mDbgOnlyBucketAtY(-1),
 			mDbgShowBuckets(false),
-			mDbgColorCodedGrids(false)
+			mDbgColorCodedGrids(false),
+			mDbgRasterizeVerts(false)
 		{
 		}
 	};

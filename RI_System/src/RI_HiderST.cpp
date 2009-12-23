@@ -353,27 +353,6 @@ inline void addMPSamples(
 				const float			*valCi
 			)
 {
-
-/*
-0    1    2    3    4
-minX
-| .25
-| minSubX
-|_|_________________
-|.|  |.   |.   |.   |
-| |. |  . |  . |  . |
-| | .|   .|   .|   .|
-|_.__|_.__|_.__|_.__|
-|.|  |.   |.   |.   |
-| |. |  . |  . |  . |
-| | .|   .|   .|   .|
-|_.__|_.__|_.__|_.__|
-|.   |.   |.   |.   |
-|  . |  . |  . |  . |
-|   .|   .|   .|   .|
-|_.__|_.__|_.__|_.__|
-*/
-
 	int	minX = (int)floor( minPos[0] );
 	int	maxX = (int) ceil( maxPos[0] );
 
@@ -459,118 +438,156 @@ void Hider::Bust(
 				u_int				screenWd,
 				u_int				screenHe ) const
 {
-	SlScalar screenCx  = SlScalar( screenWd * 0.5f );
-	SlScalar screenCy  = SlScalar( screenHe * 0.5f );
-	SlScalar screenHWd = SlScalar( screenWd * 0.5f );
-	SlScalar screenHHe = SlScalar( screenHe * 0.5f );
-
-	const SlVec3	*pPointsWS	= (const SlVec3 *)workGrid.mpPointsWS;
-
 	const SlColor	*pOi = (const SlColor *)workGrid.mSymbolIs.FindSymbolIData( "Oi" );
 	const SlColor	*pCi = (const SlColor *)workGrid.mSymbolIs.FindSymbolIData( "Ci" );
 
-	const SlVec3	 *pN = (const SlVec3  *)workGrid.mSymbolIs.FindSymbolIData( "N"	);
+	//const SlVec3	 *pN = (const SlVec3  *)workGrid.mSymbolIs.FindSymbolIData( "N"	);
 
-	static const SlScalar	one( 1 );
-
-	size_t	blocksN = RI_GET_SIMD_BLOCKS( workGrid.mPointsN );
-	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
-		SlVec4		homoP = V4__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
+		static const SlScalar	one( 1 );
 
-		SlVec4		projP = homoP / homoP.w();
+		SlScalar screenCx  = SlScalar( screenWd * 0.5f );
+		SlScalar screenCy  = SlScalar( screenHe * 0.5f );
+		SlScalar screenHWd = SlScalar( screenWd * 0.5f );
+		SlScalar screenHHe = SlScalar( screenHe * 0.5f );
 
-		// TODO: should replace pPointsWS with pPointsCS... ..to avoid this and also because
-		// perhaps P should indeed be in "current" space (camera)
-		SlVec3		PtCS = V3__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldCamera );
+		const SlVec3	*pPointsWS	= (const SlVec3 *)workGrid.mpPointsWS;
 
-		shadGrid.mpPointsCS[ blkIdx ]			= PtCS;
-		//shadGrid.mpPointsCloseCS[ blkIdx ]	= 0;
+		size_t	blocksN = RI_GET_SIMD_BLOCKS( workGrid.mPointsN );
+		for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
+		{
+			SlVec4		homoP = V4__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
 
-		shadGrid.mpPosWin[ blkIdx ][0] =  projP.x() * screenHWd + screenCx;
-		shadGrid.mpPosWin[ blkIdx ][1] = -projP.y() * screenHHe + screenCy;
+			SlVec4		projP = homoP / homoP.w();
 
-		shadGrid.mpCi[ blkIdx ] = pCi[ blkIdx ];
-		shadGrid.mpOi[ blkIdx ] = pOi[ blkIdx ];
+			// TODO: should replace pPointsWS with pPointsCS... ..to avoid this and also because
+			// perhaps P should indeed be in "current" space (camera)
+			SlVec3		PtCS = V3__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldCamera );
+
+			shadGrid.mpPointsCS[ blkIdx ]			= PtCS;
+			//shadGrid.mpPointsCloseCS[ blkIdx ]	= 0;
+
+			shadGrid.mpPosWin[ blkIdx ][0] =  projP.x() * screenHWd + screenCx;
+			shadGrid.mpPosWin[ blkIdx ][1] = -projP.y() * screenHHe + screenCy;
+
+			shadGrid.mpCi[ blkIdx ] = pCi[ blkIdx ];
+			shadGrid.mpOi[ blkIdx ] = pOi[ blkIdx ];
+		}
 	}
 
 	DASSERT( workGrid.mXDim == RI_GET_SIMD_BLOCKS( workGrid.mXDim ) * RI_SIMD_BLK_LEN );
 
-	size_t	sampIdx = 0;
-	u_int	xDim	= workGrid.mXDim;
-	u_int	yDim	= workGrid.mYDim;
 	u_int	xN		= workGrid.mXDim - 1;
 	u_int	yN		= workGrid.mYDim - 1;
 
 	u_int	buckWd	= bucket.GetWd();
 	u_int	buckHe	= bucket.GetHe();
 
-	// scan the grid.. for every potential micro-polygon
-	for (u_int i=0; i < yN; ++i)
+	if ( mParams.mDbgRasterizeVerts )
 	{
-		for (u_int j=0; j < xN; ++j, ++sampIdx)
+		// scan the grid.. for every vertex
+		size_t	srcVertIdx = 0;
+		for (u_int i=0; i < yN; ++i)
 		{
-			// vector coords of the micro-poly
-			u_int	vidx[4] = {
-						sampIdx+0,
-						sampIdx+1,
-						sampIdx+xDim,
-						sampIdx+xDim+1 };
-
-			Vec3f	minPos(  FLT_MAX,  FLT_MAX,  FLT_MAX );
-			Vec3f	maxPos( -FLT_MAX, -FLT_MAX, -FLT_MAX );
-
-			// calculate the bounds in window space and orientation
-			//	--------
-			//	| /\   |
-			//	|/   \ |
-			//	|\    /|
-			//	|  \ / |
-			//	--------
-			size_t	blk[4];
-			size_t	sub[4];
-			Vec3f	buckPos[4];
-
-			for (size_t k=0; k < 4; ++k)
+			for (u_int j=0; j < xN; ++j, ++srcVertIdx)
 			{
-				blk[k] = vidx[k] / RI_SIMD_BLK_LEN;
-				sub[k] = vidx[k] & (RI_SIMD_BLK_LEN-1);
+				u_int	blk = (u_int)srcVertIdx / RI_SIMD_BLK_LEN;
+				u_int	sub = (u_int)srcVertIdx & (RI_SIMD_BLK_LEN-1);
 
-				buckPos[k][0] = shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ] - (float)bucket.mX1;
-				buckPos[k][1] = shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ] - (float)bucket.mY1;
-				buckPos[k][2] = shadGrid.mpPointsCS[ blk[k] ][2][ sub[k] ];
+				int pixX = (int)floor( shadGrid.mpPosWin[ blk ][0][ sub ] - (float)bucket.mX1 );
+				int pixY = (int)floor( shadGrid.mpPosWin[ blk ][1][ sub ] - (float)bucket.mY1 );
 
-				updateMinMax( minPos, maxPos, buckPos[k] );
+				if ( pixX >= 0 && pixY >= 0 && pixX < (int)buckWd && pixY < (int)buckHe )
+				{
+					HiderPixel	&pixel = pixels[ pixY * buckWd + pixX ];
+
+					HiderSampleData *pSampData = pixel.mpSampDataLists[0].grow();
+
+					pSampData->mOi[0] = shadGrid.mpOi[ blk ][0][ sub ];
+					pSampData->mOi[1] = shadGrid.mpOi[ blk ][1][ sub ];
+					pSampData->mOi[2] = shadGrid.mpOi[ blk ][2][ sub ];
+
+					pSampData->mCi[0] = shadGrid.mpCi[ blk ][0][ sub ];
+					pSampData->mCi[1] = shadGrid.mpCi[ blk ][1][ sub ];
+					pSampData->mCi[2] = shadGrid.mpCi[ blk ][2][ sub ];
+
+					pSampData->mDepth = shadGrid.mpPointsCS[ blk ][2][ sub ];
+				}
 			}
 
-			// sample only from the first vertex.. no bilinear
-			// interpolation in the micro-poly !
-			float valOi[3] =
-				{
-					shadGrid.mpOi[ blk[0] ][0][ sub[0] ],
-					shadGrid.mpOi[ blk[0] ][1][ sub[0] ],
-					shadGrid.mpOi[ blk[0] ][2][ sub[0] ]
-				};
-			float valCi[3] =
-				{
-					shadGrid.mpCi[ blk[0] ][0][ sub[0] ],
-					shadGrid.mpCi[ blk[0] ][1][ sub[0] ],
-					shadGrid.mpCi[ blk[0] ][2][ sub[0] ]
-				};
-
-			addMPSamples(
-					*bucket.mpSampCoordsBuff,
-					&pixels[0],
-					minPos,
-					maxPos,
-					(int)buckWd,
-					(int)buckHe,
-					buckPos,
-					valOi,
-					valCi );
+			srcVertIdx += 1;
 		}
+	}
+	else
+	{
+		// scan the grid.. for every potential micro-polygon
+		size_t	srcVertIdx = 0;
+		for (u_int i=0; i < yN; ++i)
+		{
+			for (u_int j=0; j < xN; ++j, ++srcVertIdx)
+			{
+				// vector coords of the micro-poly
+				u_int	vidx[4] = {
+							srcVertIdx + 0,
+							srcVertIdx + 1,
+							srcVertIdx + xN+1,
+							srcVertIdx + xN+2 };
 
-		sampIdx += 1;
+				Vec3f	minPos(  FLT_MAX,  FLT_MAX,  FLT_MAX );
+				Vec3f	maxPos( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+
+				// calculate the bounds in window space and orientation
+				//	--------
+				//	| /\   |
+				//	|/   \ |
+				//	|\    /|
+				//	|  \ / |
+				//	--------
+				size_t	blk[4];
+				size_t	sub[4];
+				Vec3f	buckPos[4];
+
+				for (size_t k=0; k < 4; ++k)
+				{
+					blk[k] = vidx[k] / RI_SIMD_BLK_LEN;
+					sub[k] = vidx[k] & (RI_SIMD_BLK_LEN-1);
+
+					buckPos[k][0] = shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ] - (float)bucket.mX1;
+					buckPos[k][1] = shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ] - (float)bucket.mY1;
+					buckPos[k][2] = shadGrid.mpPointsCS[ blk[k] ][2][ sub[k] ];
+
+					updateMinMax( minPos, maxPos, buckPos[k] );
+				}
+
+				// sample only from the first vertex.. no bilinear
+				// interpolation in the micro-poly !
+				float valOi[3] =
+					{
+						shadGrid.mpOi[ blk[0] ][0][ sub[0] ],
+						shadGrid.mpOi[ blk[0] ][1][ sub[0] ],
+						shadGrid.mpOi[ blk[0] ][2][ sub[0] ]
+					};
+				float valCi[3] =
+					{
+						shadGrid.mpCi[ blk[0] ][0][ sub[0] ],
+						shadGrid.mpCi[ blk[0] ][1][ sub[0] ],
+						shadGrid.mpCi[ blk[0] ][2][ sub[0] ]
+					};
+
+				addMPSamples(
+						*bucket.mpSampCoordsBuff,
+						&pixels[0],
+						minPos,
+						maxPos,
+						(int)buckWd,
+						(int)buckHe,
+						buckPos,
+						valOi,
+						valCi );
+			}
+
+			srcVertIdx += 1;
+		}
 	}
 }
 
@@ -605,10 +622,10 @@ for (size_t i=0; i < RI_SIMD_BLK_LEN; ++i)
 }
 
 U8	andCode = 0xff;
-andCode &= ccodes[ sampIdx+0 ];
-andCode &= ccodes[ sampIdx+1 ];
-andCode &= ccodes[ sampIdx+xDim ];
-andCode &= ccodes[ sampIdx+xDim+1 ];
+andCode &= ccodes[ srcVertIdx+0 ];
+andCode &= ccodes[ srcVertIdx+1 ];
+andCode &= ccodes[ srcVertIdx+xDim ];
+andCode &= ccodes[ srcVertIdx+xDim+1 ];
 // all out ? Skip this
 if ( andCode )
 	continue;
@@ -702,11 +719,22 @@ void Hider::Hide(
 				DVec<HiderPixel>	&pixels,
 				HiderBucket			&buck )
 {
+	u_int	sampsPerPixel	;
+	float	ooSampsPerPixel ;
+
+	if ( mParams.mDbgRasterizeVerts )
+	{
+		sampsPerPixel	= 1;
+		ooSampsPerPixel = 1;
+	}
+	else
+	{
+		sampsPerPixel	= buck.mpSampCoordsBuff->GetSampsPerPixel();
+		ooSampsPerPixel = 1.0f / sampsPerPixel;
+	}
+
 	u_int	buckWd = buck.GetWd();
 	u_int	buckHe = buck.GetHe();
-
-	u_int	sampsPerPixel	= buck.mpSampCoordsBuff->GetSampsPerPixel();
-	float	ooSampsPerPixel = 1.0f / sampsPerPixel;
 
 	size_t	pixIdx = 0;
 	for (u_int y=0; y < buckHe; ++y)

@@ -32,10 +32,14 @@ public:
 
 	RenderOutputOpenGL	*mpRenderOutput;
 
+	// used for tricky menu/invalidated zone problem
+	int					mPostRedisplayCnt;
+
 	enum
 	{
 		MENUID_DBG_PICK_BUCKET,
 		MENUID_DBG_COLOR_CODE_GRIDS,
+		MENUID_DBG_RASTERIZE_VERTS,
 		MENUID_FILES = 200
 	};
 

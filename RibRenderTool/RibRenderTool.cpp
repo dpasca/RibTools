@@ -163,6 +163,7 @@ void RibRendTool::RebuildMenu()
 	glutAddMenuEntry( "-- Debug --", -1 );
 	addBoolMenuItem( "Pick Bucket Mode", mHiderParams.mDbgShowBuckets, MENUID_DBG_PICK_BUCKET );
 	addBoolMenuItem( "Color Coded Grids", mHiderParams.mDbgColorCodedGrids, MENUID_DBG_COLOR_CODE_GRIDS );
+	addBoolMenuItem( "Rasterize Vertices", mHiderParams.mDbgRasterizeVerts, MENUID_DBG_RASTERIZE_VERTS );
 	glutAddMenuEntry( "", -1 );
 
 	glutAddMenuEntry( "-- Test Files --", -1 );
@@ -184,15 +185,22 @@ void RibRendTool::MenuFunc( int id )
 	case MENUID_DBG_PICK_BUCKET:
 		mHiderParams.mDbgShowBuckets = !mHiderParams.mDbgShowBuckets;
 		RenderFile( true );
-		glutPostRedisplay();
 		RebuildMenu();
+		glutPostRedisplay();
 		return;
 
 	case MENUID_DBG_COLOR_CODE_GRIDS:
 		mHiderParams.mDbgColorCodedGrids = !mHiderParams.mDbgColorCodedGrids;
 		RenderFile( true );
-		glutPostRedisplay();
 		RebuildMenu();
+		glutPostRedisplay();
+		return;
+
+	case MENUID_DBG_RASTERIZE_VERTS:
+		mHiderParams.mDbgRasterizeVerts = !mHiderParams.mDbgRasterizeVerts;
+		RenderFile( true );
+		RebuildMenu();
+		glutPostRedisplay();
 		return;
 	}
 
@@ -293,6 +301,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 //===============================================================
 void RibRendTool::sDisplayFunc()
 {
+	printf( "REDRAW\n" );
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if ( mspThis->mpRenderOutput )
