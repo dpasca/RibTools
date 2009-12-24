@@ -51,7 +51,14 @@ const FltVec &Param::NumVec( size_t n )
 	if ( type == INT_ARR )
 	{
 		if ( n != DNPOS )
+		{
 			ensIntArr( n );
+		}
+		else
+		{
+			// get the proper N from the int array !
+			n = u.intArrayVal.size();
+		}
 
 		// first time ?
 		if ( u.floatArrayVal.size() != n )
@@ -66,7 +73,9 @@ const FltVec &Param::NumVec( size_t n )
 		{
 			// check it !
 			for (size_t i=0; i < u.intArrayVal.size(); ++i)
+			{
 				DASSERT( u.floatArrayVal[i] == (float)u.intArrayVal[i] );
+			}
 		}
 #endif
 	}

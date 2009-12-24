@@ -160,6 +160,23 @@ public:
 		mVRange[1] = 1;
 	}
 
+	SimplePrimitiveBase(
+				PrimitiveBase::Type type,
+				float umin,
+				float umax,
+				float vmin,
+				float vmax ) :
+		PrimitiveBase(type),
+		mSplitCnt(0),
+		mDiceGridWd(-1),
+		mDiceGridHe(-1)
+	{
+		mURange[0] = umin;
+		mURange[1] = umax;
+		mVRange[0] = vmin;
+		mVRange[1] = vmax;
+	}
+
 	virtual ~SimplePrimitiveBase() {}
 
 		bool	IsComplex() const		{ return false;	}

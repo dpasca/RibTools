@@ -294,7 +294,6 @@ void Machine::AddCommand(	const DStr	&cmdName,
 										float	vmin	= (float)p[8];
 										float	vmax	= (float)p[9];
 
-/*
 										mState.NuPatch(
 												nu		,
 												uorder	,
@@ -308,7 +307,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 												vmax	,
 												p
 											);
-*/
+
 									}	else
 
 	if ( nm == "Polygon" )				{ geN( 2, p ); mState.Polygon( p ); }	else

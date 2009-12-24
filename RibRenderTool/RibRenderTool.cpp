@@ -301,7 +301,6 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 //===============================================================
 void RibRendTool::sDisplayFunc()
 {
-	printf( "REDRAW\n" );
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if ( mspThis->mpRenderOutput )

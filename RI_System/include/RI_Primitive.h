@@ -13,6 +13,7 @@
 #include "RI_Primitive_Quadric.h"
 #include "RI_Primitive_Patch.h"
 #include "RI_Primitive_Poly.h"
+#include "RI_Primitive_NuPatch.h"
 
 //==================================================================
 namespace RI

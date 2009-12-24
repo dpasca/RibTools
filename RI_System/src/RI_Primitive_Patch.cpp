@@ -364,24 +364,4 @@ void PatchBicubic::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-/// NuPatch
-//==================================================================
-NuPatch::NuPatch(
-			int		nu		,
-			int		uorder	,
-			const float	*pUknot	,
-			float	umin	,
-			float	umax	,
-			int		nv		,
-			int		vorder	,
-			const float	*pVknot	,
-			float	vmin	,
-			float	vmax	,
-			ParamList &params
-			) :
-		SimplePrimitiveBase(PrimitiveBase::NUPATCH)
-{
-}
-
-//==================================================================
 }

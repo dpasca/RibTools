@@ -445,6 +445,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_Primitive_NuPatch.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_Primitive_NuPatch.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_Primitive_Patch.cpp"
 				>
 			</File>
@@ -466,6 +474,10 @@
 			</File>
 			<File
 				RelativePath="..\include\RI_Primitive_Quadric.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_Primitive_Utils.h"
 				>
 			</File>
 			<File
