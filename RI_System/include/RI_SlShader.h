@@ -208,13 +208,13 @@ public:
 
 	SlShaderInst( const SlShaderInst &right )
 	{
-		moShader.Borrow( right.moShader.Use() );
+		moShader.Borrow( right.moShader );
 		//mCallSymIList	= right.mCallSymIList;
 	}
 
 	void operator = ( const SlShaderInst &right )
 	{
-		moShader.Borrow( right.moShader.Use() );
+		moShader.Borrow( right.moShader );
 		//mCallSymIList	= right.mCallSymIList;
 	}
 

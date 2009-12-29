@@ -172,6 +172,7 @@ void RibRendTool::RebuildMenu()
 	mTestRibFilesPaths.clear();
 
 	addDirToMenu( "TestScenes", "rib" );
+	addDirToMenu( "TestScenes/KillerooNURBS", "rib" );
 	addDirToMenu( "TestScenes/Sponza", "rib" );
 	addDirToMenu( "TestScenes/LightsTests", "rib" );
 	addDirToMenu( "TestScenes/ValuesTests", "rib" );

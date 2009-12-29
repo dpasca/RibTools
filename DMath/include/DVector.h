@@ -109,7 +109,7 @@ public:
 	{
 		v3[0] = v3[1] = v3[2] = 0.f;
 	}
-	
+
 	Vec3 operator + (const _S& rval) const { return Vec3( v3[0] + rval, v3[1] + rval, v3[2] + rval ); }
 	Vec3 operator - (const _S& rval) const { return Vec3( v3[0] - rval, v3[1] - rval, v3[2] - rval ); }
 	Vec3 operator * (const _S& rval) const { return Vec3( v3[0] * rval, v3[1] * rval, v3[2] * rval ); }
@@ -194,6 +194,27 @@ public:
 	Vec4( const _S& x_, const _S& y_, const _S& z_, const _S& w_ )	{ v4[0] = x_; v4[1] = y_; v4[2] = z_; v4[3] = w_; }
 	Vec4( const _S *p_ )								{ v4[0] = p_[0]; v4[1] = p_[1]; v4[2] = p_[2]; v4[3] = p_[3]; }
 
+	void Set( const _S& x_, const _S& y_, const _S& z_, const _S& w_ )
+	{
+		v4[0] = x_;
+		v4[1] = y_;
+		v4[2] = z_;
+		v4[3] = w_;
+	}
+
+	void Set( const _S *p_ )
+	{
+		v4[0] = p_[0];
+		v4[1] = p_[1];
+		v4[2] = p_[2];
+		v4[3] = p_[3];
+	}
+
+	void SetZero()
+	{
+		v4[0] = v4[1] = v4[2] = v4[3] = 0.f;
+	}
+
 	Vec3<_S> GetAsV3() const
 	{
 		return Vec3<_S>( v4 );
@@ -248,6 +269,7 @@ typedef	Vec2<float>							Vec2f;
 typedef	Vec3<float>							Vec3f;
 typedef	Vec4<float>							Vec4f;
 typedef	VecN<float,DMT_SIMD_FLEN>			VecSIMDf;
+typedef	VecN<int,DMT_SIMD_FLEN>				VecSIMDi;
 
 typedef	Vec2< VecN<float,DMT_SIMD_FLEN> >	Vec2xSIMDf;
 typedef	Vec3< VecN<float,DMT_SIMD_FLEN> >	Vec3xSIMDf;

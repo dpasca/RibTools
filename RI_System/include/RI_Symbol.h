@@ -18,6 +18,7 @@ namespace RI
 //==================================================================
 #if defined(_MSC_VER)
 typedef __declspec(align(64)) VecSIMDf		SlScalar;
+typedef __declspec(align(64)) VecSIMDi		SlScalari;
 typedef __declspec(align(64)) Vec3xSIMDf	SlColor;
 typedef __declspec(align(64)) Vec2xSIMDf	SlVec2;
 typedef __declspec(align(64)) Vec3xSIMDf	SlVec3;
@@ -25,6 +26,7 @@ typedef __declspec(align(64)) Vec4xSIMDf	SlVec4;
 
 #elif defined(__GNUC__)
 typedef VecSIMDf	SlScalar	__attribute__ ((aligned(64)));
+typedef VecSIMDi	SlScalari	__attribute__ ((aligned(64)));
 typedef Vec3xSIMDf	SlColor		__attribute__ ((aligned(64)));
 typedef Vec2xSIMDf	SlVec2		__attribute__ ((aligned(64)));
 typedef Vec3xSIMDf	SlVec3		__attribute__ ((aligned(64)));
