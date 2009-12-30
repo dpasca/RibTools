@@ -6,6 +6,7 @@
 /// copyright info. 
 //==================================================================
 
+#include "stdafx.h"
 #include "RibRenderLib_Net.h"
 #include "DSystem/include/DNetwork_Connecter.h"
 #include "DSystem/include/DUtils_MemFile.h"

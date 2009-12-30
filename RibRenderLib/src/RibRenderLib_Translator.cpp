@@ -1,40 +1,40 @@
 //==================================================================
-/// RI_Machine.cpp
+/// RibRenderLib_Translator.cpp
 ///
-/// Created by Davide Pasca - 2008/12/17
+/// Created by Davide Pasca - 2009/12/30
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_Machine.h"
+#include "RibRenderLib_Translator.h"
 
 //==================================================================
-namespace RI
+namespace RRL
 {
 
 //==================================================================
 /// 
 //==================================================================
-Machine::Machine( const Params &params ) :
+Translator::Translator( const Params &params ) :
 	mState(params.mState),
 	mParams(params)
 {
 }
 
 //==================================================================
-void Machine::unknownCommand( const char *pCmdName )
+void Translator::unknownCommand( const char *pCmdName )
 {
 	printf( "Unknown command %s !\n", pCmdName );
 }
 
 //==================================================================
-void Machine::exN( size_t n, const ParamList &cmdParams )
+void Translator::exN( size_t n, const RI::ParamList &cmdParams )
 {
 	if NOT( cmdParams.size() == n )
 	{
 		mState.ErrHandler(
-				E_BADARGUMENT,
+				RI::E_BADARGUMENT,
 				"Expecting %i params, got %i",
 				n, cmdParams.size() );
 		DASSTHROW( false, ("E_BADARGUMENT") );
@@ -42,12 +42,12 @@ void Machine::exN( size_t n, const ParamList &cmdParams )
 }
 
 //==================================================================
-void Machine::geN( size_t n, const ParamList &cmdParams )
+void Translator::geN( size_t n, const RI::ParamList &cmdParams )
 {
 	if NOT( cmdParams.size() >= n  )
 	{
 		mState.ErrHandler(
-				E_BADARGUMENT,
+				RI::E_BADARGUMENT,
 				"Expecting at least %i params, got %i",
 				n, cmdParams.size() );
 		DASSTHROW( false, ("E_BADARGUMENT") );
@@ -55,7 +55,7 @@ void Machine::geN( size_t n, const ParamList &cmdParams )
 }
 
 //==================================================================
-static void mkBound( Bound &out_Bound, ParamList &cmdParams )
+static void mkBound( RI::Bound &out_Bound, RI::ParamList &cmdParams )
 {
 	if ( cmdParams.size() == 1 )
 	{
@@ -81,7 +81,7 @@ static void mkBound( Bound &out_Bound, ParamList &cmdParams )
 }
 
 //==================================================================
-static RtToken matchToken( const char *pStr, RtToken pAllowedTokens[] )
+RtToken Translator::matchToken( const char *pStr, RtToken pAllowedTokens[] )
 {
 	for (int i=0; pAllowedTokens[i] != 0; ++i)
 	{
@@ -93,7 +93,7 @@ static RtToken matchToken( const char *pStr, RtToken pAllowedTokens[] )
 }
 
 //==================================================================
-void Machine::addFormatCmd( ParamList &p )
+void Translator::addFormatCmd( RI::ParamList &p )
 {
 	exN( 3, p );
 
@@ -134,66 +134,11 @@ void Machine::addFormatCmd( ParamList &p )
 }
 
 //==================================================================
-bool Machine::addCommand_prims(
-							const DStr	&nm,
-							ParamList	&p )
-{
-	static RtToken tlPatch0[]			= { RI_BILINEAR, RI_BICUBIC, 0 };
-
-	if ( nm == "Cone" )				{ exN( 3, p ); mState.Cone(			p[0], p[1], p[2] ); }	else
-	if ( nm == "Cylinder" )			{ exN( 4, p ); mState.Cylinder(		p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Sphere" )			{ exN( 4, p ); mState.Sphere(		p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Hyperboloid" )		{ exN( 7, p ); mState.Hyperboloid(	Vec3f( p[0], p[1], p[2] ),
-																		Vec3f( p[3], p[4], p[5] ),
-																		p[6] ); }	else
-	if ( nm == "Paraboloid" )		{ exN( 4, p ); mState.Paraboloid(	p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Torus" )			{ exN( 5, p ); mState.Torus(		p[0], p[1], p[2], p[3], p[4] ); }	else
-	if ( nm == "Patch" )			{ geN( 3, p ); mState.Patch(		matchToken( p[0], tlPatch0 ), p ); }	else
-	if ( nm == "PatchMesh" )		{ geN( 5, p ); mState.PatchMesh(	matchToken( p[0], tlPatch0 ), p ); }	else
-
-	if ( nm == "NuPatch" )			{
-										geN( 11, p );
-										int		nu		= (int)p[0];
-										int		uorder	= (int)p[1];
-										const float	*pUknot	= p[2].PFlt();
-										float	umin	= (float)p[3];
-										float	umax	= (float)p[4];
-										int		nv		= (int)p[5];
-										int		vorder	= (int)p[6];
-										const float	*pVknot	= p[7].PFlt();
-										float	vmin	= (float)p[8];
-										float	vmax	= (float)p[9];
-
-										mState.NuPatch(
-												nu		,
-												uorder	,
-												pUknot	,
-												umin	,
-												umax	,
-												nv		,
-												vorder	,
-												pVknot	,
-												vmin	,
-												vmax	,
-												p
-											);
-
-									}	else
-
-	if ( nm == "Polygon" )				{ geN( 2, p ); mState.Polygon( p ); }	else
-	if ( nm == "PointsGeneralPolygons" ){ geN( 5, p ); mState.PointsGeneralPolygons( p ); }
-	else
-		return false;
-
-	return true;
-}
-
-//==================================================================
-void Machine::AddCommand(	const DStr	&cmdName,
-							ParamList	&cmdParams )
+void Translator::AddCommand(	const DStr	&cmdName,
+							RI::ParamList	&cmdParams )
 {
 	const DStr	&nm = cmdName;
-	ParamList	&p = cmdParams;
+	RI::ParamList	&p = cmdParams;
 
 	static RtToken tlSolidBegin[]		= { RI_PRIMITIVE, RI_INTERSECTION, RI_UNION, RI_DIFFERENCE, 0 };
 	static RtToken tlGeometricApproximation[]	= { RI_FLATNESS, 0 };
@@ -217,8 +162,8 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "MotionBegin" )		{ exN( 2, p ); mState.MotionBegin( p[0], p[0].PFlt() ); } else
 	if ( nm == "MotionEnd" )		{ exN( 0, p ); mState.MotionEnd();			}	else
 	// attributes
-	if ( nm == "Bound" )			{ Bound b; mkBound( b, p ); mState.DoBound( b );	}	else
-	if ( nm == "Detail" )			{ Bound b; mkBound( b, p ); mState.Detail( b ); }	else
+	if ( nm == "Bound" )			{ RI::Bound b; mkBound( b, p ); mState.DoBound( b );	}	else
+	if ( nm == "Detail" )			{ RI::Bound b; mkBound( b, p ); mState.Detail( b ); }	else
 	if ( nm == "DetailRange" )		{ exN( 4, p ); mState.DetailRange(p[0],p[1],p[2],p[3]);	}	else
 	if ( nm == "GeometricApproximation" )
 									{
@@ -284,50 +229,19 @@ void Machine::AddCommand(	const DStr	&cmdName,
 		mState.Displacement( p );
 	}
 	else
-	// options
-	if ( nm == "Format" )
 	{
-		addFormatCmd( p );
-	}
-	else
-	if ( nm == "FrameAspectRatio" )	{ exN( 1, p ); mState.FrameAspectRatio( p[0] );	}	else
-	if ( nm == "ScreenWindow" )		{ exN( 4, p ); mState.ScreenWindow(		p[0], p[1], p[2], p[3] );	}	else
-	if ( nm == "CropWindow" )		{ exN( 4, p ); mState.CropWindow(		p[0], p[1], p[2], p[3] );	}	else
-	if ( nm == "Projection" )		{ geN( 1, p ); mState.Projection(	p );	}	else
-	if ( nm == "Clipping" )			{ exN( 2, p ); mState.Clipping(		p[0], p[1] );	}	else
-	if ( nm == "DepthOfField" )		{ exN( 3, p ); mState.DepthOfField(	p[0], p[1], p[2] );	}	else
-	if ( nm == "Shutter" )			{ exN( 2, p ); mState.Shutter(		p[0], p[1] );	}	else
-	if ( nm == "Color"	)			
-	{
-		geN( 1, p );
-		if ( p.size() == 1 )
-			mState.ColorSet( p[0].PFlt(3) );
-		else
-		if ( p.size() == 3 )
-			mState.ColorSet( Color( p[0].Flt(), p[1].Flt(), p[2].Flt() ) );
-		else
-		{
-			DASSTHROW( false, ("Wrong param count") );
-		}
-	}
-	else
-	if ( nm == "Opacity" )			{ exN( 1, p ); mState.Opacity(		p[0].PFlt(3) );	}	else
-	if ( nm == "PixelSamples" )		{ exN( 2, p ); mState.PixelSamples( p[0], p[1] );	}	else
-	
-	
-	// transformations
-	if ( nm == "Identity" )			{ exN( 0, p ); mState.Identity();							}	else
-	if ( nm == "ConcatTransform" )	{ exN( 1, p ); mState.ConcatTransform(	p[0].PFlt(16) );	}	else
-	if ( nm == "Transform" )		{ exN( 1, p ); mState.TransformCmd(	p[0].PFlt(16) );	}	else
-	if ( nm == "Scale" )			{ exN( 3, p ); mState.Scale(		p[0], p[1], p[2] );	}	else
-	if ( nm == "Rotate" )			{ exN( 4, p ); mState.Rotate(		p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Translate" )		{ exN( 3, p );
-									mState.Translate(	p[0], p[1], p[2] );	}
-	else
+		// primitives
+		if ( addCommand_prims( nm, p ) )
+			return;
 
-	// primitives
-	if NOT( addCommand_prims( nm, p ) )
-	{
+		// transformations
+		if ( addCommand_transforms( nm, p ) )
+			return;
+
+		// options
+		if ( addCommand_options( nm, p ) )
+			return;
+
 		// unknown
 		unknownCommand( nm.c_str() );
 	}

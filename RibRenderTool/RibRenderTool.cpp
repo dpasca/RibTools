@@ -265,7 +265,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	RI::Framework	framework( mpRenderOutput, NULL, mHiderParams );
 	RI::FileManagerDisk	fileManager;
 
-	RI::Machine::Params	params;
+	RRL::Translator::Params	params;
 	params.mState.mpFramework			= &framework;
 	params.mState.mpFileManager			= &fileManager;
 	params.mState.mBaseDir				= baseDir;
@@ -277,11 +277,9 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	params.mForcedWd					= forcedWd;
 	params.mForcedHe					= forcedHe;
 
-	RI::Machine			machine( params );
-
 	try
 	{
-		RRL::Render	render( pFileName, machine, fileManager );
+		RRL::Render	render( pFileName, params, fileManager );
 	}
 	catch ( std::bad_alloc )
 	{

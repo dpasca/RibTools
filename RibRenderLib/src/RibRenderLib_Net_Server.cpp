@@ -6,6 +6,7 @@
 /// copyright info. 
 //==================================================================
 
+#include "stdafx.h"
 #include "RibRenderLib_Net_FileServer.h"
 #include "RibRenderLib_Net_FileManager.h"
 #include "RibRenderLib_Net_Server.h"

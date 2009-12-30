@@ -375,14 +375,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Machine.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Machine.h"
-				>
-			</File>
-			<File
 				RelativePath="..\include\RI_MicroPolygon.h"
 				>
 			</File>

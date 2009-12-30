@@ -14,9 +14,9 @@
 
 #include "RI_System/include/RI_Render.h"
 #include "RI_System/include/RI_Net_Protocol.h"
-#include "RI_System/include/RI_Machine.h"
 #include "RI_System/include/RI_Framework.h"
 
+#include "RibRenderLib_Translator.h"
 #include "RibRenderLib_Net.h"
 
 //==================================================================
@@ -32,7 +32,7 @@ class Render
 public:
 	Render(
 		const char			*pFileName,
-		RI::Machine			&machine,
+		Translator::Params	&transParams,
 		RI::FileManagerBase	&fileManager,
 		bool				verbose=false );
 };

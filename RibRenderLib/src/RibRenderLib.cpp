@@ -6,6 +6,7 @@
 /// copyright info. 
 //==================================================================
 
+#include "stdafx.h"
 #include "RibRenderLib.h"
 #include "DSystem/include/DNetwork_Connecter.h"
 #include "RI_System/include/RI_Parser.h"
@@ -18,7 +19,7 @@ namespace RRL
 /// Render
 //==================================================================
 Render::Render( const char			*pFileName,
-			    RI::Machine			&machine,
+				Translator::Params	&transParams,
 				RI::FileManagerBase	&fileManager,
 				bool				verbose )
 {
@@ -27,6 +28,8 @@ Render::Render( const char			*pFileName,
 	fileManager.GrabFile( pFileName, file );
 
 	RI::Parser	parser;
+
+	Translator		machine( transParams );
 
 	machine.GetState().Begin( "dummy" );
 

@@ -51,7 +51,7 @@
 				RuntimeLibrary="3"
 				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -184,7 +184,7 @@
 				EnableFunctionLevelLinking="true"
 				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -302,52 +302,112 @@
 				RelativePath="..\include\RibRenderLib.h"
 				>
 			</File>
+			<Filter
+				Name="Net"
+				>
+				<File
+					RelativePath="..\src\RibRenderLib_Net.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RibRenderLib_Net.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RibRenderLib_Net_FileManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RibRenderLib_Net_FileManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RibRenderLib_Net_FileServer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RibRenderLib_Net_FileServer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RibRenderLib_Net_RenderBucketsClient.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RibRenderLib_Net_RenderBucketsClient.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RibRenderLib_Net_RenderBucketsServer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RibRenderLib_Net_RenderBucketsServer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RibRenderLib_Net_Server.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RibRenderLib_Net_Server.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Translator"
+				>
+				<File
+					RelativePath="..\src\RibRenderLib_Translator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RibRenderLib_Translator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RibRenderLib_Translator_Options.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RibRenderLib_Translator_Prims.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RibRenderLib_Translator_Transforms.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Precompiled Headers"
+			>
 			<File
-				RelativePath="..\src\RibRenderLib_Net.cpp"
+				RelativePath=".\stdafx.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
-				RelativePath="..\include\RibRenderLib_Net.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RibRenderLib_Net_FileManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RibRenderLib_Net_FileManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RibRenderLib_Net_FileServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RibRenderLib_Net_FileServer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RibRenderLib_Net_RenderBucketsClient.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RibRenderLib_Net_RenderBucketsClient.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RibRenderLib_Net_RenderBucketsServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RibRenderLib_Net_RenderBucketsServer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RibRenderLib_Net_Server.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RibRenderLib_Net_Server.h"
+				RelativePath=".\targetver.h"
 				>
 			</File>
 		</Filter>

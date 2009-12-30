@@ -6,6 +6,7 @@
 /// copyright info. 
 //==================================================================
 
+#include "stdafx.h"
 #include "RibRenderLib_Net_RenderBucketsClient.h"
 
 //#define NO_LOCAL_RENDERING

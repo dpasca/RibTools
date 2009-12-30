@@ -1,6 +1,9 @@
 ##RenderMan RIB-Structure 1.0
 ##Creator iges2rib v1.0 2000/02/12 12:11:45
-Option "searchpath" "shader" ["&:/usr/staff/revel/architec/products/headus/lib/shaders"]
+
+# DAVIDE - Option "searchpath" "shader" ["&:/usr/staff/revel/architec/products/headus/lib/shaders"]
+Option "searchpath" "shader" ["@:./Shaders"]
+
 FrameBegin 1
 Display "killeroo.0001.tif" "file" "rgba"
 PixelSamples 2 2

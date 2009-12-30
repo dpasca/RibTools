@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 #include "RI_Parser.h"
-#include "RI_Machine.h"
 #include "RI_Render.h"
 
 //==================================================================
