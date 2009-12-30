@@ -46,7 +46,8 @@ public:
 		copyFrom( from );
 	}
 
-	virtual ~DVec()
+	// virtual
+	~DVec()
 	{
 		clear();
 		freeAll();

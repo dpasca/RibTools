@@ -157,6 +157,8 @@ public:
 	void Clipping( float near, float farr );
 	void DepthOfField( float fStop, float focalLength, float focalDistance );
 	void Shutter( float openShutter, float closeShutter );
+	// options.display
+	void PixelSamples( int samplesX, int samplesY );
 
 	// transforms
 	void Identity();

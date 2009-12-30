@@ -545,6 +545,15 @@ void State::Shutter( float openShutter, float closeShutter )
 }
 
 //==================================================================
+void State::PixelSamples( int samplesX, int samplesY )
+{
+	if NOT( verifyOpType( OPTYPE_OPTS ) )
+		return;
+
+	mOptionsStack.top().cmdPixelSamples( samplesX, samplesY );
+}
+
+//==================================================================
 void State::Identity()
 {
 	mTransformOpenStack.top().SetIdentity();

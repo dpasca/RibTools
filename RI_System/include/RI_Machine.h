@@ -62,6 +62,8 @@ private:
 
 	void addFormatCmd( ParamList &p );
 
+	bool addCommand_prims( const DStr &nm, ParamList &p );
+
 };
 
 //==================================================================

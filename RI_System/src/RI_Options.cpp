@@ -59,6 +59,8 @@ void Options::Init( const SymbolList *pGlobalSyms, RevisionTracker *pRevision )
 	ParamList	plist;
 	plist.Add( RI_ORTHOGRAPHIC );
 	cmdProjection( plist );
+
+	mDisp.Init();
 }
 
 //==================================================================
@@ -156,6 +158,15 @@ void Options::cmdShutter( float openShutter, float closeShutter )
 	mCloseShutter	= closeShutter;
 
 	mpRevision->BumpRevision();
+}
+
+//==================================================================
+void Options::cmdPixelSamples( int samplesX, int samplesY )
+{
+	// minimum value is 1 as per RISpec.. but we also set a
+	// maximum value.. just in case !
+	mDisp.mPixSamples[0] = D::Clamp( samplesX, 1, 64 );
+	mDisp.mPixSamples[1] = D::Clamp( samplesY, 1, 64 );
 }
 
 //==================================================================

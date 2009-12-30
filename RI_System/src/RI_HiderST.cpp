@@ -16,7 +16,6 @@ static const u_int	BUCKET_SIZE = 128;
 
 //==================================================================
 #define MAX_DATA_PER_SAMPLE	1024
-#define SUB_SAMP_DIM_LOG2	2		// 4 x 4
 
 //==================================================================
 namespace RI
@@ -74,6 +73,35 @@ HiderSampleCoordsBuffer *Hider::findOrAddSampCoordBuff( u_int wd, u_int he, u_in
 }
 
 //==================================================================
+static u_int findClosestSquareAreaLog2Dim( int dimX, int dimY )
+{
+	int	reqSubArea = dimX * dimY;
+
+	u_int	subPixDimLog2;
+
+	for (subPixDimLog2 = 0; subPixDimLog2 <= 8; ++subPixDimLog2)
+	{
+		int	dimSquareL = (1 << ((subPixDimLog2 + 0) << 1));
+		int	dimSquareR = (1 << ((subPixDimLog2 + 1) << 1));
+
+		// is the requested subpixel area less than the next log2 area
+		// and greater or equal than the current log2 area ?
+		if ( reqSubArea < dimSquareR && reqSubArea >= dimSquareL )
+		{
+			int	diffToL = DAbs( reqSubArea - dimSquareL );
+			int	diffToR = DAbs( reqSubArea - dimSquareR );
+
+			if ( diffToR < diffToL )
+				++subPixDimLog2;
+
+			break;
+		}
+	}
+
+	return subPixDimLog2;
+}
+
+//==================================================================
 void Hider::WorldBegin(
 					const Options &opt,
 					const Matrix44 &mtxWorldCamera )
@@ -85,6 +113,11 @@ void Hider::WorldBegin(
 	
 	mFinalBuff.Setup( opt.mXRes, opt.mYRes );
 	mFinalBuff.Clear();
+
+	u_int subPixDimLog2 =
+			findClosestSquareAreaLog2Dim(
+					opt.mDisp.mPixSamples[0],
+					opt.mDisp.mPixSamples[1] );
 	
 #if 0
 	// DNEW instead ?
@@ -108,7 +141,7 @@ void Hider::WorldBegin(
 				 mParams.mDbgOnlyBucketAtY < y2 )
 			{
 				HiderSampleCoordsBuffer	*pSampCoordsBuff =
-						findOrAddSampCoordBuff( x2 - x, y2 - y, SUB_SAMP_DIM_LOG2 );
+						findOrAddSampCoordBuff( x2 - x, y2 - y, subPixDimLog2 );
 
 				mpBuckets.push_back(
 						DNEW HiderBucket( x, y, x2, y2, pSampCoordsBuff ) );

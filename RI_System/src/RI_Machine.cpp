@@ -134,6 +134,61 @@ void Machine::addFormatCmd( ParamList &p )
 }
 
 //==================================================================
+bool Machine::addCommand_prims(
+							const DStr	&nm,
+							ParamList	&p )
+{
+	static RtToken tlPatch0[]			= { RI_BILINEAR, RI_BICUBIC, 0 };
+
+	if ( nm == "Cone" )				{ exN( 3, p ); mState.Cone(			p[0], p[1], p[2] ); }	else
+	if ( nm == "Cylinder" )			{ exN( 4, p ); mState.Cylinder(		p[0], p[1], p[2], p[3] ); }	else
+	if ( nm == "Sphere" )			{ exN( 4, p ); mState.Sphere(		p[0], p[1], p[2], p[3] ); }	else
+	if ( nm == "Hyperboloid" )		{ exN( 7, p ); mState.Hyperboloid(	Vec3f( p[0], p[1], p[2] ),
+																		Vec3f( p[3], p[4], p[5] ),
+																		p[6] ); }	else
+	if ( nm == "Paraboloid" )		{ exN( 4, p ); mState.Paraboloid(	p[0], p[1], p[2], p[3] ); }	else
+	if ( nm == "Torus" )			{ exN( 5, p ); mState.Torus(		p[0], p[1], p[2], p[3], p[4] ); }	else
+	if ( nm == "Patch" )			{ geN( 3, p ); mState.Patch(		matchToken( p[0], tlPatch0 ), p ); }	else
+	if ( nm == "PatchMesh" )		{ geN( 5, p ); mState.PatchMesh(	matchToken( p[0], tlPatch0 ), p ); }	else
+
+	if ( nm == "NuPatch" )			{
+										geN( 11, p );
+										int		nu		= (int)p[0];
+										int		uorder	= (int)p[1];
+										const float	*pUknot	= p[2].PFlt();
+										float	umin	= (float)p[3];
+										float	umax	= (float)p[4];
+										int		nv		= (int)p[5];
+										int		vorder	= (int)p[6];
+										const float	*pVknot	= p[7].PFlt();
+										float	vmin	= (float)p[8];
+										float	vmax	= (float)p[9];
+
+										mState.NuPatch(
+												nu		,
+												uorder	,
+												pUknot	,
+												umin	,
+												umax	,
+												nv		,
+												vorder	,
+												pVknot	,
+												vmin	,
+												vmax	,
+												p
+											);
+
+									}	else
+
+	if ( nm == "Polygon" )				{ geN( 2, p ); mState.Polygon( p ); }	else
+	if ( nm == "PointsGeneralPolygons" ){ geN( 5, p ); mState.PointsGeneralPolygons( p ); }
+	else
+		return false;
+
+	return true;
+}
+
+//==================================================================
 void Machine::AddCommand(	const DStr	&cmdName,
 							ParamList	&cmdParams )
 {
@@ -144,7 +199,6 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	static RtToken tlGeometricApproximation[]	= { RI_FLATNESS, 0 };
 	static RtToken tlOrientation[]		= { RI_OUTSIDE, RI_INSIDE, RI_LH, RI_RH, 0 };
 	static RtToken tlBasis[]			= { RI_BEZIERBASIS, RI_BSPLINEBASIS, RI_POWERBASIS, RI_CATMULLROMBASIS, RI_HERMITEBASIS, 0 };
-	static RtToken tlPatch0[]			= { RI_BILINEAR, RI_BICUBIC, 0 };
 
 	if ( nm == "Begin" )			{ exN( 1, p ); mState.Begin( p[0] );		}	else
 	if ( nm == "End" )				{ exN( 0, p ); mState.End();				}	else
@@ -258,6 +312,7 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	}
 	else
 	if ( nm == "Opacity" )			{ exN( 1, p ); mState.Opacity(		p[0].PFlt(3) );	}	else
+	if ( nm == "PixelSamples" )		{ exN( 2, p ); mState.PixelSamples( p[0], p[1] );	}	else
 	
 	
 	// transformations
@@ -267,53 +322,15 @@ void Machine::AddCommand(	const DStr	&cmdName,
 	if ( nm == "Scale" )			{ exN( 3, p ); mState.Scale(		p[0], p[1], p[2] );	}	else
 	if ( nm == "Rotate" )			{ exN( 4, p ); mState.Rotate(		p[0], p[1], p[2], p[3] ); }	else
 	if ( nm == "Translate" )		{ exN( 3, p );
-									mState.Translate(	p[0], p[1], p[2] );	}	else
+									mState.Translate(	p[0], p[1], p[2] );	}
+	else
 
 	// primitives
-	if ( nm == "Cone" )				{ exN( 3, p ); mState.Cone(			p[0], p[1], p[2] ); }	else
-	if ( nm == "Cylinder" )			{ exN( 4, p ); mState.Cylinder(		p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Sphere" )			{ exN( 4, p ); mState.Sphere(		p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Hyperboloid" )		{ exN( 7, p ); mState.Hyperboloid(	Vec3f( p[0], p[1], p[2] ),
-																		Vec3f( p[3], p[4], p[5] ),
-																		p[6] ); }	else
-	if ( nm == "Paraboloid" )		{ exN( 4, p ); mState.Paraboloid(	p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Torus" )			{ exN( 5, p ); mState.Torus(		p[0], p[1], p[2], p[3], p[4] ); }	else
-	if ( nm == "Patch" )			{ geN( 3, p ); mState.Patch(		matchToken( p[0], tlPatch0 ), p ); }	else
-	if ( nm == "PatchMesh" )		{ geN( 5, p ); mState.PatchMesh(	matchToken( p[0], tlPatch0 ), p ); }	else
-
-	if ( nm == "NuPatch" )			{
-										geN( 11, p );
-										int		nu		= (int)p[0];
-										int		uorder	= (int)p[1];
-										const float	*pUknot	= p[2].PFlt();
-										float	umin	= (float)p[3];
-										float	umax	= (float)p[4];
-										int		nv		= (int)p[5];
-										int		vorder	= (int)p[6];
-										const float	*pVknot	= p[7].PFlt();
-										float	vmin	= (float)p[8];
-										float	vmax	= (float)p[9];
-
-										mState.NuPatch(
-												nu		,
-												uorder	,
-												pUknot	,
-												umin	,
-												umax	,
-												nv		,
-												vorder	,
-												pVknot	,
-												vmin	,
-												vmax	,
-												p
-											);
-
-									}	else
-
-	if ( nm == "Polygon" )				{ geN( 2, p ); mState.Polygon( p ); }	else
-	if ( nm == "PointsGeneralPolygons" ){ geN( 5, p ); mState.PointsGeneralPolygons( p ); }	else
-	// unknown
-									{ unknownCommand( nm.c_str() ); }
+	if NOT( addCommand_prims( nm, p ) )
+	{
+		// unknown
+		unknownCommand( nm.c_str() );
+	}
 
 }
 

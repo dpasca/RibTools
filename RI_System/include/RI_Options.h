@@ -25,6 +25,18 @@ class Options
 {
 	const SymbolList	*mpGlobalSyms;
 
+	class Display
+	{
+	public:
+		u_int	mPixSamples[2];
+
+		void Init()
+		{
+			mPixSamples[0] = 2;
+			mPixSamples[1] = 2;
+		}
+	};
+
 public:
 	Options();
 	void Init( const SymbolList *pGlobalSyms, RevisionTracker *pRevision );
@@ -54,7 +66,8 @@ public:
 	RevisionTracker	*mpRevision;
 	
 	// Display
-	// ...
+	Display	mDisp;
+
 public:
 	// Functions
 	void cmdFormat( int xRes, int yRes, float pixelRatio );
@@ -65,6 +78,9 @@ public:
 	void cmdClipping( float near, float farr );
 	void cmdDepthOfField( float fStop, float focalLength, float focalDistance );
 	void cmdShutter( float openShutter, float closeShutter );
+
+	// Display
+	void cmdPixelSamples( int samplesX, int samplesY );
 
 	void Finalize();
 
