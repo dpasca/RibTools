@@ -265,21 +265,24 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 	RI::Framework	framework( mpRenderOutput, NULL, mHiderParams );
 	RI::FileManagerDisk	fileManager;
 
-	RRL::Translator::Params	params;
-	params.mState.mpFramework			= &framework;
-	params.mState.mpFileManager			= &fileManager;
-	params.mState.mBaseDir				= baseDir;
-	params.mState.mDefaultShadersDir	= defaultShadersDir;
+	RRL::Render::Params	params;
+	
+	params.mTrans.mState.mpFramework			= &framework;
+	params.mTrans.mState.mpFileManager			= &fileManager;
+	params.mTrans.mState.mBaseDir				= baseDir;
+	params.mTrans.mState.mDefaultShadersDir	= defaultShadersDir;
 
 	if ( mHiderParams.mDbgColorCodedGrids )
-		params.mState.mForcedSurfaceShader = "constant";
+		params.mTrans.mState.mForcedSurfaceShader = "constant";
 
-	params.mForcedWd					= forcedWd;
-	params.mForcedHe					= forcedHe;
+	params.mTrans.mForcedWd		= forcedWd;
+	params.mTrans.mForcedHe		= forcedHe;
+
+	params.mpFileName			= pFileName;
 
 	try
 	{
-		RRL::Render	render( pFileName, params, fileManager );
+		RRL::Render	render( params );
 	}
 	catch ( std::bad_alloc )
 	{

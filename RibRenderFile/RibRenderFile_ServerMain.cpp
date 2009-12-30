@@ -52,18 +52,19 @@ static int serverTask( SOCKET clientSock )
 	RI::Hider::Params	hiderParams;
 	RI::Framework		framework( &rendOutNull, &rendBuckets, hiderParams );
 
-	RRL::Translator::Params	params;
-	params.mState.mpFramework			= &framework;
-	params.mState.mpFileManager			= &fileManagerNet;
-	params.mState.mBaseDir				= netRendJob.BaseDir;
-	params.mState.mDefaultShadersDir	= netRendJob.DefaultResourcesDir;
-	params.mForcedLongDim				= netRendJob.ForcedLongDim;
-	params.mForcedWd					= netRendJob.ForcedWd;
-	params.mForcedHe					= netRendJob.ForcedHe;
+	RRL::Render::Params	params;
+	params.mTrans.mState.mpFramework			= &framework;
+	params.mTrans.mState.mpFileManager			= &fileManagerNet;
+	params.mTrans.mState.mBaseDir				= netRendJob.BaseDir;
+	params.mTrans.mState.mDefaultShadersDir	= netRendJob.DefaultResourcesDir;
+	params.mTrans.mForcedLongDim				= netRendJob.ForcedLongDim;
+	params.mTrans.mForcedWd					= netRendJob.ForcedWd;
+	params.mTrans.mForcedHe					= netRendJob.ForcedHe;
+	params.mpFileName						= netRendJob.FileName;
 
 	try
 	{
-		RRL::Render	render( netRendJob.FileName, params, fileManagerNet );
+		RRL::Render	render( params );
 	}
 	catch ( ... )
 	{

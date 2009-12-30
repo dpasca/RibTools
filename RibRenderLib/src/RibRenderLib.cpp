@@ -18,20 +18,17 @@ namespace RRL
 //==================================================================
 /// Render
 //==================================================================
-Render::Render( const char			*pFileName,
-				Translator::Params	&transParams,
-				RI::FileManagerBase	&fileManager,
-				bool				verbose )
+Render::Render( Params &params )
 {
 	DUT::MemFile	file;
 
-	fileManager.GrabFile( pFileName, file );
+	params.mTrans.mState.mpFileManager->GrabFile( params.mpFileName, file );
 
 	RI::Parser	parser;
 
-	Translator		machine( transParams );
+	Translator		translator( params.mTrans );
 
-	machine.GetState().Begin( "dummy" );
+	translator.GetState().Begin( "dummy" );
 
 	for (size_t i=0; i <= file.GetDataSize(); ++i)
 	{
@@ -48,7 +45,7 @@ Render::Render( const char			*pFileName,
 
 			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
 
-			if ( verbose )
+			if ( params.mVerbose )
 			{
 				printf( "CMD %s ", cmdName.c_str() );
 
@@ -60,7 +57,7 @@ Render::Render( const char			*pFileName,
 
 
 			try {
-				machine.AddCommand( cmdName, cmdParams );
+				translator.AddCommand( cmdName, cmdParams );
 			} catch ( std::runtime_error ex )
 			{
 				printf( "Error while parsing line %i\n> CMD: %s\n",
@@ -71,7 +68,7 @@ Render::Render( const char			*pFileName,
 		}
 	}
 
-	machine.GetState().End();
+	translator.GetState().End();
 }
 
 //==================================================================

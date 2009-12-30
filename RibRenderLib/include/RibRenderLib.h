@@ -28,13 +28,23 @@ namespace RRL
 //==================================================================
 class Render
 {
+public:
+	class Params
+	{
+	public:
+		const char			*mpFileName;
+		bool				mVerbose;
+		Translator::Params	mTrans;
+
+		Params() :
+			mpFileName(NULL),
+			mVerbose(false)
+		{
+		}
+	};
 
 public:
-	Render(
-		const char			*pFileName,
-		Translator::Params	&transParams,
-		RI::FileManagerBase	&fileManager,
-		bool				verbose=false );
+	Render( Params &params );
 };
 
 //==================================================================

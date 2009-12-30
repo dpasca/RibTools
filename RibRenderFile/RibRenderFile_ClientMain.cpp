@@ -184,14 +184,15 @@ int ClientMain( int argc, char **argv )
 		{
 			RI::Framework		framework( &rendOut, NULL, hiderParams );
 
-			RRL::Translator::Params	params;
-			params.mState.mpFramework			= &framework;
-			params.mState.mpFileManager			= &fileManagerDisk;
-			params.mState.mBaseDir				= cmdPars.baseDir;
-			params.mState.mDefaultShadersDir	= defaultShadersDir;
-			params.mForcedLongDim				= cmdPars.forcedlongdim;
+			RRL::Render::Params	params;
+			params.mTrans.mState.mpFramework		= &framework;
+			params.mTrans.mState.mpFileManager		= &fileManagerDisk;
+			params.mTrans.mState.mBaseDir			= cmdPars.baseDir;
+			params.mTrans.mState.mDefaultShadersDir	= defaultShadersDir;
+			params.mTrans.mForcedLongDim			= cmdPars.forcedlongdim;
+			params.mpFileName						= cmdPars.pInFileName;
 
-			RRL::Render	render( cmdPars.pInFileName, params, fileManagerDisk );
+			RRL::Render	render( params );
 		}
 		catch ( std::bad_alloc )
 		{
@@ -213,14 +214,15 @@ int ClientMain( int argc, char **argv )
 	
 			RI::Framework				framework( &rendOut, &rendBuckets, hiderParams );
 
-			RRL::Translator::Params	params;
-			params.mState.mpFramework			= &framework;
-			params.mState.mpFileManager			= &fileManagerDisk;
-			params.mState.mBaseDir				= cmdPars.baseDir;
-			params.mState.mDefaultShadersDir	= defaultShadersDir;
-			params.mForcedLongDim				= cmdPars.forcedlongdim;
+			RRL::Render::Params	params;
+			params.mTrans.mState.mpFramework		= &framework;
+			params.mTrans.mState.mpFileManager		= &fileManagerDisk;
+			params.mTrans.mState.mBaseDir			= cmdPars.baseDir;
+			params.mTrans.mState.mDefaultShadersDir	= defaultShadersDir;
+			params.mTrans.mForcedLongDim			= cmdPars.forcedlongdim;
+			params.mpFileName						= cmdPars.pInFileName;
 
-			RRL::Render	render( cmdPars.pInFileName, params, fileManagerDisk );
+			RRL::Render	render( params );
 		}
 		catch ( std::bad_alloc )
 		{
