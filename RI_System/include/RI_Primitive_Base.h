@@ -13,6 +13,7 @@
 #include "RI_Param.h"
 #include "RI_Symbol.h"
 #include "RI_MicroPolygonGrid.h"
+#include "RI_Primitive_Utils.h"
 
 //==================================================================
 namespace RI
@@ -193,24 +194,18 @@ public:
 
 	CheckSplitRes CheckForSplit(
 							const Hider &hider,
-							bool &out_uSplit,
-							bool &out_vSplit );
+							int			out_bound2d[4],
+							bool		&out_uSplit,
+							bool		&out_vSplit );
 
 	void	Split( Hider &hider, bool uSplit, bool vSplit );
 
-	// make a 3D bound, return false if the bound cannot be made
-	virtual bool	MakeBound( Bound &out_bound ) const = 0;
+	// WARNING: we assume dicing no larger than 3^2 !!!
+	// ..make sure about this everywhere MakeBound() uses MakeBoundFromUVRangeN
+	static const size_t	MAX_MAKE_BOUND_OUT_SIZE = MAX_PADDED_VERTS_FOR_MakeBoundFromUVRangeN( 3 );
 
-/*
-	inline Point3	&EvalP(
-						float u,
-						float v,
-						Point3 &out_pt ) const
-	{
-		Eval_dPdu_dPdv( u, v, out_pt, NULL, NULL );
-		return out_pt;
-	}
-*/
+	// make a 3D bound, return false if the bound cannot be made
+	virtual void	MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const = 0;
 
 	inline SlVec3	&EvalP(
 						const SlVec2 &uv,

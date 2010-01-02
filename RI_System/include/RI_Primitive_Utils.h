@@ -81,15 +81,16 @@ inline void bilinearFill( float out_x[], float out_y[], float x1, float y1, floa
 	}
 }
 
-#define MAKE_BOUND_DIM_LEN	3
+//==================================================================
+#define MAX_PADDED_VERTS_FOR_MakeBoundFromUVRangeN(_DIM_)	RI_GET_SIMD_PAD_SUBS( _DIM_ * _DIM_ )
 
 //==================================================================
-template <class _S>
-bool MakeBoundFromUVRange9( const _S &This, Bound &out_bound )
+template <class _S, u_int _DIM_LEN>
+void MakeBoundFromUVRangeN( const _S &This, Bound &out_bound, SlVec3 *out_pPo )
 {
 	out_bound.Reset();
 
-	static const size_t	N_ELEMS = MAKE_BOUND_DIM_LEN*MAKE_BOUND_DIM_LEN;
+	static const size_t	N_ELEMS = _DIM_LEN*_DIM_LEN;
 	static const size_t	N_ELEMS_PAD = RI_GET_SIMD_PAD_SUBS( N_ELEMS );
 
 	float	DVECTOR_SIMD_ALIGN( us ) [N_ELEMS_PAD];
@@ -102,13 +103,13 @@ bool MakeBoundFromUVRange9( const _S &This, Bound &out_bound )
 		This.mVRange[0],
 		This.mURange[1],
 		This.mVRange[1],
-		MAKE_BOUND_DIM_LEN,
-		MAKE_BOUND_DIM_LEN,
+		_DIM_LEN,
+		_DIM_LEN,
 		N_ELEMS_PAD );
 
-	SlVec3	Po[ N_ELEMS_PAD ];
+	//SlVec3	Po[ N_ELEMS_PAD ];
 
-	This.EvalP( (const SlScalar *)us, (const SlScalar *)vs, Po, N_ELEMS );
+	This.EvalP( (const SlScalar *)us, (const SlScalar *)vs, out_pPo, N_ELEMS );
 
 	for (size_t i=0; i < N_ELEMS; ++i)
 	{
@@ -116,13 +117,11 @@ bool MakeBoundFromUVRange9( const _S &This, Bound &out_bound )
 		size_t	sub = i & (RI_SIMD_BLK_LEN-1);
 
 		out_bound.Expand( Vec3f(
-								Po[blk][0][sub],
-								Po[blk][1][sub],
-								Po[blk][2][sub]
+								out_pPo[blk][0][sub],
+								out_pPo[blk][1][sub],
+								out_pPo[blk][2][sub]
 							) );
 	}
-
-	return true;
 }
 
 //==================================================================

@@ -180,14 +180,19 @@ void Framework::worldEnd_splitAndAddToBuckets()
 
 		SimplePrimitiveBase	*pPrim = (SimplePrimitiveBase *)mHider.mpPrims[i];
 
+		int		bound2d[4];
 		bool	uSplit;
 		bool	vSplit;
 		SimplePrimitiveBase::CheckSplitRes	dosRes =
-				pPrim->CheckForSplit( mHider, uSplit, vSplit );
+								pPrim->CheckForSplit(
+											mHider,
+											bound2d,
+											uSplit,
+											vSplit );
 
 		if ( dosRes == SimplePrimitiveBase::CHECKSPLITRES_DICE )
 		{
-			mHider.InsertForDicing( (SimplePrimitiveBase *)pPrim );
+			mHider.InsertForDicing( (SimplePrimitiveBase *)pPrim, bound2d );
 		}
 		else
 		if ( dosRes == SimplePrimitiveBase::CHECKSPLITRES_SPLIT )

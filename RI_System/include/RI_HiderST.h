@@ -86,11 +86,11 @@ public:
 					const SimplePrimitiveBase	&srcPrim
 					);
 
-	void InsertForDicing( SimplePrimitiveBase *pPrim );
+	void InsertForDicing( SimplePrimitiveBase *pPrim, const int bound2d[4] );
 
 	void WorldEnd();
 	
-	float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const;
+	float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld, int out_box2D[4]  ) const;
 	SlScalar RasterLengthSqr( const SlVec3 &ptA, const SlVec3 &ptB, const Matrix44 &mtxLocalWorld ) const;
 
 	void Bust(	const HiderBucket	&bucket,

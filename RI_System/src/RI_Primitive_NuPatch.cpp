@@ -357,9 +357,9 @@ void NuPatch::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-bool NuPatch::MakeBound( Bound &out_bound ) const
+void NuPatch::MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
 {
-	return MakeBoundFromUVRange9( *this, out_bound );
+	MakeBoundFromUVRangeN<NuPatch,3>( *this, out_bound, out_pPo );
 }
 
 //==================================================================

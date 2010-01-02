@@ -11,6 +11,7 @@
 
 #include "RI_Buffer2D.h"
 #include "RI_HiderSampleCoordsBuffer.h"
+#include "RI_Primitive_Base.h"
 
 //==================================================================
 namespace RI

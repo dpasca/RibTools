@@ -301,7 +301,7 @@ inline void bounds2DSweepP(
 }
 
 //==================================================================
-bool Cylinder::MakeBound( Bound &out_bound ) const
+void Cylinder::MakeBound( Bound &out_bound ) const
 {
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
@@ -309,10 +309,9 @@ bool Cylinder::MakeBound( Bound &out_bound ) const
 	bounds2DSweepL( out_bound, mRadius, mRadius, tuMin, tuMax );
 	out_bound.mBox[0].z() = DMix( mZMin, mZMax, mVRange[0] );
 	out_bound.mBox[1].z() = DMix( mZMin, mZMax, mVRange[1] );
-	return true;
 }
 
-bool Cone::MakeBound( Bound &out_bound ) const
+void Cone::MakeBound( Bound &out_bound ) const
 {
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
@@ -323,10 +322,9 @@ bool Cone::MakeBound( Bound &out_bound ) const
 	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
 	out_bound.mBox[0].z() = mVRange[0] * mHeight;
 	out_bound.mBox[1].z() = mVRange[1] * mHeight;
-	return true;
 }
 
-bool Sphere::MakeBound( Bound &out_bound ) const
+void Sphere::MakeBound( Bound &out_bound ) const
 {
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
@@ -353,10 +351,9 @@ bool Sphere::MakeBound( Bound &out_bound ) const
 
 	out_bound.mBox[0].z() = DSin( aVMin ) * mRadius;
 	out_bound.mBox[1].z() = DSin( aVMax ) * mRadius;
-	return true;
 }
 
-bool Hyperboloid::MakeBound( Bound &out_bound ) const
+void Hyperboloid::MakeBound( Bound &out_bound ) const
 {
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
@@ -372,10 +369,9 @@ bool Hyperboloid::MakeBound( Bound &out_bound ) const
 	
 	out_bound.mBox[0].z() = DMIN( pMin.z()[0], pMax.z()[0] );
 	out_bound.mBox[1].z() = DMAX( pMin.z()[0], pMax.z()[0] );
-	return true;
 }
 
-bool Paraboloid::MakeBound( Bound &out_bound ) const
+void Paraboloid::MakeBound( Bound &out_bound ) const
 {
 	float	scale = mRmax / DSqrt( mZmax );
 
@@ -389,10 +385,9 @@ bool Paraboloid::MakeBound( Bound &out_bound ) const
 	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
 	out_bound.mBox[0].z() = zVMin;
 	out_bound.mBox[1].z() = zVMax;
-	return true;
 }
 
-bool Torus::MakeBound( Bound &out_bound ) const
+void Torus::MakeBound( Bound &out_bound ) const
 {
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
@@ -410,7 +405,6 @@ bool Torus::MakeBound( Bound &out_bound ) const
 	bounds2DSweepL( out_bound, rMin, rMax, tuMin, tuMax );
 	out_bound.mBox[0].z() = a.mBox[0].y();
 	out_bound.mBox[1].z() = a.mBox[1].y();
-	return true;
 }
 
 //==================================================================

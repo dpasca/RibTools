@@ -69,7 +69,7 @@ public:
 
 		NuPatch	*Clone() const {	return DNEW NuPatch( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,

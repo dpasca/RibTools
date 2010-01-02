@@ -15,9 +15,6 @@
 static const u_int	BUCKET_SIZE = 128;
 
 //==================================================================
-#define MAX_DATA_PER_SAMPLE	1024
-
-//==================================================================
 namespace RI
 {
 
@@ -182,31 +179,11 @@ void Hider::InsertSplitted(
 }
 
 //==================================================================
-void Hider::InsertForDicing( SimplePrimitiveBase *pPrim )
+void Hider::InsertForDicing( SimplePrimitiveBase *pPrim, const int bound2d[2] )
 {
-	Bound	bound;
-	if NOT( pPrim->MakeBound( bound ) )
-	{
-		DASSERT( 0 );
-		return;
-	}
-
-	const Matrix44 &mtxLocalWorld = pPrim->mpTransform->GetMatrix();
-
-	float bound2df[4];
-	if NOT( makeRasterBound( bound, mtxLocalWorld, bound2df ) )
-	{
-		return;
-	}
-
-	int minX = (int)floorf( bound2df[0] );
-	int minY = (int)floorf( bound2df[1] );
-	int maxX =  (int)ceilf( bound2df[2] );
-	int maxY =  (int)ceilf( bound2df[3] );
-
 	for (size_t i=0; i < mpBuckets.size(); ++i)
 	{
-		if ( mpBuckets[i]->Intersects( minX, minY, maxX, maxY ) )
+		if ( mpBuckets[i]->Intersects( bound2d[0], bound2d[1], bound2d[2], bound2d[3] ) )
 		{
 			mpBuckets[i]->mpPrims.push_back( (SimplePrimitiveBase *)pPrim->Borrow() );
 		}
@@ -319,20 +296,25 @@ bool Hider::makeRasterBound(
 }
 
 //==================================================================
-float Hider::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const
+float Hider::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld, int out_box2D[4] ) const
 {
 	if NOT( b.IsValid() )
 	{
 		return MP_GRID_MAX_SIZE / 4;
 	}
 
-	float	bound2d[4];
+	float	bound2df[4];
 
-	bool valid = makeRasterBound( b, mtxLocalWorld, bound2d );
+	bool valid = makeRasterBound( b, mtxLocalWorld, bound2df );
+
+	out_box2D[0] = (int)floorf( bound2df[0] );
+	out_box2D[1] = (int)floorf( bound2df[1] );
+	out_box2D[2] =  (int)ceilf( bound2df[2] );
+	out_box2D[3] =  (int)ceilf( bound2df[3] );
 
 	if ( valid )
 	{
-		float	squareArea = (bound2d[3] - bound2d[1]) * (bound2d[2] - bound2d[0]);
+		float	squareArea = (bound2df[3] - bound2df[1]) * (bound2df[2] - bound2df[0]);
 		return squareArea * 1;
 	}
 	else
@@ -386,429 +368,6 @@ void Hider::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 	}
 }
 */
-
-//==================================================================
-inline void updateMinMax( Vec3f &minf, Vec3f &maxf, const Vec3f &val )
-{
-	if ( val[0] < minf[0] ) minf[0] = val[0];
-	if ( val[1] < minf[1] ) minf[1] = val[1];
-	if ( val[2] < minf[2] ) minf[2] = val[2];
-
-	if ( val[0] > maxf[0] ) maxf[0] = val[0];
-	if ( val[1] > maxf[1] ) maxf[1] = val[1];
-	if ( val[2] > maxf[2] ) maxf[2] = val[2];
-}
-
-//==================================================================
-// NOTE: all coords here are in bucket space
-inline void addMPSamples(
-				const HiderSampleCoordsBuffer	&sampCoordsBuff,
-				HiderPixel			*pPixels,
-				const Vec3f			&minPos,
-				const Vec3f			&maxPos,
-				int					buckWd,
-				int					buckHe,
-				const Vec3f			microquad[4],
-				const float			*valOi,
-				const float			*valCi
-			)
-{
-	int	minX = (int)floor( minPos[0] );
-	int	maxX = (int) ceil( maxPos[0] );
-
-	int	minY = (int)floor( minPos[1] );
-	int	maxY = (int) ceil( maxPos[1] );
-
-	// completely out ?
-	if ( maxX < 0 || maxY < 0 || minX >= buckWd || minY >= buckHe )
-		return;
-
-	// clip
-	if ( minX < 0 )	minX = 0;
-	if ( minY < 0 )	minY = 0;
-	if ( maxX >= buckWd )	maxX = buckWd-1;
-	if ( maxY >= buckHe )	maxY = buckHe-1;
-
-/*
-   0__
-   /  --
-  /     -- 1
- /__      /
-2   --   /
-      --/
-	    3
-*/
-	Vec3f d10 = microquad[1] - microquad[0];
-	Vec3f d31 = microquad[3] - microquad[1];
-	Vec3f d23 = microquad[2] - microquad[3];
-	Vec3f d02 = microquad[0] - microquad[2];
-
-	u_int sampsPerPixel = sampCoordsBuff.GetSampsPerPixel();
-
-	HiderPixel	*pPixelsRow = pPixels + minY * buckWd;
-
-	for (int y=minY; y <= maxY; ++y)
-	{
-		for (int x=minX; x <= maxX; ++x)
-		{
-			HiderPixel	&pixel = pPixelsRow[ x ];
-
-			for (u_int i=0; i < sampsPerPixel; ++i)
-			{
-				const HiderSampleCoords &sampCoords = pixel.mpSampCoords[i];
-
-				float sampX = (float)x + sampCoords.mX;
-				float sampY = (float)y + sampCoords.mY;
-
-				float crs0 = ((sampY-microquad[0][1]) * d10[0] - (sampX-microquad[0][0]) * d10[1]);
-				float crs1 = ((sampY-microquad[1][1]) * d31[0] - (sampX-microquad[1][0]) * d31[1]);
-				float crs2 = ((sampY-microquad[3][1]) * d23[0] - (sampX-microquad[3][0]) * d23[1]);
-				float crs3 = ((sampY-microquad[2][1]) * d02[0] - (sampX-microquad[2][0]) * d02[1]);
-
-				if (
-					(crs0 <= 0 && crs1 <= 0 && crs2 <= 0 && crs3 <= 0) ||
-					(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 && crs3 >= 0)
-					)
-				{
-					HiderSampleData *pSampData = pixel.mpSampDataLists[i].grow();
-
-					pSampData->mOi[0] = valOi[0];
-					pSampData->mOi[1] = valOi[1];
-					pSampData->mOi[2] = valOi[2];
-
-					pSampData->mCi[0] = valCi[0];
-					pSampData->mCi[1] = valCi[1];
-					pSampData->mCi[2] = valCi[2];
-
-					pSampData->mDepth = microquad[0][2];
-				}
-			}
-		}
-
-		pPixelsRow += buckWd;
-	}
-}
-
-//==================================================================
-void Hider::Bust(
-				const HiderBucket	&bucket,
-				ShadedGrid			&shadGrid,
-				const WorkGrid		&workGrid,
-				DVec<HiderPixel>	&pixels,
-				u_int				screenWd,
-				u_int				screenHe ) const
-{
-	const SlColor	*pOi = (const SlColor *)workGrid.mSymbolIs.FindSymbolIData( "Oi" );
-	const SlColor	*pCi = (const SlColor *)workGrid.mSymbolIs.FindSymbolIData( "Ci" );
-
-	//const SlVec3	 *pN = (const SlVec3  *)workGrid.mSymbolIs.FindSymbolIData( "N"	);
-
-	{
-		static const SlScalar	one( 1 );
-
-		SlScalar screenCx  = SlScalar( screenWd * 0.5f );
-		SlScalar screenCy  = SlScalar( screenHe * 0.5f );
-		SlScalar screenHWd = SlScalar( screenWd * 0.5f );
-		SlScalar screenHHe = SlScalar( screenHe * 0.5f );
-
-		const SlVec3	*pPointsWS	= (const SlVec3 *)workGrid.mpPointsWS;
-
-		size_t	blocksN = RI_GET_SIMD_BLOCKS( workGrid.mPointsN );
-		for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
-		{
-			SlVec4		homoP = V4__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
-
-			SlVec4		projP = homoP / homoP.w();
-
-			// TODO: should replace pPointsWS with pPointsCS... ..to avoid this and also because
-			// perhaps P should indeed be in "current" space (camera)
-			SlVec3		PtCS = V3__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldCamera );
-
-			shadGrid.mpPointsCS[ blkIdx ]			= PtCS;
-			//shadGrid.mpPointsCloseCS[ blkIdx ]	= 0;
-
-			shadGrid.mpPosWin[ blkIdx ][0] =  projP.x() * screenHWd + screenCx;
-			shadGrid.mpPosWin[ blkIdx ][1] = -projP.y() * screenHHe + screenCy;
-
-			shadGrid.mpCi[ blkIdx ] = pCi[ blkIdx ];
-			shadGrid.mpOi[ blkIdx ] = pOi[ blkIdx ];
-		}
-	}
-
-	DASSERT( workGrid.mXDim == RI_GET_SIMD_BLOCKS( workGrid.mXDim ) * RI_SIMD_BLK_LEN );
-
-	u_int	xN		= workGrid.mXDim - 1;
-	u_int	yN		= workGrid.mYDim - 1;
-
-	u_int	buckWd	= bucket.GetWd();
-	u_int	buckHe	= bucket.GetHe();
-
-	if ( mParams.mDbgRasterizeVerts )
-	{
-		// scan the grid.. for every vertex
-		size_t	srcVertIdx = 0;
-		for (u_int i=0; i < yN; ++i)
-		{
-			for (u_int j=0; j < xN; ++j, ++srcVertIdx)
-			{
-				u_int	blk = (u_int)srcVertIdx / RI_SIMD_BLK_LEN;
-				u_int	sub = (u_int)srcVertIdx & (RI_SIMD_BLK_LEN-1);
-
-				int pixX = (int)floor( shadGrid.mpPosWin[ blk ][0][ sub ] - (float)bucket.mX1 );
-				int pixY = (int)floor( shadGrid.mpPosWin[ blk ][1][ sub ] - (float)bucket.mY1 );
-
-				if ( pixX >= 0 && pixY >= 0 && pixX < (int)buckWd && pixY < (int)buckHe )
-				{
-					HiderPixel	&pixel = pixels[ pixY * buckWd + pixX ];
-
-					HiderSampleData *pSampData = pixel.mpSampDataLists[0].grow();
-
-					pSampData->mOi[0] = shadGrid.mpOi[ blk ][0][ sub ];
-					pSampData->mOi[1] = shadGrid.mpOi[ blk ][1][ sub ];
-					pSampData->mOi[2] = shadGrid.mpOi[ blk ][2][ sub ];
-
-					pSampData->mCi[0] = shadGrid.mpCi[ blk ][0][ sub ];
-					pSampData->mCi[1] = shadGrid.mpCi[ blk ][1][ sub ];
-					pSampData->mCi[2] = shadGrid.mpCi[ blk ][2][ sub ];
-
-					pSampData->mDepth = shadGrid.mpPointsCS[ blk ][2][ sub ];
-				}
-			}
-
-			srcVertIdx += 1;
-		}
-	}
-	else
-	{
-		// scan the grid.. for every potential micro-polygon
-		size_t	srcVertIdx = 0;
-		for (u_int i=0; i < yN; ++i)
-		{
-			for (u_int j=0; j < xN; ++j, ++srcVertIdx)
-			{
-				// vector coords of the micro-poly
-				u_int	vidx[4] = {
-							srcVertIdx + 0,
-							srcVertIdx + 1,
-							srcVertIdx + xN+1,
-							srcVertIdx + xN+2 };
-
-				Vec3f	minPos(  FLT_MAX,  FLT_MAX,  FLT_MAX );
-				Vec3f	maxPos( -FLT_MAX, -FLT_MAX, -FLT_MAX );
-
-				// calculate the bounds in window space and orientation
-				//	--------
-				//	| /\   |
-				//	|/   \ |
-				//	|\    /|
-				//	|  \ / |
-				//	--------
-				size_t	blk[4];
-				size_t	sub[4];
-				Vec3f	buckPos[4];
-
-				for (size_t k=0; k < 4; ++k)
-				{
-					blk[k] = vidx[k] / RI_SIMD_BLK_LEN;
-					sub[k] = vidx[k] & (RI_SIMD_BLK_LEN-1);
-
-					buckPos[k][0] = shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ] - (float)bucket.mX1;
-					buckPos[k][1] = shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ] - (float)bucket.mY1;
-					buckPos[k][2] = shadGrid.mpPointsCS[ blk[k] ][2][ sub[k] ];
-
-					updateMinMax( minPos, maxPos, buckPos[k] );
-				}
-
-				// sample only from the first vertex.. no bilinear
-				// interpolation in the micro-poly !
-				float valOi[3] =
-					{
-						shadGrid.mpOi[ blk[0] ][0][ sub[0] ],
-						shadGrid.mpOi[ blk[0] ][1][ sub[0] ],
-						shadGrid.mpOi[ blk[0] ][2][ sub[0] ]
-					};
-				float valCi[3] =
-					{
-						shadGrid.mpCi[ blk[0] ][0][ sub[0] ],
-						shadGrid.mpCi[ blk[0] ][1][ sub[0] ],
-						shadGrid.mpCi[ blk[0] ][2][ sub[0] ]
-					};
-
-				addMPSamples(
-						*bucket.mpSampCoordsBuff,
-						&pixels[0],
-						minPos,
-						maxPos,
-						(int)buckWd,
-						(int)buckHe,
-						buckPos,
-						valOi,
-						valCi );
-			}
-
-			srcVertIdx += 1;
-		}
-	}
-}
-
-/*
-//==================================================================
-#define CCODE_X1	1
-#define CCODE_X2	2
-#define CCODE_Y1	4
-#define CCODE_Y2	8
-#define CCODE_Z1	16
-#define CCODE_Z2	32
-
-U8	ccodes[ MP_GRID_MAX_SIZE ];
-U8	gridORCCodes = 0;
-// would be nice to simdfy this one too
-for (size_t i=0; i < RI_SIMD_BLK_LEN; ++i)
-{
-	float	x = homoP.x()[i];
-	float	y = homoP.y()[i];
-	float	z = homoP.z()[i];
-	float	w = homoP.w()[i];
-
-	U8	ccode = 0;
-	if ( x < -w )	ccode |= CCODE_X1;
-	if ( x >  w )	ccode |= CCODE_X2;
-	if ( y < -w )	ccode |= CCODE_Y1;
-	if ( y >  w )	ccode |= CCODE_Y2;
-	if ( z < -w )	ccode |= CCODE_Z1;
-	if ( z >  w )	ccode |= CCODE_Z2;
-	ccodes[i] = ccode;
-	gridORCCodes |= ccode;
-}
-
-U8	andCode = 0xff;
-andCode &= ccodes[ srcVertIdx+0 ];
-andCode &= ccodes[ srcVertIdx+1 ];
-andCode &= ccodes[ srcVertIdx+xDim ];
-andCode &= ccodes[ srcVertIdx+xDim+1 ];
-// all out ? Skip this
-if ( andCode )
-	continue;
-*/
-
-//==================================================================
-static void sortSampData(
-				const HiderSampleData	**pSampDataListSort,
-				const HiderSampleData	*pData,
-				u_int					dataN )
-{
-	if ( dataN == 1 )
-	{
-		pSampDataListSort[0] = pData;
-		return;
-	}
-
-	// (sad ?) insert sort
-	{
-		int doneDataN = 0;
-
-		for (u_int i=0; i < dataN; ++i)
-		{
-			float	depthI = pData[i].mDepth;
-
-			int j=0;
-			for (; j < doneDataN; ++j)
-			{
-				if ( depthI < pSampDataListSort[j]->mDepth )
-				{
-					for (int k=doneDataN-1; k >= j; --k)
-						pSampDataListSort[k+1] = pSampDataListSort[k];
-
-					break;
-				}
-			}
-
-			pSampDataListSort[j] = &pData[i];
-			doneDataN += 1;
-		}
-	}
-}
-
-//==================================================================
-inline void samplePixelBox(
-				Vec3f				&pixCol,
-				const HiderPixel	&pixel,
-				u_int				sampsPerPixel,
-				float				ooSampsPerPixel )
-{
-	static Vec3<float>	one( 1 );
-
-	for (u_int si=0; si < sampsPerPixel; ++si)
-	{
-		const DVec<HiderSampleData> &sampDataList = pixel.mpSampDataLists[si];
-
-		u_int	dataN = sampDataList.size();
-		if NOT( dataN )
-			continue;
-
-		DASSERT( dataN <= MAX_DATA_PER_SAMPLE );
-		dataN = DMIN( dataN, MAX_DATA_PER_SAMPLE );
-
-		const HiderSampleData	*pData = &sampDataList[0];
-
-		const HiderSampleData *pSampDataListSort[ MAX_DATA_PER_SAMPLE ];
-
-		sortSampData( pSampDataListSort, pData, dataN );
-
-		// TODO: optimize by considering only until the first fully
-		//       opaque sample from front
-
-		Vec3<float>	accCol( 0.f );
-
-		for (int i=(int)dataN-1; i >= 0; --i)
-		{
-			Vec3<float>	col = Vec3<float>( pSampDataListSort[i]->mCi );
-			Vec3<float>	opa = Vec3<float>( pSampDataListSort[i]->mOi );
-
-			accCol = accCol * (one - opa) + col;
-		}
-
-		pixCol += accCol;
-	}
-
-	pixCol = pixCol * ooSampsPerPixel;
-}
-
-//==================================================================
-void Hider::Hide(
-				DVec<HiderPixel>	&pixels,
-				HiderBucket			&buck )
-{
-	u_int	sampsPerPixel	;
-	float	ooSampsPerPixel ;
-
-	if ( mParams.mDbgRasterizeVerts )
-	{
-		sampsPerPixel	= 1;
-		ooSampsPerPixel = 1;
-	}
-	else
-	{
-		sampsPerPixel	= buck.mpSampCoordsBuff->GetSampsPerPixel();
-		ooSampsPerPixel = 1.0f / sampsPerPixel;
-	}
-
-	u_int	buckWd = buck.GetWd();
-	u_int	buckHe = buck.GetHe();
-
-	size_t	pixIdx = 0;
-	for (u_int y=0; y < buckHe; ++y)
-	{
-		for (u_int x=0; x < buckWd; ++x, ++pixIdx)
-		{
-			Vec3f	pixCol( 0.f );
-
-			samplePixelBox( pixCol, pixels[pixIdx], sampsPerPixel, ooSampsPerPixel );
-
-			buck.mCBuff.SetSample( x, y, &pixCol.x() );
-		}
-	}
-}
 
 //==================================================================
 size_t Hider::GetOutputBucketMemSize( size_t buckIdx ) const

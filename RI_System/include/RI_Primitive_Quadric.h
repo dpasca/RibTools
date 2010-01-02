@@ -39,7 +39,11 @@ public:
 
 		Cylinder *Clone() const {	return DNEW Cylinder( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		{
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+		}
+		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -69,7 +73,11 @@ public:
 
 		Cone *Clone() const {	return DNEW Cone( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		{
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+		}
+		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -101,7 +109,11 @@ public:
 
 		Sphere *Clone() const {	return DNEW Sphere( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		{
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+		}
+		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -131,7 +143,11 @@ public:
 
 		Hyperboloid *Clone() const { return DNEW Hyperboloid( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		{
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+		}
+		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -163,7 +179,11 @@ public:
 
 		Paraboloid *Clone() const {	return DNEW Paraboloid( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		{
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,3>( *this, out_bound, out_pPo );
+		}
+		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -199,7 +219,11 @@ public:
 	
 		Torus *Clone() const {	return DNEW Torus( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const;
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		{
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+		}
+		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,

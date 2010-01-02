@@ -347,6 +347,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_Hider_Filter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RI_Hider_Micropolys.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_HiderSampleCoordsBuffer.cpp"
 				>
 			</File>

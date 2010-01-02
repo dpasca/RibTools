@@ -422,17 +422,22 @@ bool ParamsFindP(	ParamList &params,
 SimplePrimitiveBase::CheckSplitRes
 	SimplePrimitiveBase::CheckForSplit(
 							const Hider &hider,
-							bool &out_uSplit,
-							bool &out_vSplit )
+							int			out_bound2d[4],
+							bool		&out_uSplit,
+							bool		&out_vSplit )
 {
 	const Matrix44 &mtxLocalWorld = mpTransform->GetMatrix();
 
 	DASSERT( mDiceGridWd == -1 && mDiceGridHe == -1 );
 
-	Bound	bound;
-	MakeBound( bound );
+	SlVec3	testDicePo[ MAX_MAKE_BOUND_OUT_SIZE ];
 
-	float pixelArea = hider.RasterEstimate( bound, mtxLocalWorld );
+	Bound	bound;
+	bound.Reset();
+
+	MakeBound( bound, testDicePo );
+
+	float pixelArea = hider.RasterEstimate( bound, mtxLocalWorld, out_bound2d );
 	
 	if ( pixelArea <= MP_GRID_MAX_SIZE )
 	{
@@ -520,52 +525,6 @@ SimplePrimitiveBase::CheckSplitRes
 		return CHECKSPLITRES_SPLIT;	// will split
 	}
 }
-
-/*
-//==================================================================
-bool SimplePrimitiveBase::IsDiceable(
-						WorkGrid &g,
-						Hider *pHider,
-						bool &out_uSplit,
-						bool &out_vSplit )
-{
-	const Matrix44 &mtxLocalWorld = mpTransform->GetMatrix();
-	
-	Bound	bound;
-	if ( MakeBound( bound ) )
-	{
-		out_uSplit = false;
-		out_vSplit = false;
-
-		float pixelArea = pHider->RasterEstimate( bound, mtxLocalWorld );
-		
-		if ( pixelArea <= WorkGrid::MP_GRID_MAX_SIZE )
-		{
-			float	dim = sqrtf( pixelArea );
-			if ( dim > 0 )
-			{
-				int	dimX = (int)ceilf( dim );
-				int	dimY = (int)ceilf( dim );
-
-				g.Setup(dimX,
-						dimY,
-						mURange,
-						mVRange,
-						mtxLocalWorld
-						);
-
-				return true;
-			}
-			else
-				return false;
-		}
-	}
-
-	out_uSplit = true;
-	out_vSplit = true;
-	return false;
-}
-*/
 
 //==================================================================
 }

@@ -24,7 +24,7 @@ class PatchBilinear : public SimplePrimitiveBase
 private:
 	//ParamList		mParams;
 	Vec3f			mHullPos_sca[4];
-	//SlVec3			mHullPos[4];
+	//SlVec3		mHullPos[4];
 
 public:
 	PatchBilinear( ParamList &params, const SymbolList &globalSymbols );
@@ -36,19 +36,10 @@ public:
 
 		PatchBilinear *Clone() const {	return DNEW PatchBilinear( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
 		{
-			return MakeBoundFromUVRange( *this, out_bound );
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,2>( *this, out_bound, out_pPo );
 		}
-
-/*
-		void Eval_dPdu_dPdv(
-					float u,
-					float v,
-					Point3 &out_pt,
-					Vec3f *out_dPdu,
-					Vec3f *out_dPdv ) const;
-*/
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -124,19 +115,10 @@ public:
 
 		PatchBicubic *Clone() const {	return DNEW PatchBicubic( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const
+		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
 		{
-			return MakeBoundFromUVRange( *this, out_bound );
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,2>( *this, out_bound, out_pPo );
 		}
-
-/*
-		void Eval_dPdu_dPdv(
-					float u,
-					float v,
-					Point3 &out_pt,
-					Vec3f *out_dPdu,
-					Vec3f *out_dPdv ) const;
-*/
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
