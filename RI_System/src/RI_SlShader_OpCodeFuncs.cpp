@@ -22,8 +22,8 @@ namespace RI
 
 //==================================================================
 //==================================================================
-#define S SlScalar
-#define V SlVec3
+#define S Float_
+#define V Float3_
 //#define MATRIX	Matrix44
 
 //==================================================================
@@ -65,7 +65,7 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 
 	SOP::Inst_Pow_SSS,
 
-	SOP::Inst_MOVVS3<SlVec3,SlScalar>,
+	SOP::Inst_MOVVS3<Float3_,Float_>,
 
 	SOP::Inst_Dot_SVV,
 
@@ -80,13 +80,13 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 
 	SOP::Inst_CMPLT<S>,	// cmplt
 
-	SOP::Inst_Noise1<SlScalar>,
-	SOP::Inst_Noise1<SlVec2>,
-	SOP::Inst_Noise1<SlVec3>,
+	SOP::Inst_Noise1<Float_>,
+	SOP::Inst_Noise1<Float2_>,
+	SOP::Inst_Noise1<Float3_>,
 
-	SOP::Inst_Noise3<SlScalar>,
-	SOP::Inst_Noise3<SlVec2>,
-	SOP::Inst_Noise3<SlVec3>,
+	SOP::Inst_Noise3<Float_>,
+	SOP::Inst_Noise3<Float2_>,
+	SOP::Inst_Noise3<Float3_>,
 
 	SOP::Inst_GetVComp<0>,
 	SOP::Inst_GetVComp<1>,

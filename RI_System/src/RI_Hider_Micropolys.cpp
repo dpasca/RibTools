@@ -14,7 +14,7 @@ namespace RI
 {
 
 //==================================================================
-inline void updateMinMax( Vec3f &minf, Vec3f &maxf, const Vec3f &val )
+inline void updateMinMax( Float3 &minf, Float3 &maxf, const Float3 &val )
 {
 	if ( val[0] < minf[0] ) minf[0] = val[0];
 	if ( val[1] < minf[1] ) minf[1] = val[1];
@@ -30,11 +30,11 @@ inline void updateMinMax( Vec3f &minf, Vec3f &maxf, const Vec3f &val )
 inline void addMPSamples(
 				const HiderSampleCoordsBuffer	&sampCoordsBuff,
 				HiderPixel			*pPixels,
-				const Vec3f			&minPos,
-				const Vec3f			&maxPos,
+				const Float3			&minPos,
+				const Float3			&maxPos,
 				int					buckWd,
 				int					buckHe,
-				const Vec3f			microquad[4],
+				const Float3			microquad[4],
 				const float			*valOi,
 				const float			*valCi
 			)
@@ -64,10 +64,10 @@ inline void addMPSamples(
       --/
 	    3
 */
-	Vec3f d10 = microquad[1] - microquad[0];
-	Vec3f d31 = microquad[3] - microquad[1];
-	Vec3f d23 = microquad[2] - microquad[3];
-	Vec3f d02 = microquad[0] - microquad[2];
+	Float3 d10 = microquad[1] - microquad[0];
+	Float3 d31 = microquad[3] - microquad[1];
+	Float3 d23 = microquad[2] - microquad[3];
+	Float3 d02 = microquad[0] - microquad[2];
 
 	u_int sampsPerPixel = sampCoordsBuff.GetSampsPerPixel();
 
@@ -127,28 +127,28 @@ void Hider::Bust(
 	const SlColor	*pOi = (const SlColor *)workGrid.mSymbolIs.FindSymbolIData( "Oi" );
 	const SlColor	*pCi = (const SlColor *)workGrid.mSymbolIs.FindSymbolIData( "Ci" );
 
-	//const SlVec3	 *pN = (const SlVec3  *)workGrid.mSymbolIs.FindSymbolIData( "N"	);
+	//const Float3_	 *pN = (const Float3_  *)workGrid.mSymbolIs.FindSymbolIData( "N"	);
 
 	{
-		static const SlScalar	one( 1 );
+		static const Float_	one( 1 );
 
-		SlScalar screenCx  = SlScalar( screenWd * 0.5f );
-		SlScalar screenCy  = SlScalar( screenHe * 0.5f );
-		SlScalar screenHWd = SlScalar( screenWd * 0.5f );
-		SlScalar screenHHe = SlScalar( screenHe * 0.5f );
+		Float_ screenCx  = Float_( screenWd * 0.5f );
+		Float_ screenCy  = Float_( screenHe * 0.5f );
+		Float_ screenHWd = Float_( screenWd * 0.5f );
+		Float_ screenHHe = Float_( screenHe * 0.5f );
 
-		const SlVec3	*pPointsWS	= (const SlVec3 *)workGrid.mpPointsWS;
+		const Float3_	*pPointsWS	= (const Float3_ *)workGrid.mpPointsWS;
 
-		size_t	blocksN = RI_GET_SIMD_BLOCKS( workGrid.mPointsN );
+		size_t	blocksN = DMT_SIMD_BLOCKS( workGrid.mPointsN );
 		for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 		{
-			SlVec4		homoP = V4__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldProj );
+			Float4_		homoP = V4__V3W1_Mul_M44<Float_>( pPointsWS[ blkIdx ], mMtxWorldProj );
 
-			SlVec4		projP = homoP / homoP.w();
+			Float4_		projP = homoP / homoP.w();
 
 			// TODO: should replace pPointsWS with pPointsCS... ..to avoid this and also because
 			// perhaps P should indeed be in "current" space (camera)
-			SlVec3		PtCS = V3__V3W1_Mul_M44<SlScalar>( pPointsWS[ blkIdx ], mMtxWorldCamera );
+			Float3_		PtCS = V3__V3W1_Mul_M44<Float_>( pPointsWS[ blkIdx ], mMtxWorldCamera );
 
 			shadGrid.mpPointsCS[ blkIdx ]			= PtCS;
 			//shadGrid.mpPointsCloseCS[ blkIdx ]	= 0;
@@ -161,7 +161,7 @@ void Hider::Bust(
 		}
 	}
 
-	DASSERT( workGrid.mXDim == RI_GET_SIMD_BLOCKS( workGrid.mXDim ) * RI_SIMD_BLK_LEN );
+	DASSERT( workGrid.mXDim == DMT_SIMD_BLOCKS( workGrid.mXDim ) * DMT_SIMD_FLEN );
 
 	u_int	xN		= workGrid.mXDim - 1;
 	u_int	yN		= workGrid.mYDim - 1;
@@ -177,8 +177,8 @@ void Hider::Bust(
 		{
 			for (u_int j=0; j < xN; ++j, ++srcVertIdx)
 			{
-				u_int	blk = (u_int)srcVertIdx / RI_SIMD_BLK_LEN;
-				u_int	sub = (u_int)srcVertIdx & (RI_SIMD_BLK_LEN-1);
+				u_int	blk = (u_int)srcVertIdx / DMT_SIMD_FLEN;
+				u_int	sub = (u_int)srcVertIdx & (DMT_SIMD_FLEN-1);
 
 				int pixX = (int)floor( shadGrid.mpPosWin[ blk ][0][ sub ] - (float)bucket.mX1 );
 				int pixY = (int)floor( shadGrid.mpPosWin[ blk ][1][ sub ] - (float)bucket.mY1 );
@@ -219,8 +219,8 @@ void Hider::Bust(
 							srcVertIdx + xN+1,
 							srcVertIdx + xN+2 };
 
-				Vec3f	minPos(  FLT_MAX,  FLT_MAX,  FLT_MAX );
-				Vec3f	maxPos( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+				Float3	minPos(  FLT_MAX,  FLT_MAX,  FLT_MAX );
+				Float3	maxPos( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 
 				// calculate the bounds in window space and orientation
 				//	--------
@@ -231,12 +231,12 @@ void Hider::Bust(
 				//	--------
 				size_t	blk[4];
 				size_t	sub[4];
-				Vec3f	buckPos[4];
+				Float3	buckPos[4];
 
 				for (size_t k=0; k < 4; ++k)
 				{
-					blk[k] = vidx[k] / RI_SIMD_BLK_LEN;
-					sub[k] = vidx[k] & (RI_SIMD_BLK_LEN-1);
+					blk[k] = vidx[k] / DMT_SIMD_FLEN;
+					sub[k] = vidx[k] & (DMT_SIMD_FLEN-1);
 
 					buckPos[k][0] = shadGrid.mpPosWin[ blk[k] ][0][ sub[k] ] - (float)bucket.mX1;
 					buckPos[k][1] = shadGrid.mpPosWin[ blk[k] ][1][ sub[k] ] - (float)bucket.mY1;

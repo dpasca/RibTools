@@ -31,19 +31,19 @@ Polygon::Polygon( ParamList &params, const SymbolList &globalSymbols ) :
 //==================================================================
 static void simplifyAddTriangle(
 				Hider &hider,
-				const Vec3f &v1,
-				const Vec3f &v2,
-				const Vec3f &v3,
+				const Float3 &v1,
+				const Float3 &v2,
+				const Float3 &v3,
 				ParamList &params,
 				ComplexPrimitiveBase &srcPrim
 				)
 {
-	Vec3f	mid = (v1 + v2 + v3) * (1.0f/3);
-	Vec3f	a	= (v1 + v2) * 0.5f;
-	Vec3f	b	= (v2 + v3) * 0.5f;
-	Vec3f	c	= (v1 + v3) * 0.5f;
+	Float3	mid = (v1 + v2 + v3) * (1.0f/3);
+	Float3	a	= (v1 + v2) * 0.5f;
+	Float3	b	= (v2 + v3) * 0.5f;
+	Float3	c	= (v1 + v3) * 0.5f;
 
-	Vec3f	patchVerts[4];
+	Float3	patchVerts[4];
 	patchVerts[0] = v1;
 	patchVerts[1] = a;
 	patchVerts[2] = c;
@@ -77,7 +77,7 @@ void Polygon::Simplify( Hider &hider )
 	int	start	= 1;
 	int	end		= DMIN( (int)3, last );
 	
-	Vec3f	patchVerts[4];
+	Float3	patchVerts[4];
 	
 	while ( (end - start) == 2 )
 	{
@@ -98,9 +98,9 @@ void Polygon::Simplify( Hider &hider )
 	{	
 		simplifyAddTriangle(
 						hider,
-						Vec3f( &paramP[3 * 0] ),
-						Vec3f( &paramP[3 * start] ),
-						Vec3f( &paramP[3 * end] ),
+						Float3( &paramP[3 * 0] ),
+						Float3( &paramP[3 * start] ),
+						Float3( &paramP[3 * end] ),
 						mParams,
 						*this
 					);
@@ -137,7 +137,7 @@ static void tessellateToBilinearPatches(
 	int	start	= 1;
 	int	end		= DMIN( (int)3, last );
 
-	Vec3f	patchVerts[4];
+	Float3	patchVerts[4];
 
 	while ( (end - start) == 2 )
 	{
@@ -158,9 +158,9 @@ static void tessellateToBilinearPatches(
 	{	
 		simplifyAddTriangle(
 						hider,
-						Vec3f( &paramP[3 * pIndices[ 0		] ] ),
-						Vec3f( &paramP[3 * pIndices[ start	] ] ),
-						Vec3f( &paramP[3 * pIndices[ end	] ] ),
+						Float3( &paramP[3 * pIndices[ 0		] ] ),
+						Float3( &paramP[3 * pIndices[ start	] ] ),
+						Float3( &paramP[3 * pIndices[ end	] ] ),
 						primParams,
 						srcPrim
 					);

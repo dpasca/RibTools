@@ -20,21 +20,21 @@ namespace RI
 
 //==================================================================
 void Cylinder::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
-	SlScalar	theta = uv[0] * mThetamaxRad;
+	Float_	theta = uv[0] * mThetamaxRad;
 
 	out_pt.Set(
 			DCos( theta ) * mRadius,
 			DSin( theta ) * mRadius,
-			DMix( SlScalar( mZMin ), SlScalar( mZMax ), SlScalar( uv[1] ) ) );
+			DMix( Float_( mZMin ), Float_( mZMax ), Float_( uv[1] ) ) );
 
 	if ( out_dPdu )
 	{
-		SlScalar	tmp = mThetamaxRad * mRadius;
+		Float_	tmp = mThetamaxRad * mRadius;
 
 		out_dPdu->Set(
 					tmp * -DSin( theta ),
@@ -50,16 +50,16 @@ void Cylinder::Eval_dPdu_dPdv(
 
 //==================================================================
 void Cone::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
-	SlScalar	theta = uv[0] * mThetamaxRad;
-	SlScalar	cosUTheta = DCos( theta );
-	SlScalar	sinUTheta = DSin( theta );
+	Float_	theta = uv[0] * mThetamaxRad;
+	Float_	cosUTheta = DCos( theta );
+	Float_	sinUTheta = DSin( theta );
 
-	SlScalar	rad1V = mRadius * (SlScalar( 1 ) - uv[1]);
+	Float_	rad1V = mRadius * (Float_( 1 ) - uv[1]);
 	
 	out_pt.Set(
 		rad1V * cosUTheta,
@@ -68,7 +68,7 @@ void Cone::Eval_dPdu_dPdv(
 
 	if ( out_dPdu )
 	{
-		SlScalar	tmp = mThetamaxRad * rad1V;
+		Float_	tmp = mThetamaxRad * rad1V;
 
 		out_dPdu->Set(
 			tmp * -sinUTheta,
@@ -84,17 +84,17 @@ void Cone::Eval_dPdu_dPdv(
 
 //==================================================================
 void Sphere::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
 	// $$$ following 2 are "uniform"
-	SlScalar	alphamin	= DASin( mZMin / mRadius );
-	SlScalar	alphadelta	= SlScalar( DASin( mZMax / mRadius ) ) - alphamin;
+	Float_	alphamin	= DASin( mZMin / mRadius );
+	Float_	alphadelta	= Float_( DASin( mZMax / mRadius ) ) - alphamin;
 
-	SlScalar	theta = uv[0] * mThetamaxRad;
-	SlScalar	alpha = alphamin + uv[1] * alphadelta;
+	Float_	theta = uv[0] * mThetamaxRad;
+	Float_	alpha = alphamin + uv[1] * alphadelta;
 
 	out_pt.Set(
 		mRadius * DCos( alpha ) * DCos( theta ),
@@ -103,18 +103,18 @@ void Sphere::Eval_dPdu_dPdv(
 	
 	if ( out_dPdu )
 	{
-		SlScalar	cosAlpha = DCos( alpha );
-		SlScalar	cosUTheta = DCos( theta );
-		SlScalar	sinUTheta = DSin( theta );
+		Float_	cosAlpha = DCos( alpha );
+		Float_	cosUTheta = DCos( theta );
+		Float_	sinUTheta = DSin( theta );
 
-		SlScalar	tmp1 = mThetamaxRad * mRadius;
+		Float_	tmp1 = mThetamaxRad * mRadius;
 		out_dPdu->Set(
 			tmp1 * -sinUTheta * cosAlpha,
 			tmp1 *  cosUTheta * cosAlpha,
 			0.f );
 
-		SlScalar	tmp2 = alphadelta * mRadius;
-		SlScalar	tmp3 = tmp2 * -DSin( alpha );
+		Float_	tmp2 = alphadelta * mRadius;
+		Float_	tmp3 = tmp2 * -DSin( alpha );
 		out_dPdv->Set(
 			tmp3 * cosUTheta,
 			tmp3 * sinUTheta,
@@ -124,16 +124,16 @@ void Sphere::Eval_dPdu_dPdv(
 
 //==================================================================
 void Hyperboloid::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
-	SlScalar	uTheta = uv[0] * mThetamaxRad;
-	SlScalar	cosUTheta = DCos( uTheta );
-	SlScalar	sinUTheta = DSin( uTheta );
+	Float_	uTheta = uv[0] * mThetamaxRad;
+	Float_	cosUTheta = DCos( uTheta );
+	Float_	sinUTheta = DSin( uTheta );
 
-	SlVec3	p1p2v = DMix( SlVec3( mP1 ), SlVec3( mP2 ), uv[1] );
+	Float3_	p1p2v = DMix( Float3_( mP1 ), Float3_( mP2 ), uv[1] );
 
 	out_pt.Set(
 		p1p2v.x() * cosUTheta - p1p2v.y() * sinUTheta,
@@ -147,7 +147,7 @@ void Hyperboloid::Eval_dPdu_dPdv(
 			mThetamaxRad * (p1p2v.x() *  cosUTheta + p1p2v.y() * -sinUTheta),
 			0.f );
 
-		SlVec3	dp = mP2 - mP1;
+		Float3_	dp = mP2 - mP1;
 
 		out_dPdv->Set(
 			dp.x() * cosUTheta - dp.y() * sinUTheta,
@@ -158,17 +158,17 @@ void Hyperboloid::Eval_dPdu_dPdv(
 
 //==================================================================
 void Paraboloid::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
-	SlScalar	uTheta = uv[0] * mThetamaxRad;
-	SlScalar	cosUTheta = DCos( uTheta );
-	SlScalar	sinUTheta = DSin( uTheta );
-	SlScalar	scale = mRmax / DSqrt( mZmax );
-	SlScalar	z = DMix( SlScalar( mZmin ), SlScalar( mZmax ), uv[1] );
-	SlScalar	r = scale * DSqrt( z );
+	Float_	uTheta = uv[0] * mThetamaxRad;
+	Float_	cosUTheta = DCos( uTheta );
+	Float_	sinUTheta = DSin( uTheta );
+	Float_	scale = mRmax / DSqrt( mZmax );
+	Float_	z = DMix( Float_( mZmin ), Float_( mZmax ), uv[1] );
+	Float_	r = scale * DSqrt( z );
 
 	out_pt.Set(
 			r * cosUTheta,
@@ -177,14 +177,14 @@ void Paraboloid::Eval_dPdu_dPdv(
 
 	if ( out_dPdu )
 	{
-		SlScalar	tmp1 = r * mThetamaxRad;
+		Float_	tmp1 = r * mThetamaxRad;
 		out_dPdu->Set(
 			tmp1 * -sinUTheta,
 			tmp1 *  cosUTheta,
 			0.f );
 
-		SlScalar	dz = mZmax - mZmin;
-		SlScalar	dx = 0.5f * dz / DSqrt( z ) * scale;
+		Float_	dz = mZmax - mZmin;
+		Float_	dx = 0.5f * dz / DSqrt( z ) * scale;
 
 		out_dPdv->Set(
 			dx * cosUTheta,
@@ -195,16 +195,16 @@ void Paraboloid::Eval_dPdu_dPdv(
 
 //==================================================================
 void Torus::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
-	SlScalar	uTheta = uv[0] * mThetamaxRad;
-	SlScalar	cosUTheta = DCos( uTheta );
-	SlScalar	sinUTheta = DSin( uTheta );
-	SlScalar	phi = DMix( SlScalar( mPhiminRad ), SlScalar( mPhimaxRad ), uv[1] );
-	SlScalar	sx = DCos( phi ) * mMinRadius + mMaxRadius;
+	Float_	uTheta = uv[0] * mThetamaxRad;
+	Float_	cosUTheta = DCos( uTheta );
+	Float_	sinUTheta = DSin( uTheta );
+	Float_	phi = DMix( Float_( mPhiminRad ), Float_( mPhimaxRad ), uv[1] );
+	Float_	sx = DCos( phi ) * mMinRadius + mMaxRadius;
 
 	out_pt.Set(
 			sx * cosUTheta,
@@ -218,8 +218,8 @@ void Torus::Eval_dPdu_dPdv(
 			sx * mThetamaxRad *  cosUTheta,
 			0.f );
 
-		SlScalar dphi	= mPhimaxRad - mPhiminRad;
-		SlScalar dsx	= dphi * -DSin( phi ) * mMinRadius;
+		Float_ dphi	= mPhimaxRad - mPhiminRad;
+		Float_ dsx	= dphi * -DSin( phi ) * mMinRadius;
 
 		out_dPdv->Set(
 			dsx * cosUTheta,
@@ -358,10 +358,10 @@ void Hyperboloid::MakeBound( Bound &out_bound ) const
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
 
-	SlVec2	uvMin( 0.f, mVRange[0] );
-	SlVec2	uvMax( 0.f, mVRange[1] );
-	SlVec3	pMin; EvalP( uvMin, pMin );
-	SlVec3	pMax; EvalP( uvMax, pMax );
+	Float2_	uvMin( 0.f, mVRange[0] );
+	Float2_	uvMax( 0.f, mVRange[1] );
+	Float3_	pMin; EvalP( uvMin, pMin );
+	Float3_	pMax; EvalP( uvMax, pMax );
 
 	out_bound.Reset();
 	bounds2DSweepP( out_bound, pMin.x()[0], pMin.y()[0], tuMin, tuMax );

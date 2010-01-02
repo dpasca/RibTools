@@ -56,7 +56,7 @@ static void sortSampData(
 
 //==================================================================
 inline void filterPixelBox(
-				Vec3f				&pixCol,
+				Float3				&pixCol,
 				const HiderPixel	&pixel,
 				u_int				sampsPerPixel,
 				float				ooSampsPerPixel )
@@ -126,7 +126,7 @@ void Hider::Hide(
 	{
 		for (u_int x=0; x < buckWd; ++x, ++pixIdx)
 		{
-			Vec3f	pixCol( 0.f );
+			Float3	pixCol( 0.f );
 
 			filterPixelBox( pixCol, pixels[pixIdx], sampsPerPixel, ooSampsPerPixel );
 
@@ -147,7 +147,7 @@ void Hider::Hide(
 U8	ccodes[ MP_GRID_MAX_SIZE ];
 U8	gridORCCodes = 0;
 // would be nice to simdfy this one too
-for (size_t i=0; i < RI_SIMD_BLK_LEN; ++i)
+for (size_t i=0; i < DMT_SIMD_FLEN; ++i)
 {
 	float	x = homoP.x()[i];
 	float	y = homoP.y()[i];

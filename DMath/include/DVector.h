@@ -279,25 +279,33 @@ template<class _S> Vec4<_S> operator / (const _S &lval, const Vec4<_S> &rval) { 
 #if defined(_MSC_VER)
 #define DVECTOR_SIMD_ALIGN( _X_ )	__declspec(align(64))	_X_
 
+typedef __declspec(align(64)) VecN<float,DMT_SIMD_FLEN>			Float_;
+typedef __declspec(align(64)) VecN<int,DMT_SIMD_FLEN>			Int_;
+
+typedef __declspec(align(64)) Vec2< VecN<float,DMT_SIMD_FLEN> >	Float2_;
+typedef __declspec(align(64)) Vec3< VecN<float,DMT_SIMD_FLEN> >	Float3_;
+typedef __declspec(align(64)) Vec4< VecN<float,DMT_SIMD_FLEN> >	Float4_;
+
 #elif defined(__GNUC__)
 #define DVECTOR_SIMD_ALIGN( _X_ )	_X_ __attribute__ ((aligned(64)))
 
+typedef	VecN<float,DMT_SIMD_FLEN>			Float_ __attribute__ ((aligned(64)));
+typedef	VecN<int,DMT_SIMD_FLEN>				Int_ __attribute__ ((aligned(64)));
+
+typedef	Vec2< VecN<float,DMT_SIMD_FLEN> >	Float2_ __attribute__ ((aligned(64)));
+typedef	Vec3< VecN<float,DMT_SIMD_FLEN> >	Float3_ __attribute__ ((aligned(64)));
+typedef	Vec4< VecN<float,DMT_SIMD_FLEN> >	Float4_ __attribute__ ((aligned(64)));
+
 #endif
 
-typedef	Vec2<float>							Vec2f;
-typedef	Vec3<float>							Vec3f;
-typedef	Vec4<float>							Vec4f;
-typedef	VecN<float,DMT_SIMD_FLEN>			VecSIMDf;
-typedef	VecN<int,DMT_SIMD_FLEN>				VecSIMDi;
-
-typedef	Vec2< VecN<float,DMT_SIMD_FLEN> >	Vec2xSIMDf;
-typedef	Vec3< VecN<float,DMT_SIMD_FLEN> >	Vec3xSIMDf;
-typedef	Vec4< VecN<float,DMT_SIMD_FLEN> >	Vec4xSIMDf;
+typedef	Vec2<float>												Float2;
+typedef	Vec3<float>												Float3;
+typedef	Vec4<float>												Float4;
 
 //==================================================================
-typedef	Vec2f		Point2;
-typedef	Vec3f		Point3;
-typedef	Vec4f		Point4;
-typedef	Vec3f		Color;
+typedef	Float2		Point2;
+typedef	Float3		Point3;
+typedef	Float4		Point4;
+typedef	Float3		Color;
 
 #endif

@@ -54,7 +54,7 @@ void PatchMesh::Simplify( Hider &hider )
 		int	nUPatches = nu - 1 + uPeriodic ? 1 : 0;
 		int	nVPatches = nv - 1 + vPeriodic ? 1 : 0;
 
-		Vec3f	hullv3[4];
+		Float3	hullv3[4];
 
 		for (int i=0; i < nUPatches; ++i)
 		{
@@ -64,10 +64,10 @@ void PatchMesh::Simplify( Hider &hider )
 			{
 				int	jj = (j+1) % nv;
 
-				hullv3[0] = Vec3f( &pMeshHull[(i +nu*j )*3] );
-				hullv3[1] = Vec3f( &pMeshHull[(ii+nu*j )*3] );
-				hullv3[2] = Vec3f( &pMeshHull[(i +nu*jj)*3] );
-				hullv3[3] = Vec3f( &pMeshHull[(ii+nu*jj)*3] );
+				hullv3[0] = Float3( &pMeshHull[(i +nu*j )*3] );
+				hullv3[1] = Float3( &pMeshHull[(ii+nu*j )*3] );
+				hullv3[2] = Float3( &pMeshHull[(i +nu*jj)*3] );
+				hullv3[3] = Float3( &pMeshHull[(ii+nu*jj)*3] );
 
 				hider.InsertSimple(
 						DNEW RI::PatchBilinear( mParams, hullv3 ),
@@ -90,7 +90,7 @@ void PatchMesh::Simplify( Hider &hider )
 		int	nUPatches = uPeriodic ? nu / uSteps : (nu-4) / uSteps + 1;
 		int	nVPatches = vPeriodic ? nv / vSteps : (nv-4) / vSteps + 1;
 
-		Vec3f	hullv3[16];
+		Float3	hullv3[16];
 		
 		for (int j0=0; j0 < nVPatches; ++j0)
 		{
@@ -107,7 +107,7 @@ void PatchMesh::Simplify( Hider &hider )
 
 						DASSERT( srcIdx >= 0 && (srcIdx*3) < meshHullSize );
 
-						hullv3[hidx++] = Vec3f( &pMeshHull[ srcIdx * 3 ]);
+						hullv3[hidx++] = Float3( &pMeshHull[ srcIdx * 3 ]);
 					}
 				}
 
@@ -130,7 +130,7 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &globalSymbols
 	SimplePrimitiveBase(PATCHBILINEAR)//,
 	//mParams(params)
 {
-	Vec3f	pos[4];
+	Float3	pos[4];
 
 	bool	gotP = ParamsFindP( params, globalSymbols, pos, 4 );
 
@@ -141,7 +141,7 @@ PatchBilinear::PatchBilinear( ParamList &params, const SymbolList &globalSymbols
 }
 
 //==================================================================
-PatchBilinear::PatchBilinear( ParamList &params, const Vec3f hull[4] ) :
+PatchBilinear::PatchBilinear( ParamList &params, const Float3 hull[4] ) :
 	SimplePrimitiveBase(PATCHBILINEAR)//,
 	//mParams(params)
 {
@@ -155,21 +155,21 @@ void PatchBilinear::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vec3f *out_dPdu,
-			Vec3f *out_dPdv ) const
+			Float3 *out_dPdu,
+			Float3 *out_dPdv ) const
 {
-	Vec3f	left	= DMix( mHullPos_sca[0], mHullPos_sca[2], v );
-	Vec3f	right	= DMix( mHullPos_sca[1], mHullPos_sca[3], v );
+	Float3	left	= DMix( mHullPos_sca[0], mHullPos_sca[2], v );
+	Float3	right	= DMix( mHullPos_sca[1], mHullPos_sca[3], v );
 	out_pt			= DMix( left, right, u );
 
 	if ( out_dPdu )
 	{
-		Vec3f	left	= mHullPos_sca[2] - mHullPos_sca[0];
-		Vec3f	right	= mHullPos_sca[3] - mHullPos_sca[1];
+		Float3	left	= mHullPos_sca[2] - mHullPos_sca[0];
+		Float3	right	= mHullPos_sca[3] - mHullPos_sca[1];
 		*out_dPdv		= DMix( left, right, u );
 
-		Vec3f	bottom	= mHullPos_sca[1] - mHullPos_sca[0];
-		Vec3f	top		= mHullPos_sca[3] - mHullPos_sca[2];
+		Float3	bottom	= mHullPos_sca[1] - mHullPos_sca[0];
+		Float3	top		= mHullPos_sca[3] - mHullPos_sca[2];
 		*out_dPdu		= DMix( bottom, top, v );
 	}
 }
@@ -177,28 +177,28 @@ void PatchBilinear::Eval_dPdu_dPdv(
 
 //==================================================================
 void PatchBilinear::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
-	SlVec3	hullPos[4];
+	Float3_	hullPos[4];
 
 	for (int i=0; i < 4; ++i)
 		hullPos[i] = mHullPos_sca[i];
 
-	SlVec3	left	= DMix( hullPos[0], hullPos[2], uv[1] );
-	SlVec3	right	= DMix( hullPos[1], hullPos[3], uv[1] );
+	Float3_	left	= DMix( hullPos[0], hullPos[2], uv[1] );
+	Float3_	right	= DMix( hullPos[1], hullPos[3], uv[1] );
 	out_pt			= DMix( left, right, uv[0] );
 
 	if ( out_dPdu )
 	{
-		SlVec3	left	= hullPos[2] - hullPos[0];
-		SlVec3	right	= hullPos[3] - hullPos[1];
+		Float3_	left	= hullPos[2] - hullPos[0];
+		Float3_	right	= hullPos[3] - hullPos[1];
 		*out_dPdv		= DMix( left, right, uv[0] );
 
-		SlVec3	bottom	= hullPos[1] - hullPos[0];
-		SlVec3	top		= hullPos[3] - hullPos[2];
+		Float3_	bottom	= hullPos[1] - hullPos[0];
+		Float3_	top		= hullPos[3] - hullPos[2];
 		*out_dPdu		= DMix( bottom, top, uv[1] );
 	}
 }
@@ -220,7 +220,7 @@ PatchBicubic::PatchBicubic( ParamList &params, const Attributes &attr, const Sym
 
 //==================================================================
 PatchBicubic::PatchBicubic( ParamList &params,
-							const Vec3f hull[16],
+							const Float3 hull[16],
 						    const Attributes &attr,
 							const SymbolList &globalSymbols ) :
 	SimplePrimitiveBase(PATCHBICUBIC),
@@ -308,8 +308,8 @@ void PatchBicubic::Eval_dPdu_dPdv(
 			float u,
 			float v,
 			Point3 &out_pt,
-			Vec3f *out_dPdu,
-			Vec3f *out_dPdv ) const
+			Float3 *out_dPdu,
+			Float3 *out_dPdv ) const
 {
 	const RtBasis	&uBasis = *mpUBasis;
 	const RtBasis	&vBasis = *mpVBasis;
@@ -337,18 +337,18 @@ void PatchBicubic::Eval_dPdu_dPdv(
 
 //==================================================================
 void PatchBicubic::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
 	const RtBasis	&uBasis = *mpUBasis;
 	const RtBasis	&vBasis = *mpVBasis;
 
-	SlVec3 uBottom	= mCalcU[0].Eval( uv[0] );
-	SlVec3 uMid1	= mCalcU[1].Eval( uv[0] );
-	SlVec3 uMid2	= mCalcU[2].Eval( uv[0] );
-	SlVec3 uTop		= mCalcU[3].Eval( uv[0] );
+	Float3_ uBottom	= mCalcU[0].Eval( uv[0] );
+	Float3_ uMid1	= mCalcU[1].Eval( uv[0] );
+	Float3_ uMid2	= mCalcU[2].Eval( uv[0] );
+	Float3_ uTop		= mCalcU[3].Eval( uv[0] );
 
 	out_pt = spline( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
 
@@ -356,10 +356,10 @@ void PatchBicubic::Eval_dPdu_dPdv(
 	{
 		*out_dPdv = splineDeriv( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
 
-		SlVec3 vBottom	= mCalcV[0].Eval( uv[1] );
-		SlVec3 vMid1	= mCalcV[1].Eval( uv[1] );
-		SlVec3 vMid2	= mCalcV[2].Eval( uv[1] );
-		SlVec3 vTop		= mCalcV[3].Eval( uv[1] );
+		Float3_ vBottom	= mCalcV[0].Eval( uv[1] );
+		Float3_ vMid1	= mCalcV[1].Eval( uv[1] );
+		Float3_ vMid2	= mCalcV[2].Eval( uv[1] );
+		Float3_ vTop		= mCalcV[3].Eval( uv[1] );
 
 		*out_dPdu = splineDeriv( uv[0], uBasis, vBottom, vMid1, vMid2, vTop );
 	}

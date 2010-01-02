@@ -19,16 +19,16 @@ namespace RI
 {
 
 //==================================================================
-static void MakeCube( const Bound &b, Vec3f out_box[8] )
+static void MakeCube( const Bound &b, Float3 out_box[8] )
 {
-	out_box[0] = Vec3f( b.mBox[0][0], b.mBox[0][1], b.mBox[0][2] );
-	out_box[1] = Vec3f( b.mBox[1][0], b.mBox[0][1], b.mBox[0][2] );
-	out_box[2] = Vec3f( b.mBox[0][0], b.mBox[1][1], b.mBox[0][2] );
-	out_box[3] = Vec3f( b.mBox[1][0], b.mBox[1][1], b.mBox[0][2] );
-	out_box[4] = Vec3f( b.mBox[0][0], b.mBox[0][1], b.mBox[1][2] );
-	out_box[5] = Vec3f( b.mBox[1][0], b.mBox[0][1], b.mBox[1][2] );
-	out_box[6] = Vec3f( b.mBox[0][0], b.mBox[1][1], b.mBox[1][2] );
-	out_box[7] = Vec3f( b.mBox[1][0], b.mBox[1][1], b.mBox[1][2] );
+	out_box[0] = Float3( b.mBox[0][0], b.mBox[0][1], b.mBox[0][2] );
+	out_box[1] = Float3( b.mBox[1][0], b.mBox[0][1], b.mBox[0][2] );
+	out_box[2] = Float3( b.mBox[0][0], b.mBox[1][1], b.mBox[0][2] );
+	out_box[3] = Float3( b.mBox[1][0], b.mBox[1][1], b.mBox[0][2] );
+	out_box[4] = Float3( b.mBox[0][0], b.mBox[0][1], b.mBox[1][2] );
+	out_box[5] = Float3( b.mBox[1][0], b.mBox[0][1], b.mBox[1][2] );
+	out_box[6] = Float3( b.mBox[0][0], b.mBox[1][1], b.mBox[1][2] );
+	out_box[7] = Float3( b.mBox[1][0], b.mBox[1][1], b.mBox[1][2] );
 }
 
 //==================================================================
@@ -220,7 +220,7 @@ bool Hider::makeRasterBound(
 						const Matrix44 &mtxLocalWorld,
 						float out_bound2d[4] ) const
 {
-	Vec3f	boxVerts[8];
+	Float3	boxVerts[8];
 	MakeCube( b, boxVerts );
 
 	float destHalfWd	= (float)mOptions.mXRes * 0.5f;
@@ -245,7 +245,7 @@ bool Hider::makeRasterBound(
 
 	for (size_t i=0; i < 8; ++i)
 	{
-		Vec4f	Pproj = V4__V3W1_Mul_M44<float>( boxVerts[i], mtxLocalProj );
+		Float4	Pproj = V4__V3W1_Mul_M44<float>( boxVerts[i], mtxLocalProj );
 
 		float	x = Pproj.x();
 		float	y = Pproj.y();
@@ -357,7 +357,7 @@ void Hider::pointsTo2D( Point2 *pDes, const Point3 *pSrc, u_int n )
 
 	for (size_t i=0; i < n; ++i)
 	{
-		Vec4f	homoP = MultiplyV3W1M( pSrc[i], mMtxCamProj );
+		Float4	homoP = MultiplyV3W1M( pSrc[i], mMtxCamProj );
 		
 		float	oow = 1.0f / homoP.w;
 		

@@ -71,52 +71,52 @@ static void addShaderParam(
 	case Symbol::TYP_POINT:
 		{
 			const float *p = params[fromIdx+1].PFlt( 3 );
-			SlVec3	vec( p[0], p[1], p[2] );
+			Float3_	vec( p[0], p[1], p[2] );
 
 			if ( paramIsDirection )
 			{
 				// xyz1 * mtx
-				vec = V3__V3W1_Mul_M44<SlScalar>( vec, mtxLocalCam );
+				vec = V3__V3W1_Mul_M44<Float_>( vec, mtxLocalCam );
 			}
 			else
 			{
 				// xyz1 * mtx
-				vec = V3__V3W1_Mul_M44<SlScalar>( vec, mtxLocalCam );
+				vec = V3__V3W1_Mul_M44<Float_>( vec, mtxLocalCam );
 			}
 
-			*((SlVec3 *)pData) = vec;
+			*((Float3_ *)pData) = vec;
 		}
 		break;
 
 	case Symbol::TYP_VECTOR:
 		{
 			const float *p = params[fromIdx+1].PFlt( 3 );
-			SlVec3	vec( p[0], p[1], p[2] );
+			Float3_	vec( p[0], p[1], p[2] );
 			// xyz0 * mtx
 			// TODO: confirm it really is W0 !
-			vec = V3__V3W0_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
-			*((SlVec3 *)pData) = vec;
+			vec = V3__V3W0_Mul_M44<Float_>( vec, state.GetCurTransformOpenMtx() );
+			*((Float3_ *)pData) = vec;
 		}
 		break;
 
 	case Symbol::TYP_NORMAL:
 		{
 			const float *p = params[fromIdx+1].PFlt( 3 );
-			SlVec3	vec( p[0], p[1], p[2] );
+			Float3_	vec( p[0], p[1], p[2] );
 			// xyz0 * mtx
 			// TODO: confirm it really is W0 !
-			vec = V3__V3W0_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
-			*((SlVec3 *)pData) = vec;
+			vec = V3__V3W0_Mul_M44<Float_>( vec, state.GetCurTransformOpenMtx() );
+			*((Float3_ *)pData) = vec;
 		}
 		break;
 
 	case Symbol::TYP_HPOINT:
 		{
 			const float *p = params[fromIdx+1].PFlt( 4 );
-			SlVec4	vec( p[0], p[1], p[2], p[3] );
+			Float4_	vec( p[0], p[1], p[2], p[3] );
 			// xyzw * mtx
-			vec = V4__V4_Mul_M44<SlScalar>( vec, state.GetCurTransformOpenMtx() );
-			*((SlVec4 *)pData) = vec;
+			vec = V4__V4_Mul_M44<Float_>( vec, state.GetCurTransformOpenMtx() );
+			*((Float4_ *)pData) = vec;
 		}
 		break;
 

@@ -16,7 +16,7 @@
 
 //==================================================================
 static const u_int	TEST_DICE_LEN = 4;
-static const u_int	TEST_DICE_SIMD_BLOCKS = RI_GET_SIMD_BLOCKS( TEST_DICE_LEN * TEST_DICE_LEN );
+static const u_int	TEST_DICE_SIMD_BLOCKS = DMT_SIMD_BLOCKS( TEST_DICE_LEN * TEST_DICE_LEN );
 
 //==================================================================
 namespace RI
@@ -87,7 +87,7 @@ void SimplePrimitiveBase::Split( Hider &hider, bool uSplit, bool vSplit )
 
 //==================================================================
 void SimplePrimitiveBase::fillUVsArray(
-									SlVec2 out_locUV[],
+									Float2_ out_locUV[],
 									float du,
 									float dv,
 									u_int xDim,
@@ -101,12 +101,12 @@ void SimplePrimitiveBase::fillUVsArray(
 		float	u = 0.0f;
 		for (u_int j=0; j < xDim; ++j, u += du, ++sampleIdx)
 		{
-			Vec2f	tmpUV = CalcLocalUV( u, v );
+			Float2	tmpUV = CalcLocalUV( u, v );
 
-			size_t	blk = sampleIdx / RI_SIMD_BLK_LEN;
-			size_t	sub = sampleIdx & (RI_SIMD_BLK_LEN-1);
+			size_t	blk = sampleIdx / DMT_SIMD_FLEN;
+			size_t	sub = sampleIdx & (DMT_SIMD_FLEN-1);
 
-			SlVec2	&blkLocUV = out_locUV[ blk ];
+			Float2_	&blkLocUV = out_locUV[ blk ];
 
 			blkLocUV[0][ sub ] = tmpUV[0];
 			blkLocUV[1][ sub ] = tmpUV[1];
@@ -116,8 +116,8 @@ void SimplePrimitiveBase::fillUVsArray(
 
 //==================================================================
 void SimplePrimitiveBase::fillUVsArray(
-									SlVec2 locUV[],
-									SlVec2 locDUDV[],
+									Float2_ locUV[],
+									Float2_ locDUDV[],
 									float du,
 									float dv,
 									u_int xDim,
@@ -125,7 +125,7 @@ void SimplePrimitiveBase::fillUVsArray(
 {
 	size_t	sampleIdx = 0;
 
-	Vec2f	prevUV( 0, 0 );
+	Float2	prevUV( 0, 0 );
 
 	float	v = 0.0f;
 	for (u_int i=0; i < yDim; ++i, v += dv)
@@ -133,13 +133,13 @@ void SimplePrimitiveBase::fillUVsArray(
 		float	u = 0.0f;
 		for (u_int j=0; j < xDim; ++j, u += du, ++sampleIdx)
 		{
-			Vec2f	tmpUV = CalcLocalUV( u, v );
+			Float2	tmpUV = CalcLocalUV( u, v );
 
-			size_t	blk = sampleIdx / RI_SIMD_BLK_LEN;
-			size_t	sub = sampleIdx & (RI_SIMD_BLK_LEN-1);
+			size_t	blk = sampleIdx / DMT_SIMD_FLEN;
+			size_t	sub = sampleIdx & (DMT_SIMD_FLEN-1);
 
-			SlVec2	&blkLocUV = locUV[ blk ];
-			SlVec2	&blkLocDUDV = locDUDV[ blk ];
+			Float2_	&blkLocUV = locUV[ blk ];
+			Float2_	&blkLocDUDV = locDUDV[ blk ];
 
 			blkLocUV[0][ sub ] = tmpUV[0];
 			blkLocUV[1][ sub ] = tmpUV[1];
@@ -153,13 +153,13 @@ void SimplePrimitiveBase::fillUVsArray(
 		}
 	}
 
-	u_int xBlkN = RI_GET_SIMD_BLOCKS( xDim );
+	u_int xBlkN = DMT_SIMD_BLOCKS( xDim );
 
 	// -- calc du edge (replicates col 1 into col 0..)
 	u_int	blk = 0;
 	for (u_int i=0; i < yDim; ++i, blk += xBlkN)
 	{
-		SlVec2	&blkLocDUDV = locDUDV[ blk ];
+		Float2_	&blkLocDUDV = locDUDV[ blk ];
 
 		float	locDU = CalcLocalU( du ) - CalcLocalU( 0 );
 
@@ -182,14 +182,14 @@ void SimplePrimitiveBase::Dice(
 					WorkGrid &g,
 					bool doColorCoded ) const
 {
-	//SlVec3	*pPointsWS = g.mpPointsWS;
+	//Float3_	*pPointsWS = g.mpPointsWS;
 
-	SlVec3	 *pPointsWS = (SlVec3	*)g.mSymbolIs.FindSymbolIData( "P"	);
-	SlScalar *pOODu		= (SlScalar *)g.mSymbolIs.FindSymbolIData( "_oodu" );
-	SlScalar *pOODv		= (SlScalar *)g.mSymbolIs.FindSymbolIData( "_oodv" );
-	SlVec3	 *pI		= (SlVec3	*)g.mSymbolIs.FindSymbolIData( "I"	);
-	SlVec3	 *pN		= (SlVec3	*)g.mSymbolIs.FindSymbolIData( "N"	);
-	SlVec3	 *pNg		= (SlVec3	*)g.mSymbolIs.FindSymbolIData( "Ng"	);
+	Float3_	 *pPointsWS = (Float3_	*)g.mSymbolIs.FindSymbolIData( "P"	);
+	Float_ *pOODu		= (Float_ *)g.mSymbolIs.FindSymbolIData( "_oodu" );
+	Float_ *pOODv		= (Float_ *)g.mSymbolIs.FindSymbolIData( "_oodv" );
+	Float3_	 *pI		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "I"	);
+	Float3_	 *pN		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "N"	);
+	Float3_	 *pNg		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "Ng"	);
 	SlColor	 *pOs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Os"	);
 	SlColor	 *pCs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Cs"	);
 
@@ -203,7 +203,7 @@ void SimplePrimitiveBase::Dice(
 	if ( mpAttribs->mOrientationFlipped )
 		mtxLocalCameraNorm = mtxLocalCameraNorm * Matrix44::Scale( -1, -1, -1 );
 
-	Vec3f	camPosCS = g.mMtxWorldCamera.GetTranslation();
+	Float3	camPosCS = g.mMtxWorldCamera.GetTranslation();
 
 	SlColor	useColor;
 	SlColor	useOpa;
@@ -262,33 +262,33 @@ void SimplePrimitiveBase::Dice(
 	}
 
 	// build the UVs
-	SlVec2	locUV[ MP_GRID_MAX_SIMD_BLKS ];
-	SlVec2	locDUDV[ MP_GRID_MAX_SIMD_BLKS ];
+	Float2_	locUV[ MP_GRID_MAX_SIMD_BLKS ];
+	Float2_	locDUDV[ MP_GRID_MAX_SIMD_BLKS ];
 
 	fillUVsArray( locUV, locDUDV, du, dv, g.mXDim, g.mYDim );
 
 	//DASSERT( sampleIdx == g.mPointsN );
 
-	size_t	blocksN = RI_GET_SIMD_BLOCKS( g.mPointsN );
+	size_t	blocksN = DMT_SIMD_BLOCKS( g.mPointsN );
 
-	SlScalar	one( 1.0f );
+	Float_	one( 1.0f );
 
 	for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 	{
 #if 1
-		SlVec3	dPdu;
-		SlVec3	dPdv;
-		SlVec3	posLS;
+		Float3_	dPdu;
+		Float3_	dPdv;
+		Float3_	posLS;
 
 		Eval_dPdu_dPdv( locUV[blkIdx], posLS, &dPdu, &dPdv );
 
 		if ( posLS[0][0] == 0 && posLS[0][1] == 0 && posLS[0][2] == 0 )
 			continue;
 
-		SlVec3	norLS = dPdu.GetCross( dPdv ).GetNormalized();
-		SlVec3	posWS = V3__V3W1_Mul_M44<SlScalar>( posLS, g.mMtxLocalWorld );
-		SlVec3	posCS = V3__V3W1_Mul_M44<SlScalar>( posLS, g.mMtxLocalCamera );
-		SlVec3	norCS = V3__V3W1_Mul_M44<SlScalar>( norLS, mtxLocalCameraNorm ).GetNormalized();
+		Float3_	norLS = dPdu.GetCross( dPdv ).GetNormalized();
+		Float3_	posWS = V3__V3W1_Mul_M44<Float_>( posLS, g.mMtxLocalWorld );
+		Float3_	posCS = V3__V3W1_Mul_M44<Float_>( posLS, g.mMtxLocalCamera );
+		Float3_	norCS = V3__V3W1_Mul_M44<Float_>( norLS, mtxLocalCameraNorm ).GetNormalized();
 
 		pPointsWS[blkIdx]	= posWS;
 
@@ -301,23 +301,23 @@ void SimplePrimitiveBase::Dice(
 		pCs[blkIdx]		= useColor;
 
 #else
-		SlVec2	&tmpvblk = locUV[ blkIdx ];
+		Float2_	&tmpvblk = locUV[ blkIdx ];
 
-		for (size_t	itmIdx=0; itmIdx < RI_SIMD_BLK_LEN; ++itmIdx)
+		for (size_t	itmIdx=0; itmIdx < DMT_SIMD_FLEN; ++itmIdx)
 		{
-			Vec3f	dPdu;
-			Vec3f	dPdv;
-			Vec3f	posLS;
+			Float3	dPdu;
+			Float3	dPdv;
+			Float3	posLS;
 			Eval_dPdu_dPdv(	locUV[ blkIdx ][0][ itmIdx ],
 							locUV[ blkIdx ][1][ itmIdx ],
 							posLS,
 							&dPdu,
 							&dPdv );
 
-			Vec3f	norLS = dPdu.GetCross( dPdv ).GetNormalized();
-			Vec3f	posWS = V3__V3W1_Mul_M44<float>( posLS, g.mMtxLocalWorld );
-			Vec3f	posCS = V3__V3W1_Mul_M44<float>( posLS, g.mMtxLocalCamera );
-			Vec3f	norCS = V3__V3W1_Mul_M44<float>( norLS, mtxLocalCameraNorm ).GetNormalized();
+			Float3	norLS = dPdu.GetCross( dPdv ).GetNormalized();
+			Float3	posWS = V3__V3W1_Mul_M44<float>( posLS, g.mMtxLocalWorld );
+			Float3	posCS = V3__V3W1_Mul_M44<float>( posLS, g.mMtxLocalCamera );
+			Float3	norCS = V3__V3W1_Mul_M44<float>( norLS, mtxLocalCameraNorm ).GetNormalized();
 
 			// store in blocked SOA format
 
@@ -325,7 +325,7 @@ void SimplePrimitiveBase::Dice(
 			pPointsWS[blkIdx][1][itmIdx] = posWS[1];
 			pPointsWS[blkIdx][2][itmIdx] = posWS[2];
 
-			Vec3f	tmpI = (posCS - -camPosCS).GetNormalized();
+			Float3	tmpI = (posCS - -camPosCS).GetNormalized();
 			pI[blkIdx][0][itmIdx] = tmpI[0];
 			pI[blkIdx][1][itmIdx] = tmpI[1];
 			pI[blkIdx][2][itmIdx] = tmpI[2];
@@ -348,7 +348,7 @@ void SimplePrimitiveBase::Dice(
 //==================================================================
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &globalSymbols,
-					DVec<Vec3f> &out_vectorP,
+					DVec<Float3> &out_vectorP,
 					int fromIdx )
 {
 	bool	gotP = false;
@@ -369,7 +369,7 @@ bool ParamsFindP(	ParamList &params,
 			out_vectorP.resize( fltVec.size() / 3 );
 
 			for (size_t iv=0, id=0; iv < fltVec.size(); iv += 3)
-				out_vectorP[id++] = Vec3f( &fltVec[ iv ] );
+				out_vectorP[id++] = Float3( &fltVec[ iv ] );
 
 			return true;
 		}
@@ -381,7 +381,7 @@ bool ParamsFindP(	ParamList &params,
 //==================================================================
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &globalSymbols,
-					Vec3f	*pOut_vectorP,
+					Float3	*pOut_vectorP,
 					int	expectedN,
 					int fromIdx )
 {
@@ -409,7 +409,7 @@ bool ParamsFindP(	ParamList &params,
 			size_t	srcN = fltVec.size();
 
 			for (size_t si=0, di=0; si < srcN; si += 3, di += 1)
-				pOut_vectorP[ di ] = Vec3f( &fltVec[ si ] );
+				pOut_vectorP[ di ] = Float3( &fltVec[ si ] );
 			
 			return true;
 		}
@@ -430,7 +430,7 @@ SimplePrimitiveBase::CheckSplitRes
 
 	DASSERT( mDiceGridWd == -1 && mDiceGridHe == -1 );
 
-	SlVec3	testDicePo[ MAX_MAKE_BOUND_OUT_SIZE ];
+	Float3_	testDicePo[ MAX_MAKE_BOUND_OUT_SIZE ];
 
 	Bound	bound;
 	bound.Reset();
@@ -448,7 +448,7 @@ SimplePrimitiveBase::CheckSplitRes
 
 		float	dim = DSqrt( pixelArea );
 
-		mDiceGridWd = RI_GET_SIMD_PAD_SUBS( (int)ceilf( dim ) );
+		mDiceGridWd = DMT_SIMD_PADSIZE( (int)ceilf( dim ) );
 		mDiceGridHe = (int)ceilf( dim );
 
 		out_uSplit = false;
@@ -470,8 +470,8 @@ SimplePrimitiveBase::CheckSplitRes
 				TEST_DICE_LEN,
 				TEST_DICE_LEN );
 
-		//SlVec3	avg_dPdu( 0.f, 0.f, 0.f );
-		//SlVec3	avg_dPdv( 0.f, 0.f, 0.f );
+		//Float3_	avg_dPdu( 0.f, 0.f, 0.f );
+		//Float3_	avg_dPdv( 0.f, 0.f, 0.f );
 		SlScalar	avg_dPdu( 0.f );
 		SlScalar	avg_dPdv( 0.f );
 		for (u_int i=0; i < TEST_DICE_SIMD_BLOCKS; ++i)
@@ -491,12 +491,12 @@ SimplePrimitiveBase::CheckSplitRes
 		//avg_dPdv /= (float)TEST_DICE_SIMD_BLOCKS * DMT_SIMD_FLEN;
 /*
 
-		Vec3f avg_dPdu_s(
+		Float3 avg_dPdu_s(
 				avg_dPdu.x().AddReduce(),	// avg_dPdu.x()[0] + avg_dPdu.x()[1] ...
 				avg_dPdu.y().AddReduce(),
 				avg_dPdu.z().AddReduce() );
 
-		Vec3f avg_dPdv_s(
+		Float3 avg_dPdv_s(
 				avg_dPdv.x().AddReduce(),	// avg_dPdv.x()[0] + avg_dPdv.x()[1] ...
 				avg_dPdv.y().AddReduce(),
 				avg_dPdv.z().AddReduce() );

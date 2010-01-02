@@ -111,7 +111,7 @@ void SlRunContext::InitializeSIMD( size_t samplesN )
 {
 	DASSERT( samplesN <= mMaxPointsN );
 	mPointsN = samplesN;
-	mBlocksN = RI_GET_SIMD_BLOCKS( mPointsN );
+	mBlocksN = DMT_SIMD_BLOCKS( mPointsN );
 
 	for (u_int i=0; i < mPointsN; ++i)
 		mpSIMDFlags[i] = 0;

@@ -205,26 +205,26 @@ public:
 	static const size_t	MAX_MAKE_BOUND_OUT_SIZE = MAX_PADDED_VERTS_FOR_MakeBoundFromUVRangeN( 3 );
 
 	// make a 3D bound, return false if the bound cannot be made
-	virtual void	MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const = 0;
+	virtual void	MakeBound( Bound &out_bound, Float3_ *out_pPo ) const = 0;
 
-	inline SlVec3	&EvalP(
-						const SlVec2 &uv,
-						SlVec3 &out_pt ) const
+	inline Float3_	&EvalP(
+						const Float2_ &uv,
+						Float3_ &out_pt ) const
 	{
 		Eval_dPdu_dPdv( uv, out_pt, NULL, NULL );
 		return out_pt;
 	}
 
 	inline void EvalP(
-						const SlScalar *pUArray,
-						const SlScalar *pVArray,
-						SlVec3 *out_pPts,
+						const Float_ *pUArray,
+						const Float_ *pVArray,
+						Float3_ *out_pPts,
 						size_t	ptsN ) const
 	{
-		size_t	blksN =  RI_GET_SIMD_BLOCKS( ptsN );
+		size_t	blksN =  DMT_SIMD_BLOCKS( ptsN );
 		for (size_t i=0; i < blksN; ++i)
 		{
-			SlVec2	uv( pUArray[i], pVArray[i] );
+			Float2_	uv( pUArray[i], pVArray[i] );
 			Eval_dPdu_dPdv( uv, out_pPts[i], NULL, NULL );
 		}
 	}
@@ -234,31 +234,31 @@ public:
 						float u,
 						float v,
 						Point3 &out_pt,
-						Vec3f *out_dPdu,
-						Vec3f *out_dPdv ) const
+						Float3 *out_dPdu,
+						Float3 *out_dPdv ) const
 	{
 		DASSERT( 0 );
 	}
 */
 
 	virtual void	Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const = 0;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const = 0;
 
 	inline void Eval_dPdu_dPdv(
-						const SlScalar *pUArray,
-						const SlScalar *pVArray,
-						SlVec3 *out_pPts,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv,
+						const Float_ *pUArray,
+						const Float_ *pVArray,
+						Float3_ *out_pPts,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv,
 						size_t	ptsN ) const
 	{
-		size_t	blksN =  RI_GET_SIMD_BLOCKS( ptsN );
+		size_t	blksN =  DMT_SIMD_BLOCKS( ptsN );
 		for (size_t i=0; i < blksN; ++i)
 		{
-			SlVec2	uv( pUArray[i], pVArray[i] );
+			Float2_	uv( pUArray[i], pVArray[i] );
 			Eval_dPdu_dPdv( uv, out_pPts[i], &out_dPdu[i], &out_dPdv[i] );
 		}
 	}
@@ -268,19 +268,19 @@ public:
 						bool doColorCoded ) const;
 
 /*
-	inline Vec2f CalcLocalUV( const Vec2f &gridUV ) const
+	inline Float2 CalcLocalUV( const Float2 &gridUV ) const
 	{
 		return
-			Vec2f(
+			Float2(
 				DMix( mURange[0], mURange[1], gridUV.x() ),
 				DMix( mVRange[0], mVRange[1], gridUV.y() )
 			);
 	}
 */
-	inline Vec2f CalcLocalUV( float u, float v ) const
+	inline Float2 CalcLocalUV( float u, float v ) const
 	{
 		return
-			Vec2f(
+			Float2(
 				DMix( mURange[0], mURange[1], u ),
 				DMix( mVRange[0], mVRange[1], v )
 			);
@@ -293,15 +293,15 @@ public:
 
 private:
 	void fillUVsArray(
-				SlVec2 locUV[],
-				SlVec2 locDUDV[],
+				Float2_ locUV[],
+				Float2_ locDUDV[],
 				float du,
 				float dv,
 				u_int xDim,
 				u_int yDim ) const;
 
 	void fillUVsArray(
-				SlVec2 locUV[],
+				Float2_ locUV[],
 				float du,
 				float dv,
 				u_int xDim,
@@ -311,12 +311,12 @@ private:
 //==================================================================
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &globalSymbols,
-					DVec<Vec3f> &out_vectorP,
+					DVec<Float3> &out_vectorP,
 					int fromIdx=1 );
 
 bool ParamsFindP(	ParamList &params,
 					const SymbolList &globalSymbols,
-					Vec3f	*pOut_vectorP,
+					Float3	*pOut_vectorP,
 					int		expectedN,
 					int		fromIdx=1 );
 

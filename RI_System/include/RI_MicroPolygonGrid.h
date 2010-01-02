@@ -37,7 +37,7 @@ public:
 	u_int			mXBlocks;
 	u_int			mYDim;
 	u_int			mPointsN;
-	SlVec3			*mpPointsWS;
+	Float3_			*mpPointsWS;
 	float			mURange[2];
 	float			mVRange[2];
 	SymbolIList		mSymbolIs;
@@ -75,9 +75,9 @@ public:
 	u_int			mXBlocks;
 	u_int			mYDim;
 	u_int			mPointsN;
-	SlVec3			*mpPointsCS;
-	SlVec3			*mpPointsCloseCS;
-	SlVec2			*mpPosWin;
+	Float3_			*mpPointsCS;
+	Float3_			*mpPointsCloseCS;
+	Float2_			*mpPosWin;
 	SlColor			*mpCi;
 	SlColor			*mpOi;
 

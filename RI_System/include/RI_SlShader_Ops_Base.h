@@ -297,9 +297,9 @@ void Inst_2Op( SlRunContext &ctx )
 //==================================================================
 void Inst_Dot_SVV( SlRunContext &ctx )
 {
-		  SlScalar*	lhs	= ctx.GetVoidRW( (	  SlScalar *)0, 1 );
-	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
-	const SlVec3*	op2	= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
+		  Float_*	lhs	= ctx.GetVoidRW( (	  Float_ *)0, 1 );
+	const Float3_*	op1	= ctx.GetVoidRO( (const Float3_ *)0, 2 );
+	const Float3_*	op2	= ctx.GetVoidRO( (const Float3_ *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -338,9 +338,9 @@ void Inst_Dot_SVV( SlRunContext &ctx )
 //==================================================================
 void Inst_Pow_SSS( SlRunContext &ctx )
 {
-		  SlScalar*	lhs	= ctx.GetVoidRW( (		SlScalar *)0, 1 );
-	const SlScalar*	op1	= ctx.GetVoidRO( (const SlScalar *)0, 2 );
-	const SlScalar*	op2	= ctx.GetVoidRO( (const SlScalar *)0, 3 );
+		  Float_*	lhs	= ctx.GetVoidRW( (		Float_ *)0, 1 );
+	const Float_*	op1	= ctx.GetVoidRO( (const Float_ *)0, 2 );
+	const Float_*	op2	= ctx.GetVoidRO( (const Float_ *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -426,8 +426,8 @@ void Inst_Min_Max( SlRunContext &ctx )
 template <const size_t COMP_IDX>
 void Inst_GetVComp( SlRunContext &ctx )
 {
-		  SlScalar*	lhs	= ctx.GetVoidRW( (		SlScalar*)0, 1 );
-	const SlVec3*	op1	= ctx.GetVoidRO( (const	SlVec3	*)0	,2 );
+		  Float_*	lhs	= ctx.GetVoidRW( (		Float_*)0, 1 );
+	const Float3_*	op1	= ctx.GetVoidRO( (const	Float3_	*)0	,2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -463,8 +463,8 @@ void Inst_GetVComp( SlRunContext &ctx )
 template <const size_t COMP_IDX>
 void Inst_SetVComp( SlRunContext &ctx )
 {
-		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3	*)0, 1 );
-	const SlScalar*	op1	= ctx.GetVoidRO( (const SlScalar*)0, 2 );
+		  Float3_*	lhs	= ctx.GetVoidRW( (		Float3_	*)0, 1 );
+	const Float_*	op1	= ctx.GetVoidRO( (const Float_*)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 

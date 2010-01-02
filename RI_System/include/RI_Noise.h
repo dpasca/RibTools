@@ -55,20 +55,20 @@ public:
 	static float noise3( const float vec[3] );
 
 	//==================================================================
-	inline static SlScalar unoise1( const SlScalar &sca )
+	inline static Float_ unoise1( const Float_ &sca )
 	{
-		SlScalar	outSca;
-		for (int i=0; i < RI_SIMD_BLK_LEN; ++i)
+		Float_	outSca;
+		for (int i=0; i < DMT_SIMD_FLEN; ++i)
 		{
 			outSca[i] = noise1( sca[i] );
 		}
 		return outSca * 0.5f + 0.5f;
 	}
 	//==================================================================
-	inline static SlScalar unoise1( const SlVec2 &vec )
+	inline static Float_ unoise1( const Float2_ &vec )
 	{
-		SlScalar	outSca;
-		for (int i=0; i < RI_SIMD_BLK_LEN; ++i)
+		Float_	outSca;
+		for (int i=0; i < DMT_SIMD_FLEN; ++i)
 		{
 			float	sisdVec[3] = { vec[0][i], vec[1][i] };
 			outSca[i] = noise2( sisdVec );
@@ -76,10 +76,10 @@ public:
 		return outSca * 0.5f + 0.5f;
 	}
 	//==================================================================
-	inline static SlScalar unoise1( const SlVec3 &vec )
+	inline static Float_ unoise1( const Float3_ &vec )
 	{
-		SlScalar	outSca;
-		for (int i=0; i < RI_SIMD_BLK_LEN; ++i)
+		Float_	outSca;
+		for (int i=0; i < DMT_SIMD_FLEN; ++i)
 		{
 			float	sisdVec[3] = { vec[0][i], vec[1][i], vec[2][i] };
 			outSca[i] = noise3( sisdVec );
@@ -88,10 +88,10 @@ public:
 	}
 
 	//==================================================================
-	inline static SlVec3 unoise3( const SlScalar &sca )
+	inline static Float3_ unoise3( const Float_ &sca )
 	{
-		SlVec3	outVec;
-		for (int i=0; i < RI_SIMD_BLK_LEN; ++i)
+		Float3_	outVec;
+		for (int i=0; i < DMT_SIMD_FLEN; ++i)
 		{
 			outVec[0][i] = noise1( sca[i] + RI_NS_O0X );
 			outVec[1][i] = noise1( sca[i] + RI_NS_O1X );
@@ -100,14 +100,14 @@ public:
 		return outVec * 0.5f + 0.5f;
 	}
 	//==================================================================
-	inline static SlVec3 unoise3( const SlVec2 &vec )
+	inline static Float3_ unoise3( const Float2_ &vec )
 	{
-		SlVec3	outVec;
-		for (int i=0; i < RI_SIMD_BLK_LEN; ++i)
+		Float3_	outVec;
+		for (int i=0; i < DMT_SIMD_FLEN; ++i)
 		{
-			Vec2f	sisdVec0( vec[0][i], vec[1][i] );
-			Vec2f	sisdVec1 = sisdVec0 + Vec2f( RI_NS_O0X, RI_NS_O0Y );
-			Vec2f	sisdVec2 = sisdVec0 + Vec2f( RI_NS_O1X, RI_NS_O1Y );
+			Float2	sisdVec0( vec[0][i], vec[1][i] );
+			Float2	sisdVec1 = sisdVec0 + Float2( RI_NS_O0X, RI_NS_O0Y );
+			Float2	sisdVec2 = sisdVec0 + Float2( RI_NS_O1X, RI_NS_O1Y );
 
 			outVec[0][i] = noise2( &sisdVec0[0] );
 			outVec[1][i] = noise2( &sisdVec1[0] );
@@ -116,14 +116,14 @@ public:
 		return outVec * 0.5f + 0.5f;
 	}
 	//==================================================================
-	inline static SlVec3 unoise3( const SlVec3 &vec )
+	inline static Float3_ unoise3( const Float3_ &vec )
 	{
-		SlVec3	outVec;
-		for (int i=0; i < RI_SIMD_BLK_LEN; ++i)
+		Float3_	outVec;
+		for (int i=0; i < DMT_SIMD_FLEN; ++i)
 		{
-			Vec3f	sisdVec0( vec[0][i], vec[1][i], vec[2][i] );
-			Vec3f	sisdVec1 = sisdVec0 + Vec3f( RI_NS_O0X, RI_NS_O0Y, RI_NS_O0Z );
-			Vec3f	sisdVec2 = sisdVec0 + Vec3f( RI_NS_O1X, RI_NS_O1Y, RI_NS_O1Z );
+			Float3	sisdVec0( vec[0][i], vec[1][i], vec[2][i] );
+			Float3	sisdVec1 = sisdVec0 + Float3( RI_NS_O0X, RI_NS_O0Y, RI_NS_O0Z );
+			Float3	sisdVec2 = sisdVec0 + Float3( RI_NS_O1X, RI_NS_O1Y, RI_NS_O1Z );
 
 			outVec[0][i] = noise3( &sisdVec0[0] );
 			outVec[1][i] = noise3( &sisdVec1[0] );

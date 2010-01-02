@@ -36,7 +36,7 @@ WorkGrid::WorkGrid( const SymbolList &globalSyms ) :
 
 	mpDataCs = (SlColor *)	addSymI( globalSyms, "Cs"	);
 	mpDataOs = (SlColor *)	addSymI( globalSyms, "Os"	);
-	mpPointsWS = (SlVec3 *)	addSymI( globalSyms, "P"	);
+	mpPointsWS = (Float3_ *)	addSymI( globalSyms, "P"	);
 							addSymI( globalSyms, "dPdu"	);
 							addSymI( globalSyms, "dPdv"	);
 							addSymI( globalSyms, "_oodu");
@@ -80,7 +80,7 @@ void *WorkGrid::addSymI( const SymbolList &globalSyms, const char *pName )
 //==================================================================
 static void fillColArray( SlColor *pCol, size_t n, float r, float g, float b )
 {
-	size_t	blocksN = RI_GET_SIMD_BLOCKS( n );
+	size_t	blocksN = DMT_SIMD_BLOCKS( n );
 
 	for (size_t i=0; i < blocksN; ++i)
 	{
@@ -98,10 +98,10 @@ void WorkGrid::Setup(
 						const Matrix44 &mtxWorldCamera )
 {
 	mXDim = xdim;
-	mXBlocks = RI_GET_SIMD_BLOCKS( xdim );
+	mXBlocks = DMT_SIMD_BLOCKS( xdim );
 
 	// ensure that the width is multiple of the SIMD width
-	DASSERT( (mXBlocks * RI_SIMD_BLK_LEN) == mXDim );
+	DASSERT( (mXBlocks * DMT_SIMD_FLEN) == mXDim );
 
 	mYDim = ydim;
 	mPointsN = mXDim * mYDim;
@@ -134,7 +134,7 @@ void WorkGrid::Displace( const Attributes &attribs )
 		mDispRunCtx.SetupIfChanged(
 						attribs,
 						attribs.moDisplaceSHI.Use(),
-						RI_GET_SIMD_BLOCKS( mXDim ),
+						DMT_SIMD_BLOCKS( mXDim ),
 						mYDim,
 						mPointsN );
 
@@ -148,7 +148,7 @@ void WorkGrid::Shade( const Attributes &attribs )
 	mSurfRunCtx.SetupIfChanged(
 					attribs,
 					attribs.moSurfaceSHI.Use(),
-					RI_GET_SIMD_BLOCKS( mXDim ),
+					DMT_SIMD_BLOCKS( mXDim ),
 					mYDim,
 					mPointsN );
 
@@ -178,7 +178,7 @@ void ShadedGrid::Init( u_int pointsN )
 {
 	mPointsN = pointsN;
 
-	size_t	blocksN = RI_GET_SIMD_BLOCKS( pointsN );
+	size_t	blocksN = DMT_SIMD_BLOCKS( pointsN );
 
 	size_t	offs[5] = { 0 };
 
@@ -188,9 +188,9 @@ void ShadedGrid::Init( u_int pointsN )
 	offs[3] = offs[2] + sizeof(*mpCi			) * blocksN;
 	offs[4] = offs[3] + sizeof(*mpOi			) * blocksN;
 
-	mpPointsCS		= (SlVec3	*)DNEW U8 [ offs[4] ];
-	mpPointsCloseCS = (SlVec3	*)((U8 *)mpPointsCS + offs[0]);
-	mpPosWin		= (SlVec2	*)((U8 *)mpPointsCS + offs[1]);
+	mpPointsCS		= (Float3_	*)DNEW U8 [ offs[4] ];
+	mpPointsCloseCS = (Float3_	*)((U8 *)mpPointsCS + offs[0]);
+	mpPosWin		= (Float2_	*)((U8 *)mpPointsCS + offs[1]);
 	mpCi			= (SlColor	*)((U8 *)mpPointsCS + offs[2]);
 	mpOi			= (SlColor	*)((U8 *)mpPointsCS + offs[3]);
 }

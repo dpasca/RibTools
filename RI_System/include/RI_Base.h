@@ -20,15 +20,9 @@
 namespace RI
 {
 
-#define RI_SIMD_BLK_LEN				DMT_SIMD_FLEN
-#define	RI_GET_SIMD_BLOCKS(_X_)		(((unsigned)(_X_) + (RI_SIMD_BLK_LEN-1)) / RI_SIMD_BLK_LEN)
-#define	RI_GET_SIMD_BLK_IDX(_X_)	(((unsigned)(_X_)) / RI_SIMD_BLK_LEN)
-#define	RI_GET_SIMD_SUB_IDX(_X_)	(((unsigned)(_X_)) & (RI_SIMD_BLK_LEN-1))
-#define	RI_GET_SIMD_PAD_SUBS(_X_)	(((unsigned)(_X_) + (RI_SIMD_BLK_LEN-1)) & ~(RI_SIMD_BLK_LEN-1))
-
 //==================================================================
-static const u_int	MP_GRID_MAX_SIZE = RI_GET_SIMD_PAD_SUBS( 48 ) * 48;
-static const u_int	MP_GRID_MAX_SIMD_BLKS = RI_GET_SIMD_BLOCKS( MP_GRID_MAX_SIZE );
+static const u_int	MP_GRID_MAX_SIZE = DMT_SIMD_PADSIZE( 48 ) * 48;
+static const u_int	MP_GRID_MAX_SIMD_BLKS = DMT_SIMD_BLOCKS( MP_GRID_MAX_SIZE );
 
 //==================================================================
 enum Mode
@@ -338,7 +332,7 @@ typedef void		*LightHandle;
 
 struct Bound
 {
-	Vec3f	mBox[2];
+	Float3	mBox[2];
 
 	Bound()
 	{
@@ -368,7 +362,7 @@ struct Bound
 		mBox[1].Set( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 	}
 
-	void Expand( const Vec3f &p )
+	void Expand( const Float3 &p )
 	{
 		mBox[0].x() = DMIN( mBox[0].x(), p.x() );
 		mBox[0].y() = DMIN( mBox[0].y(), p.y() );

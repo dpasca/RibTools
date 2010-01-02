@@ -23,8 +23,8 @@ bool Translator::addCommand_prims(
 	if ( nm == "Cone" )				{ exN( 3, p ); mState.Cone(			p[0], p[1], p[2] ); }	else
 	if ( nm == "Cylinder" )			{ exN( 4, p ); mState.Cylinder(		p[0], p[1], p[2], p[3] ); }	else
 	if ( nm == "Sphere" )			{ exN( 4, p ); mState.Sphere(		p[0], p[1], p[2], p[3] ); }	else
-	if ( nm == "Hyperboloid" )		{ exN( 7, p ); mState.Hyperboloid(	Vec3f( p[0], p[1], p[2] ),
-																		Vec3f( p[3], p[4], p[5] ),
+	if ( nm == "Hyperboloid" )		{ exN( 7, p ); mState.Hyperboloid(	Float3( p[0], p[1], p[2] ),
+																		Float3( p[3], p[4], p[5] ),
 																		p[6] ); }	else
 	if ( nm == "Paraboloid" )		{ exN( 4, p ); mState.Paraboloid(	p[0], p[1], p[2], p[3] ); }	else
 	if ( nm == "Torus" )			{ exN( 5, p ); mState.Torus(		p[0], p[1], p[2], p[3], p[4] ); }	else

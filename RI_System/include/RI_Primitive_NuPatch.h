@@ -26,7 +26,7 @@ class NuPatch : public SimplePrimitiveBase
 	public:
 		DVec<float>		mUKnots;
 		DVec<float>		mVKnots;
-		DVec<Vec4f>		mCtrlPws;
+		DVec<Float4>	mCtrlPws;
 		int				mUOrder;
 		int				mVOrder;
 		int				mNu;
@@ -69,13 +69,13 @@ public:
 
 		NuPatch	*Clone() const {	return DNEW NuPatch( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const;
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const;
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 };
 	
 //==================================================================

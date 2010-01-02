@@ -109,7 +109,7 @@ NuPatch::NuPatch(
 		moBaseDef->mCtrlPws.resize( nPoints );
 		for (size_t i=0; i < nPoints; ++i)
 		{
-			Vec4f	&pw = moBaseDef->mCtrlPws[i];
+			Float4	&pw = moBaseDef->mCtrlPws[i];
 			pw.x() = pSrcPos[ i*3 + 0 ];
 			pw.x() = pSrcPos[ i*3 + 1 ];
 			pw.x() = pSrcPos[ i*3 + 2 ];
@@ -134,13 +134,13 @@ NuPatch::NuPatch(
  *	k   is the order of the curve (or surface direction)
  *	kv  is the knot vector ([0..m+k-1]) to find the break point in.
  */
-static SlScalari findBreakPoint(
-					const SlScalar		&u,
+static Int_ findBreakPoint(
+					const Float_		&u,
 					const DVec<float>	&kv,
 					int					m,
 					int					k )
 {
-	SlScalari	ret;
+	Int_	ret;
 
 	for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
 	{
@@ -180,11 +180,11 @@ static SlScalari findBreakPoint(
  * (From Bartels, Beatty & Barsky, p.387)
  */
 static void basisFunctions(
-					const SlScalar		&u,
-					const SlScalari		&brkPoint,
+					const Float_		&u,
+					const Int_		&brkPoint,
 					const DVec<float>	&kv,
 					int					k,
-					SlScalar			bvals[] )
+					Float_			bvals[] )
 {
     bvals[0] = 1.0f;
 
@@ -217,11 +217,11 @@ static void basisFunctions(
 //==================================================================
 // Compute derivatives of the basis functions Bi,k(u)'
 static void basisDerivatives(
-					const SlScalar		&u,
-					const SlScalari		&brkPoint,
+					const Float_		&u,
+					const Int_		&brkPoint,
 					const DVec<float>	&kv,
 					int					k,
-					SlScalar			dvals[] )
+					Float_			dvals[] )
 {
     basisFunctions( u, brkPoint, kv, k - 1, dvals );
 
@@ -252,10 +252,10 @@ static void basisDerivatives(
  * (kvU[orderU] <= u < kvU[numU), (kvV[orderV] <= v < kvV[numV])
  */
 void NuPatch::Eval_dPdu_dPdv(
-				const SlVec2 &uv,
-				SlVec3 &out_pt,
-				SlVec3 *out_dPdu,
-				SlVec3 *out_dPdv ) const
+				const Float2_ &uv,
+				Float3_ &out_pt,
+				Float3_ *out_dPdu,
+				Float3_ *out_dPdv ) const
 {
 	int	uorder = moBaseDef->mUOrder;
 	int	vorder = moBaseDef->mVOrder;
@@ -279,23 +279,23 @@ void NuPatch::Eval_dPdu_dPdv(
 		out_dPdv->SetZero();
 	}
 
-	SlScalar bu[MAXORDER], buprime[MAXORDER];
-    SlScalar bv[MAXORDER], bvprime[MAXORDER];
+	Float_ bu[MAXORDER], buprime[MAXORDER];
+    Float_ bv[MAXORDER], bvprime[MAXORDER];
 
-	SlVec4 r( 0.f );
-	SlVec4 rutan( 0.f );
-	SlVec4 rvtan( 0.f );
+	Float4_ r( 0.f );
+	Float4_ rutan( 0.f );
+	Float4_ rvtan( 0.f );
 
     // Evaluate non-uniform basis functions (and derivatives)
-	SlScalari ubrkPoint = findBreakPoint( uv[0], uknots, moBaseDef->mNu-1, uorder );
-	SlScalari ufirst = ubrkPoint - uorder + 1;
+	Int_ ubrkPoint = findBreakPoint( uv[0], uknots, moBaseDef->mNu-1, uorder );
+	Int_ ufirst = ubrkPoint - uorder + 1;
 	basisFunctions( uv[0], ubrkPoint, uknots, uorder, bu );
 
 	if (out_dPdu)
 		basisDerivatives( uv[0], ubrkPoint, uknots, uorder, buprime );
 
-	SlScalari vbrkPoint = findBreakPoint( uv[1], vknots, moBaseDef->mNv-1, vorder );
-	SlScalari vfirst = vbrkPoint - vorder + 1;
+	Int_ vbrkPoint = findBreakPoint( uv[1], vknots, moBaseDef->mNv-1, vorder );
+	Int_ vfirst = vbrkPoint - vorder + 1;
 	basisFunctions( uv[1], vbrkPoint, vknots, vorder, bv );
 
 	if (out_dPdv)
@@ -305,9 +305,9 @@ void NuPatch::Eval_dPdu_dPdv(
 
 	int	ptsPerRow = moBaseDef->mNu;
 
-	SlScalari	idx = vfirst * ptsPerRow + ufirst;
+	Int_	idx = vfirst * ptsPerRow + ufirst;
 
-	const DVec<Vec4f>	&ctrlPws = moBaseDef->mCtrlPws;
+	const DVec<Float4>	&ctrlPws = moBaseDef->mCtrlPws;
 
     for (int i = 0; i < vorder; ++i)
 	{
@@ -317,17 +317,17 @@ void NuPatch::Eval_dPdu_dPdv(
 		{
 			int rj = uorder - 1 - j;
 
-		    SlVec4	srcPw;		
+		    Float4_	srcPw;		
 			for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
 			{
-				Vec4f	tmp = ctrlPws[ idx[smdx_] + j ];
+				Float4	tmp = ctrlPws[ idx[smdx_] + j ];
 				srcPw.x()[smdx_] = tmp.x();
 				srcPw.y()[smdx_] = tmp.y();
 				srcPw.z()[smdx_] = tmp.z();
 				srcPw.w()[smdx_] = tmp.w();
 			}
 
-			SlScalar tensor = bu[rj] * bv[ri];
+			Float_ tensor = bu[rj] * bv[ri];
 
 			r += srcPw * tensor;
 
@@ -347,7 +347,7 @@ void NuPatch::Eval_dPdu_dPdv(
 	if ( out_dPdu )
 	{
 		// Project tangents, using the quotient rule for differentiation
-		SlScalar wsqrdiv = SlScalar( 1.f ) / (r.w() * r.w());
+		Float_ wsqrdiv = Float_( 1.f ) / (r.w() * r.w());
 
 		*out_dPdu = (r.w() * rutan.GetAsV3() - rutan.w() * r.GetAsV3()) * wsqrdiv;
 		*out_dPdv = (r.w() * rvtan.GetAsV3() - rvtan.w() * r.GetAsV3()) * wsqrdiv;
@@ -357,7 +357,7 @@ void NuPatch::Eval_dPdu_dPdv(
 }
 
 //==================================================================
-void NuPatch::MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+void NuPatch::MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 {
 	MakeBoundFromUVRangeN<NuPatch,3>( *this, out_bound, out_pPo );
 }

@@ -24,16 +24,16 @@ bool MakeBoundFromUVRange( const _S &This, Bound &out_bound )
 	float	DVECTOR_SIMD_ALIGN( us ) [] = { This.mURange[0], This.mURange[1], This.mURange[0], This.mURange[1] };
 	float	DVECTOR_SIMD_ALIGN( vs ) [] = { This.mVRange[0], This.mVRange[0], This.mVRange[1], This.mVRange[1] };
 
-	SlVec3	Po[ RI_GET_SIMD_PAD_SUBS(4) ];
+	Float3_	Po[ DMT_SIMD_PADSIZE(4) ];
 
-	This.EvalP( (const SlScalar *)us, (const SlScalar *)vs, Po, 4 );
+	This.EvalP( (const Float_ *)us, (const Float_ *)vs, Po, 4 );
 
 	for (size_t i=0; i < 4; ++i)
 	{
-		size_t	blk = i / RI_SIMD_BLK_LEN;
-		size_t	sub = i & (RI_SIMD_BLK_LEN-1);
+		size_t	blk = i / DMT_SIMD_FLEN;
+		size_t	sub = i & (DMT_SIMD_FLEN-1);
 
-		out_bound.Expand( Vec3f(
+		out_bound.Expand( Float3(
 								Po[blk][0][sub],
 								Po[blk][1][sub],
 								Po[blk][2][sub]
@@ -82,16 +82,16 @@ inline void bilinearFill( float out_x[], float out_y[], float x1, float y1, floa
 }
 
 //==================================================================
-#define MAX_PADDED_VERTS_FOR_MakeBoundFromUVRangeN(_DIM_)	RI_GET_SIMD_PAD_SUBS( _DIM_ * _DIM_ )
+#define MAX_PADDED_VERTS_FOR_MakeBoundFromUVRangeN(_DIM_)	DMT_SIMD_PADSIZE( _DIM_ * _DIM_ )
 
 //==================================================================
 template <class _S, u_int _DIM_LEN>
-void MakeBoundFromUVRangeN( const _S &This, Bound &out_bound, SlVec3 *out_pPo )
+void MakeBoundFromUVRangeN( const _S &This, Bound &out_bound, Float3_ *out_pPo )
 {
 	out_bound.Reset();
 
 	static const size_t	N_ELEMS = _DIM_LEN*_DIM_LEN;
-	static const size_t	N_ELEMS_PAD = RI_GET_SIMD_PAD_SUBS( N_ELEMS );
+	static const size_t	N_ELEMS_PAD = DMT_SIMD_PADSIZE( N_ELEMS );
 
 	float	DVECTOR_SIMD_ALIGN( us ) [N_ELEMS_PAD];
 	float	DVECTOR_SIMD_ALIGN( vs ) [N_ELEMS_PAD];
@@ -107,16 +107,16 @@ void MakeBoundFromUVRangeN( const _S &This, Bound &out_bound, SlVec3 *out_pPo )
 		_DIM_LEN,
 		N_ELEMS_PAD );
 
-	//SlVec3	Po[ N_ELEMS_PAD ];
+	//Float3_	Po[ N_ELEMS_PAD ];
 
-	This.EvalP( (const SlScalar *)us, (const SlScalar *)vs, out_pPo, N_ELEMS );
+	This.EvalP( (const Float_ *)us, (const Float_ *)vs, out_pPo, N_ELEMS );
 
 	for (size_t i=0; i < N_ELEMS; ++i)
 	{
-		size_t	blk = i / RI_SIMD_BLK_LEN;
-		size_t	sub = i & (RI_SIMD_BLK_LEN-1);
+		size_t	blk = i / DMT_SIMD_FLEN;
+		size_t	sub = i & (DMT_SIMD_FLEN-1);
 
-		out_bound.Expand( Vec3f(
+		out_bound.Expand( Float3(
 								out_pPo[blk][0][sub],
 								out_pPo[blk][1][sub],
 								out_pPo[blk][2][sub]

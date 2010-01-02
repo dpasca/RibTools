@@ -54,9 +54,9 @@ void xFormname_VXV( SlRunContext &ctx )
 {
 	// should do stuff here 8)
 
-		  SlVec3*	pDes		= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
+		  Float3_*	pDes		= ctx.GetVoidRW( (		Float3_ *)0, 1 );
 	const SlStr*	pSpaceName	= ctx.GetVoidRO( (const SlStr  *)0, 2 );
-	const SlVec3*	pSrc		= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
+	const Float3_*	pSrc		= ctx.GetVoidRO( (const Float3_ *)0, 3 );
 
 	DASSERT( ctx.IsSymbolVarying( 2 ) == false );
 
@@ -77,9 +77,9 @@ void xFormname_VXV( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				if ( _TYPE == Symbol::TYP_POINT )  pDes[i] = V3__V3W1_Mul_M44<SlScalar>( pSrc[src_offset], mat ); else
-				if ( _TYPE == Symbol::TYP_VECTOR ) pDes[i] = V3__V3W0_Mul_M44<SlScalar>( pSrc[src_offset], mat ); else
-				if ( _TYPE == Symbol::TYP_NORMAL ) pDes[i] = V3__V3W0_Mul_M44<SlScalar>( pSrc[src_offset], mat ).GetNormalized();
+				if ( _TYPE == Symbol::TYP_POINT )  pDes[i] = V3__V3W1_Mul_M44<Float_>( pSrc[src_offset], mat ); else
+				if ( _TYPE == Symbol::TYP_VECTOR ) pDes[i] = V3__V3W0_Mul_M44<Float_>( pSrc[src_offset], mat ); else
+				if ( _TYPE == Symbol::TYP_NORMAL ) pDes[i] = V3__V3W0_Mul_M44<Float_>( pSrc[src_offset], mat ).GetNormalized();
 			}
 
 			src_offset	+= src_step;
@@ -91,9 +91,9 @@ void xFormname_VXV( SlRunContext &ctx )
 
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
-			if ( _TYPE == Symbol::TYP_POINT )  pDes[0] = V3__V3W1_Mul_M44<SlScalar>( pSrc[0], mat ); else
-			if ( _TYPE == Symbol::TYP_VECTOR ) pDes[0] = V3__V3W0_Mul_M44<SlScalar>( pSrc[0], mat ); else
-			if ( _TYPE == Symbol::TYP_NORMAL ) pDes[0] = V3__V3W0_Mul_M44<SlScalar>( pSrc[0], mat ).GetNormalized();
+			if ( _TYPE == Symbol::TYP_POINT )  pDes[0] = V3__V3W1_Mul_M44<Float_>( pSrc[0], mat ); else
+			if ( _TYPE == Symbol::TYP_VECTOR ) pDes[0] = V3__V3W0_Mul_M44<Float_>( pSrc[0], mat ); else
+			if ( _TYPE == Symbol::TYP_NORMAL ) pDes[0] = V3__V3W0_Mul_M44<Float_>( pSrc[0], mat ).GetNormalized();
 		}
 	}
 
@@ -111,9 +111,9 @@ void Inst_CXFormname_VXV( SlRunContext &ctx )
 {
 	// should do stuff here 8)
 
-		  SlVec3*	pDes		= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
+		  Float3_*	pDes		= ctx.GetVoidRW( (		Float3_ *)0, 1 );
 	const SlStr*	pSpaceName	= ctx.GetVoidRO( (const SlStr  *)0, 2 );
-	const SlVec3*	pSrc		= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
+	const Float3_*	pSrc		= ctx.GetVoidRO( (const Float3_ *)0, 3 );
 
 	DASSERT( ctx.IsSymbolVarying( 2 ) == false );
 
@@ -134,7 +134,7 @@ void Inst_CXFormname_VXV( SlRunContext &ctx )
 		{
 			if ( ctx.IsProcessorActive( i ) )
 			{
-				pDes[i] = V3__V3W1_Mul_M44<SlScalar>( pSrc[src_offset], mat );
+				pDes[i] = V3__V3W1_Mul_M44<Float_>( pSrc[src_offset], mat );
 			}
 
 			src_offset	+= src_step;
@@ -146,7 +146,7 @@ void Inst_CXFormname_VXV( SlRunContext &ctx )
 
 		if ( ctx.IsProcessorActive( 0 ) )
 		{
-			pDes[0] = V3__V3W1_Mul_M44<SlScalar>( pSrc[0], mat );
+			pDes[0] = V3__V3W1_Mul_M44<Float_>( pSrc[0], mat );
 		}
 	}
 

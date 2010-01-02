@@ -46,6 +46,19 @@
 
 #endif
 
+// gives the number of SIMD blocks necessary for _SIZE_ elements
+#define	DMT_SIMD_BLOCKS(_SIZE_)			(((unsigned)(_SIZE_) + (DMT_SIMD_FLEN-1)) / DMT_SIMD_FLEN)
+
+// gives the block index from the global index _GLOB_IDX_
+#define	DMT_SIMD_BLK_IDX(_GLOB_IDX_)	(((unsigned)(_GLOB_IDX_)) / DMT_SIMD_FLEN)
+
+// gives the index of a SIMD block element from the global index _GLOB_IDX_
+#define	DMT_SIMD_SUB_IDX(_GLOB_IDX_)	(((unsigned)(_GLOB_IDX_)) & (DMT_SIMD_FLEN-1))
+
+// gives the size padded to the SIMD length
+#define	DMT_SIMD_PADSIZE(_SIZE_)		(((unsigned)(_SIZE_) + (DMT_SIMD_FLEN-1)) & ~(DMT_SIMD_FLEN-1))
+
+
 #include <math.h>
 #include <float.h>
 #include <assert.h>

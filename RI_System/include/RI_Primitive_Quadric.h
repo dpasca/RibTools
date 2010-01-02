@@ -39,17 +39,17 @@ public:
 
 		Cylinder *Clone() const {	return DNEW Cylinder( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
 			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
 		}
 		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -73,17 +73,17 @@ public:
 
 		Cone *Clone() const {	return DNEW Cone( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
 			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
 		}
 		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -109,17 +109,17 @@ public:
 
 		Sphere *Clone() const {	return DNEW Sphere( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
 			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
 		}
 		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -128,12 +128,12 @@ public:
 class Hyperboloid : public SimplePrimitiveBase
 {
 public:
-	Vec3f	mP1;
-	Vec3f	mP2;
+	Float3	mP1;
+	Float3	mP2;
 	float	mThetamaxRad;
 
 public:
-	Hyperboloid( const Vec3f &p1, const Vec3f &p2, float thetamax ) :
+	Hyperboloid( const Float3 &p1, const Float3 &p2, float thetamax ) :
 		SimplePrimitiveBase(HYPERBOLOID),
 		mP1(p1),
 		mP2(p2),
@@ -143,17 +143,17 @@ public:
 
 		Hyperboloid *Clone() const { return DNEW Hyperboloid( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
 			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
 		}
 		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -179,17 +179,17 @@ public:
 
 		Paraboloid *Clone() const {	return DNEW Paraboloid( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
 			MakeBoundFromUVRangeN<SimplePrimitiveBase,3>( *this, out_bound, out_pPo );
 		}
 		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -219,17 +219,17 @@ public:
 	
 		Torus *Clone() const {	return DNEW Torus( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
 			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
 		}
 		void MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 };
 
 //==================================================================

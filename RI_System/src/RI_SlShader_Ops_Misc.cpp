@@ -21,12 +21,12 @@ namespace SOP
 //==================================================================
 void Inst_Faceforward( SlRunContext &ctx )
 {
-		  SlVec3* lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
-	const SlVec3* pN	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
-	const SlVec3* pI	= ctx.GetVoidRO( (const SlVec3 *)0, 3 );
+		  Float3_* lhs	= ctx.GetVoidRW( (		Float3_ *)0, 1 );
+	const Float3_* pN	= ctx.GetVoidRO( (const Float3_ *)0, 2 );
+	const Float3_* pI	= ctx.GetVoidRO( (const Float3_ *)0, 3 );
 
 	const SymbolI*	pNgSymI = ctx.mpGridSymIList->FindSymbolI( "Ng" );
-	const SlVec3*	pNg = (const SlVec3 *)pNgSymI->GetData();
+	const Float3_*	pNg = (const Float3_ *)pNgSymI->GetData();
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	bool	N_step	= ctx.IsSymbolVarying( 2 );
@@ -65,8 +65,8 @@ void Inst_Faceforward( SlRunContext &ctx )
 //==================================================================
 void Inst_Normalize( SlRunContext &ctx )
 {
-		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
-	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
+		  Float3_*	lhs	= ctx.GetVoidRW( (		Float3_ *)0, 1 );
+	const Float3_*	op1	= ctx.GetVoidRO( (const Float3_ *)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -97,11 +97,11 @@ void Inst_Normalize( SlRunContext &ctx )
 //==================================================================
 void Inst_CalculateNormal( SlRunContext &ctx )
 {
-		  SlVec3*	lhs	= ctx.GetVoidRW( (		SlVec3 *)0, 1 );
-	const SlVec3*	op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
+		  Float3_*	lhs	= ctx.GetVoidRW( (		Float3_ *)0, 1 );
+	const Float3_*	op1	= ctx.GetVoidRO( (const Float3_ *)0, 2 );
 
-	const SlScalar*	pOODu	= (const SlScalar*)ctx.mpGridSymIList->FindSymbolIData( "_oodu" );
-	const SlScalar*	pOODv	= (const SlScalar*)ctx.mpGridSymIList->FindSymbolIData( "_oodv" );
+	const Float_*	pOODu	= (const Float_*)ctx.mpGridSymIList->FindSymbolIData( "_oodu" );
+	const Float_*	pOODv	= (const Float_*)ctx.mpGridSymIList->FindSymbolIData( "_oodv" );
 
 	// only varying input and output !
 	DASSERT( ctx.IsSymbolVarying( 1 ) && ctx.IsSymbolVarying( 2 ) );
@@ -110,7 +110,7 @@ void Inst_CalculateNormal( SlRunContext &ctx )
 
 	//if ( ctx.IsProcessorActive( i ) )
 
-	SlVec3	dPDu[ MP_GRID_MAX_SIMD_BLKS ];
+	Float3_	dPDu[ MP_GRID_MAX_SIMD_BLKS ];
 
 	{
 		u_int	blk = 0;
@@ -118,10 +118,10 @@ void Inst_CalculateNormal( SlRunContext &ctx )
 		{
 			for (u_int ixb=0; ixb < ctx.mBlocksXN; ++ixb, ++blk)
 			{
-				const SlVec3	&blkOp1 = op1[blk];
-				SlVec3			&blkdPDu = dPDu[blk];
+				const Float3_	&blkOp1 = op1[blk];
+				Float3_			&blkdPDu = dPDu[blk];
 
-				for (u_int sub=1; sub < RI_SIMD_BLK_LEN; ++sub)
+				for (u_int sub=1; sub < DMT_SIMD_FLEN; ++sub)
 				{
 					blkdPDu[0][sub] = blkOp1[0][sub] - blkOp1[0][sub-1];
 					blkdPDu[1][sub] = blkOp1[1][sub] - blkOp1[1][sub-1];
@@ -143,7 +143,7 @@ void Inst_CalculateNormal( SlRunContext &ctx )
 		{
 			for (u_int ixb=0; ixb < ctx.mBlocksXN; ++ixb, ++blk)
 			{
-				SlVec3	dPDv = (op1[blk] - op1[blk - ctx.mBlocksXN]) * pOODv[blk];
+				Float3_	dPDv = (op1[blk] - op1[blk - ctx.mBlocksXN]) * pOODv[blk];
 
 				lhs[blk] = dPDu[blk].GetCross( dPDv ).GetNormalized();
 			}

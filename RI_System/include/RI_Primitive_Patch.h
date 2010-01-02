@@ -23,12 +23,12 @@ class PatchBilinear : public SimplePrimitiveBase
 {
 private:
 	//ParamList		mParams;
-	Vec3f			mHullPos_sca[4];
-	//SlVec3		mHullPos[4];
+	Float3			mHullPos_sca[4];
+	//Float3_		mHullPos[4];
 
 public:
 	PatchBilinear( ParamList &params, const SymbolList &globalSymbols );
-	PatchBilinear( ParamList &params, const Vec3f hull[4] );
+	PatchBilinear( ParamList &params, const Float3 hull[4] );
 
 	~PatchBilinear()
 	{
@@ -36,16 +36,16 @@ public:
 
 		PatchBilinear *Clone() const {	return DNEW PatchBilinear( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
 			MakeBoundFromUVRangeN<SimplePrimitiveBase,2>( *this, out_bound, out_pPo );
 		}
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -99,32 +99,32 @@ private:
 	ParamList				mParams;
 	const RtBasis			*mpUBasis;
 	const RtBasis			*mpVBasis;
-	Vec3f					mHullPos[16];
-	//SplinePatchCalc<Vec3f,float>	mCalcU_sca[4];
-	//SplinePatchCalc<Vec3f,float>	mCalcV_sca[4];
+	Float3					mHullPos[16];
+	//SplinePatchCalc<Float3,float>	mCalcU_sca[4];
+	//SplinePatchCalc<Float3,float>	mCalcV_sca[4];
 
-	SplinePatchCalc<SlVec3,SlScalar>	mCalcU[4];
-	SplinePatchCalc<SlVec3,SlScalar>	mCalcV[4];
+	SplinePatchCalc<Float3_,Float_>	mCalcU[4];
+	SplinePatchCalc<Float3_,Float_>	mCalcV[4];
 
 public:
 	PatchBicubic( ParamList &params, const Attributes &attr, const SymbolList &globalSymbols );
 	PatchBicubic( ParamList &params,
-							const Vec3f hull[16],
+							const Float3 hull[16],
 						    const Attributes &attr,
 							const SymbolList &globalSymbols );
 
 		PatchBicubic *Clone() const {	return DNEW PatchBicubic( *this ); }
 
-		void MakeBound( Bound &out_bound, SlVec3 *out_pPo ) const
+		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
 			MakeBoundFromUVRangeN<SimplePrimitiveBase,2>( *this, out_bound, out_pPo );
 		}
 
 		void Eval_dPdu_dPdv(
-						const SlVec2 &uv,
-						SlVec3 &out_pt,
-						SlVec3 *out_dPdu,
-						SlVec3 *out_dPdv ) const;
+						const Float2_ &uv,
+						Float3_ &out_pt,
+						Float3_ *out_dPdu,
+						Float3_ *out_dPdv ) const;
 
 private:
 	void setupEvalCalc();

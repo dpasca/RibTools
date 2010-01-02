@@ -26,10 +26,10 @@ class SlIlluminanceCtx
 {
 public:
 	u_int			mBodyStartAddr;
-	const SlVec3	*mpAxis	;
-	const SlScalar	*mpAngle;
+	const Float3_	*mpAxis	;
+	const Float_	*mpAngle;
 
-	SlVec3			*mpL;
+	Float3_			*mpL;
 
 	size_t			mActLightIdx;
 	size_t			mActLightsN;
@@ -45,9 +45,9 @@ public:
 
 	void Init(
 		u_int			bodyStartAddr,
-		const SlVec3	*pAxis	,
-		const SlScalar	*pAngle,
-		SlVec3			*pL,
+		const Float3_	*pAxis	,
+		const Float_	*pAngle,
+		Float3_			*pL,
 		size_t			lightsN
 		)
 	{
@@ -197,27 +197,27 @@ public:
 		return GetOp(argc)->mSymbol.mIsVarying ? 1 : 0;
 	}
 
-	SlScalar *GetVoidRW( SlScalar *unused, u_int argc )
+	Float_ *GetVoidRW( Float_ *unused, u_int argc )
 	{
 		SlValue	&value = GetValue(argc);
 
 		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT &&
 				 value.Flags.mCanChange != 0 );
 
-		return (SlScalar *)value.Data.pVoidValue;
+		return (Float_ *)value.Data.pVoidValue;
 	}
 
-	SlVec2 *GetVoidRW( SlVec2 *unused, u_int argc )
+	Float2_ *GetVoidRW( Float2_ *unused, u_int argc )
 	{
 		SlValue	&value = GetValue(argc);
 
 		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT &&
 				 value.Flags.mCanChange != 0 );
 
-		return (SlVec2 *)value.Data.pVoidValue;
+		return (Float2_ *)value.Data.pVoidValue;
 	}
 
-	SlVec3 *GetVoidRW( SlVec3 *unused, u_int argc )
+	Float3_ *GetVoidRW( Float3_ *unused, u_int argc )
 	{
 		SlValue	&value = GetValue(argc);
 
@@ -228,7 +228,7 @@ public:
 			 value.mpSrcSymbol->mType == Symbol::TYP_NORMAL) &&
 			 value.Flags.mCanChange != 0 );
 
-		return (SlVec3 *)value.Data.pVoidValue;
+		return (Float3_ *)value.Data.pVoidValue;
 	}
 
 	SlStr *GetVoidRW( SlStr *unused, u_int argc )
@@ -242,21 +242,21 @@ public:
 		return (SlStr *)value.Data.pVoidValue;
 	}
 
-	const SlScalar *GetVoidRO( const SlScalar *unused, u_int argc ) const
+	const Float_ *GetVoidRO( const Float_ *unused, u_int argc ) const
 	{
 		const SlValue	&value = GetValue(argc);
 		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT );
-		return (const SlScalar *)value.Data.pVoidValue;
+		return (const Float_ *)value.Data.pVoidValue;
 	}
 
-	const SlVec2 *GetVoidRO( const SlVec2 *unused, u_int argc ) const
+	const Float2_ *GetVoidRO( const Float2_ *unused, u_int argc ) const
 	{
 		const SlValue	&value = GetValue(argc);
 		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT );
-		return (const SlVec2 *)value.Data.pVoidValue;
+		return (const Float2_ *)value.Data.pVoidValue;
 	}
 
-	const SlVec3 *GetVoidRO( const SlVec3 *unused, u_int argc ) const
+	const Float3_ *GetVoidRO( const Float3_ *unused, u_int argc ) const
 	{
 		const SlValue	&value = GetValue(argc);
 
@@ -266,7 +266,7 @@ public:
 			 value.mpSrcSymbol->mType == Symbol::TYP_VECTOR ||
 			 value.mpSrcSymbol->mType == Symbol::TYP_NORMAL) );
 
-		return (const SlVec3 *)value.Data.pVoidValue;
+		return (const Float3_ *)value.Data.pVoidValue;
 	}
 
 	const SlStr *GetVoidRO( const SlStr *unused, u_int argc ) const

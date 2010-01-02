@@ -91,7 +91,7 @@ public:
 	void WorldEnd();
 	
 	float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld, int out_box2D[4]  ) const;
-	SlScalar RasterLengthSqr( const SlVec3 &ptA, const SlVec3 &ptB, const Matrix44 &mtxLocalWorld ) const;
+	Float_ RasterLengthSqr( const Float3_ &ptA, const Float3_ &ptB, const Matrix44 &mtxLocalWorld ) const;
 
 	void Bust(	const HiderBucket	&bucket,
 				ShadedGrid			&shadGrid,

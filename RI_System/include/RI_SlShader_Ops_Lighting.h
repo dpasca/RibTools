@@ -39,14 +39,14 @@ void Inst_Illuminance( SlRunContext &ctx )
 		return;
 	}
 
-	const SlVec3*	pPos	= ctx.GetVoidRO( (		SlVec3 *)0, 1 );
-	const SlVec3*	pAxis	;
-	const SlScalar*	pAngle	;
+	const Float3_*	pPos	= ctx.GetVoidRO( (		Float3_ *)0, 1 );
+	const Float3_*	pAxis	;
+	const Float_*	pAngle	;
 
 	if ( INCLUDES_AXIS_ANGLE )
 	{
-		pAxis	= ctx.GetVoidRO( (		  SlVec3 *)0, 2 );
-		pAngle	= ctx.GetVoidRO( (const SlScalar *)0, 3 );
+		pAxis	= ctx.GetVoidRO( (		  Float3_ *)0, 2 );
+		pAngle	= ctx.GetVoidRO( (const Float_ *)0, 3 );
 	}
 	else
 	{
@@ -54,7 +54,7 @@ void Inst_Illuminance( SlRunContext &ctx )
 		pAngle	= NULL;
 	}
 
-	SlVec3	*pL		= (	 SlVec3 *)ctx.mpGridSymIList->FindSymbolIData( "L" );
+	Float3_	*pL		= (	 Float3_ *)ctx.mpGridSymIList->FindSymbolIData( "L" );
 
 	ctx.NextInstruction();
 	u_int bodyStartAddr = ctx.GetCurPC();
@@ -83,12 +83,12 @@ void Inst_Solar( SlRunContext &ctx )
 	// don't really need the following...
 	// u_short funcOpEndAddr = ctx.GetOp(0)->mOpCode.mFuncopEndAddr;
 
-	SlVec3	*pL		= (	 SlVec3 *)ctx.mpGridSymIList->FindSymbolIData( "L" );
+	Float3_	*pL		= (	 Float3_ *)ctx.mpGridSymIList->FindSymbolIData( "L" );
 
 	if ( INCLUDES_AXIS_ANGLE )
 	{
-		const SlVec3*	pAxis	= ctx.GetVoidRO( (		  SlVec3 *)0, 1 );
-		const SlScalar*	pAngle	= ctx.GetVoidRO( (const SlScalar *)0, 2 );
+		const Float3_*	pAxis	= ctx.GetVoidRO( (		  Float3_ *)0, 1 );
+		const Float_*	pAngle	= ctx.GetVoidRO( (const Float_ *)0, 2 );
 
 		// set to the value of the axis..
 		// NOTE: ignoring the angle for now !
@@ -105,7 +105,7 @@ void Inst_Solar( SlRunContext &ctx )
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
 			// not checking for active processor ?
-			pL[i] = SlVec3( 0.f );
+			pL[i] = Float3_( 0.f );
 		}
 	}
 
