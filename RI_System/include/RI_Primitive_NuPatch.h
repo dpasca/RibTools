@@ -69,10 +69,7 @@ public:
 
 		NuPatch	*Clone() const {	return DNEW NuPatch( *this ); }
 
-		bool MakeBound( Bound &out_bound ) const
-		{
-			return MakeBoundFromUVRange( *this, out_bound );
-		}
+		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,

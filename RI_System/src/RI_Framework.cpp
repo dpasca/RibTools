@@ -182,15 +182,15 @@ void Framework::worldEnd_splitAndAddToBuckets()
 
 		bool	uSplit;
 		bool	vSplit;
-		SimplePrimitiveBase::DosRes	dosRes =
-				pPrim->SetupForDiceOrSplit( mHider, uSplit, vSplit );
+		SimplePrimitiveBase::CheckSplitRes	dosRes =
+				pPrim->CheckForSplit( mHider, uSplit, vSplit );
 
-		if ( dosRes == SimplePrimitiveBase::DOSRES_DICE )
+		if ( dosRes == SimplePrimitiveBase::CHECKSPLITRES_DICE )
 		{
 			mHider.InsertForDicing( (SimplePrimitiveBase *)pPrim );
 		}
 		else
-		if ( dosRes == SimplePrimitiveBase::DOSRES_SPLIT )
+		if ( dosRes == SimplePrimitiveBase::CHECKSPLITRES_SPLIT )
 		{
 			pPrim->Split( mHider, uSplit, vSplit );
 		}

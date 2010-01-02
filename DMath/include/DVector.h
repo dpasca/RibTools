@@ -128,6 +128,11 @@ public:
 		return *this * DRSqrt( v3[0] * v3[0] + v3[1] * v3[1] + v3[2] * v3[2] );
 	}
 
+	_S GetLengthSqr() const
+	{
+		return v3[0] * v3[0] + v3[1] * v3[1] + v3[2] * v3[2];
+	}
+
 	Vec3 GetCross( const Vec3 &r_ ) const
 	{
 		return Vec3(
@@ -220,6 +225,11 @@ public:
 		return Vec3<_S>( v4 );
 	}
 
+	Vec2<_S> GetAsV2() const
+	{
+		return Vec2<_S>( v4 );
+	}
+
 	Vec4 operator + (const _S& rval) const { return Vec4( v4[0] + rval, v4[1] + rval, v4[2] + rval, v4[3] + rval ); }
 	Vec4 operator - (const _S& rval) const { return Vec4( v4[0] - rval, v4[1] - rval, v4[2] - rval, v4[3] - rval ); }
 	Vec4 operator * (const _S& rval) const { return Vec4( v4[0] * rval, v4[1] * rval, v4[2] * rval, v4[3] * rval ); }
@@ -265,6 +275,15 @@ template<class _S> Vec4<_S> operator / (const _S &lval, const Vec4<_S> &rval) { 
 //==================================================================
 /// float implementations
 //==================================================================
+//==================================================================
+#if defined(_MSC_VER)
+#define DVECTOR_SIMD_ALIGN( _X_ )	__declspec(align(64))	_X_
+
+#elif defined(__GNUC__)
+#define DVECTOR_SIMD_ALIGN( _X_ )	_X_ __attribute__ ((aligned(64)))
+
+#endif
+
 typedef	Vec2<float>							Vec2f;
 typedef	Vec3<float>							Vec3f;
 typedef	Vec4<float>							Vec4f;

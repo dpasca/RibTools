@@ -77,13 +77,13 @@ public:
 	void Insert( PrimitiveBase *pPrim );
 
 	void InsertSimple(	
-					SimplePrimitiveBase		*pSimplePrim,
-					ComplexPrimitiveBase	&srcPrim
+					SimplePrimitiveBase			*pSimplePrim,
+					const ComplexPrimitiveBase	&srcPrim
 					);
 
 	void InsertSplitted(	
-					SimplePrimitiveBase		*pDesPrim,
-					SimplePrimitiveBase		&srcPrim
+					SimplePrimitiveBase			*pDesPrim,
+					const SimplePrimitiveBase	&srcPrim
 					);
 
 	void InsertForDicing( SimplePrimitiveBase *pPrim );
@@ -91,6 +91,7 @@ public:
 	void WorldEnd();
 	
 	float RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) const;
+	SlScalar RasterLengthSqr( const SlVec3 &ptA, const SlVec3 &ptB, const Matrix44 &mtxLocalWorld ) const;
 
 	void Bust(	const HiderBucket	&bucket,
 				ShadedGrid			&shadGrid,

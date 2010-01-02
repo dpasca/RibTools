@@ -33,6 +33,8 @@ public:
 	void Set( const _S *p_ )	{ FOR_I_N v[i] = p_[i];	}
 	void SetZero()				{ FOR_I_N v[i] = 0;		}
 
+	_S	AddReduce() const		{ _S acc=_S(0); FOR_I_N acc += v[i]; return acc; }
+
 	VecN operator + (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval; return tmp; }
 	VecN operator - (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval; return tmp; }
 	VecN operator * (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval; return tmp; }
@@ -45,6 +47,13 @@ public:
 	VecN operator -() const	{ VecN tmp; FOR_I_N tmp.v[i] = -v[i]; return tmp; }
 
 	VecN operator +=(const VecN &rval)	{ *this = *this + rval; return *this; }
+
+	friend VecNMask operator < ( const VecN &lval, const VecN &rval ) { VecNMask mask=0; FOR_I_N mask |= (lval[i] < rval[i] ? (1<<i) : 0); return mask; }
+	friend VecNMask operator > ( const VecN &lval, const VecN &rval ) { VecNMask mask=0; FOR_I_N mask |= (lval[i] > rval[i] ? (1<<i) : 0); return mask; }
+	friend VecNMask operator ==( const VecN &lval, const VecN &rval ) { VecNMask mask=0; FOR_I_N mask |= (lval[i] ==rval[i] ? (1<<i) : 0); return mask; }
+	friend VecNMask operator !=( const VecN &lval, const VecN &rval ) { VecNMask mask=0; FOR_I_N mask |= (lval[i] !=rval[i] ? (1<<i) : 0); return mask; }
+	friend VecNMask operator <=( const VecN &lval, const VecN &rval ) { VecNMask mask=0; FOR_I_N mask |= (lval[i] <=rval[i] ? (1<<i) : 0); return mask; }
+	friend VecNMask operator >=( const VecN &lval, const VecN &rval ) { VecNMask mask=0; FOR_I_N mask |= (lval[i] >=rval[i] ? (1<<i) : 0); return mask; }
 
 	const _S &operator [] (size_t i) const	{ return v[i]; }
 		  _S &operator [] (size_t i)		{ return v[i]; }
@@ -91,6 +100,9 @@ public:
 	//void Set( const float *p_ )	{ v = _mm_loadu_ps( p_ );	}	// unaligned
 	void SetZero()				{ v = _mm_setzero_ps();		}
 
+	// TODO: add specialized AddReduce()
+	float AddReduce() const		{ return (*this)[0] + (*this)[1] + (*this)[2] + (*this)[3]; }
+
 	VecN operator + (const float& rval) const	{ return _mm_add_ps( v, _mm_set_ps1( rval )	); }
 	VecN operator - (const float& rval) const	{ return _mm_sub_ps( v, _mm_set_ps1( rval )	); }
 	VecN operator * (const float& rval) const	{ return _mm_mul_ps( v, _mm_set_ps1( rval )	); }
@@ -103,6 +115,13 @@ public:
 	VecN operator -() const						{ return _mm_sub_ps( _mm_setzero_ps(), v ); }
 
 	VecN operator +=(const VecN &rval)			{ *this = *this + rval; return *this; }
+
+	friend VecNMask operator < ( const VecN &lval, const VecN &rval ) { return _mm_cmplt_ps( lval.v, rval.v ); }
+	friend VecNMask operator > ( const VecN &lval, const VecN &rval ) { return _mm_cmpgt_ps( lval.v, rval.v ); }
+	friend VecNMask operator ==( const VecN &lval, const VecN &rval ) { return _mm_cmpeq_ps( lval.v, rval.v ); }
+	friend VecNMask operator !=( const VecN &lval, const VecN &rval ) { return _mm_cmpneq_ps( lval.v, rval.v ); }
+	friend VecNMask operator <=( const VecN &lval, const VecN &rval ) { return _mm_cmple_ps( lval.v, rval.v ); }
+	friend VecNMask operator >=( const VecN &lval, const VecN &rval ) { return _mm_cmpge_ss( lval.v, rval.v ); }
 
 #if defined(_MSC_VER)
 	const float &operator [] (size_t i) const	{ return v.m128_f32[i]; }
@@ -180,6 +199,8 @@ public:
 	void Set( const float *p_ )	{ v = _mm512_expandd( (void *)p_, _MM_FULLUPC_NONE, _MM_HINT_NONE ); }	// unaligned
 	void SetZero()				{ v = _mm512_setzero_ps();		}
 
+	float AddReduce() const		{ return _mm512_reduce_add_ps( v ); }
+
 	VecN operator + (const float& rval) const	{ return _mm512_add_ps( v, _mm512_set_1to16_ps( rval )	); }
 	VecN operator - (const float& rval) const	{ return _mm512_sub_ps( v, _mm512_set_1to16_ps( rval )	); }
 	VecN operator * (const float& rval) const	{ return _mm512_mul_ps( v, _mm512_set_1to16_ps( rval )	); }
@@ -192,6 +213,14 @@ public:
 	VecN operator -() const						{ return _mm512_sub_ps( _mm512_setzero_ps(), v ); }
 
 	VecN operator +=(const VecN &rval)			{ *this = *this + rval; return *this; }
+
+	// TODO: verify that it works !
+	friend VecNMask operator < ( const VecN &lval, const VecN &rval ) { return _mm512_cmplt_ps(  lval.v, rval.v ); }
+	friend VecNMask operator > ( const VecN &lval, const VecN &rval ) { return _mm512_cmpnle_ps( lval.v, rval.v ); }
+	friend VecNMask operator ==( const VecN &lval, const VecN &rval ) { return _mm512_cmpeq_ps(  lval.v, rval.v ); }
+	friend VecNMask operator !=( const VecN &lval, const VecN &rval ) { return _mm512_cmpneq_ps( lval.v, rval.v ); }
+	friend VecNMask operator <=( const VecN &lval, const VecN &rval ) { return _mm512_cmple_ps(  lval.v, rval.v ); }
+	friend VecNMask operator >=( const VecN &lval, const VecN &rval ) { return _mm512_cmpnlt_ps( lval.v, rval.v ); }
 
 	const float &operator [] (size_t i) const	{ return v.v[i]; }
 		  float &operator [] (size_t i)			{ return v.v[i]; }

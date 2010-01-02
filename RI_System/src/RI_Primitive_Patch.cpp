@@ -149,6 +149,7 @@ PatchBilinear::PatchBilinear( ParamList &params, const Vec3f hull[4] ) :
 		mHullPos_sca[i] = hull[i];
 }
 
+/*
 //==================================================================
 void PatchBilinear::Eval_dPdu_dPdv(
 			float u,
@@ -172,6 +173,7 @@ void PatchBilinear::Eval_dPdu_dPdv(
 		*out_dPdu		= DMix( bottom, top, v );
 	}
 }
+*/
 
 //==================================================================
 void PatchBilinear::Eval_dPdu_dPdv(

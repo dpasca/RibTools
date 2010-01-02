@@ -41,12 +41,14 @@ public:
 			return MakeBoundFromUVRange( *this, out_bound );
 		}
 
+/*
 		void Eval_dPdu_dPdv(
 					float u,
 					float v,
 					Point3 &out_pt,
 					Vec3f *out_dPdu,
 					Vec3f *out_dPdv ) const;
+*/
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,

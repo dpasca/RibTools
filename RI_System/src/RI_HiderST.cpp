@@ -159,8 +159,8 @@ void Hider::Insert( PrimitiveBase *pPrim )
 
 //==================================================================
 void Hider::InsertSimple(	
-					SimplePrimitiveBase		*pSimplePrim,
-					ComplexPrimitiveBase	&srcPrim
+					SimplePrimitiveBase			*pSimplePrim,
+					const ComplexPrimitiveBase	&srcPrim
 					)
 {
 	pSimplePrim->CopyStates( srcPrim );
@@ -170,8 +170,8 @@ void Hider::InsertSimple(
 
 //==================================================================
 void Hider::InsertSplitted(	
-				SimplePrimitiveBase	*pDesPrim,
-				SimplePrimitiveBase	&srcPrim
+				SimplePrimitiveBase			*pDesPrim,
+				const SimplePrimitiveBase	&srcPrim
 				)
 {
 	pDesPrim->CopyStates( srcPrim );
@@ -246,8 +246,8 @@ bool Hider::makeRasterBound(
 	Vec3f	boxVerts[8];
 	MakeCube( b, boxVerts );
 
-	float destHalfWd	= (float)mFinalBuff.mWd * 0.5f;
-	float destHalfHe	= (float)mFinalBuff.mHe * 0.5f;
+	float destHalfWd	= (float)mOptions.mXRes * 0.5f;
+	float destHalfHe	= (float)mOptions.mYRes * 0.5f;
 
 	float minX =  FLT_MAX;
 	float minY =  FLT_MAX;
@@ -338,6 +338,33 @@ float Hider::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld ) con
 	else
 		return 0.0f;	// invalid or zero area...
 }
+
+/*
+//==================================================================
+SlScalar Hider::RasterLengthSqr(
+					const SlVec3 &ptA,
+					const SlVec3 &ptB,
+					const Matrix44 &mtxLocalWorld ) const
+{
+	Matrix44	mtxLocalProj = mtxLocalWorld * mMtxWorldProj;
+
+	SlVec4	ptAProj = V4__V3W1_Mul_M44<float>( ptA, mtxLocalProj );
+	SlVec4	ptBProj = V4__V3W1_Mul_M44<float>( ptB, mtxLocalProj );
+
+	DASSERT( ptAProj.w() > SlScalar( 0.f ) || ptAProj.w() < SlScalar( 0.f ) );
+	DASSERT( ptBProj.w() > SlScalar( 0.f ) || ptBProj.w() < SlScalar( 0.f ) );
+
+	SlVec2	ptAWin = ptAProj.GetAsV2() / ptAProj.w();
+	SlVec2	ptBWin = ptBProj.GetAsV2() / ptBProj.w();
+
+	SlVec2	diff = ptBWin - ptAWin;
+
+	SlScalar	xDiffWin = diff.x() * (float)mOptions.mXRes;
+	SlScalar	yDiffWin = diff.y() * (float)mOptions.mYRes;
+
+	return	xDiffWin * xDiffWin + yDiffWin * yDiffWin;
+}
+*/
 
 /*
 //==================================================================

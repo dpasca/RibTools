@@ -15,6 +15,10 @@
 #include "RI_HiderST.h"
 
 //==================================================================
+static const u_int	TEST_DICE_LEN = 4;
+static const u_int	TEST_DICE_SIMD_BLOCKS = RI_GET_SIMD_BLOCKS( TEST_DICE_LEN * TEST_DICE_LEN );
+
+//==================================================================
 namespace RI
 {
 
@@ -83,6 +87,35 @@ void SimplePrimitiveBase::Split( Hider &hider, bool uSplit, bool vSplit )
 
 //==================================================================
 void SimplePrimitiveBase::fillUVsArray(
+									SlVec2 out_locUV[],
+									float du,
+									float dv,
+									u_int xDim,
+									u_int yDim ) const
+{
+	size_t	sampleIdx = 0;
+
+	float	v = 0.0f;
+	for (u_int i=0; i < yDim; ++i, v += dv)
+	{
+		float	u = 0.0f;
+		for (u_int j=0; j < xDim; ++j, u += du, ++sampleIdx)
+		{
+			Vec2f	tmpUV = CalcLocalUV( u, v );
+
+			size_t	blk = sampleIdx / RI_SIMD_BLK_LEN;
+			size_t	sub = sampleIdx & (RI_SIMD_BLK_LEN-1);
+
+			SlVec2	&blkLocUV = out_locUV[ blk ];
+
+			blkLocUV[0][ sub ] = tmpUV[0];
+			blkLocUV[1][ sub ] = tmpUV[1];
+		}
+	}
+}
+
+//==================================================================
+void SimplePrimitiveBase::fillUVsArray(
 									SlVec2 locUV[],
 									SlVec2 locDUDV[],
 									float du,
@@ -100,7 +133,7 @@ void SimplePrimitiveBase::fillUVsArray(
 		float	u = 0.0f;
 		for (u_int j=0; j < xDim; ++j, u += du, ++sampleIdx)
 		{
-			Vec2f	tmpUV = CalcLocalUV( Vec2f( u, v ) );
+			Vec2f	tmpUV = CalcLocalUV( u, v );
 
 			size_t	blk = sampleIdx / RI_SIMD_BLK_LEN;
 			size_t	sub = sampleIdx & (RI_SIMD_BLK_LEN-1);
@@ -177,6 +210,31 @@ void SimplePrimitiveBase::Dice(
 
 	if ( doColorCoded )
 	{
+		const static float c0 = 0.0f;
+		const static float c1 = 0.33f;
+		const static float c2 = 0.66f;
+		const static float c3 = 1.0f;
+		static Color palette[16] =
+		{
+			Color( c0, c0, 1-c0 ),
+			Color( c1, c0, 1-c1 ),
+			Color( c2, c0, 1-c2 ),
+			Color( c3, c0, 1-c3 ),
+			Color( c0, c0, 1-c0 ),
+			Color( c1, c0, 1-c1 ),
+			Color( c2, c0, 1-c2 ),
+			Color( c3, c0, 1-c3 ),
+
+			Color( c0, c1, 1-c0 ),
+			Color( c1, c1, 1-c1 ),
+			Color( c2, c2, 1-c2 ),
+			Color( c3, c2, 1-c3 ),
+			Color( c0, c3, 1-c0 ),
+			Color( c1, c3, 1-c1 ),
+			Color( c2, c3, 1-c2 ),
+			Color( c3, c3, 1-c3 ),
+		};
+/*
 		const static float l = 0.3f;
 		const static float m = 0.6f;
 		const static float h = 1.0f;
@@ -191,9 +249,10 @@ void SimplePrimitiveBase::Dice(
 			Color( h, h, l ),
 			Color( h, h, h ),
 		};
+*/
 		static int cnt;
 
-		useColor = palette[ cnt++ & 7 ];
+		useColor = palette[ cnt++ & 15 ];
 		useOpa	 = SlColor( 1, 1, 1 );
 	}
 	else
@@ -360,8 +419,8 @@ bool ParamsFindP(	ParamList &params,
 }
 
 //==================================================================
-SimplePrimitiveBase::DosRes
-	SimplePrimitiveBase::SetupForDiceOrSplit(
+SimplePrimitiveBase::CheckSplitRes
+	SimplePrimitiveBase::CheckForSplit(
 							const Hider &hider,
 							bool &out_uSplit,
 							bool &out_vSplit )
@@ -369,7 +428,7 @@ SimplePrimitiveBase::DosRes
 	const Matrix44 &mtxLocalWorld = mpTransform->GetMatrix();
 
 	DASSERT( mDiceGridWd == -1 && mDiceGridHe == -1 );
-	
+
 	Bound	bound;
 	MakeBound( bound );
 
@@ -379,7 +438,7 @@ SimplePrimitiveBase::DosRes
 	{
 		if ( pixelArea < RI_EPSILON )
 		{
-			return DOSRES_CULL;
+			return CHECKSPLITRES_CULL;
 		}
 
 		float	dim = DSqrt( pixelArea );
@@ -390,14 +449,75 @@ SimplePrimitiveBase::DosRes
 		out_uSplit = false;
 		out_vSplit = false;
 
-		return DOSRES_DICE;	// will dice
+		return CHECKSPLITRES_DICE;	// will dice
 	}
 	else
 	{
+#if 0
+		SlVec2	locUV[ TEST_DICE_SIMD_BLOCKS ];
+		// set last item to 0 to be safe when using the AddReduce() later on
+		locUV[ TEST_DICE_SIMD_BLOCKS - 1 ] = SlVec2( 0.f, 0.f );
+
+		fillUVsArray(
+				locUV,
+				1.0f / (TEST_DICE_LEN - 1),
+				1.0f / (TEST_DICE_LEN - 1),
+				TEST_DICE_LEN,
+				TEST_DICE_LEN );
+
+		//SlVec3	avg_dPdu( 0.f, 0.f, 0.f );
+		//SlVec3	avg_dPdv( 0.f, 0.f, 0.f );
+		SlScalar	avg_dPdu( 0.f );
+		SlScalar	avg_dPdv( 0.f );
+		for (u_int i=0; i < TEST_DICE_SIMD_BLOCKS; ++i)
+		{
+			SlVec3	posLS;
+			SlVec3	dPdu;
+			SlVec3	dPdv;
+
+			Eval_dPdu_dPdv( locUV[ i ], posLS, &dPdu, &dPdv );
+
+			avg_dPdu += dPdu.GetLengthSqr();
+			avg_dPdv += dPdv.GetLengthSqr();
+		}
+
+		// divide by the total number of elements 
+		//avg_dPdu /= (float)TEST_DICE_SIMD_BLOCKS * DMT_SIMD_FLEN;
+		//avg_dPdv /= (float)TEST_DICE_SIMD_BLOCKS * DMT_SIMD_FLEN;
+/*
+
+		Vec3f avg_dPdu_s(
+				avg_dPdu.x().AddReduce(),	// avg_dPdu.x()[0] + avg_dPdu.x()[1] ...
+				avg_dPdu.y().AddReduce(),
+				avg_dPdu.z().AddReduce() );
+
+		Vec3f avg_dPdv_s(
+				avg_dPdv.x().AddReduce(),	// avg_dPdv.x()[0] + avg_dPdv.x()[1] ...
+				avg_dPdv.y().AddReduce(),
+				avg_dPdv.z().AddReduce() );
+*/
+
+		float lenU = avg_dPdu.AddReduce();
+		float lenV = avg_dPdv.AddReduce();
+
+		if ( lenU < lenV )
+		{
+			out_uSplit = false;
+			out_vSplit = true;
+		}
+		else
+		{
+			out_uSplit = true;
+			out_vSplit = false;
+		}
+
+#else
 		out_uSplit = true;
 		out_vSplit = true;
 
-		return DOSRES_SPLIT;	// will split
+#endif
+
+		return CHECKSPLITRES_SPLIT;	// will split
 	}
 }
 

@@ -103,7 +103,7 @@ public:
 		mpTransform	= pTransform;
 	}
 
-	void CopyStates( PrimitiveBase &fromPrim )
+	void CopyStates( const PrimitiveBase &fromPrim )
 	{
 		mpAttribs	= fromPrim.mpAttribs	;
 		mpTransform	= fromPrim.mpTransform;
@@ -184,22 +184,24 @@ public:
 
 	virtual SimplePrimitiveBase	*Clone() const = 0;
 
-	enum DosRes
+	enum CheckSplitRes
 	{
-		DOSRES_CULL,
-		DOSRES_DICE,
-		DOSRES_SPLIT,
+		CHECKSPLITRES_CULL,
+		CHECKSPLITRES_DICE,
+		CHECKSPLITRES_SPLIT,
 	};
 
-	DosRes SetupForDiceOrSplit(	const Hider &hider,
-								bool &out_uSplit,
-								bool &out_vSplit );
+	CheckSplitRes CheckForSplit(
+							const Hider &hider,
+							bool &out_uSplit,
+							bool &out_vSplit );
 
 	void	Split( Hider &hider, bool uSplit, bool vSplit );
 
 	// make a 3D bound, return false if the bound cannot be made
 	virtual bool	MakeBound( Bound &out_bound ) const = 0;
 
+/*
 	inline Point3	&EvalP(
 						float u,
 						float v,
@@ -208,6 +210,7 @@ public:
 		Eval_dPdu_dPdv( u, v, out_pt, NULL, NULL );
 		return out_pt;
 	}
+*/
 
 	inline SlVec3	&EvalP(
 						const SlVec2 &uv,
@@ -217,6 +220,21 @@ public:
 		return out_pt;
 	}
 
+	inline void EvalP(
+						const SlScalar *pUArray,
+						const SlScalar *pVArray,
+						SlVec3 *out_pPts,
+						size_t	ptsN ) const
+	{
+		size_t	blksN =  RI_GET_SIMD_BLOCKS( ptsN );
+		for (size_t i=0; i < blksN; ++i)
+		{
+			SlVec2	uv( pUArray[i], pVArray[i] );
+			Eval_dPdu_dPdv( uv, out_pPts[i], NULL, NULL );
+		}
+	}
+
+/*
 	virtual void	Eval_dPdu_dPdv(
 						float u,
 						float v,
@@ -226,59 +244,50 @@ public:
 	{
 		DASSERT( 0 );
 	}
+*/
 
 	virtual void	Eval_dPdu_dPdv(
 						const SlVec2 &uv,
 						SlVec3 &out_pt,
 						SlVec3 *out_dPdu,
 						SlVec3 *out_dPdv ) const = 0;
-					/*
-					{
-						//out_pt = SlVec3( 0.0f );
-						Vec3f dPdu;
-						Vec3f dPdv;
-						Vec3f pt;
 
-						for (int i=0; i < RI_SIMD_BLK_LEN; ++i)
-						{
-							Eval_dPdu_dPdv(
-								uv[0][i],
-								uv[1][i],
-								pt,
-								&dPdu,
-								&dPdv );
-
-							out_pt[0][i] = pt[0];
-							out_pt[1][i] = pt[1];
-							out_pt[2][i] = pt[2];
-
-							if ( out_dPdu )
-							{
-								out_dPdu[0][i] = dPdu[0];
-								out_dPdu[1][i] = dPdu[1];
-								out_dPdu[2][i] = dPdu[2];
-							}
-
-							if ( out_dPdv )
-							{
-								out_dPdv[0][i] = dPdv[0];
-								out_dPdv[1][i] = dPdv[1];
-								out_dPdv[2][i] = dPdv[2];
-							}
-						}
-					}
-					*/
+	inline void Eval_dPdu_dPdv(
+						const SlScalar *pUArray,
+						const SlScalar *pVArray,
+						SlVec3 *out_pPts,
+						SlVec3 *out_dPdu,
+						SlVec3 *out_dPdv,
+						size_t	ptsN ) const
+	{
+		size_t	blksN =  RI_GET_SIMD_BLOCKS( ptsN );
+		for (size_t i=0; i < blksN; ++i)
+		{
+			SlVec2	uv( pUArray[i], pVArray[i] );
+			Eval_dPdu_dPdv( uv, out_pPts[i], &out_dPdu[i], &out_dPdv[i] );
+		}
+	}
 
 	virtual void	Dice(
 						WorkGrid &g,
 						bool doColorCoded ) const;
 
+/*
 	inline Vec2f CalcLocalUV( const Vec2f &gridUV ) const
 	{
 		return
 			Vec2f(
 				DMix( mURange[0], mURange[1], gridUV.x() ),
 				DMix( mVRange[0], mVRange[1], gridUV.y() )
+			);
+	}
+*/
+	inline Vec2f CalcLocalUV( float u, float v ) const
+	{
+		return
+			Vec2f(
+				DMix( mURange[0], mURange[1], u ),
+				DMix( mVRange[0], mVRange[1], v )
 			);
 	}
 
@@ -291,6 +300,13 @@ private:
 	void fillUVsArray(
 				SlVec2 locUV[],
 				SlVec2 locDUDV[],
+				float du,
+				float dv,
+				u_int xDim,
+				u_int yDim ) const;
+
+	void fillUVsArray(
+				SlVec2 locUV[],
 				float du,
 				float dv,
 				u_int xDim,

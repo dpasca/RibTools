@@ -19,42 +19,25 @@ bool MakeBoundFromUVRange( const _S &This, Bound &out_bound )
 {
 #if 1
 
-	const float srcUVs[RI_GET_SIMD_PAD_SUBS(4)][2] = {
-		This.mURange[0], This.mVRange[0],
-		This.mURange[1], This.mVRange[0],
-		This.mURange[0], This.mVRange[1],
-		This.mURange[1], This.mVRange[1]
-	};
-
 	out_bound.Reset();
 
-	for (size_t blkIdx=0; blkIdx < RI_GET_SIMD_BLOCKS( 4 ); ++blkIdx)
+	float	DVECTOR_SIMD_ALIGN( us ) [] = { This.mURange[0], This.mURange[1], This.mURange[0], This.mURange[1] };
+	float	DVECTOR_SIMD_ALIGN( vs ) [] = { This.mVRange[0], This.mVRange[0], This.mVRange[1], This.mVRange[1] };
+
+	SlVec3	Po[ RI_GET_SIMD_PAD_SUBS(4) ];
+
+	This.EvalP( (const SlScalar *)us, (const SlScalar *)vs, Po, 4 );
+
+	for (size_t i=0; i < 4; ++i)
 	{
-		SlVec2	uvs;
+		size_t	blk = i / RI_SIMD_BLK_LEN;
+		size_t	sub = i & (RI_SIMD_BLK_LEN-1);
 
-		size_t	iStart	= (blkIdx + 0) * RI_SIMD_BLK_LEN + 0;
-		size_t	iEnd	= (blkIdx + 1) * RI_SIMD_BLK_LEN + 0;
-		iEnd = DMIN( 4, iEnd );
-		size_t	n = iEnd - iStart;
-
-		for (size_t subIdx=0; subIdx < n; ++subIdx)
-		{
-			uvs[0][subIdx] = srcUVs[(blkIdx + 0) * RI_SIMD_BLK_LEN + subIdx][0];
-			uvs[1][subIdx] = srcUVs[(blkIdx + 0) * RI_SIMD_BLK_LEN + subIdx][1];
-		}
-
-		SlVec3	Po;
-		This.EvalP( uvs, Po );
-
-
-		for (size_t subIdx=0; subIdx < n; ++subIdx)
-		{
-			out_bound.Expand( Vec3f(
-									Po[0][subIdx],
-									Po[1][subIdx],
-									Po[2][subIdx]
-								) );
-		}
+		out_bound.Expand( Vec3f(
+								Po[blk][0][sub],
+								Po[blk][1][sub],
+								Po[blk][2][sub]
+							) );
 	}
 
 #else
@@ -70,6 +53,62 @@ bool MakeBoundFromUVRange( const _S &This, Bound &out_bound )
 
 	return true;
 }
+
+#define MAKE_BOUND_DIM_LEN	3
+
+//==================================================================
+template <class _S>
+bool MakeBoundFromUVRange9( const _S &This, Bound &out_bound )
+{
+	out_bound.Reset();
+
+	static const size_t	N_ELEMS = MAKE_BOUND_DIM_LEN*MAKE_BOUND_DIM_LEN;
+	static const size_t	N_ELEMS_PAD = RI_GET_SIMD_PAD_SUBS( N_ELEMS );
+
+	float	DVECTOR_SIMD_ALIGN( us ) [N_ELEMS_PAD];// = { This.mURange[0], This.mURange[1], This.mURange[0], This.mURange[1] };
+	float	DVECTOR_SIMD_ALIGN( vs ) [N_ELEMS_PAD];// = { This.mVRange[0], This.mVRange[0], This.mVRange[1], This.mVRange[1] };
+
+	size_t	idx = 0;
+	float	v = This.mVRange[0];
+	float	dv = (This.mVRange[1] - This.mVRange[0]) / (MAKE_BOUND_DIM_LEN - 1);
+	float	du = (This.mURange[1] - This.mURange[0]) / (MAKE_BOUND_DIM_LEN - 1);
+	for (int y=0; y < MAKE_BOUND_DIM_LEN; ++y)
+	{
+		float	u = This.mURange[0];
+		for (int x=0; x < MAKE_BOUND_DIM_LEN; ++x, ++idx)
+		{
+			us[idx] = u;
+			vs[idx] = v;
+			u += du;
+		}
+		v += dv;
+	}
+	// replicate to the padding
+	for (; idx < N_ELEMS_PAD; ++idx)
+	{
+		us[idx] = us[idx-1];
+		vs[idx] = vs[idx-1];
+	}
+
+	SlVec3	Po[ N_ELEMS_PAD ];
+
+	This.EvalP( (const SlScalar *)us, (const SlScalar *)vs, Po, N_ELEMS );
+
+	for (size_t i=0; i < N_ELEMS; ++i)
+	{
+		size_t	blk = i / RI_SIMD_BLK_LEN;
+		size_t	sub = i & (RI_SIMD_BLK_LEN-1);
+
+		out_bound.Expand( Vec3f(
+								Po[blk][0][sub],
+								Po[blk][1][sub],
+								Po[blk][2][sub]
+							) );
+	}
+
+	return true;
+}
+
 
 
 

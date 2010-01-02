@@ -18,6 +18,113 @@ namespace RI
 {
 
 //==================================================================
+static void fillKnot( DVec<float> &out_knots, const float *pSrcKnots, int n, int order )
+{
+	out_knots.resize( n + order );
+	for (size_t i=0; i < out_knots.size(); ++i)
+	{
+		if ( i > 0 )
+			DASSTHROW( pSrcKnots[i-1] <= pSrcKnots[i], ("Invalid knot value") );
+
+		out_knots[i] = pSrcKnots[i];
+	}
+}
+
+//==================================================================
+/// NuPatch
+//==================================================================
+NuPatch::NuPatch(
+			int			nu		,
+			int			uorder	,
+			const float	*pUknot	,
+			float		umin	,
+			float		umax	,
+			int			nv		,
+			int			vorder	,
+			const float	*pVknot	,
+			float		vmin	,
+			float		vmax	,
+			ParamList	&params
+			) :
+		SimplePrimitiveBase(PrimitiveBase::NUPATCH, umin, umax, vmin, vmax)
+{
+	moBaseDef = new BaseDef( uorder, vorder, nu, nv );
+
+	DASSTHROW( uorder > 1 && vorder > 1, ("Patch order must be 2 or larger") );
+	DASSTHROW( uorder <= MAXORDER && vorder <= MAXORDER, ("Patch order must be no higher than %i", MAXORDER) );
+	DASSTHROW( umin < umax && vmin < vmax, ("'min' parameter must be less than 'max'") );
+
+	fillKnot( moBaseDef->mUKnots, pUknot, nu, uorder );
+	fillKnot( moBaseDef->mVKnots, pVknot, nv, vorder );
+
+	// order-1 really ?
+	DASSTHROW(
+		umin >= moBaseDef->mUKnots[ uorder-2 ] &&
+		vmin >= moBaseDef->mVKnots[ vorder-2 ],
+		("'min' parameter must be larger or equal of knot[ order-2 ]") );
+
+	DASSTHROW(
+		umax <= moBaseDef->mUKnots[ nu ] &&
+		vmax <= moBaseDef->mVKnots[ nv ],
+		("'max' less than knot[ n-1 ]") );
+
+	int	udegree = uorder - 1;
+	int	vdegree = vorder - 1;
+
+	int	uSegmentsN = nu - udegree;
+	int	vSegmentsN = nv - udegree;
+
+	DASSTHROW( uSegmentsN <= 0 || vSegmentsN, ("The patch generates no segments !") );
+
+	size_t	nVarsUniform = (size_t)(uSegmentsN * vSegmentsN);
+	size_t	nVarsVarying = (size_t)((uSegmentsN + 1) * (vSegmentsN + 1));
+	size_t	nPoints		 = (size_t)(nu * nv);
+
+	size_t	curParamIdx = 10;
+
+	int		PValuesParIdx;
+	size_t	dimsN = 3;
+
+	// do we have 'P' ?
+	PValuesParIdx = FindParam( "P", Param::FLT_ARR, curParamIdx, params );
+	if ( PValuesParIdx == -1 )
+	{
+		// must have 'Pw' then !
+		PValuesParIdx = FindParam( "Pw", Param::FLT_ARR, curParamIdx, params );
+		if ( PValuesParIdx == -1 )
+		{
+			DASSTHROW( 0, ("Missing P or Pw parameter") );
+			return;
+		}
+
+		dimsN = 4;
+	}
+
+	curParamIdx += 1;
+
+	const float	*pSrcPos = params[PValuesParIdx].PFlt( nPoints * dimsN );
+
+	if ( dimsN == 3 )
+	{
+		moBaseDef->mCtrlPws.resize( nPoints );
+		for (size_t i=0; i < nPoints; ++i)
+		{
+			Vec4f	&pw = moBaseDef->mCtrlPws[i];
+			pw.x() = pSrcPos[ i*3 + 0 ];
+			pw.x() = pSrcPos[ i*3 + 1 ];
+			pw.x() = pSrcPos[ i*3 + 2 ];
+			pw.w() = 1.0f;
+		}
+	}
+	else
+	{
+		moBaseDef->mCtrlPws.resize( nPoints );
+		for (size_t i=0; i < nPoints; ++i)
+			moBaseDef->mCtrlPws[i].Set( pSrcPos + i*4 );
+	}
+}
+
+//==================================================================
 /*
  * Return the current knot the parameter u is less than or equal to.
  * Find this "breakpoint" allows the evaluation routines to concentrate on
@@ -200,6 +307,8 @@ void NuPatch::Eval_dPdu_dPdv(
 
 	SlScalari	idx = vfirst * ptsPerRow + ufirst;
 
+	const DVec<Vec4f>	&ctrlPws = moBaseDef->mCtrlPws;
+
     for (int i = 0; i < vorder; ++i)
 	{
 		int ri = vorder - 1 - i;
@@ -211,7 +320,7 @@ void NuPatch::Eval_dPdu_dPdv(
 		    SlVec4	srcPw;		
 			for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
 			{
-				Vec4f	tmp = moBaseDef->mCtrlPws[ idx[smdx_] + j ];
+				Vec4f	tmp = ctrlPws[ idx[smdx_] + j ];
 				srcPw.x()[smdx_] = tmp.x();
 				srcPw.y()[smdx_] = tmp.y();
 				srcPw.z()[smdx_] = tmp.z();
@@ -226,10 +335,7 @@ void NuPatch::Eval_dPdu_dPdv(
 			{
 				tensor = buprime[rj] * bv[ri];
 				rutan += srcPw * tensor;
-			}
 
-			if ( out_dPdv )
-			{
 				tensor = bu[rj] * bvprime[ri];
 				rvtan += srcPw * tensor;
 			}
@@ -238,123 +344,22 @@ void NuPatch::Eval_dPdu_dPdv(
 		idx += ptsPerRow;
 	}
 
-    // Project tangents, using the quotient rule for differentiation
-    SlScalar wsqrdiv = SlScalar( 1.f ) / (r.w() * r.w());
-
 	if ( out_dPdu )
-		*out_dPdu = (r.w() * rutan.GetAsV3() - rutan.w() * r.GetAsV3()) * wsqrdiv;
+	{
+		// Project tangents, using the quotient rule for differentiation
+		SlScalar wsqrdiv = SlScalar( 1.f ) / (r.w() * r.w());
 
-	if ( out_dPdv )
+		*out_dPdu = (r.w() * rutan.GetAsV3() - rutan.w() * r.GetAsV3()) * wsqrdiv;
 		*out_dPdv = (r.w() * rvtan.GetAsV3() - rvtan.w() * r.GetAsV3()) * wsqrdiv;
+	}
 
     out_pt = r.GetAsV3() / r.w();
 }
 
 //==================================================================
-static void fillKnot( DVec<float> &out_knots, const float *pSrcKnots, int n, int order )
+bool NuPatch::MakeBound( Bound &out_bound ) const
 {
-	out_knots.resize( n + order );
-	for (size_t i=0; i < out_knots.size(); ++i)
-	{
-		if ( i > 0 )
-			DASSTHROW( pSrcKnots[i-1] <= pSrcKnots[i], ("Invalid knot value") );
-
-		out_knots[i] = pSrcKnots[i];
-	}
-}
-
-//==================================================================
-/// NuPatch
-//==================================================================
-NuPatch::NuPatch(
-			int			nu		,
-			int			uorder	,
-			const float	*pUknot	,
-			float		umin	,
-			float		umax	,
-			int			nv		,
-			int			vorder	,
-			const float	*pVknot	,
-			float		vmin	,
-			float		vmax	,
-			ParamList	&params
-			) :
-		SimplePrimitiveBase(PrimitiveBase::NUPATCH, umin, umax, vmin, vmax)
-{
-	moBaseDef = new BaseDef( uorder, vorder, nu, nv );
-
-	DASSTHROW( uorder > 1 && vorder > 1, ("Patch order must be 2 or larger") );
-	DASSTHROW( uorder <= MAXORDER && vorder <= MAXORDER, ("Patch order must be no higher than %i", MAXORDER) );
-	DASSTHROW( umin < umax && vmin < vmax, ("'min' parameter must be less than 'max'") );
-
-	fillKnot( moBaseDef->mUKnots, pUknot, nu, uorder );
-	fillKnot( moBaseDef->mVKnots, pVknot, nv, vorder );
-
-	// order-1 really ?
-	DASSTHROW(
-		umin >= moBaseDef->mUKnots[ uorder-2 ] &&
-		vmin >= moBaseDef->mVKnots[ vorder-2 ],
-		("'min' parameter must be larger or equal of knot[ order-2 ]") );
-
-	DASSTHROW(
-		umax <= moBaseDef->mUKnots[ nu ] &&
-		vmax <= moBaseDef->mVKnots[ nv ],
-		("'max' less than knot[ n-1 ]") );
-
-	int	udegree = uorder - 1;
-	int	vdegree = vorder - 1;
-
-	int	uSegmentsN = nu - udegree;
-	int	vSegmentsN = nv - udegree;
-
-	DASSTHROW( uSegmentsN <= 0 || vSegmentsN, ("The patch generates no segments !") );
-
-	size_t	nVarsUniform = (size_t)(uSegmentsN * vSegmentsN);
-	size_t	nVarsVarying = (size_t)((uSegmentsN + 1) * (vSegmentsN + 1));
-	size_t	nPoints		 = (size_t)(nu * nv);
-
-	size_t	curParamIdx = 10;
-
-	int		PValuesParIdx;
-	size_t	dimsN = 3;
-
-	// do we have 'P' ?
-	PValuesParIdx = FindParam( "P", Param::FLT_ARR, curParamIdx, params );
-	if ( PValuesParIdx == -1 )
-	{
-		// must have 'Pw' then !
-		PValuesParIdx = FindParam( "Pw", Param::FLT_ARR, curParamIdx, params );
-		if ( PValuesParIdx == -1 )
-		{
-			DASSTHROW( 0, ("Missing P or Pw parameter") );
-			return;
-		}
-
-		dimsN = 4;
-	}
-
-	curParamIdx += 1;
-
-	const float	*pSrcPos = params[PValuesParIdx].PFlt( nPoints * dimsN );
-
-	if ( dimsN == 3 )
-	{
-		moBaseDef->mCtrlPws.resize( nPoints );
-		for (size_t i=0; i < nPoints; ++i)
-		{
-			Vec4f	&pw = moBaseDef->mCtrlPws[i];
-			pw.x() = pSrcPos[ i*3 + 0 ];
-			pw.x() = pSrcPos[ i*3 + 1 ];
-			pw.x() = pSrcPos[ i*3 + 2 ];
-			pw.w() = 1.0f;
-		}
-	}
-	else
-	{
-		moBaseDef->mCtrlPws.resize( nPoints );
-		for (size_t i=0; i < nPoints; ++i)
-			moBaseDef->mCtrlPws[i].Set( pSrcPos + i*4 );
-	}
+	return MakeBoundFromUVRange9( *this, out_bound );
 }
 
 //==================================================================

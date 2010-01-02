@@ -26,6 +26,8 @@
 												  _mm_mul_ps(_mm_mul_ps(x,t),t) ),t)  );
 	}
 
+	typedef __m128	VecNMask;
+
 #elif defined(DMATH_USE_M512)
 
 	#define USE_C_PROTOTYPE_PRIMITIVES 0
@@ -34,9 +36,13 @@
 
 	#define DMT_SIMD_FLEN	16
 
+	typedef __mmask	VecNMask;	// only need 16 bits
+
 #else
 
 	#define DMT_SIMD_FLEN	4
+
+	typedef unsigned char	VecNMask;	// only need 4 bits (round to 1 byte)
 
 #endif
 

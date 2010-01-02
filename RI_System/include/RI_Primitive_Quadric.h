@@ -42,13 +42,6 @@ public:
 		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
-					float u,
-					float v,
-					Point3 &out_pt,
-					Vec3f *out_dPdu,
-					Vec3f *out_dPdv ) const;
-
-		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
 						SlVec3 &out_pt,
 						SlVec3 *out_dPdu,
@@ -77,13 +70,6 @@ public:
 		Cone *Clone() const {	return DNEW Cone( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
-
-		void Eval_dPdu_dPdv(
-					float u,
-					float v,
-					Point3 &out_pt,
-					Vec3f *out_dPdu,
-					Vec3f *out_dPdv ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -118,13 +104,6 @@ public:
 		bool MakeBound( Bound &out_bound ) const;
 
 		void Eval_dPdu_dPdv(
-					float u,
-					float v,
-					Point3 &out_pt,
-					Vec3f *out_dPdu,
-					Vec3f *out_dPdv ) const;
-
-		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
 						SlVec3 &out_pt,
 						SlVec3 *out_dPdu,
@@ -153,13 +132,6 @@ public:
 		Hyperboloid *Clone() const { return DNEW Hyperboloid( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
-
-		void Eval_dPdu_dPdv(
-					float u,
-					float v,
-					Point3 &out_pt,
-					Vec3f *out_dPdu,
-					Vec3f *out_dPdv ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -192,13 +164,6 @@ public:
 		Paraboloid *Clone() const {	return DNEW Paraboloid( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
-
-		void Eval_dPdu_dPdv(
-					float u,
-					float v,
-					Point3 &out_pt,
-					Vec3f *out_dPdu,
-					Vec3f *out_dPdv ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,
@@ -235,13 +200,6 @@ public:
 		Torus *Clone() const {	return DNEW Torus( *this ); }
 
 		bool MakeBound( Bound &out_bound ) const;
-
-		void Eval_dPdu_dPdv(
-					float u,
-					float v,
-					Point3 &out_pt,
-					Vec3f *out_dPdu,
-					Vec3f *out_dPdv ) const;
 
 		void Eval_dPdu_dPdv(
 						const SlVec2 &uv,

@@ -20,222 +20,6 @@ namespace RI
 
 //==================================================================
 void Cylinder::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vec3f *out_dPdu,
-			Vec3f *out_dPdv ) const
-{
-	float	theta = u * mThetamaxRad;
-
-	out_pt.Set(
-			mRadius * DCos( theta ),
-			mRadius * DSin( theta ),
-			mZMin + v * (mZMax - mZMin) );
-
-	if ( out_dPdu )
-	{
-		float	tmp = mThetamaxRad * mRadius;
-
-		out_dPdu->Set(
-					tmp * -DSin( theta ),
-					tmp *  DCos( theta ),
-					0 );
-
-		out_dPdv->Set(
-					0,
-					0,
-					mZMax - mZMin );
-	}
-}
-
-//==================================================================
-void Cone::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vec3f *out_dPdu,
-			Vec3f *out_dPdv ) const
-{
-	float	theta = u * mThetamaxRad;
-	float	cosUTheta = DCos( theta );
-	float	sinUTheta = DSin( theta );
-
-	float	rad1V = mRadius * (1 - v);
-	
-	out_pt.Set(
-		rad1V * cosUTheta,
-		rad1V * sinUTheta,
-		v * mHeight );
-
-	if ( out_dPdu )
-	{
-		float	tmp = mThetamaxRad * rad1V;
-
-		out_dPdu->Set(
-			tmp * -sinUTheta,
-			tmp *  cosUTheta,
-			0 );
-
-		out_dPdv->Set(
-			mRadius * -cosUTheta,
-			mRadius * -sinUTheta,
-			mHeight );
-	}
-}
-
-//==================================================================
-void Sphere::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vec3f *out_dPdu,
-			Vec3f *out_dPdv ) const
-{
-	// $$$ following 2 are "uniform"
-	float	alphamin	= DASin( mZMin / mRadius );
-	float	alphadelta	= DASin( mZMax / mRadius ) - alphamin;
-
-	float	theta = u * mThetamaxRad;
-	float	alpha = alphamin + v * alphadelta;
-
-	out_pt.Set(
-		mRadius * DCos( alpha ) * DCos( theta ),
-		mRadius * DCos( alpha ) * DSin( theta ),
-		mRadius * DSin( alpha ) );
-	
-	if ( out_dPdu )
-	{
-		float	cosAlpha = DCos( alpha );
-		float	cosUTheta = DCos( theta );
-		float	sinUTheta = DSin( theta );
-
-		float	tmp1 = mThetamaxRad * mRadius;
-		out_dPdu->Set(
-			tmp1 * -sinUTheta * cosAlpha,
-			tmp1 *  cosUTheta * cosAlpha,
-			0 );
-
-		float	tmp2 = alphadelta * mRadius;
-		float	tmp3 = tmp2 * -DSin( alpha );
-		out_dPdv->Set(
-			tmp3 * cosUTheta,
-			tmp3 * sinUTheta,
-			tmp2 * cosAlpha );
-	}
-}
-
-//==================================================================
-void Hyperboloid::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vec3f *out_dPdu,
-			Vec3f *out_dPdv ) const
-{
-	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = DCos( uTheta );
-	float	sinUTheta = DSin( uTheta );
-
-	Vec3f	p1p2v = DMix( mP1, mP2, v );
-
-	out_pt.Set(
-		p1p2v.x() * cosUTheta - p1p2v.y() * sinUTheta,
-		p1p2v.x() * sinUTheta + p1p2v.y() * cosUTheta,
-		p1p2v.z() );
-
-	if ( out_dPdu )
-	{
-		out_dPdu->Set(
-			mThetamaxRad * (p1p2v.x() * -sinUTheta - p1p2v.y() *  cosUTheta),
-			mThetamaxRad * (p1p2v.x() *  cosUTheta + p1p2v.y() * -sinUTheta),
-			0 );
-
-		Vec3f	dp = mP2 - mP1;
-
-		out_dPdv->Set(
-			dp.x() * cosUTheta - dp.y() * sinUTheta,
-			dp.x() * sinUTheta + dp.y() * cosUTheta,
-			dp.z() );
-	}
-}
-
-//==================================================================
-void Paraboloid::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vec3f *out_dPdu,
-			Vec3f *out_dPdv ) const
-{
-	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = DCos( uTheta );
-	float	sinUTheta = DSin( uTheta );
-	float	scale = mRmax / DSqrt( mZmax );
-	float	z = DMix( mZmin, mZmax, v );
-	float	r = scale * DSqrt( z );
-
-	out_pt.Set(
-			r * cosUTheta,
-			r * sinUTheta,
-			z );
-
-	if ( out_dPdu )
-	{
-		float	tmp1 = r * mThetamaxRad;
-		out_dPdu->Set(
-			tmp1 * -sinUTheta,
-			tmp1 *  cosUTheta,
-			0 );
-
-		float	dz = mZmax - mZmin;
-		float	dx = 0.5f * dz / DSqrt( z ) * scale;
-
-		out_dPdv->Set(
-			dx * cosUTheta,
-			dx * sinUTheta,
-			dz );
-	}
-}
-
-//==================================================================
-void Torus::Eval_dPdu_dPdv(
-			float u,
-			float v,
-			Point3 &out_pt,
-			Vec3f *out_dPdu,
-			Vec3f *out_dPdv ) const
-{
-	float	uTheta = u * mThetamaxRad;
-	float	cosUTheta = DCos( uTheta );
-	float	sinUTheta = DSin( uTheta );
-	float	phi = DMix( mPhiminRad, mPhimaxRad, v );
-	float	sx = DCos( phi ) * mMinRadius + mMaxRadius;
-
-	out_pt.Set(
-			sx * cosUTheta,
-			sx * sinUTheta,
-			mMinRadius * DSin( phi ) );
-
-	if ( out_dPdu )
-	{
-		out_dPdu->Set(
-			sx * mThetamaxRad * -sinUTheta,
-			sx * mThetamaxRad *  cosUTheta,
-			0 );
-
-		float dphi	= mPhimaxRad - mPhiminRad;
-		float dsx	= dphi * -DSin( phi ) * mMinRadius;
-
-		out_dPdv->Set(
-			dsx * cosUTheta,
-			dsx * sinUTheta,
-			dphi * DCos( phi ) * mMinRadius );
-	}
-}
-
-//==================================================================
-void Cylinder::Eval_dPdu_dPdv(
 				const SlVec2 &uv,
 				SlVec3 &out_pt,
 				SlVec3 *out_dPdu,
@@ -494,12 +278,13 @@ inline void bounds2DSweepR(
 //==================================================================
 inline void bounds2DSweepP(
 					Bound &out_bound,
-					const Point3 &p,
+					float x,
+					float y,
 					float theMin,
 					float theMax )
 {
-	float	r = DSqrt( p.x() * p.x() + p.y() * p.y() );
-	float	delta = atan2f( p.y(), p.x() );
+	float	r = DSqrt( x * x + y * y );
+	float	delta = atan2f( y, x );
 
 	theMin += delta;
 	theMax += delta;
@@ -575,15 +360,18 @@ bool Hyperboloid::MakeBound( Bound &out_bound ) const
 {
 	float	tuMin = mThetamaxRad * mURange[0];
 	float	tuMax = mThetamaxRad * mURange[1];
-	Point3	pMin; EvalP( 0, mVRange[0], pMin );
-	Point3	pMax; EvalP( 0, mVRange[1], pMax );
+
+	SlVec2	uvMin( 0.f, mVRange[0] );
+	SlVec2	uvMax( 0.f, mVRange[1] );
+	SlVec3	pMin; EvalP( uvMin, pMin );
+	SlVec3	pMax; EvalP( uvMax, pMax );
 
 	out_bound.Reset();
-	bounds2DSweepP( out_bound, pMin, tuMin, tuMax );
-	bounds2DSweepP( out_bound, pMax, tuMin, tuMax );
+	bounds2DSweepP( out_bound, pMin.x()[0], pMin.y()[0], tuMin, tuMax );
+	bounds2DSweepP( out_bound, pMax.x()[0], pMax.y()[0], tuMin, tuMax );
 	
-	out_bound.mBox[0].z() = DMIN( pMin.z(), pMax.z() );
-	out_bound.mBox[1].z() = DMAX( pMin.z(), pMax.z() );
+	out_bound.mBox[0].z() = DMIN( pMin.z()[0], pMax.z()[0] );
+	out_bound.mBox[1].z() = DMAX( pMin.z()[0], pMax.z()[0] );
 	return true;
 }
 
