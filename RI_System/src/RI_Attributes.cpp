@@ -397,10 +397,14 @@ void Attributes::cmdDisplacement( ParamList &params )
 
 		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
 		getShaderParams( params, 1, *moDisplaceSHI.Use(), mtxLocalCam );
-	}
 
-	// $$$ should really check if the shader or any params really changed
-	mpRevision->BumpRevision();
+		// $$$ should really check if the shader or any params really changed
+		mpRevision->BumpRevision();
+	}
+	else
+	{
+		onError( "Could not find the shader %s", pShaderName );
+	}
 }
 
 //==================================================================

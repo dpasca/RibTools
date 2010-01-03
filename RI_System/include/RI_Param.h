@@ -27,9 +27,10 @@ struct Param
 		UNKNOWN,
 		INT,
 		FLT,
+		STR,
 		INT_ARR,
 		FLT_ARR,
-		STR,
+		STR_ARR,
 	};
 	
 	u_int	type;
@@ -40,6 +41,7 @@ struct Param
 		DStr		stringVal;
 		DVec<int>	intArrayVal;
 		FltVec		floatArrayVal;
+		DVec<DStr>	stringArrayVal;
 	}u;
 
 	Param() : type(UNKNOWN) {}
@@ -80,7 +82,7 @@ struct Param
 		if ( type == INT )		return (float)u.intVal;	else
 		if ( type == FLT_ARR )	return u.floatArrayVal[0];	else
 		if ( type == INT_ARR )	return (float)u.intArrayVal[0];	else
-							{ badType(); return 0; }
+								{ badType(); return 0; }
 	}
 	
 	const FltVec	&NumVec( size_t n=DNPOS );	// may need to convert from int array
@@ -89,9 +91,10 @@ struct Param
 	size_t			IntArrSize() const				{ ensIntArr( DNPOS );	return u.intArrayVal.size();	}
 	const float		*PFlt( size_t n=DNPOS )			{ return &NumVec( n )[0];						}
 	size_t			FltArrSize()					{ return NumVec().size();						}
-	const char		*PChar()				const	{ ensType( STR ); return u.stringVal.c_str();	}
 
-	bool IsString() const	{ return type == STR;	}
+	const char		*PChar()				const;
+
+	bool IsString() const	{ return type == STR || type == STR_ARR; }
 	bool IsIntVal() const	{ return type == INT || type == INT_ARR; }
 
 	operator const char*	() const	{	return PChar();	}

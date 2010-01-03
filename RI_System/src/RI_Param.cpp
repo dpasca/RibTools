@@ -86,6 +86,18 @@ const FltVec &Param::NumVec( size_t n )
 }
 
 //==================================================================
+const char *Param::PChar() const
+{
+	if ( type == STR )
+		return u.stringVal.c_str();
+	else
+	if ( type == STR_ARR )
+		return u.stringArrayVal[0].c_str();
+	else
+		badType();
+}
+
+//==================================================================
 void ParamList::Add( const char *pStr )
 {
 	Param	*p = this->grow();

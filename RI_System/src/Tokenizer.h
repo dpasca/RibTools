@@ -1,11 +1,10 @@
-/*
- *  Tokenizer.h
- *  ribparser
- *
- *  Created by Davide Pasca on 08/19/11.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// Tokenizer.h
+///
+/// Created by Davide Pasca - 2008/111/19
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
@@ -35,7 +34,8 @@ class Tokenizer
 	std::string		mDataAlphanum;
 	DVec<float>		mFloatArray;
 	DVec<int>		mIntArray;
-	bool			mIsArrayFloat;
+	DVec<DStr>		mStringArray;
+	char			mArrayType;
 	std::string		mCurToken;
 
 public:
@@ -45,9 +45,10 @@ public:
 		DT_ALPHANUMERIC,
 		DT_INT,
 		DT_FLOAT,
+		DT_STRING,
 		DT_INT_ARRAY,
 		DT_FLOAT_ARRAY,
-		DT_STRING
+		DT_STRING_ARRAY,
 	};
 	
 	static const char *GetDataTypeName( DataType dtype );
@@ -82,15 +83,16 @@ public:
 		mState = UNKNOWN;
 		mStateInComment = false;
 		mCurToken = "";
-		mIsArrayFloat = false;
+		mArrayType = 0;
 	}
 
 	const char			*GetDataAphaNum()		const { DASSERT( mDataType == DT_ALPHANUMERIC ); return mDataAlphanum.c_str();	}
 	int					GetDataInt()			const { DASSERT( mDataType == DT_INT ); return mDataInt;	}
 	float				GetDataFloat()			const { DASSERT( mDataType == DT_FLOAT ); return mDataFloat;	}
+	const char			*GetDataString()		const { DASSERT( mDataType == DT_STRING ); return mDataString.c_str();	}
 	const DVec<int>		&GetDataIntArray()		const { DASSERT( mDataType == DT_INT_ARRAY ); return mIntArray; }
 	const DVec<float>	&GetDataFloatArray()	const { DASSERT( mDataType == DT_FLOAT_ARRAY ); return mFloatArray; }
-	const char			*GetDataString()		const { DASSERT( mDataType == DT_STRING ); return mDataString.c_str();	}
+	const DVec<DStr>	&GetDataStringArray()	const { DASSERT( mDataType == DT_STRING_ARRAY ); return mStringArray; }
 
 private:
 	void	setDataType();

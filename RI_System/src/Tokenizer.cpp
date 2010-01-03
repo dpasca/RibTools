@@ -1,11 +1,10 @@
-/*
- *  Tokenizer.cpp
- *  ribparser
- *
- *  Created by Davide Pasca on 08/19/11.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// Tokenizer.cpp
+///
+/// Created by Davide Pasca - 2008/11/19
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "Tokenizer.h"
@@ -19,9 +18,10 @@ const char *Tokenizer::GetDataTypeName( DataType dtype )
 	case DT_ALPHANUMERIC:	return "ALPHANUMERIC";
 	case DT_INT:			return "INT";
 	case DT_FLOAT:			return "FLOAT";
+	case DT_STRING:			return "STRING";
 	case DT_INT_ARRAY:		return "INT_ARRAY";
 	case DT_FLOAT_ARRAY:	return "FLOAT_ARRAY";
-	case DT_STRING:			return "STRING";
+	case DT_STRING_ARRAY:	return "STRING_ARRAY";
 	}
 	
 	DASSERT( 0 );
@@ -69,6 +69,17 @@ static bool isFloatStr( const char *pStr )
 		double tmp;
 		return 1 == sscanf( pStr, "%lf", &tmp );
 	}
+	else
+		return false;
+}
+
+//===============================================================
+static bool isStringStr( const char *pStr )
+{
+	size_t	len = strlen( pStr );
+
+	if ( len >= 2 && pStr[0] == '"' && pStr[len-1] == '"' )
+		return true;
 	else
 		return false;
 }
@@ -153,7 +164,9 @@ bool Tokenizer::AddChar( char ch )
 		{
 			mFloatArray.clear();
 			mIntArray.clear();
+			mStringArray.clear();
 			mState = ARRAY;
+			mArrayType = 0;
 		}
 		else
 		{
@@ -218,20 +231,59 @@ bool Tokenizer::inputHandleArray( char ch )
 
 		if ( mCurToken.length() != 0 )
 		{
-			if ( !mIsArrayFloat && isFloatStr( mCurToken.c_str() ) )
+			if ( isStringStr( mCurToken.c_str() ) )
 			{
-				changeToFloatArray();
+				// initialize this array to sring
+				if ( mArrayType == 0 )
+					mArrayType = 's';
+
+				if ( mArrayType != 's'  )
+				{
+					DASSTHROW( false, ("Cannot mix strings with numerical values in arrays") );
+				}
+			}
+			else
+			if ( isFloatStr( mCurToken.c_str() ) )
+			{
+				// initialize this array to float
+				if ( mArrayType == 0 )
+					mArrayType = 'f';
+
+				if ( mArrayType != 'f' )
+				{
+					changeToFloatArray();
+				}
+			}
+			else
+			{
+				// initialize this array to int
+				if ( mArrayType == 0 )
+					mArrayType = 'i';
 			}
 
-			if ( mIsArrayFloat )
+			// TODO: check types
+			if ( mArrayType == 'f' )
 			{
 				float val = (float)atof( mCurToken.c_str() );
 				mFloatArray.push_back( val );
 			}
 			else
+			if ( mArrayType == 'i' )
 			{
 				int val = atoi( mCurToken.c_str() );
 				mIntArray.push_back( val );
+			}
+			else
+			if ( mArrayType == 's' )
+			{
+				if ( mCurToken.length() >= 2 )
+				{
+					std::string	tmp = mCurToken.substr( 1, mCurToken.length()-2 );
+
+					mStringArray.push_back( tmp );
+				}
+				else
+					mStringArray.push_back( "" );
 			}
 			
 			mCurToken = "";
@@ -282,10 +334,14 @@ void Tokenizer::setDataType()
 	else
 	if ( mState == ARRAY )
 	{
-		if ( mIsArrayFloat )
+		if ( mArrayType == 'f' )
 			mDataType = DT_FLOAT_ARRAY;
 		else
+		if ( mArrayType == 'i' )
 			mDataType = DT_INT_ARRAY;
+		else
+		if ( mArrayType == 's' )
+			mDataType = DT_STRING_ARRAY;
 	}
 	else
 	if ( mState == STRING )
@@ -297,7 +353,7 @@ void Tokenizer::setDataType()
 //===============================================================
 void Tokenizer::changeToFloatArray()
 {
-	mIsArrayFloat = true;
+	mArrayType = 'f';
 	DASSERT( mFloatArray.size() == 0 );
 	
 	mFloatArray.resize( mIntArray.size() );

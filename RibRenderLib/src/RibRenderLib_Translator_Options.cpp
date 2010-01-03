@@ -14,6 +14,26 @@ namespace RRL
 {
 
 //==================================================================
+static void splitSearchPath( const char *pSrc, DVec<DStr> &out_strings )
+{
+	char	buff[4096];
+
+	DASSTHROW( strlen(pSrc) < _countof(buff), ("Search path string too long !") );
+
+	strcpy_s( buff, pSrc );
+
+	char *pTokCtx;
+	char *pTok;
+
+	if ( pTok = strtok_r( buff, ":", &pTokCtx ) )
+	{
+		do 
+		{
+			printf( "Path: %s\n", pTok );
+		} while ( pTok = strtok_r(NULL, ":", &pTokCtx) );
+		
+	}
+}
 
 //==================================================================
 bool Translator::addCommand_options(
@@ -28,6 +48,13 @@ bool Translator::addCommand_options(
 
 		if ( 0 == strcmp( pOpionName, "searchpath" ) )
 		{
+			const char *pPathType = p[1].PChar();
+			const char *pPathString = p[2].PChar();
+
+			// Option "searchpath" "shader" ["@:./Shaders"] 
+
+			DVec<DStr>	strings;
+			splitSearchPath( pPathString, strings );
 		}
 	}
 	else
