@@ -93,8 +93,9 @@ const char *Param::PChar() const
 	else
 	if ( type == STR_ARR )
 		return u.stringArrayVal[0].c_str();
-	else
-		badType();
+
+	badType();
+	return NULL;
 }
 
 //==================================================================

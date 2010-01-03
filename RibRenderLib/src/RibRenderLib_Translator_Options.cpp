@@ -29,9 +29,46 @@ static void splitSearchPath( const char *pSrc, DVec<DStr> &out_strings )
 	{
 		do 
 		{
-			printf( "Path: %s\n", pTok );
+			out_strings.push_back( pTok );
 		} while ( pTok = strtok_r(NULL, ":", &pTokCtx) );
-		
+	}
+}
+
+//==================================================================
+static void processSearchPath( DVec<DStr> &curSPathList, DVec<DStr> &newStrings )
+{
+	// make a copy
+	DVec<DStr>	oldList = curSPathList;
+
+	curSPathList.clear();
+
+	bool	gotPrevPath = false;
+	bool	gotStdPath = false;
+
+	for (size_t i=0; i < newStrings.size(); ++i)
+	{
+		if ( newStrings[i] == "&" )	// cur path
+		{
+			DASSTHROW( gotPrevPath == false, ("'&' used more than once in 'searchpath'") );
+			gotPrevPath = true;
+
+			// append old list at this point
+			for (size_t j=0; j < oldList.size(); ++j)
+				curSPathList.push_back( oldList[j] );
+		}
+		else
+		if ( newStrings[i] == "@" )	// default path
+		{	
+			DASSTHROW( gotStdPath == false, ("'@' used more than once in 'searchpath'") );
+			gotStdPath = true;
+			// add as is
+			curSPathList.push_back( "@" );
+		}
+		else
+		{
+			// just a path string
+			curSPathList.push_back( newStrings[i] );
+		}
 	}
 }
 
@@ -48,13 +85,33 @@ bool Translator::addCommand_options(
 
 		if ( 0 == strcmp( pOpionName, "searchpath" ) )
 		{
+			// example: Option "searchpath" "shader" ["@:./Shaders"] 
+
 			const char *pPathType = p[1].PChar();
 			const char *pPathString = p[2].PChar();
 
-			// Option "searchpath" "shader" ["@:./Shaders"] 
+			u_int	idx = 0;
+
+			if ( 0 == _stricmp( pPathType, "shader" ) )
+			{
+				idx = RI::Options::SEARCHPATH_SHADER;
+			}
+			else
+			if ( 0 == _stricmp( pPathType, "texture" ) )
+			{
+				idx = RI::Options::SEARCHPATH_TEXTURE;
+			}
+			else
+			{
+				printf( "Warning: unrecognized searchpath type\n" );
+				return true;
+			}
 
 			DVec<DStr>	strings;
 			splitSearchPath( pPathString, strings );
+
+			DVec<DStr>	&spathList = GetState().GetCurOptions().mSearchPaths[ idx ];
+			processSearchPath( spathList, strings );
 		}
 	}
 	else

@@ -68,6 +68,15 @@ public:
 	// Display
 	Display	mDisp;
 
+	enum
+	{
+		SEARCHPATH_SHADER,
+		SEARCHPATH_TEXTURE,
+		SEARCHPATH_N,
+	};
+
+	DVec<DStr>	mSearchPaths[SEARCHPATH_N];
+
 public:
 	// Functions
 	void cmdFormat( int xRes, int yRes, float pixelRatio );
