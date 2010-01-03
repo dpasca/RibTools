@@ -166,27 +166,30 @@ void Attributes::getShaderParams(
 
 
 //==================================================================
-SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName )
+SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName, bool &out_fileExists )
 {
+	FileManagerBase	&fmanager = mpState->GetFileManager();
+
 	char	buff[1024];
+
+	sprintf( buff, "%s/%s.sl", pBasePath, pSName );
+	if NOT( fmanager.FileExists( buff ) )
+	{
+		sprintf( buff, "%s/%s.rrasm", pBasePath, pSName );
+
+		if NOT( fmanager.FileExists( buff ) )
+		{
+			out_fileExists = false;
+			return NULL;
+		}
+	}
+
+	out_fileExists = true;
 
 	SlShader::CtorParams	params;
 	params.pName			= pSName;
 	params.pAppResDir		= pAppResDir;
 	params.pSourceFileName	= buff;
-
-#if !defined(DISABLE_SL_SHADERS)
-	sprintf( buff, "%s/%s.sl", pBasePath, pSName );
-	if NOT( DUT::FileExists( buff ) )
-#endif
-	{
-		sprintf( buff, "%s/%s.rrasm", pBasePath, pSName );
-		if NOT( DUT::FileExists( buff ) )
-		{
-			// couldn't find
-			return NULL;
-		}
-	}
 
 	SlShader *pShader = NULL;
 
@@ -204,9 +207,24 @@ SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir,
 }
 
 //==================================================================
+// remove trailing slash or backslash
+static void strRemoveTrailingDirDiv( DStr &io_str )
+{
+	while ( io_str.length() )
+	{
+		char ch = io_str[ io_str.length() - 1 ];
+
+		if ( ch != '/' && ch != '\\' )
+			break;
+
+		io_str.resize( io_str.length() - 1 );
+	}
+}
+
+//==================================================================
 SlShader *Attributes::getShader( const char *pShaderName, const char *pAlternateName )
 {
-
+	// try see if we have it loaded already
 	SlShader	*pShader =
 			(SlShader *)mpResManager->FindResource( pShaderName,
 													ResourceBase::TYPE_SHADER );
@@ -216,17 +234,67 @@ SlShader *Attributes::getShader( const char *pShaderName, const char *pAlternate
 
 	const char *pAppResDir = mpState->GetDefShadersDir();
 
-	if ( pShader = loadShader( mpState->GetBaseDir(), pAppResDir, pShaderName ) )
+	// try with the RIB file path
+	bool	found;
+	if ( pShader = loadShader( mpState->GetBaseDir(), pAppResDir, pShaderName, found ) )
 		return pShader;
 
-	if ( pShader = loadShader( pAppResDir, pAppResDir, pShaderName ) )
-		return pShader;
+	// try look into the search path
+	const DVec<DStr>	&spaths = mpState->GetCurOptions().mSearchPaths[ Options::SEARCHPATH_SHADER ];
+
+	// if there are no searchpaths specified..
+	if NOT( spaths.size() )
+	{
+		// ..use the default path (is this the right behavior ?)
+		if ( pShader = loadShader( pAppResDir, pAppResDir, pShaderName, found ) )
+			return pShader;
+	}
+	else
+	{
+		for (size_t i=0; i < spaths.size(); ++i)
+		{
+			std::string	usePath;
+			bool		usePathIsAbsolute;
+
+			if ( spaths[i] == "@" )
+			{
+				usePathIsAbsolute = true;
+				usePath = pAppResDir;
+			}
+			else
+			{
+				usePathIsAbsolute = false;	// not really 100% sure..
+				usePath = spaths[i];
+			}
+
+			strRemoveTrailingDirDiv( usePath );
+
+			if ( pShader = loadShader( usePath.c_str(), pAppResDir, pShaderName, found ) )
+				return pShader;
+
+			if ( !found && !usePathIsAbsolute )
+			{
+				// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
+				usePath = std::string( mpState->GetBaseDir() ) + "/" + usePath;
+
+				if ( pShader = loadShader( usePath.c_str(), pAppResDir, pShaderName, found ) )
+					return pShader;
+			}
+
+			// in case we found it, but there is an error of some sort..
+			// ..just give up instead of trying different paths
+			if ( found )
+				break;
+		}
+	}
 
 	if ( pAlternateName )
+	{
 		if ( pShader =
 				(SlShader *)mpResManager->FindResource( pAlternateName,
 														ResourceBase::TYPE_SHADER ) )
 			return pShader;
+	}
 
 	return NULL;
 }

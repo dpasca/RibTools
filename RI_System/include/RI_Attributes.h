@@ -120,7 +120,7 @@ public:
 	void cmdDisplacement( ParamList &params );
 
 private:
-	SlShader *loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName );
+	SlShader *loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName, bool &out_fileExists );
 	SlShader *getShader( const char *pShaderName, const char *pAlternateName );
 	void getShaderParams( ParamList &params, size_t fromIdx, SlShaderInst &shaderInst, const Matrix44 &mtxLocalCam );
 };

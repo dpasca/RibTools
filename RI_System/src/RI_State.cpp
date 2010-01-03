@@ -162,7 +162,6 @@ void State::addDefShader( const char *pBasePath, const char *pSName )
 	SlShader *pShader = NULL;
 	try 
 	{
-#if !defined(DISABLE_SL_SHADERS)
 		sprintf( buff, "%s/%s.sl", pBasePath, params.pName );
 		if ( mParams.mpFileManager->FileExists( buff ) )
 		{
@@ -170,7 +169,6 @@ void State::addDefShader( const char *pBasePath, const char *pSName )
 			mResManager.AddResource( pShader );
 		}
 		else
-#endif
 		{
 			sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
 			if ( mParams.mpFileManager->FileExists( buff ) )
