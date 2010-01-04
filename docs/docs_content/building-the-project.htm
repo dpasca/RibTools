@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0114)http://sites.google.com/site/ribtools/development/building-the-project?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F -->
+<HTML xmlns="http://www.w3.org/1999/xhtml"><STYLE>#gtasks_box {
+-webkit-border-radius:5px;
+background:#fff;
+width:300px;
+border:1px solid #ccc;
+position:fixed;
+z-index:999;
+height:500px;
+bottom:0;
+right:0;
+}
+
+#gtasks_box_drag {
+height:20px;
+background:#ccc url(popintop.png);
+cursor:move;
+-webkit-border-radius-topleft:5px;
+-webkit-border-radius-topright:5px;
+}
+
+#gtasks_box_iframe {
+border:0;
+height:480px;
+}</STYLE><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<SCRIPT type="text/javascript">/* Copyright 2008 Google. */ (function() { // Input 0
+var a=window;
+// Input 1
+var c="start";function d(e){this.t={};this.tick=function(f,g,b){b=b?b:(new Date).getTime();this.t[f]=[b,g]};this.tick(c,null,e)}var h=new d;a.jstiming={Timer:d,load:h};try{a.jstiming.pt=a.gtbExternal&&a.gtbExternal.pageT()||a.external&&a.external.pageT}catch(i){};
+// Input 2
+})()
+</SCRIPT>
+<LINK rel="shortcut icon" href="http://www.gstatic.com/sites/p/b46d27/system/app/images/favicon.ico" type="image/x-icon">
+<LINK rel="apple-touch-icon" href="http://www.gstatic.com/sites/p/b46d27/system/app/images/apple-touch-icon.png" type="image/png">
+<SCRIPT type="text/javascript">/* Copyright 2008 Google. */ (function() { var e=parseInt,h=window,i="length";function j(a){return document.getElementById(a)}h.byId=j;var k="";function l(a){return a.replace(/^\s+|\s+$/g,k)}h.trim=l;
+var m="MSIE",n="6.0",o="string",p='id="',q='" ',r='class="',s='title="',t="display:inline-block;",u="left",v="float:left;",w="right",x="float:right;",y="cursor:hand;",z="<span ",A=' style="width:',B="px; height:",C="px;",D=";padding: 0;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='",E="', sizingMethod='scale');\"></span><span style=\"padding: ",F=" ",G=";",H="float:",I='"></span>';
+h.ie6ImgFix=function(a){var b=h.navigator?navigator.userAgent:k;if(b.indexOf(m)!=-1&&typeof opera=="undefined"){var d=/MSIE\s+([^\);]+)(\)|;)/;d.test(b);b=RegExp.$1;if(b==n){var c=typeof a==o?j(a):a;a=c.id?p+c.id+q:k;b=c.className?r+c.className+q:k;d=c.title?s+c.title+q:s+c.alt+q;var f=t+c.style.cssText;if(c.align==u)f=v+f;if(c.align==w)f=x+f;if(c.parentElement.href)f=y+f;var g=c.currentStyle,L=c.width-e(g.paddingLeft,10)-e(g.paddingRight,10),M=c.height-e(g.paddingTop,10)-e(g.paddingBottom,10),N=
+z+a+b+d+A+L+B+M+C+f+D+c.src+E+g.paddingTop+F+g.paddingRight+F+g.paddingBottom+F+g.paddingLeft+G+(g.styleFloat?H+g.styleFloat+G:k)+I;h.setTimeout(function(){c.outerHTML=N},1)}}};var J=[],K=0;h.JOT_addListener=function(a,b,d){var c=new String(K++);a={eventName:a,handler:b,compId:d,key:c};J.push(a);return c};h.JOT_removeListenerByKey=function(a){for(var b=0;b<J[i];b++)if(J[b].key==a){J.splice(b,1);break}};
+h.JOT_removeAllListenersForName=function(a){for(var b=0;b<J[i];b++)J[b].eventName==a&&J.splice(b,1)};var O="function";h.JOT_postEvent=function(a,b,d){var c={eventName:a,eventSrc:b||{},payload:d||{}};if(h.JOT_fullyLoaded){b=J[i];for(d=0;d<b&&d<J[i];d++){var f=J[d];if(f&&f.eventName==a){c.listenerCompId=f.compId||k;(f=typeof f.handler==O?f.handler:h[f.handler])&&f(c)}}}else h.JOT_delayedEvents.push({eventName:a,eventSrc:b,payload:d})};h.JOT_delayedEvents=[];h.JOT_fullyLoaded=false;var P="{0}";
+h.JOT_formatRelativeToNow=function(a,b){a=((new Date).getTime()-a)/6E4;if(a>=1440)return null;var d=0;if(a>=60){a/=60;d=2}a>=2&&d++;return b?h.JOT_siteRelTimeStrs[d].replace(P,Math.floor(a)):h.JOT_userRelTimeStrs[d].replace(P,Math.floor(a))}; })()
+</SCRIPT>
+<SCRIPT>
+
+
+var webspace = {"signInUrl":"https://www.google.com/a/UniversalLogin?continue=http%3A%2F%2Fsites.google.com%2Fsite%2Fribtools%2Fdevelopment%2Fbuilding-the-project&service=jotspot","isGaiaBarRendered":false,"isConsumer":true,"termsUrl":"http://www.google.com/sites/help/intl/en/terms.html","enableAnalytics":true,"homePath":"/","sharingPolicy":"OPENED","isAdsenseEnabled":true,"analyticsAccountId":"UA-12218473-1","baseUri":"/site/ribtools","name":"ribtools","features":{"subpageNav":false,"useNewCountdownEmbed":false,"useStandardEmbedsInSidebar":false,"experimental":{"displayEditorLockExceptions":false},"structuredDataSchemas":false,"editorSaveEndpointMigrations":true},"domain":"defaultdomain","adsensePublisherId":null,"isStartPageEnabled":false,"domainAnalyticsAccountId":"","siteTitle":"RibTools"};
+
+
+webspace.isInsertPicasaPhotosEnabled = true;
+  
+
+webspace.isMyMapsEmbedEnabled = true;
+  
+
+webspace.gadgets = {"isGadgetDirectoryEnabled":true,"baseUri":"/site/ribtools/system/app/pages/gadgets","isGgsRenderingEnabled":true};
+
+
+webspace.user = {"uid":"16576455740937204251","hasAdminAccess":true,"guest_":false,"domain":"gmail.com","hasWriteAccess":true,"userName":"dpasca","dasherUser":false,"primaryEmail":"dpasca@gmail.com","displayNameOrEmail":"Davide Pasca"};
+
+webspace.page = {"locale":"en","state":"","wuid":"wuid:gx:5e43def87ab0fa8d","timeZone":"Asia/Tokyo","properties":{},"type":"text","canChangePath":true,"parentWuid":"wuid:gx:3508dc8a36216e72","revision":11,"title":"Building the project","isRtlLocale":false,"bidiEnabled":false,"siteLocale":"en","name":"building-the-project","path":"/development/building-the-project","isSiteRtlLocale":false,"parentPath":"/development"};
+
+
+var editorResources = [
+  'http://www.gstatic.com/sites/p/b46d27/system/js/trog_edit__en.js',
+  'http://www.gstatic.com/sites/p/b46d27/system/app/css/trogedit.css',
+  '/site/ribtools/_/rsrc/1262057158751/system/app/css/editor.css'
+];
+
+var JOT_clearDotPath = 'http://www.gstatic.com/sites/p/b46d27/system/app/images/cleardot.gif';
+
+
+var JOT_userRelTimeStrs = ["a minute ago"," minutes ago","an hour ago"," hours ago"];
+
+
+webspace.page.currentTemplate = {"title":"Web Page","path":"/system/app/pagetemplates/text"};
+
+
+
+
+
+var JOT_siteRelTimeStrs = ["a minute ago", "{0} minutes ago", "an hour ago", "{0} hours ago"];
+
+
+</SCRIPT>
+<SCRIPT type="text/javascript">
+                window.jstiming.load.tick('scl');
+              </SCRIPT>
+<LINK rel="stylesheet" type="text/css" href="./building-the-project_files/standard-css-beigeandblue-ltr-ltr.css">
+<LINK rel="stylesheet" type="text/css" href="./building-the-project_files/overlay.css">
+<SCRIPT type="text/javascript">
+                window.jstiming.load.tick('cl');
+              </SCRIPT>
+</HEAD><BODY xmlns="http://www.google.com/ns/jotspot" id="body" class="en" style="background-color: #fff">
+<DIV id="sites-chrome-everything" style="margin:10px; direction:ltr">
+<DIV id="sites-chrome-main-wrapper">
+<TABLE id="sites-chrome-main" class="sites-layout-hbox" cellspacing="0">
+<TBODY><TR>
+<TD id="sites-canvas" style="border: none;">
+<DIV xmlns="http://www.w3.org/1999/xhtml" id="title-crumbs" style="">
+<A dir="ltr" href="http://sites.google.com/site/ribtools/development">Development</A>‎ &gt; ‎
+  </DIV>
+<H3 xmlns="http://www.w3.org/1999/xhtml" id="sites-page-title-header" style="" align="left">
+<SPAN id="sites-page-title" dir="ltr">Building the project</SPAN>
+</H3>
+<DIV class="sites-canvas-main">
+<TABLE xmlns="http://www.w3.org/1999/xhtml" cellspacing="0" class="sites-layout-name-one-column sites-layout-hbox"><TBODY><TR><TD class="sites-layout-tile sites-tile-name-content-1"><DIV dir="ltr"><DIV class="sites-embed-align-right-wrapping-on"><DIV class="sites-embed-border-off sites-embed" style="width:250px;"><DIV class="sites-embed-content sites-embed-type-toc"><DIV class="goog-toc sites-embed-toc-maxdepth-6"><P>Contents</P><OL class="goog-toc"><LI class="goog-toc"><A href="http://sites.google.com/site/ribtools/development/building-the-project?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F#TOC-The-Code"><STRONG>1 </STRONG>The Code</A></LI><LI class="goog-toc"><A href="http://sites.google.com/site/ribtools/development/building-the-project?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F#TOC-Directory-Structure"><STRONG>2 </STRONG>Directory Structure</A><OL class="goog-toc"><LI class="goog-toc"><A href="http://sites.google.com/site/ribtools/development/building-the-project?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F#TOC-Directory-Structure1"><STRONG>2.1 </STRONG>Directory Structure</A></LI></OL></LI><LI class="goog-toc"><A href="http://sites.google.com/site/ribtools/development/building-the-project?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F#TOC-Compiling-and-running-from-VS"><STRONG>3 </STRONG>Compiling and running from VS</A><OL class="goog-toc"><LI class="goog-toc"><A href="http://sites.google.com/site/ribtools/development/building-the-project?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F#TOC-Building-the-solution"><STRONG>3.1 </STRONG>Building the solution</A></LI><LI class="goog-toc"><A href="http://sites.google.com/site/ribtools/development/building-the-project?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F#TOC-A-little-test"><STRONG>3.2 </STRONG>A little test</A></LI><LI class="goog-toc"><A href="http://sites.google.com/site/ribtools/development/building-the-project?tmpl=%2Fsystem%2Fapp%2Ftemplates%2Fprint%2F#TOC-Running-from-Visual-Studio"><STRONG>3.3 </STRONG>Running from Visual Studio</A></LI></OL></LI></OL></DIV></DIV></DIV></DIV>
+<H2><A name="TOC-The-Code"></A>The Code</H2>
+<DIV><B>RibTools</B>&nbsp;is currently released under the&nbsp;<A href="http://www.gnu.org/copyleft/lesser.html" rel="nofollow" style="color:rgb(71, 18, 100);outline-style:none;outline-width:initial;outline-color:initial">LGPL license</A>. The code is open for anyone that wants to use it, as long as it's properly redistributed.</DIV>
+<DIV>RibTools currently compiles only for Windows and using Visual Studio 2008. The code is written with portability in mind and support for Linux builds is planned for the future.
+<DIV>
+<DIV style="text-align:center">
+<UL><LI style="text-align:left"><B><SPAN style="font-size:medium"><FONT color="#000000"><A href="http://ribtools.googlecode.com/" style="color:rgb(71, 18, 100);outline-style:none;outline-width:initial;outline-color:initial">Get the source code</A></FONT></SPAN></B></LI></UL>
+<DIV style="text-align:left"><SPAN style="font-size:medium"><B><SPAN style="font-weight:normal;font-size:13px">
+<H2><A name="TOC-Directory-Structure"></A><B>
+<H3 style="display:inline !important"><A name="TOC-Directory-Structure1"></A><FONT size="6"><SPAN style="font-size:20px">Directory Structure</SPAN></FONT></H3>
+</B></H2>
+<DIV>As obtained from the Subversion repository:</DIV>
+<DIV><BR>
+</DIV>
+<TABLE border="0" cellpadding="0" style="margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px">
+<TBODY>
+<TR>
+<TD style="vertical-align:top"><B>DistribSrc/</B></TD>
+<TD style="vertical-align:top">Source assets</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>DMath/</B></TD>
+<TD style="vertical-align:top">Math library sources and project</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>docs/</B></TD>
+<TD style="vertical-align:top">Documentation related files (currently just some images)</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>DSystem/</B></TD>
+<TD style="vertical-align:top">Base system library sources and projects</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>external/</B></TD>
+<TD style="vertical-align:top">External libraries, directly included</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>externals/</B></TD>
+<TD style="vertical-align:top">External libraries included automatically by SVN</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>Extra/</B></TD>
+<TD style="vertical-align:top">Unused</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>linux/</B></TD>
+<TD style="vertical-align:top">Linux main project file&nbsp;<B>(unused)</B></TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>osx/</B></TD>
+<TD style="vertical-align:top">OS X main project file&nbsp;<B>(unused)</B></TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>pc/</B></TD>
+<TD style="vertical-align:top">Windows main project file</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>RI_System/</B></TD>
+<TD style="vertical-align:top">Core rendering engine and RenderMan-interface</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>RibRenderFile/</B></TD>
+<TD style="vertical-align:top">RibRenderFile application project and sources</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>RibRenderLib/</B></TD>
+<TD style="vertical-align:top">A library that groups most functionalities used by both <I>RibRenderFile </I>and <I>RibRenderTool</I></TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>RibRenderTool/</B></TD>
+<TD style="vertical-align:top">RibRenderTool application project and sources</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>RSLCompilerCmd/</B></TD>
+<TD style="vertical-align:top">RSLCompilerCmd application project and sources</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><B>RSLCompilerLib/</B></TD>
+<TD style="vertical-align:top">RSL compiler library</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><I>build.bat</I></TD>
+<TD style="vertical-align:top">Script that builds the&nbsp;<B>assets</B>&nbsp;from&nbsp;<B>DistribSrc/</B>&nbsp;into&nbsp;<B>Distrib/</B></TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><I>license.txt</I></TD>
+<TD style="vertical-align:top">License file</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><I>make_install.bat</I></TD>
+<TD style="vertical-align:top">Script that builds a .zip file for binary distribution (assumes EXEs have been manually compiled with VS)</TD>
+</TR>
+<TR>
+<TD style="vertical-align:top"><I>readme.html</I></TD>
+<TD style="vertical-align:top">Read-me file</TD>
+</TR>
+</TBODY>
+</TABLE>
+<BR>
+</SPAN></B></SPAN></DIV>
+<DIV style="text-align:left"><SPAN style="font-size:medium"><B><SPAN style="font-weight:normal;font-size:13px">An additional directory named </SPAN><SPAN style="font-size:13px">Distrib/<SPAN style="font-weight:normal">&nbsp;is generated as part of the build process. This directory is automatically generated, and it can therefore be safely erased (unless one has any important changes in it !)</SPAN></SPAN></B></SPAN></DIV>
+<DIV style="text-align:left"><SPAN style="font-size:medium"><B><SPAN style="font-size:13px"><SPAN style="font-weight:normal">The </SPAN>Distrib/<SPAN style="font-weight:normal">&nbsp;directory contains both data coming from </SPAN>DistribSrc/<SPAN style="font-weight:normal">&nbsp;and executables generated when compiling with Visual Studio (see below).</SPAN></SPAN></B></SPAN></DIV>
+<DIV style="text-align:left"><SPAN style="font-size:medium"><B><SPAN style="font-weight:normal;font-size:13px"><BR>
+</SPAN></B></SPAN></DIV>
+<DIV style="text-align:left">There are some directory naming conventions used through the project:</DIV>
+<DIV style="text-align:left">
+<UL><LI><B>pc/</B> directories hold files specific to Windows builds (usually Visual Studio solution and project files)</LI>
+<LI><B>linux/&nbsp;<SPAN style="font-weight:normal">directories&nbsp;hold files specific to Linux builds</SPAN></B></LI>
+<LI><B><SPAN style="font-weight:normal"><B>osx/&nbsp;<SPAN style="font-weight:normal">directories&nbsp;hold files specific to Mac OS X builds</SPAN></B></SPAN></B></LI>
+<LI><B><B>src/&nbsp;<SPAN style="font-weight:normal"><B><SPAN style="font-weight:normal"><B><SPAN style="font-weight:normal">directories&nbsp;hold <I>.cpp</I> files</SPAN></B></SPAN></B></SPAN></B></B></LI>
+<LI><B><B><SPAN style="font-weight:normal"><B><SPAN style="font-weight:normal"><B><SPAN style="font-weight:normal"><B><B>include/&nbsp;<SPAN style="font-weight:normal"><B><SPAN style="font-weight:normal"><B><SPAN style="font-weight:normal">directories&nbsp;hold <I>.h</I> files</SPAN></B></SPAN></B></SPAN></B></B></SPAN></B></SPAN></B></SPAN></B></B></LI></UL>
+<H2><A name="TOC-Compiling-and-running-from-VS"></A>Compiling and running from VS</H2>
+<H3><A name="TOC-Building-the-solution"></A>Building the solution</H3>
+<DIV>
+<OL><LI>Double click on <I><B>build.bat</B></I>&nbsp;to run a script that will create the directory <B>Distrib/</B></LI>
+<LI>Open the directory <B>pc/</B>&nbsp;from the main directory
+<DIV style="display:block;text-align:left"><A href="http://sites.google.com/site/ribtools/development/building-the-project/develop-pc-folder-in-context.png?attredirects=0" imageanchor="1"><IMG border="0" src="./building-the-project_files/develop-pc-folder-in-context.png"></A></DIV>
+</LI>
+<LI>Double click on <I><B>RibRender.sln</B></I>&nbsp;inside <B>pc/</B> to&nbsp;launch the main solution with Visual Studio 2008<BR>
+</LI>
+<LI>From the Standard Toolbar select a <I>solution configuration</I> (<B>Debug</B> or <B>Release</B>) and a <I>platform configuration</I> (<B>Win32&nbsp;</B>or&nbsp;<B>x64</B>)
+<DIV style="display:block;text-align:left"><A href="http://sites.google.com/site/ribtools/development/building-the-project/develop-select-config.png?attredirects=0" imageanchor="1"><IMG border="0" src="./building-the-project_files/develop-select-config.png"></A></DIV>
+</LI>
+<LI>Build the solution by selecting the option from the <B>Build</B> menu (or press F7 or Ctrl+Alt+B, depending on the VS configuration)
+<DIV style="display:block;text-align:left"><A href="http://sites.google.com/site/ribtools/development/building-the-project/develop-build-solution-menu.png?attredirects=0" imageanchor="1"><IMG border="0" src="./building-the-project_files/develop-build-solution-menu.png"></A></DIV>
+</LI>
+</OL>
+<DIV>Once the build is finished the&nbsp;<B>Distrib/</B>&nbsp;directory should contain 3 executables:</DIV>
+<DIV><BR>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<BLOCKQUOTE style="margin:0 0 0 40px;border:none;padding:0px">
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><B><FONT color="#666666">Extras/</FONT></B></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><B><FONT color="#666666">Install/</FONT></B></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><B><FONT color="#666666">TestScenes/</FONT></B></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><B><FONT color="#666666">TestsOutput/</FONT></B></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><B><FONT color="#666666">Resources/</FONT></B></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I><FONT color="#666666">DelCompiledShaders.bat</FONT></I></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I><FONT color="#666666">MakeTests.bat</FONT></I></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I><FONT color="#666666">readme.html</FONT></I></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I>RibRenderFile.exe</I></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I><FONT color="#666666">RibRenderFile.pdb</FONT></I></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I>RibRenderTool.exe</I></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I><FONT color="#666666">RibRenderTool.pdb</FONT></I></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I>RSLCompilerCmd.exe</I></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><I><FONT color="#666666">RSLCompilerCmd.pdb</FONT></I></DIV>
+<DIV><FONT color="#666666"><I><BR>
+</I></FONT></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</BLOCKQUOTE>
+<SPAN style="color:rgb(102, 102, 102)"><I><SPAN style="color:rgb(0, 0, 0);font-style:normal">
+<DIV style="display:inline !important">Note that for every&nbsp;<I>.exe</I>&nbsp;file there is a corresponding&nbsp;<I>.pdb</I>&nbsp;file.</DIV>
+</SPAN></I></SPAN><BR>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<DIV>
+<DIV>
+<DIV><FONT color="#666666"><I><SPAN style="color:rgb(0, 0, 0);font-style:normal">
+<DIV>PDB files hold debug data necessary to display symbols when debugging with Visual Studio's debugger.</DIV>
+</SPAN></I></FONT></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV>
+<DIV>
+<DIV>
+<DIV style="text-align:center">
+<DIV style="text-align:left">
+<H3><A name="TOC-A-little-test"></A>A little test</H3>
+<DIV>
+<OL><LI>From the <B>Distrib/</B> directory, launch&nbsp;<I><B>RibRenderTool.exe</B></I></LI>
+<LI><I><SPAN style="font-style:normal">Right-click inside the RibRenderTool window and select a test scene from the pop-up menu (<I>Airplane.rib</I> is a safe bet)
+<DIV style="display:block;text-align:left"><A href="http://sites.google.com/site/ribtools/development/building-the-project/develop-select-airplane-scene.png?attredirects=0" imageanchor="1"><IMG border="0" height="156" src="./building-the-project_files/develop-select-airplane-scene.png" width="200"></A></DIV>
+</SPAN></I></LI>
+<LI><I><SPAN style="font-style:normal">After a little while the scene should appear in all it's beauty (!)
+<DIV style="display:block;text-align:left"><A href="./building-the-project_files/airplane.png" imageanchor="1"><IMG border="0" height="157" src="./building-the-project_files/airplane.png" width="200"></A></DIV>
+</SPAN></I></LI>
+</OL><H3><A name="TOC-Running-from-Visual-Studio"></A>Running from Visual Studio</H3><DIV>In order to run form visual studio, a one time setup is necessary.</DIV><DIV><OL><LI>Set the choosen application as the StartUp project</LI><OL><LI>Right-click on an executable project (e.g. RibToolsTool), and choose <B>Set as StartUp Project</B> from the pop-up menu.<DIV style="display:block;text-align:left"><A href="http://sites.google.com/site/ribtools/development/building-the-project/develop-set-as-startup-prj.png?attredirects=0" imageanchor="1"><IMG border="0" height="200" src="./building-the-project_files/develop-set-as-startup-prj.png" width="135"></A></DIV></LI></OL><LI>Setup the working directory</LI><OL><LI>Right-click on the application project&nbsp;(e.g. RibToolsTool) and select&nbsp;<B>Properties&nbsp;</B>from the pop-up menu.<BR><SPAN style="font-weight:bold"><SPAN style="font-weight:normal">Find the&nbsp;</SPAN>Working Directory<SPAN style="font-weight:normal">&nbsp;setting in the </SPAN>Properties <SPAN style="font-weight:normal">dialog by selecting </SPAN><I><SPAN style="font-weight:normal">Configuration Properties</SPAN></I><SPAN style="font-weight:normal"> -&gt; </SPAN><I><SPAN style="font-weight:normal">Debugging</SPAN></I><SPAN style="font-weight:normal">.<BR><SPAN style="font-weight:bold"><SPAN style="font-weight:normal">Set the&nbsp;<SPAN style="font-weight:bold">Working Directory</SPAN>&nbsp;to&nbsp;</SPAN><B>..\..\Distrib<DIV style="display:block;text-align:left"><A href="http://sites.google.com/site/ribtools/development/building-the-project/develop-working-dir.png?attredirects=0" imageanchor="1"><IMG border="0" height="119" src="./building-the-project_files/develop-working-dir.png" width="200"></A></DIV><SPAN style="font-weight:bold"><B><SPAN style="font-weight:normal"><DIV style="display:inline !important"><B>Note:</B>&nbsp;don't forget to set this for all configurations (Release and Debug) and all platforms (Win32 and x64).&nbsp;<SPAN style="font-weight:bold"><B><SPAN style="font-weight:normal"><DIV style="display:inline !important">A common mistake is to set up the Working Dir only for the current configuration and forget about the other configurations.</DIV></SPAN></B></SPAN></DIV></SPAN></B></SPAN></B></SPAN></SPAN></SPAN></LI></OL><LI><SPAN style="font-weight:bold"><DIV><B><DIV style="display:block;text-align:left"><SPAN style="font-weight:normal">Run the application with or without the debugger by pressing F5, Ctrl+F5 (or whatever is your configuration 8)</SPAN></DIV></B></DIV></SPAN></LI></OL></DIV><DIV><BR></DIV></DIV>
+</DIV>
+</DIV>
+</DIV>
+</DIV></DIV></TD></TR></TBODY></TABLE>
+</DIV>
+</TD>
+</TR>
+</TBODY></TABLE>
+</DIV>
+</DIV>
+
+
+<DIV id="gtasks_box" style="position: relative; display: none; " class="ui-draggable"><DIV id="gtasks_box_drag"></DIV><IFRAME id="gtasks_box_iframe" src="./building-the-project_files/ig.htm"></IFRAME></DIV></BODY></HTML>
