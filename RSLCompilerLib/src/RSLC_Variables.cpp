@@ -30,6 +30,7 @@ VarType VarTypeFromToken( const Token *pTok )
 	case T_DT_color	: return VT_COLOR;
 	case T_DT_matrix: return VT_MATRIX;
 	case T_DT_string: return VT_STRING;
+	case T_DT_bool:	  return VT_BOOL;
 	case T_DT_void:	  return VT_VOID;
 	}
 
@@ -646,13 +647,13 @@ void SolveGlobalConstants( TokNode *pRoot )
 		if ( pDestVar->GetVarType() == VT_FLOAT )
 		{
 			DASSERT(
-				pDestVar->mBaseValNum.size() == 0 &&
-				pExprVar->mBaseValNum.size() == 1
+				pDestVar->mBaseVal.mNumVec.size() == 0 &&
+				pExprVar->mBaseVal.mNumVec.size() == 1
 				);
 
-			pDestVar->mBaseValNum.push_back(
-						pExprVar->mBaseValNum[0] );
-			pDestVar->mHasBaseVal = true;
+			pDestVar->mBaseVal.mNumVec.push_back(
+						pExprVar->mBaseVal.mNumVec[0] );
+			pDestVar->mBaseVal.mUse = true;
 		}
 		else
 		{
@@ -671,7 +672,7 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	//--- write storage
 	const char *pStorage = "ERROR!!!";
 
-	if ( var.mHasBaseVal )	pStorage = "temporary"; else
+	if ( var.mBaseVal.mUse )	pStorage = "temporary"; else
 	if ( var.mIsGlobal )	pStorage = "global"; else
 	if ( var.mIsSHParam )	pStorage = "parameter"; else
 	{
@@ -684,7 +685,7 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	const char *pClass;
 	if ( var.mIsVarying )
 	{
-		DASSTHROW( var.mHasBaseVal == false,
+		DASSTHROW( var.mBaseVal.mUse == false,
 				("Internal error ! Variable '%s' is varying but has a base value !",
 					var.GetUseName().c_str()) );
 
@@ -692,7 +693,7 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	}
 	else
 	{
-		if ( var.mHasBaseVal )
+		if ( var.mBaseVal.mUse )
 			pClass = "constant";
 		else
 			pClass = "uniform";
@@ -700,18 +701,31 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	fprintf_s( pFile, "%-8s ", pClass );
 
 	//--- write the name
-	fprintf_s( pFile, "%-7s ", VarTypeToString( var.GetVarType() ) );
+	VarType	varType = var.GetVarType();
+
+	fprintf_s( pFile, "%-7s ", VarTypeToString( varType ) );
 
 	//--- write the eventual constant value
-	if ( var.mHasBaseVal )
+	if ( var.mBaseVal.mUse )
 	{
-		// should be either numbers or a string.. but enough asserts for now !!
+		fprintf_s( pFile, "\t" );
 
-		for (size_t k=0; k < var.mBaseValNum.size(); ++k)
-			fprintf_s( pFile, "\t%f", var.mBaseValNum[k] );
-
-		if ( var.mBaseValStr.length() )
-			fprintf_s( pFile, "\t\"%s\"", var.mBaseValStr.c_str() );
+		// should be either bool, numbers or a string..
+		if ( varType == VT_BOOL )
+		{
+			fprintf_s( pFile, "%i", var.mBaseVal.mBool ? 1 : 0 );
+		}
+		else
+		if ( varType == VT_STRING )
+		{
+			if ( var.mBaseVal.mStr.length() )
+				fprintf_s( pFile, "\"%s\"", var.mBaseVal.mStr.c_str() );
+		}
+		else
+		{
+			for (size_t k=0; k < var.mBaseVal.mNumVec.size(); ++k)
+				fprintf_s( pFile, "%f", var.mBaseVal.mNumVec[k] );
+		}
 	}
 
 	fprintf_s( pFile, "\n" );

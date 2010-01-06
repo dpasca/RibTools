@@ -40,6 +40,9 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	NULL	,	T_TYPE_VALUE	,	T_VL_NUMBER	,
 	NULL	,	T_TYPE_VALUE	,	T_VL_STRING	,
 
+	"true"	,	T_TYPE_VALUE	,	T_VL_BOOL_TRUE	,
+	"false"	,	T_TYPE_VALUE	,	T_VL_BOOL_FALSE	,
+
 	OP_DEF(	"="		,	ASSIGN		)	,	// assign ops
 	OP_DEF(	"+="	,	PLUSASS		)	,
 	OP_DEF(	"-="	,	MINUSASS	)	,
@@ -80,12 +83,13 @@ static TokenDef _sTokenDefs[TOKEN_N] =
 	DT_DEF( color			)	,
 	DT_DEF( matrix			)	,
 	DT_DEF( string			)	,
+	DT_DEF( bool			)	,
 	DT_DEF( void			)	,
 
 	DE_DEF( varying			)	,
 	DE_DEF( uniform			)	,
 
-	FO_DEF( if				)	,
+	//FO_DEF( if				)	,
 	FO_DEF( for				)	,
 	FO_DEF( while			)	,
 

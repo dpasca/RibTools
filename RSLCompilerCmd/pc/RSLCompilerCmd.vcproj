@@ -390,6 +390,14 @@
 				RelativePath="..\tests\test7.sl"
 				>
 			</File>
+			<File
+				RelativePath="..\tests\test8.sl"
+				>
+			</File>
+			<File
+				RelativePath="..\tests\test9.sl"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

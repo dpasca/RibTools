@@ -256,6 +256,12 @@ RSLC::VarType TokNode::GetVarType() const
 		else
 		if ( mpToken->id == T_VL_STRING )
 			return VT_STRING;
+		else
+		if ( mpToken->id == T_VL_BOOL_TRUE )
+			return VT_BOOL;
+		else
+		if ( mpToken->id == T_VL_BOOL_FALSE )
+			return VT_BOOL;
 
 		DASSERT( 0 );
 		return VT_UNKNOWN;

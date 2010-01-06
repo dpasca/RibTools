@@ -38,9 +38,25 @@ public:
 
 	Register		mBuild_Register;
 
-	bool			mHasBaseVal;
-	DVec<float>		mBaseValNum;
-	std::string		mBaseValStr;
+	struct BaseVal
+	{
+		bool			mUse;
+		DVec<float>		mNumVec;
+		std::string		mStr;
+		bool			mBool;
+
+		BaseVal() :
+			mUse(false),
+			mBool(false)
+		{
+		}
+
+		void Set( float num )		{	mUse = true; mNumVec.push_back( num );	}
+		void Set( const char *pStr ){	mUse = true; mStr = pStr;	}
+		void Set( bool val )		{	mUse = true; mBool = val;	}
+
+	} mBaseVal;
+
 
 	Variable() :
 		//mpOwnerNode(NULL),
@@ -54,8 +70,7 @@ public:
 		mIsLValue(false),
 		mIsGlobal(false),
 		mIsSHParam(false),
-		mIsUsed(false),
-		mHasBaseVal(false)
+		mIsUsed(false)
 	{
 	}
 
@@ -73,9 +88,9 @@ public:
 		mIsLValue		(	from.mIsLValue			),
 		mIsGlobal		(	from.mIsGlobal			),
 		mIsSHParam		(	from.mIsSHParam			),
-		mBaseValNum		(	from.mBaseValNum		),
+		mBaseVal.mNumVec		(	from.mBaseVal.mNumVec		),
 		mIsUsed			(	from.mIsUsed			),
-		mHasBaseVal		(	from.mHasBaseVal		)
+		mBaseVal.mUse		(	from.mBaseVal.mUse		)
 	{
 	}
 */
@@ -107,7 +122,7 @@ public:
 
 	bool IsConstant() const
 	{
-		return mHasBaseVal && !mIsGlobal && !mIsSHParam && !mIsVarying;
+		return mBaseVal.mUse && !mIsGlobal && !mIsSHParam && !mIsVarying;
 	}
 };
 

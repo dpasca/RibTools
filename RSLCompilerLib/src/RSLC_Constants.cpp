@@ -35,8 +35,8 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 		{
 			if ( vars[i].IsConstant() )
 			{
-				if ( vars[i].mBaseValNum.size() == 1 &&
-					 vars[i].mBaseValNum[0] == floatVal )
+				if ( vars[i].mBaseVal.mNumVec.size() == 1 &&
+					 vars[i].mBaseVal.mNumVec[0] == floatVal )
 				{
 					pNode->mVarLink.Setup( pRoot, i );
 					return;
@@ -54,14 +54,21 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 		{
 			if ( vars[i].IsConstant() )
 			{
-				if ( vars[i].mBaseValNum.size() == 1 &&
-					 0 == strcmp( vars[i].mBaseValStr.c_str(), pStrVal ) )
+				if ( vars[i].mBaseVal.mNumVec.size() == 1 &&
+					 0 == strcmp( vars[i].mBaseVal.mStr.c_str(), pStrVal ) )
 				{
 					pNode->mVarLink.Setup( pRoot, i );
 					return;
 				}
 			}
 		}
+	}
+	else
+	if ( pNode->mpToken->id == T_VL_BOOL_TRUE ||
+		 pNode->mpToken->id == T_VL_BOOL_FALSE )
+	{
+		//DASSERT( 0 );
+		vtype = VT_BOOL;
 	}
 	else
 	{
@@ -78,7 +85,6 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 
 	pVar->mIsVarying		= false;
 	pVar->mIsForcedDetail	= false;
-	pVar->mHasBaseVal		= true;
 
 	pVar->mInternalName		= DUT::SSPrintFS( "_@K%02i", pNode->mVarLink.GetVarIdx() );
 
@@ -86,15 +92,20 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 
 	if ( pNode->mpToken->id == T_VL_NUMBER )
 	{
-		pVar->mBaseValNum.push_back( floatVal );
+		pVar->mBaseVal.Set( floatVal );
 	}
 	else
 	if ( pNode->mpToken->id == T_VL_STRING )
 	{
-		pVar->mBaseValStr = pStrVal;
+		pVar->mBaseVal.Set( pStrVal );
+	}
+	else
+	if ( pNode->mpToken->id == T_VL_BOOL_TRUE ||
+		 pNode->mpToken->id == T_VL_BOOL_FALSE )
+	{
+		pVar->mBaseVal.Set( pNode->mpToken->id == T_VL_BOOL_TRUE );
 	}
 }
-
 
 //==================================================================
 static void realizeConstants_rec( TokNode *pNode, TokNode *pRoot )
