@@ -16,6 +16,10 @@ namespace RSLC
 {
 
 //==================================================================
+namespace RRASMOut
+{
+
+//==================================================================
 static void writeVariable( FILE *pFile, const Variable &var )
 {
 	fprintf_s( pFile, "\t" );
@@ -25,7 +29,7 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	//--- write storage
 	const char *pStorage = "ERROR!!!";
 
-	if ( var.mBaseVal.mUse )	pStorage = "temporary"; else
+	if ( var.HasBaseVal() )	pStorage = "temporary"; else
 	if ( var.mIsGlobal )	pStorage = "global"; else
 	if ( var.mIsSHParam )	pStorage = "parameter"; else
 	{
@@ -38,7 +42,7 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	const char *pClass;
 	if ( var.mIsVarying )
 	{
-		DASSTHROW( var.mBaseVal.mUse == false,
+		DASSTHROW( var.HasBaseVal() == false,
 				("Internal error ! Variable '%s' is varying but has a base value !",
 					var.GetUseName().c_str()) );
 
@@ -46,7 +50,7 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	}
 	else
 	{
-		if ( var.mBaseVal.mUse )
+		if ( var.HasBaseVal() )
 			pClass = "constant";
 		else
 			pClass = "uniform";
@@ -59,25 +63,26 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	fprintf_s( pFile, "%-7s ", VarTypeToString( varType ) );
 
 	//--- write the eventual constant value
-	if ( var.mBaseVal.mUse )
+	if ( var.HasBaseVal() )
 	{
 		fprintf_s( pFile, "\t" );
 
 		// should be either bool, numbers or a string..
 		if ( varType == VT_BOOL )
 		{
-			fprintf_s( pFile, "%i", var.mBaseVal.mBool ? 1 : 0 );
+			fprintf_s( pFile, "%i", var.GetBaseValBool() ? 1 : 0 );
 		}
 		else
 		if ( varType == VT_STRING )
 		{
-			if ( var.mBaseVal.mStr.length() )
-				fprintf_s( pFile, "\"%s\"", var.mBaseVal.mStr.c_str() );
+			fprintf_s( pFile, "\"%s\"", var.GetBaseValString() );
 		}
 		else
 		{
-			for (size_t k=0; k < var.mBaseVal.mNumVec.size(); ++k)
-				fprintf_s( pFile, "%f", var.mBaseVal.mNumVec[k] );
+			const DVec<float>	&vec = var.GetBaseValFloatVec();
+
+			for (size_t k=0; k < vec.size(); ++k)
+				fprintf_s( pFile, "%f", vec[k] );
 		}
 	}
 
@@ -111,10 +116,6 @@ static void writeShaderParamVariables( FILE *pFile, TokNode *pNode )
 		writeShaderParamVariables( pFile, pNode->mpChilds[i] );
 	}
 }
-
-//==================================================================
-namespace RRASMOut
-{
 
 //==================================================================
 void WriteVariables( FILE *pFile, TokNode *pNode )

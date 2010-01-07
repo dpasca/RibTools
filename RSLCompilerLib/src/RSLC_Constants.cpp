@@ -33,14 +33,13 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 
 		for (size_t i=0; i < vars.size(); ++i)
 		{
-			if ( vars[i].IsConstant() )
+			if NOT( vars[i].HasBaseVal( VT_FLOAT ) )
+				continue;
+
+			if ( vars[i].GetBaseValFloat() == floatVal )
 			{
-				if ( vars[i].mBaseVal.mNumVec.size() == 1 &&
-					 vars[i].mBaseVal.mNumVec[0] == floatVal )
-				{
-					pNode->mVarLink.Setup( pRoot, i );
-					return;
-				}
+				pNode->mVarLink.Setup( pRoot, i );
+				return;
 			}
 		}
 	}
@@ -52,14 +51,13 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 
 		for (size_t i=0; i < vars.size(); ++i)
 		{
-			if ( vars[i].IsConstant() )
+			if NOT( vars[i].HasBaseVal( VT_STRING ) )
+				continue;
+
+			if ( 0 == strcmp( vars[i].GetBaseValString(), pStrVal ) )
 			{
-				if ( vars[i].mBaseVal.mNumVec.size() == 1 &&
-					 0 == strcmp( vars[i].mBaseVal.mStr.c_str(), pStrVal ) )
-				{
-					pNode->mVarLink.Setup( pRoot, i );
-					return;
-				}
+				pNode->mVarLink.Setup( pRoot, i );
+				return;
 			}
 		}
 	}

@@ -387,6 +387,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_TokenDefs.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_TokenDefs.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Tree.cpp"
 				>
 			</File>

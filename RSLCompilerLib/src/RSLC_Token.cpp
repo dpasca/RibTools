@@ -13,116 +13,8 @@
 //==================================================================
 namespace RSLC
 {
-
-//==================================================================
-struct TokenDef
-{
-	const char	*pStr;
-	TokenIDType	idType;
-	TokenID		id;
-};
-
-//==================================================================
-#define OP_DEF(_STR_,_X_)	_STR_, T_TYPE_OPERATOR,	T_OP_##_X_
-#define DT_DEF(_X_)			#_X_, T_TYPE_DATATYPE,	T_DT_##_X_
-#define ST_DEF(_X_)			#_X_, T_TYPE_SHADERTYPE,T_ST_##_X_
-#define DE_DEF(_X_)			#_X_, T_TYPE_DETAIL,	T_DE_##_X_
-#define KW_DEF(_X_)			#_X_, T_TYPE_KEYWORD,	T_KW_##_X_
-#define FO_DEF(_X_)			#_X_, T_TYPE_FUNCOP,	T_FO_##_X_
-
-//==================================================================
-static TokenDef _sTokenDefs[TOKEN_N] =
-{
-	NULL	,	T_TYPE_NONTERM	,	T_NONTERM	,
-
-	NULL	,	T_TYPE_TEMPDEST	,	T_TD_TEMPDEST	,
-
-	NULL	,	T_TYPE_VALUE	,	T_VL_NUMBER	,
-	NULL	,	T_TYPE_VALUE	,	T_VL_STRING	,
-
-	"true"	,	T_TYPE_VALUE	,	T_VL_BOOL_TRUE	,
-	"false"	,	T_TYPE_VALUE	,	T_VL_BOOL_FALSE	,
-
-	OP_DEF(	"="		,	ASSIGN		)	,	// assign ops
-	OP_DEF(	"+="	,	PLUSASS		)	,
-	OP_DEF(	"-="	,	MINUSASS	)	,
-	OP_DEF(	"*="	,	MULASS		)	,
-	OP_DEF(	"/="	,	DIVASS		)	,
-
-	OP_DEF(	"<="	,	LSEQ		)	,	// cmp ops
-	OP_DEF(	">="	,	GEEQ		)	,
-	OP_DEF(	"<"		,	LSTH		)	,
-	OP_DEF(	">"		,	GRTH		)	,
-	OP_DEF(	"=="	,	EQ			)	,
-	OP_DEF(	"!="	,	NEQ			)	,
-
-	OP_DEF(	"&&"	,	LOGIC_AND	)	,	// general bi-ops
-	OP_DEF(	"||"	,	LOGIC_OR	)	,
-	OP_DEF(	"+"		,	PLUS		)	,
-	OP_DEF(	"-"		,	MINUS		)	,
-	OP_DEF(	"*"		,	MUL			)	,
-	OP_DEF(	"/"		,	DIV			)	,
-	OP_DEF(	"^"		,	POW			)	,
-	OP_DEF(	"."		,	DOT			)	,
-
-	OP_DEF(	":"		,	COLON		)	,
-	OP_DEF(	","		,	COMMA		)	,
-	OP_DEF(	";"		,	SEMICOL		)	,
-	OP_DEF(	"("		,	LFT_BRACKET			)	,
-	OP_DEF(	")"		,	RGT_BRACKET			)	,
-	OP_DEF(	"["		,	LFT_SQ_BRACKET		)	,
-	OP_DEF(	"]"		,	RGT_SQ_BRACKET		)	,
-	OP_DEF(	"{"		,	LFT_CRL_BRACKET		)	,
-	OP_DEF(	"}"		,	RGT_CRL_BRACKET		)	,
-	OP_DEF(	"#"		,	HASH		)	,
-
-	DT_DEF( float			)	,
-	DT_DEF( vector			)	,
-	DT_DEF( point			)	,
-	DT_DEF( normal			)	,
-	DT_DEF( color			)	,
-	DT_DEF( matrix			)	,
-	DT_DEF( string			)	,
-	DT_DEF( bool			)	,
-	DT_DEF( void			)	,
-
-	DE_DEF( varying			)	,
-	DE_DEF( uniform			)	,
-
-	//FO_DEF( if				)	,
-	FO_DEF( for				)	,
-	FO_DEF( while			)	,
-
-	KW_DEF( break			)	,
-	KW_DEF( continue		)	,
-	KW_DEF( return			)	,
-	KW_DEF( output			)	,
-	KW_DEF( __funcop		)	,
-
-	//KW_DEF( texture			)	,	// texture_type
-	//KW_DEF( environment		)	,
-	KW_DEF( bump			)	,
-	//KW_DEF( shadow			)	,
-
-	ST_DEF( light			)	,	// shader types
-	ST_DEF( surface			)	,
-	ST_DEF( volume			)	,
-	ST_DEF( displacement	)	,
-	ST_DEF( transformation	)	,
-	ST_DEF( imager			)	,
-};
-
 //==================================================================
 static size_t _sTokenDefsIdxInvSortLen[TOKEN_N];
-
-//==================================================================
-#undef OP_DEF
-#undef DT_DEF
-#undef ST_DEF
-#undef DE_DEF
-#undef KW_DEF
-//#undef SF_DEF
-#undef FO_DEF
 
 //==================================================================
 static bool matches( const char *pStr, size_t i, size_t strSize, const char *pFindStr )
@@ -161,7 +53,7 @@ static bool findSkipWhites( const char *pStr, size_t &i, size_t strSize, int &io
 //==================================================================
 static void newToken( DVec<Token> &tokens, int lineCnt )
 {
-	if ( tokens.back().str.size() )
+	if ( tokens.back().IsSet() )
 	{
 		tokens.grow();
 		tokens.back().sourceLine = lineCnt;
@@ -193,7 +85,7 @@ Token *TokenFromDefOrNTerm( const char *pTokenStr, int lineCnt )
 {
 	for (size_t j=T_VL_STRING+1; j < TOKEN_N; ++j)
 	{
-		const TokenDef &tokDef = _sTokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
+		const TokenDef &tokDef = _TokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
 
 		if ( tokDef.pStr && 0 == strcmp( pTokenStr, tokDef.pStr ) )
 			return DNEW Token( tokDef.pStr, tokDef.id, tokDef.idType );
@@ -215,7 +107,7 @@ static bool matchTokenDef(
 {
 	for (size_t j=0; j < TOKEN_N; ++j)
 	{
-		const TokenDef &tokDef = _sTokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
+		const TokenDef &tokDef = _TokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
 
 		if NOT( tokDef.pStr )
 			continue;
@@ -475,8 +367,8 @@ const char *GetTokenIDStr( TokenID tokid )
 {
 	for (size_t i=0; i < TOKEN_N; ++i)
 	{
-		if ( _sTokenDefs[i].id == tokid )
-			return _sTokenDefs[i].pStr ? _sTokenDefs[i].pStr : "N/A";
+		if ( _TokenDefs[i].id == tokid )
+			return _TokenDefs[i].pStr ? _TokenDefs[i].pStr : "N/A";
 	}
 
 	return "SYMBOL NOT FOUND ?!!";
@@ -508,7 +400,7 @@ static void initSortedTable()
 
 	for (size_t i=0; i < TOKEN_N; ++i)
 	{
-		sortItems[i].strLen = _sTokenDefs[i].pStr ? strlen( _sTokenDefs[i].pStr ) : 0;
+		sortItems[i].strLen = _TokenDefs[i].pStr ? strlen( _TokenDefs[i].pStr ) : 0;
 		sortItems[i].idx	= i;
 	}
 

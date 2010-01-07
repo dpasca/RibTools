@@ -29,7 +29,7 @@ static void assignRegisters_sub( TokNode *pNode, int &io_regIdx )
 
 	if ( pVar )
 	{
-		if (!pVar->mBaseVal.mUse &&
+		if (!pVar->HasBaseVal() &&
 			!pVar->mIsGlobal &&
 			!pVar->IsRegisterAssigned() )
 		{

@@ -18,6 +18,10 @@ namespace RSLC
 {
 
 //==================================================================
+namespace RRASMOut
+{
+
+//==================================================================
 static const std::string getOperand(
 					TokNode *pOperand,
 					VarType &out_varType )
@@ -107,6 +111,13 @@ static const char *asmOpCodeFromOpToken( const Token *pTok )
 	case T_OP_MINUS:	return "sub";
 	case T_OP_POW:		return "pow";
 	case T_OP_DOT:		return "dot";
+
+	case T_OP_LSEQ	:	return "setle";
+	case T_OP_GEEQ	:	return "setge";
+	case T_OP_LSTH	:	return "setlt";
+	case T_OP_GRTH	:	return "setgt";
+	case T_OP_EQ	:	return "seteq";
+	case T_OP_NEQ	:	return "setne";
 
 	default:
 		return pTok->str.c_str();
@@ -303,10 +314,6 @@ static void writeDefParams( FILE *pFile, const Function &func )
 
 	fprintf_s( pFile, "\t;==== End Def Params\n\n" );
 }
-
-//==================================================================
-namespace RRASMOut
-{
 
 //==================================================================
 void WriteFunctions( FILE *pFile, TokNode *pNode )

@@ -646,14 +646,7 @@ void SolveGlobalConstants( TokNode *pRoot )
 
 		if ( pDestVar->GetVarType() == VT_FLOAT )
 		{
-			DASSERT(
-				pDestVar->mBaseVal.mNumVec.size() == 0 &&
-				pExprVar->mBaseVal.mNumVec.size() == 1
-				);
-
-			pDestVar->mBaseVal.mNumVec.push_back(
-						pExprVar->mBaseVal.mNumVec[0] );
-			pDestVar->mBaseVal.mUse = true;
+			pDestVar->mBaseVal.Set( pExprVar->GetBaseValFloat() );
 		}
 		else
 		{

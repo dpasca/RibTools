@@ -38,22 +38,42 @@ public:
 
 	Register		mBuild_Register;
 
-	struct BaseVal
+	class BaseVal
 	{
+		friend class Variable;
+		
 		bool			mUse;
 		DVec<float>		mNumVec;
 		std::string		mStr;
 		bool			mBool;
-
+	
+	public:
 		BaseVal() :
 			mUse(false),
 			mBool(false)
 		{
 		}
 
-		void Set( float num )		{	mUse = true; mNumVec.push_back( num );	}
-		void Set( const char *pStr ){	mUse = true; mStr = pStr;	}
-		void Set( bool val )		{	mUse = true; mBool = val;	}
+		void Set( float num )
+		{
+			DASSERT( mUse == false );
+			mUse = true;
+			mNumVec.push_back( num );
+		}
+
+		void Set( const char *pStr )
+		{	
+			DASSERT( mUse == false && mNumVec.size() == 0 );
+			mUse = true;
+			mStr = pStr;
+		}
+
+		void Set( bool val )
+		{
+			DASSERT( mUse == false && mNumVec.size() == 0 );
+			mUse = true;
+			mBool = val;
+		}
 
 	} mBaseVal;
 
@@ -74,29 +94,43 @@ public:
 	{
 	}
 
-/*
-	Variable( const Variable &from ) :
-		mInternalName	(	from.mInternalName		),
-		mpDTypeTok		(	from.mpDTypeTok			),
-		mpDetailTok		(	from.mpDetailTok		),
-		mpSpaceCastTok	(	from.mpSpaceCastTok		),
-		mpDefNameTok	(	from.mpDefNameTok		),
-		mpDefValToks	(	from.mpDefValToks		),
-		mVarType		(	from.mVarType			),
-		mIsVarying		(	from.mIsVarying			),
-		mIsForcedDetail	(	from.mIsForcedDetail	),
-		mIsLValue		(	from.mIsLValue			),
-		mIsGlobal		(	from.mIsGlobal			),
-		mIsSHParam		(	from.mIsSHParam			),
-		mBaseVal.mNumVec		(	from.mBaseVal.mNumVec		),
-		mIsUsed			(	from.mIsUsed			),
-		mBaseVal.mUse		(	from.mBaseVal.mUse		)
-	{
-	}
-*/
-
 	~Variable()
 	{
+	}
+
+
+	float GetBaseValFloat() const
+	{
+		DASSERT( mVarType == VT_FLOAT && mBaseVal.mUse );
+		return mBaseVal.mNumVec[0];
+	}
+	const DVec<float> &GetBaseValFloatVec() const
+	{
+		DASSERT(
+			(  mVarType == VT_FLOAT	
+			|| mVarType == VT_POINT	
+			|| mVarType == VT_COLOR	
+			|| mVarType == VT_VECTOR	
+			|| mVarType == VT_NORMAL	
+			|| mVarType == VT_MATRIX )
+			&& mBaseVal.mUse );
+
+		return mBaseVal.mNumVec;
+	}
+	const char *GetBaseValString() const
+	{
+		DASSERT( mVarType == VT_STRING && mBaseVal.mUse );
+		return mBaseVal.mStr.c_str();
+	}
+	bool GetBaseValBool() const
+	{
+		DASSERT( mVarType == VT_BOOL && mBaseVal.mUse );
+		return mBaseVal.mBool;
+	}
+
+	bool HasBaseVal( VarType varType=VT_UNKNOWN ) const
+	{
+		return mBaseVal.mUse && (varType == VT_UNKNOWN || mVarType == varType);
 	}
 
 	bool HasDefName() const { return mpDefNameTok != NULL;	}

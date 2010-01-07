@@ -48,6 +48,7 @@ void SolveBiOpType(	const TokNode *pOperator,
 
 	if ( (vt1 == VT_STRING) != (vt2 == VT_STRING) )
 	{
+		return;
 		throw Exception( "Strings can only operate with other strings !", pOperator );
 	}
 
