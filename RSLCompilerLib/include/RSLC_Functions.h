@@ -57,8 +57,6 @@ void ResolveFunctionCalls( TokNode *pNode );
 
 void CloseFuncOps( TokNode *pNode );
 
-void WriteFunctions( FILE *pFile, TokNode *pNode );
-
 //==================================================================
 }
 

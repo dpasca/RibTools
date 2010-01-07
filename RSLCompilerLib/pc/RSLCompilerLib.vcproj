@@ -343,10 +343,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\RSLC_Functions_WriteFunctions.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RSLC_Operators.cpp"
 				>
 			</File>
@@ -368,6 +364,18 @@
 			</File>
 			<File
 				RelativePath="..\include\RSLC_Registers.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_RRASMOut.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_RRASMOut_WriteFunctions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_RRASMOut_WriteVariables.cpp"
 				>
 			</File>
 			<File

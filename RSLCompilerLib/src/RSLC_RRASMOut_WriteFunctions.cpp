@@ -1,5 +1,5 @@
 //==================================================================
-/// RSLC_Functions_WriteFunctions.cpp
+/// RSLC_RRASMOut_WriteFunctions.cpp
 ///
 /// Created by Davide Pasca - 2009/9/2
 /// See the file "license.txt" that comes with this project for
@@ -305,6 +305,10 @@ static void writeDefParams( FILE *pFile, const Function &func )
 }
 
 //==================================================================
+namespace RRASMOut
+{
+
+//==================================================================
 void WriteFunctions( FILE *pFile, TokNode *pNode )
 {
 	const DVec<Function> &funcs = pNode->GetFuncs();
@@ -346,7 +350,8 @@ void WriteFunctions( FILE *pFile, TokNode *pNode )
 	fprintf_s( pFile, "\n" );
 }
 
-
+//==================================================================
+}
 
 //==================================================================
 }

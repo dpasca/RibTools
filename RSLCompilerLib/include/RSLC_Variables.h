@@ -44,7 +44,6 @@ void MarkUsedVariables( TokNode *pRoot );
 void DiscoverVariablesDeclarations( TokNode *pNode );
 void DiscoverVariablesUsage( TokNode *pNode );
 void DiscoverVariables( TokNode *pNode );
-void WriteVariables( FILE *pFile, TokNode *pNode );
 
 //==================================================================
 }

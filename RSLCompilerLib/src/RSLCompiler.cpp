@@ -21,6 +21,7 @@
 #include "RSLC_Constants.h"
 #include "RSLC_Expressions.h"
 #include "RSLCompiler.h"
+#include "RSLC_RRASMOut.h"
 
 //==================================================================
 using namespace	RSLC;
@@ -133,11 +134,11 @@ void RSLCompiler::SaveASM( const char *pFName, const char *pRefSourceName )
 
 	fprintf_s( pFile, "\n.data\n" );
 
-	WriteVariables( pFile, mpRoot );
+	RRASMOut::WriteVariables( pFile, mpRoot );
 
 	fprintf_s( pFile, "\n.code\n" );
 
-	WriteFunctions( pFile, mpRoot );
+	RRASMOut::WriteFunctions( pFile, mpRoot );
 
 	fclose( pFile );
 }
