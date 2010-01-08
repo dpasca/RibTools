@@ -133,8 +133,7 @@ const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function>
 {
 	Function	*pFound = NULL;
 
-	TokNode *pFCallParams = pFCallNode->GetChildTry( 0 );
-	DASSERT( pFCallParams != NULL );
+	TokNode		*pFCallParams = pFCallNode->GetChildTry( 0 );
 
 	Function	*pBestMatch = NULL;
 	size_t		convertMatches = 0;
@@ -151,11 +150,22 @@ const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function>
 			continue;
 		}
 
-		// match number and types of params
-		if NOT( doVTypesMatch( funcs[i], *pFCallParams, false ) )
-			continue;
+		if ( pFCallParams )
+		{
+			// match number and types of params
+			if NOT( doVTypesMatch( funcs[i], *pFCallParams, false ) )
+				continue;
+		}
 
 		return &funcs[i];
+	}
+
+	// if there are no params (param-less funcop) then there
+	// is no point in trying to match the function further
+	// ..because there is no param matching to do 8)
+	if NOT( pFCallParams )
+	{
+		return NULL;
 	}
 
 	// now try "lax" match.. where vector, point and normal are all considered the same
@@ -171,8 +181,11 @@ const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function>
 		}
 
 		// match number and types of params
-		if NOT( doVTypesMatch( funcs[i], *pFCallParams, true ) )
-			continue;
+		if ( pFCallParams )
+		{
+			if NOT( doVTypesMatch( funcs[i], *pFCallParams, true ) )
+				continue;
+		}
 
 		return &funcs[i];
 	}

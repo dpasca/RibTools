@@ -83,7 +83,7 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 			pFuncName->mIsFuncOp = true;
 		}
 
-		// what's the retun value ?
+		// what's the return value ?
 		if ( pRetType->mpToken->idType == T_TYPE_DATATYPE )
 		{
 			// something properly specified ?
@@ -111,7 +111,10 @@ static void discoverFuncsDeclarations( TokNode *pRoot )
 }
 
 //==================================================================
-static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
+static void discoverFuncsCalls_sub(
+						TokNode				 *pFuncCallNode,
+						const DVec<Function> &funcs,
+						int					 &out_parentIdx )
 {
 	// constructor ?
 	bool	isDataType = pFuncCallNode->IsDataType();
@@ -145,7 +148,49 @@ static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
 		}
 	}
 
-	if ( pRightNode && pRightNode->mpToken->id == T_OP_LFT_BRACKET )
+	// should have something following because it has to be one of the following case
+	// - an actual function call, in which case there should be an open bracket
+	// - a funcop such as "else", with no params, but that should have a following
+	//   statement or block
+	if NOT( pRightNode )
+	{
+		return;
+		//throw Exception( "Incomplete statement", pFuncCallNode );
+	}
+
+	//if ( pFunc->mpRetTypeTok->id == T_KW___funcop )
+
+	// do an early match to see if there is at least one function call
+	// with this name  ..actual match will happen later in resolveFunctionCalls()
+	// ..because it's more complex as it needs to resolve ambiguities stemming from
+	// freaking function overloading.. which is nice but complicates things
+	bool isFuncOp = false;
+
+	// if it doesn't start by "_asm_"
+	if ( pFuncCallNode->GetTokStr() != strstr( pFuncCallNode->GetTokStr(), "_asm_" ) )
+	{
+		bool functionNameExists = false;
+	
+		for (size_t i=0; i < funcs.size(); ++i)
+		{
+			if ( 0 == strcmp(
+						pFuncCallNode->GetTokStr(),
+						funcs[i].mpNameNode->GetTokStr() ) )
+			{
+				functionNameExists = true;
+				if ( funcs[i].mpRetTypeTok->id == T_KW___funcop )
+					isFuncOp = true;
+
+				break;
+			}
+		}
+
+		if NOT( functionNameExists )
+			return;
+	}
+
+
+	if ( pRightNode->mpToken->id == T_OP_LFT_BRACKET )
 	{
 		// set the block type as a function call
 		pRightNode->UpdateBlockTypeToFuncCall();
@@ -173,10 +218,19 @@ static void discoverFuncsUsageSub( TokNode *pFuncCallNode, int &out_parentIdx )
 
 		pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
 	}
+	else
+	if ( isFuncOp )
+	{
+		// funcops with no params can be called without the brackets
+		// ..for example "else()" is a funcop and it can be called as "else"
+		// Note: funcops sch as "else" and "if" are defined in RSLC_Builtins.sl 
+
+		pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
+	}
 }
 
 //==================================================================
-static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int &out_parentIdx )
+static void discoverFuncsCalls( TokNode *pNode, const DVec<Function> &funcs, int &out_parentIdx )
 {
 	bool	isDataType = pNode->IsDataType();
 
@@ -192,12 +246,12 @@ static void discoverFuncsUsage( TokNode *pNode, const DVec<Function> &funcs, int
 		  isDataType) &&
 			pNode->mNodeType == TokNode::TYPE_STANDARD )
 	{
-		discoverFuncsUsageSub( pNode, out_parentIdx );
+		discoverFuncsCalls_sub( pNode, funcs, out_parentIdx );
 	}
 
 	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
 	{
-		discoverFuncsUsage( pNode->mpChilds[i], funcs, i );
+		discoverFuncsCalls( pNode->mpChilds[i], funcs, i );
 	}
 }
 
@@ -207,7 +261,7 @@ void DiscoverFunctions( TokNode *pRoot )
 	discoverFuncsDeclarations( pRoot );
 
 	int	idx = 0;
-	discoverFuncsUsage( pRoot, pRoot->GetFuncs(), idx );
+	discoverFuncsCalls( pRoot, pRoot->GetFuncs(), idx );
 }
 
 //==================================================================

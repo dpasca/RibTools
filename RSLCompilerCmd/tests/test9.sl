@@ -8,19 +8,6 @@
 
 surface test9( string texturename )
 {
-
-/*
-	bool a = true == false;
-*/
-
-	Ci = color( 1, 0, 0 );
-
-	texturename != "";
-	{
-		Ci = color( 0, 0, 1 );
-	}
-	
-/*
 	if ( texturename != "" )
 	{
 		Ci = color( 0, 0, 1 );
@@ -29,7 +16,6 @@ surface test9( string texturename )
 	{
 		Ci = color( 1, 0, 0 );
 	}
-*/
 
 	Oi = 1;
 }

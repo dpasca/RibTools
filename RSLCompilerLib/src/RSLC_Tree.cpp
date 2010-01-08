@@ -332,52 +332,63 @@ bool TokNode::TrySetVarying( bool onoff )
 }
 
 //==================================================================
+static bool defineBlockTypeAndID_DeclFunctionOrShader( TokNode *pNode )
+{
+	// are we at root level ?
+	if NOT( pNode->mpParent && pNode->mpParent->mpParent == NULL )
+		return false;
+
+	TokNode	*pFnName = pNode->GetLeft();
+	if ( pFnName )
+	{
+		TokNode	*pFnType = pFnName->GetLeft();
+		if ( pFnType )
+		{
+			// do we have something like.. ?
+			// uniform vector AA = vector(1,2,3);
+			if ( pFnType->mpToken->id == T_OP_ASSIGN )
+			{
+				//pFnType = pFnType->GetLeft();
+			}
+			else
+			{
+				// shader
+				if ( pFnType && pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
+					pNode->SetBlockType( BLKT_SHPARAMS );
+				else	// function
+				if ( pFnType &&
+						(pFnType->mpToken->idType == T_TYPE_DATATYPE ||
+						 pFnType->mpToken->id == T_KW___funcop) )
+				{
+					pNode->SetBlockType( BLKT_FNPARAMS );
+				}
+				else
+				{
+					throw Exception( "Return type unknown", pNode );
+				}
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+//==================================================================
 static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 {
 	if ( pNode->mpToken )
 	{
 		if ( pNode->mpToken->id == T_OP_LFT_BRACKET )
 		{
-			// are we at root level ?
-			if ( pNode->mpParent && pNode->mpParent->mpParent == NULL )
+			if NOT( defineBlockTypeAndID_DeclFunctionOrShader( pNode ) )
 			{
-				TokNode	*pFnName = pNode->GetLeft();
-				if ( pFnName )
+				if ( pNode->GetBlockType() == BLKT_UNKNOWN )
 				{
-					TokNode	*pFnType = pFnName->GetLeft();
-					if ( pFnType )
-					{
-						// do we have something like.. ?
-						// uniform vector AA = vector(1,2,3);
-						if ( pFnType->mpToken->id == T_OP_ASSIGN )
-						{
-							//pFnType = pFnType->GetLeft();
-						}
-						else
-						{
-							// shader
-							if ( pFnType && pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
-								pNode->SetBlockType( BLKT_SHPARAMS );
-							else	// function
-							if ( pFnType &&
-									(pFnType->mpToken->idType == T_TYPE_DATATYPE ||
-									 pFnType->mpToken->id == T_KW___funcop) )
-							{
-								pNode->SetBlockType( BLKT_FNPARAMS );
-							}
-							else
-							{
-								throw Exception( "Return type unknown", pNode );
-							}
-						}
-					}
+					// set as a plain expression otherwise
+					pNode->SetBlockType( BLKT_EXPRESSION );
 				}
-			}
-
-			if ( pNode->GetBlockType() == BLKT_UNKNOWN )
-			{
-				// set as a plain expression otherwise
-				pNode->SetBlockType( BLKT_EXPRESSION );
 			}
 		}
 		else
