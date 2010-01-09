@@ -9,6 +9,40 @@
 for RibRender */
 
 /*================================================================
+/// FuncOps -- These are really basic language constructors
+///   ..notice how "if" and "else" are defined here..
+///==============================================================*/
+__funcop solar( vector axis; float angle )
+{
+	_asm_solarbegin_vs( axis, angle );
+}
+/*===============================================================*/
+__funcop solar()
+{
+	_asm_solarbegin();
+}
+/*===============================================================*/
+__funcop illuminance( point pos; vector axis; float angle )
+{
+	_asm_illuminance_vvs( pos, axis, angle );
+}
+/*===============================================================*/
+__funcop illuminance( point pos )
+{
+	_asm_illuminance_v( pos );
+}
+/*===============================================================*/
+__funcop if( bool val )
+{
+	_asm_iftrue_b( val );
+}
+/*===============================================================*/
+__funcop else()
+{
+	_asm_orelse();
+}
+
+/*================================================================
 /// Globals from the renderer itself
 ///==============================================================*/
 varying		color		Cs	;	/* also uniform ? */
@@ -38,29 +72,6 @@ point		varying		Ps
 /// Common constants
 ///==============================================================*/
 uniform float PI = 3.14159265;	/* Should implement "const" for this 8) */
-
-/*================================================================
-/// FuncOps
-///==============================================================*/
-__funcop solar( vector axis; float angle )
-{
-	_asm_solarbegin_vs( axis, angle );
-}
-/*===============================================================*/
-__funcop solar()
-{
-	_asm_solarbegin();
-}
-/*===============================================================*/
-__funcop illuminance( point pos; vector axis; float angle )
-{
-	_asm_illuminance_vvs( pos, axis, angle );
-}
-/*===============================================================*/
-__funcop illuminance( point pos )
-{
-	_asm_illuminance_v( pos );
-}
 
 /*================================================================*/
 float	radians( float deg )

@@ -49,6 +49,7 @@ public:
 	TokNode			*mpParent;
 	Type			mNodeType;
 	bool			mIsFuncOp;
+	bool			mOutputFuncOpEnd;
 	
 	// TODO: ummmmm !!
 	const Function	*mpNodeTypeFuncCall_pFunc;

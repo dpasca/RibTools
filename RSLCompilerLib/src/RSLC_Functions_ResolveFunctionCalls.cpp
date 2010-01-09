@@ -254,6 +254,28 @@ static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassPara
 }
 
 //==================================================================
+// Kind of a nasty special case.. but what can you do ?
+static void handleFuncopEndForIfElse( TokNode *pFuncParamsHooks )
+{
+	//pFuncParamsHooks->mpN
+
+	TokNode	*pRight = pFuncParamsHooks->GetRight();
+
+	if ( pRight )
+	{
+		pRight = pRight->GetRight();
+		if ( pRight && 0 == strcmp( pRight->GetTokStr(), "else" ) )
+		{
+			pFuncParamsHooks->mOutputFuncOpEnd = false;
+			return;
+		}
+	}
+
+	pFuncParamsHooks->mOutputFuncOpEnd = true;
+}
+
+
+//==================================================================
 static void resolveFunctionCalls(
 						TokNode *pNode,
 						const DVec<Function> &funcs )
@@ -317,6 +339,8 @@ static void resolveFunctionCalls(
 					throw Exception( "Missing statement !", pNode );
 
 				pClonedParamsHooks->mIsFuncOp = true;
+
+				handleFuncopEndForIfElse( pClonedParamsHooks );
 			}
 		}
 		else
@@ -422,7 +446,7 @@ void ResolveFunctionCalls( TokNode *pNode )
 //==================================================================
 static void closeFuncOps_sub( TokNode *pNode )
 {
-	if ( pNode->mIsFuncOp )
+	if ( pNode->mIsFuncOp && pNode->mOutputFuncOpEnd )
 	{
 		TokNode	*pFuncOpEndMarker = DNEW TokNode( "_asm_funcopend", T_NONTERM, T_TYPE_NONTERM );
 		pFuncOpEndMarker->mNodeType = TokNode::TYPE_FUNCCALL;

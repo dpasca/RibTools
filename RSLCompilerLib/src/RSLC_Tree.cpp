@@ -26,6 +26,7 @@ TokNode::TokNode( Token *pObj ) :
 	mNodeType(TYPE_STANDARD),
 	mBlockType(BLKT_UNKNOWN),
 	mIsFuncOp(false),
+	mOutputFuncOpEnd(false),
 	mBlockID(0),
 	mpNodeTypeFuncCall_pFunc(NULL)
 {
@@ -41,6 +42,7 @@ TokNode::TokNode( const char *pTokStr, TokenID tokId, TokenIDType tokIdType ) :
 	mNodeType(TYPE_STANDARD),
 	mBlockType(BLKT_UNKNOWN),
 	mIsFuncOp(false),
+	mOutputFuncOpEnd(false),
 	mBlockID(0),
 	mpNodeTypeFuncCall_pFunc(NULL)
 {
@@ -58,6 +60,7 @@ TokNode::TokNode( const TokNode &from ) :
 	mNodeType		(from.mNodeType),
 	mBlockType		(from.mBlockType),
 	mIsFuncOp		(from.mIsFuncOp),
+	mOutputFuncOpEnd(from.mOutputFuncOpEnd),
 	mBlockID		(0),
 	mVarLink		(from.mVarLink),
 	mpNodeTypeFuncCall_pFunc(from.mpNodeTypeFuncCall_pFunc)
