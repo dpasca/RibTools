@@ -51,6 +51,8 @@ void *Symbol::AllocClone( size_t size ) const
 	case Symbol::TYP_COLOR:	pOutData = allocStream( sizeof(SlColor)*blocksN );	break;
 	case Symbol::TYP_MATRIX:pOutData = allocStream( sizeof(Matrix44)*size );	break;
 	case Symbol::TYP_STRING:pOutData = allocStream( sizeof(SlStr)*size );		break;
+	case Symbol::TYP_BOOL:	pOutData = allocStream( sizeof(VecNMask)*size );	break;
+
 	default:
 		DASSERT( 0 );
 		break;
@@ -76,11 +78,12 @@ void Symbol::CopyConstValue( void *pDestData ) const
 	case Symbol::TYP_FLOAT:	((Float_	*)pDestData)[0] = ((const Float_ *)mpConstVal)[0]; break;
 	case Symbol::TYP_POINT:	
 	case Symbol::TYP_VECTOR:
-	case Symbol::TYP_NORMAL:((Float3_	*)pDestData)[0] = ((const Float3_   *)mpConstVal)[0]; break;
-	case Symbol::TYP_HPOINT:((Float4_	*)pDestData)[0] = ((const Float4_   *)mpConstVal)[0]; break;
-	case Symbol::TYP_COLOR:	((SlColor	*)pDestData)[0] = ((const SlColor  *)mpConstVal)[0]; break;
-	case Symbol::TYP_MATRIX:((Matrix44	*)pDestData)[0] = ((const Matrix44 *)mpConstVal)[0]; break;
-	case Symbol::TYP_STRING:((SlStr		*)pDestData)[0] = ((const SlStr	   *)mpConstVal)[0]; break;
+	case Symbol::TYP_NORMAL:((Float3_	*)pDestData)[0] = ((const Float3_	*)mpConstVal)[0]; break;
+	case Symbol::TYP_HPOINT:((Float4_	*)pDestData)[0] = ((const Float4_	*)mpConstVal)[0]; break;
+	case Symbol::TYP_COLOR:	((SlColor	*)pDestData)[0] = ((const SlColor	*)mpConstVal)[0]; break;
+	case Symbol::TYP_MATRIX:((Matrix44	*)pDestData)[0] = ((const Matrix44	*)mpConstVal)[0]; break;
+	case Symbol::TYP_STRING:((SlStr		*)pDestData)[0] = ((const SlStr		*)mpConstVal)[0]; break;
+	case Symbol::TYP_BOOL:	((VecNMask	*)pDestData)[0] = ((const VecNMask	*)mpConstVal)[0]; break;
 
 	default:
 		DASSERT( 0 );
@@ -174,6 +177,15 @@ void Symbol::FillDataFromSISD( void *pDestData, size_t size, const void *pSrcDat
 		}
 		break;
 
+	case Symbol::TYP_BOOL:
+		{
+			VecNMask	tmp = *(const VecNMask *)pSrcData;
+
+			for (size_t i=0; i < size; ++i)
+				((VecNMask	*)pDestData)[i] = tmp;
+		}
+		break;
+
 	default:
 		DASSERT( 0 );
 		break;
@@ -198,6 +210,7 @@ void Symbol::FillDataFromSIMD( void *pDestData, size_t size, const void *pSrcDat
 	case Symbol::TYP_COLOR:		for (size_t i=0; i < blksN; ++i)((SlColor	*)pDestData)[i] = ((SlColor		*)pSrcData)[0];	break;
 	case Symbol::TYP_MATRIX:	for (size_t i=0; i < size; ++i)	((Matrix44	*)pDestData)[i] = ((Matrix44	*)pSrcData)[0];	break;
 	case Symbol::TYP_STRING:	for (size_t i=0; i < size; ++i)	((SlStr		*)pDestData)[i] = ((SlStr		*)pSrcData)[0];	break;
+	case Symbol::TYP_BOOL:		for (size_t i=0; i < size; ++i)	((VecNMask	*)pDestData)[i] = ((VecNMask	*)pSrcData)[0];	break;
 
 	default:
 		DASSERT( 0 );
@@ -327,8 +340,9 @@ static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pD
 	if ( 0 == strcmp( pTok, "normal" ) ) { ++typCnt; out_params.mType = Symbol::TYP_NORMAL	;	}	else
 	if ( 0 == strcmp( pTok, "hpoint" ) ) { ++typCnt; out_params.mType = Symbol::TYP_HPOINT	;	}	else
 	if ( 0 == strcmp( pTok, "color"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_COLOR	;	}	else
-	if ( 0 == strcmp( pTok, "string" ) ) { ++typCnt; out_params.mType = Symbol::TYP_STRING	;	}	else
 	if ( 0 == strcmp( pTok, "matrix" ) ) { ++typCnt; out_params.mType = Symbol::TYP_MATRIX	;	}	else
+	if ( 0 == strcmp( pTok, "string" ) ) { ++typCnt; out_params.mType = Symbol::TYP_STRING	;	}	else
+	if ( 0 == strcmp( pTok, "bool"   ) ) { ++typCnt; out_params.mType = Symbol::TYP_BOOL	;	}	else
 	{
 		DASSTHROW( 0, ("Bad declaration, expecting symbol type: '%s'", pDecl) );
 	}

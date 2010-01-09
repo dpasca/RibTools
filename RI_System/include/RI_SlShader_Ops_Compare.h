@@ -165,6 +165,45 @@ void Inst_SETCMP_REL( SlRunContext &ctx )
 	ctx.NextInstruction();
 }
 
+//==================================================================
+void Inst_IfTrue( SlRunContext &ctx )
+{
+	  VecNMask*	lhs	= ctx.GetRW( (VecNMask *)0, 1 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			SLRUNCTX_BLKWRITECHECK( i );
+			{
+			//lhs[i] = CmpMaskLE(op1[op1_offset], op2[op2_offset]);
+			}
+		}
+	}
+	else
+	{
+		for (u_int i=0; i < 1; ++i)
+		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+			//lhs[0] = CmpMaskLE(op1[0], op2[0]);
+			}
+		}
+	}
+
+	ctx.mFopStack.push( SRC_FuncopStack::ID_IFTRUE );
+
+	ctx.NextInstruction();
+}
+
+
+//==================================================================
+void Inst_OrElse( SlRunContext &ctx )
+{
+	ctx.NextInstruction();
+}
 
 //==================================================================
 }

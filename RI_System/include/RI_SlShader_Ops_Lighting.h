@@ -69,6 +69,8 @@ void Inst_Illuminance( SlRunContext &ctx )
 
 	// start looping by the funcop end
 	ctx.GotoInstruction( funcOpEndAddr );
+
+	ctx.mFopStack.push( SRC_FuncopStack::ID_ILLUMINANCE );
 }
 
 //==================================================================
@@ -110,7 +112,7 @@ void Inst_Solar( SlRunContext &ctx )
 	}
 
 	// yes.. we are in a solar() block 8)
-	ctx.mIsInSolar = true;
+	ctx.mFopStack.push( SRC_FuncopStack::ID_SOLAR );
 
 	ctx.NextInstruction();
 }

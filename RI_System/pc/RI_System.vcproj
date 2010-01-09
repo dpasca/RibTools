@@ -431,58 +431,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\RI_Primitive.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Primitive.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RI_Primitive_Base.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Primitive_Base.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RI_Primitive_NuPatch.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Primitive_NuPatch.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RI_Primitive_Patch.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Primitive_Patch.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RI_Primitive_Poly.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Primitive_Poly.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RI_Primitive_Quadric.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Primitive_Quadric.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RI_Primitive_Utils.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RI_Render.cpp"
 				>
 			</File>
@@ -627,6 +575,62 @@
 				</File>
 				<File
 					RelativePath="..\include\RI_SlShader_Ops_XForm.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Primitives"
+				>
+				<File
+					RelativePath="..\src\RI_Primitive.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_Primitive.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_Primitive_Base.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_Primitive_Base.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_Primitive_NuPatch.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_Primitive_NuPatch.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_Primitive_Patch.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_Primitive_Patch.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_Primitive_Poly.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_Primitive_Poly.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RI_Primitive_Quadric.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_Primitive_Quadric.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_Primitive_Utils.h"
 					>
 				</File>
 			</Filter>

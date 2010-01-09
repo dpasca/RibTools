@@ -66,6 +66,59 @@ public:
 	bool IsActive() const	{	return mActLightIdx != DNPOS;	}
 };
 
+
+//==================================================================
+class SRC_FuncopStack
+{
+public:
+	enum Id
+	{
+		ID_IFTRUE,
+		ID_SOLAR,
+		ID_ILLUMINANCE,
+		ID_N
+	};
+
+	static const size_t	MAX_N = 16;
+
+	Id		mStack[MAX_N];
+	size_t	mStackN;
+
+public:
+	SRC_FuncopStack() :
+		mStackN(0)
+	{
+	}
+
+	void push( Id id )
+	{
+		DASSTHROW( mStackN < MAX_N, ("Out of bounds with funcop stack !") );
+		mStack[ mStackN++ ] = id;
+	}
+
+	void pop()
+	{
+		DASSTHROW( mStackN > 0, ("Out of bounds with funcop stack !") );
+		--mStackN;
+	}
+
+	Id top() const
+	{
+		DASSTHROW( mStackN > 0, ("Out of bounds with funcop stack !") );
+		return mStack[ mStackN - 1 ];
+	}
+
+	void clear()
+	{
+		mStackN = 0;
+	}
+
+	size_t size() const
+	{
+		return mStackN;
+	}
+};
+
 //==================================================================
 /// SlRunContext
 //==================================================================
@@ -82,10 +135,9 @@ public:
 	DVec<u_int>				mDefParamValsStartPCs;
 
 public:
-	WorkGrid		*mpGrid;
+	WorkGrid				*mpGrid;
 
-	// for light shaders only
-	bool					mIsInSolar;
+	SRC_FuncopStack			mFopStack;
 
 	// for surface shaders only
 	SlIlluminanceCtx		mIlluminanceCtx;
@@ -150,9 +202,7 @@ public:
 
 	bool IsInFuncop() const
 	{
-		return
-			mIsInSolar ||
-			mIlluminanceCtx.IsActive();
+		return mFopStack.size() != 0;
 	}
 
 	const SlCPUWord *GetOp( u_int argc ) const

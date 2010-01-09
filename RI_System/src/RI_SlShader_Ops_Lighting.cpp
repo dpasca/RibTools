@@ -194,9 +194,21 @@ void Inst_Ambient( SlRunContext &ctx )
 //==================================================================
 void Inst_FuncopEnd( SlRunContext &ctx )
 {
-	// are we doing illuminance ?
-	if ( ctx.mIlluminanceCtx.IsActive() )
+	SRC_FuncopStack::Id funcopId =	ctx.mFopStack.top();
+
+	// are we in an if ?
+	if ( funcopId == SRC_FuncopStack::ID_IFTRUE )
 	{
+		// do nothing
+		ctx.mFopStack.pop();
+		ctx.NextInstruction();
+	}
+	else
+	// are we doing illuminance ?
+	if ( funcopId == SRC_FuncopStack::ID_ILLUMINANCE )
+	{
+		DASSERT( ctx.mIlluminanceCtx.IsActive() );
+
 		if ( ctx.mIlluminanceCtx.mActLightIdx < ctx.mIlluminanceCtx.mActLightsN )
 		{
 			const LightSourceT	*pLight = NULL;
@@ -234,16 +246,18 @@ void Inst_FuncopEnd( SlRunContext &ctx )
 		}
 
 		ctx.mIlluminanceCtx.Reset();
+		ctx.mFopStack.pop();
 		ctx.NextInstruction();
 	}
 	else
-	if ( ctx.mIsInSolar )
+	if ( funcopId == SRC_FuncopStack::ID_SOLAR )
 	{
+		ctx.mFopStack.pop();
 		ctx.NextInstruction();
 	}
 	else
 	{
-		DASSTHROW( 0, ("'funcop' not matching !") );
+		DASSTHROW( 0, ("'funcop' stack broken ?!") );
 	}
 }
 

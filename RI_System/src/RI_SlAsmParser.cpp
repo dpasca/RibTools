@@ -482,7 +482,10 @@ size_t SlAsmParser::findOrAddTempSymbol( const char *pName )
 
 	if NOT(	typeLower == 's' ||
 			typeLower == 'v' ||
-			typeLower == 'x' )
+			typeLower == 'h' ||
+			typeLower == 'm' ||
+			typeLower == 'x' ||
+			typeLower == 'b' )
 		return -1;
 
 	int	retIdx = (int)mpShader->mpShaSyms.size();
@@ -532,7 +535,7 @@ static OperTypeID getOperTypeFromSlSymbolType( Symbol::Type slSymType, bool &out
 
 	switch ( slSymType )
 	{
-	case Symbol::TYP_FLOAT:	return OPRTYPE_F1 ;
+	case Symbol::TYP_FLOAT:		return OPRTYPE_F1 ;
 
 	case Symbol::TYP_POINT:
 	case Symbol::TYP_VECTOR:
@@ -544,6 +547,8 @@ static OperTypeID getOperTypeFromSlSymbolType( Symbol::Type slSymType, bool &out
 
 	case Symbol::TYP_MATRIX:	return OPRTYPE_M44;
 	case Symbol::TYP_STRING:	return OPRTYPE_STR;
+
+	case Symbol::TYP_BOOL:		return OPRTYPE_BL;
 
 	default:
 		out_success = false;

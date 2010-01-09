@@ -37,15 +37,16 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 {
 	NULL,	// ret
 
-	SOP::Inst_1Op<S,S,OBT_MOV>,
-	SOP::Inst_1Op<V,S,OBT_MOV>,
-	SOP::Inst_1Op<V,V,OBT_MOV>,
+	SOP::Inst_Mov<S,S>,
+	SOP::Inst_Mov<V,S>,
+	SOP::Inst_Mov<V,V>,
+	// M ?
+	SOP::Inst_Mov<X,X>,
+	SOP::Inst_Mov<B,B>,
 
-	SOP::Inst_MovXX,
-
-	SOP::Inst_1Op<S,S,OBT_ABS>,
-	SOP::Inst_1Op<V,S,OBT_ABS>,
-	SOP::Inst_1Op<V,V,OBT_ABS>,
+	SOP::Inst_Abs<S,S>,
+	SOP::Inst_Abs<V,S>,
+	SOP::Inst_Abs<V,V>,
 
 	SOP::Inst_Sign<S,S>,
 
@@ -138,6 +139,9 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 	SOP::Inst_Illuminance<true  >,
 
 	SOP::Inst_FuncopEnd,
+
+	SOP::Inst_IfTrue,
+	SOP::Inst_OrElse,
 };
 
 #undef S

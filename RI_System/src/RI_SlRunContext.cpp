@@ -36,7 +36,7 @@ SlRunContext::SlRunContext( SymbolIList &symsIList, size_t maxPointsN ) :
 
 	mpGrid			= NULL;
 
-	mIsInSolar		= false;
+	mFopStack.clear();
 }
 
 //==================================================================

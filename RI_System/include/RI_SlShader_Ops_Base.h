@@ -140,8 +140,8 @@ void Inst_MOVVS3( SlRunContext &ctx )
 }
 
 //==================================================================
-template <class TA, class TB, const OpBaseTypeID opBaseTypeID>
-void Inst_1Op( SlRunContext &ctx )
+template <class TA, class TB>
+void Inst_Mov( SlRunContext &ctx )
 {
 		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -157,9 +157,7 @@ void Inst_1Op( SlRunContext &ctx )
 		{
 			SLRUNCTX_BLKWRITECHECK( i );
 			{
-				if ( opBaseTypeID == OBT_MOV	) lhs[i] = op1[op1_offset]; else
-				if ( opBaseTypeID == OBT_ABS	) lhs[i] = DAbs( op1[op1_offset] );
-					else { DASSERT( 0 ); }
+			lhs[i] = op1[op1_offset];
 			}
 
 			op1_offset	+= op1_step;
@@ -173,9 +171,7 @@ void Inst_1Op( SlRunContext &ctx )
 		{
 			SLRUNCTX_BLKWRITECHECK( 0 );
 			{
-			if ( opBaseTypeID == OBT_MOV	) lhs[0] = op1[0]; else
-			if ( opBaseTypeID == OBT_ABS	) lhs[0] = DAbs( op1[0] );
-				else { DASSERT( 0 );	}
+			lhs[0] = op1[0];
 			}
 		}
 	}
@@ -183,6 +179,47 @@ void Inst_1Op( SlRunContext &ctx )
 	ctx.NextInstruction();
 }
 
+//==================================================================
+template <class TA, class TB>
+void Inst_Abs( SlRunContext &ctx )
+{
+		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
+	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			SLRUNCTX_BLKWRITECHECK( i );
+			{
+			lhs[i] = DAbs( op1[op1_offset] );
+			}
+
+			op1_offset	+= op1_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		for (u_int i=0; i < 1; ++i)
+		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+			lhs[0] = DAbs( op1[0] );
+			}
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+/*
 //==================================================================
 static inline void Inst_MovXX( SlRunContext &ctx )
 {
@@ -197,6 +234,7 @@ static inline void Inst_MovXX( SlRunContext &ctx )
 
 	ctx.NextInstruction();
 }
+*/
 
 //==================================================================
 template <class TA, class TB>

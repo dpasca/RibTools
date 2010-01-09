@@ -19,8 +19,9 @@ namespace RI
 #define OPC_FLG_RIGHTISIMM			1
 #define OPC_FLG_UNIFORMOPERS		2
 #define OPC_FLG_FUNCOP_BEGIN		4
-#define OPC_FLG_FUNCOP_END			8
-#define OPC_FLG_DIRPOSLIGHT_INSTR	16
+#define OPC_FLG_FUNCOP_MIDDLE		8
+#define OPC_FLG_FUNCOP_END			16
+#define OPC_FLG_DIRPOSLIGHT_INSTR	32
 
 //==================================================================
 struct SlAsmOpCodeDef

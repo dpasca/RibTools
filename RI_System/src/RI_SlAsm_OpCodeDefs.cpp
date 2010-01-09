@@ -28,6 +28,7 @@ SlAsmOpCodeDef	_gSlAsmOpCodeDefs[] =
 	"mov.vv"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3,	NA,	NA,	NA,
 																					   
 	"mov.xx"		,	2,			0,	OPRTYPE_STR,OPRTYPE_STR,NA,	NA,	NA,
+	"mov.bb"		,	2,			0,	OPRTYPE_BL,	OPRTYPE_BL,	NA,	NA,	NA,
 																					   
 	"abs.ss"		,	2,			0,	OPRTYPE_F1,	OPRTYPE_F1,	NA,	NA,	NA,
 	"abs.vs"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F1,	NA,	NA,	NA,
@@ -122,6 +123,9 @@ SlAsmOpCodeDef	_gSlAsmOpCodeDefs[] =
 	"illuminance.v",	1,			OPC_FLG_DIRPOSLIGHT_INSTR | OPC_FLG_FUNCOP_BEGIN, OPRTYPE_F3, NA, NA,	NA,	NA,
 	"illuminance.vvs",	3,			OPC_FLG_DIRPOSLIGHT_INSTR | OPC_FLG_FUNCOP_BEGIN, OPRTYPE_F3, OPRTYPE_F3, OPRTYPE_F1,	NA,	NA,
 	"funcopend"		,	0,			OPC_FLG_FUNCOP_END,	  NA, NA, NA,	NA,	NA,
+
+	"iftrue.b"		,	1,			OPC_FLG_FUNCOP_BEGIN, OPRTYPE_BL, NA, NA,	NA,	NA,
+	"orelse"		,	0,			OPC_FLG_FUNCOP_MIDDLE,NA, NA, NA,	NA,	NA,
 
 	NULL			,	0,			0,	NA, NA, NA, NA, NA
 };
