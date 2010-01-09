@@ -9,6 +9,8 @@
 #ifndef RSLC_OPERATORS_H
 #define RSLC_OPERATORS_H
 
+#include "RSLC_VarType.h"
+
 //==================================================================
 namespace RSLC
 {

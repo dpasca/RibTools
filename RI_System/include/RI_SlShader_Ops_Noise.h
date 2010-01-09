@@ -21,8 +21,8 @@ namespace SOP
 template <class TB>
 inline void Inst_Noise1( SlRunContext &ctx )
 {
-		  Float_*	lhs	= ctx.GetVoidRW( (Float_ *)0, 1 );
-	const TB*		op1	= ctx.GetVoidRO( (const TB *)0, 2 );
+		  Float_*	lhs	= ctx.GetRW( (Float_ *)0, 1 );
+	const TB*		op1	= ctx.GetRO( (const TB *)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -33,8 +33,10 @@ inline void Inst_Noise1( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
+			{
 				lhs[i] = Noise::unoise1( op1[op1_offset] );
+			}
 
 			op1_offset += op1_step;
 		}
@@ -43,9 +45,12 @@ inline void Inst_Noise1( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			lhs[0] = Noise::unoise1( op1[0] );
+			}
 		}
 	}
 
@@ -56,8 +61,8 @@ inline void Inst_Noise1( SlRunContext &ctx )
 template <class TB>
 inline void Inst_Noise3( SlRunContext &ctx )
 {
-		  Float3_*	lhs	= ctx.GetVoidRW( (	  Float3_*)0, 1 );
-	const TB	*	op1	= ctx.GetVoidRO( (const TB	*)0, 2 );
+		  Float3_*	lhs	= ctx.GetRW( (	  Float3_*)0, 1 );
+	const TB	*	op1	= ctx.GetRO( (const TB	*)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -68,8 +73,10 @@ inline void Inst_Noise3( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
+			{
 				lhs[i] = Noise::unoise3( op1[op1_offset] );
+			}
 
 			op1_offset += op1_step;
 		}
@@ -78,9 +85,12 @@ inline void Inst_Noise3( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			lhs[0] = Noise::unoise3( op1[0] );
+			}
 		}
 	}
 

@@ -54,9 +54,9 @@ void xFormname_VXV( SlRunContext &ctx )
 {
 	// should do stuff here 8)
 
-		  Float3_*	pDes		= ctx.GetVoidRW( (		Float3_ *)0, 1 );
-	const SlStr*	pSpaceName	= ctx.GetVoidRO( (const SlStr  *)0, 2 );
-	const Float3_*	pSrc		= ctx.GetVoidRO( (const Float3_ *)0, 3 );
+		  Float3_*	pDes		= ctx.GetRW( (		Float3_ *)0, 1 );
+	const SlStr*	pSpaceName	= ctx.GetRO( (const SlStr  *)0, 2 );
+	const Float3_*	pSrc		= ctx.GetRO( (const Float3_ *)0, 3 );
 
 	DASSERT( ctx.IsSymbolVarying( 2 ) == false );
 
@@ -75,7 +75,7 @@ void xFormname_VXV( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				if ( _TYPE == Symbol::TYP_POINT )  pDes[i] = V3__V3W1_Mul_M44<Float_>( pSrc[src_offset], mat ); else
 				if ( _TYPE == Symbol::TYP_VECTOR ) pDes[i] = V3__V3W0_Mul_M44<Float_>( pSrc[src_offset], mat ); else
@@ -89,11 +89,14 @@ void xFormname_VXV( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 3 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			if ( _TYPE == Symbol::TYP_POINT )  pDes[0] = V3__V3W1_Mul_M44<Float_>( pSrc[0], mat ); else
 			if ( _TYPE == Symbol::TYP_VECTOR ) pDes[0] = V3__V3W0_Mul_M44<Float_>( pSrc[0], mat ); else
 			if ( _TYPE == Symbol::TYP_NORMAL ) pDes[0] = V3__V3W0_Mul_M44<Float_>( pSrc[0], mat ).GetNormalized();
+			}
 		}
 	}
 
@@ -111,9 +114,9 @@ void Inst_CXFormname_VXV( SlRunContext &ctx )
 {
 	// should do stuff here 8)
 
-		  Float3_*	pDes		= ctx.GetVoidRW( (		Float3_ *)0, 1 );
-	const SlStr*	pSpaceName	= ctx.GetVoidRO( (const SlStr  *)0, 2 );
-	const Float3_*	pSrc		= ctx.GetVoidRO( (const Float3_ *)0, 3 );
+		  Float3_*	pDes		= ctx.GetRW( (		Float3_ *)0, 1 );
+	const SlStr*	pSpaceName	= ctx.GetRO( (const SlStr  *)0, 2 );
+	const Float3_*	pSrc		= ctx.GetRO( (const Float3_ *)0, 3 );
 
 	DASSERT( ctx.IsSymbolVarying( 2 ) == false );
 
@@ -132,7 +135,7 @@ void Inst_CXFormname_VXV( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				pDes[i] = V3__V3W1_Mul_M44<Float_>( pSrc[src_offset], mat );
 			}
@@ -144,9 +147,12 @@ void Inst_CXFormname_VXV( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 3 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
-			pDes[0] = V3__V3W1_Mul_M44<Float_>( pSrc[0], mat );
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+				pDes[0] = V3__V3W1_Mul_M44<Float_>( pSrc[0], mat );
+			}
 		}
 	}
 

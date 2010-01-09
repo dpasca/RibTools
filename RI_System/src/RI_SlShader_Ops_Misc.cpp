@@ -21,9 +21,9 @@ namespace SOP
 //==================================================================
 void Inst_Faceforward( SlRunContext &ctx )
 {
-		  Float3_* lhs	= ctx.GetVoidRW( (		Float3_ *)0, 1 );
-	const Float3_* pN	= ctx.GetVoidRO( (const Float3_ *)0, 2 );
-	const Float3_* pI	= ctx.GetVoidRO( (const Float3_ *)0, 3 );
+		  Float3_* lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
+	const Float3_* pN	= ctx.GetRO( (const Float3_ *)0, 2 );
+	const Float3_* pI	= ctx.GetRO( (const Float3_ *)0, 3 );
 
 	const SymbolI*	pNgSymI = ctx.mpGridSymIList->FindSymbolI( "Ng" );
 	const Float3_*	pNg = (const Float3_ *)pNgSymI->GetData();
@@ -41,8 +41,10 @@ void Inst_Faceforward( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
+			{
 				lhs[i] = pN[N_offset] * DSign( -pI[I_offset].GetDot( pNg[Ng_offset] ) );
+			}
 
 			N_offset	+= N_step	;
 			I_offset	+= I_step	;
@@ -55,8 +57,13 @@ void Inst_Faceforward( SlRunContext &ctx )
 		DASSERT( !I_step		);
 		DASSERT( !Ng_step	);
 
-		if ( ctx.IsProcessorActive( 0 ) )
-			lhs[0] = pN[0] * DSign( -pI[0].GetDot( pNg[0] ) );
+		for (u_int i=0; i < 1; ++i)
+		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+				lhs[0] = pN[0] * DSign( -pI[0].GetDot( pNg[0] ) );
+			}
+		}
 	}
 
 	ctx.NextInstruction();
@@ -65,8 +72,8 @@ void Inst_Faceforward( SlRunContext &ctx )
 //==================================================================
 void Inst_Normalize( SlRunContext &ctx )
 {
-		  Float3_*	lhs	= ctx.GetVoidRW( (		Float3_ *)0, 1 );
-	const Float3_*	op1	= ctx.GetVoidRO( (const Float3_ *)0, 2 );
+		  Float3_*	lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
+	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -77,8 +84,10 @@ void Inst_Normalize( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
+			{
 				lhs[i] = op1[op1_offset].GetNormalized();
+			}
 
 			op1_offset += op1_step;
 		}
@@ -87,8 +96,13 @@ void Inst_Normalize( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
-			lhs[0] = op1[0].GetNormalized();
+		for (u_int i=0; i < 1; ++i)
+		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+				lhs[0] = op1[0].GetNormalized();
+			}
+		}
 	}
 
 	ctx.NextInstruction();
@@ -97,8 +111,8 @@ void Inst_Normalize( SlRunContext &ctx )
 //==================================================================
 void Inst_CalculateNormal( SlRunContext &ctx )
 {
-		  Float3_*	lhs	= ctx.GetVoidRW( (		Float3_ *)0, 1 );
-	const Float3_*	op1	= ctx.GetVoidRO( (const Float3_ *)0, 2 );
+		  Float3_*	lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
+	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
 
 	const Float_*	pOODu	= (const Float_*)ctx.mpGridSymIList->FindSymbolIData( "_oodu" );
 	const Float_*	pOODv	= (const Float_*)ctx.mpGridSymIList->FindSymbolIData( "_oodv" );
@@ -108,7 +122,7 @@ void Inst_CalculateNormal( SlRunContext &ctx )
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
-	//if ( ctx.IsProcessorActive( i ) )
+	//SLRUNCTX_BLKWRITECHECK( i );
 
 	Float3_	dPDu[ MP_GRID_MAX_SIMD_BLKS ];
 

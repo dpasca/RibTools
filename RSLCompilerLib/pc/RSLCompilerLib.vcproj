@@ -307,10 +307,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\RSLC_Defs_OpConvert.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RSLC_Exceptions.cpp"
 				>
 			</File>
@@ -348,6 +344,14 @@
 			</File>
 			<File
 				RelativePath="..\include\RSLC_Operators.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_Operators_SolveBiOpType.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Operators_SolveBiOpType_RulesTable.h"
 				>
 			</File>
 			<File

@@ -28,6 +28,35 @@
 
 	typedef __m128	VecNMask;
 
+	static const union
+	{
+		unsigned int	m[4];
+		__m128			v;
+	} DMT_SIMD_ALLONE = { { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF } };
+
+	static const union
+	{
+		unsigned int	m[4];
+		__m128			v;
+	} DMT_SIMD_ALLZERO = { { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF } };
+
+	static const VecNMask VecNMaskFull = DMT_SIMD_ALLONE.v;
+	static const VecNMask VecNMaskEmpty = DMT_SIMD_ALLZERO.v;
+
+	inline bool		operator ==( const VecNMask &lval, const VecNMask &rval )
+	{
+		__m128	tmp = _mm_xor_ps( lval, rval );
+
+		unsigned int	folded =  ((const unsigned int *)&tmp)[0]
+								| ((const unsigned int *)&tmp)[1]
+								| ((const unsigned int *)&tmp)[2]
+								| ((const unsigned int *)&tmp)[3];
+		return !!folded;
+	}
+
+	inline VecNMask	operator & ( const VecNMask &lval, const VecNMask &rval ) {	return _mm_and_ps( lval, rval ); }
+	inline VecNMask	operator | ( const VecNMask &lval, const VecNMask &rval ) {	return _mm_or_ps( lval, rval ); }
+
 #elif defined(DMATH_USE_M512)
 
 	#define USE_C_PROTOTYPE_PRIMITIVES 0
@@ -38,12 +67,16 @@
 
 	typedef __mmask	VecNMask;	// only need 16 bits
 
+	static const VecNMask VecNMaskFull = (VecNMask)-1;
+	static const VecNMask VecNMaskEmpty = (VecNMask)0;
 #else
 
 	#define DMT_SIMD_FLEN	4
 
 	typedef unsigned char	VecNMask;	// only need 4 bits (round to 1 byte)
 
+	static const VecNMask VecNMaskFull = (VecNMask)-1;
+	static const VecNMask VecNMaskEmpty = (VecNMask)0;
 #endif
 
 // gives the number of SIMD blocks necessary for _SIZE_ elements
@@ -141,6 +174,7 @@ template <class T>	inline T		DMax( const T &a, const T &b )
 #define FM_SQRT2    ((float)M_SQRT2   )
 #define FM_SQRT1_2  ((float)M_SQRT1_2 )
 
+typedef unsigned char		DU8;
 typedef unsigned int		DU32;
 typedef unsigned __int64	DU64;
 

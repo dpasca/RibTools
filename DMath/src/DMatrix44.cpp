@@ -20,7 +20,7 @@ void Matrix44::PrintOut() const
 
 		for (size_t c=0; c < 4; ++c)
 		{
-			printf( " %f", u.m44[r][c] );
+			printf( " %f", mij(r,c) );
 		}
 	}
 	printf( "]\n" );
@@ -66,10 +66,10 @@ Matrix44 Matrix44::GetInverse( bool *out_pSuccess ) const
 		*out_pSuccess = false;
 
 	float a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4;
-	a1 = out.u.m44[0][0]; b1 = out.u.m44[0][1]; c1 = out.u.m44[0][2]; d1 = out.u.m44[0][3];
-	a2 = out.u.m44[1][0]; b2 = out.u.m44[1][1]; c2 = out.u.m44[1][2]; d2 = out.u.m44[1][3];
-	a3 = out.u.m44[2][0]; b3 = out.u.m44[2][1]; c3 = out.u.m44[2][2]; d3 = out.u.m44[2][3];
-	a4 = out.u.m44[3][0]; b4 = out.u.m44[3][1]; c4 = out.u.m44[3][2]; d4 = out.u.m44[3][3];
+	a1 = out.mij(0,0); b1 = out.mij(0,1); c1 = out.mij(0,2); d1 = out.mij(0,3);
+	a2 = out.mij(1,0); b2 = out.mij(1,1); c2 = out.mij(1,2); d2 = out.mij(1,3);
+	a3 = out.mij(2,0); b3 = out.mij(2,1); c3 = out.mij(2,2); d3 = out.mij(2,3);
+	a4 = out.mij(3,0); b4 = out.mij(3,1); c4 = out.mij(3,2); d4 = out.mij(3,3);
 
 	float det = det4x4(a1,a2,a3,a4,b1,b2,b3,b4,c1,c2,c3,c4,d1,d2,d3,d4);
 
@@ -79,27 +79,27 @@ Matrix44 Matrix44::GetInverse( bool *out_pSuccess ) const
 		return out;
 	}
 
-	out.u.m44[0][0] =   det3x3( b2, b3, b4, c2, c3, c4, d2, d3, d4);
-	out.u.m44[1][0] = - det3x3( a2, a3, a4, c2, c3, c4, d2, d3, d4);
-	out.u.m44[2][0] =   det3x3( a2, a3, a4, b2, b3, b4, d2, d3, d4);
-	out.u.m44[3][0] = - det3x3( a2, a3, a4, b2, b3, b4, c2, c3, c4);
+	out.mij(0,0) =   det3x3( b2, b3, b4, c2, c3, c4, d2, d3, d4);
+	out.mij(1,0) = - det3x3( a2, a3, a4, c2, c3, c4, d2, d3, d4);
+	out.mij(2,0) =   det3x3( a2, a3, a4, b2, b3, b4, d2, d3, d4);
+	out.mij(3,0) = - det3x3( a2, a3, a4, b2, b3, b4, c2, c3, c4);
 
-	out.u.m44[0][1] = - det3x3( b1, b3, b4, c1, c3, c4, d1, d3, d4);
-	out.u.m44[1][1] =   det3x3( a1, a3, a4, c1, c3, c4, d1, d3, d4);
-	out.u.m44[2][1] = - det3x3( a1, a3, a4, b1, b3, b4, d1, d3, d4);
-	out.u.m44[3][1] =   det3x3( a1, a3, a4, b1, b3, b4, c1, c3, c4);
+	out.mij(0,1) = - det3x3( b1, b3, b4, c1, c3, c4, d1, d3, d4);
+	out.mij(1,1) =   det3x3( a1, a3, a4, c1, c3, c4, d1, d3, d4);
+	out.mij(2,1) = - det3x3( a1, a3, a4, b1, b3, b4, d1, d3, d4);
+	out.mij(3,1) =   det3x3( a1, a3, a4, b1, b3, b4, c1, c3, c4);
 
-	out.u.m44[0][2] =   det3x3( b1, b2, b4, c1, c2, c4, d1, d2, d4);
-	out.u.m44[1][2] = - det3x3( a1, a2, a4, c1, c2, c4, d1, d2, d4);
-	out.u.m44[2][2] =   det3x3( a1, a2, a4, b1, b2, b4, d1, d2, d4);
-	out.u.m44[3][2] = - det3x3( a1, a2, a4, b1, b2, b4, c1, c2, c4);
+	out.mij(0,2) =   det3x3( b1, b2, b4, c1, c2, c4, d1, d2, d4);
+	out.mij(1,2) = - det3x3( a1, a2, a4, c1, c2, c4, d1, d2, d4);
+	out.mij(2,2) =   det3x3( a1, a2, a4, b1, b2, b4, d1, d2, d4);
+	out.mij(3,2) = - det3x3( a1, a2, a4, b1, b2, b4, c1, c2, c4);
 
-	out.u.m44[0][3] = - det3x3( b1, b2, b3, c1, c2, c3, d1, d2, d3);
-	out.u.m44[1][3] =   det3x3( a1, a2, a3, c1, c2, c3, d1, d2, d3);
-	out.u.m44[2][3] = - det3x3( a1, a2, a3, b1, b2, b3, d1, d2, d3);
-	out.u.m44[3][3] =   det3x3( a1, a2, a3, b1, b2, b3, c1, c2, c3);
+	out.mij(0,3) = - det3x3( b1, b2, b3, c1, c2, c3, d1, d2, d3);
+	out.mij(1,3) =   det3x3( a1, a2, a3, c1, c2, c3, d1, d2, d3);
+	out.mij(2,3) = - det3x3( a1, a2, a3, b1, b2, b3, d1, d2, d3);
+	out.mij(3,3) =   det3x3( a1, a2, a3, b1, b2, b3, c1, c2, c3);
 
-	out *= 1/det;
+	out = out * (1/det);
 
 	if ( out_pSuccess )
 		*out_pSuccess = true;

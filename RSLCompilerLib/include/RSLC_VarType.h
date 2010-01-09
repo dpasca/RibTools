@@ -17,15 +17,16 @@ namespace RSLC
 enum VarType
 {
 	VT_UNKNOWN	,
+	VT_VOID		,
 	VT_FLOAT	,
 	VT_POINT	,
-	VT_COLOR	,
 	VT_VECTOR	,
 	VT_NORMAL	,
+	VT_HPOINT	,
+	VT_COLOR	,
 	VT_MATRIX	,
 	VT_STRING	,
 	VT_BOOL		,
-	VT_VOID		,
 	VT_N
 };
 

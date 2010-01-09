@@ -21,30 +21,9 @@ namespace SOP
 
 //==================================================================
 template <class TA>
-void Inst_CMPLT( SlRunContext &ctx )
-{
-	const TA	*lhs	= ctx.GetVoidRO( (const TA *)0, 1 );
-	const TA	*rhs	= ctx.GetVoidRO( (const TA *)0, 2 );
-
-	DASSERT( !ctx.IsSymbolVarying( 1 ) );
-	DASSERT( !ctx.IsSymbolVarying( 2 ) );
-
-	// emm.. not truly uniform for now !!
-	if ( lhs[0][0] < rhs[0][0] )
-	{
-		u_int	addr = ctx.GetOp( 3 )->mAddress.mOffset;
-
-		ctx.GotoInstruction( addr );
-	}
-	else
-		ctx.NextInstruction();
-}
-
-//==================================================================
-template <class TA>
 void Inst_LD1( SlRunContext &ctx )
 {
-	TA		*lhs		= ctx.GetVoidRW( (TA *)0,  1 );
+	TA		*lhs		= ctx.GetRW( (TA *)0,  1 );
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
 	TA		tmp = TA( ctx.GetImmFloat( 2 ) );
@@ -53,7 +32,7 @@ void Inst_LD1( SlRunContext &ctx )
 	{
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				lhs[i] = tmp;
 			}
@@ -61,9 +40,12 @@ void Inst_LD1( SlRunContext &ctx )
 	}
 	else
 	{
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
-			lhs[0] = tmp;
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+				lhs[0] = tmp;
+			}
 		}
 	}
 
@@ -74,7 +56,7 @@ void Inst_LD1( SlRunContext &ctx )
 template <class TA>
 void Inst_LD3( SlRunContext &ctx )
 {
-	TA		*lhs		= ctx.GetVoidRW( (TA *)0,  1 );
+	TA		*lhs		= ctx.GetRW( (TA *)0,  1 );
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
 	TA		tmp = TA( ctx.GetImmFloat( 2 ), ctx.GetImmFloat( 3 ), ctx.GetImmFloat( 4 ) );
@@ -83,7 +65,7 @@ void Inst_LD3( SlRunContext &ctx )
 	{
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				lhs[i] = tmp;
 			}
@@ -91,9 +73,12 @@ void Inst_LD3( SlRunContext &ctx )
 	}
 	else
 	{
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
-			lhs[0] = tmp;
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+				lhs[0] = tmp;
+			}
 		}
 	}
 
@@ -104,10 +89,10 @@ void Inst_LD3( SlRunContext &ctx )
 template <class TA, class TB>
 void Inst_MOVVS3( SlRunContext &ctx )
 {
-		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
-	const TB*	op2	= ctx.GetVoidRO( (const TB *)0, 3 );
-	const TB*	op3	= ctx.GetVoidRO( (const TB *)0, 4 );
+		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
+	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
+	const TB*	op2	= ctx.GetRO( (const TB *)0, 3 );
+	const TB*	op3	= ctx.GetRO( (const TB *)0, 4 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -122,7 +107,7 @@ void Inst_MOVVS3( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				lhs[i][0] = op1[op1_offset];
 				lhs[i][1] = op2[op2_offset];
@@ -140,11 +125,14 @@ void Inst_MOVVS3( SlRunContext &ctx )
 				 !ctx.IsSymbolVarying( 3 ) &&
 				 !ctx.IsSymbolVarying( 4 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			lhs[0][0] = op1[0];
 			lhs[0][1] = op2[0];
 			lhs[0][2] = op3[0];
+			}
 		}
 	}
 
@@ -155,8 +143,8 @@ void Inst_MOVVS3( SlRunContext &ctx )
 template <class TA, class TB, const OpBaseTypeID opBaseTypeID>
 void Inst_1Op( SlRunContext &ctx )
 {
-		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
+		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
+	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -167,7 +155,7 @@ void Inst_1Op( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				if ( opBaseTypeID == OBT_MOV	) lhs[i] = op1[op1_offset]; else
 				if ( opBaseTypeID == OBT_ABS	) lhs[i] = DAbs( op1[op1_offset] );
@@ -181,11 +169,14 @@ void Inst_1Op( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			if ( opBaseTypeID == OBT_MOV	) lhs[0] = op1[0]; else
 			if ( opBaseTypeID == OBT_ABS	) lhs[0] = DAbs( op1[0] );
-				else { DASSERT( 0 ); }
+				else { DASSERT( 0 );	}
+			}
 		}
 	}
 
@@ -195,8 +186,8 @@ void Inst_1Op( SlRunContext &ctx )
 //==================================================================
 static inline void Inst_MovXX( SlRunContext &ctx )
 {
-		  SlStr*	lhs	= ctx.GetVoidRW( (		SlStr *)0, 1 );
-	const SlStr*	op1	= ctx.GetVoidRO( (const SlStr *)0, 2 );
+		  SlStr*	lhs	= ctx.GetRW( (		SlStr *)0, 1 );
+	const SlStr*	op1	= ctx.GetRO( (const SlStr *)0, 2 );
 
 	DASSERT(
 		ctx.IsSymbolVarying( 1 ) == false &&
@@ -211,8 +202,8 @@ static inline void Inst_MovXX( SlRunContext &ctx )
 template <class TA, class TB>
 void Inst_Sign( SlRunContext &ctx )
 {
-		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
+		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
+	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -223,7 +214,7 @@ void Inst_Sign( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				lhs[i] = DSign( op1[op1_offset] );
 			}
@@ -235,9 +226,12 @@ void Inst_Sign( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			lhs[0] = DSign( op1[0] );
+			}
 		}
 	}
 
@@ -248,9 +242,9 @@ void Inst_Sign( SlRunContext &ctx )
 template <class TA, class TB, class TC, const OpBaseTypeID opBaseTypeID>
 void Inst_2Op( SlRunContext &ctx )
 {
-		  TA*	lhs	= ctx.GetVoidRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetVoidRO( (const TB *)0, 2 );
-	const TC*	op2	= ctx.GetVoidRO( (const TC *)0, 3 );
+		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
+	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
+	const TC*	op2	= ctx.GetRO( (const TC *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -263,12 +257,12 @@ void Inst_2Op( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
-				if ( opBaseTypeID == OBT_ADD ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
-				if ( opBaseTypeID == OBT_SUB ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
-				if ( opBaseTypeID == OBT_MUL ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
-				if ( opBaseTypeID == OBT_DIV ) lhs[i] = op1[op1_offset] / op2[op2_offset]; else
+				if ( opBaseTypeID == OBT_ADD	 ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
+				if ( opBaseTypeID == OBT_SUB	 ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
+				if ( opBaseTypeID == OBT_MUL	 ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
+				if ( opBaseTypeID == OBT_DIV	 ) lhs[i] = op1[op1_offset] / op2[op2_offset]; else
 				{ DASSERT( 0 ); }
 			}
 			
@@ -281,13 +275,16 @@ void Inst_2Op( SlRunContext &ctx )
 		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
 				 !ctx.IsSymbolVarying( 3 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
-			if ( opBaseTypeID == OBT_ADD ) lhs[0] = op1[0] + op2[0]; else
-			if ( opBaseTypeID == OBT_SUB ) lhs[0] = op1[0] - op2[0]; else
-			if ( opBaseTypeID == OBT_MUL ) lhs[0] = op1[0] * op2[0]; else
-			if ( opBaseTypeID == OBT_DIV ) lhs[0] = op1[0] / op2[0]; else
-			{ DASSERT( 0 ); }
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+			if ( opBaseTypeID == OBT_ADD	 ) lhs[0] = op1[0] + op2[0]; else
+			if ( opBaseTypeID == OBT_SUB	 ) lhs[0] = op1[0] - op2[0]; else
+			if ( opBaseTypeID == OBT_MUL	 ) lhs[0] = op1[0] * op2[0]; else
+			if ( opBaseTypeID == OBT_DIV	 ) lhs[0] = op1[0] / op2[0]; else
+			{ DASSERT( 0 );		}
+			}
 		}
 	}
 
@@ -297,9 +294,9 @@ void Inst_2Op( SlRunContext &ctx )
 //==================================================================
 void Inst_Dot_SVV( SlRunContext &ctx )
 {
-		  Float_*	lhs	= ctx.GetVoidRW( (	  Float_ *)0, 1 );
-	const Float3_*	op1	= ctx.GetVoidRO( (const Float3_ *)0, 2 );
-	const Float3_*	op2	= ctx.GetVoidRO( (const Float3_ *)0, 3 );
+		  Float_*	lhs	= ctx.GetRW( (	  Float_ *)0, 1 );
+	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
+	const Float3_*	op2	= ctx.GetRO( (const Float3_ *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -312,7 +309,7 @@ void Inst_Dot_SVV( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				lhs[i] = op1[op1_offset].GetDot( op2[op2_offset] );
 			}
@@ -326,9 +323,12 @@ void Inst_Dot_SVV( SlRunContext &ctx )
 		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
 				 !ctx.IsSymbolVarying( 3 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
-			lhs[0] = op1[0].GetDot( op2[0] );
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+				lhs[0] = op1[0].GetDot( op2[0] );
+			}
 		}
 	}
 
@@ -338,9 +338,9 @@ void Inst_Dot_SVV( SlRunContext &ctx )
 //==================================================================
 void Inst_Pow_SSS( SlRunContext &ctx )
 {
-		  Float_*	lhs	= ctx.GetVoidRW( (		Float_ *)0, 1 );
-	const Float_*	op1	= ctx.GetVoidRO( (const Float_ *)0, 2 );
-	const Float_*	op2	= ctx.GetVoidRO( (const Float_ *)0, 3 );
+		  Float_*	lhs	= ctx.GetRW( (		Float_ *)0, 1 );
+	const Float_*	op1	= ctx.GetRO( (const Float_ *)0, 2 );
+	const Float_*	op2	= ctx.GetRO( (const Float_ *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -353,7 +353,7 @@ void Inst_Pow_SSS( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				lhs[i] = DPow( op1[op1_offset], op2[op2_offset] );
 			}
@@ -367,9 +367,12 @@ void Inst_Pow_SSS( SlRunContext &ctx )
 		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
 				 !ctx.IsSymbolVarying( 3 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
-			lhs[0] = DPow( op1[0], op2[0] );
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+				lhs[0] = DPow( op1[0], op2[0] );
+			}
 		}
 	}
 
@@ -380,9 +383,9 @@ void Inst_Pow_SSS( SlRunContext &ctx )
 template <class T, const OpBaseTypeID opBaseTypeID>
 void Inst_Min_Max( SlRunContext &ctx )
 {
-		  T*	lhs	= ctx.GetVoidRW( (	    T *)0, 1 );
-	const T*	op1	= ctx.GetVoidRO( (const T *)0, 2 );
-	const T*	op2	= ctx.GetVoidRO( (const T *)0, 3 );
+		  T*	lhs	= ctx.GetRW( (	    T *)0, 1 );
+	const T*	op1	= ctx.GetRO( (const T *)0, 2 );
+	const T*	op2	= ctx.GetRO( (const T *)0, 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -395,7 +398,7 @@ void Inst_Min_Max( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				if ( opBaseTypeID == OBT_MIN ) lhs[i] = DMin( op1[op1_offset], op2[op2_offset] ); else
 				if ( opBaseTypeID == OBT_MAX ) lhs[i] = DMax( op1[op1_offset], op2[op2_offset] ); else
@@ -411,11 +414,14 @@ void Inst_Min_Max( SlRunContext &ctx )
 		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
 				 !ctx.IsSymbolVarying( 3 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			if ( opBaseTypeID == OBT_MIN ) lhs[0] = DMin( op1[0], op2[0] ); else
 			if ( opBaseTypeID == OBT_MAX ) lhs[0] = DMax( op1[0], op2[0] ); else
-			{ DASSERT( 0 ); }
+			{ DASSERT( 0 );		}
+			}
 		}
 	}
 
@@ -426,8 +432,8 @@ void Inst_Min_Max( SlRunContext &ctx )
 template <const size_t COMP_IDX>
 void Inst_GetVComp( SlRunContext &ctx )
 {
-		  Float_*	lhs	= ctx.GetVoidRW( (		Float_*)0, 1 );
-	const Float3_*	op1	= ctx.GetVoidRO( (const	Float3_	*)0	,2 );
+		  Float_*	lhs	= ctx.GetRW( (		Float_*)0, 1 );
+	const Float3_*	op1	= ctx.GetRO( (const	Float3_	*)0	,2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -438,7 +444,7 @@ void Inst_GetVComp( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				lhs[i] = op1[op1_offset][COMP_IDX];
 			}
@@ -450,9 +456,12 @@ void Inst_GetVComp( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			lhs[0] = op1[0][COMP_IDX];
+			}
 		}
 	}
 
@@ -463,8 +472,8 @@ void Inst_GetVComp( SlRunContext &ctx )
 template <const size_t COMP_IDX>
 void Inst_SetVComp( SlRunContext &ctx )
 {
-		  Float3_*	lhs	= ctx.GetVoidRW( (		Float3_	*)0, 1 );
-	const Float_*	op1	= ctx.GetVoidRO( (const Float_*)0, 2 );
+		  Float3_*	lhs	= ctx.GetRW( (		Float3_	*)0, 1 );
+	const Float_*	op1	= ctx.GetRO( (const Float_*)0, 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -475,7 +484,7 @@ void Inst_SetVComp( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				lhs[i][COMP_IDX] = op1[op1_offset];
 			}
@@ -487,9 +496,12 @@ void Inst_SetVComp( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		for (u_int i=0; i < 1; ++i)
 		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
 			lhs[0][COMP_IDX] = op1[0];
+			}
 		}
 	}
 

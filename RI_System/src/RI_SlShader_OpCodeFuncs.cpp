@@ -13,6 +13,7 @@
 #include "RI_SlShader_Ops_Noise.h"
 #include "RI_SlShader_Ops_XForm.h"
 #include "RI_SlShader_Ops_Misc.h"
+#include "RI_SlShader_Ops_Compare.h"
 
 #include "RI_SlShader_OpCodeFuncs.h"
 
@@ -22,8 +23,13 @@ namespace RI
 
 //==================================================================
 //==================================================================
+#define B VecNMask
 #define S Float_
 #define V Float3_
+#define H Float4_
+#define M Matrix44
+#define X SlStr
+
 //#define MATRIX	Matrix44
 
 //==================================================================
@@ -79,6 +85,25 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 	SOP::Inst_LD3<V>,
 
 	SOP::Inst_CMPLT<S>,	// cmplt
+
+	SOP::Inst_SETCMP_REL<S,OBT_SETLE>,
+	SOP::Inst_SETCMP_REL<S,OBT_SETGE>,
+	SOP::Inst_SETCMP_REL<S,OBT_SETLT>,
+	SOP::Inst_SETCMP_REL<S,OBT_SETGT>,
+
+	SOP::Inst_SETCMP_EQ <S,OBT_SETEQ>,
+	SOP::Inst_SETCMP_EQ <V,OBT_SETEQ>,
+	SOP::Inst_SETCMP_EQ <H,OBT_SETEQ>,
+	NULL, //SOP::Inst_SETCMP_EQ <M,OBT_SETEQ>,
+	SOP::Inst_SETCMP_EQ_NoVary <X,OBT_SETEQ>,
+	SOP::Inst_SETCMP_EQ <B,OBT_SETEQ>,
+
+	SOP::Inst_SETCMP_EQ <S,OBT_SETNEQ>,
+	SOP::Inst_SETCMP_EQ <V,OBT_SETNEQ>,
+	SOP::Inst_SETCMP_EQ <H,OBT_SETNEQ>,
+	NULL, //SOP::Inst_SETCMP_EQ <M,OBT_SETNEQ>,
+	SOP::Inst_SETCMP_EQ_NoVary <X,OBT_SETNEQ>,
+	SOP::Inst_SETCMP_EQ <B,OBT_SETNEQ>,
 
 	SOP::Inst_Noise1<Float_>,
 	SOP::Inst_Noise1<Float2_>,

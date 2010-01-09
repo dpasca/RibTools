@@ -123,6 +123,9 @@ public:
 
 	Vec3 operator +=(const Vec3 &rval)	{ *this = *this + rval; return *this; }
 
+	friend bool operator ==( const Vec3 &lval, const Vec3 &rval ) { return (lval.v3[0] == rval.v3[0]) && (lval.v3[1] == rval.v3[1]) && (lval.v3[2] == rval.v3[2]); }
+	friend bool operator !=( const Vec3 &lval, const Vec3 &rval ) { return (lval.v3[0] != rval.v3[0]) && (lval.v3[1] != rval.v3[1]) && (lval.v3[2] != rval.v3[2]); }
+
 	Vec3 GetNormalized() const
 	{
 		return *this * DRSqrt( v3[0] * v3[0] + v3[1] * v3[1] + v3[2] * v3[2] );
@@ -243,6 +246,9 @@ public:
 
 	Vec4 operator +=(const Vec4 &rval)	{ *this = *this + rval; return *this; }
 
+	friend bool operator ==( const Vec4 &lval, const Vec4 &rval ) { return (lval.v4[0] == rval.v4[0]) && (lval.v4[1] == rval.v4[1]) && (lval.v4[2] == rval.v4[2]) && (lval.v4[3] == rval.v4[3]); }
+	friend bool operator !=( const Vec4 &lval, const Vec4 &rval ) { return (lval.v4[0] != rval.v4[0]) && (lval.v4[1] != rval.v4[1]) && (lval.v4[2] != rval.v4[2]) && (lval.v4[3] != rval.v4[3]); }
+
 	const _S &x() const { return v4[0];	}
 	const _S &y() const { return v4[1];	}
 	const _S &z() const { return v4[2];	}
@@ -272,6 +278,40 @@ template<class _S> Vec4<_S> operator - (const _S &lval, const Vec4<_S> &rval) { 
 template<class _S> Vec4<_S> operator * (const _S &lval, const Vec4<_S> &rval) { return rval * lval; }
 template<class _S> Vec4<_S> operator / (const _S &lval, const Vec4<_S> &rval) { return rval / lval; }
 
+template<class _S>
+VecNMask CmpMaskEQ( const Vec3<_S> &lval, const Vec3<_S> &rval )
+{
+	return	  CmpMaskEQ( lval[0], rval[0] )
+			& CmpMaskEQ( lval[1], rval[1] )
+			& CmpMaskEQ( lval[2], rval[2] );
+}
+
+template<class _S>
+VecNMask CmpMaskNE( const Vec3<_S> &lval, const Vec3<_S> &rval )
+{
+	return	  CmpMaskNE( lval[0], rval[0] )
+			| CmpMaskNE( lval[1], rval[1] )
+			| CmpMaskNE( lval[2], rval[2] );
+}
+
+template<class _S>
+VecNMask CmpMaskEQ( const Vec4<_S> &lval, const Vec4<_S> &rval )
+{
+	return	  CmpMaskEQ( lval[0], rval[0] )
+			& CmpMaskEQ( lval[1], rval[1] )
+			& CmpMaskEQ( lval[2], rval[2] ) 
+			& CmpMaskEQ( lval[3], rval[3] );
+}
+
+template<class _S>
+VecNMask CmpMaskNE( const Vec4<_S> &lval, const Vec4<_S> &rval )
+{
+	return	  CmpMaskNE( lval[0], rval[0] )
+			| CmpMaskNE( lval[1], rval[1] )
+			| CmpMaskNE( lval[2], rval[2] ) 
+			| CmpMaskNE( lval[3], rval[3] );
+}
+
 //==================================================================
 /// float implementations
 //==================================================================
@@ -281,6 +321,7 @@ template<class _S> Vec4<_S> operator / (const _S &lval, const Vec4<_S> &rval) { 
 
 typedef __declspec(align(64)) VecN<float,DMT_SIMD_FLEN>			Float_;
 typedef __declspec(align(64)) VecN<int,DMT_SIMD_FLEN>			Int_;
+typedef __declspec(align(64)) VecN<DU8,DMT_SIMD_FLEN>			Bool_;
 
 typedef __declspec(align(64)) Vec2< VecN<float,DMT_SIMD_FLEN> >	Float2_;
 typedef __declspec(align(64)) Vec3< VecN<float,DMT_SIMD_FLEN> >	Float3_;
@@ -291,6 +332,7 @@ typedef __declspec(align(64)) Vec4< VecN<float,DMT_SIMD_FLEN> >	Float4_;
 
 typedef	VecN<float,DMT_SIMD_FLEN>			Float_ __attribute__ ((aligned(64)));
 typedef	VecN<int,DMT_SIMD_FLEN>				Int_ __attribute__ ((aligned(64)));
+typedef	VecN<DU8,DMT_SIMD_FLEN>				Bool_ __attribute__ ((aligned(64)));
 
 typedef	Vec2< VecN<float,DMT_SIMD_FLEN> >	Float2_ __attribute__ ((aligned(64)));
 typedef	Vec3< VecN<float,DMT_SIMD_FLEN> >	Float3_ __attribute__ ((aligned(64)));

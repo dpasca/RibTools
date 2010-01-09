@@ -507,21 +507,15 @@ size_t SlAsmParser::findOrAddTempSymbol( const char *pName )
 	else
 		pSymbol->SetUniform();
 
-	if ( typeLower == 's' )
+	if ( typeLower == 's' )	pSymbol->mType	= Symbol::TYP_FLOAT;	else
+	if ( typeLower == 'v' )	pSymbol->mType	= Symbol::TYP_VECTOR;	else	// vector base
+	if ( typeLower == 'h' )	pSymbol->mType	= Symbol::TYP_HPOINT;	else
+	if ( typeLower == 'm' )	pSymbol->mType	= Symbol::TYP_MATRIX;	else
+	if ( typeLower == 'x' ) pSymbol->mType	= Symbol::TYP_STRING;	else
+	if ( typeLower == 'b' ) pSymbol->mType	= Symbol::TYP_BOOL;		else
 	{
-		// scalar base
-		pSymbol->mType	= Symbol::TYP_FLOAT;
-	}
-	else
-	if ( typeLower == 'v' )
-	{
-		// vector base
-		pSymbol->mType	= Symbol::TYP_VECTOR;
-	}
-	else
-	{
-		// string
-		pSymbol->mType	= Symbol::TYP_STRING;
+		DASSERT( 0 );
+		return DNPOS;
 	}
 
 	mpShader->mpShaSyms.push_back( pSymbol.release() );

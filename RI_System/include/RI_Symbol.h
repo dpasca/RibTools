@@ -40,6 +40,9 @@ public:
 	{
 		strcpy_s( mStr, pFromCStr );
 	}
+
+	friend bool operator ==( const SlStr &lval, const SlStr &rval ) { return 0 == strcmp( lval.mStr, rval.mStr ); }
+	friend bool operator !=( const SlStr &lval, const SlStr &rval ) { return 0 != strcmp( lval.mStr, rval.mStr ); }
 };
 
 //==================================================================
@@ -49,15 +52,16 @@ public:
 	enum Type
 	{
 		TYP_UNKNOWN,
-		TYP_VOIDD,
+		TYP_VOID,
 		TYP_FLOAT,
 		TYP_POINT,
 		TYP_VECTOR,
 		TYP_NORMAL,
 		TYP_HPOINT,
 		TYP_COLOR,
-		TYP_STRING,
 		TYP_MATRIX,
+		TYP_STRING,
+		TYP_BOOL,
 		TYPES_N
 	};
 
@@ -181,7 +185,7 @@ public:
 	{
 		Symbol::CtorParams params;
 		params.mpName	= pName;
-		params.mType	= Symbol::TYP_VOIDD;
+		params.mType	= Symbol::TYP_VOID;
 		params.mClass	= Symbol::CLASS_MSK_CONSTANT;
 		params.mStorage	= Symbol::STOR_GLOBAL;
 		return Add( params );

@@ -9,95 +9,10 @@
 #include "RSLC_Tree.h"
 #include "RSLC_Operators.h"
 #include "RSLC_Exceptions.h"
-#include "RSLC_Defs_OpConvert.h"
 
 //==================================================================
 namespace RSLC
 {
-
-//==================================================================
-static bool areTypesCompatible( VarType vt1, VarType vt2 )
-{
-	if ( vt1 == vt2 )
-		return true;
-
-	if (
-		(vt1 == VT_POINT	&& vt2 == VT_VECTOR	) ||
-		(vt1 == VT_POINT	&& vt2 == VT_NORMAL	) ||
-		(vt1 == VT_VECTOR	&& vt2 == VT_POINT	)||
-		(vt1 == VT_VECTOR	&& vt2 == VT_NORMAL	) ||
-		(vt1 == VT_NORMAL	&& vt2 == VT_POINT	) ||
-		(vt1 == VT_NORMAL	&& vt2 == VT_VECTOR	)
-		)
-		return true;
-
-	return false;
-}
-
-//==================================================================
-void SolveBiOpType(	const TokNode *pOperator,
-					VarType	vt1,
-					VarType	vt2,
-					VarType &out_varType )
-{
-	out_varType		= VT_UNKNOWN;
-
-	DASSERT( pOperator->mpToken->IsBiOp() );
-
-	DASSERT( vt1 != VT_UNKNOWN && vt2 != VT_UNKNOWN );
-
-	if ( (vt1 == VT_STRING) != (vt2 == VT_STRING) )
-	{
-		return;
-		throw Exception( "Strings can only operate with other strings !", pOperator );
-	}
-
-	if ( vt1 == VT_STRING )
-	{
-		if ( pOperator->mpToken->id != T_OP_ASSIGN &&
-			 pOperator->mpToken->id != T_OP_EQ &&
-			 pOperator->mpToken->id != T_OP_NEQ
-			 )
-			throw Exception( "Invalid operator between strings !", pOperator );
-	}
-
-	// handle comparison operators
-	if ( pOperator->mpToken->IsCmpOp() )
-	{
-		if NOT( areTypesCompatible( vt1, vt2 ) )
-			throw Exception( "Incompatible types in comparison", pOperator );
-
-		out_varType = VT_BOOL;
-	}
-	else
-	{
-		for (size_t i=0; i < _countof(_gBiOpConvertRules); ++i)
-		{
-			if NOT( pOperator->mpToken->id == _gBiOpConvertRules[i].mOper )
-				continue;
-
-			if NOT(
-				areTypesCompatible( _gBiOpConvertRules[i].mLType, vt1 ) &&
-				areTypesCompatible( _gBiOpConvertRules[i].mRType, vt2 )
-				)
-				continue;
-
-			out_varType = _gBiOpConvertRules[i].mResType;
-			break;
-		}
-
-		if ( out_varType == VT_UNKNOWN )
-		{
-			throw Exception(
-				DUT::SSPrintFS(
-						"Could not resolve operation. Incompatible types [ '%s' %s '%s' ] ?",
-							VarTypeToString( vt1 ),
-							pOperator->GetTokStr(),
-							VarTypeToString( vt2 ) )
-						, pOperator );
-		}
-	}
-}
 
 //==================================================================
 static void reparentBiOperators(

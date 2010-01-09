@@ -9,6 +9,8 @@
 #ifndef RSLC_DEFS_OPCONVERT_H
 #define RSLC_DEFS_OPCONVERT_H
 
+#include "RSLC_Token.h"
+
 //==================================================================
 namespace RSLC
 {
@@ -23,7 +25,7 @@ struct BiOpConvertRule
 };
 
 //==================================================================
-BiOpConvertRule	_gBiOpConvertRules[] =
+static BiOpConvertRule	_sBiOpConvertRules[] =
 {
 	T_OP_ASSIGN		,	VT_VECTOR	,	VT_VECTOR	,	VT_VECTOR	,
 	T_OP_ASSIGN		,	VT_VECTOR	,	VT_VECTOR	,	VT_FLOAT	,
@@ -111,6 +113,32 @@ BiOpConvertRule	_gBiOpConvertRules[] =
 
 	T_OP_LOGIC_AND	,	VT_BOOL,	VT_BOOL,	VT_BOOL,
 	T_OP_LOGIC_OR	,	VT_BOOL,	VT_BOOL,	VT_BOOL,
+
+	// compare operations
+	T_OP_LSEQ		,	VT_BOOL,	VT_FLOAT,	VT_FLOAT,
+	T_OP_GEEQ		,	VT_BOOL,	VT_FLOAT,	VT_FLOAT,
+	T_OP_LSTH		,	VT_BOOL,	VT_FLOAT,	VT_FLOAT,
+	T_OP_GRTH		,	VT_BOOL,	VT_FLOAT,	VT_FLOAT,
+
+	// ==
+	T_OP_EQ			,	VT_BOOL,	VT_FLOAT	,	VT_FLOAT	,
+	T_OP_EQ			,	VT_BOOL,	VT_POINT	,	VT_POINT	,
+	T_OP_EQ			,	VT_BOOL,	VT_COLOR	,	VT_COLOR	,
+	T_OP_EQ			,	VT_BOOL,	VT_VECTOR	,	VT_VECTOR	,
+	T_OP_EQ			,	VT_BOOL,	VT_NORMAL	,	VT_NORMAL	,
+	T_OP_EQ			,	VT_BOOL,	VT_MATRIX	,	VT_MATRIX	,
+	T_OP_EQ			,	VT_BOOL,	VT_STRING	,	VT_STRING	,
+	T_OP_EQ			,	VT_BOOL,	VT_BOOL		,	VT_BOOL		,
+
+	// !=
+	T_OP_NEQ		,	VT_BOOL,	VT_FLOAT	,	VT_FLOAT	,
+	T_OP_NEQ		,	VT_BOOL,	VT_POINT	,	VT_POINT	,
+	T_OP_NEQ		,	VT_BOOL,	VT_COLOR	,	VT_COLOR	,
+	T_OP_NEQ		,	VT_BOOL,	VT_VECTOR	,	VT_VECTOR	,
+	T_OP_NEQ		,	VT_BOOL,	VT_NORMAL	,	VT_NORMAL	,
+	T_OP_NEQ		,	VT_BOOL,	VT_MATRIX	,	VT_MATRIX	,
+	T_OP_NEQ		,	VT_BOOL,	VT_STRING	,	VT_STRING	,
+	T_OP_NEQ		,	VT_BOOL,	VT_BOOL		,	VT_BOOL		,
 };
 
 //==================================================================

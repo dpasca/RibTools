@@ -272,10 +272,10 @@ inline _S spline(
 				const _S &p2,
 				const _S &p3 )
 {
-	_S v0(p0*b.u.m44[0][0] + p1*b.u.m44[0][1] + p2*b.u.m44[0][2] + p3*b.u.m44[0][3]);
-	_S v1(p0*b.u.m44[1][0] + p1*b.u.m44[1][1] + p2*b.u.m44[1][2] + p3*b.u.m44[1][3]);
-	_S v2(p0*b.u.m44[2][0] + p1*b.u.m44[2][1] + p2*b.u.m44[2][2] + p3*b.u.m44[2][3]);
-	_S v3(p0*b.u.m44[3][0] + p1*b.u.m44[3][1] + p2*b.u.m44[3][2] + p3*b.u.m44[3][3]);
+	_S v0(p0*b.mij(0,0) + p1*b.mij(0,1) + p2*b.mij(0,2) + p3*b.mij(0,3));
+	_S v1(p0*b.mij(1,0) + p1*b.mij(1,1) + p2*b.mij(1,2) + p3*b.mij(1,3));
+	_S v2(p0*b.mij(2,0) + p1*b.mij(2,1) + p2*b.mij(2,2) + p3*b.mij(2,3));
+	_S v3(p0*b.mij(3,0) + p1*b.mij(3,1) + p2*b.mij(3,2) + p3*b.mij(3,3));
 
 	return	v0 *t*t*t +
 			v1 *t*t +
@@ -293,9 +293,9 @@ inline _S splineDeriv(
 					const _S &p2,
 					const _S &p3 )
 {
-	_S v0(p0*b.u.m44[0][0] + p1*b.u.m44[0][1] + p2*b.u.m44[0][2] + p3*b.u.m44[0][3]);
-	_S v1(p0*b.u.m44[1][0] + p1*b.u.m44[1][1] + p2*b.u.m44[1][2] + p3*b.u.m44[1][3]);
-	_S v2(p0*b.u.m44[2][0] + p1*b.u.m44[2][1] + p2*b.u.m44[2][2] + p3*b.u.m44[2][3]);
+	_S v0(p0*b.mij(0,0) + p1*b.mij(0,1) + p2*b.mij(0,2) + p3*b.mij(0,3));
+	_S v1(p0*b.mij(1,0) + p1*b.mij(1,1) + p2*b.mij(1,2) + p3*b.mij(1,3));
+	_S v2(p0*b.mij(2,0) + p1*b.mij(2,1) + p2*b.mij(2,2) + p3*b.mij(2,3));
 
 	return	v0 *3*t*t +
 			v1 *2*t +

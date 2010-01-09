@@ -81,7 +81,7 @@ return C;
 void Inst_Diffuse( SlRunContext &ctx )
 {
 /*
-		  SlColor* lhs	= ctx.GetVoidRW( (		SlColor*)0, 1 );
+		  SlColor* lhs	= ctx.GetRW( (		SlColor*)0, 1 );
 	const SlVec3 * op1	= ctx.GetVoidRO( (const SlVec3 *)0, 2 );
 
 	const Point3*	pP = (const Point3 *)ctx.mpGridSymIList->FindSymbolIData( "P" );
@@ -100,7 +100,7 @@ void Inst_Diffuse( SlRunContext &ctx )
 
 		for (u_int i=0; i < ctx.mBlocksN; ++i)
 		{
-			if ( ctx.IsProcessorActive( i ) )
+			SLRUNCTX_BLKWRITECHECK( i );
 			{
 				SlVec3	Nn = op1[op1_offset].GetNormalized();
 
@@ -120,7 +120,7 @@ void Inst_Diffuse( SlRunContext &ctx )
 	{
 		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		if ( ctx.IsProcessorActive( 0 ) )
+		SLRUNCTX_BLKWRITECHECK( 0 );
 		{
 			SlVec3	Nn = op1[0].GetNormalized();
 			SlColor	col( 0.0f );
@@ -178,12 +178,14 @@ void Inst_Ambient( SlRunContext &ctx )
 		ctx.mCache.mAmbientCol = ambCol;
 	}
 
-	SlColor	*lhs	= ctx.GetVoidRW( (SlColor*)0, 1 );
+	SlColor	*lhs	= ctx.GetRW( (SlColor*)0, 1 );
 
 	for (u_int i=0; i < ctx.mBlocksN; ++i)
 	{
-		if ( ctx.IsProcessorActive( i ) )
+		SLRUNCTX_BLKWRITECHECK( i );
+		{
 			lhs[i] = ctx.mCache.mAmbientCol;
+		}
 	}
 
 	ctx.NextInstruction();

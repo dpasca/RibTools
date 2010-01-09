@@ -23,10 +23,7 @@
 class Matrix44
 {
 public:
-	union {
-		float	m16[16];
-		float	m44[4][4];
-	} u;
+	VecN<float,16>	v16;
 
 	Matrix44()
 	{
@@ -49,28 +46,32 @@ public:
 		float m20_, float m21_, float m22_, float m23_,
 		float m30_, float m31_, float m32_, float m33_ )
 	{
-		u.m44[0][0] = m00_; u.m44[0][1] = m01_; u.m44[0][2] = m02_; u.m44[0][3] = m03_;
-		u.m44[1][0] = m10_; u.m44[1][1] = m11_; u.m44[1][2] = m12_; u.m44[1][3] = m13_;
-		u.m44[2][0] = m20_; u.m44[2][1] = m21_; u.m44[2][2] = m22_; u.m44[2][3] = m23_;
-		u.m44[3][0] = m30_; u.m44[3][1] = m31_; u.m44[3][2] = m32_; u.m44[3][3] = m33_;
+		mij(0,0) = m00_; mij(0,1) = m01_; mij(0,2) = m02_; mij(0,3) = m03_;
+		mij(1,0) = m10_; mij(1,1) = m11_; mij(1,2) = m12_; mij(1,3) = m13_;
+		mij(2,0) = m20_; mij(2,1) = m21_; mij(2,2) = m22_; mij(2,3) = m23_;
+		mij(3,0) = m30_; mij(3,1) = m31_; mij(3,2) = m32_; mij(3,3) = m33_;
 	}
+
+	const float &mij( size_t y, size_t x ) const	{ return v16[ y * 4 + x ];	}
+		  float &mij( size_t y, size_t x )			{ return v16[ y * 4 + x ];	}
 
 	Float3 GetV3( size_t idx ) const
 	{
-		return Float3( u.m44[idx] );
+		return Float3( mij(idx,0), mij(idx,1), mij(idx,2) );
 	}
 
 	void SetV3( size_t idx, const Float3 &v )
 	{
-		u.m44[idx][0] = v.v3[0];
-		u.m44[idx][1] = v.v3[1];
-		u.m44[idx][2] = v.v3[2];
+		mij(idx,0) = v.v3[0];
+		mij(idx,1) = v.v3[1];
+		mij(idx,2) = v.v3[2];
 	}
 
 	void Identity()
 	{
-		memset( u.m16, 0, sizeof(float) * 16 );
-		u.m44[0][0] = u.m44[1][1] = u.m44[2][2] = u.m44[3][3] = 1.0f;
+		v16 = VecN<float,16>( 0.f );
+
+		mij(0,0) = mij(1,1) = mij(2,2) = mij(3,3) = 1.0f;
 	}
 		
 	inline Matrix44 GetTranspose() const;
@@ -87,27 +88,30 @@ public:
 
 	void CopyRowMajor( const float *pSrcMtx )
 	{
-		memcpy( u.m16, pSrcMtx, sizeof(float) * 16 );
+		v16 = VecN<float,16>( pSrcMtx );
 	}
 	
 	Float3 GetTranslation() const
 	{
 		return Float3(
-			u.m44[3][0],
-			u.m44[3][1],
-			u.m44[3][2]
+			mij(3,0),
+			mij(3,1),
+			mij(3,2)
 		);
 	}
 
 	void PrintOut() const;
 
-	Matrix44 operator + (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]+rval.u.m16[i]; return m_; }
-	Matrix44 operator - (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]-rval.u.m16[i]; return m_; }
-//	Matrix44 operator * (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]*rval.u.m16[i]; return m_; }
-	Matrix44 operator / (const Matrix44 &rval) const { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]/rval.u.m16[i]; return m_; }
+	Matrix44 operator + (const Matrix44 &rval) const { Matrix44 ret; ret.v16 = v16 + rval.v16; return ret; }
+	Matrix44 operator - (const Matrix44 &rval) const { Matrix44 ret; ret.v16 = v16 - rval.v16; return ret; }
+//	Matrix44 operator * (const Matrix44 &rval) const { Matrix44 ret; ret.v16 = v16 * rval.v16; return ret; }
+	Matrix44 operator / (const Matrix44 &rval) const { Matrix44 ret; ret.v16 = v16 / rval.v16; return ret; }
 
-	Matrix44 operator *  (const float rval) const	 { Matrix44 m_; for(int i=0;i<16;++i) m_.u.m16[i]=u.m16[i]*rval; return m_; }
-	void	 operator *= (const float rval)			 { for(int i=0;i<16;++i) u.m16[i] *= u.m16[i]*rval; }
+	Matrix44 operator *  (const float rval) const	 { Matrix44 ret; ret.v16 = v16 * rval; return ret; }
+	//void	 operator *= (const float rval)			 { v16 *= rval; }
+
+	friend bool operator ==( const Matrix44 &lval, const Matrix44 &rval ) { return lval.v16 == rval.v16; }
+	friend bool operator !=( const Matrix44 &lval, const Matrix44 &rval ) { return lval.v16 != rval.v16; }
 };
 
 //==================================================================
@@ -117,7 +121,7 @@ inline Matrix44 Matrix44::GetTranspose() const
 
 	for (int i=0; i < 4; ++i)
 		for (int j=0; j < 4; ++j)
-			out.u.m44[i][j] = u.m44[j][i];
+			out.mij(i,j) = mij(j,i);
 
 	return out;
 }
@@ -129,7 +133,7 @@ inline Matrix44 Matrix44::GetAs33() const
 
 	for (int i=0; i < 3; ++i)
 		for (int j=0; j < 3; ++j)
-			out.u.m44[i][j] = u.m44[i][j];
+			out.mij(i,j) = mij(i,j);
 
 	return out;
 }
@@ -161,11 +165,11 @@ inline Matrix44 Matrix44::GetOrthonormal() const
 inline Matrix44 Matrix44::Scale( float sx, float sy, float sz )
 {
 	Matrix44	m;
-	memset( m.u.m16, 0, sizeof(float) * 16 );
-	m.u.m44[0][0] = sx;
-	m.u.m44[1][1] = sy;
-	m.u.m44[2][2] = sz;
-	m.u.m44[3][3] = 1.0f;
+	m.v16 = VecN<float,16>( 0.f );
+	m.mij(0,0) = sx;
+	m.mij(1,1) = sy;
+	m.mij(2,2) = sz;
+	m.mij(3,3) = 1.0f;
 	
 	return m;
 }
@@ -173,10 +177,10 @@ inline Matrix44 Matrix44::Scale( float sx, float sy, float sz )
 inline Matrix44 Matrix44::Translate( float tx, float ty, float tz )
 {
 	Matrix44	m( true );
-	m.u.m44[3][0] = tx;
-	m.u.m44[3][1] = ty;
-	m.u.m44[3][2] = tz;
-	m.u.m44[3][3] = 1.0f;
+	m.mij(3,0) = tx;
+	m.mij(3,1) = ty;
+	m.mij(3,2) = tz;
+	m.mij(3,3) = 1.0f;
 	
 	return m;
 }
@@ -243,12 +247,12 @@ inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 			float	sum = 0;
 			for (size_t i=0; i < 4; ++i)
 				#ifdef DMATRIX44_ROWMTX_MODE
-				sum += m1.u.m44[i][c] * m2.u.m44[r][i];
+				sum += m1.mij(i,c) * m2.mij(r,i);
 				#else
-				sum += m1.u.m44[r][i] * m2.u.m44[i][c];
+				sum += m1.mij(r,i) * m2.mij(i,c);
 				#endif
 
-			tmp.u.m44[r][c] = sum;
+			tmp.mij(r,c) = sum;
 		}
 		
 	}
@@ -261,17 +265,10 @@ inline Float4 V4__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
 	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
 	return Float4(
-#ifdef DMATRIX44_ROWMTX_MODE
-		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
-		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
-		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2],
-		a.u.m44[0][3] * x + a.u.m44[1][3] * y + a.u.m44[2][3] * z + a.u.m44[3][3]
-#else
-		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
-		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
-		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3],
-		a.u.m44[3][0] * x + a.u.m44[3][1] * y + a.u.m44[3][2] * z + a.u.m44[3][3]
-#endif
+		a.mij(0,0) * x + a.mij(0,1) * y + a.mij(0,2) * z + a.mij(0,3),
+		a.mij(1,0) * x + a.mij(1,1) * y + a.mij(1,2) * z + a.mij(1,3),
+		a.mij(2,0) * x + a.mij(2,1) * y + a.mij(2,2) * z + a.mij(2,3),
+		a.mij(3,0) * x + a.mij(3,1) * y + a.mij(3,2) * z + a.mij(3,3)
 	);
 }
 
@@ -281,15 +278,9 @@ inline Float3 V3__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
 	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
 	return Float3(
-#ifdef DMATRIX44_ROWMTX_MODE
-		a.u.m44[0][0] * x + a.u.m44[1][0] * y + a.u.m44[2][0] * z + a.u.m44[3][0],
-		a.u.m44[0][1] * x + a.u.m44[1][1] * y + a.u.m44[2][1] * z + a.u.m44[3][1],
-		a.u.m44[0][2] * x + a.u.m44[1][2] * y + a.u.m44[2][2] * z + a.u.m44[3][2]
-#else
-		a.u.m44[0][0] * x + a.u.m44[0][1] * y + a.u.m44[0][2] * z + a.u.m44[0][3],
-		a.u.m44[1][0] * x + a.u.m44[1][1] * y + a.u.m44[1][2] * z + a.u.m44[1][3],
-		a.u.m44[2][0] * x + a.u.m44[2][1] * y + a.u.m44[2][2] * z + a.u.m44[2][3]
-#endif
+		a.mij(0,0) * x + a.mij(0,1) * y + a.mij(0,2) * z + a.mij(0,3),
+		a.mij(1,0) * x + a.mij(1,1) * y + a.mij(1,2) * z + a.mij(1,3),
+		a.mij(2,0) * x + a.mij(2,1) * y + a.mij(2,2) * z + a.mij(2,3)
 	);
 }
 
@@ -302,17 +293,10 @@ inline Vec4<_T> V4__V3W1_Mul_M44( const Vec3<_T> &v, const Matrix44 &a )
 	const _T	&z = v.v3[2];
 
 	return Vec4<_T>(
-#ifdef DMATRIX44_ROWMTX_MODE
-		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2] + a.u.m44[0][3],
-		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2] + a.u.m44[1][3],
-		x * a.u.m44[2][0] + y * a.u.m44[2][1] + z * a.u.m44[2][2] + a.u.m44[2][3],
-		x * a.u.m44[3][0] + y * a.u.m44[3][1] + z * a.u.m44[3][2] + a.u.m44[3][3]
-#else											 
-		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0] + a.u.m44[3][0],
-		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1] + a.u.m44[3][1],
-		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2] + a.u.m44[3][2],
-		x * a.u.m44[0][3] + y * a.u.m44[1][3] + z * a.u.m44[2][3] + a.u.m44[3][3]
-#endif
+		x * a.mij(0,0) + y * a.mij(1,0) + z * a.mij(2,0) + a.mij(3,0),
+		x * a.mij(0,1) + y * a.mij(1,1) + z * a.mij(2,1) + a.mij(3,1),
+		x * a.mij(0,2) + y * a.mij(1,2) + z * a.mij(2,2) + a.mij(3,2),
+		x * a.mij(0,3) + y * a.mij(1,3) + z * a.mij(2,3) + a.mij(3,3)
 	);
 }
 
@@ -326,17 +310,10 @@ inline Vec4<_T> V4__V4_Mul_M44( const Vec4<_T> &v, const Matrix44 &a )
 	const _T	&w = v.v4[3];
 
 	return Vec4<_T>(
-#ifdef DMATRIX44_ROWMTX_MODE
-		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2] + w * a.u.m44[0][3],
-		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2] + w * a.u.m44[1][3],
-		x * a.u.m44[2][0] + y * a.u.m44[2][1] + z * a.u.m44[2][2] + w * a.u.m44[2][3],
-		x * a.u.m44[3][0] + y * a.u.m44[3][1] + z * a.u.m44[3][2] + w * a.u.m44[3][3]
-#else											 
-		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0] + w * a.u.m44[3][0],
-		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1] + w * a.u.m44[3][1],
-		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2] + w * a.u.m44[3][2],
-		x * a.u.m44[0][3] + y * a.u.m44[1][3] + z * a.u.m44[2][3] + w * a.u.m44[3][3]
-#endif
+		x * a.mij(0,0) + y * a.mij(1,0) + z * a.mij(2,0) + w * a.mij(3,0),
+		x * a.mij(0,1) + y * a.mij(1,1) + z * a.mij(2,1) + w * a.mij(3,1),
+		x * a.mij(0,2) + y * a.mij(1,2) + z * a.mij(2,2) + w * a.mij(3,2),
+		x * a.mij(0,3) + y * a.mij(1,3) + z * a.mij(2,3) + w * a.mij(3,3)
 	);
 }
 
@@ -349,17 +326,10 @@ inline _S4 V4__V3W0_Mul_M44( const _S3 &v, const Matrix44 &a )
 	const _T	&z = v.v3[2];
 
 	return _S4(
-#ifdef DMATRIX44_ROWMTX_MODE
-		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2],
-		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2],
-		x * a.u.m44[2][0] + y * a.u.m44[2][1] + z * a.u.m44[2][2],
-		x * a.u.m44[3][0] + y * a.u.m44[3][1] + z * a.u.m44[3][2]
-#else											 
-		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0],
-		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1],
-		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2],
-		x * a.u.m44[0][3] + y * a.u.m44[1][3] + z * a.u.m44[2][3]
-#endif
+		x * a.mij(0,0) + y * a.mij(1,0) + z * a.mij(2,0),
+		x * a.mij(0,1) + y * a.mij(1,1) + z * a.mij(2,1),
+		x * a.mij(0,2) + y * a.mij(1,2) + z * a.mij(2,2),
+		x * a.mij(0,3) + y * a.mij(1,3) + z * a.mij(2,3)
 	);
 }
 
@@ -372,15 +342,9 @@ inline Vec3<_S> V3__V3W1_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
 	const _S	&z = v.v3[2];
 
 	return Vec3<_S>(
-#ifdef DMATRIX44_ROWMTX_MODE
-		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2] + a.u.m44[0][3],
-		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2] + a.u.m44[1][3],
-		x * a.u.m44[2][0] + y * a.u.m44[2][1] + z * a.u.m44[2][2] + a.u.m44[2][3]
-#else											 
-		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0] + a.u.m44[3][0],
-		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1] + a.u.m44[3][1],
-		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2] + a.u.m44[3][2]
-#endif
+		x * a.mij(0,0) + y * a.mij(1,0) + z * a.mij(2,0) + a.mij(3,0),
+		x * a.mij(0,1) + y * a.mij(1,1) + z * a.mij(2,1) + a.mij(3,1),
+		x * a.mij(0,2) + y * a.mij(1,2) + z * a.mij(2,2) + a.mij(3,2)
 	);
 }
 
@@ -393,15 +357,9 @@ inline Vec3<_S> V3__V3W0_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
 	const _S	&z = v.v3[2];
 
 	return Vec3<_S>(
-#ifdef DMATRIX44_ROWMTX_MODE
-		x * a.u.m44[0][0] + y * a.u.m44[0][1] + z * a.u.m44[0][2],
-		x * a.u.m44[1][0] + y * a.u.m44[1][1] + z * a.u.m44[1][2],
-		x * a.u.m44[2][0] + y * a.u.m44[2][1] + z * a.u.m44[2][2]
-#else											 
-		x * a.u.m44[0][0] + y * a.u.m44[1][0] + z * a.u.m44[2][0],
-		x * a.u.m44[0][1] + y * a.u.m44[1][1] + z * a.u.m44[2][1],
-		x * a.u.m44[0][2] + y * a.u.m44[1][2] + z * a.u.m44[2][2]
-#endif
+		x * a.mij(0,0) + y * a.mij(1,0) + z * a.mij(2,0),
+		x * a.mij(0,1) + y * a.mij(1,1) + z * a.mij(2,1),
+		x * a.mij(0,2) + y * a.mij(1,2) + z * a.mij(2,2)
 	);
 }
 

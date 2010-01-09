@@ -598,6 +598,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\RI_SlShader_Ops_Compare.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\RI_SlShader_Ops_Lighting.cpp"
 					>
 				</File>
