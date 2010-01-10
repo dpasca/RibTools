@@ -128,7 +128,6 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 
 	SOP::Inst_Normalize,
 	SOP::Inst_Faceforward,
-	SOP::Inst_Diffuse,
 	SOP::Inst_Ambient,
 	SOP::Inst_CalculateNormal,
 

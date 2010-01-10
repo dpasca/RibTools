@@ -1,18 +1,21 @@
 //==================================================================
-/// RI_SlAsm_OpCodeDefs.h
+/// RI_RRASM_OpCodeDefs.h
 ///
-/// Created by Davide Pasca - 2009/11/9
+/// Created by Davide Pasca - 2010/1/10
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_SLASM_OPCODEDEFS_H
-#define RI_SLASM_OPCODEDEFS_H
+#ifndef RI_RRASM_OPCODEDEFS_H
+#define RI_RRASM_OPCODEDEFS_H
 
 #include "RI_SlShader.h"
 
 //==================================================================
 namespace RI
+{
+//==================================================================
+namespace RRASM
 {
 
 //==================================================================
@@ -24,7 +27,7 @@ namespace RI
 #define OPC_FLG_DIRPOSLIGHT_INSTR	32
 
 //==================================================================
-struct SlAsmOpCodeDef
+struct OpCodeDef
 {
 	const char	*pName;
 	u_int		OperCnt;
@@ -32,8 +35,10 @@ struct SlAsmOpCodeDef
 	OperTypeID	Types[5];
 };
 
-extern SlAsmOpCodeDef	_gSlAsmOpCodeDefs[];
+extern OpCodeDef	_gOpCodeDefs[];
 
+//==================================================================
+}
 //==================================================================
 }
 

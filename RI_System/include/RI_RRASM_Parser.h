@@ -1,13 +1,13 @@
 //==================================================================
-/// RI_SlAsmParser.h
+/// RI_RRASM_Parser.h
 ///
-/// Created by Davide Pasca - 2009/3/4
+/// Created by Davide Pasca - 2010/1/10
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_SLASMPARSER_H
-#define RI_SLASMPARSER_H
+#ifndef RI_RRASM_PARSER_H
+#define RI_RRASM_PARSER_H
 
 #include "RI_Base.h"
 #include "RI_SlShader.h"
@@ -16,14 +16,17 @@
 //==================================================================
 namespace RI
 {
+//==================================================================
+namespace RRASM
+{
 
 //==================================================================
-struct SlAsmOpCodeDef;
+struct OpCodeDef;
 
 //==================================================================
-/// SlAsmParser
+/// Parser
 //==================================================================
-class SlAsmParser
+class Parser
 {
 	enum Section
 	{
@@ -47,7 +50,7 @@ class SlAsmParser
 	
 public:
 	//==================================================================
-	SlAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName );
+	Parser( DUT::MemFile &file, SlShader *pShader, const char *pName );
 
 private:
 	void doParse( DUT::MemFile &file );
@@ -56,12 +59,12 @@ private:
 	bool handleShaderTypeDef( const char *pLineWork, Section curSection );
 
 	void parseDataLine( char lineBuff[], int lineCnt );
-	const SlAsmOpCodeDef	*findOpDef( const char *pOpName, u_int &opCodeIdx );
+	const OpCodeDef	*findOpDef( const char *pOpName, u_int &opCodeIdx );
 	size_t findSymbol( const char *pName, bool ignoreCase ) const;
 	size_t findOrAddTempSymbol( const char *pName );
 	void parseCodeLine( char lineBuff[], int lineCnt );
 	void parseCode_handleOperImmediate( const char *pTok );
-	void parseCode_handleOperSymbol( const char *pTok, const SlAsmOpCodeDef *pOpDef, int operIdx );
+	void parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx );
 	bool parseLabelDef( const char *pTok );
 	void getVector( const char *pStr, float out_val[], int n );
 	void getString( const char *pStr, SlStr &out_str );
@@ -74,6 +77,8 @@ private:
 							const char *pReportOpName );
 };
 
+//==================================================================
+}
 //==================================================================
 }
 

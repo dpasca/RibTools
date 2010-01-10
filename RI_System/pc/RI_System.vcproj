@@ -498,19 +498,19 @@
 				Name="Shader"
 				>
 				<File
-					RelativePath="..\src\RI_SlAsm_OpCodeDefs.cpp"
+					RelativePath="..\src\RI_RRASM_OpCodeDefs.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlAsm_OpCodeDefs.h"
+					RelativePath="..\include\RI_RRASM_OpCodeDefs.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RI_SlAsmParser.cpp"
+					RelativePath="..\src\RI_RRASM_Parser.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlAsmParser.h"
+					RelativePath="..\include\RI_RRASM_Parser.h"
 					>
 				</File>
 				<File

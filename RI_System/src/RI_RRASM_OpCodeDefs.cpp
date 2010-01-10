@@ -1,16 +1,19 @@
 //==================================================================
-/// RI_SlAsm_OpCodeDefs.cpp
+/// RI_RRASM_OpCodeDefs.cpp
 ///
-/// Created by Davide Pasca - 2009/11/9
+/// Created by Davide Pasca - 2010/1/10
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_SlAsm_OpCodeDefs.h"
+#include "RI_RRASM_OpCodeDefs.h"
 
 //==================================================================
 namespace RI
+{
+//==================================================================
+namespace RRASM
 {
 
 #define NA	OPRTYPE_NA
@@ -19,7 +22,7 @@ namespace RI
 // NOTE: this table must match the order of callbacks in sInstructionTable in RI_SlShader.cpp
 // NOTE: make sure that the allowed types satisfy the rules in
 //       RSLC_Operators_SolveBiOpType_RulesTable.h
-SlAsmOpCodeDef	_gSlAsmOpCodeDefs[] =
+OpCodeDef	_gOpCodeDefs[] =
 {
 	"ret"			,	0,			0,	NA,	NA, NA, NA, NA,
 
@@ -114,7 +117,6 @@ SlAsmOpCodeDef	_gSlAsmOpCodeDefs[] =
 
 	"normalize"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, NA, NA, NA,
 	"faceforward"	,	3,			0,	OPRTYPE_F3,	OPRTYPE_F3,	OPRTYPE_F3, NA, NA,
-	"diffuse"		,	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, NA, NA, NA,
 	"ambient"		,	1,			0,	OPRTYPE_F3,	NA, NA,	NA,	NA,
 	"calculatenormal",	2,			0,	OPRTYPE_F3,	OPRTYPE_F3, NA,	NA,	NA,
 
@@ -132,5 +134,7 @@ SlAsmOpCodeDef	_gSlAsmOpCodeDefs[] =
 
 #undef NA
 
+//==================================================================
+}
 //==================================================================
 }
