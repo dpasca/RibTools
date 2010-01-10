@@ -26,38 +26,64 @@
 												  _mm_mul_ps(_mm_mul_ps(x,t),t) ),t)  );
 	}
 
-	typedef __m128	VecNMask;
-
-	static const union
+	//==================================================================
+	struct VecNMask
 	{
-		unsigned int	m[4];
-		__m128			v;
-	} DMT_SIMD_ALLONE = { { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF } };
+		union
+		{
+			unsigned int	m[4];
+			__m128			v;
+		} u;
 
-	static const union
+		VecNMask()						{}
+		
+		VecNMask( const __m128 &from )	{	u.v = from; }
+		
+		VecNMask( unsigned int a, unsigned int b, unsigned int c, unsigned int d )
+		{
+			u.m[0] = a;
+			u.m[1] = b;
+			u.m[2] = c;
+			u.m[3] = d;
+		}
+
+		friend VecNMask CmpMaskEQ( const VecNMask &lval, const VecNMask &rval ) { return _mm_cmpeq_ps( lval.u.v, rval.u.v );  }
+		friend VecNMask CmpMaskNE( const VecNMask &lval, const VecNMask &rval ) { return _mm_cmpneq_ps( lval.u.v, rval.u.v ); }
+
+		friend bool operator ==( const VecNMask &lval, const VecNMask &rval )
+		{
+			__m128	tmp = _mm_xor_ps( lval.u.v, rval.u.v );
+
+			unsigned int	folded =  ((const unsigned int *)&tmp)[0]
+									| ((const unsigned int *)&tmp)[1]
+									| ((const unsigned int *)&tmp)[2]
+									| ((const unsigned int *)&tmp)[3];
+			return !folded;
+		}
+
+		friend bool operator !=( const VecNMask &lval, const VecNMask &rval )
+		{
+			return !(lval == rval);
+		}
+
+		VecNMask operator & ( const VecNMask &rval ) {	return _mm_and_ps( u.v, rval.u.v ); }
+		VecNMask operator | ( const VecNMask &rval ) {	return _mm_or_ps( u.v, rval.u.v ); }
+	};
+
+	static const VecNMask DMT_SIMD_ALLONE( 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF );
+	static const VecNMask DMT_SIMD_ALLZERO( 0, 0, 0, 0 );
+
+	static const VecNMask VecNMaskFull = DMT_SIMD_ALLONE.u.v;
+	static const VecNMask VecNMaskEmpty = DMT_SIMD_ALLZERO.u.v;
+
+	inline void VecNMask_Broadcast0Lane( VecNMask &val )
 	{
-		unsigned int	m[4];
-		__m128			v;
-	} DMT_SIMD_ALLZERO = { { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF } };
-
-	static const VecNMask VecNMaskFull = DMT_SIMD_ALLONE.v;
-	static const VecNMask VecNMaskEmpty = DMT_SIMD_ALLZERO.v;
-
-	inline bool		operator ==( const VecNMask &lval, const VecNMask &rval )
-	{
-		__m128	tmp = _mm_xor_ps( lval, rval );
-
-		unsigned int	folded =  ((const unsigned int *)&tmp)[0]
-								| ((const unsigned int *)&tmp)[1]
-								| ((const unsigned int *)&tmp)[2]
-								| ((const unsigned int *)&tmp)[3];
-		return !!folded;
+		val.u.v = _mm_shuffle_ps( val.u.v, val.u.v, _MM_SHUFFLE(0,0,0,0) );
 	}
 
-	inline VecNMask	operator & ( const VecNMask &lval, const VecNMask &rval ) {	return _mm_and_ps( lval, rval ); }
-	inline VecNMask	operator | ( const VecNMask &lval, const VecNMask &rval ) {	return _mm_or_ps( lval, rval ); }
+#else
 
-#elif defined(DMATH_USE_M512)
+#if defined(DMATH_USE_M512)
 
 	#define USE_C_PROTOTYPE_PRIMITIVES 0
 
@@ -67,16 +93,23 @@
 
 	typedef __mmask	VecNMask;	// only need 16 bits
 
-	static const VecNMask VecNMaskFull = (VecNMask)-1;
-	static const VecNMask VecNMaskEmpty = (VecNMask)0;
 #else
 
 	#define DMT_SIMD_FLEN	4
 
 	typedef unsigned char	VecNMask;	// only need 4 bits (round to 1 byte)
 
+#endif
+
+	inline void VecNMask_Broadcast0Lane( VecNMask &val )
+	{
+		// expand the least significant bit
+		val = (VecNMask)(((signed short)(val << 15)) >> 15);
+	}
+
 	static const VecNMask VecNMaskFull = (VecNMask)-1;
 	static const VecNMask VecNMaskEmpty = (VecNMask)0;
+
 #endif
 
 // gives the number of SIMD blocks necessary for _SIZE_ elements

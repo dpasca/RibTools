@@ -192,71 +192,78 @@ void Inst_Ambient( SlRunContext &ctx )
 }
 
 //==================================================================
+void FuncOpEnd_Illuminance( SlRunContext &ctx )
+{
+	DASSERT( ctx.mIlluminanceCtx.IsActive() );
+
+	if ( ctx.mIlluminanceCtx.mActLightIdx < ctx.mIlluminanceCtx.mActLightsN )
+	{
+		const LightSourceT	*pLight = NULL;
+
+		// find the next non-ambient light
+		for (;
+			ctx.mIlluminanceCtx.mActLightIdx < ctx.mIlluminanceCtx.mActLightsN;
+			++ctx.mIlluminanceCtx.mActLightIdx )
+		{
+			// get the light from the attributes (though attributes takes them from "State")
+			pLight = ctx.mpAttribs->GetLight( ctx.mIlluminanceCtx.mActLightIdx );
+
+			if ( pLight->mIsAmbient )
+				continue;
+
+			// make sure that the subcontextes for the lights are initialized
+			ctx.ActLightsCtxs_CheckInit();
+
+			SlRunContext *pCtx = ctx.GetActLightCtx( ctx.mIlluminanceCtx.mActLightIdx );
+
+			// setup the new context
+			pCtx->SetupIfChanged(
+						*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
+						pLight->moShaderInst.Use(),	// shader instance from the light source
+						ctx.mBlocksXN,				// same dimensions as the current shader
+						ctx.mPointsYN );			// ...
+
+			// run the light shader !!
+			pCtx->mpShaderInst->Run( *pCtx );
+
+			ctx.mIlluminanceCtx.Increment();
+			ctx.GotoInstruction( ctx.mIlluminanceCtx.mBodyStartAddr );
+			return;
+		}
+	}
+
+	ctx.mIlluminanceCtx.Reset();
+	ctx.mFopStack.pop();
+	ctx.NextInstruction();
+}
+
+//==================================================================
 void Inst_FuncopEnd( SlRunContext &ctx )
 {
-	SRC_FuncopStack::Id funcopId =	ctx.mFopStack.top();
+	u_int funcopFlgs =	ctx.mFopStack.top();
 
-	// are we in an if ?
-	if ( funcopId == SRC_FuncopStack::ID_IFTRUE )
+	// are ending an if or an else ?
+	if ( funcopFlgs & (SRC_FuncopStack::FLG_IFTRUE | SRC_FuncopStack::FLG_ORELSE) )
 	{
-		// do nothing
+		// just continue
 		ctx.mFopStack.pop();
 		ctx.NextInstruction();
 	}
 	else
 	// are we doing illuminance ?
-	if ( funcopId == SRC_FuncopStack::ID_ILLUMINANCE )
+	if ( funcopFlgs & SRC_FuncopStack::FLG_ILLUMINANCE )
 	{
-		DASSERT( ctx.mIlluminanceCtx.IsActive() );
-
-		if ( ctx.mIlluminanceCtx.mActLightIdx < ctx.mIlluminanceCtx.mActLightsN )
-		{
-			const LightSourceT	*pLight = NULL;
-
-			// find the next non-ambient light
-			for (;
-				ctx.mIlluminanceCtx.mActLightIdx < ctx.mIlluminanceCtx.mActLightsN;
-				++ctx.mIlluminanceCtx.mActLightIdx )
-			{
-				// get the light from the attributes (though attributes takes them from "State")
-				pLight = ctx.mpAttribs->GetLight( ctx.mIlluminanceCtx.mActLightIdx );
-
-				if ( pLight->mIsAmbient )
-					continue;
-
-				// make sure that the subcontextes for the lights are initialized
-				ctx.ActLightsCtxs_CheckInit();
-
-				SlRunContext *pCtx = ctx.GetActLightCtx( ctx.mIlluminanceCtx.mActLightIdx );
-
-				// setup the new context
-				pCtx->SetupIfChanged(
-							*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
-							pLight->moShaderInst.Use(),	// shader instance from the light source
-							ctx.mBlocksXN,				// same dimensions as the current shader
-							ctx.mPointsYN );			// ...
-
-				// run the light shader !!
-				pCtx->mpShaderInst->Run( *pCtx );
-
-				ctx.mIlluminanceCtx.Increment();
-				ctx.GotoInstruction( ctx.mIlluminanceCtx.mBodyStartAddr );
-				return;
-			}
-		}
-
-		ctx.mIlluminanceCtx.Reset();
-		ctx.mFopStack.pop();
-		ctx.NextInstruction();
+		FuncOpEnd_Illuminance( ctx );
 	}
 	else
-	if ( funcopId == SRC_FuncopStack::ID_SOLAR )
+	if ( funcopFlgs & SRC_FuncopStack::FLG_SOLAR )
 	{
 		ctx.mFopStack.pop();
 		ctx.NextInstruction();
 	}
 	else
 	{
+		ctx.NextInstruction();
 		DASSTHROW( 0, ("'funcop' stack broken ?!") );
 	}
 }

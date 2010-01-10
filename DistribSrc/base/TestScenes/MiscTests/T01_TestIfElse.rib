@@ -11,7 +11,7 @@ WorldBegin
 	Sphere 1 -1 1 360
 
 	Translate 2.2 0 0
-	Surface "T01_TestIfElse" "texture" ["YES"]
+	Surface "T01_TestIfElse" "texturename" ["YES"]
 	Sphere 1 -1 1 360
 	
 WorldEnd

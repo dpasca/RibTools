@@ -180,7 +180,9 @@ void SlShaderInst::runFrom( SlRunContext &ctx, u_int startPC ) const
 			}
 
 			// [pWord->mOpCode.mDestOpType]
-			_gSlOpCodeFuncs[pWord->mOpCode.mTableOffset]( ctx );
+			SlOpCodeFunc	nextFunc = _gSlOpCodeFuncs[pWord->mOpCode.mTableOffset];
+
+			nextFunc( ctx );
 
 #if defined(FORCE_MEM_CORRUPTION_CHECK)
 			const char *pDude = DNEW char;

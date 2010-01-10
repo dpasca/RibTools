@@ -71,17 +71,16 @@ public:
 class SRC_FuncopStack
 {
 public:
-	enum Id
-	{
-		ID_IFTRUE,
-		ID_SOLAR,
-		ID_ILLUMINANCE,
-		ID_N
-	};
+	static const u_int	FLG_IFTRUE			= 1 << 1;
+	static const u_int	FLG_IFTRUE_TRUE		= 1 << 2;
+	static const u_int	FLG_IFTRUE_VARY		= 1 << 3;
+	static const u_int	FLG_ORELSE			= 1 << 4;
+	static const u_int	FLG_SOLAR			= 1 << 5;
+	static const u_int	FLG_ILLUMINANCE		= 1 << 6;
 
 	static const size_t	MAX_N = 16;
 
-	Id		mStack[MAX_N];
+	u_int	mStack[MAX_N];
 	size_t	mStackN;
 
 public:
@@ -90,7 +89,7 @@ public:
 	{
 	}
 
-	void push( Id id )
+	void push( u_int id )
 	{
 		DASSTHROW( mStackN < MAX_N, ("Out of bounds with funcop stack !") );
 		mStack[ mStackN++ ] = id;
@@ -102,7 +101,7 @@ public:
 		--mStackN;
 	}
 
-	Id top() const
+	u_int top() const
 	{
 		DASSTHROW( mStackN > 0, ("Out of bounds with funcop stack !") );
 		return mStack[ mStackN - 1 ];

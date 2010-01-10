@@ -39,6 +39,21 @@ void Inst_CMPLT( SlRunContext &ctx )
 }
 
 //==================================================================
+template <class _T>
+inline _T GetBroadcast0Lane( const _T &val )
+{
+	return _T( val[0] );
+}
+//==================================================================
+template <>
+inline VecNMask GetBroadcast0Lane( const VecNMask &val )
+{
+	VecNMask	tmp = val;
+	VecNMask_Broadcast0Lane( tmp );
+	return tmp;
+}
+
+//==================================================================
 template <class TB, const OpBaseTypeID opBaseTypeID>
 void Inst_SETCMP_EQ( SlRunContext &ctx )
 {
@@ -77,8 +92,10 @@ void Inst_SETCMP_EQ( SlRunContext &ctx )
 		{
 			SLRUNCTX_BLKWRITECHECK( 0 );
 			{
-			if ( opBaseTypeID == OBT_SETEQ	 ) lhs[0] = CmpMaskEQ(op1[0], op2[0]); else
-			if ( opBaseTypeID == OBT_SETNEQ	 ) lhs[0] = CmpMaskNE(op1[0], op2[0]); else
+			TB	expandedOp1 = GetBroadcast0Lane( op1[0] );	// replicate a single value through the whole SIMD register
+			TB	expandedOp2 = GetBroadcast0Lane( op2[0] );	// ...
+			if ( opBaseTypeID == OBT_SETEQ	 ) lhs[0] = CmpMaskEQ(expandedOp1, expandedOp2); else
+			if ( opBaseTypeID == OBT_SETNEQ	 ) lhs[0] = CmpMaskNE(expandedOp1, expandedOp2); else
 			{ DASSERT( 0 );		}
 			}
 		}
@@ -139,7 +156,7 @@ void Inst_SETCMP_REL( SlRunContext &ctx )
 				if ( opBaseTypeID == OBT_SETGT	 ) lhs[i] = CmpMaskGT(op1[op1_offset], op2[op2_offset]); else
 				{ DASSERT( 0 ); }
 			}
-			
+
 			op1_offset	+= op1_step;
 			op2_offset	+= op2_step;
 		}
@@ -153,10 +170,12 @@ void Inst_SETCMP_REL( SlRunContext &ctx )
 		{
 			SLRUNCTX_BLKWRITECHECK( 0 );
 			{
-			if ( opBaseTypeID == OBT_SETLE	 ) lhs[0] = CmpMaskLE(op1[0], op2[0]); else
-			if ( opBaseTypeID == OBT_SETGE	 ) lhs[0] = CmpMaskGE(op1[0], op2[0]); else
-			if ( opBaseTypeID == OBT_SETLT	 ) lhs[0] = CmpMaskLT(op1[0], op2[0]); else
-			if ( opBaseTypeID == OBT_SETGT	 ) lhs[0] = CmpMaskGT(op1[0], op2[0]); else
+			TB	expandedOp1 = GetBroadcast0Lane( op1[0] );	// replicate a single value through the whole SIMD register
+			TB	expandedOp2 = GetBroadcast0Lane( op2[0] );	// ...
+			if ( opBaseTypeID == OBT_SETLE	 ) lhs[0] = CmpMaskLE(expandedOp1, expandedOp2); else
+			if ( opBaseTypeID == OBT_SETGE	 ) lhs[0] = CmpMaskGE(expandedOp1, expandedOp2); else
+			if ( opBaseTypeID == OBT_SETLT	 ) lhs[0] = CmpMaskLT(expandedOp1, expandedOp2); else
+			if ( opBaseTypeID == OBT_SETGT	 ) lhs[0] = CmpMaskGT(expandedOp1, expandedOp2); else
 			{ DASSERT( 0 );		}
 			}
 		}
@@ -165,45 +184,8 @@ void Inst_SETCMP_REL( SlRunContext &ctx )
 	ctx.NextInstruction();
 }
 
-//==================================================================
-void Inst_IfTrue( SlRunContext &ctx )
-{
-	  VecNMask*	lhs	= ctx.GetRW( (VecNMask *)0, 1 );
-
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-
-	if ( lhs_varying )
-	{
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-			//lhs[i] = CmpMaskLE(op1[op1_offset], op2[op2_offset]);
-			}
-		}
-	}
-	else
-	{
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-			//lhs[0] = CmpMaskLE(op1[0], op2[0]);
-			}
-		}
-	}
-
-	ctx.mFopStack.push( SRC_FuncopStack::ID_IFTRUE );
-
-	ctx.NextInstruction();
-}
-
-
-//==================================================================
-void Inst_OrElse( SlRunContext &ctx )
-{
-	ctx.NextInstruction();
-}
+void Inst_IfTrue( SlRunContext &ctx );
+void Inst_OrElse( SlRunContext &ctx );
 
 //==================================================================
 }

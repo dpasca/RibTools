@@ -32,8 +32,7 @@ static const char *gpMainLabelName = "__main";
 //==================================================================
 SlAsmParser::SlAsmParser( DUT::MemFile &file, SlShader *pShader, const char *pName ) :
 	mpShader(pShader),
-	mpName(pName),
-	mFuncOpBeginIdx(DNPOS)
+	mpName(pName)
 {
 	doParse( file );
 
@@ -699,23 +698,46 @@ void SlAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 
 	if ( pOpDef->Flags & OPC_FLG_FUNCOP_BEGIN )
 	{
+		// A beginning funcop could be: iftrue or soloar or illuminance
+
+		mFuncOpBeginIdx.push_back( instrIdx );
+
+		/*	TODO: deal with the nesting issue for light stuff at some point..
 		if ( mFuncOpBeginIdx != DNPOS )
 		{
 			onError( "Instruction %s cannot be nested !", pOpDef->pName );
 		}
 		else
 			mFuncOpBeginIdx = instrIdx;
+		*/
+	}
+	else
+	if ( pOpDef->Flags & OPC_FLG_FUNCOP_MIDDLE )
+	{
+		// A middle funcop could be: orelse
+
+		if NOT( mFuncOpBeginIdx.size() )
+			onError( "Something not matching for %s (where did it start ?)", pOpDef->pName );
+
+		size_t	setAddrInstrIdx = mFuncOpBeginIdx.back();
+		mFuncOpBeginIdx.pop_back();
+		mpShader->mCode[setAddrInstrIdx].mOpCode.mFuncopEndAddr = instrIdx;
+
+		mFuncOpBeginIdx.push_back( instrIdx );
 	}
 	else
 	if ( pOpDef->Flags & OPC_FLG_FUNCOP_END )
 	{
-		if ( mFuncOpBeginIdx == DNPOS )
-		{
-			onError( "Missing matching instruction for %s ", pOpDef->pName );
-		}
+		// A end funcop is alwaus "funcopend" and it may close any of the
+		// beginning or middle funcops
 
-		mpShader->mCode[mFuncOpBeginIdx].mOpCode.mFuncopEndAddr = instrIdx;
-		mFuncOpBeginIdx = DNPOS;
+		if NOT( mFuncOpBeginIdx.size() )
+			onError( "Something not matching for %s (where did it start ?)", pOpDef->pName );
+
+		size_t	setAddrInstrIdx = mFuncOpBeginIdx.back();
+		mFuncOpBeginIdx.pop_back();
+
+		mpShader->mCode[setAddrInstrIdx].mOpCode.mFuncopEndAddr = instrIdx;
 	}
 
 	if ( pOpDef->Flags & OPC_FLG_DIRPOSLIGHT_INSTR )
@@ -726,7 +748,7 @@ void SlAsmParser::parseCodeLine( char lineBuff[], int lineCnt )
 	SlCPUWord		instruction;
 	instruction.mOpCode.mTableOffset	= opCodeIdx;
 	instruction.mOpCode.mOperandCount	= pOpDef->OperCnt;
-	instruction.mOpCode.mFuncopEndAddr	= 0;
+	instruction.mOpCode.mFuncopEndAddr	= SlOpCode::INVALID_ADDR;
 	instruction.mOpCode.mDbgLineNum		= lineCnt;
 
 	mpShader->mCode.push_back( instruction );

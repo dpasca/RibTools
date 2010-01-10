@@ -116,17 +116,19 @@ public:
 //==================================================================
 struct SlOpCode
 {
-	u_int	mTableOffset;
-	u_short	mOperandCount;
-	u_short	mFuncopEndAddr;
-	u_int	mDbgLineNum;
+	static const u_short	INVALID_ADDR = 0xffff;
+
+	u_int	mTableOffset;	// Instruction index in the instruction table
+	u_short	mOperandCount;	// How many operands ?
+	u_short	mFuncopEndAddr;	// end of if/else, solar, etc, address
+	u_int	mDbgLineNum;	// what line in the RRASM code ?
 };
 
 //==================================================================
 struct SlSymbolWord
 {
-	u_int		mTableOffset;
-	bool		mIsVarying;
+	u_int	mTableOffset;
+	bool	mIsVarying;
 	Symbol	*mpOrigSymbol;
 };
 

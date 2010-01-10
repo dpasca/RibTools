@@ -313,36 +313,4 @@ public:
 
 #undef FOR_I_N
 
-/*
-#if defined(DMATH_USE_M128)
-
-template <> VecNMask CmpMaskLT( const VecN<float,DMT_SIMD_FLEN> &lval, const VecN<float,DMT_SIMD_FLEN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <> VecNMask CmpMaskGT( const VecN<float,DMT_SIMD_FLEN> &lval, const VecN<float,DMT_SIMD_FLEN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <> VecNMask CmpMaskEQ( const VecN<float,DMT_SIMD_FLEN> &lval, const VecN<float,DMT_SIMD_FLEN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <> VecNMask CmpMaskNE( const VecN<float,DMT_SIMD_FLEN> &lval, const VecN<float,DMT_SIMD_FLEN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <> VecNMask CmpMaskLE( const VecN<float,DMT_SIMD_FLEN> &lval, const VecN<float,DMT_SIMD_FLEN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <> VecNMask CmpMaskGE( const VecN<float,DMT_SIMD_FLEN> &lval, const VecN<float,DMT_SIMD_FLEN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-
-#elif defined(DMATH_USE_M512)
-
-template <class _S, size_t _N> VecNMask CmpMaskLT( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskGT( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskEQ( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskNE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskLE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskGE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-
-#else
-
-template <class _S, size_t _N> VecNMask CmpMaskLT( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskGT( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskEQ( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskNE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskLE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskGE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-
-#endif
-*/
-
-
 #endif

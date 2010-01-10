@@ -546,6 +546,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\include\RI_SlShader_Ops_Compare.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\include\RI_SlShader_Ops_Compare.h"
 					>
 				</File>

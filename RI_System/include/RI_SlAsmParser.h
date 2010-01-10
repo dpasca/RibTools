@@ -43,7 +43,7 @@ class SlAsmParser
 	DVec<Label>		mLabelDefs;
 	DVec<Label>		mLabelRefs;
 
-	size_t			mFuncOpBeginIdx;
+	DVec<size_t>	mFuncOpBeginIdx;
 	
 public:
 	//==================================================================
