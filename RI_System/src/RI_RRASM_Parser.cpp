@@ -12,7 +12,7 @@
 #include <stdarg.h>
 #include "DUtils.h"
 #include "RI_MicroPolygonGrid.h"
-#include "RI_SlRunContext.h"
+#include "RI_SVM_Context.h"
 #include "RI_RRASM_Parser.h"
 #include "RI_RRASM_OpCodeDefs.h"
 
@@ -33,7 +33,7 @@ static const char *gpMainLabelName = "__main";
 //==================================================================
 /// Parser
 //==================================================================
-Parser::Parser( DUT::MemFile &file, SlShader *pShader, const char *pName ) :
+Parser::Parser( DUT::MemFile &file, SVM::Shader *pShader, const char *pName ) :
 	mpShader(pShader),
 	mpName(pName)
 {
@@ -87,16 +87,16 @@ static bool beginsWithTokenI( const char *pStr, const char *pMatch )
 //==================================================================
 bool Parser::handleShaderTypeDef( const char *pLineWork, Section curSection )
 {
-	SlShader::Type	type = SlShader::TYPE_UNKNOWN;
+	SVM::Shader::Type	type = SVM::Shader::TYPE_UNKNOWN;
 
-	if ( !strcasecmp( pLineWork, "light" ) )		type = SlShader::TYPE_LIGHT;	else
-	if ( !strcasecmp( pLineWork, "surface" ) )		type = SlShader::TYPE_SURFACE;	else
-	if ( !strcasecmp( pLineWork, "volume" ) )		type = SlShader::TYPE_VOLUME;	else
-	if ( !strcasecmp( pLineWork, "displacement" ) )	type = SlShader::TYPE_DISPLACEMENT;	else
-	if ( !strcasecmp( pLineWork, "transformation" ) )type = SlShader::TYPE_TRANSFORMATION;	else
-	if ( !strcasecmp( pLineWork, "imager" ) )		type = SlShader::TYPE_IMAGER;
+	if ( !strcasecmp( pLineWork, "light" ) )		type = SVM::Shader::TYPE_LIGHT;	else
+	if ( !strcasecmp( pLineWork, "surface" ) )		type = SVM::Shader::TYPE_SURFACE;	else
+	if ( !strcasecmp( pLineWork, "volume" ) )		type = SVM::Shader::TYPE_VOLUME;	else
+	if ( !strcasecmp( pLineWork, "displacement" ) )	type = SVM::Shader::TYPE_DISPLACEMENT;	else
+	if ( !strcasecmp( pLineWork, "transformation" ) )type = SVM::Shader::TYPE_TRANSFORMATION;	else
+	if ( !strcasecmp( pLineWork, "imager" ) )		type = SVM::Shader::TYPE_IMAGER;
 
-	if ( type == SlShader::TYPE_UNKNOWN )
+	if ( type == SVM::Shader::TYPE_UNKNOWN )
 	{
 		if (
 			beginsWithTokenI( pLineWork, "light" ) 			||
@@ -112,7 +112,7 @@ bool Parser::handleShaderTypeDef( const char *pLineWork, Section curSection )
 		return false;
 	}
 
-	if ( mpShader->mType != SlShader::TYPE_UNKNOWN )
+	if ( mpShader->mType != SVM::Shader::TYPE_UNKNOWN )
 		onError( "Shader start/type already defined !" );
 	else
 	{
@@ -181,7 +181,7 @@ void Parser::doParse( DUT::MemFile &file )
 		++lineCnt;
 	}
 
-	if ( mpShader->mType == SlShader::TYPE_UNKNOWN )
+	if ( mpShader->mType == SVM::Shader::TYPE_UNKNOWN )
 		onError( "Shader type undefined !" );
 }
 
@@ -531,30 +531,30 @@ size_t Parser::findOrAddTempSymbol( const char *pName )
 
 
 //==================================================================
-static OperTypeID getOperTypeFromSlSymbolType( Symbol::Type slSymType, bool &out_success )
+static SVM::OperTypeID getOperTypeFromSlSymbolType( Symbol::Type slSymType, bool &out_success )
 {
 	out_success = true;
 
 	switch ( slSymType )
 	{
-	case Symbol::TYP_FLOAT:		return OPRTYPE_F1 ;
+	case Symbol::TYP_FLOAT:		return SVM::OPRTYPE_F1 ;
 
 	case Symbol::TYP_POINT:
 	case Symbol::TYP_VECTOR:
-	case Symbol::TYP_NORMAL:	return OPRTYPE_F3 ;
+	case Symbol::TYP_NORMAL:	return SVM::OPRTYPE_F3 ;
 
-	case Symbol::TYP_HPOINT:	return OPRTYPE_F4 ;
+	case Symbol::TYP_HPOINT:	return SVM::OPRTYPE_F4 ;
 
-	case Symbol::TYP_COLOR:		return OPRTYPE_F3 ;
+	case Symbol::TYP_COLOR:		return SVM::OPRTYPE_F3 ;
 
-	case Symbol::TYP_MATRIX:	return OPRTYPE_M44;
-	case Symbol::TYP_STRING:	return OPRTYPE_STR;
+	case Symbol::TYP_MATRIX:	return SVM::OPRTYPE_M44;
+	case Symbol::TYP_STRING:	return SVM::OPRTYPE_STR;
 
-	case Symbol::TYP_BOOL:		return OPRTYPE_BL;
+	case Symbol::TYP_BOOL:		return SVM::OPRTYPE_BL;
 
 	default:
 		out_success = false;
-		return OPRTYPE_F1;
+		return SVM::OPRTYPE_F1;
 	}
 }
 
@@ -567,12 +567,12 @@ static bool isTempSymbol( const char *pTok )
 //==================================================================
 void Parser::verifySymbolType(
 								Symbol::Type slSymType,
-								OperTypeID otExpected,
+								SVM::OperTypeID otExpected,
 								int reportOpIdx,
 								const char *pReportOpName )
 {
 	bool	success;
-	OperTypeID	otSolved = getOperTypeFromSlSymbolType( slSymType, success );
+	SVM::OperTypeID	otSolved = getOperTypeFromSlSymbolType( slSymType, success );
 
 	if ( !success || otSolved != otExpected )
 	{
@@ -584,7 +584,7 @@ void Parser::verifySymbolType(
 //==================================================================
 void Parser::parseCode_handleOperImmediate( const char *pTok )
 {
-	SlCPUWord	word;
+	SVM::CPUWord	word;
 
 	float	val;
 	if ( 1 != sscanf( pTok, "%f" , &val ) )
@@ -598,11 +598,11 @@ void Parser::parseCode_handleOperImmediate( const char *pTok )
 //==================================================================
 void Parser::parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx )
 {
-	OperTypeID	expectedOperType = pOpDef->Types[operIdx];
+	SVM::OperTypeID	expectedOperType = pOpDef->Types[operIdx];
 
-	SlCPUWord	word;
+	SVM::CPUWord	word;
 
-	if ( expectedOperType == OPRTYPE_ADDR )
+	if ( expectedOperType == SVM::OPRTYPE_ADDR )
 	{
 		// look for a label
 		Label	*pLabel = mLabelRefs.grow();
@@ -748,10 +748,10 @@ void Parser::parseCodeLine( char lineBuff[], int lineCnt )
 		mpShader->mHasDirPosInstructions = true;
 	}
 
-	SlCPUWord		instruction;
+	SVM::CPUWord		instruction;
 	instruction.mOpCode.mTableOffset	= opCodeIdx;
 	instruction.mOpCode.mOperandCount	= pOpDef->OperCnt;
-	instruction.mOpCode.mFuncopEndAddr	= SlOpCode::INVALID_ADDR;
+	instruction.mOpCode.mFuncopEndAddr	= SVM::OpCode::INVALID_ADDR;
 	instruction.mOpCode.mDbgLineNum		= lineCnt;
 
 	mpShader->mCode.push_back( instruction );

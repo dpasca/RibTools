@@ -13,7 +13,7 @@
 #include "RI_Param.h"
 #include "RI_Tokens.h"
 #include "RI_Symbol.h"
-#include "RI_SlShader.h"
+#include "RI_SVM_Shader.h"
 #include "RI_LightSource.h"
 
 //==================================================================
@@ -64,8 +64,8 @@ public:
 
 	Color				mColor;
 	Color				mOpacity;
-	RCOwn<SlShaderInst>	moSurfaceSHI;
-	RCOwn<SlShaderInst>	moDisplaceSHI;
+	RCOwn<SVM::ShaderInst>	moSurfaceSHI;
+	RCOwn<SVM::ShaderInst>	moDisplaceSHI;
 
 	DVec<U16>			mActiveLights;
 
@@ -120,9 +120,9 @@ public:
 	void cmdDisplacement( ParamList &params );
 
 private:
-	SlShader *loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName, bool &out_fileExists );
-	SlShader *getShader( const char *pShaderName, const char *pAlternateName );
-	void getShaderParams( ParamList &params, size_t fromIdx, SlShaderInst &shaderInst, const Matrix44 &mtxLocalCam );
+	SVM::Shader *loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName, bool &out_fileExists );
+	SVM::Shader *getShader( const char *pShaderName, const char *pAlternateName );
+	void getShaderParams( ParamList &params, size_t fromIdx, SVM::ShaderInst &shaderInst, const Matrix44 &mtxLocalCam );
 };
 
 //==================================================================

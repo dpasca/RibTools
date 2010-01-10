@@ -101,7 +101,7 @@ static void solveExpressions_sub( TokNode *pNode, const DVec<Function> &funcs )
 
 		if ( pFunc )
 		{
-			pNode->mpNodeTypeFuncCall_pFunc = pFunc;
+			pNode->mFuncCall.mpFunc = pFunc;
 		}
 	}
 	else

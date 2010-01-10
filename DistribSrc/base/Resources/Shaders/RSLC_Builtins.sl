@@ -327,9 +327,44 @@ color phong( normal N; vector V; float size )
 	return C;
 }
 
+/*================================================================*/
+color trace( point P, point R )
+{
+	return color( 0 );
+}
+
+/*================================================================*/
+color texture( string texname ){
+	color	val; _asm_texture_vx( val, texname );
+	return val;
+}
+/*================================================================*/
+color texture( string texname; float s0, t0 ){
+	color	val; _asm_texture_vxss( val, texname, s0, t0 );
+	return val;
+}
+/*================================================================*/
+color texture( string texname; float s0, t0, s1, t1, s2, t2, s3, t3 ){
+	color	val; _asm_texture_vxssssssss( val, texname, s0, t0, s1, t1, s2, t2, s3, t3 );
+	return val;
+}
+/*================================================================*/
+float texture( string texname ){
+	float	val; _asm_texture_sxss( val, texname, s0, t0 );
+	return val;
+}
+/*================================================================*/
+float texture( string texname; float s0, t0 ){
+	float	val; _asm_texture_sxss( val, texname, s0, t0 );
+	return val;
+}
+/*================================================================*/
+float texture( string texname; float s0, t0, s1, t1, s2, t2, s3, t3 ){
+	float	val; _asm_texture_sxssssssss( val, texname, s0, t0, s1, t1, s2, t2, s3, t3 );
+	return val;
+}
+
 /*
-color	trace( point P, point R ){}
-float	texture( string name[channel]; [texture coordinates,] [parameterlist] ){}
 color	texture( string name[channel]; [texture coordinates,] [parameterlist] ){}
 float	environment( string name[channel]; texture coordinates, [parameterlist] ){}
 color	environment( string name[channel]; texture coordinates, [parameterlist] ){}

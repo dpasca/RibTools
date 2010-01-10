@@ -154,18 +154,18 @@ void State::addDefShader( const char *pBasePath, const char *pSName )
 {
 	char	buff[1024];
 
-	SlShader::CtorParams	params;
+	SVM::Shader::CtorParams	params;
 	params.pName			= pSName;
 	params.pSourceFileName	= buff;
 	params.pAppResDir		= mParams.mDefaultShadersDir.c_str();
 
-	SlShader *pShader = NULL;
+	SVM::Shader *pShader = NULL;
 	try 
 	{
 		sprintf( buff, "%s/%s.sl", pBasePath, params.pName );
 		if ( mParams.mpFileManager->FileExists( buff ) )
 		{
-			pShader = DNEW SlShader( params, *mParams.mpFileManager );
+			pShader = DNEW SVM::Shader( params, *mParams.mpFileManager );
 			mResManager.AddResource( pShader );
 		}
 		else
@@ -173,7 +173,7 @@ void State::addDefShader( const char *pBasePath, const char *pSName )
 			sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
 			if ( mParams.mpFileManager->FileExists( buff ) )
 			{
-				pShader = DNEW SlShader( params, *mParams.mpFileManager );
+				pShader = DNEW SVM::Shader( params, *mParams.mpFileManager );
 				mResManager.AddResource( pShader );
 			}
 		}

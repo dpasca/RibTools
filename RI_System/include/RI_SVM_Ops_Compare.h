@@ -1,25 +1,24 @@
 //==================================================================
-/// RI_SlShader_Ops_Compare.h
+/// RI_SVM_Ops_Compare.h
 ///
 /// Created by Davide Pasca - 2010/1/9
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_SLSHADER_OPS_COMPARE_H
-#define RI_SLSHADER_OPS_COMPARE_H
+#ifndef RI_SVM_OPS_COMPARE_H
+#define RI_SVM_OPS_COMPARE_H
 
 //==================================================================
 namespace RI
 {
-
 //==================================================================
-namespace SOP
+namespace SVM
 {
 
 //==================================================================
 template <class TA>
-void Inst_CMPLT( SlRunContext &ctx )
+void Inst_CMPLT( Context &ctx )
 {
 	const TA	*lhs	= ctx.GetRO( (const TA *)0, 1 );
 	const TA	*rhs	= ctx.GetRO( (const TA *)0, 2 );
@@ -55,7 +54,7 @@ inline VecNMask GetBroadcast0Lane( const VecNMask &val )
 
 //==================================================================
 template <class TB, const OpBaseTypeID opBaseTypeID>
-void Inst_SETCMP_EQ( SlRunContext &ctx )
+void Inst_SETCMP_EQ( Context &ctx )
 {
 	  VecNMask*	lhs	= ctx.GetRW( (VecNMask *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -106,7 +105,7 @@ void Inst_SETCMP_EQ( SlRunContext &ctx )
 
 //==================================================================
 template <class TB, const OpBaseTypeID opBaseTypeID>
-void Inst_SETCMP_EQ_NoVary( SlRunContext &ctx )
+void Inst_SETCMP_EQ_NoVary( Context &ctx )
 {
 	  VecNMask*	lhs	= ctx.GetRW( (VecNMask *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -131,7 +130,7 @@ void Inst_SETCMP_EQ_NoVary( SlRunContext &ctx )
 
 //==================================================================
 template <class TB, const OpBaseTypeID opBaseTypeID>
-void Inst_SETCMP_REL( SlRunContext &ctx )
+void Inst_SETCMP_REL( Context &ctx )
 {
 	  VecNMask*	lhs	= ctx.GetRW( (VecNMask *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -184,12 +183,11 @@ void Inst_SETCMP_REL( SlRunContext &ctx )
 	ctx.NextInstruction();
 }
 
-void Inst_IfTrue( SlRunContext &ctx );
-void Inst_OrElse( SlRunContext &ctx );
+void Inst_IfTrue( Context &ctx );
+void Inst_OrElse( Context &ctx );
 
 //==================================================================
 }
-
 //==================================================================
 }
 

@@ -16,7 +16,7 @@ namespace RI
 
 //==================================================================
 static void addShaderParam(
-					SlShaderInst		&shaInst,
+					SVM::ShaderInst		&shaInst,
 					const SymbolList	&globalSyms,
 					ParamList			&params,
 					size_t				fromIdx,
@@ -133,7 +133,7 @@ static void addShaderParam(
 void Attributes::getShaderParams(
 						ParamList		&params,
 						size_t			fromIdx,
-						SlShaderInst	&shaderInst,
+						SVM::ShaderInst	&shaderInst,
 						const Matrix44	&mtxLocalCam )
 {
 	for (size_t i=fromIdx; i < params.size(); ++i)
@@ -166,7 +166,7 @@ void Attributes::getShaderParams(
 
 
 //==================================================================
-SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName, bool &out_fileExists )
+SVM::Shader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName, bool &out_fileExists )
 {
 	FileManagerBase	&fmanager = mpState->GetFileManager();
 
@@ -186,15 +186,15 @@ SlShader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir,
 
 	out_fileExists = true;
 
-	SlShader::CtorParams	params;
+	SVM::Shader::CtorParams	params;
 	params.pName			= pSName;
 	params.pAppResDir		= pAppResDir;
 	params.pSourceFileName	= buff;
 
-	SlShader *pShader = NULL;
+	SVM::Shader *pShader = NULL;
 
 	try {
-		pShader = DNEW SlShader( params, mpState->GetFileManager() );
+		pShader = DNEW SVM::Shader( params, mpState->GetFileManager() );
 	} catch ( ... )
 	{
 		mpState->EXCEPTPrintf( "Could not assemble '%s' !", params.pSourceFileName );
@@ -222,11 +222,11 @@ static void strRemoveTrailingDirDiv( DStr &io_str )
 }
 
 //==================================================================
-SlShader *Attributes::getShader( const char *pShaderName, const char *pAlternateName )
+SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAlternateName )
 {
 	// try see if we have it loaded already
-	SlShader	*pShader =
-			(SlShader *)mpResManager->FindResource( pShaderName,
+	SVM::Shader	*pShader =
+			(SVM::Shader *)mpResManager->FindResource( pShaderName,
 													ResourceBase::TYPE_SHADER );
 
 	if ( pShader )
@@ -291,7 +291,7 @@ SlShader *Attributes::getShader( const char *pShaderName, const char *pAlternate
 	if ( pAlternateName )
 	{
 		if ( pShader =
-				(SlShader *)mpResManager->FindResource( pAlternateName,
+				(SVM::Shader *)mpResManager->FindResource( pAlternateName,
 														ResourceBase::TYPE_SHADER ) )
 			return pShader;
 	}

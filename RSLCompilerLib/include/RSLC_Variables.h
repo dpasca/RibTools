@@ -38,6 +38,7 @@ void AddSelfVariable(
 VarType VarTypeFromToken( const Token *pTok );
 const char *VarTypeToString( VarType type );
 char VarTypeToLetter( VarType type );
+bool IsSameVarType( VarType vta, VarType vtb, bool laxCheck );
 
 //==================================================================
 void MarkUsedVariables( TokNode *pRoot );

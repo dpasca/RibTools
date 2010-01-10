@@ -514,71 +514,71 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\RI_SlRunContext.cpp"
+					RelativePath="..\src\RI_SVM_Binding.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlRunContext.h"
+					RelativePath="..\src\RI_SVM_Context.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RI_SlShader.cpp"
+					RelativePath="..\include\RI_SVM_Context.h"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader.h"
+					RelativePath="..\src\RI_SVM_OpCodeFuncs.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RI_SlShader_Binding.cpp"
+					RelativePath="..\include\RI_SVM_OpCodeFuncs.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RI_SlShader_OpCodeFuncs.cpp"
+					RelativePath="..\include\RI_SVM_Ops_Base.h"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader_OpCodeFuncs.h"
+					RelativePath="..\include\RI_SVM_Ops_Compare.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader_Ops_Base.h"
+					RelativePath="..\include\RI_SVM_Ops_Compare.h"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader_Ops_Compare.cpp"
+					RelativePath="..\src\RI_SVM_Ops_Lighting.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader_Ops_Compare.h"
+					RelativePath="..\include\RI_SVM_Ops_Lighting.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RI_SlShader_Ops_Lighting.cpp"
+					RelativePath="..\src\RI_SVM_Ops_Misc.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader_Ops_Lighting.h"
+					RelativePath="..\include\RI_SVM_Ops_Misc.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RI_SlShader_Ops_Misc.cpp"
+					RelativePath="..\include\RI_SVM_Ops_Noise.h"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader_Ops_Misc.h"
+					RelativePath="..\src\RI_SVM_Ops_XForm.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader_Ops_Noise.h"
+					RelativePath="..\include\RI_SVM_Ops_XForm.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RI_SlShader_Ops_XForm.cpp"
+					RelativePath="..\src\RI_SVM_Shader.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SlShader_Ops_XForm.h"
+					RelativePath="..\include\RI_SVM_Shader.h"
 					>
 				</File>
 			</Filter>

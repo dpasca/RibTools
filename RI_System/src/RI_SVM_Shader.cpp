@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_SlShader.cpp
+/// RI_SVM_Shader.cpp
 ///
 /// Created by Davide Pasca - 2009/2/19
 /// See the file "license.txt" that comes with this project for
@@ -7,13 +7,13 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_SlShader.h"
-#include "RI_SlRunContext.h"
+#include "RI_SVM_Shader.h"
+#include "RI_SVM_Context.h"
 #include "RI_RRASM_Parser.h"
 #include "RI_Attributes.h"
 #include "RI_State.h"
 #include "DUtils.h"
-#include "RI_SlShader_OpCodeFuncs.h"
+#include "RI_SVM_OpCodeFuncs.h"
 #include "RSLCompilerLib/include/RSLCompiler.h"
 #include "DSystem/include/DUtils_Files.h"
 
@@ -22,6 +22,9 @@
 
 //==================================================================
 namespace RI
+{
+//==================================================================
+namespace SVM
 {
 
 //==================================================================
@@ -66,7 +69,7 @@ static void compileSLToAsm(
 //==================================================================
 static void compileFromMemFile(
 				DUT::MemFile &file,
-				SlShader *pShader,
+				Shader *pShader,
 				const char *pFileName,
 				const char *pShaderName,
 				const char *pAppResDir,
@@ -109,9 +112,9 @@ static void compileFromMemFile(
 }
 
 //==================================================================
-/// SlShader
+/// Shader
 //==================================================================
-SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
+Shader::Shader( const CtorParams &params, FileManagerBase &fileManager ) :
 	ResourceBase(params.pName, ResourceBase::TYPE_SHADER),
 	mType(TYPE_UNKNOWN),
 	mStartPC(INVALID_PC),
@@ -139,28 +142,28 @@ SlShader::SlShader( const CtorParams &params, FileManagerBase &fileManager ) :
 }
 
 //==================================================================
-/// SlShaderInst
+/// ShaderInst
 //==================================================================
-SlShaderInst::SlShaderInst( SlShader *pShader, size_t maxPointsN ) :
+ShaderInst::ShaderInst( Shader *pShader, size_t maxPointsN ) :
 	moShader(pShader),
 	mMaxPointsN(maxPointsN)
 {
 }
 
 //==================================================================
-SlShaderInst::~SlShaderInst()
+ShaderInst::~ShaderInst()
 {
 }
 
 //==================================================================
-void SlShaderInst::runFrom( SlRunContext &ctx, u_int startPC ) const
+void ShaderInst::runFrom( Context &ctx, u_int startPC ) const
 {
 	ctx.mProgramCounterIdx = 0;
 	ctx.mProgramCounter[ ctx.mProgramCounterIdx ] = startPC;
 	ctx.mIlluminanceCtx.Reset();
 	ctx.mFopStack.clear();
 
-	const SlCPUWord	*pWord = NULL;
+	const CPUWord	*pWord = NULL;
 
 	try {
 		while ( true )
@@ -199,7 +202,7 @@ void SlShaderInst::runFrom( SlRunContext &ctx, u_int startPC ) const
 }
 
 //==================================================================
-void SlShaderInst::Run( SlRunContext &ctx ) const
+void ShaderInst::Run( Context &ctx ) const
 {
 	// reset the program counter
 	ctx.mProgramCounterIdx = 0;
@@ -211,7 +214,7 @@ void SlShaderInst::Run( SlRunContext &ctx ) const
 	// initialize the non uniform/constant values with eventual default data
 	for (size_t i=0; i < ctx.mpShaderInst->moShader->mpShaSyms.size(); ++i)
 	{
-		SlValue	&slValue = ctx.mpDataSegment[i];
+		Value	&slValue = ctx.mpDataSegment[i];
 
 		if ( slValue.Flags.mOwnData &&
 			 slValue.mpSrcSymbol->mpConstVal != NULL )
@@ -235,5 +238,7 @@ void SlShaderInst::Run( SlRunContext &ctx ) const
 	runFrom( ctx, moShader->mStartPC );
 }
 
+//==================================================================
+}
 //==================================================================
 }

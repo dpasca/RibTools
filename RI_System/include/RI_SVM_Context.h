@@ -1,23 +1,26 @@
 //==================================================================
-/// RI_SlRunContext.h
+/// RI_SVM_Context.h
 ///
 /// Created by Davide Pasca - 2009/2/20
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_SLRUNCONTEXT_H
-#define RI_SLRUNCONTEXT_H
+#ifndef RI_SVM_CONTEXT_H
+#define RI_SVM_CONTEXT_H
 
-#include "RI_SlShader.h"
+#include "RI_SVM_Shader.h"
 
 //==================================================================
 namespace RI
 {
-
 class Attributes;
 class SymbolList;
 class WorkGrid;
+
+//==================================================================
+namespace SVM
+{
 
 //==================================================================
 /// SlIlluminanceCtx
@@ -119,9 +122,9 @@ public:
 };
 
 //==================================================================
-/// SlRunContext
+/// Context
 //==================================================================
-class SlRunContext
+class Context
 {
 	static const u_int		MAX_PROG_STACK = 32;
 
@@ -146,12 +149,12 @@ public:
 	u_int					mPointsN;
 	u_int					mBlocksN;
 	int						*mpSIMDFlags;
-	SlValue					*mpDataSegment;
-	const SlShaderInst		*mpShaderInst;
+	Value					*mpDataSegment;
+	const ShaderInst		*mpShaderInst;
 	SymbolIList				*mpGridSymIList;
 	const Attributes		*mpAttribs;
 
-	DVec<SlRunContext *>	mpActLightsCtxs;
+	DVec<Context *>	mpActLightsCtxs;
 
 	class Cache
 	{
@@ -174,19 +177,19 @@ public:
 
 	} mCache;
 
-	SlRunContext( SymbolIList &symsIList, size_t maxPointsN );
-	~SlRunContext();
+	Context( SymbolIList &symsIList, size_t maxPointsN );
+	~Context();
 
 	void Init( WorkGrid *pGrid );
 
 	void SetupIfChanged(
 			const Attributes	&attribs,
-			const SlShaderInst	*pShaderInst,
+			const ShaderInst	*pShaderInst,
 			u_int				blocksXN,
 			u_int				pointsYN,
 			size_t				pointsN=0 );
 
-	SlRunContext *GetActLightCtx( size_t actLightIdx )
+	Context *GetActLightCtx( size_t actLightIdx )
 	{
 		return mpActLightsCtxs[ actLightIdx ];
 	}
@@ -194,7 +197,7 @@ public:
 	void ActLightsCtxs_CheckInit();
 	void FreeActLightsCtxs();
 
-	const SlShader *GetShader() const
+	const Shader *GetShader() const
 	{
 		return mpShaderInst->moShader.Use();
 	}
@@ -204,7 +207,7 @@ public:
 		return mFopStack.size() != 0;
 	}
 
-	const SlCPUWord *GetOp( u_int argc ) const
+	const CPUWord *GetOp( u_int argc ) const
 	{
 		return &mpShaderInst->moShader->mCode[mProgramCounter[mProgramCounterIdx] + argc];
 	}
@@ -214,12 +217,12 @@ public:
 		return GetOp(0)->mOpCode.mOperandCount;
 	}
 
-	SlValue			&GetValue( u_int argc )
+	Value			&GetValue( u_int argc )
 	{
 		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
 		return mpDataSegment[tableOff];
 	}
-	const SlValue	&GetValue( u_int argc ) const
+	const Value	&GetValue( u_int argc ) const
 	{
 		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
 		return mpDataSegment[tableOff];
@@ -248,13 +251,13 @@ public:
 
 	// -----
 private:
-	static void ensureWritable( const SlValue &value, Symbol::Type type )
+	static void ensureWritable( const Value &value, Symbol::Type type )
 	{
 		DASSERT( value.mpSrcSymbol->mType == type &&
 				 value.Flags.mCanChange != 0 );
 	}
 
-	static void ensureReadable( const SlValue &value, Symbol::Type type )
+	static void ensureReadable( const Value &value, Symbol::Type type )
 	{
 		DASSERT( value.mpSrcSymbol->mType == type  );
 	}
@@ -263,21 +266,21 @@ public:
 	// -----
 	Float_ *GetRW( Float_ *unused, u_int argc )
 	{
-		SlValue	&value = GetValue(argc);
+		Value	&value = GetValue(argc);
 		ensureWritable( value, Symbol::TYP_FLOAT );
 		return (Float_ *)value.Data.pVoidValue;
 	}
 
 	Float2_ *GetRW( Float2_ *unused, u_int argc )
 	{
-		SlValue	&value = GetValue(argc);
+		Value	&value = GetValue(argc);
 		ensureWritable( value, Symbol::TYP_FLOAT );
 		return (Float2_ *)value.Data.pVoidValue;
 	}
 
 	Float3_ *GetRW( Float3_ *unused, u_int argc )
 	{
-		SlValue	&value = GetValue(argc);
+		Value	&value = GetValue(argc);
 		DASSERT(
 			(value.mpSrcSymbol->mType == Symbol::TYP_POINT ||
 			 value.mpSrcSymbol->mType == Symbol::TYP_COLOR ||
@@ -289,28 +292,28 @@ public:
 
 	Float4_ *GetRW( Float4_ *unused, u_int argc )
 	{
-		SlValue	&value = GetValue(argc);
+		Value	&value = GetValue(argc);
 		ensureWritable( value, Symbol::TYP_HPOINT );
 		return (Float4_ *)value.Data.pVoidValue;
 	}
 
 	Matrix44 *GetRW( Matrix44 *unused, u_int argc )
 	{
-		SlValue	&value = GetValue(argc);
+		Value	&value = GetValue(argc);
 		ensureWritable( value, Symbol::TYP_MATRIX );
 		return (Matrix44 *)value.Data.pVoidValue;
 	}
 
 	SlStr *GetRW( SlStr *unused, u_int argc )
 	{
-		SlValue	&value = GetValue(argc);
+		Value	&value = GetValue(argc);
 		ensureWritable( value, Symbol::TYP_STRING );
 		return (SlStr *)value.Data.pVoidValue;
 	}
 
 	VecNMask *GetRW( VecNMask *unused, u_int argc )
 	{
-		SlValue	&value = GetValue(argc);
+		Value	&value = GetValue(argc);
 		ensureWritable( value, Symbol::TYP_BOOL );
 		return (VecNMask *)value.Data.pVoidValue;
 	}
@@ -318,21 +321,21 @@ public:
 	// -----
 	const Float_ *GetRO( const Float_ *unused, u_int argc ) const
 	{
-		const SlValue	&value = GetValue(argc);
+		const Value	&value = GetValue(argc);
 		ensureReadable( value, Symbol::TYP_FLOAT );
 		return (const Float_ *)value.Data.pVoidValue;
 	}
 
 	const Float2_ *GetRO( const Float2_ *unused, u_int argc ) const
 	{
-		const SlValue	&value = GetValue(argc);
+		const Value	&value = GetValue(argc);
 		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT );
 		return (const Float2_ *)value.Data.pVoidValue;
 	}
 
 	const Float3_ *GetRO( const Float3_ *unused, u_int argc ) const
 	{
-		const SlValue	&value = GetValue(argc);
+		const Value	&value = GetValue(argc);
 		DASSERT(
 			(value.mpSrcSymbol->mType == Symbol::TYP_POINT ||
 			 value.mpSrcSymbol->mType == Symbol::TYP_COLOR ||
@@ -343,28 +346,28 @@ public:
 
 	const Float4_ *GetRO( const Float4_ *unused, u_int argc ) const
 	{
-		const SlValue	&value = GetValue(argc);
+		const Value	&value = GetValue(argc);
 		ensureReadable( value, Symbol::TYP_HPOINT );
 		return (const Float4_ *)value.Data.pVoidValue;
 	}
 
 	const Matrix44 *GetRO( const Matrix44 *unused, u_int argc ) const
 	{
-		const SlValue	&value = GetValue(argc);
+		const Value	&value = GetValue(argc);
 		ensureReadable( value, Symbol::TYP_MATRIX );
 		return (const Matrix44 *)value.Data.pVoidValue;
 	}
 
 	const SlStr *GetRO( const SlStr *unused, u_int argc ) const
 	{
-		const SlValue	&value = GetValue(argc);
+		const Value	&value = GetValue(argc);
 		ensureReadable( value, Symbol::TYP_STRING );
 		return (const SlStr *)value.Data.pVoidValue;
 	}
 
 	const VecNMask *GetRO( const VecNMask *unused, u_int argc ) const
 	{
-		const SlValue	&value = GetValue(argc);
+		const Value	&value = GetValue(argc);
 		ensureReadable( value, Symbol::TYP_BOOL );
 		return (const VecNMask *)value.Data.pVoidValue;
 	}
@@ -393,6 +396,8 @@ public:
 				continue
 
 
+//==================================================================
+}
 //==================================================================
 }
 

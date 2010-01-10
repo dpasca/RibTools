@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_SlShader_Ops_XForm.cpp
+/// RI_SVM_Ops_XForm.cpp
 ///
 /// Created by Davide Pasca - 2009/10/7
 /// See the file "license.txt" that comes with this project for
@@ -7,21 +7,20 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_SlRunContext.h"
-#include "RI_SlShader_Ops_XForm.h"
+#include "RI_SVM_Context.h"
+#include "RI_SVM_Ops_XForm.h"
 #include "RI_MicroPolygonGrid.h"
 
 //==================================================================
 namespace RI
 {
-
 //==================================================================
-namespace SOP
+namespace SVM
 {
 
 //==================================================================
 static void getMtxToCurrent(
-					SlRunContext &ctx,
+					Context &ctx,
 					Matrix44 &out_MtxToCurrent,
 					const char *pFrSpaceName )
 {
@@ -50,7 +49,7 @@ static void getMtxToCurrent(
 
 //==================================================================
 template <const Symbol::Type _TYPE>
-void xFormname_VXV( SlRunContext &ctx )
+void xFormname_VXV( Context &ctx )
 {
 	// should do stuff here 8)
 
@@ -104,13 +103,13 @@ void xFormname_VXV( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_PXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::TYP_POINT>( ctx ); }
-void Inst_VXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::TYP_VECTOR>( ctx ); }
-void Inst_NXFormname_VXV( SlRunContext &ctx )	{ xFormname_VXV<Symbol::TYP_NORMAL>( ctx ); }
+void Inst_PXFormname_VXV( Context &ctx )	{ xFormname_VXV<Symbol::TYP_POINT>( ctx ); }
+void Inst_VXFormname_VXV( Context &ctx )	{ xFormname_VXV<Symbol::TYP_VECTOR>( ctx ); }
+void Inst_NXFormname_VXV( Context &ctx )	{ xFormname_VXV<Symbol::TYP_NORMAL>( ctx ); }
 
 //==================================================================
 // quite different for color ?
-void Inst_CXFormname_VXV( SlRunContext &ctx )
+void Inst_CXFormname_VXV( Context &ctx )
 {
 	// should do stuff here 8)
 
@@ -161,6 +160,5 @@ void Inst_CXFormname_VXV( SlRunContext &ctx )
 
 //==================================================================
 }
-
 //==================================================================
 }

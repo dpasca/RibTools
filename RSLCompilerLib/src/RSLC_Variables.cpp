@@ -79,6 +79,31 @@ char VarTypeToLetter( VarType type )
 }
 
 //==================================================================
+bool IsSameVarType( VarType vta, VarType vtb, bool laxTypes )
+{
+	if ( laxTypes )
+	{
+		switch ( vta )
+		{
+		//case VT_VECTOR:
+		case VT_POINT:
+		case VT_NORMAL:
+			vta = VT_VECTOR;
+		}
+
+		switch ( vtb )
+		{
+		//case VT_VECTOR:
+		case VT_POINT:
+		case VT_NORMAL:
+			vtb = VT_VECTOR;
+		}
+	}
+
+	return vta == vtb;
+}
+
+//==================================================================
 Variable *AddVariable(
 			TokNode *pNode,
 			TokNode *pDTypeNode,

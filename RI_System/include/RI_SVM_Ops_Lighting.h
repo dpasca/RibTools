@@ -1,30 +1,28 @@
 //==================================================================
-/// RI_SlShader_Ops_Lighting.h
+/// RI_SVM_Ops_Lighting.h
 ///
 /// Created by Davide Pasca - 2009/5/19
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_SLSHADER_OPS_LIGHTING_H
-#define RI_SLSHADER_OPS_LIGHTING_H
+#ifndef RI_SVM_OPS_LIGHTING_H
+#define RI_SVM_OPS_LIGHTING_H
 
 //==================================================================
 namespace RI
 {
-
-class SlRunContext;
-
 //==================================================================
-namespace SOP
+namespace SVM
 {
+class Context;
 
 //==================================================================
 template<bool INCLUDES_AXIS_ANGLE>
-void Inst_Illuminance( SlRunContext &ctx )
+void Inst_Illuminance( Context &ctx )
 {
 	// only from surface shaders !!
-	DASSERT( ctx.GetShader()->mType == SlShader::TYPE_SURFACE );
+	DASSERT( ctx.GetShader()->mType == Shader::TYPE_SURFACE );
 
 	DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
 
@@ -75,10 +73,10 @@ void Inst_Illuminance( SlRunContext &ctx )
 
 //==================================================================
 template<bool INCLUDES_AXIS_ANGLE>
-void Inst_Solar( SlRunContext &ctx )
+void Inst_Solar( Context &ctx )
 {
 	// only from light shaders !!
-	DASSERT( ctx.GetShader()->mType == SlShader::TYPE_LIGHT );
+	DASSERT( ctx.GetShader()->mType == Shader::TYPE_LIGHT );
 
 	DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
 
@@ -118,15 +116,14 @@ void Inst_Solar( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_FuncopEnd( SlRunContext &ctx );
+void Inst_FuncopEnd( Context &ctx );
 
 //==================================================================
-void Inst_Diffuse( SlRunContext &ctx );
-void Inst_Ambient( SlRunContext &ctx );
+void Inst_Diffuse( Context &ctx );
+void Inst_Ambient( Context &ctx );
 
 //==================================================================
 }
-
 //==================================================================
 }
 

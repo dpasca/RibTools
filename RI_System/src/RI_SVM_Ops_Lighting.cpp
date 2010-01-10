@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_SlShader_Ops_Lighting.cpp
+/// RI_SVM_Ops_Lighting.cpp
 ///
 /// Created by Davide Pasca - 2009/5/19
 /// See the file "license.txt" that comes with this project for
@@ -11,20 +11,19 @@
 #include "RI_State.h"
 #include "RI_Attributes.h"
 #include "RI_LightSource.h"
-#include "RI_SlRunContext.h"
-#include "RI_SlShader_Ops_Lighting.h"
+#include "RI_SVM_Context.h"
+#include "RI_SVM_Ops_Lighting.h"
 
 //==================================================================
 namespace RI
 {
-
 //==================================================================
-namespace SOP
+namespace SVM
 {
 
 //==================================================================
 // this is a simplified version.. until lights become available 8)
-void Inst_Ambient( SlRunContext &ctx )
+void Inst_Ambient( Context &ctx )
 {
 	if NOT( ctx.mCache.mAmbientColDone )
 	{
@@ -48,7 +47,7 @@ void Inst_Ambient( SlRunContext &ctx )
 			if NOT( pLight->mIsAmbient )
 				continue;
 
-			SlRunContext *pCtx = ctx.GetActLightCtx( i );
+			Context *pCtx = ctx.GetActLightCtx( i );
 
 			// setup the new context
 			pCtx->SetupIfChanged(
@@ -80,7 +79,7 @@ void Inst_Ambient( SlRunContext &ctx )
 }
 
 //==================================================================
-void FuncOpEnd_Illuminance( SlRunContext &ctx )
+void FuncOpEnd_Illuminance( Context &ctx )
 {
 	DASSERT( ctx.mIlluminanceCtx.IsActive() );
 
@@ -102,7 +101,7 @@ void FuncOpEnd_Illuminance( SlRunContext &ctx )
 			// make sure that the subcontextes for the lights are initialized
 			ctx.ActLightsCtxs_CheckInit();
 
-			SlRunContext *pCtx = ctx.GetActLightCtx( ctx.mIlluminanceCtx.mActLightIdx );
+			Context *pCtx = ctx.GetActLightCtx( ctx.mIlluminanceCtx.mActLightIdx );
 
 			// setup the new context
 			pCtx->SetupIfChanged(
@@ -126,7 +125,7 @@ void FuncOpEnd_Illuminance( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_FuncopEnd( SlRunContext &ctx )
+void Inst_FuncopEnd( Context &ctx )
 {
 	u_int funcopFlgs =	ctx.mFopStack.top();
 
@@ -158,6 +157,5 @@ void Inst_FuncopEnd( SlRunContext &ctx )
 
 //==================================================================
 }
-
 //==================================================================
 }

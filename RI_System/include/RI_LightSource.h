@@ -10,7 +10,7 @@
 #define RI_LIGHTSOURCE_H
 
 #include "RI_Base.h"
-#include "RI_SlShader.h"
+#include "RI_SVM_Shader.h"
 
 //==================================================================
 namespace RI
@@ -26,7 +26,7 @@ class Transform;
 class LightSourceT
 {
 public:
-	RCOwn<SlShaderInst>	moShaderInst;
+	RCOwn<SVM::ShaderInst>	moShaderInst;
 
 public:
 	enum Type

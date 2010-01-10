@@ -1,13 +1,13 @@
 //==================================================================
-/// RI_SlShader.h
+/// RI_SVM_Shader.h
 ///
 /// Created by Davide Pasca - 2009/2/19
 /// See the file "license.txt" that comes with this project for
 /// copyright info.
 //==================================================================
 
-#ifndef RI_SLSHADER_H
-#define RI_SLSHADER_H
+#ifndef RI_SVM_SHADER_H
+#define RI_SVM_SHADER_H
 
 #include "RI_Base.h"
 #include "RI_Symbol.h"
@@ -16,6 +16,9 @@
 
 //==================================================================
 namespace RI
+{
+//==================================================================
+namespace SVM
 {
 
 //==================================================================
@@ -64,7 +67,7 @@ enum OpCodeID
 };
 
 //==================================================================
-class SlValue
+class Value
 {
 public:
 	struct
@@ -81,7 +84,7 @@ public:
 
 	const Symbol	*mpSrcSymbol;
 
-	SlValue()
+	Value()
 	{
 		Flags.mOwnData = 0;
 		Flags.mCanChange = 0;
@@ -114,7 +117,7 @@ public:
 };
 
 //==================================================================
-struct SlOpCode
+struct OpCode
 {
 	static const u_short	INVALID_ADDR = 0xffff;
 
@@ -125,7 +128,7 @@ struct SlOpCode
 };
 
 //==================================================================
-struct SlSymbolWord
+struct SymbolWord
 {
 	u_int	mTableOffset;
 	bool	mIsVarying;
@@ -133,30 +136,30 @@ struct SlSymbolWord
 };
 
 //==================================================================
-struct SlAddress
+struct Address
 {
 	u_int	mOffset;
 };
 
 //==================================================================
-struct SlImmFloat
+struct ImmFloat
 {
 	float	mValue;
 };
 
 //==================================================================
-union SlCPUWord
+union CPUWord
 {
-	SlOpCode		mOpCode;
-	SlSymbolWord	mSymbol;
-	SlAddress		mAddress;
-	SlImmFloat		mImmFloat;
+	OpCode		mOpCode;
+	SymbolWord	mSymbol;
+	Address		mAddress;
+	ImmFloat	mImmFloat;
 };
 
 //==================================================================
-/// SlShader
+/// Shader
 //==================================================================
-class SlShader : public ResourceBase
+class Shader : public ResourceBase
 {
 public:
 	enum Type
@@ -176,7 +179,7 @@ public:
 	DVec<Symbol	*>		mpShaSyms;
 	DVec<u_int>			mpShaSymsStartPCs;
 	u_int				mStartPC;
-	DVec<SlCPUWord>		mCode;
+	DVec<CPUWord>		mCode;
 	bool				mHasDirPosInstructions;
 
 	struct CtorParams
@@ -195,17 +198,17 @@ public:
 		}
 	};
 
-	SlShader( const CtorParams &params, FileManagerBase &fileManager );
+	Shader( const CtorParams &params, FileManagerBase &fileManager );
 };
 
 //==================================================================
-/// SlShaderInst
+/// ShaderInst
 //==================================================================
-class SlShaderInst : public RCBase
+class ShaderInst : public RCBase
 {
-	friend class SlRunContext;
+	friend class Context;
 
-	RCOwn<SlShader>		moShader;
+	RCOwn<Shader>		moShader;
 	size_t				mMaxPointsN;
 
 public:
@@ -213,34 +216,36 @@ public:
 	SymbolIList			mCallSymIList;
 
 public:
-	SlShaderInst( SlShader *pShader, size_t maxPointsN=MP_GRID_MAX_SIZE );
-	~SlShaderInst();
+	ShaderInst( Shader *pShader, size_t maxPointsN=MP_GRID_MAX_SIZE );
+	~ShaderInst();
 
-	SlShaderInst( const SlShaderInst &right )
+	ShaderInst( const ShaderInst &right )
 	{
 		moShader.Borrow( right.moShader );
 		//mCallSymIList	= right.mCallSymIList;
 	}
 
-	void operator = ( const SlShaderInst &right )
+	void operator = ( const ShaderInst &right )
 	{
 		moShader.Borrow( right.moShader );
 		//mCallSymIList	= right.mCallSymIList;
 	}
 
-	SlValue	*Bind(
+	Value	*Bind(
 			const SymbolList	&globalSyms,
 			SymbolIList			&gridSymIList,
 			DVec<u_int>			&out_defParamValsStartPCs ) const;
 
-	void Unbind( SlValue * &pDataSegment ) const;
+	void Unbind( Value * &pDataSegment ) const;
 
-	void Run( class SlRunContext &ctx ) const;
+	void Run( class Context &ctx ) const;
 
 private:
-	void runFrom( class SlRunContext &ctx, u_int startPC ) const;
+	void runFrom( class Context &ctx, u_int startPC ) const;
 };
 
+//==================================================================
+}
 //==================================================================
 }
 

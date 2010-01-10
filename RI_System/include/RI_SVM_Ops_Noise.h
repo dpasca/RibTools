@@ -1,25 +1,24 @@
 //==================================================================
-/// RI_SlShader_Ops_Noise.h
+/// RI_SVM_Ops_Noise.h
 ///
 /// Created by Davide Pasca - 2009/5/19
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_SLSHADER_OPS_NOISE_H
-#define RI_SLSHADER_OPS_NOISE_H
+#ifndef RI_SVM_OPS_NOISE_H
+#define RI_SVM_OPS_NOISE_H
 
 //==================================================================
 namespace RI
 {
-
 //==================================================================
-namespace SOP
+namespace SVM
 {
 
 //==================================================================
 template <class TB>
-inline void Inst_Noise1( SlRunContext &ctx )
+inline void Inst_Noise1( Context &ctx )
 {
 		  Float_*	lhs	= ctx.GetRW( (Float_ *)0, 1 );
 	const TB*		op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -59,7 +58,7 @@ inline void Inst_Noise1( SlRunContext &ctx )
 
 //==================================================================
 template <class TB>
-inline void Inst_Noise3( SlRunContext &ctx )
+inline void Inst_Noise3( Context &ctx )
 {
 		  Float3_*	lhs	= ctx.GetRW( (	  Float3_*)0, 1 );
 	const TB	*	op1	= ctx.GetRO( (const TB	*)0, 2 );
@@ -99,7 +98,6 @@ inline void Inst_Noise3( SlRunContext &ctx )
 
 //==================================================================
 }
-
 //==================================================================
 }
 

@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_SlRunContext.cpp
+/// RI_SVM_RunContext.cpp
 ///
 /// Created by Davide Pasca - 2009/2/20
 /// See the file "license.txt" that comes with this project for
@@ -7,18 +7,21 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_SlRunContext.h"
+#include "RI_SVM_Context.h"
 #include "RI_MicroPolygonGrid.h"
 #include "RI_Attributes.h"
 
 //==================================================================
 namespace RI
 {
+//==================================================================
+namespace SVM
+{
 
 //==================================================================
-/// SlRunContext
+/// Context
 //==================================================================
-SlRunContext::SlRunContext( SymbolIList &symsIList, size_t maxPointsN ) :
+Context::Context( SymbolIList &symsIList, size_t maxPointsN ) :
 	mMaxPointsN(maxPointsN)
 {
 	mBlocksXN;
@@ -40,7 +43,7 @@ SlRunContext::SlRunContext( SymbolIList &symsIList, size_t maxPointsN ) :
 }
 
 //==================================================================
-SlRunContext::~SlRunContext()
+Context::~Context()
 {
 	DSAFE_DELETE_ARRAY( mpSIMDFlags );
 
@@ -55,7 +58,7 @@ SlRunContext::~SlRunContext()
 //==================================================================
 // this is called only once and from the end of the grid constructor
 // so to get the pointer of the grid that owns this object
-void SlRunContext::Init( WorkGrid *pGrid )
+void Context::Init( WorkGrid *pGrid )
 {
 	// make sure it hasn't been set already !
 	DASSERT( mpGrid == NULL );
@@ -64,9 +67,9 @@ void SlRunContext::Init( WorkGrid *pGrid )
 }
 
 //==================================================================
-void SlRunContext::SetupIfChanged(
+void Context::SetupIfChanged(
 			const Attributes	&attribs,
-			const SlShaderInst	*pShaderInst,
+			const ShaderInst	*pShaderInst,
 			u_int				blocksXN,
 			u_int				pointsYN,
 			size_t				pointsN )
@@ -107,7 +110,7 @@ void SlRunContext::SetupIfChanged(
 }
 
 //==================================================================
-void SlRunContext::InitializeSIMD( size_t samplesN )
+void Context::InitializeSIMD( size_t samplesN )
 {
 	DASSERT( samplesN <= mMaxPointsN );
 	mPointsN = samplesN;
@@ -118,7 +121,7 @@ void SlRunContext::InitializeSIMD( size_t samplesN )
 }
 
 //==================================================================
-void SlRunContext::ActLightsCtxs_CheckInit()
+void Context::ActLightsCtxs_CheckInit()
 {
 	// already allocated ? ..then just return
 	if ( mpActLightsCtxs.size() )
@@ -130,7 +133,7 @@ void SlRunContext::ActLightsCtxs_CheckInit()
 
 	for (size_t i=0; i < n; ++i)
 	{
-		SlRunContext *pCtx = DNEW SlRunContext( mpGrid->mSymbolIs, MP_GRID_MAX_SIZE );
+		Context *pCtx = DNEW Context( mpGrid->mSymbolIs, MP_GRID_MAX_SIZE );
 
 		// add the context to the list of light contextes
 		mpActLightsCtxs.push_back( pCtx );
@@ -141,7 +144,7 @@ void SlRunContext::ActLightsCtxs_CheckInit()
 }
 
 //==================================================================
-void SlRunContext::FreeActLightsCtxs()
+void Context::FreeActLightsCtxs()
 {
 	for (size_t i=0; i < mpActLightsCtxs.size(); ++i)
 	{
@@ -155,4 +158,5 @@ void SlRunContext::FreeActLightsCtxs()
 
 //==================================================================
 }
-
+//==================================================================
+}

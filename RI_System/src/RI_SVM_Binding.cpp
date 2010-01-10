@@ -7,10 +7,13 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_SlShader.h"
+#include "RI_SVM_Shader.h"
 
 //==================================================================
 namespace RI
+{
+//==================================================================
+namespace SVM
 {
 
 //==================================================================
@@ -58,7 +61,7 @@ static void matchSymbols( const Symbol &dst, const Symbol &src, bool &out_needCo
 
 //==================================================================
 static void bindGlobalStorageSymbol(
-						SlValue				&destValue	,
+						Value				&destValue	,
 						const Symbol		&shaSym		,
 						SymbolIList			&gridSymIList,
 						const SymbolList	&globalSyms
@@ -110,7 +113,7 @@ static void bindGlobalStorageSymbol(
 
 //==================================================================
 static void bindTemporaryStorageSymbol(
-						SlValue				&destValue	,
+						Value				&destValue	,
 						const Symbol		&shaSym		,
 						size_t				maxPoints
 						)
@@ -139,7 +142,7 @@ static void bindTemporaryStorageSymbol(
 }
 
 //==================================================================
-SlValue	*SlShaderInst::Bind(
+Value	*ShaderInst::Bind(
 					const SymbolList	&globalSyms,
 					SymbolIList			&gridSymIList,
 					DVec<u_int>			&out_defParamValsStartPCs ) const
@@ -148,7 +151,7 @@ SlValue	*SlShaderInst::Bind(
 
 	size_t	symbolsN = moShader->mpShaSyms.size();
 
-	SlValue	*pDataSegment = DNEW SlValue [ symbolsN ];
+	Value	*pDataSegment = DNEW Value [ symbolsN ];
 
 	for (size_t i=0; i < symbolsN; ++i)
 	{
@@ -197,7 +200,7 @@ SlValue	*SlShaderInst::Bind(
 				}
 				else
 				{
-					SlValue	&destValue = pDataSegment[i];
+					Value	&destValue = pDataSegment[i];
 
 					// is the param constant ?  ..odd, but...
 					if ( shaSym.IsConstant() )
@@ -236,7 +239,7 @@ SlValue	*SlShaderInst::Bind(
 }
 
 //==================================================================
-void SlShaderInst::Unbind( SlValue * &pDataSegment ) const
+void ShaderInst::Unbind( Value * &pDataSegment ) const
 {
 	size_t	symbolsN = moShader->mpShaSyms.size();
 
@@ -250,5 +253,7 @@ void SlShaderInst::Unbind( SlValue * &pDataSegment ) const
 	pDataSegment = NULL;
 }
 
+//==================================================================
+}
 //==================================================================
 }

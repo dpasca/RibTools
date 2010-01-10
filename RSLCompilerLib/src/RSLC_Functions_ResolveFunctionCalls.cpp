@@ -85,19 +85,21 @@ static TokNode *cloneBranch( const TokNode *pNode )
 }
 
 //==================================================================
-static bool isVecNorPoint( VarType vtype )
-{
-	return
-		vtype == VT_VECTOR ||
-		vtype == VT_NORMAL ||
-		vtype == VT_POINT;
-}
-
-//==================================================================
-static bool doVTypesMatch( const Function &func, const TokNode &callNode, bool laxTypes )
+static bool doVTypesMatch(
+				const Function	&func,
+				const TokNode	&callNode,
+				VarType			retCastVType,
+				bool			laxTypes )
 {
 	if ( callNode.mpChilds.size() != func.mParamsVarTypes.size() )
 		return false;
+
+	// do we have a return cast value to match ?
+	if ( retCastVType != VT_UNKNOWN )
+	{
+		if NOT( IsSameVarType( retCastVType, func.mRetVarType, laxTypes ) )
+			return false;
+	}
 
 	for (size_t i=0; i < callNode.mpChilds.size(); ++i)
 	{
@@ -105,24 +107,8 @@ static bool doVTypesMatch( const Function &func, const TokNode &callNode, bool l
 
 		DASSERT( vtype != VT_UNKNOWN );
 
-		if ( laxTypes )
-		{
-			if ( isVecNorPoint( func.mParamsVarTypes[i] ) )
-			{
-				if NOT( isVecNorPoint( vtype ) )
-					return false;
-			}
-			else
-			{
-				if ( func.mParamsVarTypes[i] != vtype )
-					return false;
-			}
-		}
-		else
-		{
-			if ( func.mParamsVarTypes[i] != vtype )
-				return false;
-		}
+		if NOT( IsSameVarType( vtype, func.mParamsVarTypes[i], laxTypes ) )
+			return false;
 	}
 
 	return true;
@@ -134,6 +120,8 @@ const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function>
 	Function	*pFound = NULL;
 
 	TokNode		*pFCallParams = pFCallNode->GetChildTry( 0 );
+
+	VarType		retCastVType = pFCallNode->mFuncCall.mReturnCastVType;
 
 	Function	*pBestMatch = NULL;
 	size_t		convertMatches = 0;
@@ -153,7 +141,7 @@ const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function>
 		if ( pFCallParams )
 		{
 			// match number and types of params
-			if NOT( doVTypesMatch( funcs[i], *pFCallParams, false ) )
+			if NOT( doVTypesMatch( funcs[i], *pFCallParams, retCastVType, false ) )
 				continue;
 		}
 
@@ -183,7 +171,7 @@ const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function>
 		// match number and types of params
 		if ( pFCallParams )
 		{
-			if NOT( doVTypesMatch( funcs[i], *pFCallParams, true ) )
+			if NOT( doVTypesMatch( funcs[i], *pFCallParams, retCastVType, true ) )
 				continue;
 		}
 

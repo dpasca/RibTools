@@ -15,14 +15,72 @@ namespace RSLC
 {
 
 //==================================================================
+static void doReparent( TokNode *pNode, size_t &out_parentIdx )
+{
+	TokNode	*pLValue = pNode->GetLeft();
+	TokNode	*pRValue = pNode->GetRight();
+
+	//if NOT( pLValue )
+	//	throw Exception( "Missing left value in expression assignment.", pNode->mpToken );
+
+	if ( pRValue && pLValue )
+	{
+		//	L	=	R
+
+		if ( pRValue )
+		{
+			// Handle the funky RSL return value typecast. Example:
+			// val = float texture( "yoyo" )
+			// col = color texture( "yoyo" )
+
+			// if R a data type ? (float, color, etc)
+			if ( pRValue->IsDataType() )
+			{
+				TokNode	*pFuncNode = pRValue->GetRight();
+
+				// is it followed by a function call ?
+				if ( pFuncNode && pFuncNode->mNodeType == TokNode::TYPE_FUNCCALL )
+				{
+					// set the the return value cast data type
+					pFuncNode->mFuncCall.mReturnCastVType = VarTypeFromToken( pRValue->mpToken );
+
+					// we can now remove R...
+					DASSERT( pRValue->mpChilds.size() == 0 );
+					pRValue->UnlinkFromParent();
+					DSAFE_DELETE( pRValue );
+
+					// R becomes the function call node ..which we proceed to
+					// make it into a child for the operator
+					pRValue = pFuncNode;
+				}
+			}
+
+			pRValue->Reparent( pNode );
+			pNode->mpChilds.push_front( pRValue );
+		}
+		//	L	=
+		//			R
+
+		if ( pLValue )
+		{
+			pLValue->Reparent( pNode );
+			pNode->mpChilds.push_front( pLValue );
+		}
+		//		=
+		//	L		R
+
+		DASSERT( out_parentIdx > 0 );
+		out_parentIdx -= 1;
+	}
+}
+
+//==================================================================
 static void reparentBiOperators(
 						TokNode *pNode,
 						const TokenID *pMatchingIDs,
 						size_t matchIDsN,
 						size_t &out_parentIdx,
-						bool excludeIfFuncParam=false,
-						TokenID	*pExcludeParentTokens=NULL,
-						size_t excludeParentTokensSize=0 )
+						bool excludeIfFuncParam=false )
 {
 	if ( pNode->mpToken )
 	{
@@ -39,20 +97,6 @@ static void reparentBiOperators(
 					|| blkType == BLKT_FNPARAMS )
 					dontProcess = true;
 			}
-
-/*
-			if ( pExcludeParentTokens && pNode->mpToken )
-			{
-				for (size_t i=0; i < excludeParentTokensSize; ++i)
-				{
-					if ( pNode->mpToken->id == pExcludeParentTokens[i] )
-					{
-						dontProcess = true;
-						break;
-					}
-				}
-			}
-*/
 		}
 
 		if NOT( dontProcess )
@@ -61,52 +105,22 @@ static void reparentBiOperators(
 			{
 				if ( pMatchingIDs[i] == pNode->mpToken->id )
 				{
-					TokNode	*pLValue = pNode->GetLeft();
-					TokNode	*pRValue = pNode->GetRight();
-
-					//if NOT( pLValue )
-					//	throw Exception( "Missing left value in expression assignment.", pNode->mpToken );
-
-					if ( pRValue && pLValue )
-					{
-						//	L	=	R
-
-						if ( pRValue )
-						{
-							pRValue->Reparent( pNode );
-							pNode->mpChilds.push_front( pRValue );
-						}
-						//	L	=
-						//			R
-
-						if ( pLValue )
-						{
-							pLValue->Reparent( pNode );
-							pNode->mpChilds.push_front( pLValue );
-						}
-						//		=
-						//	L		R
-
-						DASSERT( out_parentIdx > 0 );
-						out_parentIdx -= 1;
-					}
-
+					doReparent( pNode, out_parentIdx );
 					break;
 				}
 			}
 		}
 	}
 
-	//if ( pNode->GetBlockType() != BLKT_UNKNOWN )
-		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-		{
-			reparentBiOperators(
-						pNode->mpChilds[i],
-						pMatchingIDs,
-						matchIDsN,
-						i,
-						excludeIfFuncParam );
-		}
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		reparentBiOperators(
+					pNode->mpChilds[i],
+					pMatchingIDs,
+					matchIDsN,
+					i,
+					excludeIfFuncParam );
+	}
 }
 
 /*

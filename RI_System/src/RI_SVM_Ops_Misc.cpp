@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_SlShader_Ops_Misc.cpp
+/// RI_SVM_Ops_Misc.cpp
 ///
 /// Created by Davide Pasca - 2009/10/29
 /// See the file "license.txt" that comes with this project for
@@ -7,19 +7,18 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_SlRunContext.h"
-#include "RI_SlShader_Ops_Misc.h"
+#include "RI_SVM_Context.h"
+#include "RI_SVM_Ops_Misc.h"
 
 //==================================================================
 namespace RI
 {
-
 //==================================================================
-namespace SOP
+namespace SVM
 {
 
 //==================================================================
-void Inst_Faceforward( SlRunContext &ctx )
+void Inst_Faceforward( Context &ctx )
 {
 		  Float3_* lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
 	const Float3_* pN	= ctx.GetRO( (const Float3_ *)0, 2 );
@@ -70,7 +69,7 @@ void Inst_Faceforward( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_Normalize( SlRunContext &ctx )
+void Inst_Normalize( Context &ctx )
 {
 		  Float3_*	lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
 	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
@@ -109,7 +108,7 @@ void Inst_Normalize( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_CalculateNormal( SlRunContext &ctx )
+void Inst_CalculateNormal( Context &ctx )
 {
 		  Float3_*	lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
 	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
@@ -172,6 +171,5 @@ void Inst_CalculateNormal( SlRunContext &ctx )
 
 //==================================================================
 }
-
 //==================================================================
 }

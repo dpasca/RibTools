@@ -10,7 +10,7 @@
 #include <memory>
 #include "RI_Attributes.h"
 #include "RI_MicroPolygonGrid.h"
-#include "RI_SlRunContext.h"
+#include "RI_SVM_Context.h"
 
 //==================================================================
 using std::auto_ptr;
@@ -36,7 +36,7 @@ WorkGrid::WorkGrid( const SymbolList &globalSyms ) :
 
 	mpDataCs = (SlColor *)	addSymI( globalSyms, "Cs"	);
 	mpDataOs = (SlColor *)	addSymI( globalSyms, "Os"	);
-	mpPointsWS = (Float3_ *)	addSymI( globalSyms, "P"	);
+	mpPointsWS = (Float3_ *)addSymI( globalSyms, "P"	);
 							addSymI( globalSyms, "dPdu"	);
 							addSymI( globalSyms, "dPdv"	);
 							addSymI( globalSyms, "_oodu");

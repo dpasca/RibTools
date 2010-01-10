@@ -10,7 +10,7 @@
 #define RI_RRASM_PARSER_H
 
 #include "RI_Base.h"
-#include "RI_SlShader.h"
+#include "RI_SVM_Shader.h"
 #include "DSystem/include/DUtils_MemFile.h"
 
 //==================================================================
@@ -41,7 +41,7 @@ class Parser
 		u_int	mAddress;
 	};
 
-	SlShader		*mpShader;
+	SVM::Shader		*mpShader;
 	const char		*mpName;
 	DVec<Label>		mLabelDefs;
 	DVec<Label>		mLabelRefs;
@@ -50,7 +50,7 @@ class Parser
 	
 public:
 	//==================================================================
-	Parser( DUT::MemFile &file, SlShader *pShader, const char *pName );
+	Parser( DUT::MemFile &file, SVM::Shader *pShader, const char *pName );
 
 private:
 	void doParse( DUT::MemFile &file );
@@ -72,7 +72,7 @@ private:
 	void onError( const char *pFmt, ... ) const;
 
 	void verifySymbolType(	Symbol::Type slSymType,
-							OperTypeID otExpected,
+							SVM::OperTypeID otExpected,
 							int reportOpIdx,
 							const char *pReportOpName );
 };

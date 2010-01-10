@@ -9,7 +9,7 @@
 #ifndef RI_RRASM_OPCODEDEFS_H
 #define RI_RRASM_OPCODEDEFS_H
 
-#include "RI_SlShader.h"
+#include "RI_SVM_Shader.h"
 
 //==================================================================
 namespace RI
@@ -29,10 +29,10 @@ namespace RRASM
 //==================================================================
 struct OpCodeDef
 {
-	const char	*pName;
-	u_int		OperCnt;
-	u_int		Flags;
-	OperTypeID	Types[5];
+	const char		*pName;
+	u_int			OperCnt;
+	u_int			Flags;
+	SVM::OperTypeID	Types[5];
 };
 
 extern OpCodeDef	_gOpCodeDefs[];

@@ -13,7 +13,7 @@
 #include "DSystem/include/DContainers.h"
 #include "DMath/include/DMath.h"
 #include "RI_Symbol.h"
-#include "RI_SlRunContext.h"
+#include "RI_SVM_Context.h"
 
 //==================================================================
 namespace RI
@@ -29,8 +29,8 @@ class WorkGrid
 	SlColor			*mpDataOi;
 	SlColor			*mpDataCs;
 	SlColor			*mpDataOs;
-	SlRunContext	mSurfRunCtx;
-	SlRunContext	mDispRunCtx;
+	SVM::Context	mSurfRunCtx;
+	SVM::Context	mDispRunCtx;
 
 public:
 	u_int			mXDim;

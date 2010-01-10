@@ -27,8 +27,7 @@ TokNode::TokNode( Token *pObj ) :
 	mBlockType(BLKT_UNKNOWN),
 	mIsFuncOp(false),
 	mOutputFuncOpEnd(false),
-	mBlockID(0),
-	mpNodeTypeFuncCall_pFunc(NULL)
+	mBlockID(0)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
@@ -43,8 +42,7 @@ TokNode::TokNode( const char *pTokStr, TokenID tokId, TokenIDType tokIdType ) :
 	mBlockType(BLKT_UNKNOWN),
 	mIsFuncOp(false),
 	mOutputFuncOpEnd(false),
-	mBlockID(0),
-	mpNodeTypeFuncCall_pFunc(NULL)
+	mBlockID(0)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
@@ -63,7 +61,7 @@ TokNode::TokNode( const TokNode &from ) :
 	mOutputFuncOpEnd(from.mOutputFuncOpEnd),
 	mBlockID		(0),
 	mVarLink		(from.mVarLink),
-	mpNodeTypeFuncCall_pFunc(from.mpNodeTypeFuncCall_pFunc)
+	mFuncCall		(from.mFuncCall)
 {
 #ifdef _DEBUG
 	mUIDCnt = sUIDCnt++;
@@ -273,9 +271,9 @@ RSLC::VarType TokNode::GetVarType() const
 	if ( mVarLink.IsValid() )
 		return mVarLink.GetVarPtr()->GetVarType();
 	else
-	if ( mpNodeTypeFuncCall_pFunc )
+	if ( mFuncCall.mpFunc )
 	{
-		return mpNodeTypeFuncCall_pFunc->mRetVarType;
+		return mFuncCall.mpFunc->mRetVarType;
 	}
 	else
 	{

@@ -16,11 +16,15 @@ displacement disp_textured(
 			texture(
 				mapname,
 				(u - min_u) / (max_u - min_u),
-				(v - min_v) / (max_v - min_v),
+				(v - min_v) / (max_v - min_v) );
+
+/* DAVIDE - commenting this until vargarg is implemented
+
 				"swidth", 0.0001,
 				"twidth", 0.0001,
 				"samples", 1);
-
+*/
+				
 		magnitude   = ((level * 2) - 1) * Km;
 	}
 	else
@@ -28,7 +32,6 @@ displacement disp_textured(
 		magnitude   = 0.0;
 	}
 
-	P   += normalize( N) * magnitude;
+	P   = P + normalize( N) * magnitude;
 	N   = calculatenormal( P);
 }
-

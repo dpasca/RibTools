@@ -122,8 +122,8 @@ void Attributes::Init(
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
 
-	moSurfaceSHI = DNEW SlShaderInst( 
-		(SlShader *)pResManager->FindResource( "dbg_normal_col",
+	moSurfaceSHI = DNEW SVM::ShaderInst( 
+		(SVM::Shader *)pResManager->FindResource( "dbg_normal_col",
 													ResourceBase::TYPE_SHADER ) );
 }
 
@@ -304,7 +304,7 @@ void Attributes::cmdLightSource( ParamList &params )
 
 	const char *pShaderName = params[0].PChar();
 
-	SlShader	*pShader = getShader( pShaderName, NULL );
+	SVM::Shader	*pShader = getShader( pShaderName, NULL );
 
 	if NOT( pShader )
 	{
@@ -331,7 +331,7 @@ void Attributes::cmdLightSource( ParamList &params )
 	}
 */
 
-	pLight->moShaderInst = DNEW SlShaderInst( pShader, MP_GRID_MAX_SIZE );
+	pLight->moShaderInst = DNEW SVM::ShaderInst( pShader, MP_GRID_MAX_SIZE );
 	//pLight->moShaderInst->mMtxLocalCam = xform.GetMatrix() * mtxWorldCam;
 
 	pLight->mID = params[1].Int();
@@ -365,11 +365,11 @@ void Attributes::cmdSurface( ParamList &params )
 	else
 		pShaderName = params[0].PChar();
 
-	SlShader	*pShader = getShader( pShaderName, "matte" );
+	SVM::Shader	*pShader = getShader( pShaderName, "matte" );
 
 	if ( pShader )
 	{
-		moSurfaceSHI = DNEW SlShaderInst( pShader );
+		moSurfaceSHI = DNEW SVM::ShaderInst( pShader );
 
 		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
 		getShaderParams( params, 1, *moSurfaceSHI.Use(), mtxLocalCam );
@@ -389,11 +389,11 @@ void Attributes::cmdDisplacement( ParamList &params )
 
 	const char *pShaderName = params[0].PChar();
 
-	SlShader	*pShader = getShader( pShaderName, NULL );
+	SVM::Shader	*pShader = getShader( pShaderName, NULL );
 
 	if ( pShader )
 	{
-		moDisplaceSHI = DNEW SlShaderInst( pShader );
+		moDisplaceSHI = DNEW SVM::ShaderInst( pShader );
 
 		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
 		getShaderParams( params, 1, *moDisplaceSHI.Use(), mtxLocalCam );

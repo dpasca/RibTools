@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_SlSymbol.h
+/// RI_SVM_Symbol.h
 ///
 /// Created by Davide Pasca - 2009/2/19
 /// See the file "license.txt" that comes with this project for

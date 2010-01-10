@@ -1,5 +1,5 @@
 //==================================================================
-/// RI_SlShader_Ops_Compare.cpp
+/// RI_SVM_Ops_Compare.cpp
 ///
 /// Created by Davide Pasca - 2010/1/10
 /// See the file "license.txt" that comes with this project for
@@ -7,15 +7,14 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_SlShader_Ops_Compare.h"
-#include "RI_SlRunContext.h"
+#include "RI_SVM_Ops_Compare.h"
+#include "RI_SVM_Context.h"
 
 //==================================================================
 namespace RI
 {
-
 //==================================================================
-namespace SOP
+namespace SVM
 {
 
 /*
@@ -31,7 +30,7 @@ namespace SOP
 */
 
 //==================================================================
-void Inst_IfTrue( SlRunContext &ctx )
+void Inst_IfTrue( Context &ctx )
 {
 	const VecNMask*	op1	= ctx.GetRW( (VecNMask *)0, 1 );
 
@@ -79,7 +78,7 @@ void Inst_IfTrue( SlRunContext &ctx )
 		else
 		{
 			// go tot he end of the if or begin of the else
-			const SlCPUWord *pOp = ctx.GetOp(0);
+			const CPUWord *pOp = ctx.GetOp(0);
 
 			u_short beginElse_endifAddr = pOp->mOpCode.mFuncopEndAddr;
 
@@ -92,7 +91,7 @@ void Inst_IfTrue( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_OrElse( SlRunContext &ctx )
+void Inst_OrElse( Context &ctx )
 {
 	u_int	funcopFlgs = ctx.mFopStack.top();
 
@@ -113,7 +112,7 @@ void Inst_OrElse( SlRunContext &ctx )
 		// already went through the body of the "if", so skip
 		// the body of the "else"
 
-		const SlCPUWord *pOp = ctx.GetOp(0);
+		const CPUWord *pOp = ctx.GetOp(0);
 
 		u_short endifAddr = pOp->mOpCode.mFuncopEndAddr;
 
@@ -131,7 +130,6 @@ void Inst_OrElse( SlRunContext &ctx )
 		ctx.NextInstruction();
 	}
 }
-
 
 //==================================================================
 }

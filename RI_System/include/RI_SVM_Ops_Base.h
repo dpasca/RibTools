@@ -1,27 +1,26 @@
 //==================================================================
-/// RI_SlShader_Ops_Base.h
+/// RI_SVM_Ops_Base.h
 ///
 /// Created by Davide Pasca - 2009/5/19
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_SLSHADER_OPS_BASE_H
-#define RI_SLSHADER_OPS_BASE_H
+#ifndef RI_SVM_OPS_BASE_H
+#define RI_SVM_OPS_BASE_H
 
-#include "RI_SlRunContext.h"
+#include "RI_SVM_Context.h"
 
 //==================================================================
 namespace RI
 {
-
 //==================================================================
-namespace SOP
+namespace SVM
 {
 
 //==================================================================
 template <class TA>
-void Inst_LD1( SlRunContext &ctx )
+void Inst_LD1( Context &ctx )
 {
 	TA		*lhs		= ctx.GetRW( (TA *)0,  1 );
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
@@ -54,7 +53,7 @@ void Inst_LD1( SlRunContext &ctx )
 
 //==================================================================
 template <class TA>
-void Inst_LD3( SlRunContext &ctx )
+void Inst_LD3( Context &ctx )
 {
 	TA		*lhs		= ctx.GetRW( (TA *)0,  1 );
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
@@ -87,7 +86,7 @@ void Inst_LD3( SlRunContext &ctx )
 
 //==================================================================
 template <class TA, class TB>
-void Inst_MOVVS3( SlRunContext &ctx )
+void Inst_MOVVS3( Context &ctx )
 {
 		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -141,7 +140,7 @@ void Inst_MOVVS3( SlRunContext &ctx )
 
 //==================================================================
 template <class TA, class TB>
-void Inst_Mov( SlRunContext &ctx )
+void Inst_Mov( Context &ctx )
 {
 		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -181,7 +180,7 @@ void Inst_Mov( SlRunContext &ctx )
 
 //==================================================================
 template <class TA, class TB>
-void Inst_Abs( SlRunContext &ctx )
+void Inst_Abs( Context &ctx )
 {
 		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -221,7 +220,7 @@ void Inst_Abs( SlRunContext &ctx )
 
 /*
 //==================================================================
-static inline void Inst_MovXX( SlRunContext &ctx )
+static inline void Inst_MovXX( Context &ctx )
 {
 		  SlStr*	lhs	= ctx.GetRW( (		SlStr *)0, 1 );
 	const SlStr*	op1	= ctx.GetRO( (const SlStr *)0, 2 );
@@ -238,7 +237,7 @@ static inline void Inst_MovXX( SlRunContext &ctx )
 
 //==================================================================
 template <class TA, class TB>
-void Inst_Sign( SlRunContext &ctx )
+void Inst_Sign( Context &ctx )
 {
 		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -278,7 +277,7 @@ void Inst_Sign( SlRunContext &ctx )
 
 //==================================================================
 template <class TA, class TB, class TC, const OpBaseTypeID opBaseTypeID>
-void Inst_2Op( SlRunContext &ctx )
+void Inst_2Op( Context &ctx )
 {
 		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
 	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
@@ -330,7 +329,7 @@ void Inst_2Op( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_Dot_SVV( SlRunContext &ctx )
+void Inst_Dot_SVV( Context &ctx )
 {
 		  Float_*	lhs	= ctx.GetRW( (	  Float_ *)0, 1 );
 	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
@@ -374,7 +373,7 @@ void Inst_Dot_SVV( SlRunContext &ctx )
 }
 
 //==================================================================
-void Inst_Pow_SSS( SlRunContext &ctx )
+void Inst_Pow_SSS( Context &ctx )
 {
 		  Float_*	lhs	= ctx.GetRW( (		Float_ *)0, 1 );
 	const Float_*	op1	= ctx.GetRO( (const Float_ *)0, 2 );
@@ -419,7 +418,7 @@ void Inst_Pow_SSS( SlRunContext &ctx )
 
 //==================================================================
 template <class T, const OpBaseTypeID opBaseTypeID>
-void Inst_Min_Max( SlRunContext &ctx )
+void Inst_Min_Max( Context &ctx )
 {
 		  T*	lhs	= ctx.GetRW( (	    T *)0, 1 );
 	const T*	op1	= ctx.GetRO( (const T *)0, 2 );
@@ -468,7 +467,7 @@ void Inst_Min_Max( SlRunContext &ctx )
 
 //==================================================================
 template <const size_t COMP_IDX>
-void Inst_GetVComp( SlRunContext &ctx )
+void Inst_GetVComp( Context &ctx )
 {
 		  Float_*	lhs	= ctx.GetRW( (		Float_*)0, 1 );
 	const Float3_*	op1	= ctx.GetRO( (const	Float3_	*)0	,2 );
@@ -508,7 +507,7 @@ void Inst_GetVComp( SlRunContext &ctx )
 
 //==================================================================
 template <const size_t COMP_IDX>
-void Inst_SetVComp( SlRunContext &ctx )
+void Inst_SetVComp( Context &ctx )
 {
 		  Float3_*	lhs	= ctx.GetRW( (		Float3_	*)0, 1 );
 	const Float_*	op1	= ctx.GetRO( (const Float_*)0, 2 );
@@ -548,7 +547,6 @@ void Inst_SetVComp( SlRunContext &ctx )
 
 //==================================================================
 }
-
 //==================================================================
 }
 

@@ -20,6 +20,22 @@ namespace RSLC
 {
 
 //==================================================================
+class Node_FuncCall
+{
+public:
+	// TODO: ummmmm !!
+	const Function	*mpFunc;
+	VarType			mReturnCastVType;
+
+public:
+	Node_FuncCall() :
+		mpFunc(NULL),
+		mReturnCastVType(VT_UNKNOWN)	// no cast to begin with
+	{
+	}
+};
+
+//==================================================================
 class TokNode
 {
 #ifdef _DEBUG
@@ -50,9 +66,8 @@ public:
 	Type			mNodeType;
 	bool			mIsFuncOp;
 	bool			mOutputFuncOpEnd;
-	
-	// TODO: ummmmm !!
-	const Function	*mpNodeTypeFuncCall_pFunc;
+
+	Node_FuncCall	mFuncCall;
 
 private:
 	BlockType		mBlockType;
