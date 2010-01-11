@@ -29,8 +29,11 @@ public:
 	Token			*mpDefNameTok;
 	DVec<Token*>	mpDefValToks;
 	VarType			mVarType;
+
 	bool			mIsVarying;
+	bool			mIsVariabilityFinalized;
 	bool			mIsForcedDetail;
+
 	bool			mIsLValue;
 	bool			mIsGlobal;
 	bool			mIsSHParam;
@@ -86,6 +89,7 @@ public:
 		mpDefNameTok(NULL),
 		mVarType(VT_UNKNOWN),
 		mIsVarying(false),
+		mIsVariabilityFinalized(false),
 		mIsForcedDetail(false),
 		mIsLValue(false),
 		mIsGlobal(false),
@@ -152,6 +156,7 @@ public:
 
 	bool IsVarying() const;
 	bool IsForcedDetail() const;
+	void SetForcedDetail( bool onoff );
 	void SetVarying( bool varying );
 
 	bool IsConstant() const

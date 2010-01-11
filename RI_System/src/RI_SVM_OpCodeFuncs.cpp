@@ -14,7 +14,7 @@
 #include "RI_SVM_Ops_XForm.h"
 #include "RI_SVM_Ops_Misc.h"
 #include "RI_SVM_Ops_Compare.h"
-
+#include "RI_SVM_Ops_Texture.h"
 #include "RI_SVM_OpCodeFuncs.h"
 
 //==================================================================
@@ -29,6 +29,7 @@ namespace SVM
 #define B VecNMask
 #define S Float_
 #define V Float3_
+#define C Float3_
 #define H Float4_
 #define M Matrix44
 #define X SlStr
@@ -109,13 +110,13 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 	Inst_SETCMP_EQ_NoVary <X,OBT_SETNEQ>,
 	Inst_SETCMP_EQ <B,OBT_SETNEQ>,
 
-	Inst_Noise1<Float_>,
+	Inst_Noise1<S>,
 	Inst_Noise1<Float2_>,
-	Inst_Noise1<Float3_>,
+	Inst_Noise1<V>,
 
-	Inst_Noise3<Float_>,
+	Inst_Noise3<S>,
 	Inst_Noise3<Float2_>,
-	Inst_Noise3<Float3_>,
+	Inst_Noise3<V>,
 
 	Inst_GetVComp<0>,
 	Inst_GetVComp<1>,
@@ -144,6 +145,11 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 
 	Inst_IfTrue,
 	Inst_OrElse,
+
+	Inst_Texture<S,0>	,
+	Inst_Texture<V,0>	,
+	Inst_Texture<S,1>	,
+	Inst_Texture<V,1>	,
 };
 
 #undef S

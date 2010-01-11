@@ -298,7 +298,7 @@ bool TokNode::IsVarying() const
 }
 
 //==================================================================
-bool TokNode::TrySetVarying( bool onoff )
+bool TokNode::TrySetVarying_AndForceIfTrue( bool onoff )
 {
 	if ( mpToken->idType == T_TYPE_VALUE )
 		return !onoff;	// if it's a value then it's ok if "uniform" is expected
@@ -316,14 +316,18 @@ bool TokNode::TrySetVarying( bool onoff )
 			{
 				// ..all good, we can change the detail
 				pVar->SetVarying( onoff );
-				return true;
 			}
 		}
 		else
 		{
 			// not changing.. all fine then..
-			return true;
 		}
+
+		// try force the detail if varying anyway
+		if ( onoff && !pVar->IsForcedDetail() )
+			pVar->SetForcedDetail( true );
+
+		return true;
 	}
 	else
 	{

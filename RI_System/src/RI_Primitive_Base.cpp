@@ -184,14 +184,16 @@ void SimplePrimitiveBase::Dice(
 {
 	//Float3_	*pPointsWS = g.mpPointsWS;
 
-	Float3_	 *pPointsWS = (Float3_	*)g.mSymbolIs.FindSymbolIData( "P"	);
-	Float_ *pOODu		= (Float_ *)g.mSymbolIs.FindSymbolIData( "_oodu" );
-	Float_ *pOODv		= (Float_ *)g.mSymbolIs.FindSymbolIData( "_oodv" );
-	Float3_	 *pI		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "I"	);
-	Float3_	 *pN		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "N"	);
-	Float3_	 *pNg		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "Ng"	);
-	SlColor	 *pOs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Os"	);
-	SlColor	 *pCs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Cs"	);
+	Float3_	*pPointsWS	= (Float3_	*)g.mSymbolIs.FindSymbolIData( "P"	);
+	Float_	*pOODu		= (Float_	*)g.mSymbolIs.FindSymbolIData( "_oodu" );
+	Float_	*pOODv		= (Float_	*)g.mSymbolIs.FindSymbolIData( "_oodv" );
+	Float_	*pu			= (Float_	*)g.mSymbolIs.FindSymbolIData( "u" );
+	Float_	*pv			= (Float_	*)g.mSymbolIs.FindSymbolIData( "v" );
+	Float3_	*pI			= (Float3_	*)g.mSymbolIs.FindSymbolIData( "I"	);
+	Float3_	*pN			= (Float3_	*)g.mSymbolIs.FindSymbolIData( "N"	);
+	Float3_	*pNg		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "Ng"	);
+	SlColor	*pOs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Os"	);
+	SlColor	*pCs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Cs"	);
 
 	DASSERT( pPointsWS == g.mpPointsWS );
 
@@ -295,6 +297,10 @@ void SimplePrimitiveBase::Dice(
 		pI[blkIdx]		= (posCS - -camPosCS);//.GetNormalized();
 		pOODu[blkIdx]	= one / locDUDV[blkIdx][0];
 		pOODv[blkIdx]	= one / locDUDV[blkIdx][1];
+
+		pu[blkIdx]		= locUV[blkIdx][0];
+		pv[blkIdx]		= locUV[blkIdx][1];
+
 		pN[blkIdx]		= norCS;
 		pNg[blkIdx]		= norCS;
 		pOs[blkIdx]		= useOpa;

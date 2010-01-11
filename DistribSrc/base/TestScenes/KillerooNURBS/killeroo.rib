@@ -20,9 +20,9 @@ Translate -19.0565 12.7217 55.7731
 Clipping 30.258 3025.8
 WorldBegin
 
-# DAVIDE - Added the following light source
+# DAVIDE - Temporarily replacing the light source
 LightSource "distantlight" 3  "from"  [ -10 -5 8 ] "to"  [ 0 0 0 ]
-LightSource "shoulderlight" 0
+#LightSource "shoulderlight" 0
 
 AttributeBegin
 Declare "mapname" 	"string"

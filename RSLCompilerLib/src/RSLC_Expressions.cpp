@@ -173,7 +173,7 @@ static void solveVariablesDetail_sub( TokNode *pNode )
 			- If R is varying, then L must be..
 			*/
 
-			bool lSetSuccess = pLNode->TrySetVarying( rIsVarying );
+			bool lSetSuccess = pLNode->TrySetVarying_AndForceIfTrue( rIsVarying );
 
 			// cannot make L varying ? that's an error
 			// (..otherwise it is fine.. e.g. left is forced varying and right is uniform..)
@@ -200,12 +200,12 @@ static void solveVariablesDetail_sub( TokNode *pNode )
 			if ( !lIsVarying && !rIsVarying )
 			{
 				// both operands are uniform.. so we try to make the '+' uniform as well
-				opSetSuccess = pNode->TrySetVarying( false );
+				opSetSuccess = pNode->TrySetVarying_AndForceIfTrue( false );
 			}
 			else
 			{
 				// if either is varying, then so must be the operator
-				opSetSuccess = pNode->TrySetVarying( true );
+				opSetSuccess = pNode->TrySetVarying_AndForceIfTrue( true );
 
 			}
 

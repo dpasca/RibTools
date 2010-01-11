@@ -197,7 +197,7 @@ public:
 	VarType GetVarType() const;
 
 	bool IsVarying() const;
-	bool TrySetVarying( bool onoff );
+	bool TrySetVarying_AndForceIfTrue( bool onoff );
 };
 
 //==================================================================

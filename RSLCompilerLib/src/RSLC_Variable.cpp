@@ -52,6 +52,14 @@ bool Variable::IsForcedDetail() const
 }
 
 //==================================================================
+void Variable::SetForcedDetail( bool onoff )
+{
+	DASSERT( mIsForcedDetail == false );
+
+	mIsForcedDetail = onoff;
+}
+
+//==================================================================
 void Variable::SetVarying( bool varying )
 {
 	DASSERT( mIsForcedDetail == false );

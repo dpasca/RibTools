@@ -43,10 +43,14 @@ std::string Register::GetName() const
 		break;
 	}
 
-	if NOT( IsVarying() )
-		strcat_s( regBase, "u" );
+	char *pStrFmt;
 
-	return DUT::SSPrintFS( "$%s%i", regBase, GetRegIdx() );
+	if ( IsVarying() )
+		pStrFmt = "$%s%i";
+	else
+		pStrFmt = "$%su%i";
+
+	return DUT::SSPrintFS( pStrFmt, regBase, GetRegIdx() );
 }
 
 //==================================================================

@@ -538,7 +538,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\include\RI_SVM_Ops_Compare.cpp"
+					RelativePath="..\src\RI_SVM_Ops_Compare.cpp"
 					>
 				</File>
 				<File
@@ -563,6 +563,10 @@
 				</File>
 				<File
 					RelativePath="..\include\RI_SVM_Ops_Noise.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RI_SVM_Ops_Texture.h"
 					>
 				</File>
 				<File

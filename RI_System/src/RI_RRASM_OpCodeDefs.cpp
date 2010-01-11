@@ -137,6 +137,11 @@ OpCodeDef	_gOpCodeDefs[] =
 	"iftrue.b"		,	1,			OPC_FLG_FUNCOP_BEGIN, BL, NA, NA,	NA,	NA,
 	"orelse"		,	0,			OPC_FLG_FUNCOP_MIDDLE,NA, NA, NA,	NA,	NA,
 
+	"texture.sx"	,	2,			0,	F1,	STR, F1, F1, NA,
+	"texture.vx"	,	2,			0,	F3,	STR, F1, F1, NA,
+	"texture.sxss"	,	4,			0,	F1,	STR, F1, F1, NA,
+	"texture.vxss"	,	4,			0,	F3,	STR, F1, F1, NA,
+
 	NULL			,	0,			0,	NA, NA, NA, NA, NA
 };
 

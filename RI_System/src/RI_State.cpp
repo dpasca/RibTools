@@ -454,6 +454,19 @@ void State::LightSource( ParamList &params )
 //==================================================================
 void State::Declare( ParamList &params )
 {
+	if ( params.size() != 2 )
+	{
+		DASSTHROW( 0, ("Broken declare ?") );
+	}
+
+	const char *pSymName = params[0].PChar();
+	const char *pSymType = params[1].PChar();
+
+	char	buff[1024];
+	sprintf_s( buff, "uniform %s", pSymType );
+
+	mGlobalSyms.AddGlob( buff,  pSymName );
+
 	//mGlobalSyms.Add( );
 	//mAttributesStack.top().cmdSurface( params );
 }
