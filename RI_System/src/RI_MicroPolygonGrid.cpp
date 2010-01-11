@@ -23,7 +23,7 @@ namespace RI
 WorkGrid::WorkGrid( const SymbolList &globalSyms ) :
 	mXDim(0),
 	mYDim(0),
-	mpPointsWS(0),
+	mpPointsCS(0),
 	mPointsN(0),
 	mpDataCi(0),
 	mpDataOi(0),
@@ -36,7 +36,7 @@ WorkGrid::WorkGrid( const SymbolList &globalSyms ) :
 
 	mpDataCs = (SlColor *)	addSymI( globalSyms, "Cs"	);
 	mpDataOs = (SlColor *)	addSymI( globalSyms, "Os"	);
-	mpPointsWS = (Float3_ *)addSymI( globalSyms, "P"	);
+	mpPointsCS = (Float3_ *)addSymI( globalSyms, "P"	);
 							addSymI( globalSyms, "dPdu"	);
 							addSymI( globalSyms, "dPdv"	);
 							addSymI( globalSyms, "_oodu");
@@ -114,6 +114,7 @@ void WorkGrid::Setup(
 	mMtxWorldCamera	= mtxWorldCamera;
 
 	mMtxLocalCamera = mMtxLocalWorld * mMtxWorldCamera;
+	mMtxCameraLocal = mMtxLocalCamera.GetInverse();	// this is handy for calculatenormal()
 
 	DASSERT( mPointsN <= MP_GRID_MAX_SIZE );
 

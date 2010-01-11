@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "RI_SVM_Context.h"
 #include "RI_SVM_Ops_Misc.h"
+#include "RI_MicroPolygonGrid.h"
 
 //==================================================================
 namespace RI
@@ -123,22 +124,28 @@ void Inst_CalculateNormal( Context &ctx )
 
 	//SLRUNCTX_BLKWRITECHECK( i );
 
-	Float3_	dPDu[ MP_GRID_MAX_SIMD_BLKS ];
+	Float3_	dPDu[ MP_GRID_MAX_SIZE_SIMD_BLKS ];
+	Float3_	P_LS[ MP_GRID_MAX_SIZE_SIMD_BLKS ];
 
 	{
+		const Matrix44	&mtxCameraLocal = ctx.mpGrid->mMtxCameraLocal;
+		
 		u_int	blk = 0;
 		for (u_int iy=0; iy < ctx.mPointsYN; ++iy)
 		{
 			for (u_int ixb=0; ixb < ctx.mBlocksXN; ++ixb, ++blk)
 			{
-				const Float3_	&blkOp1 = op1[blk];
+				// calculate the position in local space
+				P_LS[blk] = V3__V3W1_Mul_M44<Float_>( op1[blk], mtxCameraLocal );
+
+				const Float3_	&blkP_LS = P_LS[blk];
 				Float3_			&blkdPDu = dPDu[blk];
 
 				for (u_int sub=1; sub < DMT_SIMD_FLEN; ++sub)
 				{
-					blkdPDu[0][sub] = blkOp1[0][sub] - blkOp1[0][sub-1];
-					blkdPDu[1][sub] = blkOp1[1][sub] - blkOp1[1][sub-1];
-					blkdPDu[2][sub] = blkOp1[2][sub] - blkOp1[2][sub-1];
+					blkdPDu[0][sub] = blkP_LS[0][sub] - blkP_LS[0][sub-1];
+					blkdPDu[1][sub] = blkP_LS[1][sub] - blkP_LS[1][sub-1];
+					blkdPDu[2][sub] = blkP_LS[2][sub] - blkP_LS[2][sub-1];
 				}
 
 				blkdPDu[0][0] = blkdPDu[0][1];
@@ -151,14 +158,21 @@ void Inst_CalculateNormal( Context &ctx )
 	}
 
 	{
+		const Matrix44	&mtxLocalCameraNorm = ctx.mpGrid->mMtxLocalCameraNorm;
+
 		u_int	blk = ctx.mBlocksXN;
 		for (u_int iy=1; iy < ctx.mPointsYN; ++iy)
 		{
 			for (u_int ixb=0; ixb < ctx.mBlocksXN; ++ixb, ++blk)
 			{
-				Float3_	dPDv = (op1[blk] - op1[blk - ctx.mBlocksXN]) * pOODv[blk];
+				const Float3_	&P_LS_y0x = P_LS[blk - ctx.mBlocksXN];
+				const Float3_	&P_LS_y1x = P_LS[blk];
 
-				lhs[blk] = dPDu[blk].GetCross( dPDv ).GetNormalized();
+				Float3_	dPDv = (P_LS_y1x - P_LS_y0x) * pOODv[blk];
+
+				lhs[blk] = V3__V3W0_Mul_M44<Float_>(
+									dPDu[blk].GetCross( dPDv ),
+									mtxLocalCameraNorm			).GetNormalized();
 			}
 		}
 

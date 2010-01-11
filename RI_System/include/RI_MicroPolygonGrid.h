@@ -37,7 +37,7 @@ public:
 	u_int			mXBlocks;
 	u_int			mYDim;
 	u_int			mPointsN;
-	Float3_			*mpPointsWS;
+	Float3_			*mpPointsCS;
 	float			mURange[2];
 	float			mVRange[2];
 	SymbolIList		mSymbolIs;
@@ -45,6 +45,8 @@ public:
 	Matrix44		mMtxLocalWorld;
 	Matrix44		mMtxWorldCamera;
 	Matrix44		mMtxLocalCamera;
+	Matrix44		mMtxLocalCameraNorm;
+	Matrix44		mMtxCameraLocal;
 
 	WorkGrid( const SymbolList &globalSymbols );
 	~WorkGrid();

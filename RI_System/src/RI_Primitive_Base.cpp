@@ -182,20 +182,21 @@ void SimplePrimitiveBase::Dice(
 					WorkGrid &g,
 					bool doColorCoded ) const
 {
-	//Float3_	*pPointsWS = g.mpPointsWS;
+	//Float3_	*pP = g.mpPointsCS;
 
-	Float3_	*pPointsWS	= (Float3_	*)g.mSymbolIs.FindSymbolIData( "P"	);
-	Float_	*pOODu		= (Float_	*)g.mSymbolIs.FindSymbolIData( "_oodu" );
-	Float_	*pOODv		= (Float_	*)g.mSymbolIs.FindSymbolIData( "_oodv" );
-	Float_	*pu			= (Float_	*)g.mSymbolIs.FindSymbolIData( "u" );
-	Float_	*pv			= (Float_	*)g.mSymbolIs.FindSymbolIData( "v" );
-	Float3_	*pI			= (Float3_	*)g.mSymbolIs.FindSymbolIData( "I"	);
-	Float3_	*pN			= (Float3_	*)g.mSymbolIs.FindSymbolIData( "N"	);
-	Float3_	*pNg		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "Ng"	);
-	SlColor	*pOs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Os"	);
-	SlColor	*pCs		= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Cs"	);
+	// NOTE: all spatial and directional values are in "current" (camera) space
+	Float3_	*pP		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "P"	);
+	Float_	*pOODu	= (Float_	*)g.mSymbolIs.FindSymbolIData( "_oodu" );
+	Float_	*pOODv	= (Float_	*)g.mSymbolIs.FindSymbolIData( "_oodv" );
+	Float_	*pu		= (Float_	*)g.mSymbolIs.FindSymbolIData( "u" );
+	Float_	*pv		= (Float_	*)g.mSymbolIs.FindSymbolIData( "v" );
+	Float3_	*pI		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "I"	);
+	Float3_	*pN		= (Float3_	*)g.mSymbolIs.FindSymbolIData( "N"	);
+	Float3_	*pNg	= (Float3_	*)g.mSymbolIs.FindSymbolIData( "Ng"	);
+	SlColor	*pOs	= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Os"	);
+	SlColor	*pCs	= (SlColor	*)g.mSymbolIs.FindSymbolIData( "Cs"	);
 
-	DASSERT( pPointsWS == g.mpPointsWS );
+	DASSERT( pP == g.mpPointsCS );
 
 	float	du = 1.0f / (g.mXDim-1);
 	float	dv = 1.0f / (g.mYDim-1);
@@ -204,6 +205,8 @@ void SimplePrimitiveBase::Dice(
 
 	if ( mpAttribs->mOrientationFlipped )
 		mtxLocalCameraNorm = mtxLocalCameraNorm * Matrix44::Scale( -1, -1, -1 );
+
+	g.mMtxLocalCameraNorm	= mtxLocalCameraNorm;
 
 	Float3	camPosCS = g.mMtxWorldCamera.GetTranslation();
 
@@ -264,8 +267,8 @@ void SimplePrimitiveBase::Dice(
 	}
 
 	// build the UVs
-	Float2_	locUV[ MP_GRID_MAX_SIMD_BLKS ];
-	Float2_	locDUDV[ MP_GRID_MAX_SIMD_BLKS ];
+	Float2_	locUV[ MP_GRID_MAX_SIZE_SIMD_BLKS ];
+	Float2_	locDUDV[ MP_GRID_MAX_SIZE_SIMD_BLKS ];
 
 	fillUVsArray( locUV, locDUDV, du, dv, g.mXDim, g.mYDim );
 
@@ -288,11 +291,10 @@ void SimplePrimitiveBase::Dice(
 			continue;
 
 		Float3_	norLS = dPdu.GetCross( dPdv ).GetNormalized();
-		Float3_	posWS = V3__V3W1_Mul_M44<Float_>( posLS, g.mMtxLocalWorld );
 		Float3_	posCS = V3__V3W1_Mul_M44<Float_>( posLS, g.mMtxLocalCamera );
 		Float3_	norCS = V3__V3W1_Mul_M44<Float_>( norLS, mtxLocalCameraNorm ).GetNormalized();
 
-		pPointsWS[blkIdx]	= posWS;
+		pP[blkIdx]		= posCS;
 
 		pI[blkIdx]		= (posCS - -camPosCS);//.GetNormalized();
 		pOODu[blkIdx]	= one / locDUDV[blkIdx][0];
@@ -327,9 +329,9 @@ void SimplePrimitiveBase::Dice(
 
 			// store in blocked SOA format
 
-			pPointsWS[blkIdx][0][itmIdx] = posWS[0];
-			pPointsWS[blkIdx][1][itmIdx] = posWS[1];
-			pPointsWS[blkIdx][2][itmIdx] = posWS[2];
+			pP[blkIdx][0][itmIdx] = posWS[0];
+			pP[blkIdx][1][itmIdx] = posWS[1];
+			pP[blkIdx][2][itmIdx] = posWS[2];
 
 			Float3	tmpI = (posCS - -camPosCS).GetNormalized();
 			pI[blkIdx][0][itmIdx] = tmpI[0];

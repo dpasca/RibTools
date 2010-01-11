@@ -70,8 +70,8 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 	Inst_2Op<V,V,V,OBT_MUL>,
 
 	Inst_2Op<S,S,S,OBT_DIV>,
-	Inst_2Op<V,S,V,OBT_DIV>,
 	Inst_2Op<V,V,S,OBT_DIV>,
+	Inst_2Op<V,S,V,OBT_DIV>,
 	Inst_2Op<V,V,V,OBT_DIV>,
 
 	Inst_Pow_SSS,
@@ -79,6 +79,8 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
 	Inst_MOVVS3<Float3_,Float_>,
 
 	Inst_Dot_SVV,
+
+	Inst_Length_SV,
 
 	Inst_Min_Max<S,OBT_MIN>,
 	Inst_Min_Max<V,OBT_MIN>,

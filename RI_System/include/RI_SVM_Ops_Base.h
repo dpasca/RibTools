@@ -373,6 +373,46 @@ void Inst_Dot_SVV( Context &ctx )
 }
 
 //==================================================================
+void Inst_Length_SV( Context &ctx )
+{
+		  Float_*	lhs	= ctx.GetRW( (	     Float_ *)0, 1 );
+	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
+
+	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+
+	if ( lhs_varying )
+	{
+		int		op1_offset = 0;
+		int		op2_offset = 0;
+		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+
+		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		{
+			SLRUNCTX_BLKWRITECHECK( i );
+			{
+			lhs[i] = op1[op1_offset].GetLength();
+			}
+			
+			op1_offset	+= op1_step;
+		}
+	}
+	else
+	{
+		DASSERT( !ctx.IsSymbolVarying( 2 ) );
+
+		for (u_int i=0; i < 1; ++i)
+		{
+			SLRUNCTX_BLKWRITECHECK( 0 );
+			{
+			lhs[0] = op1[0].GetLength();
+			}
+		}
+	}
+
+	ctx.NextInstruction();
+}
+
+//==================================================================
 void Inst_Pow_SSS( Context &ctx )
 {
 		  Float_*	lhs	= ctx.GetRW( (		Float_ *)0, 1 );

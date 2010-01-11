@@ -137,20 +137,16 @@ void Hider::Bust(
 		Float_ screenHWd = Float_( screenWd * 0.5f );
 		Float_ screenHHe = Float_( screenHe * 0.5f );
 
-		const Float3_	*pPointsWS	= (const Float3_ *)workGrid.mpPointsWS;
+		const Float3_	*pPointsCS	= (const Float3_ *)workGrid.mpPointsCS;
 
 		size_t	blocksN = DMT_SIMD_BLOCKS( workGrid.mPointsN );
 		for (size_t blkIdx=0; blkIdx < blocksN; ++blkIdx)
 		{
-			Float4_		homoP = V4__V3W1_Mul_M44<Float_>( pPointsWS[ blkIdx ], mMtxWorldProj );
+			Float4_		homoP = V4__V3W1_Mul_M44<Float_>( pPointsCS[ blkIdx ], mOptions.mMtxCamProj );
 
 			Float4_		projP = homoP / homoP.w();
 
-			// TODO: should replace pPointsWS with pPointsCS... ..to avoid this and also because
-			// perhaps P should indeed be in "current" space (camera)
-			Float3_		PtCS = V3__V3W1_Mul_M44<Float_>( pPointsWS[ blkIdx ], mMtxWorldCamera );
-
-			shadGrid.mpPointsCS[ blkIdx ]			= PtCS;
+			shadGrid.mpPointsCS[ blkIdx ]			= pPointsCS[ blkIdx ];
 			//shadGrid.mpPointsCloseCS[ blkIdx ]	= 0;
 
 			shadGrid.mpPosWin[ blkIdx ][0] =  projP.x() * screenHWd + screenCx;

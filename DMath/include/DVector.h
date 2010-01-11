@@ -136,6 +136,11 @@ public:
 		return v3[0] * v3[0] + v3[1] * v3[1] + v3[2] * v3[2];
 	}
 
+	_S GetLength() const
+	{
+		return DSqrt( GetLengthSqr() );
+	}
+
 	Vec3 GetCross( const Vec3 &r_ ) const
 	{
 		return Vec3(

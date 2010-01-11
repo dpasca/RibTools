@@ -73,6 +73,8 @@ OpCodeDef	_gOpCodeDefs[] =
 
 	"dot.svv"		,	3,			0,	F1,	F3,	F3,	NA,	NA,
 
+	"length.sv"		,	2,			0,	F1,	F3,	NA,	NA,	NA,
+
 	"min.sss"		,	3,			0,	F1,	F1,	F1,	NA,	NA,
 	"min.vvv"		,	3,			0,	F3,	F3,	F3,	NA,	NA,
 

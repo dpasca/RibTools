@@ -359,7 +359,7 @@ void PatchBicubic::Eval_dPdu_dPdv(
 		Float3_ vBottom	= mCalcV[0].Eval( uv[1] );
 		Float3_ vMid1	= mCalcV[1].Eval( uv[1] );
 		Float3_ vMid2	= mCalcV[2].Eval( uv[1] );
-		Float3_ vTop		= mCalcV[3].Eval( uv[1] );
+		Float3_ vTop	= mCalcV[3].Eval( uv[1] );
 
 		*out_dPdu = splineDeriv( uv[0], uBasis, vBottom, vMid1, vMid2, vTop );
 	}
