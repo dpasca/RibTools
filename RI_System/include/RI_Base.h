@@ -21,8 +21,7 @@ namespace RI
 {
 
 //==================================================================
-static const u_int	MP_GRID_MAX_WIDTH_SIMD_BLKS		= DMT_SIMD_PADSIZE( 48 );
-static const u_int	MP_GRID_MAX_SIZE				= MP_GRID_MAX_WIDTH_SIMD_BLKS * 48;
+static const u_int	MP_GRID_MAX_SIZE				= DMT_SIMD_PADSIZE( 48 ) * 48;
 static const u_int	MP_GRID_MAX_SIZE_SIMD_BLKS		= DMT_SIMD_BLOCKS( MP_GRID_MAX_SIZE );
 
 //==================================================================

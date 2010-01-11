@@ -32,6 +32,11 @@ displacement disp_textured(
 		magnitude   = 0.0;
 	}
 
+	/* DAVIDE - Changing to "proper" displacement (any difference ?)
 	P   = P + normalize( N) * magnitude;
+	*/
+	normal Nn = normalize( N );
+	P   = P + Nn * magnitude / length( ntransform( "shader", Nn );
+	
 	N   = calculatenormal( P);
 }
