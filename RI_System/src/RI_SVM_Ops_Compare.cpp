@@ -30,7 +30,7 @@ namespace SVM
 */
 
 //==================================================================
-void Inst_IfTrue( Context &ctx )
+void Inst_IfTrue( Context &ctx, u_int blocksN )
 {
 	const VecNMask*	op1	= (const VecNMask *)ctx.GetRW( 1 );
 
@@ -38,11 +38,11 @@ void Inst_IfTrue( Context &ctx )
 
 	if ( varying )
 	{
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		for (u_int i=0; i < blocksN; ++i)
 		{
 			SLRUNCTX_BLKWRITECHECK( i );
 			{
-			//lhs[i] = CmpMaskLE(op1[op1_offset], op2[op2_offset]);
+			//lhs[i] = CmpMaskLE(op1[op1_idx], op2[op2_idx]);
 			}
 		}
 
@@ -91,7 +91,7 @@ void Inst_IfTrue( Context &ctx )
 }
 
 //==================================================================
-void Inst_OrElse( Context &ctx )
+void Inst_OrElse( Context &ctx, u_int blocksN )
 {
 	u_int	funcopFlgs = ctx.mFopStack.top();
 

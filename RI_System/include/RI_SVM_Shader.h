@@ -17,6 +17,13 @@
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+namespace RRASM
+{
+	struct OpCodeDef;
+}
+
 //==================================================================
 namespace SVM
 {
@@ -226,7 +233,7 @@ public:
 	void Run( class Context &ctx ) const;
 
 private:
-	bool verifyOpParams( Context &ctx, u_int opCodeIdx ) const;
+	bool verifyOpParams( Context &ctx, const RRASM::OpCodeDef &opCodeDef ) const;
 	void runFrom( class Context &ctx, u_int startPC ) const;
 };
 

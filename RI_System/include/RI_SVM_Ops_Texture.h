@@ -18,7 +18,7 @@ namespace SVM
 
 //==================================================================
 template <class TA, const size_t N_COORDS>
-void Inst_Texture( Context &ctx )
+void Inst_Texture( Context &ctx, u_int blocksN )
 {
 			TA		*lhs	= (			TA *)ctx.GetRW( 1 );
 	const SlStr		*pName	= (const SlStr *)ctx.GetRO( 2 );
@@ -51,45 +51,22 @@ void Inst_Texture( Context &ctx )
 		stSteps[0][1] = ctx.GetSymbolVaryingStep( 4 );
 	}
 
-	bool	des_varying = ctx.IsSymbolVarying( 1 );
-
-	if ( des_varying )
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
 			if ( sizeof(TA) == sizeof(Float_) )
 				lhs[i] = TA( 0.5f );// pST[0][0][ stOffs[0][0] ] + pST[0][1][ stOffs[0][1] ];
 			else
 			{
 				DASSERT( 0 );
 			}
-
-			}
-
-			for (size_t sti=0; sti < N_COORDS; ++sti)
-			{
-				stOffs[sti][0] += stSteps[sti][0];
-				stOffs[sti][1] += stSteps[sti][1];
-			}
 		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 3 ) );
 
-		for (u_int i=0; i < 1; ++i)
+		for (size_t sti=0; sti < N_COORDS; ++sti)
 		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-			if ( sizeof(TA) == sizeof(Float_) )
-				lhs[i] = TA( 0.5f );//lhs[i] = pST[0][0][ stOffs[0][0] ] + pST[0][1][ stOffs[0][1] ];
-			else
-			{
-				DASSERT( 0 );
-			}
-			}
+			stOffs[sti][0] += stSteps[sti][0];
+			stOffs[sti][1] += stSteps[sti][1];
 		}
 	}
 

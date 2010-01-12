@@ -18,39 +18,22 @@ namespace SVM
 
 //==================================================================
 template <class TB>
-inline void Inst_Noise1( Context &ctx )
+inline void Inst_Noise1( Context &ctx, u_int blocksN )
 {
 		  Float_*	lhs	= (		 Float_*)ctx.GetRW( 1 );
 	const TB	*	op1	= (const TB	   *)ctx.GetRO( 2 );
 
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-	
-	if ( lhs_varying )
+	int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+	int		op1_idx = 0;
+
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
-		int		op1_offset = 0;
-
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				lhs[i] = Noise::unoise1( op1[op1_offset] );
-			}
-
-			op1_offset += op1_step;
+			lhs[i] = Noise::unoise1( op1[op1_idx] );
 		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-			lhs[0] = Noise::unoise1( op1[0] );
-			}
-		}
+		op1_idx += op1_step;
 	}
 
 	ctx.NextInstruction();
@@ -58,39 +41,22 @@ inline void Inst_Noise1( Context &ctx )
 
 //==================================================================
 template <class TB>
-inline void Inst_Noise3( Context &ctx )
+inline void Inst_Noise3( Context &ctx, u_int blocksN )
 {
 		  Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
 	const TB	 *	op1	= (const TB		*)ctx.GetRO( 2 );
 
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-	
-	if ( lhs_varying )
+	int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+	int		op1_idx = 0;
+
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
-		int		op1_offset = 0;
-
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				lhs[i] = Noise::unoise3( op1[op1_offset] );
-			}
-
-			op1_offset += op1_step;
+			lhs[i] = Noise::unoise3( op1[op1_idx] );
 		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-			lhs[0] = Noise::unoise3( op1[0] );
-			}
-		}
+		op1_idx += op1_step;
 	}
 
 	ctx.NextInstruction();

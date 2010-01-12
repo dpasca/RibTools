@@ -16,7 +16,7 @@ namespace RI
 namespace SVM
 {
 
-typedef void (*SlOpCodeFunc)( Context &ctx );
+typedef void (*SlOpCodeFunc)( Context &ctx, u_int blocksN );
 
 SlOpCodeFunc	_gSlOpCodeFuncs[];
 

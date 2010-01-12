@@ -49,7 +49,7 @@ static void getMtxToCurrent(
 
 //==================================================================
 template <const Symbol::Type _TYPE>
-void xFormname_VXV( Context &ctx )
+void xFormname_VXV( Context &ctx, u_int blocksN )
 {
 	// should do stuff here 8)
 
@@ -59,57 +59,38 @@ void xFormname_VXV( Context &ctx )
 
 	DASSERT( ctx.IsSymbolVarying( 2 ) == false );
 
-	bool	des_varying = ctx.IsSymbolVarying( 1 );
-
 	//const char	*pToSpaceName = "current";
 	const char	*pFrSpaceName = pSpaceName->mStr;
 
 	Matrix44	mat;
 	getMtxToCurrent( ctx, mat, pFrSpaceName );
 
-	if ( des_varying )
+	int		src_offset = 0;
+	int		src_step = ctx.GetSymbolVaryingStep( 3 );
+
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		int		src_offset = 0;
-		int		src_step = ctx.GetSymbolVaryingStep( 3 );
-
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				if ( _TYPE == Symbol::TYP_POINT )  pDes[i] = V3__V3W1_Mul_M44<Float_>( pSrc[src_offset], mat ); else
-				if ( _TYPE == Symbol::TYP_VECTOR ) pDes[i] = V3__V3W0_Mul_M44<Float_>( pSrc[src_offset], mat ); else
-				if ( _TYPE == Symbol::TYP_NORMAL ) pDes[i] = V3__V3W0_Mul_M44<Float_>( pSrc[src_offset], mat ).GetNormalized();
-			}
-
-			src_offset	+= src_step;
+			if ( _TYPE == Symbol::TYP_POINT )  pDes[i] = V3__V3W1_Mul_M44<Float_>( pSrc[src_offset], mat ); else
+			if ( _TYPE == Symbol::TYP_VECTOR ) pDes[i] = V3__V3W0_Mul_M44<Float_>( pSrc[src_offset], mat ); else
+			if ( _TYPE == Symbol::TYP_NORMAL ) pDes[i] = V3__V3W0_Mul_M44<Float_>( pSrc[src_offset], mat ).GetNormalized();
 		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 3 ) );
 
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-			if ( _TYPE == Symbol::TYP_POINT )  pDes[0] = V3__V3W1_Mul_M44<Float_>( pSrc[0], mat ); else
-			if ( _TYPE == Symbol::TYP_VECTOR ) pDes[0] = V3__V3W0_Mul_M44<Float_>( pSrc[0], mat ); else
-			if ( _TYPE == Symbol::TYP_NORMAL ) pDes[0] = V3__V3W0_Mul_M44<Float_>( pSrc[0], mat ).GetNormalized();
-			}
-		}
+		src_offset	+= src_step;
 	}
 
 	ctx.NextInstruction();
 }
 
 //==================================================================
-void Inst_PXFormname_VXV( Context &ctx )	{ xFormname_VXV<Symbol::TYP_POINT>( ctx ); }
-void Inst_VXFormname_VXV( Context &ctx )	{ xFormname_VXV<Symbol::TYP_VECTOR>( ctx ); }
-void Inst_NXFormname_VXV( Context &ctx )	{ xFormname_VXV<Symbol::TYP_NORMAL>( ctx ); }
+void Inst_PXFormname_VXV( Context &ctx, u_int blocksN )	{ xFormname_VXV<Symbol::TYP_POINT>( ctx, blocksN ); }
+void Inst_VXFormname_VXV( Context &ctx, u_int blocksN )	{ xFormname_VXV<Symbol::TYP_VECTOR>( ctx, blocksN ); }
+void Inst_NXFormname_VXV( Context &ctx, u_int blocksN )	{ xFormname_VXV<Symbol::TYP_NORMAL>( ctx, blocksN ); }
 
 //==================================================================
 // quite different for color ?
-void Inst_CXFormname_VXV( Context &ctx )
+void Inst_CXFormname_VXV( Context &ctx, u_int blocksN )
 {
 	// should do stuff here 8)
 
@@ -119,40 +100,23 @@ void Inst_CXFormname_VXV( Context &ctx )
 
 	DASSERT( ctx.IsSymbolVarying( 2 ) == false );
 
-	bool	des_varying = ctx.IsSymbolVarying( 1 );
-
 	//const char	*pToSpaceName = "current";
 	const char	*pFrSpaceName = pSpaceName->mStr;
 
 	Matrix44	mat;
 	getMtxToCurrent( ctx, mat, pFrSpaceName );
 
-	if ( des_varying )
+	int		src_offset = 0;
+	int		src_step = ctx.GetSymbolVaryingStep( 3 );
+
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		int		src_offset = 0;
-		int		src_step = ctx.GetSymbolVaryingStep( 3 );
-
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				pDes[i] = V3__V3W1_Mul_M44<Float_>( pSrc[src_offset], mat );
-			}
-
-			src_offset	+= src_step;
+			pDes[i] = V3__V3W1_Mul_M44<Float_>( pSrc[src_offset], mat );
 		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 3 ) );
 
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-				pDes[0] = V3__V3W1_Mul_M44<Float_>( pSrc[0], mat );
-			}
-		}
+		src_offset	+= src_step;
 	}
 
 	ctx.NextInstruction();

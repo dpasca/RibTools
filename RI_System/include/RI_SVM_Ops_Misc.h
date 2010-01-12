@@ -17,9 +17,9 @@ namespace SVM
 {
 class Context;
 
-void Inst_Faceforward( Context &ctx );
-void Inst_Normalize( Context &ctx );
-void Inst_CalculateNormal( Context &ctx );
+void Inst_Faceforward( Context &ctx, u_int blocksN );
+void Inst_Normalize( Context &ctx, u_int blocksN );
+void Inst_CalculateNormal( Context &ctx, u_int blocksN );
 
 //==================================================================
 }

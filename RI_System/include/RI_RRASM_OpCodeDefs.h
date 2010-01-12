@@ -20,12 +20,13 @@ namespace RRASM
 {
 
 //==================================================================
-#define OPC_FLG_RIGHTISIMM			1
-#define OPC_FLG_UNIFORMOPERS		2
-#define OPC_FLG_FUNCOP_BEGIN		4
-#define OPC_FLG_FUNCOP_MIDDLE		8
-#define OPC_FLG_FUNCOP_END			16
-#define OPC_FLG_DIRPOSLIGHT_INSTR	32
+static const u_int OPC_FLG_1STISDEST		= 1	;	// first param is destination value
+static const u_int OPC_FLG_RIGHTISIMM		= 2	;	// 2nd and above params are immediate
+static const u_int OPC_FLG_UNIFORMOPERS		= 4	;	// all ops must be uniform
+static const u_int OPC_FLG_FUNCOP_BEGIN		= 8	;	// it's a funcop begin instruction
+static const u_int OPC_FLG_FUNCOP_MIDDLE	= 16;	// it's a funcop middle instruction
+static const u_int OPC_FLG_FUNCOP_END		= 32;	// it's a funcop end instruction
+static const u_int OPC_FLG_DIRPOSLIGHT		= 64;	// it's dealing with positional and directional light
 
 //==================================================================
 struct OpCodeDef

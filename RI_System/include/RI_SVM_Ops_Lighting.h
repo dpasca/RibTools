@@ -18,8 +18,9 @@ namespace SVM
 class Context;
 
 //==================================================================
+// WARNING: this one doens't use blocksN
 template<bool INCLUDES_AXIS_ANGLE>
-void Inst_Illuminance( Context &ctx )
+void Inst_Illuminance( Context &ctx, u_int blocksN_unused )
 {
 	// only from surface shaders !!
 	DASSERT( ctx.GetShader()->mType == Shader::TYPE_SURFACE );
@@ -52,7 +53,8 @@ void Inst_Illuminance( Context &ctx )
 		pAngle	= NULL;
 	}
 
-	Float3_	*pL		= (	 Float3_ *)ctx.mpGridSymIList->FindSymbolIData( "L" );
+	SymbolI	*pLSym = ctx.mpGridSymIList->FindSymbolI( "L" );
+	Float3_	*pL	= (Float3_ *)pLSym->GetRWData();
 
 	ctx.NextInstruction();
 	u_int bodyStartAddr = ctx.GetCurPC();
@@ -72,8 +74,9 @@ void Inst_Illuminance( Context &ctx )
 }
 
 //==================================================================
+// WARNING: this one overrides blocksN !
 template<bool INCLUDES_AXIS_ANGLE>
-void Inst_Solar( Context &ctx )
+void Inst_Solar( Context &ctx, u_int blocksN_unused )
 {
 	// only from light shaders !!
 	DASSERT( ctx.GetShader()->mType == Shader::TYPE_LIGHT );
@@ -83,7 +86,9 @@ void Inst_Solar( Context &ctx )
 	// don't really need the following...
 	// u_short funcOpEndAddr = ctx.GetOp(0)->mOpCode.mFuncopEndAddr;
 
-	Float3_	*pL		= (	 Float3_ *)ctx.mpGridSymIList->FindSymbolIData( "L" );
+	SymbolI	*pLSym = ctx.mpGridSymIList->FindSymbolI( "L" );
+	Float3_	*pL	= (Float3_ *)pLSym->GetRWData();
+	u_int blocksN = pLSym->IsVarying() ? ctx.mBlocksN : 1;
 
 	if ( INCLUDES_AXIS_ANGLE )
 	{
@@ -93,7 +98,7 @@ void Inst_Solar( Context &ctx )
 		// set to the value of the axis..
 		// NOTE: ignoring the angle for now !
 
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		for (u_int i=0; i < blocksN; ++i)
 		{
 			// not checking for active processor ?
 			pL[i] = -pAxis->GetNormalized();	// why '-' ?! ..just because ?
@@ -102,7 +107,7 @@ void Inst_Solar( Context &ctx )
 	else
 	{
 		// set light direction as 0,0,0
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		for (u_int i=0; i < blocksN; ++i)
 		{
 			// not checking for active processor ?
 			pL[i] = Float3_( 0.f );
@@ -116,11 +121,11 @@ void Inst_Solar( Context &ctx )
 }
 
 //==================================================================
-void Inst_FuncopEnd( Context &ctx );
+void Inst_FuncopEnd( Context &ctx, u_int blocksN );
 
 //==================================================================
-void Inst_Diffuse( Context &ctx );
-void Inst_Ambient( Context &ctx );
+void Inst_Diffuse( Context &ctx, u_int blocksN );
+void Inst_Ambient( Context &ctx, u_int blocksN );
 
 //==================================================================
 }

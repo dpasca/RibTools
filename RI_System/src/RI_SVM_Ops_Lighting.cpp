@@ -23,7 +23,7 @@ namespace SVM
 
 //==================================================================
 // this is a simplified version.. until lights become available 8)
-void Inst_Ambient( Context &ctx )
+void Inst_Ambient( Context &ctx, u_int blocksN )
 {
 	if NOT( ctx.mCache.mAmbientColDone )
 	{
@@ -67,7 +67,7 @@ void Inst_Ambient( Context &ctx )
 
 	SlColor	*lhs	= (SlColor *)ctx.GetRW( 1 );
 
-	for (u_int i=0; i < ctx.mBlocksN; ++i)
+	for (u_int i=0; i < blocksN; ++i)
 	{
 		SLRUNCTX_BLKWRITECHECK( i );
 		{
@@ -125,7 +125,7 @@ void FuncOpEnd_Illuminance( Context &ctx )
 }
 
 //==================================================================
-void Inst_FuncopEnd( Context &ctx )
+void Inst_FuncopEnd( Context &ctx, u_int blocksN )
 {
 	u_int funcopFlgs =	ctx.mFopStack.top();
 

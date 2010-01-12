@@ -158,17 +158,39 @@ ShaderInst::~ShaderInst()
 }
 
 //==================================================================
-bool ShaderInst::verifyOpParams( Context &ctx, u_int opCodeIdx ) const
+inline bool ShaderInst::verifyOpParams( Context &ctx, const RRASM::OpCodeDef &opCodeDef ) const
 {
-	const RRASM::OpCodeDef	&opCodeDef = RRASM::_gOpCodeDefs[ opCodeIdx ];
+#ifdef _DEBUG
+
+	// special case, only check fir the 1st type
+	if ( opCodeDef.Flags & RRASM::OPC_FLG_RIGHTISIMM )
+		return ctx.isOpcodeTypeCompatible( 1, opCodeDef.Types[0] );
 
 	for (u_int i=0; i < opCodeDef.OperCnt; ++i)
 	{
-		if NOT( ctx.isOpcodeTypeCompatible( i+1, opCodeDef.Types[i] ) )
+		// don't che address.. it's not a symbol
+		if ( opCodeDef.Types[i] == Symbol::TYP_ADDR )
+			continue;
+
+		if NOT( ctx.isOpcodeTypeCompatible( i + 1, opCodeDef.Types[i] ) )
+		{
+			DASSERT( 0 );
 			return false;
+		}
 	}
 
+#endif
+
 	return true;
+}
+
+//==================================================================
+inline u_int getDestBlocksN( Context &ctx, const RRASM::OpCodeDef &opCodeDef )
+{
+	if ( 0 != (opCodeDef.Flags & RRASM::OPC_FLG_1STISDEST) && ctx.IsSymbolVarying( 1 ) )
+		return ctx.mBlocksN;
+	else
+		return 1;
 }
 
 //==================================================================
@@ -198,16 +220,20 @@ void ShaderInst::runFrom( Context &ctx, u_int startPC ) const
 				ctx.mProgramCounterIdx -= 1;
 			}
 
-			u_int	opCodeIdx = pWord->mOpCode.mTableOffset;
+			u_int					opCodeIdx = pWord->mOpCode.mTableOffset;
+
+			const RRASM::OpCodeDef	&opCodeDef = RRASM::_gOpCodeDefs[ opCodeIdx ];
 
 			// only an assert because by now the RRASM should have
 			// verified this !
-			DASSERT( verifyOpParams( ctx, opCodeIdx ) );
+			verifyOpParams( ctx, opCodeDef );
+
+			u_int	blocksN = getDestBlocksN( ctx, opCodeDef );
 
 			// get the opcode functions
 			SlOpCodeFunc	nextFunc = _gSlOpCodeFuncs[ opCodeIdx ];
 			// execute the opcode !
-			nextFunc( ctx );
+			nextFunc( ctx, blocksN );
 
 #if defined(FORCE_MEM_CORRUPTION_CHECK)
 			const char *pDude = DNEW char;

@@ -18,7 +18,7 @@ namespace SVM
 
 //==================================================================
 template <class TA>
-void Inst_CMPLT( Context &ctx )
+void Inst_CMPLT( Context &ctx, u_int blocksN )
 {
 	const TA	*lhs = (const TA*)ctx.GetRO( 1 );
 	const TA	*rhs = (const TA*)ctx.GetRO( 2 );
@@ -54,50 +54,28 @@ inline VecNMask GetBroadcast0Lane( const VecNMask &val )
 
 //==================================================================
 template <class TB, const OpBaseTypeID opBaseTypeID>
-void Inst_SETCMP_EQ( Context &ctx )
+void Inst_SETCMP_EQ( Context &ctx, u_int blocksN )
 {
 	  VecNMask*	lhs	= (VecNMask*)ctx.GetRW( 1 );
 	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
 	const TB*	op2	= (const TB*)ctx.GetRO( 3 );
 
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	int		op1_idx = 0;
+	int		op2_idx = 0;
+	int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+	int		op2_step = ctx.GetSymbolVaryingStep( 3 );
 
-	if ( lhs_varying )
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		int		op1_offset = 0;
-		int		op2_offset = 0;
-		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
-		int		op2_step = ctx.GetSymbolVaryingStep( 3 );
-
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				if ( opBaseTypeID == OBT_SETEQ	 ) lhs[i] = CmpMaskEQ(op1[op1_offset], op2[op2_offset]); else
-				if ( opBaseTypeID == OBT_SETNEQ	 ) lhs[i] = CmpMaskNE(op1[op1_offset], op2[op2_offset]); else
-				{ DASSERT( 0 ); }
-			}
-			
-			op1_offset	+= op1_step;
-			op2_offset	+= op2_step;
+			if ( opBaseTypeID == OBT_SETEQ	 ) lhs[i] = CmpMaskEQ(op1[op1_idx], op2[op2_idx]); else
+			if ( opBaseTypeID == OBT_SETNEQ	 ) lhs[i] = CmpMaskNE(op1[op1_idx], op2[op2_idx]); else
+			{ DASSERT( 0 ); }
 		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
-				 !ctx.IsSymbolVarying( 3 ) );
-
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-			TB	expandedOp1 = GetBroadcast0Lane( op1[0] );	// replicate a single value through the whole SIMD register
-			TB	expandedOp2 = GetBroadcast0Lane( op2[0] );	// ...
-			if ( opBaseTypeID == OBT_SETEQ	 ) lhs[0] = CmpMaskEQ(expandedOp1, expandedOp2); else
-			if ( opBaseTypeID == OBT_SETNEQ	 ) lhs[0] = CmpMaskNE(expandedOp1, expandedOp2); else
-			{ DASSERT( 0 );		}
-			}
-		}
+		
+		op1_idx	+= op1_step;
+		op2_idx	+= op2_step;
 	}
 
 	ctx.NextInstruction();
@@ -105,7 +83,7 @@ void Inst_SETCMP_EQ( Context &ctx )
 
 //==================================================================
 template <class TB, const OpBaseTypeID opBaseTypeID>
-void Inst_SETCMP_EQ_NoVary( Context &ctx )
+void Inst_SETCMP_EQ_NoVary( Context &ctx, u_int blocksN )
 {
 	  VecNMask*	lhs	= (VecNMask*)ctx.GetRW( 1 );
 	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
@@ -130,61 +108,37 @@ void Inst_SETCMP_EQ_NoVary( Context &ctx )
 
 //==================================================================
 template <class TB, const OpBaseTypeID opBaseTypeID>
-void Inst_SETCMP_REL( Context &ctx )
+void Inst_SETCMP_REL( Context &ctx, u_int blocksN )
 {
 	  VecNMask*	lhs	=  (VecNMask*)ctx.GetRW( 1 );
 	const TB*	op1	=  (const TB*)ctx.GetRO( 2 );
 	const TB*	op2	=  (const TB*)ctx.GetRO( 3 );
 
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	int		op1_idx = 0;
+	int		op2_idx = 0;
+	int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+	int		op2_step = ctx.GetSymbolVaryingStep( 3 );
 
-	if ( lhs_varying )
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		int		op1_offset = 0;
-		int		op2_offset = 0;
-		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
-		int		op2_step = ctx.GetSymbolVaryingStep( 3 );
-
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				if ( opBaseTypeID == OBT_SETLE	 ) lhs[i] = CmpMaskLE(op1[op1_offset], op2[op2_offset]); else
-				if ( opBaseTypeID == OBT_SETGE	 ) lhs[i] = CmpMaskGE(op1[op1_offset], op2[op2_offset]); else
-				if ( opBaseTypeID == OBT_SETLT	 ) lhs[i] = CmpMaskLT(op1[op1_offset], op2[op2_offset]); else
-				if ( opBaseTypeID == OBT_SETGT	 ) lhs[i] = CmpMaskGT(op1[op1_offset], op2[op2_offset]); else
-				{ DASSERT( 0 ); }
-			}
-
-			op1_offset	+= op1_step;
-			op2_offset	+= op2_step;
+			if ( opBaseTypeID == OBT_SETLE	 ) lhs[i] = CmpMaskLE(op1[op1_idx], op2[op2_idx]); else
+			if ( opBaseTypeID == OBT_SETGE	 ) lhs[i] = CmpMaskGE(op1[op1_idx], op2[op2_idx]); else
+			if ( opBaseTypeID == OBT_SETLT	 ) lhs[i] = CmpMaskLT(op1[op1_idx], op2[op2_idx]); else
+			if ( opBaseTypeID == OBT_SETGT	 ) lhs[i] = CmpMaskGT(op1[op1_idx], op2[op2_idx]); else
+			{ DASSERT( 0 ); }
 		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
-				 !ctx.IsSymbolVarying( 3 ) );
 
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-			TB	expandedOp1 = GetBroadcast0Lane( op1[0] );	// replicate a single value through the whole SIMD register
-			TB	expandedOp2 = GetBroadcast0Lane( op2[0] );	// ...
-			if ( opBaseTypeID == OBT_SETLE	 ) lhs[0] = CmpMaskLE(expandedOp1, expandedOp2); else
-			if ( opBaseTypeID == OBT_SETGE	 ) lhs[0] = CmpMaskGE(expandedOp1, expandedOp2); else
-			if ( opBaseTypeID == OBT_SETLT	 ) lhs[0] = CmpMaskLT(expandedOp1, expandedOp2); else
-			if ( opBaseTypeID == OBT_SETGT	 ) lhs[0] = CmpMaskGT(expandedOp1, expandedOp2); else
-			{ DASSERT( 0 );		}
-			}
-		}
+		op1_idx	+= op1_step;
+		op2_idx	+= op2_step;
 	}
 
 	ctx.NextInstruction();
 }
 
-void Inst_IfTrue( Context &ctx );
-void Inst_OrElse( Context &ctx );
+void Inst_IfTrue( Context &ctx, u_int blocksN );
+void Inst_OrElse( Context &ctx, u_int blocksN );
 
 //==================================================================
 }

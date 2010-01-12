@@ -17,10 +17,10 @@ namespace SVM
 {
 
 //==================================================================
-void Inst_PXFormname_VXV( Context &ctx );
-void Inst_VXFormname_VXV( Context &ctx );
-void Inst_NXFormname_VXV( Context &ctx );
-void Inst_CXFormname_VXV( Context &ctx );
+void Inst_PXFormname_VXV( Context &ctx, u_int blocksN );
+void Inst_VXFormname_VXV( Context &ctx, u_int blocksN );
+void Inst_NXFormname_VXV( Context &ctx, u_int blocksN );
+void Inst_CXFormname_VXV( Context &ctx, u_int blocksN );
 
 //==================================================================
 }

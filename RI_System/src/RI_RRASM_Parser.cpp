@@ -700,7 +700,7 @@ void Parser::parseCodeLine( char lineBuff[], int lineCnt )
 		mpShader->mCode[setAddrInstrIdx].mOpCode.mFuncopEndAddr = instrIdx;
 	}
 
-	if ( pOpDef->Flags & OPC_FLG_DIRPOSLIGHT_INSTR )
+	if ( pOpDef->Flags & OPC_FLG_DIRPOSLIGHT )
 	{
 		mpShader->mHasDirPosInstructions = true;
 	}

@@ -19,7 +19,7 @@ namespace SVM
 {
 
 //==================================================================
-void Inst_Faceforward( Context &ctx )
+void Inst_Faceforward( Context &ctx, u_int blocksN )
 {
 		  Float3_* lhs	= (		 Float3_*)ctx.GetRW( 1 );
 	const Float3_* pN	= (const Float3_*)ctx.GetRO( 2 );
@@ -28,88 +28,53 @@ void Inst_Faceforward( Context &ctx )
 	const SymbolI*	pNgSymI = ctx.mpGridSymIList->FindSymbolI( "Ng" );
 	const Float3_*	pNg = (const Float3_ *)pNgSymI->GetData();
 
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
-	bool	N_step	= ctx.IsSymbolVarying( 2 );
-	bool	I_step	= ctx.IsSymbolVarying( 3 );
-	bool	Ng_step	= pNgSymI->IsVarying() ? 1 : 0;
+	int		N_step	= ctx.GetSymbolVaryingStep( 2 );
+	int		I_step	= ctx.GetSymbolVaryingStep( 3 );
+	int		Ng_step	= pNgSymI->IsVarying() ? 1 : 0;
 
-	if ( lhs_varying )
+	int		N_offset	= 0;
+	int		I_offset	= 0;
+	int		Ng_offset	= 0;
+
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		int		N_offset	= 0;
-		int		I_offset	= 0;
-		int		Ng_offset	= 0;
-
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				lhs[i] = pN[N_offset] * DSign( -pI[I_offset].GetDot( pNg[Ng_offset] ) );
-			}
-
-			N_offset	+= N_step	;
-			I_offset	+= I_step	;
-			Ng_offset	+= Ng_step	;
+			lhs[i] = pN[N_offset] * DSign( -pI[I_offset].GetDot( pNg[Ng_offset] ) );
 		}
-	}
-	else
-	{
-		DASSERT( !N_step		);
-		DASSERT( !I_step		);
-		DASSERT( !Ng_step	);
 
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-				lhs[0] = pN[0] * DSign( -pI[0].GetDot( pNg[0] ) );
-			}
-		}
+		N_offset	+= N_step	;
+		I_offset	+= I_step	;
+		Ng_offset	+= Ng_step	;
 	}
 
 	ctx.NextInstruction();
 }
 
 //==================================================================
-void Inst_Normalize( Context &ctx )
+void Inst_Normalize( Context &ctx, u_int blocksN )
 {
 		  Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
 	const Float3_*	op1	= (const Float3_*)ctx.GetRO( 2 );
 
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
+	int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+	int		op1_idx = 0;
 
-	if ( lhs_varying )
+	for (u_int i=0; i < blocksN; ++i)
 	{
-		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
-		int		op1_offset = 0;
-
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				lhs[i] = op1[op1_offset].GetNormalized();
-			}
-
-			op1_offset += op1_step;
+			lhs[i] = op1[op1_idx].GetNormalized();
 		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) );
 
-		for (u_int i=0; i < 1; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-				lhs[0] = op1[0].GetNormalized();
-			}
-		}
+		op1_idx += op1_step;
 	}
 
 	ctx.NextInstruction();
 }
 
 //==================================================================
-void Inst_CalculateNormal( Context &ctx )
+void Inst_CalculateNormal( Context &ctx, u_int blocksN )
 {
 		  Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
 	const Float3_*	op1	= (const Float3_*)ctx.GetRO( 2 );
@@ -119,8 +84,6 @@ void Inst_CalculateNormal( Context &ctx )
 
 	// only varying input and output !
 	DASSERT( ctx.IsSymbolVarying( 1 ) && ctx.IsSymbolVarying( 2 ) );
-
-	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
 	//SLRUNCTX_BLKWRITECHECK( i );
 
