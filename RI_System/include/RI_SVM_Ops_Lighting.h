@@ -37,14 +37,14 @@ void Inst_Illuminance( Context &ctx )
 		return;
 	}
 
-	const Float3_*	pPos	= ctx.GetRO( (		Float3_ *)0, 1 );
+	const Float3_*	pPos	= (Float3_ *)ctx.GetRO( 1 );
 	const Float3_*	pAxis	;
 	const Float_*	pAngle	;
 
 	if ( INCLUDES_AXIS_ANGLE )
 	{
-		pAxis	= ctx.GetRO( (		  Float3_ *)0, 2 );
-		pAngle	= ctx.GetRO( (const Float_ *)0, 3 );
+		pAxis	= (		Float3_ *)ctx.GetRO( 2 );
+		pAngle	= (const Float_ *)ctx.GetRO( 3 );
 	}
 	else
 	{
@@ -87,8 +87,8 @@ void Inst_Solar( Context &ctx )
 
 	if ( INCLUDES_AXIS_ANGLE )
 	{
-		const Float3_*	pAxis	= ctx.GetRO( (		  Float3_ *)0, 1 );
-		const Float_*	pAngle	= ctx.GetRO( (const Float_ *)0, 2 );
+		const Float3_*	pAxis	= (		Float3_ *)ctx.GetRO( 1 );
+		const Float_ *	pAngle	= (const Float_ *)ctx.GetRO( 2 );
 
 		// set to the value of the axis..
 		// NOTE: ignoring the angle for now !

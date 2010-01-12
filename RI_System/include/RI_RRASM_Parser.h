@@ -70,11 +70,6 @@ private:
 	void getString( const char *pStr, SlStr &out_str );
 
 	void onError( const char *pFmt, ... ) const;
-
-	void verifySymbolType(	Symbol::Type slSymType,
-							SVM::OperTypeID otExpected,
-							int reportOpIdx,
-							const char *pReportOpName );
 };
 
 //==================================================================

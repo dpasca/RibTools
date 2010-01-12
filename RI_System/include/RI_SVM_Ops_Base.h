@@ -22,7 +22,7 @@ namespace SVM
 template <class TA>
 void Inst_LD1( Context &ctx )
 {
-	TA		*lhs		= ctx.GetRW( (TA *)0,  1 );
+	TA		*lhs		= (TA *)ctx.GetRW( 1 );
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
 	TA		tmp = TA( ctx.GetImmFloat( 2 ) );
@@ -55,7 +55,7 @@ void Inst_LD1( Context &ctx )
 template <class TA>
 void Inst_LD3( Context &ctx )
 {
-	TA		*lhs		= ctx.GetRW( (TA *)0,  1 );
+	TA		*lhs		= (TA *)ctx.GetRW( 1 );
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
 	TA		tmp = TA( ctx.GetImmFloat( 2 ), ctx.GetImmFloat( 3 ), ctx.GetImmFloat( 4 ) );
@@ -88,10 +88,10 @@ void Inst_LD3( Context &ctx )
 template <class TA, class TB>
 void Inst_MOVVS3( Context &ctx )
 {
-		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
-	const TB*	op2	= ctx.GetRO( (const TB *)0, 3 );
-	const TB*	op3	= ctx.GetRO( (const TB *)0, 4 );
+		  TA*	lhs	= (		 TA*)ctx.GetRW( 1 );
+	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
+	const TB*	op2	= (const TB*)ctx.GetRO( 3 );
+	const TB*	op3	= (const TB*)ctx.GetRO( 4 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -142,8 +142,8 @@ void Inst_MOVVS3( Context &ctx )
 template <class TA, class TB>
 void Inst_Mov( Context &ctx )
 {
-		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
+		  TA*	lhs	= (		 TA*)ctx.GetRW( 1 );
+	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -182,8 +182,8 @@ void Inst_Mov( Context &ctx )
 template <class TA, class TB>
 void Inst_Abs( Context &ctx )
 {
-		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
+		  TA*	lhs	= (		 TA*)ctx.GetRW( 1 );
+	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -239,8 +239,8 @@ static inline void Inst_MovXX( Context &ctx )
 template <class TA, class TB>
 void Inst_Sign( Context &ctx )
 {
-		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
+		  TA*	lhs	= (		 TA*)ctx.GetRW( 1 );
+	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -279,50 +279,32 @@ void Inst_Sign( Context &ctx )
 template <class TA, class TB, class TC, const OpBaseTypeID opBaseTypeID>
 void Inst_2Op( Context &ctx )
 {
-		  TA*	lhs	= ctx.GetRW( (		TA *)0, 1 );
-	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
-	const TC*	op2	= ctx.GetRO( (const TC *)0, 3 );
+		  TA*	lhs	= (		 TA*)ctx.GetRW( 1 );
+	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
+	const TC*	op2	= (const TC*)ctx.GetRO( 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
-	if ( lhs_varying )
-	{
-		int		op1_offset = 0;
-		int		op2_offset = 0;
-		int		op1_step = ctx.GetSymbolVaryingStep( 2 );
-		int		op2_step = ctx.GetSymbolVaryingStep( 3 );
+	u_int	blocksN = ctx.IsSymbolVarying( 1 ) ? ctx.mBlocksN : 1;
 
-		for (u_int i=0; i < ctx.mBlocksN; ++i)
-		{
-			SLRUNCTX_BLKWRITECHECK( i );
-			{
-				if ( opBaseTypeID == OBT_ADD	 ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
-				if ( opBaseTypeID == OBT_SUB	 ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
-				if ( opBaseTypeID == OBT_MUL	 ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
-				if ( opBaseTypeID == OBT_DIV	 ) lhs[i] = op1[op1_offset] / op2[op2_offset]; else
-				{ DASSERT( 0 ); }
-			}
-			
-			op1_offset	+= op1_step;
-			op2_offset	+= op2_step;
-		}
-	}
-	else
-	{
-		DASSERT( !ctx.IsSymbolVarying( 2 ) &&
-				 !ctx.IsSymbolVarying( 3 ) );
+	int		op1_offset = 0;
+	int		op2_offset = 0;
+	int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+	int		op2_step = ctx.GetSymbolVaryingStep( 3 );
 
-		for (u_int i=0; i < 1; ++i)
+	for (u_int i=0; i < blocksN; ++i)
+	{
+		SLRUNCTX_BLKWRITECHECK( i );
 		{
-			SLRUNCTX_BLKWRITECHECK( 0 );
-			{
-			if ( opBaseTypeID == OBT_ADD	 ) lhs[0] = op1[0] + op2[0]; else
-			if ( opBaseTypeID == OBT_SUB	 ) lhs[0] = op1[0] - op2[0]; else
-			if ( opBaseTypeID == OBT_MUL	 ) lhs[0] = op1[0] * op2[0]; else
-			if ( opBaseTypeID == OBT_DIV	 ) lhs[0] = op1[0] / op2[0]; else
-			{ DASSERT( 0 );		}
-			}
+			if ( opBaseTypeID == OBT_ADD ) lhs[i] = op1[op1_offset] + op2[op2_offset]; else
+			if ( opBaseTypeID == OBT_SUB ) lhs[i] = op1[op1_offset] - op2[op2_offset]; else
+			if ( opBaseTypeID == OBT_MUL ) lhs[i] = op1[op1_offset] * op2[op2_offset]; else
+			if ( opBaseTypeID == OBT_DIV ) lhs[i] = op1[op1_offset] / op2[op2_offset]; else
+			{ DASSERT( 0 ); }
 		}
+		
+		op1_offset	+= op1_step;
+		op2_offset	+= op2_step;
 	}
 
 	ctx.NextInstruction();
@@ -331,9 +313,9 @@ void Inst_2Op( Context &ctx )
 //==================================================================
 void Inst_Dot_SVV( Context &ctx )
 {
-		  Float_*	lhs	= ctx.GetRW( (	  Float_ *)0, 1 );
-	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
-	const Float3_*	op2	= ctx.GetRO( (const Float3_ *)0, 3 );
+		  Float_ *	lhs	= (		 Float_ *)ctx.GetRW( 1 );
+	const Float3_*	op1	= (const Float3_*)ctx.GetRO( 2 );
+	const Float3_*	op2	= (const Float3_*)ctx.GetRO( 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -375,8 +357,8 @@ void Inst_Dot_SVV( Context &ctx )
 //==================================================================
 void Inst_Length_SV( Context &ctx )
 {
-		  Float_*	lhs	= ctx.GetRW( (	     Float_ *)0, 1 );
-	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
+		  Float_ *	lhs	= (		 Float_ *)ctx.GetRW( 1 );
+	const Float3_*	op1	= (const Float3_*)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -415,9 +397,9 @@ void Inst_Length_SV( Context &ctx )
 //==================================================================
 void Inst_Pow_SSS( Context &ctx )
 {
-		  Float_*	lhs	= ctx.GetRW( (		Float_ *)0, 1 );
-	const Float_*	op1	= ctx.GetRO( (const Float_ *)0, 2 );
-	const Float_*	op2	= ctx.GetRO( (const Float_ *)0, 3 );
+		  Float_*	lhs	= (		 Float_*)ctx.GetRW( 1 );
+	const Float_*	op1	= (const Float_*)ctx.GetRO( 2 );
+	const Float_*	op2	= (const Float_*)ctx.GetRO( 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -460,9 +442,9 @@ void Inst_Pow_SSS( Context &ctx )
 template <class T, const OpBaseTypeID opBaseTypeID>
 void Inst_Min_Max( Context &ctx )
 {
-		  T*	lhs	= ctx.GetRW( (	    T *)0, 1 );
-	const T*	op1	= ctx.GetRO( (const T *)0, 2 );
-	const T*	op2	= ctx.GetRO( (const T *)0, 3 );
+		  T*	lhs	=  (	  T*)ctx.GetRW( 1 );
+	const T*	op1	=  (const T*)ctx.GetRO( 2 );
+	const T*	op2	=  (const T*)ctx.GetRO( 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -509,8 +491,8 @@ void Inst_Min_Max( Context &ctx )
 template <const size_t COMP_IDX>
 void Inst_GetVComp( Context &ctx )
 {
-		  Float_*	lhs	= ctx.GetRW( (		Float_*)0, 1 );
-	const Float3_*	op1	= ctx.GetRO( (const	Float3_	*)0	,2 );
+		  Float_ *	lhs	= (		 Float_ *)ctx.GetRW( 1 );
+	const Float3_*	op1	= (const Float3_*)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -549,8 +531,8 @@ void Inst_GetVComp( Context &ctx )
 template <const size_t COMP_IDX>
 void Inst_SetVComp( Context &ctx )
 {
-		  Float3_*	lhs	= ctx.GetRW( (		Float3_	*)0, 1 );
-	const Float_*	op1	= ctx.GetRO( (const Float_*)0, 2 );
+		  Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
+	const Float_ *	op1	= (const Float_ *)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 

@@ -20,8 +20,8 @@ namespace SVM
 template <class TA, const size_t N_COORDS>
 void Inst_Texture( Context &ctx )
 {
-			TA		*lhs	= ctx.GetRW( (			TA *)0, 1 );
-	const SlStr		*pName	= ctx.GetRO( (const	 SlStr *)0, 2 );
+			TA		*lhs	= (			TA *)ctx.GetRW( 1 );
+	const SlStr		*pName	= (const SlStr *)ctx.GetRO( 2 );
 	const Float_	*pST[8][2];
 	int				stOffs[8][2];
 	int				stSteps[8][2];
@@ -30,8 +30,8 @@ void Inst_Texture( Context &ctx )
 	{
 		for (size_t i=0; i < N_COORDS; ++i)
 		{
-			pST[i][0] = ctx.GetRO( (const	 Float_*)0, 3 + i );
-			pST[i][1] = ctx.GetRO( (const	 Float_*)0, 4 + i );
+			pST[i][0] = (const Float_*)ctx.GetRO( 3 + i );
+			pST[i][1] = (const Float_*)ctx.GetRO( 4 + i );
 			stOffs[i][0] = 0;
 			stOffs[i][1] = 0;
 			stSteps[i][0] = ctx.GetSymbolVaryingStep( 3 + i );

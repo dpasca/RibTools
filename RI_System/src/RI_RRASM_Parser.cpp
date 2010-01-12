@@ -529,56 +529,10 @@ size_t Parser::findOrAddTempSymbol( const char *pName )
 	return retIdx;
 }
 
-
-//==================================================================
-static SVM::OperTypeID getOperTypeFromSlSymbolType( Symbol::Type slSymType, bool &out_success )
-{
-	out_success = true;
-
-	switch ( slSymType )
-	{
-	case Symbol::TYP_FLOAT:		return SVM::OPRTYPE_F1 ;
-
-	case Symbol::TYP_POINT:
-	case Symbol::TYP_VECTOR:
-	case Symbol::TYP_NORMAL:	return SVM::OPRTYPE_F3 ;
-
-	case Symbol::TYP_HPOINT:	return SVM::OPRTYPE_F4 ;
-
-	case Symbol::TYP_COLOR:		return SVM::OPRTYPE_F3 ;
-
-	case Symbol::TYP_MATRIX:	return SVM::OPRTYPE_M44;
-	case Symbol::TYP_STRING:	return SVM::OPRTYPE_STR;
-
-	case Symbol::TYP_BOOL:		return SVM::OPRTYPE_BL;
-
-	default:
-		out_success = false;
-		return SVM::OPRTYPE_F1;
-	}
-}
-
 //==================================================================
 static bool isTempSymbol( const char *pTok )
 {
 	return pTok[0] == '$';
-}
-
-//==================================================================
-void Parser::verifySymbolType(
-								Symbol::Type slSymType,
-								SVM::OperTypeID otExpected,
-								int reportOpIdx,
-								const char *pReportOpName )
-{
-	bool	success;
-	SVM::OperTypeID	otSolved = getOperTypeFromSlSymbolType( slSymType, success );
-
-	if ( !success || otSolved != otExpected )
-	{
-		// following should except really..
-		onError( "Invalid operand type at position %i (%s)", reportOpIdx+1, pReportOpName );
-	}
 }
 
 //==================================================================
@@ -598,11 +552,11 @@ void Parser::parseCode_handleOperImmediate( const char *pTok )
 //==================================================================
 void Parser::parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpDef, int operIdx )
 {
-	SVM::OperTypeID	expectedOperType = pOpDef->Types[operIdx];
+	Symbol::Type	expectedType = pOpDef->Types[operIdx];
 
 	SVM::CPUWord	word;
 
-	if ( expectedOperType == SVM::OPRTYPE_ADDR )
+	if ( expectedType == Symbol::TYP_ADDR )
 	{
 		// look for a label
 		Label	*pLabel = mLabelRefs.grow();
@@ -640,11 +594,14 @@ void Parser::parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpD
 		}
 
 		// verify that the symbol type matches with the operator type
-		verifySymbolType(
-					mpShader->mpShaSyms[symbolIdx]->mType,
-					expectedOperType,
-					operIdx,
-					pTok );
+
+		bool matches =
+			Symbol::IsTypeCompatible( 
+						mpShader->mpShaSyms[symbolIdx]->mType,
+						expectedType );
+
+		if NOT( matches )
+			onError( "Invalid operand type at position %i (%s)", operIdx+1, pTok );
 	}
 
 	mpShader->mCode.push_back( word );

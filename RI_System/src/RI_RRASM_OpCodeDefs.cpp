@@ -8,6 +8,7 @@
 
 #include "stdafx.h"
 #include "RI_RRASM_OpCodeDefs.h"
+#include "RI_Symbol.h"
 
 //==================================================================
 namespace RI
@@ -16,15 +17,15 @@ namespace RI
 namespace RRASM
 {
 
-#define NA	SVM::OPRTYPE_NA
-#define F1	SVM::OPRTYPE_F1
-#define F2	SVM::OPRTYPE_F2
-#define F3	SVM::OPRTYPE_F3
-#define F4	SVM::OPRTYPE_F4
-#define M44	SVM::OPRTYPE_M44
-#define STR	SVM::OPRTYPE_STR
-#define BL	SVM::OPRTYPE_BL
-#define ADDR SVM::OPRTYPE_ADDR
+#define NA	Symbol::TYP_UNKNOWN
+#define F1	Symbol::TYP_FLOAT
+#define F2	Symbol::TYP_FLOAT2
+#define F3	Symbol::TYP_POINT
+#define F4	Symbol::TYP_HPOINT
+#define M44	Symbol::TYP_MATRIX
+#define STR	Symbol::TYP_STRING
+#define BL	Symbol::TYP_BOOL
+#define ADR Symbol::TYP_ADDR
 
 //==================================================================
 // NOTE: this table must match the order of callbacks in sInstructionTable in RI_SVM_Shader.cpp
@@ -84,7 +85,7 @@ OpCodeDef	_gOpCodeDefs[] =
 	"ld.s"			,	2,			OPC_FLG_RIGHTISIMM,		F1,	NA,	NA,	NA,	NA,
 	"ld.v"			,	4,			OPC_FLG_RIGHTISIMM,		F3,	NA,	NA,	NA,	NA,
 
-	"cmplt.ssl"		,	3,			OPC_FLG_UNIFORMOPERS,	F1,	F1,ADDR,NA,NA,
+	"cmplt.ssl"		,	3,			OPC_FLG_UNIFORMOPERS,	F1,	F1,ADR,NA,NA,
 
 	"setle.bss"		,	3,			0,	BL,	F1,	F1,	NA,	NA,
 	"setge.bss"		,	3,			0,	BL,	F1,	F1,	NA,	NA,
@@ -146,6 +147,7 @@ OpCodeDef	_gOpCodeDefs[] =
 
 	NULL			,	0,			0,	NA, NA, NA, NA, NA
 };
+
 
 //==================================================================
 }

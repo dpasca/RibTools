@@ -32,7 +32,7 @@ namespace SVM
 //==================================================================
 void Inst_IfTrue( Context &ctx )
 {
-	const VecNMask*	op1	= ctx.GetRW( (VecNMask *)0, 1 );
+	const VecNMask*	op1	= (const VecNMask *)ctx.GetRW( 1 );
 
 	bool	varying = ctx.IsSymbolVarying( 1 );
 

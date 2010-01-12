@@ -53,9 +53,9 @@ void xFormname_VXV( Context &ctx )
 {
 	// should do stuff here 8)
 
-		  Float3_*	pDes		= ctx.GetRW( (		Float3_ *)0, 1 );
-	const SlStr*	pSpaceName	= ctx.GetRO( (const SlStr  *)0, 2 );
-	const Float3_*	pSrc		= ctx.GetRO( (const Float3_ *)0, 3 );
+		  Float3_*	pDes		= (		 Float3_*)ctx.GetRW( 1 );
+	const SlStr  *	pSpaceName	= (const SlStr  *)ctx.GetRO( 2 );
+	const Float3_*	pSrc		= (const Float3_*)ctx.GetRO( 3 );
 
 	DASSERT( ctx.IsSymbolVarying( 2 ) == false );
 
@@ -113,9 +113,9 @@ void Inst_CXFormname_VXV( Context &ctx )
 {
 	// should do stuff here 8)
 
-		  Float3_*	pDes		= ctx.GetRW( (		Float3_ *)0, 1 );
-	const SlStr*	pSpaceName	= ctx.GetRO( (const SlStr  *)0, 2 );
-	const Float3_*	pSrc		= ctx.GetRO( (const Float3_ *)0, 3 );
+		  Float3_	*pDes		= (		 Float3_*)ctx.GetRW( 1 );
+	const SlStr		*pSpaceName	= (const SlStr	*)ctx.GetRO( 2 );
+	const Float3_	*pSrc		= (const Float3_*)ctx.GetRO( 3 );
 
 	DASSERT( ctx.IsSymbolVarying( 2 ) == false );
 

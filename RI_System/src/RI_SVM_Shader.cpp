@@ -17,6 +17,8 @@
 #include "RSLCompilerLib/include/RSLCompiler.h"
 #include "DSystem/include/DUtils_Files.h"
 
+#include "RI_RRASM_OpCodeDefs.h"
+
 //==================================================================
 //#define FORCE_MEM_CORRUPTION_CHECK
 
@@ -156,6 +158,20 @@ ShaderInst::~ShaderInst()
 }
 
 //==================================================================
+bool ShaderInst::verifyOpParams( Context &ctx, u_int opCodeIdx ) const
+{
+	const RRASM::OpCodeDef	&opCodeDef = RRASM::_gOpCodeDefs[ opCodeIdx ];
+
+	for (u_int i=0; i < opCodeDef.OperCnt; ++i)
+	{
+		if NOT( ctx.isOpcodeTypeCompatible( i+1, opCodeDef.Types[i] ) )
+			return false;
+	}
+
+	return true;
+}
+
+//==================================================================
 void ShaderInst::runFrom( Context &ctx, u_int startPC ) const
 {
 	ctx.mProgramCounterIdx = 0;
@@ -182,9 +198,15 @@ void ShaderInst::runFrom( Context &ctx, u_int startPC ) const
 				ctx.mProgramCounterIdx -= 1;
 			}
 
-			// [pWord->mOpCode.mDestOpType]
-			SlOpCodeFunc	nextFunc = _gSlOpCodeFuncs[pWord->mOpCode.mTableOffset];
+			u_int	opCodeIdx = pWord->mOpCode.mTableOffset;
 
+			// only an assert because by now the RRASM should have
+			// verified this !
+			DASSERT( verifyOpParams( ctx, opCodeIdx ) );
+
+			// get the opcode functions
+			SlOpCodeFunc	nextFunc = _gSlOpCodeFuncs[ opCodeIdx ];
+			// execute the opcode !
 			nextFunc( ctx );
 
 #if defined(FORCE_MEM_CORRUPTION_CHECK)

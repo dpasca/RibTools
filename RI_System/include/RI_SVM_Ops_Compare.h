@@ -20,8 +20,8 @@ namespace SVM
 template <class TA>
 void Inst_CMPLT( Context &ctx )
 {
-	const TA	*lhs	= ctx.GetRO( (const TA *)0, 1 );
-	const TA	*rhs	= ctx.GetRO( (const TA *)0, 2 );
+	const TA	*lhs = (const TA*)ctx.GetRO( 1 );
+	const TA	*rhs = (const TA*)ctx.GetRO( 2 );
 
 	DASSERT( !ctx.IsSymbolVarying( 1 ) );
 	DASSERT( !ctx.IsSymbolVarying( 2 ) );
@@ -56,9 +56,9 @@ inline VecNMask GetBroadcast0Lane( const VecNMask &val )
 template <class TB, const OpBaseTypeID opBaseTypeID>
 void Inst_SETCMP_EQ( Context &ctx )
 {
-	  VecNMask*	lhs	= ctx.GetRW( (VecNMask *)0, 1 );
-	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
-	const TB*	op2	= ctx.GetRO( (const TB *)0, 3 );
+	  VecNMask*	lhs	= (VecNMask*)ctx.GetRW( 1 );
+	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
+	const TB*	op2	= (const TB*)ctx.GetRO( 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -107,9 +107,9 @@ void Inst_SETCMP_EQ( Context &ctx )
 template <class TB, const OpBaseTypeID opBaseTypeID>
 void Inst_SETCMP_EQ_NoVary( Context &ctx )
 {
-	  VecNMask*	lhs	= ctx.GetRW( (VecNMask *)0, 1 );
-	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
-	const TB*	op2	= ctx.GetRO( (const TB *)0, 3 );
+	  VecNMask*	lhs	= (VecNMask*)ctx.GetRW( 1 );
+	const TB*	op1	= (const TB*)ctx.GetRO( 2 );
+	const TB*	op2	= (const TB*)ctx.GetRO( 3 );
 
 		DASSERT( !ctx.IsSymbolVarying( 1 ) &&
 				 !ctx.IsSymbolVarying( 2 ) &&
@@ -132,9 +132,9 @@ void Inst_SETCMP_EQ_NoVary( Context &ctx )
 template <class TB, const OpBaseTypeID opBaseTypeID>
 void Inst_SETCMP_REL( Context &ctx )
 {
-	  VecNMask*	lhs	= ctx.GetRW( (VecNMask *)0, 1 );
-	const TB*	op1	= ctx.GetRO( (const TB *)0, 2 );
-	const TB*	op2	= ctx.GetRO( (const TB *)0, 3 );
+	  VecNMask*	lhs	=  (VecNMask*)ctx.GetRW( 1 );
+	const TB*	op1	=  (const TB*)ctx.GetRO( 2 );
+	const TB*	op2	=  (const TB*)ctx.GetRO( 3 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 

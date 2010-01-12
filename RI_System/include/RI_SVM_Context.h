@@ -250,126 +250,30 @@ public:
 	}
 
 	// -----
-private:
-	static void ensureWritable( const Value &value, Symbol::Type type )
-	{
-		DASSERT( value.mpSrcSymbol->mType == type &&
-				 value.Flags.mCanChange != 0 );
-	}
-
-	static void ensureReadable( const Value &value, Symbol::Type type )
-	{
-		DASSERT( value.mpSrcSymbol->mType == type  );
-	}
-
 public:
-	// -----
-	Float_ *GetRW( Float_ *unused, u_int argc )
+	bool isOpcodeTypeCompatible( u_int argc, Symbol::Type matchType ) const
 	{
-		Value	&value = GetValue(argc);
-		ensureWritable( value, Symbol::TYP_FLOAT );
-		return (Float_ *)value.Data.pVoidValue;
-	}
+		const Value	&value = GetValue( argc );
 
-	Float2_ *GetRW( Float2_ *unused, u_int argc )
-	{
-		Value	&value = GetValue(argc);
-		ensureWritable( value, Symbol::TYP_FLOAT );
-		return (Float2_ *)value.Data.pVoidValue;
-	}
-
-	Float3_ *GetRW( Float3_ *unused, u_int argc )
-	{
-		Value	&value = GetValue(argc);
-		DASSERT(
-			(value.mpSrcSymbol->mType == Symbol::TYP_POINT ||
-			 value.mpSrcSymbol->mType == Symbol::TYP_COLOR ||
-			 value.mpSrcSymbol->mType == Symbol::TYP_VECTOR ||
-			 value.mpSrcSymbol->mType == Symbol::TYP_NORMAL) &&
-			 value.Flags.mCanChange != 0 );
-		return (Float3_ *)value.Data.pVoidValue;
-	}
-
-	Float4_ *GetRW( Float4_ *unused, u_int argc )
-	{
-		Value	&value = GetValue(argc);
-		ensureWritable( value, Symbol::TYP_HPOINT );
-		return (Float4_ *)value.Data.pVoidValue;
-	}
-
-	Matrix44 *GetRW( Matrix44 *unused, u_int argc )
-	{
-		Value	&value = GetValue(argc);
-		ensureWritable( value, Symbol::TYP_MATRIX );
-		return (Matrix44 *)value.Data.pVoidValue;
-	}
-
-	SlStr *GetRW( SlStr *unused, u_int argc )
-	{
-		Value	&value = GetValue(argc);
-		ensureWritable( value, Symbol::TYP_STRING );
-		return (SlStr *)value.Data.pVoidValue;
-	}
-
-	VecNMask *GetRW( VecNMask *unused, u_int argc )
-	{
-		Value	&value = GetValue(argc);
-		ensureWritable( value, Symbol::TYP_BOOL );
-		return (VecNMask *)value.Data.pVoidValue;
+		return
+			Symbol::IsTypeCompatible(
+							value.mpSrcSymbol->mType,
+							matchType );
 	}
 
 	// -----
-	const Float_ *GetRO( const Float_ *unused, u_int argc ) const
+	inline void *GetRW( u_int argc )
 	{
-		const Value	&value = GetValue(argc);
-		ensureReadable( value, Symbol::TYP_FLOAT );
-		return (const Float_ *)value.Data.pVoidValue;
+		Value	&value = GetValue( argc );
+		DASSERT( value.Flags.mCanChange != 0 );
+		return value.Data.pVoidValue;
 	}
 
-	const Float2_ *GetRO( const Float2_ *unused, u_int argc ) const
+	// -----
+	inline const void *GetRO( u_int argc ) const
 	{
 		const Value	&value = GetValue(argc);
-		DASSERT( value.mpSrcSymbol->mType == Symbol::TYP_FLOAT );
-		return (const Float2_ *)value.Data.pVoidValue;
-	}
-
-	const Float3_ *GetRO( const Float3_ *unused, u_int argc ) const
-	{
-		const Value	&value = GetValue(argc);
-		DASSERT(
-			(value.mpSrcSymbol->mType == Symbol::TYP_POINT ||
-			 value.mpSrcSymbol->mType == Symbol::TYP_COLOR ||
-			 value.mpSrcSymbol->mType == Symbol::TYP_VECTOR ||
-			 value.mpSrcSymbol->mType == Symbol::TYP_NORMAL) );
-		return (const Float3_ *)value.Data.pVoidValue;
-	}
-
-	const Float4_ *GetRO( const Float4_ *unused, u_int argc ) const
-	{
-		const Value	&value = GetValue(argc);
-		ensureReadable( value, Symbol::TYP_HPOINT );
-		return (const Float4_ *)value.Data.pVoidValue;
-	}
-
-	const Matrix44 *GetRO( const Matrix44 *unused, u_int argc ) const
-	{
-		const Value	&value = GetValue(argc);
-		ensureReadable( value, Symbol::TYP_MATRIX );
-		return (const Matrix44 *)value.Data.pVoidValue;
-	}
-
-	const SlStr *GetRO( const SlStr *unused, u_int argc ) const
-	{
-		const Value	&value = GetValue(argc);
-		ensureReadable( value, Symbol::TYP_STRING );
-		return (const SlStr *)value.Data.pVoidValue;
-	}
-
-	const VecNMask *GetRO( const VecNMask *unused, u_int argc ) const
-	{
-		const Value	&value = GetValue(argc);
-		ensureReadable( value, Symbol::TYP_BOOL );
-		return (const VecNMask *)value.Data.pVoidValue;
+		return value.Data.pVoidValue;
 	}
 
 	void InitializeSIMD( size_t samplesN );

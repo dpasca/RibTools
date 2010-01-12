@@ -22,21 +22,6 @@ namespace SVM
 {
 
 //==================================================================
-enum OperTypeID
-{
-	OPRTYPE_NA,
-	OPRTYPE_F1	,
-	OPRTYPE_F2	,
-	OPRTYPE_F3	,
-	OPRTYPE_F4	,
-	OPRTYPE_M44	,
-	OPRTYPE_STR	,
-	OPRTYPE_BL	,
-	OPRTYPE_ADDR,
-	OPRTYPE_N
-};
-
-//==================================================================
 enum OpBaseTypeID
 {
 	OBT_MOV	,
@@ -241,6 +226,7 @@ public:
 	void Run( class Context &ctx ) const;
 
 private:
+	bool verifyOpParams( Context &ctx, u_int opCodeIdx ) const;
 	void runFrom( class Context &ctx, u_int startPC ) const;
 };
 

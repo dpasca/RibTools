@@ -65,7 +65,7 @@ void Inst_Ambient( Context &ctx )
 		ctx.mCache.mAmbientCol = ambCol;
 	}
 
-	SlColor	*lhs	= ctx.GetRW( (SlColor*)0, 1 );
+	SlColor	*lhs	= (SlColor *)ctx.GetRW( 1 );
 
 	for (u_int i=0; i < ctx.mBlocksN; ++i)
 	{

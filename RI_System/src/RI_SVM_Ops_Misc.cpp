@@ -21,9 +21,9 @@ namespace SVM
 //==================================================================
 void Inst_Faceforward( Context &ctx )
 {
-		  Float3_* lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
-	const Float3_* pN	= ctx.GetRO( (const Float3_ *)0, 2 );
-	const Float3_* pI	= ctx.GetRO( (const Float3_ *)0, 3 );
+		  Float3_* lhs	= (		 Float3_*)ctx.GetRW( 1 );
+	const Float3_* pN	= (const Float3_*)ctx.GetRO( 2 );
+	const Float3_* pI	= (const Float3_*)ctx.GetRO( 3 );
 
 	const SymbolI*	pNgSymI = ctx.mpGridSymIList->FindSymbolI( "Ng" );
 	const Float3_*	pNg = (const Float3_ *)pNgSymI->GetData();
@@ -72,8 +72,8 @@ void Inst_Faceforward( Context &ctx )
 //==================================================================
 void Inst_Normalize( Context &ctx )
 {
-		  Float3_*	lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
-	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
+		  Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
+	const Float3_*	op1	= (const Float3_*)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 
@@ -111,8 +111,8 @@ void Inst_Normalize( Context &ctx )
 //==================================================================
 void Inst_CalculateNormal( Context &ctx )
 {
-		  Float3_*	lhs	= ctx.GetRW( (		Float3_ *)0, 1 );
-	const Float3_*	op1	= ctx.GetRO( (const Float3_ *)0, 2 );
+		  Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
+	const Float3_*	op1	= (const Float3_*)ctx.GetRO( 2 );
 
 	const Float_*	pOODu	= (const Float_*)ctx.mpGridSymIList->FindSymbolIData( "_oodu" );
 	const Float_*	pOODv	= (const Float_*)ctx.mpGridSymIList->FindSymbolIData( "_oodv" );

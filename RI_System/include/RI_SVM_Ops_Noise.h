@@ -20,8 +20,8 @@ namespace SVM
 template <class TB>
 inline void Inst_Noise1( Context &ctx )
 {
-		  Float_*	lhs	= ctx.GetRW( (Float_ *)0, 1 );
-	const TB*		op1	= ctx.GetRO( (const TB *)0, 2 );
+		  Float_*	lhs	= (		 Float_*)ctx.GetRW( 1 );
+	const TB	*	op1	= (const TB	   *)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	
@@ -60,8 +60,8 @@ inline void Inst_Noise1( Context &ctx )
 template <class TB>
 inline void Inst_Noise3( Context &ctx )
 {
-		  Float3_*	lhs	= ctx.GetRW( (	  Float3_*)0, 1 );
-	const TB	*	op1	= ctx.GetRO( (const TB	*)0, 2 );
+		  Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
+	const TB	 *	op1	= (const TB		*)ctx.GetRO( 2 );
 
 	bool	lhs_varying = ctx.IsSymbolVarying( 1 );
 	

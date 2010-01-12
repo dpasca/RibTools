@@ -6,8 +6,8 @@
 /// copyright info.
 //==================================================================
 
-#ifndef RI_SLSYMBOL_H
-#define RI_SLSYMBOL_H
+#ifndef RI_SVM_SYMBOL_H
+#define RI_SVM_SYMBOL_H
 
 #include "RI_Base.h"
 
@@ -54,6 +54,7 @@ public:
 		TYP_UNKNOWN,
 		TYP_VOID,
 		TYP_FLOAT,
+		TYP_FLOAT2,
 		TYP_POINT,
 		TYP_VECTOR,
 		TYP_NORMAL,
@@ -62,8 +63,19 @@ public:
 		TYP_MATRIX,
 		TYP_STRING,
 		TYP_BOOL,
+		TYP_ADDR,
 		TYPES_N
 	};
+
+	static bool IsTypeCompatible( Type a, Type b )
+	{
+		if ( a == b )
+			return true;
+
+		return 
+			( (a == TYP_POINT || a == TYP_VECTOR || a == TYP_NORMAL || a == TYP_COLOR) &&
+			  (b == TYP_POINT || b == TYP_VECTOR || b == TYP_NORMAL || b == TYP_COLOR) );
+	}
 
 	enum Storage
 	{
