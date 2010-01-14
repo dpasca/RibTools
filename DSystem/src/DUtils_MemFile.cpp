@@ -101,17 +101,48 @@ bool MemFile::ReadTextLine( char *pDestStr, size_t destStrMaxSize )
 		}
 		else
 		{
-			DASSTHROW( destIdx < destStrMaxSize, ("Writing out of bounds !") );
+			if NOT( destIdx < destStrMaxSize )
+				throw std::out_of_range( "Writing out of bounds !" );
+
 			pDestStr[ destIdx++ ] = ch;
 		}
 	}
 
-	DASSTHROW( destIdx < destStrMaxSize, ("Writing out of bounds !") );
+	if NOT( destIdx < destStrMaxSize )
+		throw std::out_of_range( "Writing out of bounds !" );
+
 	pDestStr[ destIdx ] = 0;
 
 	DASSERT( mReadPos <= mDataSize );
 
 	return true;
+}
+
+//==================================================================
+void MemFile::ReadData( void *pDest, size_t readSize )
+{
+	memcpy( pDest, ReadDataPtr( readSize ), readSize );
+}
+
+//==================================================================
+const void *MemFile::ReadDataPtr( size_t readSize )
+{
+	size_t	readPos = mReadPos;
+
+	SeekFromCur( readSize );
+
+	return mpData + readPos;
+}
+
+//==================================================================
+void MemFile::SeekFromCur( size_t skipSize )
+{
+	size_t	endPos = mReadPos + skipSize;
+
+	if NOT( endPos <= mDataSize )
+		throw std::out_of_range( "Writing out of bounds !" );
+
+	mpData += skipSize;
 }
 
 //==================================================================

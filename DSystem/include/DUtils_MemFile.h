@@ -41,6 +41,10 @@ public:
 	size_t GetDataSize() const	{	return mDataSize;	}
 
 	bool ReadTextLine( char *pDestStr, size_t destStrMaxSize );
+
+	void ReadData( void *pDest, size_t readSize );
+	const void *ReadDataPtr( size_t readSize );
+	void SeekFromCur( size_t skipSize );
 };
 
 //==================================================================
