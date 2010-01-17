@@ -681,7 +681,7 @@ void Parser::parseCodeLine( char lineBuff[], int lineCnt )
 
 		size_t	setAddrInstrIdx = mFuncOpBeginIdx.back();
 		mFuncOpBeginIdx.pop_back();
-		mpShader->mCode[setAddrInstrIdx].mOpCode.mFuncopEndAddr = instrIdx;
+		mpShader->mCode[setAddrInstrIdx].mOpCode.mFuncopEndAddr = (u_short)instrIdx;
 
 		mFuncOpBeginIdx.push_back( instrIdx );
 	}
@@ -697,7 +697,7 @@ void Parser::parseCodeLine( char lineBuff[], int lineCnt )
 		size_t	setAddrInstrIdx = mFuncOpBeginIdx.back();
 		mFuncOpBeginIdx.pop_back();
 
-		mpShader->mCode[setAddrInstrIdx].mOpCode.mFuncopEndAddr = instrIdx;
+		mpShader->mCode[setAddrInstrIdx].mOpCode.mFuncopEndAddr = (u_short)instrIdx;
 	}
 
 	if ( pOpDef->Flags & OPC_FLG_DIRPOSLIGHT )

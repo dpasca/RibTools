@@ -124,7 +124,7 @@ void RibRendTool::addDirToMenu( const char *pDirName, const char *pFilesExt )
 
 			glutAddMenuEntry(
 				DUT::SSPrintFS( "%s / %s", pDirName, findData.name ).c_str(),
-				MENUID_FILES + mTestRibFiles.size()-1 );
+				MENUID_FILES + (int)mTestRibFiles.size()-1 );
 
 			ret = _findnext64( handle, &findData );
 		} while ( ret == 0 );

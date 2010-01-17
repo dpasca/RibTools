@@ -113,7 +113,7 @@ void Context::SetupIfChanged(
 void Context::InitializeSIMD( size_t samplesN )
 {
 	DASSERT( samplesN <= mMaxPointsN );
-	mPointsN = samplesN;
+	mPointsN = (u_int)samplesN;
 	mBlocksN = DMT_SIMD_BLOCKS( mPointsN );
 
 	for (u_int i=0; i < mPointsN; ++i)

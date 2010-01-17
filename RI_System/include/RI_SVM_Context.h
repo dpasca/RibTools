@@ -207,7 +207,7 @@ public:
 		return mFopStack.size() != 0;
 	}
 
-	const CPUWord *GetOp( u_int argc ) const
+	const CPUWord *GetOp( size_t argc ) const
 	{
 		return &mpShaderInst->moShader->mCode[mProgramCounter[mProgramCounterIdx] + argc];
 	}
@@ -217,34 +217,34 @@ public:
 		return GetOp(0)->mOpCode.mOperandCount;
 	}
 
-	Value			&GetValue( u_int argc )
+	Value			&GetValue( size_t argc )
 	{
 		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
 		return mpDataSegment[tableOff];
 	}
-	const Value	&GetValue( u_int argc ) const
+	const Value	&GetValue( size_t argc ) const
 	{
 		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
 		return mpDataSegment[tableOff];
 	}
 
-	Symbol &GetSymbol( u_int argc )
+	Symbol &GetSymbol( size_t argc )
 	{
 		u_int	tableOff = GetOp(argc)->mSymbol.mTableOffset;
 		return *mpShaderInst->moShader->mpShaSyms[tableOff ];
 	}
 
-	float	GetImmFloat( u_int argc )
+	float	GetImmFloat( size_t argc )
 	{
 		return GetOp(argc)->mImmFloat.mValue;
 	}
 
-	bool IsSymbolVarying( u_int argc ) const
+	bool IsSymbolVarying( size_t argc ) const
 	{
 		return GetOp(argc)->mSymbol.mIsVarying;
 	}
 
-	int GetSymbolVaryingStep( u_int argc ) const
+	int GetSymbolVaryingStep( size_t argc ) const
 	{
 		return GetOp(argc)->mSymbol.mIsVarying ? 1 : 0;
 	}
@@ -262,7 +262,7 @@ public:
 	}
 
 	// -----
-	inline void *GetRW( u_int argc )
+	inline void *GetRW( size_t argc )
 	{
 		Value	&value = GetValue( argc );
 		DASSERT( value.Flags.mCanChange != 0 );
@@ -270,7 +270,7 @@ public:
 	}
 
 	// -----
-	inline const void *GetRO( u_int argc ) const
+	inline const void *GetRO( size_t argc ) const
 	{
 		const Value	&value = GetValue(argc);
 		return value.Data.pVoidValue;

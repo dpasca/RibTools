@@ -109,7 +109,7 @@ void LoadBMP( Image &img, DUT::MemFile &readFile )
 		if ( pInfoHead->biClrUsed )
 			clutSize = pInfoHead->biClrUsed;
 		else
-			clutSize = 1 << pInfoHead->biBitCount;	// 1 << 8 actually..
+			clutSize = (size_t)(1 << pInfoHead->biBitCount);	// 1 << 8 actually..
 
 		pClutData = (const myRGBQUAD *)readFile.ReadDataPtr( clutSize * sizeof(myRGBQUAD) );
 

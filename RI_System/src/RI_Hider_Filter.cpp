@@ -20,7 +20,7 @@ namespace RI
 static void sortSampData(
 				const HiderSampleData	**pSampDataListSort,
 				const HiderSampleData	*pData,
-				u_int					dataN )
+				size_t					dataN )
 {
 	if ( dataN == 1 )
 	{
@@ -32,7 +32,7 @@ static void sortSampData(
 	{
 		int doneDataN = 0;
 
-		for (u_int i=0; i < dataN; ++i)
+		for (size_t i=0; i < dataN; ++i)
 		{
 			float	depthI = pData[i].mDepth;
 
@@ -67,7 +67,7 @@ inline void filterPixelBox(
 	{
 		const DVec<HiderSampleData> &sampDataList = pixel.mpSampDataLists[si];
 
-		u_int	dataN = sampDataList.size();
+		size_t	dataN = sampDataList.size();
 		if NOT( dataN )
 			continue;
 

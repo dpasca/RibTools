@@ -210,10 +210,10 @@ void Hider::Bust(
 			{
 				// vector coords of the micro-poly
 				u_int	vidx[4] = {
-							srcVertIdx + 0,
-							srcVertIdx + 1,
-							srcVertIdx + xN+1,
-							srcVertIdx + xN+2 };
+							(u_int)srcVertIdx + 0,
+							(u_int)srcVertIdx + 1,
+							(u_int)srcVertIdx + xN+1,
+							(u_int)srcVertIdx + xN+2 };
 
 				Float3	minPos(  FLT_MAX,  FLT_MAX,  FLT_MAX );
 				Float3	maxPos( -FLT_MAX, -FLT_MAX, -FLT_MAX );

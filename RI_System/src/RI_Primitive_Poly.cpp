@@ -203,11 +203,11 @@ void PointsGeneralPolygons::Simplify( Hider &hider )
 
 		if ( 0 == strcasecmp( pNameParam, "P" ) )
 		{
-			PValuesParIdx = pi;
+			PValuesParIdx = (int)pi;
 		}
 
 		vinfo[vinfoN].pName	= pNameParam;
-		vinfo[vinfoN].parIdx= pi;
+		vinfo[vinfoN].parIdx= (int)pi;
 		++vinfoN;
 	}
 

@@ -83,7 +83,7 @@ bool FileExists( const char *pFileName )
 const char *GetFileNameOnly( const char *pPathFileName )
 {
 	int	idx = 0;
-	int	len = strlen( pPathFileName );
+	int	len = (int)strlen( pPathFileName );
 	
 	for (int i=len-1; i >= 0; --i)
 		if ( pPathFileName[i] == '/' || pPathFileName[i] == '\\' )
@@ -96,7 +96,7 @@ const char *GetFileNameOnly( const char *pPathFileName )
 const char *GetFileNameExt( const char *pPathFileName )
 {
 	int	idx = 0;
-	int	len = strlen( pPathFileName );
+	int	len = (int)strlen( pPathFileName );
 	
 	for (int i=len-1; i >= 0; --i)
 		if ( pPathFileName[i] == '.' )

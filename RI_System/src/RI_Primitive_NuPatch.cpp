@@ -86,11 +86,11 @@ NuPatch::NuPatch(
 	size_t	dimsN = 3;
 
 	// do we have 'P' ?
-	PValuesParIdx = FindParam( "P", Param::FLT_ARR, curParamIdx, params );
+	PValuesParIdx = FindParam( "P", Param::FLT_ARR, (int)curParamIdx, params );
 	if ( PValuesParIdx == -1 )
 	{
 		// must have 'Pw' then !
-		PValuesParIdx = FindParam( "Pw", Param::FLT_ARR, curParamIdx, params );
+		PValuesParIdx = FindParam( "Pw", Param::FLT_ARR, (int)curParamIdx, params );
 		if ( PValuesParIdx == -1 )
 		{
 			DASSTHROW( 0, ("Missing P or Pw parameter") );
