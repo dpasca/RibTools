@@ -1,5 +1,5 @@
 //==================================================================
-/// RibRenderTool.cpp
+/// RibRenderToy.cpp
 ///
 /// Created by Davide Pasca - 2009/4/25
 /// See the file "license.txt" that comes with this project for
@@ -13,7 +13,7 @@
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DUtils_Files.h"
 #include "RenderOutputOpenGL.h"
-#include "RibRenderTool.h"
+#include "RibRenderToy.h"
 
 #ifdef _MSC_VER
 	#include <GL/glut.h>
@@ -33,7 +33,7 @@
 //#define ECHO_INPUT
 
 //==================================================================
-RibRendTool	*RibRendTool::mspThis;
+RibRendToy	*RibRendToy::mspThis;
 
 /*
 //==================================================================
@@ -55,7 +55,7 @@ char *RibRendTool::msTestRibFiles[] =
 */
 
 //==================================================================
-RibRendTool::RibRendTool( const char *pExePath ) :
+RibRendToy::RibRendToy( const char *pExePath ) :
 	mpDispDriverFBuff(NULL),
 	mLastUsedWd(0),
 	mLastUsedHe(0),
@@ -74,7 +74,7 @@ RibRendTool::RibRendTool( const char *pExePath ) :
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize( 640, 480 );
 
-    glutCreateWindow( "RibRender" );
+    glutCreateWindow( "RibRenderToy" );
 
     glutDisplayFunc( sDisplayFunc );
     glutReshapeFunc( sReshapeFunc );
@@ -86,13 +86,13 @@ RibRendTool::RibRendTool( const char *pExePath ) :
 }
 
 //==================================================================
-RibRendTool::~RibRendTool()
+RibRendToy::~RibRendToy()
 {
 	DSAFE_DELETE( mpDispDriverFBuff );
 }
 
 //==================================================================
-void RibRendTool::SetFileToRender( const char *pFName )
+void RibRendToy::SetFileToRender( const char *pFName )
 {
 	strcpy( mFileToRender, pFName );
 }
@@ -106,7 +106,7 @@ static void addBoolMenuItem( const char *pName, bool onoff, int id )
 }
 
 //==================================================================
-void RibRendTool::addDirToMenu( const char *pDirName, const char *pFilesExt )
+void RibRendToy::addDirToMenu( const char *pDirName, const char *pFilesExt )
 {
 #if defined(WIN32)
 
@@ -152,7 +152,7 @@ void RibRendTool::addDirToMenu( const char *pDirName, const char *pFilesExt )
 }
 
 //==================================================================
-void RibRendTool::RebuildMenu()
+void RibRendToy::RebuildMenu()
 {
 	if ( mMainMenuID != -1 )
 		glutDestroyMenu( mMainMenuID );
@@ -180,7 +180,7 @@ void RibRendTool::RebuildMenu()
 }
 
 //==================================================================
-void RibRendTool::MenuFunc( int id )
+void RibRendToy::MenuFunc( int id )
 {
 	switch ( id )
 	{
@@ -219,7 +219,7 @@ void RibRendTool::MenuFunc( int id )
 }
 
 //==================================================================
-bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forcedHe/*=-1 */ )
+bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forcedHe/*=-1 */ )
 {
 	const char *pFileName;
 
@@ -302,7 +302,7 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 }
 
 //===============================================================
-void RibRendTool::sDisplayFunc()
+void RibRendToy::sDisplayFunc()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -313,7 +313,7 @@ void RibRendTool::sDisplayFunc()
 }
 
 //===============================================================
-void RibRendTool::sReshapeFunc( int width, int height )
+void RibRendToy::sReshapeFunc( int width, int height )
 {
 	glViewport(0, 0, width, height);
 
@@ -334,13 +334,13 @@ void RibRendTool::sReshapeFunc( int width, int height )
 }
 
 //===============================================================
-void RibRendTool::sMouseFunc( int button, int butState, int mx, int my )
+void RibRendToy::sMouseFunc( int button, int butState, int mx, int my )
 {
 	mspThis->MouseFunc( button, butState, mx, my );
 }
 
 //==================================================================
-void RibRendTool::MouseFunc( int button, int butState, int mx, int my )
+void RibRendToy::MouseFunc( int button, int butState, int mx, int my )
 {
 	if ( button == 0 )
 	{
@@ -360,14 +360,14 @@ void RibRendTool::MouseFunc( int button, int butState, int mx, int my )
 }
 
 //===============================================================
-void RibRendTool::sPassiveMotion( int x, int y )
+void RibRendToy::sPassiveMotion( int x, int y )
 {
 	//mspThis->SetCursorPos( x, y );
 	//glutPostRedisplay();
 }
 
 //===============================================================
-void RibRendTool::sIdleFunc()
+void RibRendToy::sIdleFunc()
 {
 	if ( mspThis->mFileToRender[0] )
 	{
@@ -389,7 +389,7 @@ void RibRendTool::sIdleFunc()
 }
 
 //==================================================================
-void RibRendTool::sMenuFunc( int id )
+void RibRendToy::sMenuFunc( int id )
 {
 	mspThis->MenuFunc( id );
 }
@@ -407,16 +407,15 @@ int main(int argc, char** argv)
 					_CRTDBG_LEAK_CHECK_DF );
 #endif
 
-    glutInit(&argc, argv);
-
+    glutInit( &argc, argv );
 
 	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
 
-	RibRendTool	tool( exePath.c_str() );
+	RibRendToy	toy( exePath.c_str() );
 
 	// set optional initial file name
 	if ( argc >= 2 )
-		tool.SetFileToRender( argv[1] );
+		toy.SetFileToRender( argv[1] );
 
 	glutMainLoop();
 

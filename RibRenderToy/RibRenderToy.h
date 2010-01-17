@@ -1,20 +1,20 @@
 //==================================================================
-/// RibRenderTool.h
+/// RibRenderToy.h
 ///
 /// Created by Davide Pasca - 2009/4/27
 /// See the file "license.txt" that comes with this project for
 /// copyright info.
 //==================================================================
 
-#ifndef RIBRENDERTOOL_H
-#define RIBRENDERTOOL_H
+#ifndef RIBRENDERTOY_H
+#define RIBRENDERTOY_H
 
 #include "RI_System/include/RI_HiderST.h"
 
 //==================================================================
-class RibRendTool
+class RibRendToy
 {
-	static RibRendTool	*mspThis;
+	static RibRendToy	*mspThis;
 	int					mMainMenuID;
 
 public:
@@ -44,8 +44,8 @@ public:
 	};
 
 	//===============================================================
-	RibRendTool( const char *p );
-	~RibRendTool();
+	RibRendToy( const char *p );
+	~RibRendToy();
 
 	void SetFileToRender( const char *pFName );
 
