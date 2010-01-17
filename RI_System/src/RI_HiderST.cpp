@@ -113,8 +113,8 @@ void Hider::WorldBegin(
 
 	u_int subPixDimLog2 =
 			findClosestSquareAreaLog2Dim(
-					opt.mDisp.mPixSamples[0],
-					opt.mDisp.mPixSamples[1] );
+					opt.mPixSamples[0],
+					opt.mPixSamples[1] );
 	
 #if 0
 	// DNEW instead ?

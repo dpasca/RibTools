@@ -20,10 +20,14 @@ namespace RI
 /// Framework
 //==================================================================
 Framework::Framework(
-						RenderOutputBase *pRenderOutput,
+						DispDriverBase *pDispDriverFile,
+						DispDriverBase *pDispDriverFBuff,
+						bool fallBackToExisitngDriver,
 						RenderBucketsBase *pRenderBuckets,
 						const Hider &hiderParams ) :
-	mpRenderOutput(pRenderOutput),
+	mpDispDriverFile(pDispDriverFile),
+	mpDispDriverFBuff(pDispDriverFBuff),
+	mFallBackToExisitngDriver(fallBackToExisitngDriver),
 	mpRenderBuckets(pRenderBuckets),
 	mpGlobalSyms(NULL),
 	mHider(hiderParams)
@@ -249,8 +253,11 @@ void Framework::WorldEnd()
 
 	worldEnd_splitAndAddToBuckets();
 
-	mpRenderOutput->SetSize( mOptions.mXRes, mOptions.mYRes );
+	if ( mpDispDriverFile )
+		mpDispDriverFile->SetSize( mOptions.mXRes, mOptions.mYRes );
 
+	if ( mpDispDriverFBuff )
+		mpDispDriverFBuff->SetSize( mOptions.mXRes, mOptions.mYRes );
 
 	// render the buckets..
 	if ( mpRenderBuckets )
@@ -262,22 +269,6 @@ void Framework::WorldEnd()
 		RenderBucketsStd	rendBuck;
 
 		rendBuck.Render( mHider );
-	}
-
-	// update the regions
-	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
-	{
-		u_int	x1 = mHider.mpBuckets[bi]->mX1;
-		u_int	y1 = mHider.mpBuckets[bi]->mY1;
-
-		mpRenderOutput->UpdateRegion(
-					x1,
-					y1,
-					mHider.mpBuckets[bi]->mX2 - x1,
-					mHider.mpBuckets[bi]->mY2 - y1,
-					mHider.GetOutputData( x1, y1 ),
-					mHider.GetOutputDataStride()
-					);
 	}
 
 	// --- release the primitives in all the buckets
@@ -299,10 +290,40 @@ void Framework::WorldEnd()
 	mpUniqueAttribs.clear();
 	mpUniqueTransform.clear();
 
+	// update the regions
+	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
+	{
+		u_int	x1 = mHider.mpBuckets[bi]->mX1;
+		u_int	y1 = mHider.mpBuckets[bi]->mY1;
+
+		u_int	wd = mHider.mpBuckets[bi]->mX2 - x1;
+		u_int	he = mHider.mpBuckets[bi]->mY2 - y1;
+
+		const float *pSrcData		= mHider.GetOutputData( x1, y1 );
+		u_int		srcDataStride	= mHider.GetOutputDataStride();
+
+		for (size_t i=0; i < mOptions.mDisplays.size(); ++i)
+		{
+			const Options::Display	&disp = mOptions.mDisplays[i];
+
+			if ( disp.IsFile() && mpDispDriverFile )
+			{
+				mpDispDriverFile->UpdateRegion(
+						x1,	y1,	wd,	he,	pSrcData, srcDataStride );
+			}
+			else
+			if ( disp.IsFrameBuff() && mpDispDriverFBuff )
+			{
+				mpDispDriverFBuff->UpdateRegion(
+						x1,	y1,	wd,	he,	pSrcData, srcDataStride );
+			}
+		}
+	}
+
 	mHider.WorldEnd();
 
-	DASSERT( mHider.GetOutputDataWd() == (u_int)mOptions.mXRes );
-	DASSERT( mHider.GetOutputDataHe() == (u_int)mOptions.mYRes );
+	//DASSERT( mHider.GetOutputDataWd() == (u_int)mOptions.mXRes );
+	//DASSERT( mHider.GetOutputDataHe() == (u_int)mOptions.mYRes );
 }
 
 

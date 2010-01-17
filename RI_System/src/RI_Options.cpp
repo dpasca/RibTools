@@ -1,17 +1,17 @@
-/*
- *  RI_Options.cpp
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/17.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Options.cpp
+///
+/// Created by Davide Pasca - 2008/12/17
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include "DTypes.h"
 #include "RI_Base.h"
 #include "RI_Options.h"
 #include "RI_Tokens.h"
+#include <stdarg.h>
 
 //==================================================================
 #define DEFAULT_ASPECT	1.0f //(4.0f/3)
@@ -20,6 +20,22 @@
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+static void onError( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	puts( buff );
+
+	throw std::runtime_error( buff );
+}
 
 //==================================================================
 Options::Options() :
@@ -60,7 +76,8 @@ void Options::Init( const SymbolList *pGlobalSyms, RevisionTracker *pRevision )
 	plist.Add( RI_ORTHOGRAPHIC );
 	cmdProjection( plist );
 
-	mDisp.Init();
+	mPixSamples[0] = 2;
+	mPixSamples[1] = 2;
 }
 
 //==================================================================
@@ -161,17 +178,72 @@ void Options::cmdShutter( float openShutter, float closeShutter )
 }
 
 //==================================================================
+void Options::cmdDisplay( const char *pName, const char *pType, const char *pMode, ParamList &params )
+{
+	Display	newDisp;
+
+	if ( 0 == strcmp( pType, RI_FILE ) )
+	{
+		newDisp.mType = RI_FILE;
+	}
+	else
+	if ( 0 == strcmp( pType, RI_FRAMEBUFFER ) )
+	{
+		newDisp.mType = RI_FRAMEBUFFER;
+	}
+	else
+	{
+		onError( "Unknown display type '%s'", pType );
+	}
+
+	newDisp.mName = pName;
+
+	mDisplays.push_back( newDisp );
+}
+
+//==================================================================
 void Options::cmdPixelSamples( int samplesX, int samplesY )
 {
 	// minimum value is 1 as per RISpec.. but we also set a
 	// maximum value.. just in case !
-	mDisp.mPixSamples[0] = D::Clamp( samplesX, 1, 64 );
-	mDisp.mPixSamples[1] = D::Clamp( samplesY, 1, 64 );
+	mPixSamples[0] = D::Clamp( samplesX, 1, 64 );
+	mPixSamples[1] = D::Clamp( samplesY, 1, 64 );
 }
 
 //==================================================================
-void Options::Finalize()
+void Options::Finalize(
+					bool hasFileDispDriver,
+					bool hasFileFBuffDriver,
+					bool fallBackExistngDriver )
 {
+	size_t	viableDisplaysN = 0;
+
+	for (size_t i=0; i < mDisplays.size(); ++i)
+	{
+		if ( hasFileDispDriver && mDisplays[i].IsFile() )
+			++viableDisplaysN;
+
+		if ( hasFileFBuffDriver && mDisplays[i].IsFrameBuff() )
+			++viableDisplaysN;
+	}
+
+	// if no display was specified, use the default ones
+	if ( mDisplays.size() == 0 ||
+		 (fallBackExistngDriver && viableDisplaysN == 0) )
+	{
+		if ( hasFileDispDriver )
+		{
+			ParamList	empyList;
+			cmdDisplay( "frame0001.jpg", RI_FILE, "rgba", empyList );
+		}
+
+		if ( hasFileFBuffDriver )
+		{
+			ParamList	empyList;
+			cmdDisplay( "frame0001.jpg", RI_FRAMEBUFFER, "rgb", empyList );
+		}
+	}
+
 	// TODO: also check Display() for mPixelAspectRatio ?
 
 	if ( mFrameAspectRatio == NOTSET_FLOAT )

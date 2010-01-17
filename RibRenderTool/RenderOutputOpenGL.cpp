@@ -15,9 +15,9 @@
 #endif
 
 //==================================================================
-// RenderOutputOpenGL
+// DispDriverFramebuffOGL
 //==================================================================
-RenderOutputOpenGL::RenderOutputOpenGL() :
+DispDriverFramebuffOGL::DispDriverFramebuffOGL() :
 	mpBuffer(NULL), mTexId(0), mWd(0), mHe(0), mTexWd(0), mTexHe(0)
 {
 	const char *pExtensionsStr = (const char *)glGetString( GL_EXTENSIONS );
@@ -43,14 +43,14 @@ RenderOutputOpenGL::RenderOutputOpenGL() :
 }
 
 //==================================================================
-RenderOutputOpenGL::~RenderOutputOpenGL()
+DispDriverFramebuffOGL::~DispDriverFramebuffOGL()
 {
 	glDeleteTextures( 1, &mTexId );
 	DSAFE_DELETE_ARRAY( mpBuffer );
 }
 
 //==================================================================
-void RenderOutputOpenGL::SetSize( u_int w, u_int h )
+void DispDriverFramebuffOGL::SetSize( u_int w, u_int h )
 {
 	glBindTexture( GL_TEXTURE_2D, mTexId );
 
@@ -58,7 +58,7 @@ void RenderOutputOpenGL::SetSize( u_int w, u_int h )
 }
 
 //==================================================================
-void RenderOutputOpenGL::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+void DispDriverFramebuffOGL::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
 {
 	glBindTexture( GL_TEXTURE_2D, mTexId );
 
@@ -77,7 +77,7 @@ void RenderOutputOpenGL::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, con
 }
 
 //==================================================================
-void RenderOutputOpenGL::Blit() const
+void DispDriverFramebuffOGL::Blit() const
 {
 	//glViewport( 0, 0, w, h );
 	glMatrixMode( GL_PROJECTION );
@@ -129,7 +129,7 @@ static u_int getNextPow2( u_int val )
 }
 
 //==================================================================
-void RenderOutputOpenGL::alloc( u_int w, u_int h )
+void DispDriverFramebuffOGL::alloc( u_int w, u_int h )
 {
 	if ( w == mWd && h == mHe )
 		return;
@@ -155,7 +155,7 @@ void RenderOutputOpenGL::alloc( u_int w, u_int h )
 }
 
 //==================================================================
-void RenderOutputOpenGL::convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+void DispDriverFramebuffOGL::convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
 {
 	u_char	*pDest = mpBuffer + (x1 + y1 * mWd) * RI::NCOLS;
 

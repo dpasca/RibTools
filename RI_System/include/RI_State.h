@@ -160,6 +160,7 @@ public:
 	void DepthOfField( float fStop, float focalLength, float focalDistance );
 	void Shutter( float openShutter, float closeShutter );
 	// options.display
+	void Display( const char *pName, const char *pType, const char *pMode, ParamList &params );
 	void PixelSamples( int samplesX, int samplesY );
 
 	// transforms

@@ -247,7 +247,11 @@ void State::FrameEnd()
 //==================================================================
 void State::WorldBegin()
 {
-	mOptionsStack.top().Finalize();
+	// tell the options what drivers we have available
+	mOptionsStack.top().Finalize(
+					!!mParams.mpFramework->mpDispDriverFile,
+					!!mParams.mpFramework->mpDispDriverFBuff,
+					mParams.mpFramework->mFallBackToExisitngDriver );
 
 	pushMode( MD_WORLD );
 
@@ -553,6 +557,15 @@ void State::Shutter( float openShutter, float closeShutter )
 		return;
 
 	mOptionsStack.top().cmdShutter( openShutter, closeShutter );
+}
+
+//==================================================================
+void State::Display( const char *pName, const char *pType, const char *pMode, ParamList &params )
+{
+	if NOT( verifyOpType( OPTYPE_OPTS ) )
+		return;
+
+	mOptionsStack.top().cmdDisplay( pName, pType, pMode, params );
 }
 
 //==================================================================

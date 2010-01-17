@@ -14,7 +14,7 @@
 //==================================================================
 // RenderOutputFile
 //==================================================================
-class RenderOutputFile : public RI::RenderOutputBase
+class DispDriverFile : public RI::DispDriverBase
 {
 	u_char		*mpBuffer;
 	u_int		mWd;
@@ -22,8 +22,8 @@ class RenderOutputFile : public RI::RenderOutputBase
 	const char	*mpFileName;
 
 public:
-	RenderOutputFile( const char *pFileName );	
-	~RenderOutputFile();
+	DispDriverFile( const char *pFileName );	
+	~DispDriverFile();
 
 		void SetSize( u_int w, u_int h );
 		void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride );

@@ -14,7 +14,7 @@
 //==================================================================
 // RenderOutputOpenGL
 //==================================================================
-class RenderOutputOpenGL : public RI::RenderOutputBase
+class DispDriverFramebuffOGL : public RI::DispDriverBase
 {
 	u_char	*mpBuffer;
 	u_int	mTexId;
@@ -27,8 +27,8 @@ private:
 	bool	mSupportsNonPow2;
 
 public:
-	RenderOutputOpenGL();	
-	~RenderOutputOpenGL();
+	DispDriverFramebuffOGL();	
+	~DispDriverFramebuffOGL();
 
 		void SetSize( u_int w, u_int h );
 		void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride );

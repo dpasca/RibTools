@@ -30,7 +30,7 @@ public:
 	int					mLastUsedWd;
 	int					mLastUsedHe;
 
-	RenderOutputOpenGL	*mpRenderOutput;
+	DispDriverFramebuffOGL	*mpDispDriverFBuff;
 
 	// used for tricky menu/invalidated zone problem
 	int					mPostRedisplayCnt;

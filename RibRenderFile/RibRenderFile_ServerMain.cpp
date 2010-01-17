@@ -48,16 +48,15 @@ static int serverTask( SOCKET clientSock )
 
 	RRL::NET::RenderBucketsServer	rendBuckets( packetManager );
 
-	RI::RenderOutputNull	rendOutNull;
 	RI::Hider::Params	hiderParams;
-	RI::Framework		framework( &rendOutNull, &rendBuckets, hiderParams );
+	RI::Framework		framework( NULL, NULL, false, &rendBuckets, hiderParams );
 
 	RRL::Render::Params	params;
-	params.mTrans.mState.mpFramework			= &framework;
-	params.mTrans.mState.mpFileManager			= &fileManagerNet;
-	params.mTrans.mState.mBaseDir				= netRendJob.BaseDir;
+	params.mTrans.mState.mpFramework		= &framework;
+	params.mTrans.mState.mpFileManager		= &fileManagerNet;
+	params.mTrans.mState.mBaseDir			= netRendJob.BaseDir;
 	params.mTrans.mState.mDefaultShadersDir	= netRendJob.DefaultResourcesDir;
-	params.mTrans.mForcedLongDim				= netRendJob.ForcedLongDim;
+	params.mTrans.mForcedLongDim			= netRendJob.ForcedLongDim;
 	params.mTrans.mForcedWd					= netRendJob.ForcedWd;
 	params.mTrans.mForcedHe					= netRendJob.ForcedHe;
 	params.mpFileName						= netRendJob.FileName;

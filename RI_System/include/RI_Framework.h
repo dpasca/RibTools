@@ -22,12 +22,12 @@ class Attributes;
 class Transform;
 
 //==================================================================
-/// RenderOutputBase
+/// DispDriverBase
 //==================================================================
-class RenderOutputBase
+class DispDriverBase
 {
 public:
-	virtual ~RenderOutputBase() {}
+	virtual ~DispDriverBase() {}
 
 	virtual void SetSize( u_int w, u_int h ) = 0;
 	virtual void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride ) = 0;
@@ -37,13 +37,13 @@ public:
 };
 
 //==================================================================
-/// RenderOutputNull
+/// DispDriverNull
 //==================================================================
-class RenderOutputNull : public RenderOutputBase
+class DispDriverNull : public DispDriverBase
 {
 public:
-	RenderOutputNull() {}
-	~RenderOutputNull() {}
+	DispDriverNull() {}
+	~DispDriverNull() {}
 
 		void SetSize( u_int w, u_int h ) {}
 		void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride ) {}
@@ -52,10 +52,11 @@ public:
 		u_int GetCurHe() const {	return 0; }
 };
 
+/*
 //==================================================================
 /// RenderOutputMem
 //==================================================================
-class RenderOutputMem : public RenderOutputBase
+class RenderOutputMem : public DispDriverBase
 {
 	u_int		mCurWd;
 	u_int		mCurHe;
@@ -106,6 +107,7 @@ public:
 	u_int GetCurWd() const	{ return mCurWd; }
 	u_int GetCurHe() const	{ return mCurHe; }
 };
+*/
 
 //==================================================================
 class RenderBucketsBase
@@ -127,10 +129,12 @@ private:
 class Framework
 {
 public:
-	RenderOutputBase	*mpRenderOutput;
+	DispDriverBase		*mpDispDriverFile;
+	DispDriverBase		*mpDispDriverFBuff;
+	bool				mFallBackToExisitngDriver;
 	RenderBucketsBase	*mpRenderBuckets;
 	const SymbolList	*mpGlobalSyms;
-	Hider			mHider;
+	Hider				mHider;
 
 private:
 	Options				mOptions;	//temporary, will remove
@@ -143,7 +147,9 @@ private:
 	RevisionChecker		mTransRev;
 
 public:
-	Framework(	RenderOutputBase *pRenderOutput,
+	Framework(	DispDriverBase *pDispDriverFile,
+				DispDriverBase *pDispDriverFBuff,
+				bool fallBackToExisitngDriver,
 				RenderBucketsBase *pRenderBuckets,
 				const Hider &hiderParams );
 

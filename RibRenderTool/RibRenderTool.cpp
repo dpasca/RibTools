@@ -56,7 +56,7 @@ char *RibRendTool::msTestRibFiles[] =
 
 //==================================================================
 RibRendTool::RibRendTool( const char *pExePath ) :
-	mpRenderOutput(NULL),
+	mpDispDriverFBuff(NULL),
 	mLastUsedWd(0),
 	mLastUsedHe(0),
 	mMainMenuID(-1)
@@ -88,7 +88,7 @@ RibRendTool::RibRendTool( const char *pExePath ) :
 //==================================================================
 RibRendTool::~RibRendTool()
 {
-	DSAFE_DELETE( mpRenderOutput );
+	DSAFE_DELETE( mpDispDriverFBuff );
 }
 
 //==================================================================
@@ -255,15 +255,15 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 
 	DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
 
-	DSAFE_DELETE( mpRenderOutput );
-	mpRenderOutput = DNEW RenderOutputOpenGL();
+	DSAFE_DELETE( mpDispDriverFBuff );
+	mpDispDriverFBuff = DNEW DispDriverFramebuffOGL();
 
 	char	defaultShadersDir[4096];
 	sprintf( defaultShadersDir, "%s/Shaders", mExeResPath );
 	printf( "Base Dir: %s\n", baseDir.c_str() );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
-	RI::Framework	framework( mpRenderOutput, NULL, mHiderParams );
+	RI::Framework	framework( NULL, mpDispDriverFBuff, true, NULL, mHiderParams );
 	RI::FileManagerDisk	fileManager;
 
 	RRL::Render::Params	params;
@@ -295,8 +295,8 @@ bool RibRendTool::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forc
 		return false;
 	}
 
-	mLastUsedWd = (int)mpRenderOutput->GetCurWd();
-	mLastUsedHe = (int)mpRenderOutput->GetCurHe();
+	mLastUsedWd = (int)mpDispDriverFBuff->GetCurWd();
+	mLastUsedHe = (int)mpDispDriverFBuff->GetCurHe();
 
 	return true;
 }
@@ -306,8 +306,8 @@ void RibRendTool::sDisplayFunc()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if ( mspThis->mpRenderOutput )
-		mspThis->mpRenderOutput->Blit();
+	if ( mspThis->mpDispDriverFBuff )
+		mspThis->mpDispDriverFBuff->Blit();
 
 	glutSwapBuffers();
 }

@@ -13,6 +13,7 @@
 #include "RI_Param.h"
 #include "DMath/include/DMath.h"
 #include "RI_Symbol.h"
+#include "RI_Tokens.h"
 
 //==================================================================
 namespace RI
@@ -25,16 +26,16 @@ class Options
 {
 	const SymbolList	*mpGlobalSyms;
 
+public:
 	class Display
 	{
 	public:
-		u_int	mPixSamples[2];
+		std::string	mName;
+		std::string	mType;
+		std::string	mMode;
 
-		void Init()
-		{
-			mPixSamples[0] = 2;
-			mPixSamples[1] = 2;
-		}
+		bool IsFile()		const { return 0 == strcmp( mType.c_str(), RI_FILE ); }
+		bool IsFrameBuff()	const { return 0 == strcmp( mType.c_str(), RI_FRAMEBUFFER ); }
 	};
 
 public:
@@ -66,7 +67,8 @@ public:
 	RevisionTracker	*mpRevision;
 	
 	// Display
-	Display	mDisp;
+	u_int			mPixSamples[2];
+	DVec<Display>	mDisplays;
 
 	enum
 	{
@@ -89,9 +91,13 @@ public:
 	void cmdShutter( float openShutter, float closeShutter );
 
 	// Display
+	void cmdDisplay( const char *pName, const char *pType, const char *pMode, ParamList &params );
 	void cmdPixelSamples( int samplesX, int samplesY );
 
-	void Finalize();
+	void Finalize(
+			bool hasFileDispDriver,
+			bool hasFileFBuffDriver,
+			bool fallBackExistngDriver );
 
 };
 	

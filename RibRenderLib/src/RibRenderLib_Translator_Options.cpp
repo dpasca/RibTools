@@ -142,6 +142,7 @@ bool Translator::addCommand_options(
 	}
 	else
 	if ( nm == "Opacity" )			{ exN( 1, p ); mState.Opacity(		p[0].PFlt(3) );	}	else
+	if ( nm == "Display" )			{ geN( 3, p ); mState.Display(		p[0], p[1], p[2], p );	} else
 	if ( nm == "PixelSamples" )		{ exN( 2, p ); mState.PixelSamples( p[0], p[1] );	}
 	else
 		return false;
