@@ -23,7 +23,6 @@
 #include "DSystem/include/DUtils_Files.h"
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DCriticalSection.h"
-#include "RenderOutputFile.h"
 #include "RibRender.h"
 
 void PrintUsage( int argc, char **argv );

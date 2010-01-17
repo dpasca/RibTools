@@ -353,14 +353,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\RenderOutputFile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\RenderOutputFile.h"
-				>
-			</File>
-			<File
 				RelativePath="..\RibRender.cpp"
 				>
 			</File>

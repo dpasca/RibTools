@@ -1,18 +1,18 @@
 //==================================================================
-/// RenderOutputFile.h
+/// RRL_DispDriverFile.h
 ///
 /// Created by Davide Pasca - 2009/4/12
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RENDEROUTPUTFILE_H
-#define RENDEROUTPUTFILE_H
+#ifndef RRL_DISPDRIVERFILE_H
+#define RRL_DISPDRIVERFILE_H
 
 #include "RI_System/include/RI_Framework.h"
 
 //==================================================================
-// RenderOutputFile
+// DispDriverFile
 //==================================================================
 class DispDriverFile : public RI::DispDriverBase
 {

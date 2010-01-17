@@ -1,12 +1,13 @@
 //==================================================================
-/// RenderOutputFile.cpp
+/// RRL_DispDriverFile.cpp
 ///
 /// Created by Davide Pasca - 2009/4/12
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#include "RenderOutputFile.h"
+#include "stdafx.h"
+#include "RRL_DispDriverFile.h"
 
 extern "C" 
 {
@@ -63,7 +64,7 @@ static void write_JPEG_file(
 }
 
 //==================================================================
-// RenderOutputFile
+// DispDriverFile
 //==================================================================
 DispDriverFile::DispDriverFile( const char *pFileName ) :
 	mpFileName(pFileName),

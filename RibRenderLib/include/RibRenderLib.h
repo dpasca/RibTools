@@ -19,6 +19,7 @@
 #include "RRL_Translator.h"
 #include "RRL_Net.h"
 
+#include "RRL_DispDriverFile.h"
 #include "RRL_DispDriverFBuffOGL.h"
 
 //==================================================================

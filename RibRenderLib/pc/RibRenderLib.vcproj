@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include"
+				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include;../../externals/libjpeg;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -110,7 +110,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include"
+				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include;../../externals/libjpeg;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -181,7 +181,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include"
+				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include;../../externals/libjpeg;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -252,7 +252,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include"
+				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include;../../externals/libjpeg;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -308,63 +308,55 @@
 				RelativePath="..\include\RibRenderLib.h"
 				>
 			</File>
-			<File
-				RelativePath="..\src\RRL_DispDriverFBuffOGL.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RRL_DispDriverFBuffOGL.h"
-				>
-			</File>
 			<Filter
 				Name="Net"
 				>
 				<File
-					RelativePath="..\src\RibRenderLib_Net.cpp"
+					RelativePath="..\src\RRL_Net.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RibRenderLib_Net.h"
+					RelativePath="..\include\RRL_Net.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RibRenderLib_Net_FileManager.cpp"
+					RelativePath="..\src\RRL_Net_FileManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RibRenderLib_Net_FileManager.h"
+					RelativePath="..\include\RRL_Net_FileManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RibRenderLib_Net_FileServer.cpp"
+					RelativePath="..\src\RRL_Net_FileServer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RibRenderLib_Net_FileServer.h"
+					RelativePath="..\include\RRL_Net_FileServer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RibRenderLib_Net_RenderBucketsClient.cpp"
+					RelativePath="..\src\RRL_Net_RenderBucketsClient.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RibRenderLib_Net_RenderBucketsClient.h"
+					RelativePath="..\include\RRL_Net_RenderBucketsClient.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RibRenderLib_Net_RenderBucketsServer.cpp"
+					RelativePath="..\src\RRL_Net_RenderBucketsServer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RibRenderLib_Net_RenderBucketsServer.h"
+					RelativePath="..\include\RRL_Net_RenderBucketsServer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RibRenderLib_Net_Server.cpp"
+					RelativePath="..\src\RRL_Net_Server.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RibRenderLib_Net_Server.h"
+					RelativePath="..\include\RRL_Net_Server.h"
 					>
 				</File>
 			</Filter>
@@ -372,23 +364,43 @@
 				Name="Translator"
 				>
 				<File
-					RelativePath="..\src\RibRenderLib_Translator.cpp"
+					RelativePath="..\src\RRL_Translator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\include\RibRenderLib_Translator.h"
+					RelativePath="..\include\RRL_Translator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RibRenderLib_Translator_Options.cpp"
+					RelativePath="..\src\RRL_Translator_Options.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RibRenderLib_Translator_Prims.cpp"
+					RelativePath="..\src\RRL_Translator_Prims.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\RibRenderLib_Translator_Transforms.cpp"
+					RelativePath="..\src\RRL_Translator_Transforms.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="DispDrivers"
+				>
+				<File
+					RelativePath="..\src\RRL_DispDriverFBuffOGL.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RRL_DispDriverFBuffOGL.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RRL_DispDriverFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RRL_DispDriverFile.h"
 					>
 				</File>
 			</Filter>
