@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="RibRenderTool"
+	Name="RibRenderToy"
 	ProjectGUID="{8621FB63-1EA3-4638-AC5A-BBC9277D7D7C}"
 	RootNamespace="RibRender"
 	Keyword="Win32Proj"
@@ -371,11 +371,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RibRenderTool.cpp"
+				RelativePath="..\RibRenderToy.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\RibRenderTool.h"
+				RelativePath="..\RibRenderToy.h"
 				>
 			</File>
 		</Filter>
