@@ -65,7 +65,7 @@ static void write_JPEG_file(
 //==================================================================
 // RenderOutputFile
 //==================================================================
-RenderOutputFile::RenderOutputFile( const char *pFileName ) :
+DispDriverFile::DispDriverFile( const char *pFileName ) :
 	mpFileName(pFileName),
 	mpBuffer(NULL),
 	mWd(0),
@@ -74,7 +74,7 @@ RenderOutputFile::RenderOutputFile( const char *pFileName ) :
 }
 
 //==================================================================
-RenderOutputFile::~RenderOutputFile()
+DispDriverFile::~DispDriverFile()
 {
 	if ( mWd && mHe )
 		write_JPEG_file( mpFileName, 100, mpBuffer, mWd, mHe );
@@ -83,24 +83,24 @@ RenderOutputFile::~RenderOutputFile()
 }
 
 //==================================================================
-void RenderOutputFile::SetSize( u_int w, u_int h )
+void DispDriverFile::SetSize( u_int w, u_int h )
 {
 	alloc( w, h );
 }
 
 //==================================================================
-void RenderOutputFile::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+void DispDriverFile::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
 {
 	convert( x1, y1, w, h, pSrcData, srcStride );
 }
 
 //==================================================================
-void RenderOutputFile::Blit() const
+void DispDriverFile::Blit() const
 {
 }
 
 //==================================================================
-void RenderOutputFile::alloc( u_int w, u_int h )
+void DispDriverFile::alloc( u_int w, u_int h )
 {
 	if ( w == mWd && h == mHe )
 		return;
@@ -112,7 +112,7 @@ void RenderOutputFile::alloc( u_int w, u_int h )
 }
 
 //==================================================================
-void RenderOutputFile::convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+void DispDriverFile::convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
 {
 	u_char	*pDest = mpBuffer + (x1 + y1 * mWd) * RI::NCOLS;
 
