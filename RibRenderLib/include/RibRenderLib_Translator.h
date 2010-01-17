@@ -1,13 +1,13 @@
 //==================================================================
-/// RibRenderLib_Translator.h
+/// RRL_Translator.h
 ///
 /// Created by Davide Pasca - 2009/12/30
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RIBRENDERLIB_TRANSLATOR_H
-#define RIBRENDERLIB_TRANSLATOR_H
+#ifndef RRL_TRANSLATOR_H
+#define RRL_TRANSLATOR_H
 
 #include "DSystem/include/DContainers.h"
 #include "RI_System/include/RI_Base.h"

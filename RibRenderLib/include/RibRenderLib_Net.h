@@ -1,18 +1,18 @@
 //==================================================================
-/// RibRenderLib_Net.h
+/// RRL_Net.h
 ///
 /// Created by Davide Pasca - 2009/8/6
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RIBRENDERLIB_NET_H
-#define RIBRENDERLIB_NET_H
+#ifndef RRL_NET_H
+#define RRL_NET_H
 
 #include "DSystem/include/DTypes.h"
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DUtils.h"
-#include "RibRenderLib_Net_Server.h"
+#include "RRL_Net_Server.h"
 
 //==================================================================
 namespace RRL
@@ -109,9 +109,9 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS );
 //==================================================================
 }
 
-#include "RibRenderLib_Net_FileManager.h"
-#include "RibRenderLib_Net_FileServer.h"
-#include "RibRenderLib_Net_RenderBucketsClient.h"
-#include "RibRenderLib_Net_RenderBucketsServer.h"
+#include "RRL_Net_FileManager.h"
+#include "RRL_Net_FileServer.h"
+#include "RRL_Net_RenderBucketsClient.h"
+#include "RRL_Net_RenderBucketsServer.h"
 
 #endif

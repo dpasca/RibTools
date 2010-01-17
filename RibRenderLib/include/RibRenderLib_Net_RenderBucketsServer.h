@@ -1,20 +1,20 @@
 //==================================================================
-/// RibRenderLib_Net_RenderBucketsServer.h
+/// RRL_Net_RenderBucketsServer.h
 ///
 /// Created by Davide Pasca - 2009/8/6
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RIBRENDERLIB_NET_RENDERBUCKETSSERVER_H
-#define RIBRENDERLIB_NET_RENDERBUCKETSSERVER_H
+#ifndef RRL_NET_RENDERBUCKETSSERVER_H
+#define RRL_NET_RENDERBUCKETSSERVER_H
 
 #include "DSystem/include/DTypes.h"
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DUtils.h"
 #include "RI_System/include/RI_Framework.h"
 
-#include "RibRenderLib_Net.h"
+#include "RRL_Net.h"
 
 //==================================================================
 namespace RRL

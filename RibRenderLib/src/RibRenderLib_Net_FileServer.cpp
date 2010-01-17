@@ -1,5 +1,5 @@
 //==================================================================
-/// RibRenderLib_Net_FileServer.cpp
+/// RRL_Net_FileServer.cpp
 ///
 /// Created by Davide Pasca - 2009/8/9
 /// See the file "license.txt" that comes with this project for
@@ -7,8 +7,8 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RibRenderLib_Net.h"
-#include "RibRenderLib_Net_FileServer.h"
+#include "RRL_Net.h"
+#include "RRL_Net_FileServer.h"
 #include "DSystem/include/DUtils_MemFile.h"
 
 //==================================================================

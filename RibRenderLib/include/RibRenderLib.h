@@ -16,8 +16,8 @@
 #include "RI_System/include/RI_Net_Protocol.h"
 #include "RI_System/include/RI_Framework.h"
 
-#include "RibRenderLib_Translator.h"
-#include "RibRenderLib_Net.h"
+#include "RRL_Translator.h"
+#include "RRL_Net.h"
 
 #include "RRL_DispDriverFBuffOGL.h"
 

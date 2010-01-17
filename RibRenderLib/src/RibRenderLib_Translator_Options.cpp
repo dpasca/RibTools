@@ -1,5 +1,5 @@
 //==================================================================
-/// RibRenderLib_Translator_Options.cpp
+/// RRL_Translator_Options.cpp
 ///
 /// Created by Davide Pasca - 2009/12/30
 /// See the file "license.txt" that comes with this project for
@@ -7,7 +7,7 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RibRenderLib_Translator.h"
+#include "RRL_Translator.h"
 
 //==================================================================
 namespace RRL

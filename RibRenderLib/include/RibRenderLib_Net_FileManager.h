@@ -1,13 +1,13 @@
 //==================================================================
-/// RibRenderLib_Net_FileManager.h
+/// RRL_Net_FileManager.h
 ///
 /// Created by Davide Pasca - 2009/8/9
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RIBRENDERLIB_NET_FILEMANAGER_H
-#define RIBRENDERLIB_NET_FILEMANAGER_H
+#ifndef RRL_NET_FILEMANAGER_H
+#define RRL_NET_FILEMANAGER_H
 
 #include "RI_System/include/RI_FileManager.h"
 #include "DSystem/include/DNetwork_PacketManager.h"

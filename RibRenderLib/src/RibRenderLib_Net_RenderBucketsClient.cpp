@@ -1,5 +1,5 @@
 //==================================================================
-/// RibRenderLib_Net_RenderBucketsClient.cpp
+/// RRL_Net_RenderBucketsClient.cpp
 ///
 /// Created by Davide Pasca - 2009/8/6
 /// See the file "license.txt" that comes with this project for
@@ -7,7 +7,7 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RibRenderLib_Net_RenderBucketsClient.h"
+#include "RRL_Net_RenderBucketsClient.h"
 
 //#define NO_LOCAL_RENDERING
 #define BUCKETS_BATCH_SIZE	8

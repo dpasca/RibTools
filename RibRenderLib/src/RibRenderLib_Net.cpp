@@ -1,5 +1,5 @@
 //==================================================================
-/// RibRenderLib_Net.cpp
+/// RRL_Net.cpp
 ///
 /// Created by Davide Pasca - 2009/8/6
 /// See the file "license.txt" that comes with this project for
@@ -7,7 +7,7 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RibRenderLib_Net.h"
+#include "RRL_Net.h"
 #include "DSystem/include/DNetwork_Connecter.h"
 #include "DSystem/include/DUtils_MemFile.h"
 

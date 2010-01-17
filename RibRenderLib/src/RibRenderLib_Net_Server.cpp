@@ -1,5 +1,5 @@
 //==================================================================
-/// RibRenderLib_Net_Server.cpp
+/// RRL_Net_Server.cpp
 ///
 /// Created by Davide Pasca - 2009/8/9
 /// See the file "license.txt" that comes with this project for
@@ -7,9 +7,9 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RibRenderLib_Net_FileServer.h"
-#include "RibRenderLib_Net_FileManager.h"
-#include "RibRenderLib_Net_Server.h"
+#include "RRL_Net_FileServer.h"
+#include "RRL_Net_FileManager.h"
+#include "RRL_Net_Server.h"
 
 //==================================================================
 namespace RRL

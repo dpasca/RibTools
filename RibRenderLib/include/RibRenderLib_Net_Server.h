@@ -1,13 +1,13 @@
 //==================================================================
-/// RibRenderLib_Net_Server.h
+/// RRL_Net_Server.h
 ///
 /// Created by Davide Pasca - 2009/8/9
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RIBRENDERLIB_NET_SERVER_H
-#define RIBRENDERLIB_NET_SERVER_H
+#ifndef RRL_NET_SERVER_H
+#define RRL_NET_SERVER_H
 
 #include "DSystem/include/DNetwork_PacketManager.h"
 
