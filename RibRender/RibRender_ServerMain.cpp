@@ -48,8 +48,12 @@ static int serverTask( SOCKET clientSock )
 
 	RRL::NET::RenderBucketsServer	rendBuckets( packetManager );
 
-	RI::Hider::Params	hiderParams;
-	RI::Framework		framework( NULL, NULL, false, &rendBuckets, hiderParams );
+	RI::Hider::Params		hiderParams;
+	RI::Framework::Params	fwParams;
+	fwParams.mFallBackToExisitngDriver	= false;
+	fwParams.mpRenderBuckets			= &rendBuckets;
+	fwParams.mpHiderParams				= &hiderParams;
+	RI::Framework		framework( fwParams );
 
 	RRL::Render::Params	params;
 	params.mTrans.mState.mpFramework		= &framework;

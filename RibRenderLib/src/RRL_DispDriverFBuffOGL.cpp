@@ -1,23 +1,25 @@
 //==================================================================
-/// RenderOutputOpenGL.cpp
+/// RRL_DispDriverFBuffOGL.cpp
 ///
 /// Created by Davide Pasca - 2009/8/2
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#include "RenderOutputOpenGL.h"
+#include "stdafx.h"
 
-#if defined(WIN32) || defined(__linux__)
-	#include <GL/glut.h>
-#else
-	#include <GLUT/glut.h>
+#if defined(WIN32)
+	#include <Windows.h>
 #endif
+
+#include <GL/GL.h>
+
+#include "RRL_DispDriverFBuffOGL.h"
 
 //==================================================================
 // DispDriverFramebuffOGL
 //==================================================================
-DispDriverFramebuffOGL::DispDriverFramebuffOGL() :
+DispDriverFBuffOGL::DispDriverFBuffOGL() :
 	mpBuffer(NULL), mTexId(0), mWd(0), mHe(0), mTexWd(0), mTexHe(0)
 {
 	const char *pExtensionsStr = (const char *)glGetString( GL_EXTENSIONS );
@@ -43,14 +45,14 @@ DispDriverFramebuffOGL::DispDriverFramebuffOGL() :
 }
 
 //==================================================================
-DispDriverFramebuffOGL::~DispDriverFramebuffOGL()
+DispDriverFBuffOGL::~DispDriverFBuffOGL()
 {
 	glDeleteTextures( 1, &mTexId );
 	DSAFE_DELETE_ARRAY( mpBuffer );
 }
 
 //==================================================================
-void DispDriverFramebuffOGL::SetSize( u_int w, u_int h )
+void DispDriverFBuffOGL::SetSize( u_int w, u_int h )
 {
 	glBindTexture( GL_TEXTURE_2D, mTexId );
 
@@ -58,7 +60,7 @@ void DispDriverFramebuffOGL::SetSize( u_int w, u_int h )
 }
 
 //==================================================================
-void DispDriverFramebuffOGL::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+void DispDriverFBuffOGL::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
 {
 	glBindTexture( GL_TEXTURE_2D, mTexId );
 
@@ -77,12 +79,12 @@ void DispDriverFramebuffOGL::UpdateRegion( u_int x1, u_int y1, u_int w, u_int h,
 }
 
 //==================================================================
-void DispDriverFramebuffOGL::Blit() const
+void DispDriverFBuffOGL::Blit() const
 {
 	//glViewport( 0, 0, w, h );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	gluOrtho2D( 0, (float)mWd, (float)mHe, 0 );
+	glOrtho( 0, (float)mWd, (float)mHe, 0, 0, 1 );
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
@@ -129,7 +131,7 @@ static u_int getNextPow2( u_int val )
 }
 
 //==================================================================
-void DispDriverFramebuffOGL::alloc( u_int w, u_int h )
+void DispDriverFBuffOGL::alloc( u_int w, u_int h )
 {
 	if ( w == mWd && h == mHe )
 		return;
@@ -150,12 +152,10 @@ void DispDriverFramebuffOGL::alloc( u_int w, u_int h )
 
 	glTexImage2D( GL_TEXTURE_2D, 0, 3, mTexWd, mTexHe, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 	mpBuffer = DNEW u_char [ w * h * 4 ];
-
-	glutReshapeWindow( w, h );
 }
 
 //==================================================================
-void DispDriverFramebuffOGL::convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
+void DispDriverFBuffOGL::convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
 {
 	u_char	*pDest = mpBuffer + (x1 + y1 * mWd) * RI::NCOLS;
 

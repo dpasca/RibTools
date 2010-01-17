@@ -129,10 +129,32 @@ private:
 class Framework
 {
 public:
-	DispDriverBase		*mpDispDriverFile;
-	DispDriverBase		*mpDispDriverFBuff;
-	bool				mFallBackToExisitngDriver;
-	RenderBucketsBase	*mpRenderBuckets;
+	class Params
+	{
+	public:
+		DispDriverBase		*mpDispDriverFile;
+		DispDriverBase		*mpDispDriverFBuff;
+		bool				mFallBackToExisitngDriver;
+		RenderBucketsBase	*mpRenderBuckets;
+		const Hider::Params	*mpHiderParams;
+
+		void				*mpCBackData;
+		void				(*mpCBackFBuffSetSize)( void *pCBackData, u_int w, u_int h );
+
+		Params() :
+			mpDispDriverFile(NULL),
+			mpDispDriverFBuff(NULL),
+			mFallBackToExisitngDriver(false),
+			mpRenderBuckets(NULL),
+			mpHiderParams(NULL),
+			mpCBackData(NULL),
+			mpCBackFBuffSetSize(NULL)
+		{
+		}
+	};
+
+	Params				mParams;
+
 	const SymbolList	*mpGlobalSyms;
 	Hider				mHider;
 
@@ -147,11 +169,7 @@ private:
 	RevisionChecker		mTransRev;
 
 public:
-	Framework(	DispDriverBase *pDispDriverFile,
-				DispDriverBase *pDispDriverFBuff,
-				bool fallBackToExisitngDriver,
-				RenderBucketsBase *pRenderBuckets,
-				const Hider &hiderParams );
+	Framework( const Params &params );
 
 	void SetGlobalSyms( const SymbolList *pGlobalSyms )
 	{

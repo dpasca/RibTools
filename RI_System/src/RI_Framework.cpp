@@ -19,18 +19,10 @@ namespace RI
 //==================================================================
 /// Framework
 //==================================================================
-Framework::Framework(
-						DispDriverBase *pDispDriverFile,
-						DispDriverBase *pDispDriverFBuff,
-						bool fallBackToExisitngDriver,
-						RenderBucketsBase *pRenderBuckets,
-						const Hider &hiderParams ) :
-	mpDispDriverFile(pDispDriverFile),
-	mpDispDriverFBuff(pDispDriverFBuff),
-	mFallBackToExisitngDriver(fallBackToExisitngDriver),
-	mpRenderBuckets(pRenderBuckets),
+Framework::Framework( const Params &params ) :
+	mParams(params),
 	mpGlobalSyms(NULL),
-	mHider(hiderParams)
+	mHider(*params.mpHiderParams)
 {
 }
 
@@ -253,16 +245,23 @@ void Framework::WorldEnd()
 
 	worldEnd_splitAndAddToBuckets();
 
-	if ( mpDispDriverFile )
-		mpDispDriverFile->SetSize( mOptions.mXRes, mOptions.mYRes );
+	if ( mParams.mpDispDriverFile )
+		mParams.mpDispDriverFile->SetSize( mOptions.mXRes, mOptions.mYRes );
 
-	if ( mpDispDriverFBuff )
-		mpDispDriverFBuff->SetSize( mOptions.mXRes, mOptions.mYRes );
+	if ( mParams.mpDispDriverFBuff )
+	{
+		mParams.mpDispDriverFBuff->SetSize( mOptions.mXRes, mOptions.mYRes );
+
+		if ( mParams.mpCBackFBuffSetSize )
+		{
+			mParams.mpCBackFBuffSetSize( mParams.mpCBackData, mOptions.mXRes, mOptions.mYRes );
+		}
+	}
 
 	// render the buckets..
-	if ( mpRenderBuckets )
+	if ( mParams.mpRenderBuckets )
 	{
-		mpRenderBuckets->Render( mHider );
+		mParams.mpRenderBuckets->Render( mHider );
 	}
 	else
 	{
@@ -306,15 +305,15 @@ void Framework::WorldEnd()
 		{
 			const Options::Display	&disp = mOptions.mDisplays[i];
 
-			if ( disp.IsFile() && mpDispDriverFile )
+			if ( disp.IsFile() && mParams.mpDispDriverFile )
 			{
-				mpDispDriverFile->UpdateRegion(
+				mParams.mpDispDriverFile->UpdateRegion(
 						x1,	y1,	wd,	he,	pSrcData, srcDataStride );
 			}
 			else
-			if ( disp.IsFrameBuff() && mpDispDriverFBuff )
+			if ( disp.IsFrameBuff() && mParams.mpDispDriverFBuff )
 			{
-				mpDispDriverFBuff->UpdateRegion(
+				mParams.mpDispDriverFBuff->UpdateRegion(
 						x1,	y1,	wd,	he,	pSrcData, srcDataStride );
 			}
 		}

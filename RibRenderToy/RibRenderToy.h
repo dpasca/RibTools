@@ -30,7 +30,7 @@ public:
 	int					mLastUsedWd;
 	int					mLastUsedHe;
 
-	DispDriverFramebuffOGL	*mpDispDriverFBuff;
+	DispDriverFBuffOGL	*mpDispDriverFBuff;
 
 	// used for tricky menu/invalidated zone problem
 	int					mPostRedisplayCnt;

@@ -9,10 +9,8 @@
 #include <stdio.h>
 #include <stdexcept>
 #include "RibRenderLib/include/RibRenderLib.h"
-
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DUtils_Files.h"
-#include "RenderOutputOpenGL.h"
 #include "RibRenderToy.h"
 
 #ifdef _MSC_VER
@@ -30,29 +28,8 @@
 
 #endif
 
-//#define ECHO_INPUT
-
 //==================================================================
 RibRendToy	*RibRendToy::mspThis;
-
-/*
-//==================================================================
-char *RibRendTool::msTestRibFiles[] =
-{
-	"Airplane.rib",
-	"Bag.rib",
-	"Chair.rib",
-	"dragonhead.rib",
-	"Elephant.rib",
-	"Enterprise_ncc1701d.rib",
-	"Pixar.rib",
-	//"sebtest.rib",
-	"SimpleMug.rib",
-	"uteapot.rib",
-	//"WarBird.rib",
-	NULL
-};
-*/
 
 //==================================================================
 RibRendToy::RibRendToy( const char *pExePath ) :
@@ -219,6 +196,12 @@ void RibRendToy::MenuFunc( int id )
 }
 
 //==================================================================
+static void onFBuffSetSize( void *pUserData, u_int w, u_int h )
+{
+	glutReshapeWindow( w, h );
+}
+
+//==================================================================
 bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forcedHe/*=-1 */ )
 {
 	const char *pFileName;
@@ -256,14 +239,20 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 	DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
 
 	DSAFE_DELETE( mpDispDriverFBuff );
-	mpDispDriverFBuff = DNEW DispDriverFramebuffOGL();
+	mpDispDriverFBuff = DNEW DispDriverFBuffOGL();
 
 	char	defaultShadersDir[4096];
 	sprintf( defaultShadersDir, "%s/Shaders", mExeResPath );
 	printf( "Base Dir: %s\n", baseDir.c_str() );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
-	RI::Framework	framework( NULL, mpDispDriverFBuff, true, NULL, mHiderParams );
+	RI::Framework::Params	fwParams;
+	fwParams.mpDispDriverFBuff			= mpDispDriverFBuff;
+	fwParams.mpCBackFBuffSetSize		= onFBuffSetSize;
+	fwParams.mFallBackToExisitngDriver	= true;
+	fwParams.mpHiderParams				= &mHiderParams;
+	RI::Framework	framework( fwParams );
+
 	RI::FileManagerDisk	fileManager;
 
 	RRL::Render::Params	params;
@@ -271,7 +260,7 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 	params.mTrans.mState.mpFramework			= &framework;
 	params.mTrans.mState.mpFileManager			= &fileManager;
 	params.mTrans.mState.mBaseDir				= baseDir;
-	params.mTrans.mState.mDefaultShadersDir	= defaultShadersDir;
+	params.mTrans.mState.mDefaultShadersDir		= defaultShadersDir;
 
 	if ( mHiderParams.mDbgColorCodedGrids )
 		params.mTrans.mState.mForcedSurfaceShader = "constant";

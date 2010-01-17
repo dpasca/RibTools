@@ -19,6 +19,8 @@
 #include "RibRenderLib_Translator.h"
 #include "RibRenderLib_Net.h"
 
+#include "RRL_DispDriverFBuffOGL.h"
+
 //==================================================================
 namespace RRL
 {

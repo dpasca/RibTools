@@ -182,7 +182,11 @@ int ClientMain( int argc, char **argv )
 	{
 		try
 		{
-			RI::Framework		framework( &rendOut, NULL, true, NULL, hiderParams );
+			RI::Framework::Params	fwParams;
+			fwParams.mpDispDriverFile			= &rendOut;
+			fwParams.mFallBackToExisitngDriver	= true;
+			fwParams.mpHiderParams				= &hiderParams;
+			RI::Framework			framework( fwParams );
 
 			RRL::Render::Params	params;
 			params.mTrans.mState.mpFramework		= &framework;
@@ -212,7 +216,12 @@ int ClientMain( int argc, char **argv )
 		{
 			RRL::NET::RenderBucketsClient	rendBuckets( cmdPars.servList );
 	
-			RI::Framework					framework( &rendOut, NULL, true, &rendBuckets, hiderParams );
+			RI::Framework::Params	fwParams;
+			fwParams.mpDispDriverFile			= &rendOut;
+			fwParams.mFallBackToExisitngDriver	= true;
+			fwParams.mpRenderBuckets			= &rendBuckets;
+			fwParams.mpHiderParams				= &hiderParams;
+			RI::Framework					framework( fwParams );
 
 			RRL::Render::Params	params;
 			params.mTrans.mState.mpFramework		= &framework;

@@ -44,13 +44,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include; ../.."
+				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="false"
+				OpenMP="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -109,12 +110,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include; ../.."
+				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableEnhancedInstructionSet="2"
+				RuntimeTypeInfo="false"
+				OpenMP="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -178,12 +181,13 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../include; ../.."
+				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="false"
+				OpenMP="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -248,11 +252,13 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../include; ../.."
+				AdditionalIncludeDirectories="../include;../..;../../externals/freeglut/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				EnableEnhancedInstructionSet="2"
+				RuntimeTypeInfo="false"
+				OpenMP="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -300,6 +306,14 @@
 			</File>
 			<File
 				RelativePath="..\include\RibRenderLib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RRL_DispDriverFBuffOGL.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RRL_DispDriverFBuffOGL.h"
 				>
 			</File>
 			<Filter
