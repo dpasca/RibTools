@@ -441,6 +441,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_Res_SearchPathScanner.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_Res_SearchPathScanner.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_Resource.cpp"
 				>
 			</File>
@@ -470,6 +478,14 @@
 			</File>
 			<File
 				RelativePath="..\include\RI_Symbol.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RI_Texture.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_Texture.h"
 				>
 			</File>
 			<File

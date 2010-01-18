@@ -22,6 +22,7 @@ public:
 	enum Type
 	{
 		TYPE_SHADER,
+		TYPE_TEXTURE,
 	};
 
 private:

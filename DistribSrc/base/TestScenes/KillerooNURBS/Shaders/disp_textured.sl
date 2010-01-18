@@ -36,7 +36,7 @@ displacement disp_textured(
 	P   = P + normalize( N) * magnitude;
 	*/
 	normal Nn = normalize( N );
-	P   = P + Nn * magnitude / length( ntransform( "shader", Nn );
+	P   = P + Nn * magnitude / length( ntransform( "shader", Nn ) );
 	
 	N   = calculatenormal( P);
 }

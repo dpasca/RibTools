@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "RI_State.h"
 #include "RI_Attributes.h"
+#include "RI_Res_SearchPathScanner.h"
 
 //==================================================================
 namespace RI
@@ -207,21 +208,6 @@ SVM::Shader *Attributes::loadShader( const char *pBasePath, const char *pAppResD
 }
 
 //==================================================================
-// remove trailing slash or backslash
-static void strRemoveTrailingDirDiv( DStr &io_str )
-{
-	while ( io_str.length() )
-	{
-		char ch = io_str[ io_str.length() - 1 ];
-
-		if ( ch != '/' && ch != '\\' )
-			break;
-
-		io_str.resize( io_str.length() - 1 );
-	}
-}
-
-//==================================================================
 SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAlternateName )
 {
 	// try see if we have it loaded already
@@ -234,58 +220,33 @@ SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAltern
 
 	const char *pAppResDir = mpState->GetDefShadersDir();
 
-	// try with the RIB file path
-	bool	found;
-	if ( pShader = loadShader( mpState->GetBaseDir(), pAppResDir, pShaderName, found ) )
-		return pShader;
-
 	// try look into the search path
 	const DVec<DStr>	&spaths = mpState->GetCurOptions().mSearchPaths[ Options::SEARCHPATH_SHADER ];
 
-	// if there are no searchpaths specified..
-	if NOT( spaths.size() )
+	SearchPathScanner	pathScanner( mpState->GetBaseDir(), pAppResDir, spaths );
+
+	std::string	usePath;
+	bool		usePathIsAbsolute;
+
+	while ( pathScanner.GetNext( usePath, usePathIsAbsolute ) )
 	{
-		// ..use the default path (is this the right behavior ?)
-		if ( pShader = loadShader( pAppResDir, pAppResDir, pShaderName, found ) )
+		bool	found;
+		if ( pShader = loadShader( usePath.c_str(), pAppResDir, pShaderName, found ) )
 			return pShader;
-	}
-	else
-	{
-		for (size_t i=0; i < spaths.size(); ++i)
+
+		if ( !found && !usePathIsAbsolute )
 		{
-			std::string	usePath;
-			bool		usePathIsAbsolute;
-
-			if ( spaths[i] == "@" )
-			{
-				usePathIsAbsolute = true;
-				usePath = pAppResDir;
-			}
-			else
-			{
-				usePathIsAbsolute = false;	// not really 100% sure..
-				usePath = spaths[i];
-			}
-
-			strRemoveTrailingDirDiv( usePath );
+			// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
+			usePath = std::string( mpState->GetBaseDir() ) + "/" + usePath;
 
 			if ( pShader = loadShader( usePath.c_str(), pAppResDir, pShaderName, found ) )
 				return pShader;
-
-			if ( !found && !usePathIsAbsolute )
-			{
-				// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
-				usePath = std::string( mpState->GetBaseDir() ) + "/" + usePath;
-
-				if ( pShader = loadShader( usePath.c_str(), pAppResDir, pShaderName, found ) )
-					return pShader;
-			}
-
-			// in case we found it, but there is an error of some sort..
-			// ..just give up instead of trying different paths
-			if ( found )
-				break;
 		}
+
+		// in case we found it, but there is an error of some sort..
+		// ..just give up instead of trying different paths
+		if ( found )
+			break;
 	}
 
 	if ( pAlternateName )
