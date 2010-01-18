@@ -1,13 +1,13 @@
 //==================================================================
-/// RRL_DispDriverFBuffOGL.h
+/// DispDriverFBuffOGL.h
 ///
 /// Created by Davide Pasca - 2009/02/12
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RRL_DISPDRIVERFBUFFOGL_H
-#define RRL_DISPDRIVERFBUFFOGL_H
+#ifndef DISPDRIVERFBUFFOGL_H
+#define DISPDRIVERFBUFFOGL_H
 
 #include "RI_System/include/RI_Framework.h"
 

@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../;../../;../../externals/freeglut/include"
+				AdditionalIncludeDirectories="../;../../;../../externals/freeglut/include;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEGLUT_STATIC"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -127,7 +127,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../;../../;../../externals/freeglut/include"
+				AdditionalIncludeDirectories="../;../../;../../externals/freeglut/include;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEGLUT_STATIC"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -214,7 +214,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../;../../;../../externals/freeglut/include"
+				AdditionalIncludeDirectories="../;../../;../../externals/freeglut/include;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;FREEGLUT_STATIC"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -303,7 +303,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../;../../;../../externals/freeglut/include"
+				AdditionalIncludeDirectories="../;../../;../../externals/freeglut/include;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;FREEGLUT_STATIC"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -376,6 +376,26 @@
 				RelativePath="..\RibRenderToy.h"
 				>
 			</File>
+			<Filter
+				Name="DispDrivers"
+				>
+				<File
+					RelativePath="..\..\DispDrivers\src\DispDriverFBuffOGL.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\DispDrivers\include\DispDriverFBuffOGL.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\DispDrivers\src\DispDriverFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\DispDrivers\include\DispDriverFile.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

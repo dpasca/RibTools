@@ -1,20 +1,21 @@
 //==================================================================
-/// RRL_DispDriverFBuffOGL.cpp
+/// DispDriverFBuffOGL.cpp
 ///
 /// Created by Davide Pasca - 2009/8/2
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#include "stdafx.h"
+//#include "stdafx.h"
 
 #if defined(WIN32)
 	#include <Windows.h>
+	#pragma comment (lib, "opengl32.lib")
 #endif
 
 #include <GL/GL.h>
 
-#include "RRL_DispDriverFBuffOGL.h"
+#include "DispDrivers/include/DispDriverFBuffOGL.h"
 
 //==================================================================
 // DispDriverFramebuffOGL

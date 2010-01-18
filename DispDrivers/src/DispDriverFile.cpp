@@ -1,17 +1,17 @@
 //==================================================================
-/// RRL_DispDriverFile.cpp
+/// DispDriverFile.cpp
 ///
 /// Created by Davide Pasca - 2009/4/12
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#include "stdafx.h"
-#include "RRL_DispDriverFile.h"
+//#include "stdafx.h"
+#include "DispDrivers/include/DispDriverFile.h"
 
 extern "C" 
 {
-	#include "jpeglib.h"
+	#include "externals/libjpeg/jpeglib.h"
 };
 
 //==================================================================

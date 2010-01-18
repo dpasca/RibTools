@@ -368,6 +368,26 @@
 				RelativePath="..\RibRender_ServerMain.cpp"
 				>
 			</File>
+			<Filter
+				Name="DispDrivers"
+				>
+				<File
+					RelativePath="..\..\DispDrivers\src\DispDriverFBuffOGL.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\DispDrivers\include\DispDriverFBuffOGL.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\DispDrivers\src\DispDriverFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\DispDrivers\include\DispDriverFile.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

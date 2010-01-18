@@ -1,13 +1,13 @@
 //==================================================================
-/// RRL_DispDriverFile.h
+/// DispDriverFile.h
 ///
 /// Created by Davide Pasca - 2009/4/12
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RRL_DISPDRIVERFILE_H
-#define RRL_DISPDRIVERFILE_H
+#ifndef DISPDRIVERFILE_H
+#define DISPDRIVERFILE_H
 
 #include "RI_System/include/RI_Framework.h"
 
