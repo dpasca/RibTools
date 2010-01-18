@@ -1,13 +1,13 @@
 //==================================================================
-/// RibRender.h
+/// RibRenderServer.h
 ///
 /// Created by Davide Pasca - 2009/4/12
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RIBRENDER_H
-#define RIBRENDER_H
+#ifndef RIBRENDERSERVER_H
+#define RIBRENDERSERVER_H
 
 #include <stdio.h>
 #include <stdexcept>
@@ -23,5 +23,6 @@
 #include "DSystem/include/DUtils_Files.h"
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DCriticalSection.h"
+
 
 #endif

@@ -1,18 +1,17 @@
 //==================================================================
-/// RibRenderFile_ServerMain.cpp
+/// RibRenderServer.cpp
 ///
 /// Created by Davide Pasca - 2009/8/3
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#include "RibRender.h"
+#include "RibRenderServer.h"
 
 //==================================================================
 static int serverTask( SOCKET clientSock )
 {
 	printf( "Rendering for %i... yeah, right !!\n", clientSock );
-
 
 	DNET::PacketManager			packetManager( clientSock );
 
@@ -83,7 +82,7 @@ static int serverTask( SOCKET clientSock )
 }
 
 //==================================================================
-int ServerMain( int argc, char **argv )
+static int serverMain( int argc, char **argv )
 {
 	int	port = 32323;
 
@@ -147,4 +146,58 @@ int ServerMain( int argc, char **argv )
 	}
 
     return 0;
+}
+
+//==================================================================
+static void printUsage( int argc, char **argv )
+{
+	printf( "Usage:\n" );
+	
+	printf( "\t%s [options]\n", argv[0] );
+
+	printf( "\nOptions:\n" );
+	printf( "\t-help | --help | -h  -- Show this help\n" );
+	printf( "\t-port <port>         -- Wait for connection at port <port>\n" );
+
+	printf( "\nExamples:\n" );
+	printf( "\t%s\n", argv[0] );
+	printf( "\t%s -port 31111\n", argv[0] );
+}
+
+//==================================================================
+int main( int argc, char **argv )
+{
+#if 0
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF |
+					_CRTDBG_DELAY_FREE_MEM_DF |
+					_CRTDBG_CHECK_ALWAYS_DF |
+					_CRTDBG_LEAK_CHECK_DF|
+					_CRTDBG_CHECK_CRT_DF );
+#endif
+
+	DNET::InitializeSocket();	// bha !
+
+	// enough params ?
+	if ( argc > 3 )
+	{
+		printUsage( argc, argv );
+		return 0;
+	}
+
+	// looking for help ?
+	for (int i=1; i < argc; ++i)
+	{
+		if (
+			0 == strcasecmp( "-help", argv[i] ) ||
+			0 == strcasecmp( "--help", argv[i] ) ||
+			0 == strcasecmp( "-h", argv[i] )
+			)
+		{
+			printUsage( argc, argv );
+			return 0;
+		}
+	}
+
+	// which mode ?
+	return serverMain( argc, argv );
 }

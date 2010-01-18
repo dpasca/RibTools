@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="RibRender"
-	ProjectGUID="{C913A525-2C67-4105-B536-C24D3B1E3EEB}"
-	RootNamespace="RibRender"
+	Name="RibRenderServer"
+	ProjectGUID="{9B94DEF8-8588-4386-B5D7-D23C160DC81E}"
+	RootNamespace="RibRenderServer"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -353,33 +353,13 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\RibRender.cpp"
+				RelativePath="..\RibRenderServer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\RibRender.h"
+				RelativePath="..\RibRenderServer.h"
 				>
 			</File>
-			<Filter
-				Name="DispDrivers"
-				>
-				<File
-					RelativePath="..\..\DispDrivers\src\DispDriverFBuffOGL.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\DispDrivers\include\DispDriverFBuffOGL.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\DispDrivers\src\DispDriverFile.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\DispDrivers\include\DispDriverFile.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
