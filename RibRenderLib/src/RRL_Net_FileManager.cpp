@@ -37,6 +37,9 @@ void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
 	writer.WriteValue( MSGID_FILEREQ );
 	writer.WriteValue( nameLen );
 	writer.WriteArray( pFileName, nameLen );
+
+	DUT::LongCriticalSection::Block	lock( mLongCS );
+
 	mpPakMan->Send( buff, writer.GetCurSize() );
 
 	printf( "NETLOG: SEND MSGID_FILEREQ %s\n", pFileName );
@@ -77,7 +80,7 @@ void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
 }
 
 //===============================================================
-bool FileManagerNet::FileExists( const char *pFileName ) const
+bool FileManagerNet::FileExists( const char *pFileName )
 {
 	char buff[2048];
 
@@ -88,6 +91,9 @@ bool FileManagerNet::FileExists( const char *pFileName ) const
 	writer.WriteValue( MSGID_FILEEXISTREQ );
 	writer.WriteValue( nameLen );
 	writer.WriteArray( pFileName, nameLen );
+
+	DUT::LongCriticalSection::Block	lock( mLongCS );
+
 	mpPakMan->Send( buff, writer.GetCurSize() );
 
 	printf( "NETLOG: SEND MSGID_FILEEXISTREQ %s\n", pFileName );

@@ -9,6 +9,15 @@
 #ifndef RI_TEXTURE_H
 #define RI_TEXTURE_H
 
+#include "RI_Resource.h"
+#include "DImage/include/DImage.h"
+
+//==================================================================
+namespace DUT
+{
+	class MemFile;
+};
+
 //==================================================================
 namespace RI
 {
@@ -19,8 +28,9 @@ namespace RI
 class Texture : public ResourceBase
 {
 public:
+	DIMG::Image	mImage;	
 
-	Texture( const char *pTexName, FileManagerBase &fileManager );
+	Texture( const char *pTexName, DUT::MemFile &file );
 };
 
 

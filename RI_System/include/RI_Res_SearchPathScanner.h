@@ -18,13 +18,13 @@ class SearchPathScanner
 {
 	size_t				mIdx;
 	const char			*mpBaseDir;
-	const char			*mpAppResDir;
+	const char			*mpDefaultDir;
 	const DVec<DStr>	*mpSearchPaths;
 
 public:
 	SearchPathScanner(
 				const char *pBaseDir,
-				const char *pAppResDir,
+				const char *pDefaultDir,
 				const DVec<DStr> &searchPaths );
 
 	bool GetNext( std::string &out_path, bool &out_pathIsAbsolute );

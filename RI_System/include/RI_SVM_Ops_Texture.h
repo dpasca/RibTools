@@ -9,6 +9,8 @@
 #ifndef RI_SVM_OPS_TEXTURE_H
 #define RI_SVM_OPS_TEXTURE_H
 
+#include "RI_Texture.h"
+
 //==================================================================
 namespace RI
 {
@@ -25,6 +27,9 @@ void Inst_Texture( Context &ctx, u_int blocksN )
 	const Float_	*pST[8][2];
 	int				stOffs[8][2];
 	int				stSteps[8][2];
+
+	RCOwn<Texture>	oTex;
+	oTex.Borrow( ctx.mpAttribs->GetTexture( pName->mStr ) );
 
 	if ( N_COORDS >= 1 )
 	{

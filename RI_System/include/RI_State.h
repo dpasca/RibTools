@@ -156,7 +156,7 @@ public:
 	void ScreenWindow( float left, float right, float bottom, float top );
 	void CropWindow( float xMin, float xMax, float yMin, float yMax );
 	void Projection( ParamList &params );
-	void Clipping( float near, float farr );
+	void Clipping( float nearr, float farr );
 	void DepthOfField( float fStop, float focalLength, float focalDistance );
 	void Shutter( float openShutter, float closeShutter );
 	// options.display

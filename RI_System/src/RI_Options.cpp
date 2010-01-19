@@ -148,11 +148,11 @@ void Options::cmdProjection( ParamList &params )
 }
 
 //==================================================================
-void Options::cmdClipping( float near, float farr )
+void Options::cmdClipping( float nearr, float farr )
 {
-	DASSERT( near < farr );
+	DASSERT( nearr < farr );
 
-	mNearClip	= near;
+	mNearClip	= nearr;
 	mFarClip	= farr;
 
 	mpRevision->BumpRevision();

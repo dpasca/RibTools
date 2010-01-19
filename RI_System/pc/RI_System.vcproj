@@ -321,6 +321,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_Attributes_Textures.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_Base.cpp"
 				>
 			</File>

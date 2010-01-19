@@ -18,6 +18,9 @@ namespace RI
 //==================================================================
 void ResourceManager::Collect()
 {
+	// TODO: should not block during delete
+	DUT::CriticalSection::Block	lock( mCSection );
+
 	size_t	wi = 0;
 	for (size_t ri=0; ri < mpList.size(); ++ri)
 	{
@@ -38,6 +41,8 @@ void ResourceManager::Collect()
 //==================================================================
 ResourceBase * ResourceManager::AddResource( ResourceBase *pRes )
 {
+	DUT::CriticalSection::Block	lock( mCSection );
+
 	DASSERT( pRes != NULL );
 	mpList.push_back( pRes );
 	return pRes;
@@ -48,6 +53,8 @@ ResourceBase *ResourceManager::FindResource(
 								const char *pName,
 								ResourceBase::Type type )
 {
+	DUT::CriticalSection::Block	lock( mCSection );
+
 	for (size_t i=0; i < mpList.size(); ++i)
 	{
 		if ( mpList[i]->mType == type )

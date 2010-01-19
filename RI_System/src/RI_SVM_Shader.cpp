@@ -33,11 +33,11 @@ namespace SVM
 static void compileSLToAsm(
 						DUT::MemFile &slSource,
 						const char *pSrcFPathName,
-						const char *pAppResDir,
+						const char *pBaseIncDir,
 						const char *pAsmOutName )
 {
 	// compile
-	std::string	basInclude( pAppResDir );
+	std::string	basInclude( pBaseIncDir );
 	basInclude += "/RSLC_Builtins.sl";
 
 	try {
@@ -74,7 +74,7 @@ static void compileFromMemFile(
 				Shader *pShader,
 				const char *pFileName,
 				const char *pShaderName,
-				const char *pAppResDir,
+				const char *pBaseIncDir,
 				FileManagerBase &fileManager )
 {
 	bool	isSL =
@@ -104,7 +104,7 @@ static void compileFromMemFile(
 	else
 	{
 		// ..otherwise.. compile the sl into an autogen.rrasm
-		compileSLToAsm( file, pFileName, pAppResDir, asmOutName );
+		compileSLToAsm( file, pFileName, pBaseIncDir, asmOutName );
 		// ..and also read in the file..
 		autogenAsmFile.Init( asmOutName );
 	}
@@ -128,14 +128,14 @@ Shader::Shader( const CtorParams &params, FileManagerBase &fileManager ) :
 	{
 		file.Init( (const void *)params.pSource, strlen(params.pSource) );
 
-		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir, fileManager );
+		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pBaseIncDir, fileManager );
 	}
 	else
 	if ( params.pSourceFileName )
 	{
 		fileManager.GrabFile( params.pSourceFileName, file );
 
-		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pAppResDir, fileManager );
+		compileFromMemFile( file, this, params.pSourceFileName, params.pName, params.pBaseIncDir, fileManager );
 	}
 	else
 	{

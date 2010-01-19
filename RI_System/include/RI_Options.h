@@ -86,7 +86,7 @@ public:
 	void cmdScreenWindow( float left, float right, float bottom, float top );
 	void cmdCropWindow( float xMin, float xMax, float yMin, float yMax );
 	void cmdProjection( ParamList &params );
-	void cmdClipping( float near, float farr );
+	void cmdClipping( float nearr, float farr );
 	void cmdDepthOfField( float fStop, float focalLength, float focalDistance );
 	void cmdShutter( float openShutter, float closeShutter );
 

@@ -165,9 +165,8 @@ void Attributes::getShaderParams(
 	}
 }
 
-
 //==================================================================
-SVM::Shader *Attributes::loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName, bool &out_fileExists )
+SVM::Shader *Attributes::loadShader( const char *pBasePath, const char *pBaseIncDir, const char *pSName, bool &out_fileExists )
 {
 	FileManagerBase	&fmanager = mpState->GetFileManager();
 
@@ -189,7 +188,7 @@ SVM::Shader *Attributes::loadShader( const char *pBasePath, const char *pAppResD
 
 	SVM::Shader::CtorParams	params;
 	params.pName			= pSName;
-	params.pAppResDir		= pAppResDir;
+	params.pBaseIncDir		= pBaseIncDir;
 	params.pSourceFileName	= buff;
 
 	SVM::Shader *pShader = NULL;
@@ -218,12 +217,12 @@ SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAltern
 	if ( pShader )
 		return pShader;
 
-	const char *pAppResDir = mpState->GetDefShadersDir();
+	const char *pBaseIncDir = mpState->GetDefShadersDir();
 
 	// try look into the search path
 	const DVec<DStr>	&spaths = mpState->GetCurOptions().mSearchPaths[ Options::SEARCHPATH_SHADER ];
 
-	SearchPathScanner	pathScanner( mpState->GetBaseDir(), pAppResDir, spaths );
+	SearchPathScanner	pathScanner( mpState->GetBaseDir(), pBaseIncDir, spaths );
 
 	std::string	usePath;
 	bool		usePathIsAbsolute;
@@ -231,7 +230,7 @@ SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAltern
 	while ( pathScanner.GetNext( usePath, usePathIsAbsolute ) )
 	{
 		bool	found;
-		if ( pShader = loadShader( usePath.c_str(), pAppResDir, pShaderName, found ) )
+		if ( pShader = loadShader( usePath.c_str(), pBaseIncDir, pShaderName, found ) )
 			return pShader;
 
 		if ( !found && !usePathIsAbsolute )
@@ -239,7 +238,7 @@ SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAltern
 			// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
 			usePath = std::string( mpState->GetBaseDir() ) + "/" + usePath;
 
-			if ( pShader = loadShader( usePath.c_str(), pAppResDir, pShaderName, found ) )
+			if ( pShader = loadShader( usePath.c_str(), pBaseIncDir, pShaderName, found ) )
 				return pShader;
 		}
 

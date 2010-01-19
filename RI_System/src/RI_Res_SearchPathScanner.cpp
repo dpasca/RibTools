@@ -16,11 +16,11 @@ namespace RI
 //==================================================================
 SearchPathScanner::SearchPathScanner(
 				const char *pBaseDir,
-				const char *pAppResDir,
+				const char *pDefaultDir,
 				const DVec<DStr> &searchPaths ) :
 	mIdx(0),
 	mpBaseDir(pBaseDir),
-	mpAppResDir(pAppResDir),
+	mpDefaultDir(pDefaultDir),
 	mpSearchPaths(&searchPaths)
 {
 }
@@ -70,10 +70,15 @@ bool SearchPathScanner::getNextNoSPathList( std::string &out_path, bool &out_pat
 		return true;
 
 	case 1:
-		out_path = mpAppResDir;
-		strRemoveTrailingDirDiv( out_path );
-		++mIdx;
-		return true;
+		if ( mpDefaultDir )
+		{
+			out_path = mpDefaultDir;
+			strRemoveTrailingDirDiv( out_path );
+			++mIdx;
+			return true;
+		}
+
+		return false;
 
 	default:
 		return false;
@@ -101,11 +106,26 @@ bool SearchPathScanner::getNextWithSPathList( std::string &out_path, bool &out_p
 	if ( mIdx >= mpSearchPaths->size() )
 		return false;
 
+	if NOT( mpDefaultDir )
+	{
+		// if we have no default dir, then skip all the @ until
+		// the next actual path
+		for (; mIdx < mpSearchPaths->size(); ++mIdx)
+		{
+			if ( (*mpSearchPaths)[mIdx] != "@" )
+				break;
+		}
+
+		// have we reached the end ?
+		if ( mIdx >= mpSearchPaths->size() )
+			return false;
+	}
+
 	// is this the default path ?
 	if ( (*mpSearchPaths)[mIdx] == "@" )
 	{
 		out_pathIsAbsolute = true;
-		out_path = mpAppResDir;
+		out_path = mpDefaultDir;
 		strRemoveTrailingDirDiv( out_path );
 	}
 	else

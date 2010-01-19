@@ -7,8 +7,8 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_State.h"
 #include "RI_Primitive.h"
+#include "RI_State.h"
 
 //==================================================================
 namespace RI
@@ -157,7 +157,7 @@ void State::addDefShader( const char *pBasePath, const char *pSName )
 	SVM::Shader::CtorParams	params;
 	params.pName			= pSName;
 	params.pSourceFileName	= buff;
-	params.pAppResDir		= mParams.mDefaultShadersDir.c_str();
+	params.pBaseIncDir		= mParams.mDefaultShadersDir.c_str();
 
 	SVM::Shader *pShader = NULL;
 	try 
@@ -535,12 +535,12 @@ void State::Projection( ParamList &params )
 	mOptionsStack.top().cmdProjection( params );
 }
 //==================================================================
-void State::Clipping( float near, float farr )
+void State::Clipping( float nearr, float farr )
 {
 	if NOT( verifyOpType( OPTYPE_OPTS ) )
 		return;
 
-	mOptionsStack.top().cmdClipping( near, farr );
+	mOptionsStack.top().cmdClipping( nearr, farr );
 }
 //==================================================================
 void State::DepthOfField( float fStop, float focalLength, float focalDistance )

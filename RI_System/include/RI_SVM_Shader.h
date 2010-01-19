@@ -179,13 +179,13 @@ public:
 		const char	*pName;
 		const char	*pSource;
 		const char	*pSourceFileName;
-		const char	*pAppResDir;
+		const char	*pBaseIncDir;
 
 		CtorParams() :
 			pName(NULL),
 			pSource(NULL),
 			pSourceFileName(NULL),
-			pAppResDir(NULL)
+			pBaseIncDir(NULL)
 		{
 		}
 	};

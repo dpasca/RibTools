@@ -10,6 +10,7 @@
 #define RI_RESOURCE_H
 
 #include "RI_Base.h"
+#include "DSystem/include/DCriticalSection.h"
 
 //==================================================================
 namespace RI
@@ -48,6 +49,7 @@ public:
 //==================================================================
 class ResourceManager
 {
+	DUT::CriticalSection	mCSection;
 	DVec<ResourceBase *>	mpList;
 public:
 	ResourceManager()

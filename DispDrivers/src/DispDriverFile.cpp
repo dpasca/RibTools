@@ -7,12 +7,17 @@
 //==================================================================
 
 //#include "stdafx.h"
-#include "DispDrivers/include/DispDriverFile.h"
 
+#include <stdio.h>
+
+#define XMD_H	// shit !
 extern "C" 
 {
 	#include "externals/libjpeg/jpeglib.h"
 };
+#undef XMD_H	// un-shit !
+
+#include "DispDrivers/include/DispDriverFile.h"
 
 //==================================================================
 static void write_JPEG_file(

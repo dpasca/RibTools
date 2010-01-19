@@ -22,6 +22,7 @@ namespace RI
 
 //==================================================================
 class State;
+class Texture;
 
 //==================================================================
 /// Attributes
@@ -119,10 +120,13 @@ public:
 	void cmdSurface( ParamList &params );
 	void cmdDisplacement( ParamList &params );
 
+	Texture *GetTexture( const char *pTextureName ) const;
+
 private:
-	SVM::Shader *loadShader( const char *pBasePath, const char *pAppResDir, const char *pSName, bool &out_fileExists );
+	SVM::Shader *loadShader( const char *pBasePath, const char *pBaseIncDir, const char *pSName, bool &out_fileExists );
 	SVM::Shader *getShader( const char *pShaderName, const char *pAlternateName );
 	void getShaderParams( ParamList &params, size_t fromIdx, SVM::ShaderInst &shaderInst, const Matrix44 &mtxLocalCam );
+	Texture *loadTexture( const char *pBasePath, const char *pName, bool &out_fileExists ) const;
 };
 
 //==================================================================

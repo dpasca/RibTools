@@ -24,7 +24,7 @@ public:
 	virtual ~FileManagerBase() {}
 
 	virtual void GrabFile( const char *pFileName, DVec<U8> &out_vec ) = 0;
-	virtual bool FileExists( const char *pFileName ) const = 0;
+	virtual bool FileExists( const char *pFileName ) = 0;
 
 	void GrabFile( const char *pFileName, DUT::MemFile &mf )
 	{
@@ -46,7 +46,7 @@ public:
 				DASSTHROW( 0, ("Could not grab the file %s", pFileName) );
 		}
 
-		bool FileExists( const char *pFileName ) const
+		bool FileExists( const char *pFileName )
 		{
 			return DUT::FileExists( pFileName );
 		}

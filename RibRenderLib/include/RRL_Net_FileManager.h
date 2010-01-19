@@ -26,13 +26,15 @@ class FileManagerNet : public RI::FileManagerBase
 {
 	friend class Server;
 
-	DNET::PacketManager	*mpPakMan;
+	DUT::LongCriticalSection	mLongCS;
+
+	DNET::PacketManager			*mpPakMan;
 
 public:
 	FileManagerNet( DNET::PacketManager &packManager );
 
 		void GrabFile( const char *pFileName, DVec<U8> &out_vec );
-		bool FileExists( const char *pFileName ) const;
+		bool FileExists( const char *pFileName );
 };
 
 //==================================================================
