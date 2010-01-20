@@ -27,10 +27,15 @@ namespace RI
 //==================================================================
 class Texture : public ResourceBase
 {
+	Float_	mS_to_X;
+	Float_	mT_to_Y;
+
 public:
-	DIMG::Image	mImage;	
+	DIMG::Image	mImage;
 
 	Texture( const char *pTexName, DUT::MemFile &file );
+
+	void Sample_1_1x1( Float_ &dest, const Float_ &s00, const Float_ &t00 ) const;
 };
 
 

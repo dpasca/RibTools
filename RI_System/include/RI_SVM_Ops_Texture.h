@@ -60,8 +60,17 @@ void Inst_Texture( Context &ctx, u_int blocksN )
 	{
 		SLRUNCTX_BLKWRITECHECK( i );
 		{
+			Float_	s00 = pST[0][0][i];
+			Float_	t00 = pST[0][1][i];
+
 			if ( sizeof(TA) == sizeof(Float_) )
-				lhs[i] = TA( 0.5f );// pST[0][0][ stOffs[0][0] ] + pST[0][1][ stOffs[0][1] ];
+			{
+				Float_	sample;
+
+				oTex->Sample_1_1x1( sample, s00, t00 );
+
+				lhs[i] = sample;
+			}
 			else
 			{
 				DASSERT( 0 );

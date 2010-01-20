@@ -69,6 +69,12 @@ public:
 		DASSERT( x < mWd && y < mHe );
 		return mpData + mBytesPerRow * y + x * mBytesPerPix;
 	}
+
+	const U8 *GetPixelPtrR( U32 x, U32 y ) const
+	{
+		DASSERT( x < mWd && y < mHe );
+		return mpData + mBytesPerRow * y + x * mBytesPerPix;
+	}
 };
 
 

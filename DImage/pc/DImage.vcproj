@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../.."
+				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -111,12 +111,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../.."
+				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				EnableEnhancedInstructionSet="2"
 				FloatingPointModel="2"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
@@ -183,7 +182,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../include;../.."
+				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -255,11 +254,10 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../include;../.."
+				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				EnableEnhancedInstructionSet="2"
 				FloatingPointModel="2"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
@@ -318,6 +316,14 @@
 			</File>
 			<File
 				RelativePath="..\include\DImage_BMP.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DImage_TIFF.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DImage_TIFF.h"
 				>
 			</File>
 		</Filter>

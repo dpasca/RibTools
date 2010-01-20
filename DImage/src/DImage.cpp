@@ -61,7 +61,7 @@ void Image::Init(
 			("Unholy image dimensions ! (%ui, %ui)", wd, he) );
 
 	DASSTHROW(
-		len != (size_t)mSampPerPix &&
+		len == (size_t)mSampPerPix &&
 		mSampPerPix <= MAX_DIM_SIZE,
 			("Bad samples definition !") );
 

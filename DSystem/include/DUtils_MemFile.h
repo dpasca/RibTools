@@ -44,7 +44,12 @@ public:
 
 	void ReadData( void *pDest, size_t readSize );
 	const void *ReadDataPtr( size_t readSize );
-	void SeekFromCur( size_t skipSize );
+
+	void SeekSet( size_t pos );
+	void SeekFromCur( ptrdiff_t offset );
+	void SeekFromEnd( ptrdiff_t offset );
+
+	size_t GetCurPos() const { return mReadPos; }
 };
 
 //==================================================================

@@ -385,6 +385,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tiff-3.9.2\libtiff\tif_next.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tiff-3.9.2\libtiff\tif_ojpeg.c"
 				>
 			</File>

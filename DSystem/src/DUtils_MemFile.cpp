@@ -135,14 +135,24 @@ const void *MemFile::ReadDataPtr( size_t readSize )
 }
 
 //==================================================================
-void MemFile::SeekFromCur( size_t skipSize )
+void MemFile::SeekSet( size_t pos )
 {
-	size_t	endPos = mReadPos + skipSize;
-
-	if NOT( endPos <= mDataSize )
+	if ( pos < 0 || pos > mDataSize )
 		throw std::out_of_range( "Writing out of bounds !" );
 
-	mpData += skipSize;
+	mReadPos = pos;
+}
+
+//==================================================================
+void MemFile::SeekFromCur( ptrdiff_t offset )
+{
+	SeekSet( (ptrdiff_t)mReadPos + offset );
+}
+
+//==================================================================
+void MemFile::SeekFromEnd( ptrdiff_t offset )
+{
+	SeekSet( (ptrdiff_t)mDataSize + offset );
 }
 
 //==================================================================

@@ -71,7 +71,7 @@ static bool isPaletteGrayscale( const myRGBQUAD *pPal, size_t cnt )
 }
 
 //==================================================================
-void LoadBMP( Image &img, DUT::MemFile &readFile )
+void LoadBMP( Image &img, DUT::MemFile &readFile, const char *pFName )
 {
 	const myBITMAPFILEHEADER *pFileHead =
 			(const myBITMAPFILEHEADER *)readFile.ReadDataPtr( sizeof(myBITMAPFILEHEADER) );

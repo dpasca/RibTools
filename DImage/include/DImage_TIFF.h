@@ -1,13 +1,13 @@
 //==================================================================
-/// DImage_BMP.h
+/// DImage_TIFF.h
 ///
-/// Created by Davide Pasca - 2010/1/15
+/// Created by Davide Pasca - 2010/1/20
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef DIMAGE_BMP_H
-#define DIMAGE_BMP_H
+#ifndef DIMAGE_TIFF_H
+#define DIMAGE_TIFF_H
 
 #include "DImage.h"
 #include "DSystem/include/DUtils_MemFile.h"
@@ -17,7 +17,7 @@ namespace DIMG
 {
 
 //==================================================================
-void LoadBMP( Image &img, DUT::MemFile &readFile, const char *pFName );
+void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName );
 
 //==================================================================
 }
