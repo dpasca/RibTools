@@ -23,6 +23,11 @@ namespace RI
 //==================================================================
 static const u_int	MP_GRID_MAX_SIZE				= DMT_SIMD_PADSIZE( 48 ) * 48;
 static const u_int	MP_GRID_MAX_SIZE_SIMD_BLKS		= DMT_SIMD_BLOCKS( MP_GRID_MAX_SIZE );
+static const u_int	MP_GRID_MIN_DIM					= DMT_SIMD_FLEN;
+// maximum dimension is the area divided by the smallest dimension
+// example.. for SIMD 4, it would be.. maxdim = padded( padded(48)*48 / 4 ) -> 48*48 / 4 -> 576
+static const u_int	MP_GRID_MAX_DIM					= DMT_SIMD_PADSIZE( MP_GRID_MAX_SIZE / DMT_SIMD_FLEN );
+static const u_int	MP_GRID_MAX_DIM_SIMD_BLKS		= DMT_SIMD_BLOCKS( MP_GRID_MAX_DIM );
 
 //==================================================================
 enum Mode

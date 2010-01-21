@@ -56,6 +56,36 @@ void Inst_Texture( Context &ctx, u_int blocksN )
 		stSteps[0][1] = ctx.GetSymbolVaryingStep( 4 );
 	}
 
+/*
+	Float_	dsDu[ MP_GRID_MAX_SIZE_SIMD_BLKS ];
+	Float_	dtDu[ MP_GRID_MAX_SIZE_SIMD_BLKS ];
+
+	{
+		u_int	blk = 0;
+		for (u_int iy=0; iy < ctx.mPointsYN; ++iy)
+		{
+			for (u_int ixb=0; ixb < ctx.mBlocksXN; ++ixb, ++blk)
+			{
+				const Float_	&blk_s	 = pST[0][0][blk];
+				const Float_	&blk_t	 = pST[0][1][blk];
+
+				for (u_int sub=1; sub < DMT_SIMD_FLEN; ++sub)
+				{
+					dsDu[0][sub] = blk_s[0][sub] - blk_s[0][sub-1];
+					dtDu[0][sub] = blk_t[0][sub] - blk_t[0][sub-1];
+				}
+
+				dsDu[0] = dsDu[1];
+				dsDu[0] = dsDu[1];
+				blkdPDu[1][0] = blkdPDu[1][1];
+				blkdPDu[2][0] = blkdPDu[2][1];
+
+				blkdPDu = blkdPDu * pOODu[blk];
+			}
+		}
+	}
+*/
+
 	for (u_int i=0; i < blocksN; ++i)
 	{
 		SLRUNCTX_BLKWRITECHECK( i );

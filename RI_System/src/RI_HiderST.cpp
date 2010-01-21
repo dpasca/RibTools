@@ -315,7 +315,7 @@ float Hider::RasterEstimate( const Bound &b, const Matrix44 &mtxLocalWorld, int 
 	if ( valid )
 	{
 		float	squareArea = (bound2df[3] - bound2df[1]) * (bound2df[2] - bound2df[0]);
-		return squareArea * 1;
+		return squareArea * 1.0f;
 	}
 	else
 		return 0.0f;	// invalid or zero area...

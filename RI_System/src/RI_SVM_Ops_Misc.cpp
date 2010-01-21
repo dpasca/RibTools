@@ -92,11 +92,13 @@ void Inst_CalculateNormal( Context &ctx, u_int blocksN )
 
 	{
 		const Matrix44	&mtxCameraLocal = ctx.mpGrid->mMtxCameraLocal;
-		
+
+		Float3	prev_blkP_LS;
+
 		u_int	blk = 0;
 		for (u_int iy=0; iy < ctx.mPointsYN; ++iy)
 		{
-			for (u_int ixb=0; ixb < ctx.mBlocksXN; ++ixb, ++blk)
+			for (u_int ixb=0; ixb < 1; ++ixb, ++blk)
 			{
 				// calculate the position in local space
 				P_LS[blk] = V3__V3W1_Mul_M44<Float_>( op1[blk], mtxCameraLocal );
@@ -111,9 +113,39 @@ void Inst_CalculateNormal( Context &ctx, u_int blocksN )
 					blkdPDu[2][sub] = blkP_LS[2][sub] - blkP_LS[2][sub-1];
 				}
 
+				prev_blkP_LS[0] = blkP_LS[0][DMT_SIMD_FLEN-1];
+				prev_blkP_LS[1] = blkP_LS[1][DMT_SIMD_FLEN-1];
+				prev_blkP_LS[2] = blkP_LS[2][DMT_SIMD_FLEN-1];
+
 				blkdPDu[0][0] = blkdPDu[0][1];
 				blkdPDu[1][0] = blkdPDu[1][1];
 				blkdPDu[2][0] = blkdPDu[2][1];
+
+				blkdPDu = blkdPDu * pOODu[blk];
+			}
+
+			for (u_int ixb=1; ixb < ctx.mBlocksXN; ++ixb, ++blk)
+			{
+				// calculate the position in local space
+				P_LS[blk] = V3__V3W1_Mul_M44<Float_>( op1[blk], mtxCameraLocal );
+
+				const Float3_	&blkP_LS = P_LS[blk];
+				Float3_			&blkdPDu = dPDu[blk];
+
+				blkdPDu[0][0] = blkP_LS[0][0] - prev_blkP_LS[0];
+				blkdPDu[1][0] = blkP_LS[1][0] - prev_blkP_LS[1];
+				blkdPDu[2][0] = blkP_LS[2][0] - prev_blkP_LS[2];
+
+				for (u_int sub=1; sub < DMT_SIMD_FLEN; ++sub)
+				{
+					blkdPDu[0][sub] = blkP_LS[0][sub] - blkP_LS[0][sub-1];
+					blkdPDu[1][sub] = blkP_LS[1][sub] - blkP_LS[1][sub-1];
+					blkdPDu[2][sub] = blkP_LS[2][sub] - blkP_LS[2][sub-1];
+				}
+
+				prev_blkP_LS[0] = blkP_LS[0][DMT_SIMD_FLEN-1];
+				prev_blkP_LS[1] = blkP_LS[1][DMT_SIMD_FLEN-1];
+				prev_blkP_LS[2] = blkP_LS[2][DMT_SIMD_FLEN-1];
 
 				blkdPDu = blkdPDu * pOODu[blk];
 			}

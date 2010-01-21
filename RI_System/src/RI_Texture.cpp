@@ -68,8 +68,8 @@ void Texture::Sample_1_1x1( Float_ &dest, const Float_ &s00, const Float_ &t00 )
 	//Int_	xi, yi;
 	for (size_t i=0; i < DMT_SIMD_FLEN; ++i)
 	{
-		int xi = ((int)floorf( x[0] )) % (int)mImage.mWd;
-		int yi = ((int)floorf( y[0] )) % (int)mImage.mHe;
+		int xi = ((int)floorf( x[i] )) % (int)mImage.mWd;
+		int yi = ((int)floorf( y[i] )) % (int)mImage.mHe;
 
 		if ( xi < 0 ) xi += mImage.mWd;
 		if ( yi < 0 ) yi += mImage.mHe;
