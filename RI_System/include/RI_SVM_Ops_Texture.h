@@ -85,32 +85,79 @@ void Inst_Texture( Context &ctx, u_int blocksN )
 		}
 	}
 */
-
-	for (u_int i=0; i < blocksN; ++i)
+/*
+	if ( N_COORDS >= 1 )
 	{
-		SLRUNCTX_BLKWRITECHECK( i );
+		Float_	above_s[ MP_GRID_MAX_DIM_SIMD_BLKS ];
+		Float_	above_t[ MP_GRID_MAX_DIM_SIMD_BLKS ];
+
+		float	prev_dsDu = 0;
+		float	prev_dtDv = 0;
+
+		u_int	blk = 0;
+		for (u_int iy=0; iy < ctx.mPointsYN; ++iy)
 		{
-			Float_	s00 = pST[0][0][i];
-			Float_	t00 = pST[0][1][i];
-
-			if ( sizeof(TA) == sizeof(Float_) )
+			for (u_int ixb=0; ixb < 1; ++ixb, ++blk)
 			{
-				Float_	sample;
+				for (u_int sub=1; sub < DMT_SIMD_FLEN; ++sub)
+				{
+					dsDu[sub] = pST[0][sub] - pST[0][sub-1];
+					dtDv[sub] = pST[1][sub] - pST[1][sub-1];
 
-				oTex->Sample_1_1x1( sample, s00, t00 );
+					oTex->Sample_1_1x1( sample, s00, t00 );
+				}
 
-				lhs[i] = sample;
+				prev_dsDu = pST[0][DMT_SIMD_FLEN-1];
+				prev_dtDv = pST[1][DMT_SIMD_FLEN-1];
 			}
-			else
+
+			for (u_int ixb=1; ixb < ctx.mBlocksXN; ++ixb, ++blk)
 			{
-				DASSERT( 0 );
+				dsDu[0][0] = pST[0][0] - prev_dsDu;
+				dtDv[1][0] = pST[1][0] - prev_dtDv;
+
+				for (u_int sub=1; sub < DMT_SIMD_FLEN; ++sub)
+				{
+					dsDu[sub] = pST[0][sub] - pST[0][sub-1];
+					dtDv[sub] = pST[1][sub] - pST[1][sub-1];
+				}
+
+				prev_dsDu = pST[0][DMT_SIMD_FLEN-1];
+				prev_dtDv = pST[1][DMT_SIMD_FLEN-1];
+
+				blkdPDu = blkdPDu * pOODu[blk];
 			}
 		}
-
-		for (size_t sti=0; sti < N_COORDS; ++sti)
+	}
+	else
+*/
+	{
+		for (u_int i=0; i < blocksN; ++i)
 		{
-			stOffs[sti][0] += stSteps[sti][0];
-			stOffs[sti][1] += stSteps[sti][1];
+			SLRUNCTX_BLKWRITECHECK( i );
+			{
+				Float_	s00 = pST[0][0][i];
+				Float_	t00 = pST[0][1][i];
+
+				if ( sizeof(TA) == sizeof(Float_) )
+				{
+					Float_	sample;
+
+					oTex->Sample_1_filter( sample, s00, t00 );
+
+					lhs[i] = sample;
+				}
+				else
+				{
+					DASSERT( 0 );
+				}
+			}
+
+			for (size_t sti=0; sti < N_COORDS; ++sti)
+			{
+				stOffs[sti][0] += stSteps[sti][0];
+				stOffs[sti][1] += stSteps[sti][1];
+			}
 		}
 	}
 

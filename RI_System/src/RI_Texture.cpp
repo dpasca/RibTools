@@ -11,9 +11,37 @@
 #include "DImage/include/DImage_TIFF.h"
 #include "RI_Texture.h"
 
+#define GAUSS_HDIM	2
+#define GAUSS_DIM	(GAUSS_HDIM*2 + 1)
+
 //==================================================================
 namespace RI
 {
+
+//==================================================================
+static float _gGaussKernel[GAUSS_DIM][GAUSS_DIM];
+
+//==================================================================
+static void makeGaussKernel()
+{
+	static const float sigma = 1.f;
+
+	for (int i=-GAUSS_HDIM; i <= GAUSS_HDIM; ++i)
+	{
+		for (int j=-GAUSS_HDIM; j <= GAUSS_HDIM; ++j)
+		{
+			float x = (float)j;
+			float y = (float)i;
+
+			float	sigmaSqr = sigma * sigma;
+
+			_gGaussKernel[j][i] =
+				float(
+					(1 / (2 * (float)M_PI * sigmaSqr)) * exp( -(x*x + y*y) / (2 * sigmaSqr) )
+				);
+		}
+	}
+}
 
 //==================================================================
 static const char *StrFindLastChar( const char *pStr, char ch )
@@ -54,6 +82,13 @@ Texture::Texture( const char *pName, DUT::MemFile &file ) :
 
 	mS_to_X = Float_( (float)mImage.mWd-1 );
 	mT_to_Y = Float_( (float)mImage.mHe-1 );
+
+	static bool kernelDone;
+	if NOT( kernelDone )
+	{
+		makeGaussKernel();
+		kernelDone = true;
+	}
 }
 
 //==================================================================
@@ -80,6 +115,47 @@ void Texture::Sample_1_1x1( Float_ &dest, const Float_ &s00, const Float_ &t00 )
 	// assume byte values for now !
 
 	dest = dest * Float_( 1.0f / 255.0f );
+}
+
+//==================================================================
+void Texture::Sample_1_filter( Float_ &dest, const Float_ &s00, const Float_ &t00 ) const
+{
+	// assume wrapping for now
+	Float_	spix = s00 * mS_to_X;
+	Float_	tpix = t00 * mT_to_Y;
+
+	int	imgw = mImage.mWd;
+	int	imgh = mImage.mHe;
+
+	Float_	tmp( 0.f );
+
+	for (int i=-GAUSS_HDIM; i <= GAUSS_HDIM; ++i)
+	{
+		for (int j=-GAUSS_HDIM; j <= GAUSS_HDIM; ++j)
+		{
+			float x = (float)j;
+			float y = (float)i;
+
+			for (size_t smdi=0; smdi < DMT_SIMD_FLEN; ++smdi)
+			{
+				int xi = (int)floorf( spix[smdi] );
+				int yi = (int)floorf( tpix[smdi] );
+
+				xi += j;
+				yi += i;
+
+				xi = xi % imgw;
+				yi = yi % imgh;
+
+				if ( xi < 0 ) xi += imgw;
+				if ( yi < 0 ) yi += imgh;
+
+				tmp[smdi] += _gGaussKernel[j][i] * (float)*mImage.GetPixelPtrR( xi, yi );
+			}
+		}
+	}
+
+	dest = tmp * Float_( 1.0f / 255.0f );
 }
 
 //==================================================================
