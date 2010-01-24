@@ -94,6 +94,7 @@ inline void filterPixelBox(
 		}
 
 		pixCol += accCol;
+		//pixCol = pSampDataListSort[0]->mCi;
 	}
 
 	pixCol = pixCol * ooSampsPerPixel;

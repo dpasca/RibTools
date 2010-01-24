@@ -52,8 +52,8 @@ void Inst_Texture( Context &ctx, u_int blocksN )
 		pST[0][1]	= (const Float_*)pSymT->GetData();
 		stOffs[0][0] = 0;
 		stOffs[0][1] = 0;
-		stSteps[0][0] = ctx.GetSymbolVaryingStep( 3 );
-		stSteps[0][1] = ctx.GetSymbolVaryingStep( 4 );
+		stSteps[0][0] = pSymS->IsVarying() ? 1 : 0;
+		stSteps[0][1] = pSymT->IsVarying() ? 1 : 0;
 	}
 
 /*

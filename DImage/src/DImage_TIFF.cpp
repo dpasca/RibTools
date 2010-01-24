@@ -87,6 +87,60 @@ namespace DIMG
 {
 
 //==================================================================
+static void SavePPM( Image &img, const char *pFName )
+{
+	FILE *pFile;
+
+	int err = fopen_s( &pFile, pFName, "wb" );
+	DASSTHROW( err == 0, ("Could not write %s", pFName) );
+
+	DASSTHROW(
+		img.mSampPerPix <= 3 &&
+		img.mBytesPerSamp == 1,
+			("Unsupported image format. Cannot write %s", pFName) );
+
+	fprintf_s( pFile,
+		"P6\n"
+		"# %s\n"
+		"%i %i\n"
+		"%i\n",
+			pFName,
+			img.mWd, img.mHe,
+			(int)(1 << (img.mBytesPerSamp<<3)) - 1 );
+
+	for (u_int y=0; y < img.mHe; ++y)
+	{
+		for (u_int x=0; x < img.mWd; ++x)
+		{
+			const U8	*pPix = img.GetPixelPtrR( x, y );
+
+			U8	col[3];
+
+			if ( img.mSampPerPix == 1 )
+				col[0] = col[1] = col[2] = pPix[0];
+			else
+			if ( img.mSampPerPix == 2 )
+			{
+				col[0] = pPix[0];
+				col[1] = pPix[1];
+				col[2] = 0;
+			}
+			else
+			if ( img.mSampPerPix == 3 )
+			{
+				col[0] = pPix[0];
+				col[1] = pPix[1];
+				col[2] = pPix[2];
+			}
+
+			fwrite( col, 1, 3, pFile );
+		}
+	}
+
+	fclose( pFile );
+}
+
+//==================================================================
 void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
 {
 	TIFF *pTiff = TIFFClientOpen(
@@ -151,41 +205,38 @@ void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
 	size_t	srcIdx = 0;
 	for (U32 y=0; y < h; ++y)
 	{
-		if ( spp == 1 )
+		U8 *pDest = img.GetPixelPtrRW( 0, y );
+
+		switch ( spp )
 		{
-			U8 *pDest = img.GetPixelPtrRW( 0, y );
-
-			switch ( spp )
+		case 1:
+			for (U32 x=0; x < w; ++x, ++srcIdx)
 			{
-			case 1:
-				for (U32 x=0; x < w; ++x, ++srcIdx)
-				{
-					pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
-					pDest += 1;
-				}
-				break;
-
-			case 3:
-				for (U32 x=0; x < w; ++x, ++srcIdx)
-				{
-					pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
-					pDest[1] = TIFFGetG( pTmpBuff[srcIdx] );
-					pDest[2] = TIFFGetB( pTmpBuff[srcIdx] );
-					pDest += 3;
-				}
-				break;
-
-			case 4:
-				for (U32 x=0; x < w; ++x, ++srcIdx)
-				{
-					pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
-					pDest[1] = TIFFGetG( pTmpBuff[srcIdx] );
-					pDest[2] = TIFFGetB( pTmpBuff[srcIdx] );
-					pDest[3] = TIFFGetA( pTmpBuff[srcIdx] );
-					pDest += 4;
-				}
-				break;
+				pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
+				pDest += 1;
 			}
+			break;
+
+		case 3:
+			for (U32 x=0; x < w; ++x, ++srcIdx)
+			{
+				pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
+				pDest[1] = TIFFGetG( pTmpBuff[srcIdx] );
+				pDest[2] = TIFFGetB( pTmpBuff[srcIdx] );
+				pDest += 3;
+			}
+			break;
+
+		case 4:
+			for (U32 x=0; x < w; ++x, ++srcIdx)
+			{
+				pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
+				pDest[1] = TIFFGetG( pTmpBuff[srcIdx] );
+				pDest[2] = TIFFGetB( pTmpBuff[srcIdx] );
+				pDest[3] = TIFFGetA( pTmpBuff[srcIdx] );
+				pDest += 4;
+			}
+			break;
 		}
 	}
 
@@ -196,6 +247,28 @@ void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
 #endif
 
 	TIFFClose( pTiff );
+
+	// the following is for debugging, to dump out the just read TIF
+#if 0
+	char	fixname[2048];
+	char	ppmName[2048];
+
+	for (size_t i=0; ; ++i)
+	{
+		fixname[i] = pFName[i];
+
+		if ( fixname[i] == '/' || fixname[i] == '\\' )
+			fixname[i] = '_';
+
+		if NOT( pFName[i] )
+			break;
+	}
+
+	sprintf_s( ppmName, "C:\\Users\\xxxxxx\\tmp\\%s.ppm", fixname );
+
+	SavePPM( img, ppmName );
+#endif
+
 }
 
 //==================================================================

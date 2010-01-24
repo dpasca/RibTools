@@ -125,7 +125,7 @@ void SimplePrimitiveBase::fillUVsArray(
 {
 	size_t	sampleIdx = 0;
 
-	Float2	prevUV( 0, 0 );
+	Float2	leftUV( 0, 0 );
 
 	float	v = 0.0f;
 	for (u_int i=0; i < yDim; ++i, v += dv)
@@ -146,10 +146,11 @@ void SimplePrimitiveBase::fillUVsArray(
 
 			if ( j > 0 )
 			{
-				blkLocDUDV[0][ sub ] = tmpUV[0] - prevUV[0];
+				blkLocDUDV[0][ sub ] = tmpUV[0] - leftUV[0];
+				//blkLocDUDV[1][ sub ] = tmpUV[1] - leftUV[1];
 			}
 
-			prevUV = tmpUV;
+			leftUV = tmpUV;
 		}
 	}
 
@@ -157,13 +158,11 @@ void SimplePrimitiveBase::fillUVsArray(
 
 	// -- calc du edge (replicates col 1 into col 0..)
 	u_int	blk = 0;
+	size_t	rightBlk = 1 / DMT_SIMD_FLEN;
+	size_t	rightSub = 1 & (DMT_SIMD_FLEN-1);
 	for (u_int i=0; i < yDim; ++i, blk += xBlkN)
 	{
-		Float2_	&blkLocDUDV = locDUDV[ blk ];
-
-		float	locDU = CalcLocalU( du ) - CalcLocalU( 0 );
-
-		blkLocDUDV[0][0] = locDU;
+		locDUDV[ blk ][0][0] = locDUDV[ blk + rightBlk ][0][ rightSub ];
 	}
 
 	// -- calc dv

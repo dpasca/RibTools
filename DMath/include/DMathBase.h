@@ -16,6 +16,7 @@
 	#include <xmmintrin.h>
 
 	#define DMT_SIMD_FLEN	4
+	#define DMT_SIMD_ALIGN_SIZE	16	//	DMT_SIMD_FLEN * 4
 
 	// better reciprocal square root found on the Internet 8)
 	inline __m128 _mm_rsqrtnr_ps( __m128 x )
@@ -83,32 +84,43 @@
 
 #else
 
-#if defined(DMATH_USE_M512)
+	#if defined(DMATH_USE_M512)
 
-	#define USE_C_PROTOTYPE_PRIMITIVES 0
+			#define USE_C_PROTOTYPE_PRIMITIVES 0
 
-	#include "external/lrb/lrb_prototype_primitives.inl"
+			#include "external/lrb/lrb_prototype_primitives.inl"
 
-	#define DMT_SIMD_FLEN	16
+			#define DMT_SIMD_FLEN	16
+			#define DMT_SIMD_ALIGN_SIZE	64	//	DMT_SIMD_FLEN * 4
 
-	typedef __mmask	VecNMask;	// only need 16 bits
+			typedef __mmask	VecNMask;	// only need 16 bits
 
-#else
+			inline void VecNMask_Broadcast0Lane( VecNMask &val )
+			{
+				// expand the least significant bit
+				val = (VecNMask)(((signed short)(val << (DMT_SIMD_FLEN-1))) >> (DMT_SIMD_FLEN-1));
+			}
 
-	#define DMT_SIMD_FLEN	4
+	#else
 
-	typedef unsigned char	VecNMask;	// only need 4 bits (round to 1 byte)
+			#define DMT_SIMD_FLEN	1
+			#define DMT_SIMD_ALIGN_SIZE	4	//	DMT_SIMD_FLEN * 4
 
-#endif
+			typedef unsigned short	VecNMask;	// only need 4 bits (round to 1 byte)
 
-	inline void VecNMask_Broadcast0Lane( VecNMask &val )
-	{
-		// expand the least significant bit
-		val = (VecNMask)(((signed short)(val << 15)) >> 15);
-	}
+			inline void VecNMask_Broadcast0Lane( VecNMask &val )
+			{
+				// expand the least significant bit
+				val = (VecNMask)(((signed char)(val << (DMT_SIMD_FLEN-1))) >> (DMT_SIMD_FLEN-1));
+			}
 
-	static const VecNMask VecNMaskFull = (VecNMask)-1;
-	static const VecNMask VecNMaskEmpty = (VecNMask)0;
+	#endif
+
+		static const VecNMask VecNMaskFull = (VecNMask)-1;
+		static const VecNMask VecNMaskEmpty = (VecNMask)0;
+
+		inline VecNMask CmpMaskEQ( const VecNMask &lval, const VecNMask &rval ) { return lval == rval; }
+		inline VecNMask CmpMaskNE( const VecNMask &lval, const VecNMask &rval ) { return lval != rval; }
 
 #endif
 

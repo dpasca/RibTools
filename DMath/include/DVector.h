@@ -322,26 +322,26 @@ VecNMask CmpMaskNE( const Vec4<_S> &lval, const Vec4<_S> &rval )
 //==================================================================
 //==================================================================
 #if defined(_MSC_VER)
-#define DVECTOR_SIMD_ALIGN( _X_ )	__declspec(align(64))	_X_
+#define DVECTOR_SIMD_ALIGN( _X_ )	__declspec(align(DMT_SIMD_ALIGN_SIZE))	_X_
 
-typedef __declspec(align(64)) VecN<float,DMT_SIMD_FLEN>			Float_;
-typedef __declspec(align(64)) VecN<int,DMT_SIMD_FLEN>			Int_;
-typedef __declspec(align(64)) VecN<DU8,DMT_SIMD_FLEN>			Bool_;
+typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) VecN<float,DMT_SIMD_FLEN>			Float_;
+typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) VecN<int,DMT_SIMD_FLEN>			Int_;
+typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) VecN<DU8,DMT_SIMD_FLEN>			Bool_;
 
-typedef __declspec(align(64)) Vec2< VecN<float,DMT_SIMD_FLEN> >	Float2_;
-typedef __declspec(align(64)) Vec3< VecN<float,DMT_SIMD_FLEN> >	Float3_;
-typedef __declspec(align(64)) Vec4< VecN<float,DMT_SIMD_FLEN> >	Float4_;
+typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) Vec2< VecN<float,DMT_SIMD_FLEN> >	Float2_;
+typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) Vec3< VecN<float,DMT_SIMD_FLEN> >	Float3_;
+typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) Vec4< VecN<float,DMT_SIMD_FLEN> >	Float4_;
 
 #elif defined(__GNUC__)
-#define DVECTOR_SIMD_ALIGN( _X_ )	_X_ __attribute__ ((aligned(64)))
+#define DVECTOR_SIMD_ALIGN( _X_ )	_X_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)))
 
-typedef	VecN<float,DMT_SIMD_FLEN>			Float_ __attribute__ ((aligned(64)));
-typedef	VecN<int,DMT_SIMD_FLEN>				Int_ __attribute__ ((aligned(64)));
-typedef	VecN<DU8,DMT_SIMD_FLEN>				Bool_ __attribute__ ((aligned(64)));
+typedef	VecN<float,DMT_SIMD_FLEN>			Float_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)));
+typedef	VecN<int,DMT_SIMD_FLEN>				Int_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)));
+typedef	VecN<DU8,DMT_SIMD_FLEN>				Bool_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)));
 
-typedef	Vec2< VecN<float,DMT_SIMD_FLEN> >	Float2_ __attribute__ ((aligned(64)));
-typedef	Vec3< VecN<float,DMT_SIMD_FLEN> >	Float3_ __attribute__ ((aligned(64)));
-typedef	Vec4< VecN<float,DMT_SIMD_FLEN> >	Float4_ __attribute__ ((aligned(64)));
+typedef	Vec2< VecN<float,DMT_SIMD_FLEN> >	Float2_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)));
+typedef	Vec3< VecN<float,DMT_SIMD_FLEN> >	Float3_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)));
+typedef	Vec4< VecN<float,DMT_SIMD_FLEN> >	Float4_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)));
 
 #endif
 

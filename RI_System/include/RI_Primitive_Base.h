@@ -202,7 +202,9 @@ public:
 
 	// WARNING: we assume dicing no larger than 3^2 !!!
 	// ..make sure about this everywhere MakeBound() uses MakeBoundFromUVRangeN
-	static const size_t	MAX_MAKE_BOUND_OUT_SIZE = MAX_PADDED_VERTS_FOR_MakeBoundFromUVRangeN( 3 );
+	static const size_t	MAKE_BOUND_FROM_UV_RANGE_DIM = 4;
+	static const size_t	MAX_MAKE_BOUND_OUT_SIZE =
+							MAX_PADDED_VERTS_FOR_MakeBoundFromUVRangeN( MAKE_BOUND_FROM_UV_RANGE_DIM );
 
 	// make a 3D bound, return false if the bound cannot be made
 	virtual void	MakeBound( Bound &out_bound, Float3_ *out_pPo ) const = 0;

@@ -211,14 +211,14 @@ public:
 
 	// TODO: verify that it works !
 	friend VecNMask CmpMaskLT( const VecN &lval, const VecN &rval ) { return _mm512_cmplt_ps( lval.v, rval.v );  }
-	friend VecNMask CmpMaskGT( const VecN &lval, const VecN &rval ) { return _mm512_cmpgt_ps( lval.v, rval.v );  }
+	friend VecNMask CmpMaskGT( const VecN &lval, const VecN &rval ) { return ~_mm512_cmple_ps( lval.v, rval.v );  }
 	friend VecNMask CmpMaskEQ( const VecN &lval, const VecN &rval ) { return _mm512_cmpeq_ps( lval.v, rval.v );  }
 	friend VecNMask CmpMaskNE( const VecN &lval, const VecN &rval ) { return _mm512_cmpneq_ps( lval.v, rval.v ); }
 	friend VecNMask CmpMaskLE( const VecN &lval, const VecN &rval ) { return _mm512_cmple_ps( lval.v, rval.v );  }
-	friend VecNMask CmpMaskGE( const VecN &lval, const VecN &rval ) { return _mm512_cmpge_ps( lval.v, rval.v );  }
+	friend VecNMask CmpMaskGE( const VecN &lval, const VecN &rval ) { return ~_mm512_cmplt_ps( lval.v, rval.v );  }
 
-	friend bool operator ==( const VecN &lval, const VecN &rval ) { return VecNMaskEmpty == CmpMaskNE( lval, rval ) }
-	friend bool operator !=( const VecN &lval, const VecN &rval ) { return VecNMaskFull  != CmpMaskEQ( lval, rval ) }
+	friend bool operator ==( const VecN &lval, const VecN &rval ) { return VecNMaskEmpty == CmpMaskNE( lval, rval ); }
+	friend bool operator !=( const VecN &lval, const VecN &rval ) { return VecNMaskFull  != CmpMaskEQ( lval, rval ); }
 
 	const float &operator [] (size_t i) const	{ return v.v[i]; }
 		  float &operator [] (size_t i)			{ return v.v[i]; }
@@ -255,23 +255,23 @@ public:
 /// No hardware SIMD
 //==================================================================
 public:
-	_S	v[_N];
+	float	v[DMT_SIMD_FLEN];
 
 	//==================================================================
 	VecN()						{}
 	VecN( const VecN &v_ )		{ FOR_I_N v[i] = v_.v[i]; }
-	VecN( const _S& a_ )		{ FOR_I_N v[i] = a_;		}
-	VecN( const _S *p_ )		{ FOR_I_N v[i] = p_[i];	}
+	VecN( const float& a_ )		{ FOR_I_N v[i] = a_;		}
+	VecN( const float *p_ )		{ FOR_I_N v[i] = p_[i];	}
 
-	void Set( const _S *p_ )	{ FOR_I_N v[i] = p_[i];	}
+	//void Set( const float *p_ )	{ FOR_I_N v[i] = p_[i];	}
 	void SetZero()				{ FOR_I_N v[i] = 0;		}
 
-	_S	AddReduce() const		{ _S acc=_S(0); FOR_I_N acc += v[i]; return acc; }
+	float	AddReduce() const		{ float acc=float(0); FOR_I_N acc += v[i]; return acc; }
 
-	VecN operator + (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval; return tmp; }
-	VecN operator - (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval; return tmp; }
-	VecN operator * (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval; return tmp; }
-	VecN operator / (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] / rval; return tmp; }
+	VecN operator + (const float& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval; return tmp; }
+	VecN operator - (const float& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval; return tmp; }
+	VecN operator * (const float& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval; return tmp; }
+	VecN operator / (const float& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] / rval; return tmp; }
 	VecN operator + (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval.v[i]; return tmp; }
 	VecN operator - (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval.v[i]; return tmp; }
 	VecN operator * (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval.v[i]; return tmp; }
@@ -288,11 +288,11 @@ public:
 	friend VecNMask CmpMaskLE( const VecN &lval, const VecN &rval ) { VecNMask mask=0; FOR_I_N mask |= (lval[i] <=rval[i] ? (1<<i) : 0); return mask; }
 	friend VecNMask CmpMaskGE( const VecN &lval, const VecN &rval ) { VecNMask mask=0; FOR_I_N mask |= (lval[i] >=rval[i] ? (1<<i) : 0); return mask; }
 
-	friend bool operator ==( const VecN &lval, const VecN &rval ) { return VecNMaskEmpty == CmpMaskNE( lval, rval ) }
-	friend bool operator !=( const VecN &lval, const VecN &rval ) { return VecNMaskFull  != CmpMaskEQ( lval, rval ) }
+	friend bool operator ==( const VecN &lval, const VecN &rval ) { return VecNMaskEmpty == CmpMaskNE( lval, rval ); }
+	friend bool operator !=( const VecN &lval, const VecN &rval ) { return VecNMaskFull  != CmpMaskEQ( lval, rval ); }
 
-	const _S &operator [] (size_t i) const	{ return v[i]; }
-		  _S &operator [] (size_t i)		{ return v[i]; }
+	const float &operator [] (size_t i) const	{ return v[i]; }
+		  float &operator [] (size_t i)		{ return v[i]; }
 
 	friend VecN	DSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
 	friend VecN	DRSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
@@ -301,14 +301,14 @@ public:
 	friend VecN	DAbs( const VecN &a	)				 { VecN tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
 	friend VecN	DMin( const VecN &a, const VecN &b ) { VecN tmp; FOR_I_N tmp[i] = DMin( a[i], b[i] ); return tmp; }
 	friend VecN	DMax( const VecN &a, const VecN &b ) { VecN tmp; FOR_I_N tmp[i] = DMax( a[i], b[i] ); return tmp; }
-	friend VecN	DSin( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
-	friend VecN	DCos( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
+	//friend VecN	DSin( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
+	//friend VecN	DCos( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
 
 #endif
 
 	friend VecN	DSin( const VecN &a ) { VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
 	friend VecN	DCos( const VecN &a ) { VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
-	//friend VecN operator * (const _S &lval, const VecN &rval) { return rval * lval; }
+	//friend VecN operator * (const float &lval, const VecN &rval) { return rval * lval; }
 };
 
 #undef FOR_I_N

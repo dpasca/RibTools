@@ -41,7 +41,7 @@ public:
 
 		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 		{
-			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+			MakeBoundFromUVRangeN<SimplePrimitiveBase,MAKE_BOUND_FROM_UV_RANGE_DIM>( *this, out_bound, out_pPo );
 		}
 		void MakeBound( Bound &out_bound ) const;
 

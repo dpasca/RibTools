@@ -18,12 +18,19 @@
 //==================================================================
 //#define DMATRIX44_ROWMTX_MODE
 
+#define DMT_MTX44_USE_VEC_TEMPLATE
+
 //==================================================================
 //__declspec(align(64))
+__declspec(align(DMT_SIMD_ALIGN_SIZE))
 class Matrix44
 {
 public:
+#ifdef DMT_MTX44_USE_VEC_TEMPLATE
 	VecN<float,16>	v16;
+#else
+	float	v16[16];
+#endif
 
 	Matrix44()
 	{
@@ -69,7 +76,11 @@ public:
 
 	void Identity()
 	{
+	#ifdef DMT_MTX44_USE_VEC_TEMPLATE
 		v16 = VecN<float,16>( 0.f );
+	#else
+		memset( v16, 0, sizeof(v16) );
+	#endif
 
 		mij(0,0) = mij(1,1) = mij(2,2) = mij(3,3) = 1.0f;
 	}
@@ -88,7 +99,11 @@ public:
 
 	void CopyRowMajor( const float *pSrcMtx )
 	{
+	#ifdef DMT_MTX44_USE_VEC_TEMPLATE
 		v16 = VecN<float,16>( pSrcMtx );
+	#else
+		memcpy( v16, pSrcMtx, sizeof(v16) );
+	#endif
 	}
 	
 	Float3 GetTranslation() const
@@ -102,16 +117,22 @@ public:
 
 	void PrintOut() const;
 
+#ifdef DMT_MTX44_USE_VEC_TEMPLATE
 	Matrix44 operator + (const Matrix44 &rval) const { Matrix44 ret; ret.v16 = v16 + rval.v16; return ret; }
 	Matrix44 operator - (const Matrix44 &rval) const { Matrix44 ret; ret.v16 = v16 - rval.v16; return ret; }
 //	Matrix44 operator * (const Matrix44 &rval) const { Matrix44 ret; ret.v16 = v16 * rval.v16; return ret; }
 	Matrix44 operator / (const Matrix44 &rval) const { Matrix44 ret; ret.v16 = v16 / rval.v16; return ret; }
 
 	Matrix44 operator *  (const float rval) const	 { Matrix44 ret; ret.v16 = v16 * rval; return ret; }
+#else
+	Matrix44 operator *  (const float rval) const	 { Matrix44 ret; for (size_t i=0; i < 16; ++i) ret.v16[i] = v16[i] * rval; return ret; }
+#endif
 	//void	 operator *= (const float rval)			 { v16 *= rval; }
 
+#ifdef DMT_MTX44_USE_VEC_TEMPLATE
 	friend bool operator ==( const Matrix44 &lval, const Matrix44 &rval ) { return lval.v16 == rval.v16; }
 	friend bool operator !=( const Matrix44 &lval, const Matrix44 &rval ) { return lval.v16 != rval.v16; }
+#endif
 };
 
 //==================================================================
@@ -165,7 +186,11 @@ inline Matrix44 Matrix44::GetOrthonormal() const
 inline Matrix44 Matrix44::Scale( float sx, float sy, float sz )
 {
 	Matrix44	m;
+#ifdef DMT_MTX44_USE_VEC_TEMPLATE
 	m.v16 = VecN<float,16>( 0.f );
+#else
+	memset( m.v16, 0, sizeof(m.v16) );
+#endif
 	m.mij(0,0) = sx;
 	m.mij(1,1) = sy;
 	m.mij(2,2) = sz;

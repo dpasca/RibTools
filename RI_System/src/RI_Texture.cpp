@@ -109,6 +109,9 @@ void Texture::Sample_1_1x1( Float_ &dest, const Float_ &s00, const Float_ &t00 )
 		if ( xi < 0 ) xi += mImage.mWd;
 		if ( yi < 0 ) yi += mImage.mHe;
 
+		//xi = D::Clamp( xi, 0, (int)mImage.mWd-1 );
+		//yi = D::Clamp( yi, 0, (int)mImage.mHe-1 );
+
 		dest[i] = (float)*mImage.GetPixelPtrR( xi, yi );
 	}
 

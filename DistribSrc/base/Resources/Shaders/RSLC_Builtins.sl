@@ -220,17 +220,17 @@ float zcomp( point	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
 float zcomp( vector	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
 float zcomp( normal	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
 
-void	setxcomp( output point	 P; float x ){}
-void	setxcomp( output vector	 P; float x ){}
-void	setxcomp( output normal	 P; float x ){}
-
-void	setycomp( output point	 P; float y ){}
-void	setycomp( output vector	 P; float y ){}
-void	setycomp( output normal	 P; float y ){}
-										  
-void	setzcomp( output point	 P; float z ){}
-void	setzcomp( output vector	 P; float z ){}
-void	setzcomp( output normal	 P; float z ){}
+void	setxcomp( output point	 P; float x ){ _asm_setxcomp_vs( P, x ); }
+void	setxcomp( output vector	 P; float x ){ _asm_setxcomp_vs( P, x ); }
+void	setxcomp( output normal	 P; float x ){ _asm_setxcomp_vs( P, x ); }
+                                                                  
+void	setycomp( output point	 P; float y ){ _asm_setycomp_vs( P, y ); }
+void	setycomp( output vector	 P; float y ){ _asm_setycomp_vs( P, y ); }
+void	setycomp( output normal	 P; float y ){ _asm_setycomp_vs( P, y ); }
+										                          
+void	setzcomp( output point	 P; float z ){ _asm_setzcomp_vs( P, z ); }
+void	setzcomp( output vector	 P; float z ){ _asm_setzcomp_vs( P, z ); }
+void	setzcomp( output normal	 P; float z ){ _asm_setzcomp_vs( P, z ); }
 
 float	length( vector V )		{	float tmp; _asm_length_sv( tmp, V ); return tmp;	}
 vector	normalize( vector V )	{	vector tmp; _asm_normalize( tmp, V ); return tmp;	}

@@ -93,6 +93,34 @@ void Inst_CalculateNormal( Context &ctx, u_int blocksN )
 	{
 		const Matrix44	&mtxCameraLocal = ctx.mpGrid->mMtxCameraLocal;
 
+#if DMT_SIMD_FLEN == 1
+		u_int	blkRow = 0;
+
+		for (u_int iy=0; iy < ctx.mPointsYN; ++iy, blkRow += ctx.mBlocksXN)
+		{
+			u_int	blkRowEnd = blkRow + ctx.mBlocksXN;
+
+			// calculate the position in local space
+			for (u_int ixb=blkRow; ixb < blkRowEnd; ++ixb)
+				P_LS[ ixb ] = V3__V3W1_Mul_M44<Float_>( op1[ ixb ], mtxCameraLocal );
+
+			const Float3_	*pPrevP_LS = &P_LS[ blkRow ];
+
+			for (u_int ixb=blkRow; ixb < blkRowEnd; ++ixb)
+			{
+				const Float3_	&blkP_LS = P_LS[ixb];
+				Float3_			&blkdPDu = dPDu[ixb];
+
+				blkdPDu[0][0] = blkP_LS[0][0] - pPrevP_LS[0][0][0];
+				blkdPDu[1][0] = blkP_LS[1][0] - pPrevP_LS[0][1][0];
+				blkdPDu[2][0] = blkP_LS[2][0] - pPrevP_LS[0][2][0];
+
+				pPrevP_LS = &blkP_LS;
+
+				blkdPDu = blkdPDu * pOODu[ixb];
+			}
+		}
+#else
 		Float3	prev_blkP_LS;
 
 		u_int	blk = 0;
@@ -150,8 +178,19 @@ void Inst_CalculateNormal( Context &ctx, u_int blocksN )
 				blkdPDu = blkdPDu * pOODu[blk];
 			}
 		}
+#endif
 	}
 
+#if 0
+	{
+		const Float3_*	pN	= (const Float3_*)ctx.mpGridSymIList->FindSymbolIData( "N" );
+
+		for (u_int blk=0; blk < ctx.mBlocksN; ++blk)
+		{
+			lhs[blk] = pN[blk];
+		}
+	}
+#else
 	{
 		const Matrix44	&mtxLocalCameraNorm = ctx.mpGrid->mMtxLocalCameraNorm;
 
@@ -174,6 +213,7 @@ void Inst_CalculateNormal( Context &ctx, u_int blocksN )
 		for (u_int blk=0; blk < ctx.mBlocksXN; ++blk)
 			lhs[blk] = lhs[blk + ctx.mBlocksXN];
 	}
+#endif
 
 	ctx.NextInstruction();
 }
