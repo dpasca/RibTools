@@ -104,18 +104,15 @@ void Inst_CalculateNormal( Context &ctx, u_int blocksN )
 			for (u_int ixb=blkRow; ixb < blkRowEnd; ++ixb)
 				P_LS[ ixb ] = V3__V3W1_Mul_M44<Float_>( op1[ ixb ], mtxCameraLocal );
 
-			const Float3_	*pPrevP_LS = &P_LS[ blkRow ];
-
 			for (u_int ixb=blkRow; ixb < blkRowEnd; ++ixb)
 			{
-				const Float3_	&blkP_LS = P_LS[ixb];
+				const Float3_	&a = P_LS[ixb+0];
+				const Float3_	&b = P_LS[ixb+1];
 				Float3_			&blkdPDu = dPDu[ixb];
 
-				blkdPDu[0][0] = blkP_LS[0][0] - pPrevP_LS[0][0][0];
-				blkdPDu[1][0] = blkP_LS[1][0] - pPrevP_LS[0][1][0];
-				blkdPDu[2][0] = blkP_LS[2][0] - pPrevP_LS[0][2][0];
-
-				pPrevP_LS = &blkP_LS;
+				blkdPDu[0][0] = b[0][0] - a[0][0];
+				blkdPDu[1][0] = b[1][0] - a[1][0];
+				blkdPDu[2][0] = b[2][0] - a[2][0];
 
 				blkdPDu = blkdPDu * pOODu[ixb];
 			}

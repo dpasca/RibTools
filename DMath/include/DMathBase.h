@@ -9,7 +9,7 @@
 #ifndef DMATHBASE_H
 #define DMATHBASE_H
 
-#define DMATH_USE_M128
+//#define DMATH_USE_M128
 //#define DMATH_USE_M512
 
 #if defined(DMATH_USE_M128)
@@ -103,7 +103,7 @@
 
 	#else
 
-			#define DMT_SIMD_FLEN	1
+			#define DMT_SIMD_FLEN		1
 			#define DMT_SIMD_ALIGN_SIZE	4	//	DMT_SIMD_FLEN * 4
 
 			typedef unsigned short	VecNMask;	// only need 4 bits (round to 1 byte)
