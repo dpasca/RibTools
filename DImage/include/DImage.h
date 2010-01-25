@@ -75,6 +75,36 @@ public:
 		DASSERT( x < mWd && y < mHe );
 		return mpData + mBytesPerRow * y + x * mBytesPerPix;
 	}
+
+	void GetPixelQuadWrapR( int x, int y, U8 *pDest4[4] ) const
+	{
+		DASSERT( mWd >= 1 && mHe >= 1 );
+
+		int	x1 = x % mWd; x1 += mWd & (x1 >> (sizeof(int)*8-1));
+		int	y1 = y % mHe; x1 += mHe & (y1 >> (sizeof(int)*8-1));
+
+		int x2 = x1 + 1; if ( x2 >= (int)mWd ) x2 -= mWd;
+		int y2 = y1 + 1; if ( y2 >= (int)mHe ) y2 -= mHe;
+
+		pDest4[0] = mpData + mBytesPerRow * y1 + x1 * mBytesPerPix;
+		pDest4[1] = mpData + mBytesPerRow * y1 + x2 * mBytesPerPix;
+		pDest4[2] = mpData + mBytesPerRow * y2 + x1 * mBytesPerPix;
+		pDest4[3] = mpData + mBytesPerRow * y2 + x2 * mBytesPerPix;
+	}
+
+	void GetPixelQuadClampR( int x, int y, U8 *pDest4[4] ) const
+	{
+		DASSERT( mWd >= 1 && mHe >= 1 );
+		int	x1 = D::Clamp( x+0, 0, (int)mWd-1 );
+		int	y1 = D::Clamp( y+0, 0, (int)mHe-1 );
+		int	x2 = D::Clamp( x+1, 0, (int)mWd-1 );
+		int	y2 = D::Clamp( y+1, 0, (int)mHe-1 );
+
+		pDest4[0] = mpData + mBytesPerRow * y1 + x1 * mBytesPerPix;
+		pDest4[1] = mpData + mBytesPerRow * y1 + x2 * mBytesPerPix;
+		pDest4[2] = mpData + mBytesPerRow * y2 + x1 * mBytesPerPix;
+		pDest4[3] = mpData + mBytesPerRow * y2 + x2 * mBytesPerPix;
+	}
 };
 
 

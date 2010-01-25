@@ -132,30 +132,33 @@ void Texture::Sample_1_filter( Float_ &dest, const Float_ &s00, const Float_ &t0
 
 	Float_	tmp( 0.f );
 
-	for (int i=-GAUSS_HDIM; i <= GAUSS_HDIM; ++i)
+	for (size_t smdi=0; smdi < DMT_SIMD_FLEN; ++smdi)
 	{
-		for (int j=-GAUSS_HDIM; j <= GAUSS_HDIM; ++j)
-		{
-			float x = (float)j;
-			float y = (float)i;
+		float	s = spix[smdi];
+		float	t = tpix[smdi];
 
-			for (size_t smdi=0; smdi < DMT_SIMD_FLEN; ++smdi)
-			{
-				int xi = (int)floorf( spix[smdi] );
-				int yi = (int)floorf( tpix[smdi] );
+		float	s_flr = floorf( s );
+		float	t_flr = floorf( t );
 
-				xi += j;
-				yi += i;
+		float	u = s - s_flr;
+		float	v = t - t_flr;
 
-				xi = xi % imgw;
-				yi = yi % imgh;
+		int		x00 = (int)s_flr;
+		int		y00 = (int)t_flr;
 
-				if ( xi < 0 ) xi += imgw;
-				if ( yi < 0 ) yi += imgh;
+		U8	*pPixels[4];
 
-				tmp[smdi] += _gGaussKernel[j][i] * (float)*mImage.GetPixelPtrR( xi, yi );
-			}
-		}
+		mImage.GetPixelQuadWrapR( x00, y00, pPixels );
+
+		float	c00 = (float)*pPixels[0];
+		float	c01 = (float)*pPixels[1];
+		float	c10 = (float)*pPixels[2];
+		float	c11 = (float)*pPixels[3];
+
+		float	top = (1 - u) * c00 + (u - 0) * c01;
+		float	bot = (1 - u) * c10 + (u - 0) * c11;
+
+		tmp[smdi] = (1 - v) * top + (v - 0) * bot;
 	}
 
 	dest = tmp * Float_( 1.0f / 255.0f );

@@ -9,7 +9,7 @@
 #ifndef DMATHBASE_H
 #define DMATHBASE_H
 
-//#define DMATH_USE_M128
+#define DMATH_USE_M128
 //#define DMATH_USE_M512
 
 #if defined(DMATH_USE_M128)
