@@ -249,9 +249,8 @@ void State::WorldBegin()
 {
 	// tell the options what drivers we have available
 	mOptionsStack.top().Finalize(
-					!!mParams.mpFramework->mParams.mpDispDriverFile,
-					!!mParams.mpFramework->mParams.mpDispDriverFBuff,
-					mParams.mpFramework->mParams.mFallBackToExisitngDriver );
+					mParams.mpFramework->mParams.mFallBackFileDisplay,
+					mParams.mpFramework->mParams.mFallBackFBuffDisplay );
 
 	pushMode( MD_WORLD );
 

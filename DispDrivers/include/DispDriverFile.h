@@ -9,31 +9,16 @@
 #ifndef DISPDRIVERFILE_H
 #define DISPDRIVERFILE_H
 
-#include "RI_System/include/RI_Framework.h"
+#include "DImage/include/DImage.h"
 
 //==================================================================
 // DispDriverFile
 //==================================================================
-class DispDriverFile : public RI::DispDriverBase
+class DispDriverFile
 {
-	u_char		*mpBuffer;
-	u_int		mWd;
-	u_int		mHe;
-	const char	*mpFileName;
-
 public:
-	DispDriverFile( const char *pFileName );	
+	DispDriverFile( const char *pFileName, const DIMG::Image &srcImg );	
 	~DispDriverFile();
-
-		void SetSize( u_int w, u_int h );
-		void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride );
-		void Blit() const;
-		u_int GetCurWd() const {	return mWd; }
-		u_int GetCurHe() const {	return mHe;	}
-
-private:
-	void alloc( u_int w, u_int h );
-	void convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride );
 };
 
 #endif

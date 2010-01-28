@@ -61,6 +61,9 @@ public:
 					int forcedHe=-1 );
 
 private:
+	void renderFile_HandleDisplays( const DVec<RI::Options::Display *> &pDisplays );
+
+private:
 	//===============================================================
 	static void sDisplayFunc();
 	static void sReshapeFunc(int width, int height);

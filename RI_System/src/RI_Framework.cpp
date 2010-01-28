@@ -204,6 +204,50 @@ void Framework::worldEnd_splitAndAddToBuckets()
 }
 
 //==================================================================
+void Framework::worldEnd_setupDisplays()
+{
+	//--- setup the displays by assigning or creating display drivers
+	for (size_t i=0; i < mOptions.mpDisplays.size(); ++i)
+	{
+		Options::Display	&disp = *mOptions.mpDisplays[i];
+
+		const char *pDispMode = disp.mMode.c_str();
+
+		U32			sampPerPix = (U32)strlen( pDispMode );
+
+		DIMG::Image::SampType	sampType;
+
+		if ( disp.mValMax == 0 )
+		{	// float
+			sampType = DIMG::Image::ST_F32;
+		}
+		else
+		if ( disp.mValMax <= 255 )
+		{	// good old 8-bit
+			sampType = DIMG::Image::ST_U8;
+		}
+		else
+		if ( disp.mValMax <= 65535 )
+		{	// 16 bit
+			sampType = DIMG::Image::ST_U16;
+		}
+		else
+		{
+			DASSTHROW( 0,
+				("Invalid quantization value for the display '%s'", disp.mName.c_str()) );
+		}
+
+		disp.mImage.Init(	(U32)mOptions.mXRes,
+							(U32)mOptions.mYRes,
+							sampPerPix,
+							sampType,
+							-1,
+							pDispMode );
+
+	}
+}
+
+//==================================================================
 /// RenderBucketsStd
 //==================================================================
 class RenderBucketsStd : public RenderBucketsBase
@@ -245,84 +289,65 @@ void Framework::WorldEnd()
 
 	worldEnd_splitAndAddToBuckets();
 
-	if ( mParams.mpDispDriverFile )
-		mParams.mpDispDriverFile->SetSize( mOptions.mXRes, mOptions.mYRes );
+	try {
 
-	if ( mParams.mpDispDriverFBuff )
-	{
-		mParams.mpDispDriverFBuff->SetSize( mOptions.mXRes, mOptions.mYRes );
+		worldEnd_setupDisplays();
 
-		if ( mParams.mpCBackFBuffSetSize )
+		// render the buckets..
+		if ( mParams.mpRenderBuckets )
 		{
-			mParams.mpCBackFBuffSetSize( mParams.mpCBackData, mOptions.mXRes, mOptions.mYRes );
+			mParams.mpRenderBuckets->Render( mHider );
 		}
-	}
-
-	// render the buckets..
-	if ( mParams.mpRenderBuckets )
-	{
-		mParams.mpRenderBuckets->Render( mHider );
-	}
-	else
-	{
-		RenderBucketsStd	rendBuck;
-
-		rendBuck.Render( mHider );
-	}
-
-	// --- release the primitives in all the buckets
-	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
-	{
-		DVec<SimplePrimitiveBase *>	&pPrimList = mHider.mpBuckets[ bi ]->GetPrimList();
-		for (size_t i=0; i < pPrimList.size(); ++i)
+		else
 		{
-			if ( pPrimList[i] )
+			RenderBucketsStd	rendBuck;
+
+			rendBuck.Render( mHider );
+		}
+
+		// --- release the primitives in all the buckets
+		for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
+		{
+			DVec<SimplePrimitiveBase *>	&pPrimList = mHider.mpBuckets[ bi ]->GetPrimList();
+			for (size_t i=0; i < pPrimList.size(); ++i)
 			{
-				pPrimList[i]->Release();
-				pPrimList[i] = NULL;
+				if ( pPrimList[i] )
+				{
+					pPrimList[i]->Release();
+					pPrimList[i] = NULL;
+				}
 			}
 		}
-	}
 
-	for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	DDELETE( mpUniqueAttribs[i] );
-	for (size_t i=0; i < mpUniqueTransform.size(); ++i)	DDELETE( mpUniqueTransform[i] );
-	mpUniqueAttribs.clear();
-	mpUniqueTransform.clear();
+		for (size_t i=0; i < mpUniqueAttribs.size(); ++i)	DDELETE( mpUniqueAttribs[i] );
+		for (size_t i=0; i < mpUniqueTransform.size(); ++i)	DDELETE( mpUniqueTransform[i] );
+		mpUniqueAttribs.clear();
+		mpUniqueTransform.clear();
 
-	// update the regions
-	for (size_t bi=0; bi < mHider.mpBuckets.size(); ++bi)
-	{
-		u_int	x1 = mHider.mpBuckets[bi]->mX1;
-		u_int	y1 = mHider.mpBuckets[bi]->mY1;
+		DIMG::Image	hiderImg(
+					mHider.GetOutputDataWd(),
+					mHider.GetOutputDataHe(),
+					NCOLS,
+					DIMG::Image::ST_F32,
+					mHider.GetOutputDataStride() * sizeof(float),
+					"rgb",	// depends on NCOLS too !
+					(const U8 *)mHider.GetOutputData(0,0) );
 
-		u_int	wd = mHider.mpBuckets[bi]->mX2 - x1;
-		u_int	he = mHider.mpBuckets[bi]->mY2 - y1;
-
-		const float *pSrcData		= mHider.GetOutputData( x1, y1 );
-		u_int		srcDataStride	= mHider.GetOutputDataStride();
-
-		for (size_t i=0; i < mOptions.mDisplays.size(); ++i)
+		for (size_t i=0; i < mOptions.mpDisplays.size(); ++i)
 		{
-			const Options::Display	&disp = mOptions.mDisplays[i];
+			Options::Display	&disp = *mOptions.mpDisplays[i];
 
-			if ( disp.IsFile() && mParams.mpDispDriverFile )
-			{
-				mParams.mpDispDriverFile->UpdateRegion(
-						x1,	y1,	wd,	he,	pSrcData, srcDataStride );
-			}
-			else
-			if ( disp.IsFrameBuff() && mParams.mpDispDriverFBuff )
-			{
-				mParams.mpDispDriverFBuff->UpdateRegion(
-						x1,	y1,	wd,	he,	pSrcData, srcDataStride );
-			}
+			DIMG::ConvertImages( disp.mImage, hiderImg );
 		}
+
+		mHider.WorldEnd();
 	}
-
-	mHider.WorldEnd();
-
-	//DASSERT( mHider.GetOutputDataWd() == (u_int)mOptions.mXRes );
-	//DASSERT( mHider.GetOutputDataHe() == (u_int)mOptions.mYRes );
+	catch ( ... )
+	{
+		// free the displays anyway !
+		mOptions.FreeDisplays();
+		throw;
+	}
 }
 
 

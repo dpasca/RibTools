@@ -1,24 +1,23 @@
 //==================================================================
-/// DImage_TIFF.h
+/// DImage_PPM.h
 ///
-/// Created by Davide Pasca - 2010/1/20
+/// Created by Davide Pasca - 2010/1/29
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef DIMAGE_TIFF_H
-#define DIMAGE_TIFF_H
+#ifndef DIMAGE_PPM_H
+#define DIMAGE_PPM_H
 
 #include "DImage.h"
-#include "DSystem/include/DUtils_MemFile.h"
+#include "DImage_PPM.h"
 
 //==================================================================
 namespace DIMG
 {
-//==================================================================
-void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName );
 
-void SaveTIFF( const Image &img, const char *pFName );
+//==================================================================
+void SavePPM( const Image &img, const char *pFName );
 
 //==================================================================
 }

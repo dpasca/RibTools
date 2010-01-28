@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc"
+				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -111,7 +111,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc"
+				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -182,7 +182,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc"
+				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -254,7 +254,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc"
+				AdditionalIncludeDirectories="../include;../..;&quot;../../externals/tiff-3.9.2/libtiff&quot;;../../externals/local/libtiff_pc;../../externals/local/libjpeg_pc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -316,6 +316,22 @@
 			</File>
 			<File
 				RelativePath="..\include\DImage_BMP.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DImage_JPEG.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DImage_JPEG.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DImage_PPM.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\DImage_PPM.h"
 				>
 			</File>
 			<File

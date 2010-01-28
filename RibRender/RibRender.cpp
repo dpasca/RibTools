@@ -7,84 +7,22 @@
 //==================================================================
 
 #include "RibRender.h"
-
-//==================================================================
-static bool getServersList( int argc, char **argv, DVec<RRL::NET::Server> &list )
-{
-	list.clear();
-
-	for (int i=1; i < argc; ++i)
-	{
-		if ( 0 == strcasecmp( "-server", argv[i] ) )
-		{
-			if ( (i+1) >= argc )
-			{
-				printf( "Missing server definition.\n" );
-				return false;
-			}
-
-			RRL::NET::Server	*pServEntry = list.grow();
-
-			char	*pContext = NULL;
-			
-			char *pToken = strtok_r( argv[i+1], ":", &pContext );
-			if ( pToken )
-			{
-				pServEntry->mAddressName = pToken;
-				if ( pToken = strtok_r( NULL, ":", &pContext ) )
-				{
-					pServEntry->mPortToCall = atoi( pToken );
-
-					if ( pServEntry->mPortToCall <= 0 && pServEntry->mPortToCall >= 65536 )
-					{
-						printf( "Invalid port range.\n" );
-						return false;
-					}
-				}
-			}
-			else
-				pServEntry->mAddressName = argv[i+1];
-
-			i += 1;
-		}
-	}
-
-	return true;
-}
-
-//==================================================================
-struct CmdParams
-{
-	const char				*pInFileName;
-	const char				*pOutFileName;
-	int						forcedlongdim;
-	DVec<RRL::NET::Server>	servList;
-
-	DStr					baseDir;
-
-	CmdParams() :
-		pInFileName		(NULL),
-		pOutFileName	(NULL),
-		forcedlongdim	(-1)
-	{
-	}
-};
+#include "DispWindows.h"
 
 //==================================================================
 static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
 {
-	out_cmdPars.pInFileName	 = argv[2];
-	out_cmdPars.pOutFileName = argv[3];
+	out_cmdPars.pInFileName	 = argv[1];
 
 	out_cmdPars.baseDir = DUT::GetDirNameFromFPathName( out_cmdPars.pInFileName );
 
-	if NOT( getServersList( argc, argv, out_cmdPars.servList ) )
+	if NOT( GetServersList( argc, argv, out_cmdPars.servList ) )
 	{
 		printf( "Error in the server list\n" );
 		return false;
 	}
 
-	for (int i=1; i < argc; ++i)
+	for (int i=2; i < argc; ++i)
 	{
 		if ( 0 == strcasecmp( "-forcedlongdim", argv[i] ) )
 		{
@@ -108,44 +46,11 @@ static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
 }
 
 //==================================================================
-static void initServers( CmdParams &cmdPars, const char *defaultShadersDir )
-{
-	// prepare the template job header for the servers
-	RRL::NET::MsgRendJob	netRendJob;
-	strcpy_s( netRendJob.FileName	, cmdPars.pInFileName );
-	strcpy_s( netRendJob.BaseDir	, cmdPars.baseDir.c_str() );
-	strcpy_s( netRendJob.DefaultResourcesDir, defaultShadersDir );
-	netRendJob.ForcedLongDim = cmdPars.forcedlongdim;
-	netRendJob.ForcedWd = -1;
-	netRendJob.ForcedHe = -1;
-
-	// connect to all servers
-	printf( "Connecting to servers...\n" );
-	RRL::NET::ConnectToServers( cmdPars.servList, 3 * 1000 );
-
-	// for each server..
-	for (size_t i=0; i < cmdPars.servList.size(); ++i)
-	{
-		// if the connection was successful
-		if ( cmdPars.servList[i].IsConnected() )
-		{
-			// print a nice message and start by sending a job header..
-			printf( "Successfully connected to %s:%i\n", cmdPars.servList[i].mAddressName.c_str(), cmdPars.servList[i].mPortToCall );
-			cmdPars.servList[i].mpPakMan->Send( &netRendJob, sizeof(netRendJob) );
-		}
-		else
-		{
-			printf( "Failed to connect to %s:%i\n", cmdPars.servList[i].mAddressName.c_str(), cmdPars.servList[i].mPortToCall );
-		}
-	}
-}
-
-//==================================================================
 static void printUsage( int argc, char **argv )
 {
-	printf( "Usage:\n" );
-	
-	printf( "\t%s <rib file> <output JPEG file> [options]\n", argv[0] );
+	printf( "\n==== RibRender -- (built of - " __DATE__ " - " __TIME__ ") ====\n" );
+
+	printf( "\n%s <rib file> <output JPEG file> [options]\n", argv[0] );
 
 	printf( "\nOptions:\n" );
 	printf( "\t-help | --help | -h             -- Show this help\n" );
@@ -158,9 +63,32 @@ static void printUsage( int argc, char **argv )
 }
 
 //==================================================================
+static DispWindows	_gsDispWindows;
+
+//==================================================================
+static void handleDisplays( const DVec<RI::Options::Display *> &pDisplays )
+{
+	// for every display
+	for (size_t i=0; i < pDisplays.size(); ++i)
+	{
+		const RI::Options::Display	&disp = *pDisplays[i];
+
+		if ( disp.IsFrameBuff() )
+		{
+			_gsDispWindows.AddWindow( disp );
+		}
+		else
+		if ( disp.IsFile() )
+		{
+			DispDriverFile	file( disp.mName.c_str(), disp.mImage );
+		}
+	}
+}
+
+//==================================================================
 static int clientMain( int argc, char **argv )
 {
-	if ( argc < 4 )
+	if ( argc < 2 )
 	{
 		printUsage( argc, argv );
 		return -1;
@@ -170,6 +98,7 @@ static int clientMain( int argc, char **argv )
 	if NOT( getCmdParams( argc, argv, cmdPars ) )
 		return -1;
 
+/*
 	const char *pOutExt = DUT::GetFileNameExt( cmdPars.pOutFileName );
 
 	if ( 0 != strcasecmp( pOutExt, "jpg" ) &&
@@ -178,6 +107,7 @@ static int clientMain( int argc, char **argv )
 		printf( "Error: output file name must have a 'jpg' or 'jpeg' extension\n" );
 		return -1;
 	}
+*/
 
 	char	defaultResDir[2048];
 	char	defaultShadersDir[4096];
@@ -191,18 +121,21 @@ static int clientMain( int argc, char **argv )
 
 	sprintf_s( defaultShadersDir, "%s/Shaders", defaultResDir );
 
-	DispDriverFile		rendOut( cmdPars.pOutFileName );
-	RI::Hider::Params	hiderParams;
-	RI::FileManagerDisk	fileManagerDisk;
+	RI::Hider::Params			hiderParams;
+	RI::FileManagerDisk			fileManagerDisk;
+
+	RI::Framework::Params	fwParams;
+	fwParams.mFallBackFileDisplay		= true;
+	fwParams.mFallBackFBuffDisplay		= false;
+	fwParams.mpHiderParams				= &hiderParams;
+	fwParams.mInFNameForDefaultOutFName	= cmdPars.pInFileName;
+
+	DVec<RI::Options::Display *>	pDisplays;
 
 	if NOT( cmdPars.servList.size() )
 	{
 		try
 		{
-			RI::Framework::Params	fwParams;
-			fwParams.mpDispDriverFile			= &rendOut;
-			fwParams.mFallBackToExisitngDriver	= true;
-			fwParams.mpHiderParams				= &hiderParams;
 			RI::Framework			framework( fwParams );
 
 			RRL::Render::Params	params;
@@ -213,7 +146,7 @@ static int clientMain( int argc, char **argv )
 			params.mTrans.mForcedLongDim			= cmdPars.forcedlongdim;
 			params.mpFileName						= cmdPars.pInFileName;
 
-			RRL::Render	render( params );
+			RRL::Render	render( params, pDisplays );
 		}
 		catch ( std::bad_alloc )
 		{
@@ -227,18 +160,15 @@ static int clientMain( int argc, char **argv )
 	}
 	else
 	{
-		initServers( cmdPars, defaultShadersDir );
+		InitServers( cmdPars, defaultShadersDir );
 
 		try
 		{
 			RRL::NET::RenderBucketsClient	rendBuckets( cmdPars.servList );
 	
-			RI::Framework::Params	fwParams;
-			fwParams.mpDispDriverFile			= &rendOut;
-			fwParams.mFallBackToExisitngDriver	= true;
-			fwParams.mpRenderBuckets			= &rendBuckets;
-			fwParams.mpHiderParams				= &hiderParams;
-			RI::Framework					framework( fwParams );
+			fwParams.mpRenderBuckets = &rendBuckets;
+
+			RI::Framework			framework( fwParams );
 
 			RRL::Render::Params	params;
 			params.mTrans.mState.mpFramework		= &framework;
@@ -248,7 +178,7 @@ static int clientMain( int argc, char **argv )
 			params.mTrans.mForcedLongDim			= cmdPars.forcedlongdim;
 			params.mpFileName						= cmdPars.pInFileName;
 
-			RRL::Render	render( params );
+			RRL::Render	render( params, pDisplays );
 		}
 		catch ( std::bad_alloc )
 		{
@@ -260,6 +190,10 @@ static int clientMain( int argc, char **argv )
 			return -1;
 		}
 	}
+
+	handleDisplays( pDisplays );
+
+	RRL::FreeDisplays( pDisplays );
 
     return 0;
 }

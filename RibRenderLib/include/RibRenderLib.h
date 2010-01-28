@@ -26,6 +26,8 @@
 namespace RRL
 {
 
+typedef DVec<RI::Options::Display *>	DisplayList;
+
 //==================================================================
 /// Render
 //==================================================================
@@ -47,8 +49,11 @@ public:
 	};
 
 public:
-	Render( Params &params );
+	Render( Params &params, DisplayList &out_pDisplays );
 };
+
+//==================================================================
+void FreeDisplays( DisplayList &pDisplays );
 
 //==================================================================
 }

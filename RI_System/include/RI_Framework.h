@@ -22,94 +22,6 @@ class Attributes;
 class Transform;
 
 //==================================================================
-/// DispDriverBase
-//==================================================================
-class DispDriverBase
-{
-public:
-	virtual ~DispDriverBase() {}
-
-	virtual void SetSize( u_int w, u_int h ) = 0;
-	virtual void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride ) = 0;
-	virtual void Blit() const = 0;
-	virtual u_int GetCurWd() const = 0;
-	virtual u_int GetCurHe() const = 0;
-};
-
-//==================================================================
-/// DispDriverNull
-//==================================================================
-class DispDriverNull : public DispDriverBase
-{
-public:
-	DispDriverNull() {}
-	~DispDriverNull() {}
-
-		void SetSize( u_int w, u_int h ) {}
-		void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride ) {}
-		void Blit() const {}
-		u_int GetCurWd() const {	return 0; }
-		u_int GetCurHe() const {	return 0; }
-};
-
-/*
-//==================================================================
-/// RenderOutputMem
-//==================================================================
-class RenderOutputMem : public DispDriverBase
-{
-	u_int		mCurWd;
-	u_int		mCurHe;
-	DVec<float>	mData;
-
-public:
-	RenderOutputMem() :
-		mCurWd(0),
-		mCurHe(0)
-	{
-	}
-
-	~RenderOutputMem()
-	{
-	}
-
-	void SetSize( u_int w, u_int h )
-	{
-		mCurWd = w;
-		mCurHe = h;
-		mData.clear();
-		mData.resize( w * h * 3 );
-	}
-
-	void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride )
-	{
-		u_int	x2 = x1 + w;
-		u_int	y2 = y1 + h;
-
-		float *pDest = &mData[0] + (x1 + y1 * mCurWd) * 3;
-
-		size_t	wc = w * 3;
-
-		for (size_t i=0; i < h; ++i)
-		{
-			for (size_t j=0; j < wc; ++j)
-				pDest[j] = pSrcData[j];
-
-			pSrcData += srcStride;
-			pDest += wc;
-		}
-	}
-
-	void Blit() const
-	{
-	}
-
-	u_int GetCurWd() const	{ return mCurWd; }
-	u_int GetCurHe() const	{ return mCurHe; }
-};
-*/
-
-//==================================================================
 class RenderBucketsBase
 {
 public:
@@ -132,23 +44,17 @@ public:
 	class Params
 	{
 	public:
-		DispDriverBase		*mpDispDriverFile;
-		DispDriverBase		*mpDispDriverFBuff;
-		bool				mFallBackToExisitngDriver;
-		RenderBucketsBase	*mpRenderBuckets;
-		const Hider::Params	*mpHiderParams;
-
-		void				*mpCBackData;
-		void				(*mpCBackFBuffSetSize)( void *pCBackData, u_int w, u_int h );
+		bool					mFallBackFileDisplay;
+		bool					mFallBackFBuffDisplay;
+		RenderBucketsBase		*mpRenderBuckets;
+		const Hider::Params		*mpHiderParams;
+		std::string				mInFNameForDefaultOutFName;
 
 		Params() :
-			mpDispDriverFile(NULL),
-			mpDispDriverFBuff(NULL),
-			mFallBackToExisitngDriver(false),
+			mFallBackFileDisplay(false),
+			mFallBackFBuffDisplay(false),
 			mpRenderBuckets(NULL),
-			mpHiderParams(NULL),
-			mpCBackData(NULL),
-			mpCBackFBuffSetSize(NULL)
+			mpHiderParams(NULL)
 		{
 		}
 	};
@@ -191,9 +97,9 @@ public:
 	static void RenderBucket_s( Hider &hider, HiderBucket &bucket );
 
 private:
-
 	void	worldEnd_simplify();
 	void	worldEnd_splitAndAddToBuckets();
+	void	worldEnd_setupDisplays();
 };
 
 //==================================================================

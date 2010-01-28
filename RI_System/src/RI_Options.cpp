@@ -180,25 +180,34 @@ void Options::cmdShutter( float openShutter, float closeShutter )
 //==================================================================
 void Options::cmdDisplay( const char *pName, const char *pType, const char *pMode, ParamList &params )
 {
-	Display	newDisp;
-
-	if ( 0 == strcmp( pType, RI_FILE ) )
+	if ( strlen( pName ) == 0 || pName[0] != '+' )
 	{
-		newDisp.mType = RI_FILE;
+		for (size_t i=0; i < mpDisplays.size(); ++i)
+			DSAFE_DELETE( mpDisplays[i] );
+
+		mpDisplays.clear();
 	}
-	else
+
+	Display	*pNewDisp = DNEW Display();
+	mpDisplays.push_back( pNewDisp );
+
 	if ( 0 == strcmp( pType, RI_FRAMEBUFFER ) )
 	{
-		newDisp.mType = RI_FRAMEBUFFER;
+		pNewDisp->mType = RI_FRAMEBUFFER;
+	}
+	else
+	if ( 0 == strcmp( pType, RI_FILE ) || 0 == strcmp( pType, "tiff" ) )
+	{
+		pNewDisp->mType = RI_FILE;
 	}
 	else
 	{
 		onError( "Unknown display type '%s'", pType );
 	}
 
-	newDisp.mName = pName;
+	pNewDisp->mMode = pMode;
 
-	mDisplays.push_back( newDisp );
+	pNewDisp->mName = pName;
 }
 
 //==================================================================
@@ -212,35 +221,23 @@ void Options::cmdPixelSamples( int samplesX, int samplesY )
 
 //==================================================================
 void Options::Finalize(
-					bool hasFileDispDriver,
-					bool hasFileFBuffDriver,
-					bool fallBackExistngDriver )
+					bool fallbackFileDisp,
+					bool fallbackFbuffDisp )
 {
 	size_t	viableDisplaysN = 0;
 
-	for (size_t i=0; i < mDisplays.size(); ++i)
+	if NOT( mpDisplays.size() )
 	{
-		if ( hasFileDispDriver && mDisplays[i].IsFile() )
-			++viableDisplaysN;
-
-		if ( hasFileFBuffDriver && mDisplays[i].IsFrameBuff() )
-			++viableDisplaysN;
-	}
-
-	// if no display was specified, use the default ones
-	if ( mDisplays.size() == 0 ||
-		 (fallBackExistngDriver && viableDisplaysN == 0) )
-	{
-		if ( hasFileDispDriver )
+		if ( fallbackFileDisp )
 		{
 			ParamList	empyList;
-			cmdDisplay( "frame0001.jpg", RI_FILE, "rgba", empyList );
+			cmdDisplay( "frame0001.tif", RI_FILE, "rgba", empyList );
 		}
 
-		if ( hasFileFBuffDriver )
+		if ( fallbackFbuffDisp )
 		{
 			ParamList	empyList;
-			cmdDisplay( "frame0001.jpg", RI_FRAMEBUFFER, "rgb", empyList );
+			cmdDisplay( "frame0001.tif", RI_FRAMEBUFFER, "rgba", empyList );
 		}
 	}
 
@@ -303,6 +300,23 @@ void Options::Finalize(
 	{
 		mpyProjection	= mpGlobalSyms->FindSymbol( RI_ORTHOGRAPHIC );
 	}
+}
+
+//==================================================================
+void Options::GetDisplays( DVec<Display *> &out_pDisplays )
+{
+	// pass the ownership
+	out_pDisplays = mpDisplays;
+	mpDisplays.clear();
+}
+
+//==================================================================
+void Options::FreeDisplays()
+{
+	for (size_t i=0; i < mpDisplays.size(); ++i)
+		DSAFE_DELETE( mpDisplays[i] );
+
+	mpDisplays.clear();
 }
 
 //==================================================================

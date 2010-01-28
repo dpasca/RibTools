@@ -14,6 +14,7 @@
 #include "DMath/include/DMath.h"
 #include "RI_Symbol.h"
 #include "RI_Tokens.h"
+#include "DImage/include/DImage.h"
 
 //==================================================================
 namespace RI
@@ -30,9 +31,24 @@ public:
 	class Display
 	{
 	public:
-		std::string	mName;
-		std::string	mType;
-		std::string	mMode;
+		std::string		mName;
+		std::string		mType;
+		std::string		mMode;
+		DIMG::Image		mImage;
+		int				mValZero;
+		int				mValOne;
+		int				mValMin;
+		int				mValMax;
+
+		Display() :
+			mValZero(0),
+			mValOne(255),
+			mValMin(0),
+			mValMax(255)
+		{
+		}
+
+		//~Display(){}
 
 		bool IsFile()		const { return 0 == strcmp( mType.c_str(), RI_FILE ); }
 		bool IsFrameBuff()	const { return 0 == strcmp( mType.c_str(), RI_FRAMEBUFFER ); }
@@ -68,7 +84,7 @@ public:
 	
 	// Display
 	u_int			mPixSamples[2];
-	DVec<Display>	mDisplays;
+	DVec<Display *>	mpDisplays;
 
 	enum
 	{
@@ -95,10 +111,11 @@ public:
 	void cmdPixelSamples( int samplesX, int samplesY );
 
 	void Finalize(
-			bool hasFileDispDriver,
-			bool hasFileFBuffDriver,
-			bool fallBackExistngDriver );
+			bool fallbackFileDisp,
+			bool fallbackFbuffDisp );
 
+	void GetDisplays( DVec<Display *> &out_pDisplays );
+	void FreeDisplays();
 };
 	
 //==================================================================

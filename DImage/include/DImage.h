@@ -33,17 +33,18 @@ public:
 		ST_F32,
 	};
 
-	U8		*mpData;
-	U32		mBytesPerRow;
-	U32		mWd;
-	U32		mHe;
-	U32		mSampType;
-	U32		mSampPerPix;
-	char	mSampNames[MAX_SAMP_PER_PIX];
+	bool		mOwnData;
+	U8			*mpData;
+	U32			mBytesPerRow;
+	U32			mWd;
+	U32			mHe;
+	SampType	mSampType;
+	U32			mSampPerPix;
+	char		mSampNames[MAX_SAMP_PER_PIX];
 
 	// calculated for convenience
-	U32		mBytesPerSamp;
-	U32		mBytesPerPix;
+	U32			mBytesPerSamp;
+	U32			mBytesPerPix;
 
 private:
 	void initBase();
@@ -54,6 +55,15 @@ public:
 		initBase();
 	}
 
+	Image(
+		U32			wd,
+		U32			he,
+		U32			sampPerPix,
+		SampType	sampType,
+		int			bytesPerRow,
+		const char	*pSampNames,
+		const U8	*pSrcDataBorrow=NULL );
+
 	~Image();
 
 	void Init(
@@ -62,7 +72,16 @@ public:
 			U32			sampPerPix,
 			SampType	sampType,
 			int			bytesPerRow,
-			const char	*pSampNames );
+			const char	*pSampNames,
+			const U8	*pSrcDataBorrow=NULL );
+
+	bool IsSamplesNames( const char *pMatchSampNames ) const;
+
+	bool IsSamplesType( SampType type ) const	{	return type == mSampType;	}
+
+	void GetPixelAsFloat( U32 x, U32 y, float out_samps[MAX_SAMP_PER_PIX] ) const;
+
+	void SetPixelFromFloat( U32 x, U32 y, const float in_samps[MAX_SAMP_PER_PIX] );
 
 	U8 *GetPixelPtrRW( U32 x, U32 y )
 	{
@@ -107,6 +126,8 @@ public:
 	}
 };
 
+//==================================================================
+void ConvertImages( Image &des, const Image &src, U32 dx=0, U32 dy=0, U32 sx=0, U32 sy=0, int wd=-1, int he=-1 );
 
 //==================================================================
 }

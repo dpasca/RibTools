@@ -49,7 +49,6 @@ static int serverTask( SOCKET clientSock )
 
 	RI::Hider::Params		hiderParams;
 	RI::Framework::Params	fwParams;
-	fwParams.mFallBackToExisitngDriver	= false;
 	fwParams.mpRenderBuckets			= &rendBuckets;
 	fwParams.mpHiderParams				= &hiderParams;
 	RI::Framework		framework( fwParams );
@@ -64,15 +63,19 @@ static int serverTask( SOCKET clientSock )
 	params.mTrans.mForcedHe					= netRendJob.ForcedHe;
 	params.mpFileName						= netRendJob.FileName;
 
+	DVec<RI::Options::Display *>	pDisplays;
+
 	try
 	{
-		RRL::Render	render( params );
+		RRL::Render	render( params, pDisplays );
 	}
 	catch ( ... )
 	{
 		printf( "Render failed !\n" );
 		return -1;
 	}
+
+	RRL::FreeDisplays( pDisplays );
 
 	printf( "Render complete.\n" );
 

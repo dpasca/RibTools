@@ -9,36 +9,29 @@
 #ifndef DISPDRIVERFBUFFOGL_H
 #define DISPDRIVERFBUFFOGL_H
 
-#include "RI_System/include/RI_Framework.h"
+#include "DImage/include/DImage.h"
 
 //==================================================================
 // RenderOutputOpenGL
 //==================================================================
-class DispDriverFBuffOGL : public RI::DispDriverBase
+class DispDriverFBuffOGL
 {
-	u_char	*mpBuffer;
-	u_int	mTexId;
-	u_int	mWd;
-	u_int	mHe;
-	u_int	mTexWd;
-	u_int	mTexHe;
+	DIMG::Image	mImage;
+	u_int		mTexId;
+	u_int		mTexWd;
+	u_int		mTexHe;
 
 private:
 	bool	mSupportsNonPow2;
 
 public:
-	DispDriverFBuffOGL();	
+	DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::Image &srcImg );	
 	~DispDriverFBuffOGL();
 
-		void SetSize( u_int w, u_int h );
-		void UpdateRegion( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride );
-		void Blit() const;
-		u_int GetCurWd() const {	return mWd; }
-		u_int GetCurHe() const {	return mHe;	}
+	void Blit() const;
 
-private:
-	void alloc( u_int w, u_int h );
-	void convert( u_int x1, u_int y1, u_int w, u_int h, const float *pSrcData, u_int srcStride );
+	u_int GetCurWd() const {	return mImage.mWd; }
+	u_int GetCurHe() const {	return mImage.mHe; }
 };
 
 #endif

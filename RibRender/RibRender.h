@@ -24,4 +24,24 @@
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DCriticalSection.h"
 
+//==================================================================
+struct CmdParams
+{
+	const char				*pInFileName;
+	int						forcedlongdim;
+	DVec<RRL::NET::Server>	servList;
+
+	DStr					baseDir;
+
+	CmdParams() :
+		pInFileName		(NULL),
+		forcedlongdim	(-1)
+	{
+	}
+};
+
+//==================================================================
+bool GetServersList( int argc, char **argv, DVec<RRL::NET::Server> &list );
+void InitServers( CmdParams &cmdPars, const char *defaultShadersDir );
+
 #endif

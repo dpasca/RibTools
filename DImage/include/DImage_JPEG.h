@@ -1,24 +1,22 @@
 //==================================================================
-/// DImage_TIFF.h
+/// DImage_JPEG.h
 ///
-/// Created by Davide Pasca - 2010/1/20
+/// Created by Davide Pasca - 2010/1/29
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef DIMAGE_TIFF_H
-#define DIMAGE_TIFF_H
+#ifndef DIMAGE_JPEG_H
+#define DIMAGE_JPEG_H
 
 #include "DImage.h"
-#include "DSystem/include/DUtils_MemFile.h"
 
 //==================================================================
 namespace DIMG
 {
-//==================================================================
-void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName );
 
-void SaveTIFF( const Image &img, const char *pFName );
+//==================================================================
+void SaveJPEG( const Image &img, const char *pFName );
 
 //==================================================================
 }

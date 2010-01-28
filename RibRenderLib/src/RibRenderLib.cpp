@@ -18,7 +18,7 @@ namespace RRL
 //==================================================================
 /// Render
 //==================================================================
-Render::Render( Params &params )
+Render::Render( Params &params, DisplayList &out_pDisplays )
 {
 	DUT::MemFile	file;
 
@@ -69,6 +69,19 @@ Render::Render( Params &params )
 	}
 
 	translator.GetState().End();
+
+	translator.GetState().GetCurOptions().GetDisplays( out_pDisplays );
+}
+
+//==================================================================
+void FreeDisplays( DisplayList &pDisplays )
+{
+	for (size_t i=0; i < pDisplays.size(); ++i)
+	{
+		DSAFE_DELETE( pDisplays[i] );
+	}
+
+	pDisplays.clear();
 }
 
 //==================================================================

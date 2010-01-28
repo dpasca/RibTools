@@ -12,23 +12,23 @@ popd
 
 pushd SpacesTests
 aqsl *.sl
-for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\..\TestsOutputAqsis\ & move *.tiff ..\..\TestsOutputAqsis\ )
+for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\..\TestsOutputAqsis\%%~nX.tif & move *.tif? ..\..\TestsOutputAqsis\ )
 del *.slx
 popd
 
 pushd LightsTests
 aqsl *.sl
-for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\..\TestsOutputAqsis\ & move *.tiff ..\..\TestsOutputAqsis\ )
+for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\..\TestsOutputAqsis\%%~nX.tif & move *.tif? ..\..\TestsOutputAqsis\ )
 del *.slx
 popd
 
 aqsl *.sl
-for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\TestsOutputAqsis\ & move *.tiff ..\TestsOutputAqsis\ )
+for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\TestsOutputAqsis\%%~nX.tif & move *.tif? ..\TestsOutputAqsis\ )
 del *.slx
 
 cd Sponza
 aqsl *.sl
-for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\TestsOutputAqsis\%%~nX.tif & move *.tif ..\TestsOutputAqsis\ & move *.tiff ..\TestsOutputAqsis\ )
+for %%X in (*.rib) do ( aqsis %%X & move ri.pic ..\TestsOutputAqsis\%%~nX.tif & move *.tif? ..\TestsOutputAqsis\ )
 del *.slx
 cd ..
 

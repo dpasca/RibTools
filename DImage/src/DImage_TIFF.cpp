@@ -87,65 +87,11 @@ namespace DIMG
 {
 
 //==================================================================
-static void SavePPM( Image &img, const char *pFName )
-{
-	FILE *pFile;
-
-	int err = fopen_s( &pFile, pFName, "wb" );
-	DASSTHROW( err == 0, ("Could not write %s", pFName) );
-
-	DASSTHROW(
-		img.mSampPerPix <= 3 &&
-		img.mBytesPerSamp == 1,
-			("Unsupported image format. Cannot write %s", pFName) );
-
-	fprintf_s( pFile,
-		"P6\n"
-		"# %s\n"
-		"%i %i\n"
-		"%i\n",
-			pFName,
-			img.mWd, img.mHe,
-			(int)(1 << (img.mBytesPerSamp<<3)) - 1 );
-
-	for (u_int y=0; y < img.mHe; ++y)
-	{
-		for (u_int x=0; x < img.mWd; ++x)
-		{
-			const U8	*pPix = img.GetPixelPtrR( x, y );
-
-			U8	col[3];
-
-			if ( img.mSampPerPix == 1 )
-				col[0] = col[1] = col[2] = pPix[0];
-			else
-			if ( img.mSampPerPix == 2 )
-			{
-				col[0] = pPix[0];
-				col[1] = pPix[1];
-				col[2] = 0;
-			}
-			else
-			if ( img.mSampPerPix == 3 )
-			{
-				col[0] = pPix[0];
-				col[1] = pPix[1];
-				col[2] = pPix[2];
-			}
-
-			fwrite( col, 1, 3, pFile );
-		}
-	}
-
-	fclose( pFile );
-}
-
-//==================================================================
 void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
 {
 	TIFF *pTiff = TIFFClientOpen(
 							pFName,
-							"rbm",
+							"rm",
 							&readFile,
 							readProc,
 							writeProc,
@@ -157,7 +103,7 @@ void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
 
 	if NOT( pTiff )
 	{
-		DASSTHROW( 0, ("Could not open %s", pFName) );
+		DASSTHROW( 0, ("Could not open %s for read", pFName) );
 	}
 
 	U32	w, h;
@@ -269,6 +215,62 @@ void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
 	SavePPM( img, ppmName );
 #endif
 
+}
+
+//==================================================================
+void SaveTIFF( const Image &img, const char *pFName )
+{
+	TIFF *pTiff = TIFFOpen( pFName, "w" );
+
+	if NOT( pTiff )
+	{
+		DASSTHROW( 0, ("Could not open %s for write", pFName) );
+	}
+
+	// Write the tiff tags to the file
+	TIFFSetField( pTiff, TIFFTAG_IMAGEWIDTH, img.mWd );
+	TIFFSetField( pTiff, TIFFTAG_IMAGELENGTH, img.mHe );
+	TIFFSetField( pTiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG );
+	//TIFFSetField( pTiff, TIFFTAG_COMPRESSION, COMPRESSION_LZW );
+    TIFFSetField( pTiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT );
+
+	DASSTHROW( img.mSampType != Image::ST_F16, ("Unsupported pixel format when writing %s", pFName) );
+
+	if ( img.mSampType == Image::ST_F32 )
+		TIFFSetField( pTiff, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP );
+
+	TIFFSetField( pTiff, TIFFTAG_BITSPERSAMPLE, img.mBytesPerSamp * 8 );
+
+	if ( img.mSampPerPix == 1 )
+	{
+		TIFFSetField( pTiff, TIFFTAG_SAMPLESPERPIXEL, 1 );
+	}
+	else
+	if ( img.mSampPerPix == 3 && img.IsSamplesNames( "rgb" ) )
+	{
+		TIFFSetField( pTiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB );
+		TIFFSetField( pTiff, TIFFTAG_SAMPLESPERPIXEL, 3 );
+	}
+	else
+	if ( img.mSampPerPix == 4 && img.IsSamplesNames( "rgba" ) )
+	{
+		TIFFSetField( pTiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB );
+		TIFFSetField( pTiff, TIFFTAG_SAMPLESPERPIXEL, 4 );
+		TIFFSetField( pTiff, TIFFTAG_MATTEING, 1 );
+	}
+	else
+	{
+		DASSTHROW( 0, ("Cannot write %s. Unsupported image format.", pFName) );
+	}
+
+	//TIFFWriteEncodedStrip( pTiff, 0, (tdata_t)img.GetPixelPtrR(0,0) );
+
+	for (U32 i=0; i < img.mHe; ++i)
+	{
+		TIFFWriteScanline( pTiff, (tdata_t)img.GetPixelPtrR(0,i), i );
+	}
+
+	TIFFClose( pTiff );
 }
 
 //==================================================================

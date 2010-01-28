@@ -196,12 +196,6 @@ void RibRendToy::MenuFunc( int id )
 }
 
 //==================================================================
-static void onFBuffSetSize( void *pUserData, u_int w, u_int h )
-{
-	glutReshapeWindow( w, h );
-}
-
-//==================================================================
 bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forcedHe/*=-1 */ )
 {
 	const char *pFileName;
@@ -238,18 +232,13 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 
 	DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
 
-	DSAFE_DELETE( mpDispDriverFBuff );
-	mpDispDriverFBuff = DNEW DispDriverFBuffOGL();
-
 	char	defaultShadersDir[4096];
 	sprintf( defaultShadersDir, "%s/Shaders", mExeResPath );
 	printf( "Base Dir: %s\n", baseDir.c_str() );
 	printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 
 	RI::Framework::Params	fwParams;
-	fwParams.mpDispDriverFBuff			= mpDispDriverFBuff;
-	fwParams.mpCBackFBuffSetSize		= onFBuffSetSize;
-	fwParams.mFallBackToExisitngDriver	= true;
+	fwParams.mFallBackFBuffDisplay		= true;
 	fwParams.mpHiderParams				= &mHiderParams;
 	RI::Framework	framework( fwParams );
 
@@ -270,9 +259,11 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 
 	params.mpFileName			= pFileName;
 
+	DVec<RI::Options::Display *>	pDisplays;
+
 	try
 	{
-		RRL::Render	render( params );
+		RRL::Render	render( params, pDisplays );
 	}
 	catch ( std::bad_alloc )
 	{
@@ -284,10 +275,40 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 		return false;
 	}
 
-	mLastUsedWd = (int)mpDispDriverFBuff->GetCurWd();
-	mLastUsedHe = (int)mpDispDriverFBuff->GetCurHe();
+	//--------------
+	try 
+	{
+		renderFile_HandleDisplays( pDisplays );
+	}
+	catch ( ... )
+	{
+		RRL::FreeDisplays( pDisplays );
+		throw;
+	}
+
+	RRL::FreeDisplays( pDisplays );
 
 	return true;
+}
+
+//==================================================================
+void RibRendToy::renderFile_HandleDisplays( const DVec<RI::Options::Display *> &pDisplays )
+{
+	// be happy with the first display found
+	for (size_t i=0; i < pDisplays.size(); ++i)
+	{
+		DSAFE_DELETE( mpDispDriverFBuff );
+
+		mpDispDriverFBuff =
+			DNEW DispDriverFBuffOGL( "Default Disp Driver", pDisplays[i]->mImage );
+
+		mLastUsedWd = (int)pDisplays[i]->mImage.mWd;
+		mLastUsedHe = (int)pDisplays[i]->mImage.mHe;
+
+		// actually resize the window !
+		glutReshapeWindow( mLastUsedWd, mLastUsedHe );
+		break;
+	}
 }
 
 //===============================================================
