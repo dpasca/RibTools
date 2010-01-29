@@ -134,8 +134,9 @@ void Translator::addFormatCmd( RI::ParamList &p )
 }
 
 //==================================================================
-void Translator::AddCommand(	const DStr	&cmdName,
-							RI::ParamList	&cmdParams )
+bool Translator::AddCommand(
+						const DStr		&cmdName,
+						RI::ParamList	&cmdParams )
 {
 	const DStr	&nm = cmdName;
 	RI::ParamList	&p = cmdParams;
@@ -150,7 +151,7 @@ void Translator::AddCommand(	const DStr	&cmdName,
 	if ( nm == "FrameBegin" )		{ exN( 1, p ); mState.FrameBegin( p[0] );	}	else
 	if ( nm == "FrameEnd" )			{ exN( 0, p ); mState.FrameEnd();			}	else
 	if ( nm == "WorldBegin" )		{ exN( 0, p ); mState.WorldBegin();			}	else
-	if ( nm == "WorldEnd" )			{ exN( 0, p ); mState.WorldEnd();			}	else
+	if ( nm == "WorldEnd" )			{ exN( 0, p ); mState.WorldEnd();	return true; }	else
 	if ( nm == "AttributeBegin" )	{ exN( 0, p ); mState.AttributeBegin();		}	else
 	if ( nm == "AttributeEnd" )		{ exN( 0, p ); mState.AttributeEnd();		}	else
 	if ( nm == "TransformBegin" )	{ exN( 0, p ); mState.TransformBegin();		}	else
@@ -232,20 +233,21 @@ void Translator::AddCommand(	const DStr	&cmdName,
 	{
 		// primitives
 		if ( addCommand_prims( nm, p ) )
-			return;
+			return false;
 
 		// transformations
 		if ( addCommand_transforms( nm, p ) )
-			return;
+			return false;
 
 		// options
 		if ( addCommand_options( nm, p ) )
-			return;
+			return false;
 
 		// unknown
 		unknownCommand( nm.c_str() );
 	}
 
+	return false;
 }
 
 //==================================================================

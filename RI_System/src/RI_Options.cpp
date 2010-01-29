@@ -317,14 +317,6 @@ void Options::Finalize(
 }
 
 //==================================================================
-void Options::GetDisplays( DVec<Display *> &out_pDisplays )
-{
-	// pass the ownership
-	out_pDisplays = mpDisplays;
-	mpDisplays.clear();
-}
-
-//==================================================================
 void Options::FreeDisplays()
 {
 	for (size_t i=0; i < mpDisplays.size(); ++i)

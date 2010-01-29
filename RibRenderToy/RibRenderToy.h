@@ -64,7 +64,11 @@ public:
 					int forcedHe=-1 );
 
 private:
-	void renderFile_HandleDisplays( const DVec<RI::Options::Display *> &pDisplays );
+	static void renderFile_HandleDisplays_s( void *pThis, const RRL::DisplayList &pDisplays )
+	{
+		((RibRendToy *)pThis)->renderFile_HandleDisplays( pDisplays );
+	}
+	void renderFile_HandleDisplays( const RRL::DisplayList &pDisplays );
 
 private:
 	//===============================================================

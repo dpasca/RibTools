@@ -67,7 +67,7 @@ static void printUsage( int argc, char **argv )
 static DispWindows	_gsDispWindows;
 
 //==================================================================
-static void handleDisplays( const DVec<RI::Options::Display *> &pDisplays )
+static void handleDisplays( void *pUserData, const RRL::DisplayList &pDisplays )
 {
 	// for every display
 	for (size_t i=0; i < pDisplays.size(); ++i)
@@ -127,76 +127,52 @@ static int clientMain( int argc, char **argv )
 	RI::Hider::Params			hiderParams;
 	RI::FileManagerDisk			fileManagerDisk;
 
-	RI::Framework::Params	fwParams;
+	RI::Framework::Params fwParams;
 	fwParams.mFallBackFileDisplay		= true;
 	fwParams.mFallBackFBuffDisplay		= false;
 	fwParams.mpHiderParams				= &hiderParams;
 	fwParams.mInFNameForDefaultOutFName	= cmdPars.pInFileName;
 
-	DVec<RI::Options::Display *>	pDisplays;
+	RRL::Render::Params	params;
+	params.mTrans.mState.mpFileManager		= &fileManagerDisk;
+	params.mTrans.mState.mBaseDir			= cmdPars.baseDir;
+	params.mTrans.mState.mDefaultShadersDir	= defaultShadersDir;
+	params.mTrans.mForcedLongDim			= cmdPars.forcedlongdim;
+	params.mpFileName						= cmdPars.pInFileName;
+	params.mpOnFrameEndCB					= handleDisplays;
 
-	if NOT( cmdPars.servList.size() )
+	try
 	{
-		try
+		if NOT( cmdPars.servList.size() )
 		{
-			RI::Framework			framework( fwParams );
+			RI::Framework	framework( fwParams );
+			params.mTrans.mState.mpFramework = &framework;
 
-			RRL::Render::Params	params;
-			params.mTrans.mState.mpFramework		= &framework;
-			params.mTrans.mState.mpFileManager		= &fileManagerDisk;
-			params.mTrans.mState.mBaseDir			= cmdPars.baseDir;
-			params.mTrans.mState.mDefaultShadersDir	= defaultShadersDir;
-			params.mTrans.mForcedLongDim			= cmdPars.forcedlongdim;
-			params.mpFileName						= cmdPars.pInFileName;
+			RRL::Render	render( params );
+		}
+		else
+		{
+			InitServers( cmdPars, defaultShadersDir );
 
-			RRL::Render	render( params, pDisplays );
-		}
-		catch ( std::bad_alloc )
-		{
-			printf( "Out of Memory !!!\n" );
-			return -1;
-		}
-		catch ( ... )
-		{
-			return -1;
-		}
-	}
-	else
-	{
-		InitServers( cmdPars, defaultShadersDir );
-
-		try
-		{
 			RRL::NET::RenderBucketsClient	rendBuckets( cmdPars.servList );
-	
+
 			fwParams.mpRenderBuckets = &rendBuckets;
 
-			RI::Framework			framework( fwParams );
+			RI::Framework	framework( fwParams );
+			params.mTrans.mState.mpFramework = &framework;
 
-			RRL::Render::Params	params;
-			params.mTrans.mState.mpFramework		= &framework;
-			params.mTrans.mState.mpFileManager		= &fileManagerDisk;
-			params.mTrans.mState.mBaseDir			= cmdPars.baseDir;
-			params.mTrans.mState.mDefaultShadersDir	= defaultShadersDir;
-			params.mTrans.mForcedLongDim			= cmdPars.forcedlongdim;
-			params.mpFileName						= cmdPars.pInFileName;
-
-			RRL::Render	render( params, pDisplays );
-		}
-		catch ( std::bad_alloc )
-		{
-			printf( "Out of Memory !!!\n" );
-			return -1;
-		}
-		catch ( ... )
-		{
-			return -1;
+			RRL::Render	render( params );
 		}
 	}
-
-	handleDisplays( pDisplays );
-
-	RRL::FreeDisplays( pDisplays );
+	catch ( std::bad_alloc )
+	{
+		printf( "Out of Memory !!!\n" );
+		return -1;
+	}
+	catch ( ... )
+	{
+		return -1;
+	}
 
 	if ( _gsDispWindows.HasWindows() )
 	{

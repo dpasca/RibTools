@@ -34,22 +34,28 @@ typedef DVec<RI::Options::Display *>	DisplayList;
 class Render
 {
 public:
+	typedef void (*OnFrameEndCBType)( void *pCBData, const DisplayList &pDisplays );
+
 	class Params
 	{
 	public:
 		const char			*mpFileName;
 		bool				mVerbose;
 		Translator::Params	mTrans;
+		OnFrameEndCBType	mpOnFrameEndCB;
+		void				*mpOnFrameEndCBData;
 
 		Params() :
 			mpFileName(NULL),
-			mVerbose(false)
+			mVerbose(false),
+			mpOnFrameEndCB(NULL),
+			mpOnFrameEndCBData(NULL)
 		{
 		}
 	};
 
 public:
-	Render( Params &params, DisplayList &out_pDisplays );
+	Render( Params &params );
 };
 
 //==================================================================

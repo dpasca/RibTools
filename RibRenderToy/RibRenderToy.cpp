@@ -259,11 +259,12 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 
 	params.mpFileName			= pFileName;
 
-	DVec<RI::Options::Display *>	pDisplays;
+	params.mpOnFrameEndCB		= renderFile_HandleDisplays_s;
+	params.mpOnFrameEndCBData	= this;
 
 	try
 	{
-		RRL::Render	render( params, pDisplays );
+		RRL::Render	render( params );
 	}
 	catch ( std::bad_alloc )
 	{
@@ -275,24 +276,11 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 		return false;
 	}
 
-	//--------------
-	try 
-	{
-		renderFile_HandleDisplays( pDisplays );
-	}
-	catch ( ... )
-	{
-		RRL::FreeDisplays( pDisplays );
-		throw;
-	}
-
-	RRL::FreeDisplays( pDisplays );
-
 	return true;
 }
 
 //==================================================================
-void RibRendToy::renderFile_HandleDisplays( const DVec<RI::Options::Display *> &pDisplays )
+void RibRendToy::renderFile_HandleDisplays( const RRL::DisplayList &pDisplays )
 {
 	// be happy with the first display found
 	for (size_t i=0; i < pDisplays.size(); ++i)

@@ -63,7 +63,14 @@ DispDriverFBuffOGL::DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::I
 		mSupportsNonPow2 = true;
 	}
 
-	mImage.Init( srcImg.mWd, srcImg.mHe, 4, DIMG::Image::ST_U8, -1, "rgba" );
+	mImage.Init(
+			srcImg.mWd,
+			srcImg.mHe,
+			4,
+			DIMG::Image::ST_U8,
+			(size_t)srcImg.mWd * 4 * sizeof(U8),
+			"rgba" );
+
 	DIMG::ConvertImages( mImage, srcImg );
 
 	glGenTextures( 1, &mTexId );

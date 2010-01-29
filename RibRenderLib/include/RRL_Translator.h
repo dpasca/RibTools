@@ -45,8 +45,9 @@ private:
 public:
 	Translator( const Params &params );
 
-	void AddCommand(const DStr	&cmdName,
-					RI::ParamList	&cmdParams );
+	bool AddCommand(
+				const DStr		&cmdName,
+				RI::ParamList	&cmdParams );
 
 	void ErrHandler( RI::Error errCode )
 	{

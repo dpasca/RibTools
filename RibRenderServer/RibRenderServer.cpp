@@ -63,19 +63,15 @@ static int serverTask( SOCKET clientSock )
 	params.mTrans.mForcedHe					= netRendJob.ForcedHe;
 	params.mpFileName						= netRendJob.FileName;
 
-	DVec<RI::Options::Display *>	pDisplays;
-
 	try
 	{
-		RRL::Render	render( params, pDisplays );
+		RRL::Render	render( params );
 	}
 	catch ( ... )
 	{
 		printf( "Render failed !\n" );
 		return -1;
 	}
-
-	RRL::FreeDisplays( pDisplays );
 
 	printf( "Render complete.\n" );
 

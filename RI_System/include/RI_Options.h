@@ -114,7 +114,9 @@ public:
 			bool fallbackFileDisp,
 			bool fallbackFbuffDisp );
 
-	void GetDisplays( DVec<Display *> &out_pDisplays );
+	//==================================================================
+	const DVec<Display *> &GetDisplays() const	{	return mpDisplays;	}
+
 	void FreeDisplays();
 };
 	

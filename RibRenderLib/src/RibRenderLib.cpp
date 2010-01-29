@@ -18,7 +18,7 @@ namespace RRL
 //==================================================================
 /// Render
 //==================================================================
-Render::Render( Params &params, DisplayList &out_pDisplays )
+Render::Render( Params &params )
 {
 	DUT::MemFile	file;
 
@@ -57,7 +57,21 @@ Render::Render( Params &params, DisplayList &out_pDisplays )
 
 
 			try {
-				translator.AddCommand( cmdName, cmdParams );
+				// add a command
+				if ( translator.AddCommand( cmdName, cmdParams ) )
+				{
+					// if the world definition has ended, then we should have some displays
+					const DisplayList &dispList = 
+							translator.GetState().GetCurOptions().GetDisplays();
+					
+					// see if we have a callback to process the displays
+					if ( params.mpOnFrameEndCB )
+						params.mpOnFrameEndCB( params.mpOnFrameEndCBData, dispList );
+
+					// free the displays
+					translator.GetState().GetCurOptions().FreeDisplays();
+				}
+
 			} catch ( std::runtime_error ex )
 			{
 				printf( "Error while parsing line %i\n> CMD: %s\n",
@@ -69,8 +83,6 @@ Render::Render( Params &params, DisplayList &out_pDisplays )
 	}
 
 	translator.GetState().End();
-
-	translator.GetState().GetCurOptions().GetDisplays( out_pDisplays );
 }
 
 //==================================================================
