@@ -24,5 +24,7 @@
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DCriticalSection.h"
 
+#define APPNAME		"RibRenderServer"
+#define APPVERSION	"0.9"
 
 #endif

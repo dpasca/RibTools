@@ -35,23 +35,25 @@ void DispWindows::AddWindow( const RI::Options::Display &disp )
 	// first window ?
 	if ( msWindows.size() == 0 )
 	{
-		glutInit( 0, 0 );
-
-		glutDisplayFunc( sDisplayFunc );
-		glutReshapeFunc( sReshapeFunc );
-		//glutMouseFunc( sMouseFunc );
-		//glutPassiveMotionFunc( sPassiveMotion );
-		//glutIdleFunc( sIdleFunc );
+		glutInit( &mArgc, mppArgv );
+	    glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
 	}
 
 	msWindows.grow();
 
-	msWindows.back().mpDispDriver =
-		DNEW DispDriverFBuffOGL( disp.mName.c_str(), disp.mImage );
-
 	glutInitWindowSize( disp.mImage.mWd, disp.mImage.mHe );
 
-	msWindows.back().mWinId = glutCreateWindow( disp.mName.c_str() );
+	std::string	winName = mWindowBaseName + " -- " + disp.mName;
+	msWindows.back().mWinId = glutCreateWindow( winName.c_str() );
+
+	glutDisplayFunc( sDisplayFunc );
+	glutReshapeFunc( sReshapeFunc );
+	//glutMouseFunc( sMouseFunc );
+	//glutPassiveMotionFunc( sPassiveMotion );
+	//glutIdleFunc( sIdleFunc );
+
+	msWindows.back().mpDispDriver =
+		DNEW DispDriverFBuffOGL( disp.mName.c_str(), disp.mImage );
 
 	msWindows.back().mpDispDriver->Blit();
 }
@@ -90,4 +92,12 @@ void DispWindows::sReshapeFunc( int width, int height )
 	glLoadIdentity();
 
 	glEnable( GL_DEPTH_TEST );
+
+	glutPostRedisplay();
+}
+
+//==================================================================
+void DispWindows::MainLoop()
+{
+	glutMainLoop();
 }

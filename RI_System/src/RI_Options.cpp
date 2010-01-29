@@ -180,7 +180,22 @@ void Options::cmdShutter( float openShutter, float closeShutter )
 //==================================================================
 void Options::cmdDisplay( const char *pName, const char *pType, const char *pMode, ParamList &params )
 {
-	if ( strlen( pName ) == 0 || pName[0] != '+' )
+	size_t len = strlen( pName );
+
+	bool appending = false;
+
+	if ( len && pName[0] == '+' )
+	{
+		appending = true;
+		pName += 1;
+		len -= 1;
+	}
+
+	// assign a dummy name if necessary
+	if NOT( len )
+		pName = "no_name";
+
+	if NOT( appending )
 	{
 		for (size_t i=0; i < mpDisplays.size(); ++i)
 			DSAFE_DELETE( mpDisplays[i] );
@@ -205,9 +220,8 @@ void Options::cmdDisplay( const char *pName, const char *pType, const char *pMod
 		onError( "Unknown display type '%s'", pType );
 	}
 
-	pNewDisp->mMode = pMode;
-
-	pNewDisp->mName = pName;
+	pNewDisp->mMode = pMode;	// setup the mode (rgb, rgba, ...)
+	pNewDisp->mName = pName;	// setup the name (dude.tif, ...)
 }
 
 //==================================================================

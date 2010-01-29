@@ -48,18 +48,19 @@ static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
 //==================================================================
 static void printUsage( int argc, char **argv )
 {
-	printf( "\n==== RibRender -- (built of - " __DATE__ " - " __TIME__ ") ====\n" );
+	printf( "\n==== "APPNAME" v"APPVERSION" -- (" __DATE__ " - " __TIME__ ") ====\n" );
 
-	printf( "\n%s <rib file> <output JPEG file> [options]\n", argv[0] );
+	printf( "\n%s <rib file> [options]\n", argv[0] );
 
 	printf( "\nOptions:\n" );
-	printf( "\t-help | --help | -h             -- Show this help\n" );
-	printf( "\t-server <address>:<port>        -- Specify an IP and port number for a render server\n" );
-	printf( "\t-forcedlongdim <size in pixels> -- Force the largest dimension's rendering size in pixels\n" );
+	printf( "    -help | --help | -h             -- Show this help\n" );
+	printf( "    -server <address>:<port>        -- Specify an IP and port number for a render server\n" );
+	printf( "    -forcedlongdim <size in pixels> -- Force the largest dimension's rendering size in pixels\n" );
 
 	printf( "\nExamples:\n" );
-	printf( "\t%s TestScenes/Airplane.rib airplane.jpg\n", argv[0] );
-	printf( "\t%s TestScenes/Airplane.rib airplane.jpg -longdimsize 1024 -server 192.168.1.107 -server 192.168.1.108\n", argv[0] );
+	printf( "    %s TestScenes/Airplane.rib\n", argv[0] );
+	printf( "    %s TestScenes/Airplane.rib -server 192.168.1.107 -server 192.168.1.108:30000\n", argv[0] );
+	printf( "    %s TestScenes/Airplane.rib -forcedlongdim 1024\n", argv[0] );
 }
 
 //==================================================================
@@ -97,6 +98,8 @@ static int clientMain( int argc, char **argv )
 	CmdParams	cmdPars;
 	if NOT( getCmdParams( argc, argv, cmdPars ) )
 		return -1;
+
+	_gsDispWindows.Init( argc, argv, APPNAME " v" APPVERSION );
 
 /*
 	const char *pOutExt = DUT::GetFileNameExt( cmdPars.pOutFileName );
@@ -194,6 +197,11 @@ static int clientMain( int argc, char **argv )
 	handleDisplays( pDisplays );
 
 	RRL::FreeDisplays( pDisplays );
+
+	if ( _gsDispWindows.HasWindows() )
+	{
+		_gsDispWindows.MainLoop();
+	}
 
     return 0;
 }

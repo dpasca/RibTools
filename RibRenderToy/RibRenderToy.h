@@ -11,6 +11,9 @@
 
 #include "RI_System/include/RI_HiderST.h"
 
+#define APPNAME		"RibRenderToy"
+#define APPVERSION	"0.9"
+
 //==================================================================
 class RibRendToy
 {

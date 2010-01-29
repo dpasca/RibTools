@@ -51,7 +51,7 @@ RibRendToy::RibRendToy( const char *pExePath ) :
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize( 640, 480 );
 
-    glutCreateWindow( "RibRenderToy" );
+    glutCreateWindow( APPNAME " v" APPVERSION );
 
     glutDisplayFunc( sDisplayFunc );
     glutReshapeFunc( sReshapeFunc );

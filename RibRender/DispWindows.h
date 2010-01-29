@@ -26,13 +26,28 @@ class DispWindows
 
 	static DVec<Window>	msWindows;
 
+	int					mArgc;
+	char				**mppArgv;
+	std::string			mWindowBaseName;
+
 public:
 	DispWindows();
-
 	~DispWindows();
+
+	void Init( int argc, char **argv, const char *pWindowBaseName )
+	{
+		mArgc = argc;
+		mppArgv = argv;
+
+		mWindowBaseName = pWindowBaseName;
+	}
 
 	//===============================================================
 	void AddWindow( const RI::Options::Display &disp );
+	
+	bool HasWindows() const { return !!msWindows.size(); }
+
+	void MainLoop();
 
 private:
 	//===============================================================

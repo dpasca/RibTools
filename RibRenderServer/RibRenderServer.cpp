@@ -154,17 +154,17 @@ static int serverMain( int argc, char **argv )
 //==================================================================
 static void printUsage( int argc, char **argv )
 {
-	printf( "Usage:\n" );
+	printf( "\n==== "APPNAME" v"APPVERSION" -- (" __DATE__ " - " __TIME__ ") ====\n" );
 	
-	printf( "\t%s [options]\n", argv[0] );
+	printf( "\n%s [options]\n", argv[0] );
 
 	printf( "\nOptions:\n" );
-	printf( "\t-help | --help | -h  -- Show this help\n" );
-	printf( "\t-port <port>         -- Wait for connection at port <port>\n" );
+	printf( "    -help | --help | -h  -- Show this help\n" );
+	printf( "    -port <port>         -- Wait for connection at port <port>\n" );
 
 	printf( "\nExamples:\n" );
-	printf( "\t%s\n", argv[0] );
-	printf( "\t%s -port 31111\n", argv[0] );
+	printf( "    %s\n", argv[0] );
+	printf( "    %s -port 31111\n", argv[0] );
 }
 
 //==================================================================

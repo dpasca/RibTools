@@ -24,6 +24,9 @@
 #include "DSystem/include/DNetwork.h"
 #include "DSystem/include/DCriticalSection.h"
 
+#define APPNAME		"RibRender"
+#define APPVERSION	"0.9"
+
 //==================================================================
 struct CmdParams
 {
