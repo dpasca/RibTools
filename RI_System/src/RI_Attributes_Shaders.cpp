@@ -56,7 +56,7 @@ static void addShaderParam(
 	{
 		// if not, then see if it's a new symbol declaration in the form
 		// <class> <type> <name>
-		pSym = shaInst.mCallSymList.Add( pName, Symbol::STOR_PARAMETER );
+		pSym = shaInst.mCallSymList.AddByString( pName, Symbol::STOR_PARAMETER );
 	}
 
 	SymbolI *pSymI = shaInst.mCallSymIList.AddInstance( *pSym, 1 );	// 1... uniform only !

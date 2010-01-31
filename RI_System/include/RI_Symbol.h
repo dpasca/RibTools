@@ -93,6 +93,9 @@ public:
 	static const u_int CLASS_MSK_VERTEX		= 3;
 	static const u_int CLASS_MSK_CONSTANT	= 4;
 
+	// used as a non-defined class value
+	static const u_int CLASS_MSK_UNDEFINED	= 15;
+
 	DStr	mName;
 	Type	mType;
 	Storage	mStorage;
@@ -107,12 +110,14 @@ public:
 		Symbol::Type	mType;
 		Symbol::Storage	mStorage;
 		u_int			mClass;
+		const void		*mpSrcData;
 
 		CtorParams() :
 			mpName(NULL),
 			mType(Symbol::TYP_UNKNOWN),
 			mStorage(Symbol::STOR_TEMPORARY),
-			mClass(0)
+			mClass(0),
+			mpSrcData(NULL)
 		{
 		}
 	};
@@ -179,18 +184,18 @@ public:
 	//	  Symbol *FindSymbol( const char *pName );
 	const Symbol *FindSymbol( const char *pName ) const;
 
-	Symbol *Add( const Symbol::CtorParams &params, const void *pSrcData=NULL );
-	Symbol *Add( const char *pDecl, const char *pName, Symbol::Storage storage, const void *pSrcData=NULL );
-	Symbol *Add( const char *pDeclName, Symbol::Storage storage, const void *pSrcData=NULL );
+	Symbol *AddByParams( const Symbol::CtorParams &params );
+	Symbol *Add( const char *pDecl, const char *pName, Symbol::Storage storage, const void *pSrcData=NULL, u_int defaultClass=Symbol::CLASS_MSK_UNDEFINED );
+	Symbol *AddByString( const char *pDeclName, Symbol::Storage storage, const void *pSrcData=NULL );
 
 	Symbol *AddGlob( const char *pDeclName, const void *pSrcData=NULL )
 	{
-		return Add( pDeclName, Symbol::STOR_GLOBAL, pSrcData );
+		return AddByString( pDeclName, Symbol::STOR_GLOBAL, pSrcData );
 	}
 
-	Symbol *AddGlob( const char *pDecl, const char *pName, const void *pSrcData=NULL )
+	Symbol *AddGlob( const char *pDecl, const char *pName, const void *pSrcData=NULL, u_int defaultClass=Symbol::CLASS_MSK_UNDEFINED )
 	{
-		return Add( pDecl, pName, Symbol::STOR_GLOBAL, pSrcData );
+		return Add( pDecl, pName, Symbol::STOR_GLOBAL, pSrcData, defaultClass );
 	}
 
 	Symbol *AddGVoid( const char *pName )
@@ -200,7 +205,7 @@ public:
 		params.mType	= Symbol::TYP_VOID;
 		params.mClass	= Symbol::CLASS_MSK_CONSTANT;
 		params.mStorage	= Symbol::STOR_GLOBAL;
-		return Add( params );
+		return AddByParams( params );
 	}
 
 	size_t size() const

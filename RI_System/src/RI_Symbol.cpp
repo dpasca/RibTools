@@ -263,11 +263,13 @@ const Symbol * SymbolList::FindSymbol( const char *pName ) const
 }
 
 //==================================================================
-Symbol *SymbolList::Add( const Symbol::CtorParams &params, const void *pSrcData )
+Symbol *SymbolList::AddByParams( const Symbol::CtorParams &params )
 {
-	if ( FindSymbol( params.mpName ) )
+	const Symbol *pSymbol = FindSymbol( params.mpName );
+	if ( pSymbol )
 	{
-		DASSERT( 0 );
+		// allow duplicate declarations for now
+		//DASSERT( 0 );
 		return NULL;
 	}
 
@@ -280,14 +282,18 @@ Symbol *SymbolList::Add( const Symbol::CtorParams &params, const void *pSrcData 
 	pSym->mStorage		= params.mStorage;
 	pSym->mClass		= params.mClass;
 
-	if ( pSrcData )
-		pSym->InitConstValue( pSrcData );
+	if ( params.mpSrcData )
+		pSym->InitConstValue( params.mpSrcData );
 
 	return pSym;
 }
 
 //==================================================================
-static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pDecl, std::string *out_name )
+static void newSymParamsFromDecl(
+						Symbol::CtorParams &out_params,
+						const char *pDecl,
+						std::string *out_name,
+						u_int defaultClass=Symbol::CLASS_MSK_UNDEFINED )
 {
 	char buff[ 1024 ];
 	strcpy_s( buff, pDecl );
@@ -307,12 +313,19 @@ static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pD
 	if NOT( pTok )
 		DASSTHROW( 0, ("Nothing to declare ?!") );
 
+	char *pType = NULL;
+
 	// class ..
 	if ( 0 == strcmp( pTok, "uniform") ) { ++detCnt; out_params.mClass = Symbol::CLASS_MSK_UNIFORM	;	}	else
 	if ( 0 == strcmp( pTok, "varying") ) { ++detCnt; out_params.mClass = Symbol::CLASS_MSK_VARYING	;	}	else
 	if ( 0 == strcmp( pTok, "vertex" ) ) { ++detCnt; out_params.mClass = Symbol::CLASS_MSK_VERTEX	;	}	else
 	if ( 0 == strcmp( pTok, "constant") ){ ++detCnt; out_params.mClass = Symbol::CLASS_MSK_CONSTANT	;	}	else
 	{
+		if ( defaultClass != Symbol::CLASS_MSK_UNDEFINED )
+		{
+			out_params.mClass = defaultClass;
+		}
+
 		if ( expectingName )
 		{
 			*out_name = pTok;
@@ -325,24 +338,34 @@ static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pD
 		}
 		else
 		{
-			DASSTHROW( 0, ("Bad declaration, expecting symbol class: '%s'", pDecl) );
+			// this token then must be the type !
+			pType = pTok;
+
+			// if we don't have a default class, and the class is not defined by the current token
+			// then we have a problem 8)
+			DASSTHROW( 
+				defaultClass != Symbol::CLASS_MSK_UNDEFINED,
+					("Bad declaration, expecting symbol class in '%s'", pDecl) );
 		}
 	}
 
-	pTok = strtok_r(NULL, " \t", &pTokCtx);
-	if NOT( pTok )
-		DASSTHROW( 0, ("Bad declaration, expecting symbol type: '%s'", pDecl) );
+	if NOT( pType )
+	{
+		pType = strtok_r(NULL, " \t", &pTokCtx);
+		if NOT( pType )
+			DASSTHROW( 0, ("Bad declaration, expecting symbol type in '%s'", pDecl) );
+	}
 
 	// type ..
-	if ( 0 == strcmp( pTok, "float"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_FLOAT	;	}	else
-	if ( 0 == strcmp( pTok, "point"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_POINT	;	}	else
-	if ( 0 == strcmp( pTok, "vector" ) ) { ++typCnt; out_params.mType = Symbol::TYP_VECTOR	;	}	else
-	if ( 0 == strcmp( pTok, "normal" ) ) { ++typCnt; out_params.mType = Symbol::TYP_NORMAL	;	}	else
-	if ( 0 == strcmp( pTok, "hpoint" ) ) { ++typCnt; out_params.mType = Symbol::TYP_HPOINT	;	}	else
-	if ( 0 == strcmp( pTok, "color"	 ) ) { ++typCnt; out_params.mType = Symbol::TYP_COLOR	;	}	else
-	if ( 0 == strcmp( pTok, "matrix" ) ) { ++typCnt; out_params.mType = Symbol::TYP_MATRIX	;	}	else
-	if ( 0 == strcmp( pTok, "string" ) ) { ++typCnt; out_params.mType = Symbol::TYP_STRING	;	}	else
-	if ( 0 == strcmp( pTok, "bool"   ) ) { ++typCnt; out_params.mType = Symbol::TYP_BOOL	;	}	else
+	if ( 0 == strcmp( pType, "float"  ) ) { ++typCnt; out_params.mType = Symbol::TYP_FLOAT	;	}	else
+	if ( 0 == strcmp( pType, "point"  ) ) { ++typCnt; out_params.mType = Symbol::TYP_POINT	;	}	else
+	if ( 0 == strcmp( pType, "vector" ) ) { ++typCnt; out_params.mType = Symbol::TYP_VECTOR	;	}	else
+	if ( 0 == strcmp( pType, "normal" ) ) { ++typCnt; out_params.mType = Symbol::TYP_NORMAL	;	}	else
+	if ( 0 == strcmp( pType, "hpoint" ) ) { ++typCnt; out_params.mType = Symbol::TYP_HPOINT	;	}	else
+	if ( 0 == strcmp( pType, "color"  ) ) { ++typCnt; out_params.mType = Symbol::TYP_COLOR	;	}	else
+	if ( 0 == strcmp( pType, "matrix" ) ) { ++typCnt; out_params.mType = Symbol::TYP_MATRIX	;	}	else
+	if ( 0 == strcmp( pType, "string" ) ) { ++typCnt; out_params.mType = Symbol::TYP_STRING	;	}	else
+	if ( 0 == strcmp( pType, "bool"   ) ) { ++typCnt; out_params.mType = Symbol::TYP_BOOL	;	}	else
 	{
 		DASSTHROW( 0, ("Bad declaration, expecting symbol type: '%s'", pDecl) );
 	}
@@ -368,25 +391,27 @@ static void newSymParamsFromDecl( Symbol::CtorParams &out_params, const char *pD
 }
 
 //==================================================================
-Symbol *SymbolList::Add( const char *pDecl, const char *pName, Symbol::Storage storage, const void *pSrcData )
+Symbol *SymbolList::Add( const char *pDecl, const char *pName, Symbol::Storage storage, const void *pSrcData, u_int defaultClass )
 {
 	Symbol::CtorParams	params;
 	
 	params.mpName	= pName;
 	params.mStorage	= storage;
+	params.mpSrcData= pSrcData;
 
 	// fill up type and details.. (expect no name..)
-	newSymParamsFromDecl( params, pDecl, NULL );
+	newSymParamsFromDecl( params, pDecl, NULL, defaultClass );
 
-	return Add( params, pSrcData );
+	return AddByParams( params );
 }
 
 //==================================================================
-Symbol *SymbolList::Add( const char *pDeclName, Symbol::Storage storage, const void *pSrcData )
+Symbol *SymbolList::AddByString( const char *pDeclName, Symbol::Storage storage, const void *pSrcData )
 {
 	Symbol::CtorParams	params;
 	
 	params.mStorage	= storage;
+	params.mpSrcData= pSrcData;
 
 	// fill up type and details.. (expects name as well)
 	std::string	name;
@@ -397,7 +422,7 @@ Symbol *SymbolList::Add( const char *pDeclName, Symbol::Storage storage, const v
 	DASSTHROW( params.mType != Symbol::TYP_UNKNOWN,
 			("Bad symbol declaration. Type is missing: '%s'", pDeclName) );
 
-	return Add( params, pSrcData );
+	return AddByParams( params );
 }
 
 //==================================================================

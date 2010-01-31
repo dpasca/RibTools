@@ -465,10 +465,7 @@ void State::Declare( ParamList &params )
 	const char *pSymName = params[0].PChar();
 	const char *pSymType = params[1].PChar();
 
-	char	buff[1024];
-	sprintf_s( buff, "uniform %s", pSymType );
-
-	mGlobalSyms.AddGlob( buff,  pSymName );
+	mGlobalSyms.AddGlob( pSymType, pSymName, NULL, Symbol::CLASS_MSK_UNIFORM );
 
 	//mGlobalSyms.Add( );
 	//mAttributesStack.top().cmdSurface( params );
