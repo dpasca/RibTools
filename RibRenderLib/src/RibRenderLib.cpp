@@ -20,15 +20,26 @@ namespace RRL
 //==================================================================
 Render::Render( Params &params )
 {
-	DUT::MemFile	file;
-
-	params.mTrans.mState.mpFileManager->GrabFile( params.mpFileName, file );
-
-	RI::Parser	parser;
-
+	RI::Parser		parser;
 	Translator		translator( params.mTrans );
 
 	translator.GetState().Begin( "dummy" );
+
+	readArchive( params.mpFileName, params, parser, translator );
+
+	translator.GetState().End();
+}
+
+//==================================================================
+void Render::readArchive(
+					const char *pFileName,
+					const Params &params,
+					RI::Parser &parser, 
+					Translator &translator )
+{
+	DUT::MemFile	file;
+
+	params.mTrans.mState.mpFileManager->GrabFile( pFileName, file );
 
 	for (size_t i=0; i <= file.GetDataSize(); ++i)
 	{
@@ -55,21 +66,35 @@ Render::Render( Params &params )
 				puts( "" );
 			}
 
-
 			try {
 				// add a command
-				if ( translator.AddCommand( cmdName, cmdParams ) )
-				{
-					// if the world definition has ended, then we should have some displays
-					const DisplayList &dispList = 
-							translator.GetState().GetCurOptions().GetDisplays();
-					
-					// see if we have a callback to process the displays
-					if ( params.mpOnFrameEndCB )
-						params.mpOnFrameEndCB( params.mpOnFrameEndCBData, dispList );
+				Translator::RetCmd	retCmd = translator.AddCommand( cmdName, cmdParams );
 
-					// free the displays
-					translator.GetState().GetCurOptions().FreeDisplays();
+				switch ( retCmd )
+				{
+				case Translator::CMD_WORLDEND:
+					{
+						RI::Options	&options = translator.GetState().GetCurOptions();
+
+						// if the world definition has ended, then we should have some displays
+						const DisplayList &dispList = options.GetDisplays();
+						
+						// see if we have a callback to process the displays
+						if ( params.mpOnFrameEndCB )
+							params.mpOnFrameEndCB( params.mpOnFrameEndCBData, dispList );
+
+						// free the displays
+						options.FreeDisplays();
+					}
+					break;
+
+				case Translator::CMD_READARCHIVE:
+
+					break;
+
+				default:
+				case Translator::CMD_GENERIC:
+					break;
 				}
 
 			} catch ( std::runtime_error ex )
@@ -81,19 +106,6 @@ Render::Render( Params &params )
 			}
 		}
 	}
-
-	translator.GetState().End();
-}
-
-//==================================================================
-void FreeDisplays( DisplayList &pDisplays )
-{
-	for (size_t i=0; i < pDisplays.size(); ++i)
-	{
-		DSAFE_DELETE( pDisplays[i] );
-	}
-
-	pDisplays.clear();
 }
 
 //==================================================================

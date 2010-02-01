@@ -45,7 +45,14 @@ private:
 public:
 	Translator( const Params &params );
 
-	bool AddCommand(
+	enum RetCmd
+	{
+		CMD_GENERIC = 0,
+		CMD_READARCHIVE,
+		CMD_WORLDEND
+	};
+
+	RetCmd AddCommand(
 				const DStr		&cmdName,
 				RI::ParamList	&cmdParams );
 

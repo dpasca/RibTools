@@ -1,11 +1,10 @@
-/*
- *  RI_Parser.h
- *  ribparser
- *
- *  Created by Davide Pasca on 08/12/xx.
- *  Copyright 2008 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_Parser.h
+///
+/// Created by Davide Pasca - 2008/12/xx
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #ifndef RI_PARSER_H
 #define RI_PARSER_H

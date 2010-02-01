@@ -15,6 +15,7 @@
 #include "RI_System/include/RI_Render.h"
 #include "RI_System/include/RI_Net_Protocol.h"
 #include "RI_System/include/RI_Framework.h"
+#include "RI_System/include/RI_Parser.h"
 
 #include "RRL_Translator.h"
 #include "RRL_Net.h"
@@ -56,10 +57,14 @@ public:
 
 public:
 	Render( Params &params );
-};
 
-//==================================================================
-void FreeDisplays( DisplayList &pDisplays );
+private:
+	void readArchive(
+			const char *pFileName,
+			const Params &params,
+			RI::Parser &parser, 
+			Translator &translator );
+};
 
 //==================================================================
 }
