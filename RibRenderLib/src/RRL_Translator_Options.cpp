@@ -73,6 +73,36 @@ static void processSearchPath( DVec<DStr> &curSPathList, DVec<DStr> &newStrings 
 }
 
 //==================================================================
+static RI::Options::SearchPath findSearchPathType( const char *pPathType )
+{
+	char buff[1024];
+	strcpy_s( buff, pPathType );
+
+
+	char *pTokCtx;
+	char *pTok;
+
+	if NOT( pTok = strtok_r( buff, " \t", &pTokCtx ) )
+		return RI::Options::SEARCHPATH_UNKNOWN;
+
+	// annoying, but plausible
+	if ( 0 == strcmp( pTok, "string" ) )
+	{
+		if NOT( pTok = strtok_r( NULL, " \t", &pTokCtx ) )
+			return RI::Options::SEARCHPATH_UNKNOWN;
+	}
+
+	if ( 0 == strcmp( pTok, "shader" ) )	return RI::Options::SEARCHPATH_SHADER; else
+	if ( 0 == strcmp( pTok, "texture" ) )	return RI::Options::SEARCHPATH_TEXTURE; else
+	if ( 0 == strcmp( pTok, "archive" ) )	return RI::Options::SEARCHPATH_ARCHIVE;
+	else
+	{
+		return RI::Options::SEARCHPATH_UNKNOWN;
+	}
+
+}
+
+//==================================================================
 bool Translator::addCommand_options(
 							const DStr		&nm,
 							RI::ParamList	&p )
@@ -90,18 +120,9 @@ bool Translator::addCommand_options(
 			const char *pPathType = p[1].PChar();
 			const char *pPathString = p[2].PChar();
 
-			u_int	idx = 0;
+			RI::Options::SearchPath	idx = findSearchPathType( pPathType );
 
-			if ( 0 == _stricmp( pPathType, "shader" ) )
-			{
-				idx = RI::Options::SEARCHPATH_SHADER;
-			}
-			else
-			if ( 0 == _stricmp( pPathType, "texture" ) )
-			{
-				idx = RI::Options::SEARCHPATH_TEXTURE;
-			}
-			else
+			if ( idx == RI::Options::SEARCHPATH_UNKNOWN )
 			{
 				printf( "Warning: unrecognized searchpath type\n" );
 				return true;

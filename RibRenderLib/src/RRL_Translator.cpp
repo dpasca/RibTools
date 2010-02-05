@@ -231,6 +231,13 @@ Translator::RetCmd
 		mState.Displacement( p );
 	}
 	else
+	if ( nm == "ReadArchive" )
+	{
+		exN( 1, p );
+		mReadArchivePathFName = mState.FindResFile( p[0], RI::Options::SEARCHPATH_ARCHIVE );
+		return CMD_READARCHIVE;
+	}
+	else
 	{
 		// primitives
 		if ( addCommand_prims( nm, p ) )

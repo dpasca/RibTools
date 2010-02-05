@@ -41,6 +41,7 @@ public:
 private:
 	RI::State	mState;
 	Params		mParams;
+	DStr		mReadArchivePathFName;
 
 public:
 	Translator( const Params &params );
@@ -62,6 +63,8 @@ public:
 	}
 
 	RI::State &GetState()	{	return mState;	}
+
+	const char *GetReadArchivePathFName() const { return mReadArchivePathFName.c_str(); }
 
 private:
 	void unknownCommand( const char *pCmdName );

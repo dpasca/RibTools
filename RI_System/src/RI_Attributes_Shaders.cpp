@@ -166,47 +166,6 @@ void Attributes::getShaderParams(
 }
 
 //==================================================================
-SVM::Shader *Attributes::loadShader( const char *pBasePath, const char *pBaseIncDir, const char *pSName, bool &out_fileExists )
-{
-	FileManagerBase	&fmanager = mpState->GetFileManager();
-
-	char	buff[1024];
-
-	sprintf( buff, "%s/%s.sl", pBasePath, pSName );
-	if NOT( fmanager.FileExists( buff ) )
-	{
-		sprintf( buff, "%s/%s.rrasm", pBasePath, pSName );
-
-		if NOT( fmanager.FileExists( buff ) )
-		{
-			out_fileExists = false;
-			return NULL;
-		}
-	}
-
-	out_fileExists = true;
-
-	SVM::Shader::CtorParams	params;
-	params.pName			= pSName;
-	params.pBaseIncDir		= pBaseIncDir;
-	params.pSourceFileName	= buff;
-
-	SVM::Shader *pShader = NULL;
-
-	try {
-		pShader = DNEW SVM::Shader( params, mpState->GetFileManager() );
-	} catch ( ... )
-	{
-		mpState->EXCEPTPrintf( "Could not assemble '%s' !", params.pSourceFileName );
-		return NULL;
-	}
-
-	mpResManager->AddResource( pShader );
-
-	return pShader;
-}
-
-//==================================================================
 SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAlternateName )
 {
 	// try see if we have it loaded already
@@ -217,37 +176,44 @@ SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAltern
 	if ( pShader )
 		return pShader;
 
-	const char *pBaseIncDir = mpState->GetDefShadersDir();
+	DStr	tmpFName;
+	DStr	shaderFullPathName;
 
-	// try look into the search path
-	const DVec<DStr>	&spaths = mpState->GetCurOptions().mSearchPaths[ Options::SEARCHPATH_SHADER ];
+	// try .sl
+	tmpFName = DStr( pShaderName ) + ".sl";
+	shaderFullPathName = mpState->FindResFile( tmpFName.c_str(), Options::SEARCHPATH_SHADER );
 
-	SearchPathScanner	pathScanner( mpState->GetBaseDir(), pBaseIncDir, spaths );
-
-	std::string	usePath;
-	bool		usePathIsAbsolute;
-
-	while ( pathScanner.GetNext( usePath, usePathIsAbsolute ) )
+	if NOT( shaderFullPathName.length() )
 	{
-		bool	found;
-		if ( pShader = loadShader( usePath.c_str(), pBaseIncDir, pShaderName, found ) )
-			return pShader;
-
-		if ( !found && !usePathIsAbsolute )
-		{
-			// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
-			usePath = std::string( mpState->GetBaseDir() ) + "/" + usePath;
-
-			if ( pShader = loadShader( usePath.c_str(), pBaseIncDir, pShaderName, found ) )
-				return pShader;
-		}
-
-		// in case we found it, but there is an error of some sort..
-		// ..just give up instead of trying different paths
-		if ( found )
-			break;
+		// try .rrasm
+		tmpFName = DStr( pShaderName ) + ".rrasm";
+		shaderFullPathName = mpState->FindResFile( tmpFName.c_str(), Options::SEARCHPATH_SHADER );
 	}
 
+	if ( shaderFullPathName.length() )
+	{
+		SVM::Shader::CtorParams	params;
+		params.pName			= pShaderName;
+		params.pBaseIncDir		= mpState->GetDefShadersDir();
+		params.pSourceFileName	= shaderFullPathName.c_str();
+
+		try {
+			pShader = DNEW SVM::Shader( params, mpState->GetFileManager() );
+		} catch ( ... )
+		{
+			mpState->EXCEPTPrintf( "Could not assemble '%s' !", params.pSourceFileName );
+			return NULL;
+		}
+
+		mpResManager->AddResource( pShader );
+
+		return pShader;
+	}
+	else
+	{
+		return NULL;
+	}
+		
 	if ( pAlternateName )
 	{
 		if ( pShader =

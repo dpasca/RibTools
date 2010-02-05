@@ -20,12 +20,11 @@ namespace RRL
 //==================================================================
 Render::Render( Params &params )
 {
-	RI::Parser		parser;
 	Translator		translator( params.mTrans );
 
 	translator.GetState().Begin( "dummy" );
 
-	readArchive( params.mpFileName, params, parser, translator );
+	readArchive( params.mpFileName, params, translator );
 
 	translator.GetState().End();
 }
@@ -34,9 +33,10 @@ Render::Render( Params &params )
 void Render::readArchive(
 					const char *pFileName,
 					const Params &params,
-					RI::Parser &parser, 
 					Translator &translator )
 {
+	RI::Parser		parser;
+
 	DUT::MemFile	file;
 
 	params.mTrans.mState.mpFileManager->GrabFile( pFileName, file );
@@ -89,7 +89,10 @@ void Render::readArchive(
 					break;
 
 				case Translator::CMD_READARCHIVE:
-
+					readArchive(
+							translator.GetReadArchivePathFName(),
+							params,
+							translator );
 					break;
 
 				default:
@@ -99,10 +102,15 @@ void Render::readArchive(
 
 			} catch ( std::runtime_error ex )
 			{
+				printf( "ERROR at %s -- %i -- (Command: %s)\n", pFileName, cmdLine, cmdName.c_str() );
+/*
 				printf( "Error while parsing line %i\n> CMD: %s\n",
 					cmdLine,
 					cmdName.c_str() );
-				break;
+*/
+
+				throw;
+				//break;
 			}
 		}
 	}

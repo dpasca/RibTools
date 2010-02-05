@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "RI_Primitive.h"
 #include "RI_State.h"
+#include "RI_Res_SearchPathScanner.h"
 
 //==================================================================
 namespace RI
@@ -639,6 +640,48 @@ size_t State::AddLightSource( LightSourceT *pLSource )
 	// add if didn't replace any existing light
 	mpLightSources.push_back( pLSource );
 	return mpLightSources.size() - 1;
+}
+
+//==================================================================
+DStr State::FindResFile( const char *pFindFileName, Options::SearchPath spathType )
+{
+	const DVec<DStr>	&spaths = GetCurOptions().mSearchPaths[ spathType ];
+
+	const char *pBaseIncDir = NULL;
+
+	// special case for shaders
+	if ( spathType == Options::SEARCHPATH_SHADER )
+		pBaseIncDir = GetDefShadersDir();
+
+	SearchPathScanner	pathScanner( GetBaseDir(), pBaseIncDir, spaths );
+
+	DStr	usePath;
+	bool	usePathIsAbsolute;
+
+	while ( pathScanner.GetNext( usePath, usePathIsAbsolute ) )
+	{
+		DStr	fullPathName = usePath + "/" + pFindFileName;
+
+		if ( GetFileManager().FileExists( fullPathName.c_str() ) )
+		{
+			return fullPathName;
+		}
+		else
+		{
+			if ( !usePathIsAbsolute )
+			{
+				// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
+				fullPathName = std::string( GetBaseDir() ) + "/" + fullPathName;
+
+				if ( GetFileManager().FileExists( fullPathName.c_str() ) )
+				{
+					return fullPathName;
+				}
+			}
+		}
+	}
+
+	return "";
 }
 
 //==================================================================

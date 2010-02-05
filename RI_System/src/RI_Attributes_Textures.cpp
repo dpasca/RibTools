@@ -17,42 +17,6 @@ namespace RI
 {
 
 //==================================================================
-Texture *Attributes::loadTexture( const char *pBasePath, const char *pName, bool &out_fileExists ) const
-{
-	FileManagerBase	&fmanager = mpState->GetFileManager();
-
-	char	buff[2048];
-
-	sprintf( buff, "%s/%s", pBasePath, pName );
-	if NOT( fmanager.FileExists( buff ) )
-	{
-		out_fileExists = false;
-		return NULL;
-	}
-
-	out_fileExists = true;
-
-	Texture *pTexture = NULL;
-
-	try {
-		// grab the file
-		DUT::MemFile	file;
-		fmanager.GrabFile( buff, file );
-
-		// load the texture based on the file
-		pTexture = DNEW Texture( pName, file );
-	} catch ( ... )
-	{
-		mpState->EXCEPTPrintf( "Could not load '%s' !", pName );
-		return NULL;
-	}
-
-	mpResManager->AddResource( pTexture );
-
-	return pTexture;
-}
-
-//==================================================================
 Texture *Attributes::GetTexture( const char *pTextureName ) const
 {
 	// try see if we have it loaded already
@@ -63,36 +27,33 @@ Texture *Attributes::GetTexture( const char *pTextureName ) const
 	if ( pTexture )
 		return pTexture;
 
-	// try look into the search path
-	const DVec<DStr>	&spaths = mpState->GetCurOptions().mSearchPaths[ Options::SEARCHPATH_TEXTURE ];
+	DStr	shaderFullPathName;
 
-	SearchPathScanner	pathScanner( mpState->GetBaseDir(), NULL, spaths );
+	shaderFullPathName = mpState->FindResFile( pTextureName, Options::SEARCHPATH_TEXTURE );
 
-	std::string	usePath;
-	bool		usePathIsAbsolute;
-
-	while ( pathScanner.GetNext( usePath, usePathIsAbsolute ) )
+	if ( shaderFullPathName.length() )
 	{
-		bool	found;
-		if ( pTexture = loadTexture( usePath.c_str(), pTextureName, found ) )
-			return pTexture;
+/*
+		try {
+*/
+			// grab the file
+			DUT::MemFile	file;
+			mpState->GetFileManager().GrabFile( shaderFullPathName.c_str(), file );
 
-		if ( !found && !usePathIsAbsolute )
+			// load the texture based on the file
+			pTexture = DNEW Texture( pTextureName, file );
+/*
+		} catch ( ... )
 		{
-			// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
-			usePath = std::string( mpState->GetBaseDir() ) + "/" + usePath;
-
-			if ( pTexture = loadTexture( usePath.c_str(), pTextureName, found ) )
-				return pTexture;
+			mpState->EXCEPTPrintf( "Could not load '%s' !", pTextureName );
+			return NULL;
 		}
+*/
 
-		// in case we found it, but there is an error of some sort..
-		// ..just give up instead of trying different paths
-		if ( found )
-			break;
+		mpResManager->AddResource( pTexture );
 	}
 
-	return NULL;
+	return pTexture;
 }
 
 //==================================================================

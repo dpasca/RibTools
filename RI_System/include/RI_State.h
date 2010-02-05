@@ -104,7 +104,10 @@ public:
 	const char *GetBaseDir()		const	{	return mParams.mBaseDir.c_str();			}
 	const char *GetDefShadersDir() const	{	return mParams.mDefaultShadersDir.c_str();	}
 
-	Options		&GetCurOptions()			{	return mOptionsStack.top();	}
+	DStr		FindResFile( const char *pFileName, Options::SearchPath spathType );
+
+	Options			&GetCurOptions()			{	return mOptionsStack.top();	}
+	const Options	&GetCurOptions() const		{	return mOptionsStack.top();	}
 
 	void	Begin( RtToken name );
 	void	End();

@@ -62,7 +62,6 @@ private:
 	void readArchive(
 			const char *pFileName,
 			const Params &params,
-			RI::Parser &parser, 
 			Translator &translator );
 };
 
