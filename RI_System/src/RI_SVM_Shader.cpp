@@ -31,6 +31,7 @@ namespace SVM
 
 //==================================================================
 static void compileSLToAsm(
+						DIO::FileManagerBase &fmanager,
 						DUT::MemFile &slSource,
 						const char *pSrcFPathName,
 						const char *pBaseIncDir,
@@ -43,6 +44,7 @@ static void compileSLToAsm(
 	try {
 		RSLCompiler::Params	params;
 		params.mDbgOutputTree = false;
+		params.mpFileManager = &fmanager;
 
 		// try compile
 		RSLCompiler	compiler(
@@ -75,7 +77,7 @@ static void compileFromMemFile(
 				const char *pFileName,
 				const char *pShaderName,
 				const char *pBaseIncDir,
-				FileManagerBase &fileManager )
+				DIO::FileManagerBase &fileManager )
 {
 	bool	isSL =
 		(0 == strcasecmp( DUT::GetFileNameExt( pFileName ), "sl" ) );
@@ -104,7 +106,7 @@ static void compileFromMemFile(
 	else
 	{
 		// ..otherwise.. compile the sl into an autogen.rrasm
-		compileSLToAsm( file, pFileName, pBaseIncDir, asmOutName );
+		compileSLToAsm( fileManager, file, pFileName, pBaseIncDir, asmOutName );
 		// ..and also read in the file..
 		autogenAsmFile.Init( asmOutName );
 	}
@@ -116,7 +118,7 @@ static void compileFromMemFile(
 //==================================================================
 /// Shader
 //==================================================================
-Shader::Shader( const CtorParams &params, FileManagerBase &fileManager ) :
+Shader::Shader( const CtorParams &params, DIO::FileManagerBase &fileManager ) :
 	ResourceBase(params.pName, ResourceBase::TYPE_SHADER),
 	mType(TYPE_UNKNOWN),
 	mStartPC(INVALID_PC),

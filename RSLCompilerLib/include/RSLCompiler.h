@@ -12,6 +12,7 @@
 #include "RSLC_Exceptions.h"
 #include "RSLC_Token.h"
 #include "RSLC_Tree.h"
+#include "DSystem/include/DIO_FileManager.h"
 
 //==================================================================
 /// RSLCompiler
@@ -27,10 +28,12 @@ public:
 	class Params
 	{
 	public:
-		bool	mDbgOutputTree;
+		bool					mDbgOutputTree;
+		DIO::FileManagerBase	*mpFileManager;
 
 		Params() :
-			mDbgOutputTree(false)
+			mDbgOutputTree(false),
+			mpFileManager(NULL)
 		{
 		}
 	};

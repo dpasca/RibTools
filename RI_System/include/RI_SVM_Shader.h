@@ -12,7 +12,7 @@
 #include "RI_Base.h"
 #include "RI_Symbol.h"
 #include "RI_Resource.h"
-#include "RI_FileManager.h"
+#include "DSystem/include/DIO_FileManager.h"
 
 //==================================================================
 namespace RI
@@ -190,7 +190,7 @@ public:
 		}
 	};
 
-	Shader( const CtorParams &params, FileManagerBase &fileManager );
+	Shader( const CtorParams &params, DIO::FileManagerBase &fileManager );
 };
 
 //==================================================================

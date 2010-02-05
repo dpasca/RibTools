@@ -357,6 +357,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_Prepro.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Prepro.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Register.cpp"
 				>
 			</File>

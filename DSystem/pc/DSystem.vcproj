@@ -315,6 +315,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\DIO_FileManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DMemory.cpp"
 				>
 			</File>

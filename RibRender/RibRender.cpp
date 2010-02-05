@@ -125,7 +125,7 @@ static int clientMain( int argc, char **argv )
 	sprintf_s( defaultShadersDir, "%s/Shaders", defaultResDir );
 
 	RI::Hider::Params			hiderParams;
-	RI::FileManagerDisk			fileManagerDisk;
+	DIO::FileManagerDisk		fileManagerDisk;
 
 	RI::Framework::Params fwParams;
 	fwParams.mFallBackFileDisplay		= true;

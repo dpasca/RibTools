@@ -242,7 +242,7 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 	fwParams.mpHiderParams				= &mHiderParams;
 	RI::Framework	framework( fwParams );
 
-	RI::FileManagerDisk	fileManager;
+	DIO::FileManagerDisk	fileManager;
 
 	RRL::Render::Params	params;
 	

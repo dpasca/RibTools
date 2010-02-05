@@ -38,10 +38,16 @@ RSLCompiler::RSLCompiler(
 {
 	DVec<U8>	sourceInc;
 
-	if NOT( DUT::GrabFile( pBaseInclude, sourceInc ) )
+	if ( pBaseInclude )
 	{
-		std::string	msg = DUT::SSPrintFS( "Failed to open %s", pBaseInclude );
-		throw Exception( msg );
+		try {
+			params.mpFileManager->GrabFile( pBaseInclude, sourceInc );
+		}
+		catch ( ... )
+		{
+			std::string	msg = DUT::SSPrintFS( "Failed to open %s", pBaseInclude );
+			throw Exception( msg );
+		}
 	}
 
 	sourceInc.append_array( (const U8 *)pSource, sourceSize );

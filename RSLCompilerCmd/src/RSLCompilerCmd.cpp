@@ -42,8 +42,11 @@ int main( int argc, char *argv[] )
 
 	try
 	{
+		DIO::FileManagerDisk	fmanager;
+
 		RSLCompiler::Params	params;
 		params.mDbgOutputTree = true;
+		params.mpFileManager = &fmanager;
 
 		RSLCompiler	compiler(
 						(const char *)&inData[0],

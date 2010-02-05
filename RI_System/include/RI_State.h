@@ -11,13 +11,13 @@
 
 #include "RI_Base.h"
 #include "DSystem/include/DContainers.h"
+#include "DSystem/include/DIO_FileManager.h"
 #include "RI_Options.h"
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
 #include "RI_Framework.h"
 #include "RI_Primitive.h"
 #include "RI_LightSource.h"
-#include "RI_FileManager.h"
 
 //==================================================================
 namespace RI
@@ -53,11 +53,11 @@ class State
 public:
 	struct Params
 	{
-		Framework		*mpFramework		;
-		FileManagerBase	*mpFileManager		;
-		DStr			mBaseDir			;
-		DStr			mDefaultShadersDir	;
-		DStr			mForcedSurfaceShader;
+		Framework				*mpFramework		;
+		DIO::FileManagerBase	*mpFileManager		;
+		DStr					mBaseDir			;
+		DStr					mDefaultShadersDir	;
+		DStr					mForcedSurfaceShader;
 
 		Params() :
 			mpFramework			(NULL),
@@ -100,7 +100,7 @@ public:
 	State( const Params &params );
 	~State();
 
-	FileManagerBase &GetFileManager()		{	return *mParams.mpFileManager;				}
+	DIO::FileManagerBase &GetFileManager()	{	return *mParams.mpFileManager;				}
 	const char *GetBaseDir()		const	{	return mParams.mBaseDir.c_str();			}
 	const char *GetDefShadersDir() const	{	return mParams.mDefaultShadersDir.c_str();	}
 

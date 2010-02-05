@@ -339,10 +339,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\RI_FileManager.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RI_Framework.cpp"
 				>
 			</File>

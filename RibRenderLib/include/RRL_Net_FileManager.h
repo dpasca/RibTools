@@ -9,7 +9,7 @@
 #ifndef RRL_NET_FILEMANAGER_H
 #define RRL_NET_FILEMANAGER_H
 
-#include "RI_System/include/RI_FileManager.h"
+#include "DSystem/include/DIO_FileManager.h"
 #include "DSystem/include/DNetwork_PacketManager.h"
 
 //==================================================================
@@ -22,7 +22,7 @@ namespace NET
 //==================================================================
 /// FileManagerNet
 //==================================================================
-class FileManagerNet : public RI::FileManagerBase
+class FileManagerNet : public DIO::FileManagerBase
 {
 	friend class Server;
 

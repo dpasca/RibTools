@@ -1,19 +1,19 @@
 //==================================================================
-/// RI_FileManager.h
+/// DIO_FileManager.h
 ///
 /// Created by Davide Pasca - 2009/8/8
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RI_FILEMANAGER_H
-#define RI_FILEMANAGER_H
+#ifndef DIO_FILEMANAGER_H
+#define DIO_FILEMANAGER_H
 
 #include "DSystem/include/DUtils_MemFile.h"
 #include "DSystem/include/DUtils_Files.h"
 
 //==================================================================
-namespace RI
+namespace DIO
 {
 
 //==================================================================
