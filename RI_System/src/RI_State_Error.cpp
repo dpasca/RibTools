@@ -52,6 +52,20 @@ void State::WarnPrintf( const char *pFmt, ... )
 }
 
 //==================================================================
+void State::ERRPrintf( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	printf( "* ERROR: %s\n", buff );
+}
+
+//==================================================================
 void State::EXCEPTPrintf( const char *pFmt, ... )
 {
 	va_list	vl;

@@ -109,7 +109,7 @@ void Render::readArchive(
 					cmdName.c_str() );
 */
 
-				throw;
+				//throw;
 				//break;
 			}
 		}

@@ -36,21 +36,21 @@ static bool findSkipWhites( CharArr &str, size_t &i, int &io_lineCnt )
 
 	if ( ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f' )
 	{
-		if ( ch == '\n' )
-			++io_lineCnt;
-
-		do {
-			ch = str[ ++i ];
-
+		for (; i < str.size(); ++i)
+		{
 			if ( ch == '\n' )
 				++io_lineCnt;
 
-		} while ( ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f' );
+			ch = str[ i ];
+
+			if NOT( ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f' )
+				break;
+		}
 
 		return true;
 	}
-
-	return false;
+	else
+		return false;
 }
 
 //==================================================================
@@ -153,17 +153,33 @@ static bool matchTokenDef(
 static bool handleComment(
 					CharArr		&str,
 					size_t		&i,
-					bool		&isInComment,
+					bool		&isInBlockComment,
+					bool		&isInLineComment,
 					int			&io_lineCnt )
 {
-	if ( isInComment )
+	if ( isInLineComment )
+	{
+		if ( str[i] == '\n' )
+		{
+			++io_lineCnt;
+			isInLineComment = false;
+		}
+		else
+		{
+			i += 1;
+		}
+
+		return true;
+	}
+	else
+	if ( isInBlockComment )
 	{
 		if ( str[i] == '\n' )
 			++io_lineCnt;
 
 		if ( matches( str, i, "*/" ) )
 		{
-			isInComment = false;
+			isInBlockComment = false;
 			i += 2;
 		}
 		else
@@ -176,7 +192,14 @@ static bool handleComment(
 	else
 	if ( matches( str, i, "/*" ) )
 	{
-		isInComment = true;
+		isInBlockComment = true;
+		i += 2;
+		return true;
+	}
+	else
+	if ( matches( str, i, "//" ) )
+	{
+		isInLineComment = true;
 		i += 2;
 		return true;
 	}
@@ -415,7 +438,8 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 {
 	initSortedTable();
 
-	bool	isInComment	= false;
+	bool	isInBlockComment	= false;
+	bool	isInLineComment		= false;
 
 	tokens.grow();
 
@@ -429,7 +453,7 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 
 	for (size_t i=0; i < str.size(); )
 	{
-		if ( handleComment( str, i, isInComment, lineCnt ) )
+		if ( handleComment( str, i, isInBlockComment, isInLineComment, lineCnt ) )
 			continue;
 
 		if ( findSkipWhites( str, i, lineCnt ) )

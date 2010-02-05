@@ -201,7 +201,7 @@ SVM::Shader *Attributes::getShader( const char *pShaderName, const char *pAltern
 			pShader = DNEW SVM::Shader( params, mpState->GetFileManager() );
 		} catch ( ... )
 		{
-			mpState->EXCEPTPrintf( "Could not assemble '%s' !", params.pSourceFileName );
+			mpState->ERRPrintf( "Could not compile '%s' !", params.pSourceFileName );
 			return NULL;
 		}
 
