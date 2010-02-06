@@ -8,28 +8,145 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include "DSystem/include/DUtils.h"
-#include "RSLCompilerLib/include/RSLCompiler.h"
 #include "DSystem/include/DUtils_Files.h"
+#include "RSLCompilerLib/include/RSLCompiler.h"
+#include "RSLCompilerLib/include/RSLC_Prepro.h"
+
+#define APPNAME		"RSLCompilerCmd"
+#define APPVERSION	"0.4a"
 
 //==================================================================
-static void printUsage( const char *pCmdName )
+struct CmdParams
 {
-	printf( "USAGE: %s <Input .sl File> <Output .rrasm File>\n", pCmdName );
+	const char				*pInFileName;
+	const char				*pOutFileName;
+	bool					optPrepro;
+
+	CmdParams() :
+		pInFileName		(NULL),
+		pOutFileName	(NULL),
+		optPrepro		(false)
+	{
+	}
+};
+
+//==================================================================
+static void printUsage( int argc, char **argv )
+{
+	printf( "\n==== "APPNAME" v"APPVERSION" -- (" __DATE__ " - " __TIME__ ") ====\n" );
+
+	printf( "\n%s <Input .sl File> <Output .rrasm File>\n", argv[0] );
+	printf( "\n%s -prepro <Input .sl File>\n", argv[0] );
+
+	printf( "\nOptions:\n" );
+	printf( "    -help | --help | -h     -- Show this help\n" );
+	printf( "    -prepro                 -- Apply the C-preprocessor and give to stdout\n" );
+}
+
+//==================================================================
+static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
+{
+	for (int i=1; i < argc; ++i)
+	{
+		if ( 0 == strcasecmp( "-prepro", argv[i] ) )
+		{
+			out_cmdPars.optPrepro = true;
+		}
+		else
+		if (0 == strcasecmp( "-help", argv[i] ) ||
+			0 == strcasecmp( "--help", argv[i] ) ||
+			0 == strcasecmp( "-h", argv[i] ) )
+		{
+			printUsage( argc, argv );
+			exit( 0 );
+			return false;	// not needed really
+		}
+		else
+		{
+			if ( out_cmdPars.pInFileName == NULL )
+				out_cmdPars.pInFileName = argv[i];
+			else
+			if ( out_cmdPars.pOutFileName == NULL )
+				out_cmdPars.pOutFileName = argv[i];
+			else
+			{
+				printf( "What is '%s' ?\n", argv[i] );
+				printUsage( argc, argv );
+				exit( 0 );
+				return false;	// not needed really
+			}
+		}
+	}
+
+	return true;
+}
+
+//==================================================================
+static void handlePreproOnly( const char *pSLFName, const char *pBuiltinPathFName )
+{
+	DIO::FileManagerDisk	fmanager;
+
+	DVec<U8>	inData;
+	if NOT( DUT::GrabFile( pSLFName, inData ) )
+	{
+		printf( "ERROR: Failed opening %s\n", pSLFName );
+		exit( -1 );
+	}
+
+	try
+	{
+
+		DVecRO<U8>	inSource( (const U8 *)&inData[0], inData.size() );
+		DVec<U8>	processedSource;
+
+		RSLC::Prepro::Map	procMap;
+
+		RSLC::Prepro	prepro(
+							fmanager,
+							inSource,
+							pBuiltinPathFName,
+							procMap,
+							processedSource );
+
+		processedSource.push_back( 0 );	//zero-terminate it for output
+
+		puts( (const char *)&processedSource[0] );
+	}
+	catch (...)
+	{
+		exit(-1);
+	}
 }
 
 //==================================================================
 int main( int argc, char *argv[] )
 {
-	if ( argc < 3 )
+	CmdParams	params;
+
+	if NOT( getCmdParams( argc, argv, params ) )
 	{
-		printf( "ERROR: Missing parameters !\n" );
-		printUsage( argv[0] );
-		exit( -1 );
+		printUsage( argc, argv );
+		return -1;
 	}
 
-	const char	*pSLFName = argv[1];
-	const char	*pRRFName = argv[2];
+	char	defaultResDir[2048];
+	char	builtinPathFName[4096];
+	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
+	if ( exePath.length() )
+		sprintf_s( defaultResDir, "%s/Resources", exePath.c_str() );
+	else
+		strcpy_s( defaultResDir, "Resources" );
+	sprintf_s( builtinPathFName, "%s/Shaders/RSLC_Builtins.sl", defaultResDir );
+
+
+	if ( params.optPrepro )
+	{
+		handlePreproOnly( params.pInFileName, builtinPathFName );
+		return 0;
+	}
+
+	const char	*pSLFName = params.pInFileName;
+	const char	*pRRFName = params.pOutFileName;
 
 	printf( "Opening %s in input...\n", pSLFName );
 
@@ -37,7 +154,7 @@ int main( int argc, char *argv[] )
 	if NOT( DUT::GrabFile( pSLFName, inData ) )
 	{
 		printf( "ERROR: Failed opening %s\n", pSLFName );
-		exit( -1 );
+		return -1;
 	}
 
 	try
@@ -51,7 +168,7 @@ int main( int argc, char *argv[] )
 		RSLCompiler	compiler(
 						(const char *)&inData[0],
 						inData.size(),
-						"Resources/Shaders/RSLC_Builtins.sl",
+						builtinPathFName,
 						params );
 
 		printf( "Generating %s...\n", pRRFName );
@@ -62,12 +179,11 @@ int main( int argc, char *argv[] )
 	{
 		printf( "ERROR: %s !\n", e.GetMessage().c_str() );
 	}
-/*
 	catch ( ... )
 	{
 		printf( "ERROR while compiling !\n" );
+		return -1;
 	}
-*/
 
 	printf( "Done !\n", pRRFName );
 

@@ -453,8 +453,8 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 
 	for (size_t i=0; i < str.size(); )
 	{
-		if ( handleComment( str, i, isInBlockComment, isInLineComment, lineCnt ) )
-			continue;
+		//if ( handleComment( str, i, isInBlockComment, isInLineComment, lineCnt ) )
+		//	continue;
 
 		if ( findSkipWhites( str, i, lineCnt ) )
 		{

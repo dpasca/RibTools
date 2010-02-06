@@ -22,12 +22,13 @@
 #include "RSLC_Expressions.h"
 #include "RSLCompiler.h"
 #include "RSLC_RRASMOut.h"
+#include "RSLC_Prepro.h"
 
 //==================================================================
 using namespace	RSLC;
 
 //==================================================================
-const char	*RSLCompiler::mpsVersionString = "0.3a";
+const char	*RSLCompiler::mpsVersionString = "0.4a";
 
 //==================================================================
 RSLCompiler::RSLCompiler(
@@ -36,23 +37,19 @@ RSLCompiler::RSLCompiler(
 		const char *pBaseInclude,
 		const Params &params )
 {
-	DVec<U8>	sourceInc;
+	DVecRO<U8>	inSource( (const U8 *)pSource, sourceSize );
+	DVec<U8>	processedSource;
 
-	if ( pBaseInclude )
-	{
-		try {
-			params.mpFileManager->GrabFile( pBaseInclude, sourceInc );
-		}
-		catch ( ... )
-		{
-			std::string	msg = DUT::SSPrintFS( "Failed to open %s", pBaseInclude );
-			throw Exception( msg );
-		}
-	}
+	Prepro::Map	procMap;
 
-	sourceInc.append_array( (const U8 *)pSource, sourceSize );
+	Prepro	prepro(
+				*params.mpFileManager,
+				inSource,
+				pBaseInclude,
+				procMap,
+				processedSource );
 
-	Tokenizer( mTokens, (const char *)&sourceInc[0], sourceInc.size() );
+	Tokenizer( mTokens, (const char *)&processedSource[0], processedSource.size() );
 
 #if 0	// useful to debug the tokenizer
 	for (size_t i=0; i < mTokens.size(); ++i)

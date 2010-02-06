@@ -10,8 +10,38 @@
 #include "DispWindows.h"
 
 //==================================================================
+static void printUsage( int argc, char **argv )
+{
+	printf( "\n==== "APPNAME" v"APPVERSION" -- (" __DATE__ " - " __TIME__ ") ====\n" );
+
+	printf( "\n%s <rib file> [options]\n", argv[0] );
+
+	printf( "\nOptions:\n" );
+	printf( "    -help | --help | -h             -- Show this help\n" );
+	printf( "    -server <address>:<port>        -- Specify an IP and port number for a render server\n" );
+	printf( "    -forcedlongdim <size in pixels> -- Force the largest dimension's rendering size in pixels\n" );
+
+	printf( "\nExamples:\n" );
+	printf( "    %s TestScenes/Airplane.rib\n", argv[0] );
+	printf( "    %s TestScenes/Airplane.rib -server 192.168.1.107 -server 192.168.1.108:30000\n", argv[0] );
+	printf( "    %s TestScenes/Airplane.rib -forcedlongdim 1024\n", argv[0] );
+}
+
+//==================================================================
 static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
 {
+	for (int i=1; i < argc; ++i)
+	{
+		if (0 == strcasecmp( "-help", argv[i] ) ||
+			0 == strcasecmp( "--help", argv[i] ) ||
+			0 == strcasecmp( "-h", argv[i] ) )
+		{
+			printUsage( argc, argv );
+			exit( 0 );
+			return false;	// not needed really
+		}
+	}
+
 	out_cmdPars.pInFileName	 = argv[1];
 
 	out_cmdPars.baseDir = DUT::GetDirNameFromFPathName( out_cmdPars.pInFileName );
@@ -43,24 +73,6 @@ static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
 	}
 
 	return true;
-}
-
-//==================================================================
-static void printUsage( int argc, char **argv )
-{
-	printf( "\n==== "APPNAME" v"APPVERSION" -- (" __DATE__ " - " __TIME__ ") ====\n" );
-
-	printf( "\n%s <rib file> [options]\n", argv[0] );
-
-	printf( "\nOptions:\n" );
-	printf( "    -help | --help | -h             -- Show this help\n" );
-	printf( "    -server <address>:<port>        -- Specify an IP and port number for a render server\n" );
-	printf( "    -forcedlongdim <size in pixels> -- Force the largest dimension's rendering size in pixels\n" );
-
-	printf( "\nExamples:\n" );
-	printf( "    %s TestScenes/Airplane.rib\n", argv[0] );
-	printf( "    %s TestScenes/Airplane.rib -server 192.168.1.107 -server 192.168.1.108:30000\n", argv[0] );
-	printf( "    %s TestScenes/Airplane.rib -forcedlongdim 1024\n", argv[0] );
 }
 
 //==================================================================
