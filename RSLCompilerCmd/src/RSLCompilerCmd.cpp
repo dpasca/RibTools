@@ -78,6 +78,10 @@ static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
 		}
 	}
 
+	if ( out_cmdPars.pInFileName == NULL ||
+		 (out_cmdPars.pOutFileName == NULL && !out_cmdPars.optPrepro) )
+		return false;
+
 	return true;
 }
 
