@@ -8,40 +8,36 @@
 
 #include <stdlib.h>
 #include "RSLC_Exceptions.h"
+#include "RSLC_FatChars.h"
 #include "RSLC_Token.h"
 
 //==================================================================
 namespace RSLC
 {
 
-typedef DVecRO<char> CharArr;
-
 //==================================================================
 static size_t _sTokenDefsIdxInvSortLen[TOKEN_N];
 
 //==================================================================
-static bool matches( CharArr &str, size_t i, const char *pFindStr )
+static bool matches( const Fat8Vec &str, size_t i, const char *pFindStr )
 {
 	for (; i < str.size() && *pFindStr; ++i)
-		if ( str[i] != *pFindStr++ )
+		if ( str[i].Ch != *pFindStr++ )
 			return false;
 
 	return true;
 }
 
 //==================================================================
-static bool findSkipWhites( CharArr &str, size_t &i, int &io_lineCnt )
+static bool findSkipWhites( const Fat8Vec &str, size_t &i )
 {
-	char	ch = str[i];
+	char	ch = str[i].Ch;
 
 	if ( ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f' )
 	{
 		for (; i < str.size(); ++i)
 		{
-			if ( ch == '\n' )
-				++io_lineCnt;
-
-			ch = str[ i ];
+			ch = str[ i ].Ch;
 
 			if NOT( ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f' )
 				break;
@@ -51,16 +47,6 @@ static bool findSkipWhites( CharArr &str, size_t &i, int &io_lineCnt )
 	}
 	else
 		return false;
-}
-
-//==================================================================
-static void newToken( DVec<Token> &tokens, int lineCnt )
-{
-	if ( tokens.back().IsSet() )
-	{
-		tokens.grow();
-		tokens.back().sourceLine = lineCnt;
-	}
 }
 
 //==================================================================
@@ -82,30 +68,43 @@ static bool isAlphaNumStrFirstChar( char ch )
 		ch == '_';
 }
 
-/*
 //==================================================================
-Token *TokenFromDefOrNTerm( const char *pTokenStr, int lineCnt )
+static bool isDigit( char ch )
 {
-	for (size_t j=T_VL_STRING+1; j < TOKEN_N; ++j)
-	{
-		const TokenDef &tokDef = _TokenDefs[ _sTokenDefsIdxInvSortLen[ j ] ];
+	return ch >= '0' && ch <= '9';
+}
 
-		if ( tokDef.pStr && 0 == strcmp( pTokenStr, tokDef.pStr ) )
-			return DNEW Token( tokDef.pStr, tokDef.id, tokDef.idType );
+//==================================================================
+/// 
+//==================================================================
+class Tokenize
+{
+public:
+	const Fat8Vec	&mStr;
+	DVec<Token>		&mTokens;
+	FatBase			&mFatBase;
+
+	//==================================================================
+	Tokenize( const Fat8Vec &str, DVec<Token> &tokens, FatBase &fatBase ) :
+		mStr(str),
+		mTokens(tokens),
+		mFatBase(fatBase)
+	{
 	}
 
-	return DNEW Token( pTokenStr, T_NONTERM, T_TYPE_NONTERM );
+//==================================================================
+void newToken( const Fat8 &fatCh )
+{
+	if ( mTokens.back().IsSet() )
+	{
+		mTokens.grow();
+		mTokens.back().sourceLine = fatCh.SrcPos;
+		mTokens.back().pSourceFileName = mFatBase.mFileNames[ fatCh.FNameIdx ].c_str();
+	}
 }
-*/
-
 
 //==================================================================
-static bool matchTokenDef(
-					DVec<Token> &tokens,
-					CharArr		&str,
-					size_t		&i,
-					bool		wasPrecededByWS,
-					int			lineCnt )
+bool matchTokenDef( size_t &i, bool wasPrecededByWS )
 {
 	for (size_t j=0; j < TOKEN_N; ++j)
 	{
@@ -114,7 +113,7 @@ static bool matchTokenDef(
 		if NOT( tokDef.pStr )
 			continue;
 
-		if ( matches( str, i, tokDef.pStr ) )
+		if ( matches( mStr, i, tokDef.pStr ) )
 		{
 			size_t	findStrLen = strlen( tokDef.pStr );
 
@@ -122,10 +121,10 @@ static bool matchTokenDef(
 			if ( isAlphaNumStrFirstChar( tokDef.pStr[0] ) )
 			{
 				// have some more on the right ?
-				if ( (i+findStrLen) < str.size() )
+				if ( (i+findStrLen) < mStr.size() )
 				{
 					// is that alphanumeric ?
-					if ( isAlphaNum( str[ i+findStrLen ] ) )
+					if ( isAlphaNum( mStr[ i+findStrLen ].Ch ) )
 					{
 						// ..if yes, then it's a bad match
 						continue;
@@ -133,14 +132,14 @@ static bool matchTokenDef(
 				}
 			}
 
-			newToken( tokens, lineCnt );
-			tokens.back().str		= tokDef.pStr;
-			tokens.back().idType	= tokDef.idType;
-			tokens.back().id		= tokDef.id;
+			newToken( mStr[i] );
+			mTokens.back().str		= tokDef.pStr;
+			mTokens.back().idType	= tokDef.idType;
+			mTokens.back().id		= tokDef.id;
 			i += findStrLen;
 			if ( wasPrecededByWS )
 			{
-				tokens.back().isPrecededByWS = wasPrecededByWS;
+				mTokens.back().isPrecededByWS = wasPrecededByWS;
 			}
 			return true;
 		}
@@ -150,132 +149,60 @@ static bool matchTokenDef(
 }
 
 //==================================================================
-static bool handleComment(
-					CharArr		&str,
-					size_t		&i,
-					bool		&isInBlockComment,
-					bool		&isInLineComment,
-					int			&io_lineCnt )
+bool handleAlphanum( size_t &i )
 {
-	if ( isInLineComment )
-	{
-		if ( str[i] == '\n' )
-		{
-			++io_lineCnt;
-			isInLineComment = false;
-		}
-		else
-		{
-			i += 1;
-		}
-
-		return true;
-	}
-	else
-	if ( isInBlockComment )
-	{
-		if ( str[i] == '\n' )
-			++io_lineCnt;
-
-		if ( matches( str, i, "*/" ) )
-		{
-			isInBlockComment = false;
-			i += 2;
-		}
-		else
-		{
-			i += 1;
-		}
-
-		return true;
-	}
-	else
-	if ( matches( str, i, "/*" ) )
-	{
-		isInBlockComment = true;
-		i += 2;
-		return true;
-	}
-	else
-	if ( matches( str, i, "//" ) )
-	{
-		isInLineComment = true;
-		i += 2;
-		return true;
-	}
-
-	return false;
-}
-
-//==================================================================
-static bool isDigit( char ch )
-{
-	return ch >= '0' && ch <= '9';
-}
-
-//==================================================================
-static bool handleAlphanum(
-					CharArr		&str,
-					size_t		&i,
-					DVec<Token> &tokens,
-					int			lineCnt )
-{
-	if NOT( isAlphaNumStrFirstChar( str[i] ) )
+	if NOT( isAlphaNumStrFirstChar( mStr[i].Ch ) )
 		return false;
 
-	newToken( tokens, lineCnt );
-	tokens.back().idType = T_TYPE_NONTERM;
-	tokens.back().id	 = T_NONTERM;
-	tokens.back().str = str[i++];
+	newToken( mStr[i] );
+	mTokens.back().idType = T_TYPE_NONTERM;
+	mTokens.back().id	 = T_NONTERM;
+	mTokens.back().str	= mStr[i++].Ch;
 
-	for (; i < str.size(); ++i)
+	for (; i < mStr.size(); ++i)
 	{
-		if ( !isAlphaNum( str[i] ) )
+		if ( !isAlphaNum( mStr[i].Ch ) )
 			break;
 
-		tokens.back().str += str[i];
+		mTokens.back().str += mStr[i].Ch;
 	}
 
 	return true;
 }
 
 //==================================================================
-static bool handleNumber(
-					CharArr		&str,
-					size_t		&i,
-					DVec<Token> &tokens,
-					int			lineCnt )
+bool handleNumber( size_t &i )
 {
-	char ch		= str[i];
+	char ch		= (char)mStr[i].Ch;
 
 	// not the beginning of a number.. ?
 	if ( (ch < '0' || ch > '9') && ch != '.' )
 		return false;
 
-	char nextCh = (i+1) < str.size() ? str[i+1] : 0;
+	char nextCh = (i+1) < mStr.size() ? (char)mStr[i+1].Ch : 0;
 
 	// starts with a dot ?
 	if ( ch == '.' )	// next must be a digit
 		if NOT( isDigit( nextCh ) )
 			return false;
 
-	newToken( tokens, lineCnt );
+	newToken( mStr[i] );
 
-	tokens.back().idType = T_TYPE_VALUE;
-	tokens.back().id	 = T_VL_NUMBER;
+	mTokens.back().idType = T_TYPE_VALUE;
+	mTokens.back().id	 = T_VL_NUMBER;
 
 	char	prevCh = 0;
 
 	bool	gotDot = false;
 
-	for (; i < str.size();)
+	for (; i < mStr.size();)
 	{
-		ch		= str[i];
-		nextCh	= (i+1) < str.size() ? str[i+1] : 0;
+		ch		= mStr[i].Ch;
+		nextCh	= (i+1) < mStr.size() ? (char)mStr[i+1].Ch : 0;
 
 		if ( isDigit( ch ) )
 		{
-			tokens.back().str += ch;
+			mTokens.back().str += ch;
 			++i;
 		}
 		else
@@ -284,32 +211,32 @@ static bool handleNumber(
 			if ( gotDot )
 			{
 				// 2+ decimal dots means bad number !
-				tokens.back().isBadNumber = true;
-				newToken( tokens, lineCnt );
+				mTokens.back().isBadNumber = true;
+				newToken( mStr[i] );
 				return true;
 			}
 
 			gotDot = true;
-			tokens.back().str += ch;
+			mTokens.back().str += ch;
 			++i;
 		}
 		else
 		if ( ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D' )	// end of a float or double ?
 		{
-			tokens.back().str += ch;
+			mTokens.back().str += ch;
 			++i;
-			newToken( tokens, lineCnt );
+			newToken( mStr[i] );
 			return true;
 		}
 		else
 		if ( ch == 'e' || ch == 'E' )
 		{
-			tokens.back().str += ch;
+			mTokens.back().str += ch;
 			++i;	// take it
 
 			if ( nextCh != 0 )
 			{
-				tokens.back().str += nextCh;
+				mTokens.back().str += nextCh;
 				++i;	// take the next character if there is any
 			}
 
@@ -317,8 +244,8 @@ static bool handleNumber(
 			if NOT( nextCh == '+' || nextCh == '-' || isDigit( nextCh ) )
 			{
 				// if not, then it's a bad number !
-				tokens.back().isBadNumber = true;
-				newToken( tokens, lineCnt );
+				mTokens.back().isBadNumber = true;
+				newToken( mStr[i] );
 				return true;
 			}
 		}
@@ -330,41 +257,40 @@ static bool handleNumber(
 		prevCh = ch;
 	}
 
-	newToken( tokens, lineCnt );
+	newToken( mStr[ i < mStr.size() ? i : (int)mStr.size()-1 ] );
 	return true;
 }
 
 //==================================================================
-static bool handleString(
-					CharArr		&str,
-					size_t		&i,
-					DVec<Token> &tokens,
-					int			lineCnt )
+bool handleString( size_t &i )
 {
-	if ( str[i] == '"' )
+	if ( mStr[i].Ch == '"' )
 	{
-		newToken( tokens, lineCnt );
-		tokens.back().idType = T_TYPE_VALUE;
-		tokens.back().id	 = T_VL_STRING;
+		newToken( mStr[i] );
+		mTokens.back().idType = T_TYPE_VALUE;
+		mTokens.back().id	 = T_VL_STRING;
 
-		//tokens.back().str = str[i++];
+		//mTokens.back().str = mStr[i++];
 		++i;
-		for (; i < str.size(); ++i)
+		for (; i < mStr.size(); ++i)
 		{
-			if ( str[i] == '"' )
+			if ( mStr[i].Ch == '"' )
 			{
 				++i;
 				return true;
 			}
 			else
-				tokens.back().str += str[i];
+				mTokens.back().str += mStr[i].Ch;
 		}
 
-		throw Exception( "String not closing !", &tokens.back() );
+		throw Exception( "String not closing !", &mTokens.back() );
 	}
 
 	return false;
 }
+
+//==================================================================
+};
 
 //==================================================================
 const char *GetTokenTypeStr( TokenIDType tokidtype )
@@ -434,7 +360,7 @@ static void initSortedTable()
 }
 
 //==================================================================
-void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
+void Tokenizer( DVec<Token> &tokens, FatBase &fatBase, const Fat8Vec &str )
 {
 	initSortedTable();
 
@@ -447,16 +373,11 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 
 	bool wasPrecededByWS = false;
 
-	int	lineCnt = 1;
-
-	CharArr	str( pSource, sourceSize );
+	Tokenize	tokenize( str, tokens, fatBase );
 
 	for (size_t i=0; i < str.size(); )
 	{
-		//if ( handleComment( str, i, isInBlockComment, isInLineComment, lineCnt ) )
-		//	continue;
-
-		if ( findSkipWhites( str, i, lineCnt ) )
+		if ( findSkipWhites( str, i ) )
 		{
 			wasPrecededByWS = true;
 			continue;
@@ -464,19 +385,19 @@ void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize )
 		else
 			wasPrecededByWS = false;
 
-		if ( handleNumber( str, i, tokens, lineCnt ) )
+		if ( tokenize.handleNumber( i ) )
 			continue;
 
-		if ( matchTokenDef( tokens, str, i, wasPrecededByWS, lineCnt ) )
+		if ( tokenize.matchTokenDef( i, wasPrecededByWS ) )
 			continue;
 
-		if ( handleAlphanum( str, i, tokens, lineCnt ) )
+		if ( tokenize.handleAlphanum( i ) )
 			continue;
 
-		if ( handleString( str, i, tokens, lineCnt ) )
+		if ( tokenize.handleString( i ) )
 			continue;
 
-		throw Exception( DUT::SSPrintFS( "Invalid character '%c' at line %i !", str[i], lineCnt+1 ) );
+		throw Exception( fatBase, str[i], "Invalid character '%c' !", str[i].Ch );
 	}
 }
 

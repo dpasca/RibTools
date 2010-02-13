@@ -13,6 +13,7 @@
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DContainers.h"
 #include "RSLC_TokenDefs.h"
+#include "RSLC_FatChars.h"
 
 //==================================================================
 namespace RSLC
@@ -41,6 +42,7 @@ public:
 	TokenIDType	idType;
 	bool		isPrecededByWS;
 	bool		isBadNumber;
+	const char	*pSourceFileName;
 	int			sourceLine;
 
 	Token() :
@@ -48,6 +50,7 @@ public:
 		idType(T_TYPE_NONTERM),
 		isPrecededByWS(false),
 		isBadNumber(false),
+		pSourceFileName(NULL),
 		sourceLine(0)
 		{}
 
@@ -98,7 +101,7 @@ public:
 //==================================================================
 const char *GetTokenTypeStr( TokenIDType tokidtype );
 const char *GetTokenIDStr( TokenID tokid );
-void Tokenizer( DVec<Token> &tokens, const char *pSource, size_t sourceSize );
+void Tokenizer( DVec<Token> &tokens, FatBase &fatBase, const Fat8Vec &str );
 
 Token *TokenFromDefOrNTerm( const char *pTokenStr, int lineCnt=0 );
 

@@ -271,6 +271,19 @@ public:
 		return end();
 	}
 
+	size_t find_idx( const T &val, size_t from=0 )
+	{
+		for (size_t i=from; i < mSize; ++i)
+		{
+			if ( mpData[i] == val )
+			{
+				return i;
+			}
+		}
+
+		return NPOS;
+	}
+
 	void find_or_push_back( const T &val )
 	{
 		if ( find( val ) != end() )
@@ -287,6 +300,11 @@ public:
 		{
 			pDes[i] = pSrc[i];
 		}
+	}
+
+	void append( const DVec<T> &srcVec )
+	{
+		append_array( &srcVec[0], srcVec.size() );
 	}
 
 	void get_ownership( DVec<T> &from )

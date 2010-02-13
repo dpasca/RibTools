@@ -18,6 +18,8 @@ namespace RSLC
 //==================================================================
 class Token;
 class TokNode;
+class FatBase;
+class Fat8;
 
 //==================================================================
 class Exception
@@ -28,6 +30,8 @@ public:
 	Exception( const std::string &msg, const Token *pTok=NULL );
 	Exception( const std::string &msg, const TokNode *pTokNode );
 	Exception( const TokNode *pTokNode, const char *pFmt, ... );
+
+	Exception( const FatBase &fatBase, const Fat8 &ch, const char *pFmt, ...  );
 
 	~Exception()
 	{

@@ -17,7 +17,6 @@
 #include "RSLC_Functions.h"
 #include "RSLC_Operators.h"
 #include "RSLC_Registers.h"
-#include "RSLC_Builtins.h"
 #include "RSLC_Constants.h"
 #include "RSLC_Expressions.h"
 #include "RSLCompiler.h"
@@ -32,24 +31,25 @@ const char	*RSLCompiler::mpsVersionString = "0.4a";
 
 //==================================================================
 RSLCompiler::RSLCompiler(
+		const char *pSLFName,
 		const char *pSource,
 		size_t sourceSize,
 		const char *pBaseInclude,
 		const Params &params )
 {
-	DVecRO<U8>	inSource( (const U8 *)pSource, sourceSize );
-	DVec<U8>	processedSource;
-
-	Prepro::Map	procMap;
+	FatBase		fatBase;
+	DVec<Fat8>	source;
+	fatBase.AppendNewFile( source, pSLFName, (const U8 *)pSource, sourceSize );
+	DVec<Fat8>	processedSource;
 
 	Prepro	prepro(
 				*params.mpFileManager,
-				inSource,
+				fatBase,
+				source,
 				pBaseInclude,
-				procMap,
 				processedSource );
 
-	Tokenizer( mTokens, (const char *)&processedSource[0], processedSource.size() );
+	Tokenizer( mTokens, fatBase, processedSource );
 
 #if 0	// useful to debug the tokenizer
 	for (size_t i=0; i < mTokens.size(); ++i)

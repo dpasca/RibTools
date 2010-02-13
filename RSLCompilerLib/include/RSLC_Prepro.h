@@ -12,6 +12,8 @@
 #include "DSystem/include/DContainers.h"
 #include "DSystem/include/DIO_FileManager.h"
 
+#include "RSLC_FatChars.h"
+
 //==================================================================
 namespace RSLC
 {
@@ -20,29 +22,12 @@ namespace RSLC
 class Prepro
 {
 public:
-	class Map
-	{
-	public:
-		DVec<DStr>	mFNames;
-		DVec<u_int>	mOrigLine;
-		DVec<u_int>	mOrigFileIdx;
-
-		void GetOrigin( u_int globalLine, u_int &out_localLine, DStr &out_fname )
-		{
-			DASSERT( globalLine < mOrigLine.size() && mOrigLine.size() == mOrigFileIdx.size() );
-
-			out_localLine = mOrigLine[ globalLine ];
-			out_fname = mFNames[ mOrigFileIdx[ globalLine ] ];
-		}
-	};
-
-public:
 	Prepro(
 		DIO::FileManagerBase	&fmanager,
-		const DVecRO<U8>		&inText,
+		FatBase					&fatBase,
+		const DVec<Fat8>		&inText,
 		const char				*pBaseInclude,
-		Map						&out_map,
-		DVec<U8>				&out_text );
+		DVec<Fat8>				&out_text );
 };
 
 //==================================================================

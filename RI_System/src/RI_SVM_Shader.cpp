@@ -48,6 +48,7 @@ static void compileSLToAsm(
 
 		// try compile
 		RSLCompiler	compiler(
+						pSrcFPathName,
 						(const char *)slSource.GetData(),
 						slSource.GetDataSize(),
 						basInclude.c_str(),

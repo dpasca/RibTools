@@ -99,22 +99,24 @@ static void handlePreproOnly( const char *pSLFName, const char *pBuiltinPathFNam
 
 	try
 	{
-
-		DVecRO<U8>	inSource( (const U8 *)&inData[0], inData.size() );
-		DVec<U8>	processedSource;
-
-		RSLC::Prepro::Map	procMap;
+		RSLC::FatBase		fatBase;
+		DVec<RSLC::Fat8>	source;
+		fatBase.AppendNewFile( source, pSLFName, (const U8 *)&inData[0], inData.size() );
+		DVec<RSLC::Fat8>	processedSource;
 
 		RSLC::Prepro	prepro(
 							fmanager,
-							inSource,
+							fatBase,
+							source,
 							pBuiltinPathFName,
-							procMap,
 							processedSource );
 
-		processedSource.push_back( 0 );	//zero-terminate it for output
+		for (size_t i=0; i < processedSource.size(); ++i)
+		{
+			putchar( processedSource[i].Ch );
+		}
 
-		puts( (const char *)&processedSource[0] );
+		puts( "" );
 	}
 	catch (...)
 	{
@@ -170,6 +172,7 @@ int main( int argc, char *argv[] )
 		params.mpFileManager = &fmanager;
 
 		RSLCompiler	compiler(
+						pSLFName,
 						(const char *)&inData[0],
 						inData.size(),
 						builtinPathFName,

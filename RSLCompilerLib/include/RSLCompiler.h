@@ -39,6 +39,7 @@ public:
 	};
 
 	RSLCompiler(
+		const char *pSLFName,
 		const char *pSource,
 		size_t sourceSize,
 		const char *pBaseInclude,
