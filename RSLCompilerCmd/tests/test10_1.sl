@@ -11,6 +11,8 @@
 #define ONE	\
 		1
 
+#define PLAIN_SYMBOL1	   
+
 surface test10_1()
 {
 	Ci = test10_2_getColor();

@@ -6,6 +6,7 @@
 /// copyright info. 
 //==================================================================
 
+#include <hash_map>
 #include "RSLC_Prepro.h"
 #include "RSLC_Exceptions.h"
 
@@ -16,13 +17,18 @@
 namespace RSLC
 {
 
+typedef stdext::hash_map<std::string,std::string>	SymbolsMap;
+
 //==================================================================
-static bool matches( const DVec<Fat8> &str, size_t end, size_t i, const char *pFindStr )
+static bool matchesAdvance( const DVec<Fat8> &str, size_t &io_i, size_t end, const char *pFindStr )
 {
-	for (; i < end && *pFindStr; ++i)
-		if ( str[i].Ch != *pFindStr++ )
+	size_t ii = io_i;
+
+	for (; ii < end && *pFindStr; ++ii)
+		if ( str[ii].Ch != *pFindStr++ )
 			return false;
 
+	io_i = ii;
 	return true;
 }
 
@@ -82,25 +88,22 @@ static size_t stripComments( DVec<Fat8> &text, size_t start, size_t end )
 		else
 		if ( isBlockComment )
 		{
-			if ( matches( text, end, i, "*/" ) )
+			if ( matchesAdvance( text, i, end, "*/" ) )
 			{
-				i += 2;
 				isBlockComment = false;
 			}
 			else
 				continue;
 		}
 		else
-		if ( matches( text, end, i, "//" ) )
+		if ( matchesAdvance( text, i, end, "//" ) )
 		{
-			i += 2;
 			isLineComment = true;
 			continue;
 		}
 		else
-		if ( matches( text, end, i, "/*" ) )
+		if ( matchesAdvance( text, i, end, "/*" ) )
 		{
-			i += 2;
 			isBlockComment = true;
 			text[ j++ ].Ch = LF;	// add a whitespace in place of a whole comment
 			continue;
@@ -113,15 +116,21 @@ static size_t stripComments( DVec<Fat8> &text, size_t start, size_t end )
 }
 
 //==================================================================
+static void skipHWhites( const DVec<Fat8> &text, size_t &i, size_t toEnd )
+{
+	for (; i < toEnd; ++i)
+		if ( text[i].Ch != ' ' && text[i].Ch != '\t' )
+			break;
+}
+
+//==================================================================
 static size_t optimizeWhitespaces( DVec<Fat8> &text, size_t start, size_t end )
 {
 	// remove whitespaces before the beginning of each line
 	size_t	j = start;
 	for (size_t i=start; i < end; ++i)
 	{
-		for (; i < end; ++i)
-			if ( text[i].Ch != ' ' && text[i].Ch != '\t' )
-				break;
+		skipHWhites( text, i, end );
 
 		for (; i < end; ++i)
 		{
@@ -174,10 +183,6 @@ static bool findAdvance( const DVec<Fat8> &text, size_t &io_from, size_t toEnd, 
 {
 	size_t i = io_from;
 
-	for (; i < toEnd; ++i)
-		if ( text[i].Ch != ' ' && text[i].Ch != '\t' )
-			break;
-
 	size_t	findIdx = 0;
 	for (; i < toEnd && pFindStr[findIdx]; ++i, ++findIdx)
 	{
@@ -199,9 +204,7 @@ static bool findAdvanceChar( const DVec<Fat8> &text, size_t &io_from, size_t toE
 {
 	size_t i = io_from;
 
-	for (; i < toEnd; ++i)
-		if ( text[i].Ch != ' ' && text[i].Ch != '\t' )
-			break;
+	skipHWhites( text, i, toEnd );
 
 	for (size_t j=0; pChars[j]; ++j)
 		if ( text[i].Ch == pChars[j] )
@@ -227,23 +230,22 @@ void CutVector( DVec<_T> &vec, size_t start, size_t end )
 
 //==================================================================
 static void handleInclude(
-				DIO::FileManagerBase	&fmanager,
-				FatBase					&fatBase,
 				DVec<Fat8>				&text,
-				size_t					&i,
+				size_t					i,
 				size_t					lineEnd,
-				size_t					includePoint )
+				size_t					includePoint,
+				DIO::FileManagerBase	&fmanager,
+				FatBase					&fatBase
+				)
 {
-	if NOT( findAdvanceChar( text, i, lineEnd, "\"<" ) )
-	{
-		throw Exception( fatBase, text[i], "No parameter for 'include' ?" );
-	}
+	skipHWhites( text, i, lineEnd );
 
 	U8	closingSymbol;
-	if ( text[i].Ch == '"' )
-		closingSymbol = '"';
+	if ( text[i].Ch == '"' )	closingSymbol = '"';	else
+	if ( text[i].Ch == '<' )	closingSymbol = '>';
 	else
-		closingSymbol = '>';
+		throw Exception( fatBase, text[i], "No parameter for 'include' ?" );
+
 
 	size_t nameStartIdx = i + 1;
 
@@ -279,12 +281,141 @@ static void handleInclude(
 }
 
 //==================================================================
+static bool isAlphaNumStart( char c )
+{
+	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+//==================================================================
+static bool isAlphaNumBody( char c )
+{
+	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+}
+
+//==================================================================
+static bool isAlphaNum( const std::string &str )
+{
+	if NOT( str.length() )
+		return false;
+
+	if NOT( isAlphaNumStart( str[0] ) )
+		return false;
+
+	for (size_t i=1; i < str.length(); ++i)
+		if NOT( isAlphaNumBody( str[i] ) )
+			return false;
+
+	return true;
+}
+
+//==================================================================
+static void handleDefine(
+				DVec<Fat8>	&text,
+				size_t		i,
+				size_t		lineEnd,
+				size_t		startPoint,
+				FatBase		&fatBase,
+				SymbolsMap	&symbols
+				)
+{
+	skipHWhites( text, i, lineEnd );
+	size_t	symbolStartIdx = i;
+
+	for (; i < lineEnd; ++i)
+		if ( text[i].Ch == ' ' || text[i].Ch == '\t' )
+			break;
+	size_t	symbolEndIdx = i;
+
+	std::string	symbolName;
+	for (size_t j=symbolStartIdx; j < symbolEndIdx; ++j)
+		symbolName += text[j].Ch;
+
+	if NOT( isAlphaNum( symbolName ) )
+		throw Exception(
+					fatBase,
+					text[symbolStartIdx],
+					"Expecting an alphanumeric but found '%s'",
+					symbolName.c_str() );
+
+	//---
+	skipHWhites( text, i, lineEnd );
+	size_t	valueStartIdx = i;
+
+	for (; i < lineEnd; ++i)
+		if ( text[i].Ch == ' ' || text[i].Ch == '\t' )
+			break;
+	size_t	valueEndIdx = i;
+
+	std::string	valueStr;
+	for (size_t j=valueStartIdx; j < valueEndIdx; ++j)
+		valueStr += text[j].Ch;
+
+	symbols[symbolName] = valueStr;
+
+	CutVector( text, startPoint, lineEnd );
+}
+
+//==================================================================
+static void applySymbols(
+				DVec<Fat8>			&text,
+				size_t				i,
+				size_t				lineEnd,
+				const SymbolsMap	&symbols
+				)
+{
+	std::string	tmp;
+
+	// this one sort of tokenizes.. we just need to find
+	// the alphanumeric stuff separated by special symbols
+	// or whitespaces.. and completely skip strings
+	for (; i < lineEnd; ++i)
+	{
+		char c = text[i].Ch;
+		if ( c == ' ' || c == '\t' )
+		{
+			continue;
+		}
+		else
+		if ( c == '"' )
+		{
+			// skip to the end of the string
+			for (; i < lineEnd; ++i)
+			{
+				c = text[i].Ch;
+				if ( c == '\\' )
+					++i;
+				else
+				if ( c == '"' )
+					break;
+			}
+		}
+		else
+		if ( isAlphaNumStart( c ) )
+		{
+			tmp.clear();
+			// grab this alphanum
+			for (; i < lineEnd; ++i)
+			{
+				if NOT( isAlphaNumBody( text[i].Ch ) )
+					break;
+
+				tmp += text[i].Ch;
+			}
+
+			symbols.find( tmp );
+		}
+	}
+}
+
+//==================================================================
 static void processFile(
 				DIO::FileManagerBase	&fmanager,
 				FatBase					&fatBase,
 				DVec<Fat8>				&text,
 				const char				*pIncFileName )
 {
+	SymbolsMap	symbols;
+
 	for (size_t i=0; i < text.size();)
 	{
 		size_t lineEnd = text.size();
@@ -299,17 +430,27 @@ static void processFile(
 
 		if ( text[i].Ch == '#' )
 		{
-			size_t	includePoint = i;
+			size_t	startPoint = i;
 
 			++i;
-			if ( findAdvance( text, i, lineEnd, "include" ) )
-			{
-				handleInclude( fmanager, fatBase, text, i, lineEnd, includePoint );
+			skipHWhites( text, i, lineEnd );
 
-				i = includePoint;
+			if ( matchesAdvance( text, i, lineEnd, "include" ) )
+			{
+				handleInclude( text, i, lineEnd, startPoint, fmanager, fatBase );
+				i = startPoint;
+				continue;
+			}
+			else
+			if ( matchesAdvance( text, i, lineEnd, "define" ) )
+			{
+				handleDefine( text, i, lineEnd, startPoint, fatBase, symbols );
+				i = startPoint;
 				continue;
 			}
 		}
+		else
+			applySymbols( text, i, lineEnd, symbols );
 
 		i = lineEnd+1;
 	}
