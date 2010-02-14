@@ -365,6 +365,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_Prepro_ClearChunk.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Prepro_ClearChunk.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_Prepro_Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Prepro_Utils.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Register.cpp"
 				>
 			</File>
@@ -390,6 +406,14 @@
 			</File>
 			<File
 				RelativePath="..\src\RSLC_RRASMOut_WriteVariables.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_TextUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_TextUtils.h"
 				>
 			</File>
 			<File

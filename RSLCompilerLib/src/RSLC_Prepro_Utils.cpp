@@ -1,18 +1,12 @@
 //==================================================================
-/// RSLC_Prepro.h
+/// RSLC_Prepro_Utils.cpp
 ///
-/// Created by Davide Pasca - 2010/2/5
+/// Created by Davide Pasca - 2010/2/14
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RSLC_PREPRO_H
-#define RSLC_PREPRO_H
-
-#include "DSystem/include/DContainers.h"
-#include "DSystem/include/DIO_FileManager.h"
-
-#include "RSLC_FatChars.h"
+#include "RSLC_Prepro_Utils.h"
 
 //==================================================================
 namespace RSLC
@@ -22,20 +16,27 @@ namespace PREPRO
 {
 
 //==================================================================
-class Prepro
+bool MatchesAdvance( const DVec<Fat8> &str, size_t &io_i, size_t end, const char *pFindStr )
 {
-public:
-	Prepro(
-		DIO::FileManagerBase	&fmanager,
-		FatBase					&fatBase,
-		const DVec<Fat8>		&inText,
-		const char				*pBaseInclude,
-		DVec<Fat8>				&out_text );
-};
+	size_t ii = io_i;
+
+	for (; ii < end && *pFindStr; ++ii)
+		if ( str[ii].Ch != *pFindStr++ )
+			return false;
+
+	io_i = ii;
+	return true;
+}
+
+//==================================================================
+void SkipHWhites( const DVec<Fat8> &text, size_t &i, size_t toEnd )
+{
+	for (; i < toEnd; ++i)
+		if ( text[i].Ch != ' ' && text[i].Ch != '\t' )
+			break;
+}
 
 //==================================================================
 }
 //==================================================================
 }
-
-#endif

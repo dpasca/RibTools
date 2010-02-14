@@ -10,6 +10,7 @@
 #include "RSLC_Exceptions.h"
 #include "RSLC_FatChars.h"
 #include "RSLC_Token.h"
+#include "RSLC_TextUtils.h"
 
 //==================================================================
 namespace RSLC
@@ -47,25 +48,6 @@ static bool findSkipWhites( const Fat8Vec &str, size_t &i )
 	}
 	else
 		return false;
-}
-
-//==================================================================
-static bool isAlphaNum( char ch )
-{
-	return
-		(ch >= 'a' && ch <= 'z') ||
-		(ch >= 'A' && ch <= 'Z') ||
-		(ch >= '0' && ch <= '9') ||
-		ch == '_';
-}
-
-//==================================================================
-static bool isAlphaNumStrFirstChar( char ch )
-{
-	return
-		(ch >= 'a' && ch <= 'z') ||
-		(ch >= 'A' && ch <= 'Z')||
-		ch == '_';
 }
 
 //==================================================================
@@ -118,13 +100,13 @@ bool matchTokenDef( size_t &i, bool wasPrecededByWS )
 			size_t	findStrLen = strlen( tokDef.pStr );
 
 			// did we match an alphanumerical string ?
-			if ( isAlphaNumStrFirstChar( tokDef.pStr[0] ) )
+			if ( IsAlphaNumStart( tokDef.pStr[0] ) )
 			{
 				// have some more on the right ?
 				if ( (i+findStrLen) < mStr.size() )
 				{
 					// is that alphanumeric ?
-					if ( isAlphaNum( mStr[ i+findStrLen ].Ch ) )
+					if ( IsAlphaNumBody( mStr[ i+findStrLen ].Ch ) )
 					{
 						// ..if yes, then it's a bad match
 						continue;
@@ -151,7 +133,7 @@ bool matchTokenDef( size_t &i, bool wasPrecededByWS )
 //==================================================================
 bool handleAlphanum( size_t &i )
 {
-	if NOT( isAlphaNumStrFirstChar( mStr[i].Ch ) )
+	if NOT( IsAlphaNumStart( mStr[i].Ch ) )
 		return false;
 
 	newToken( mStr[i] );
@@ -161,7 +143,7 @@ bool handleAlphanum( size_t &i )
 
 	for (; i < mStr.size(); ++i)
 	{
-		if ( !isAlphaNum( mStr[i].Ch ) )
+		if ( !IsAlphaNumBody( mStr[i].Ch ) )
 			break;
 
 		mTokens.back().str += mStr[i].Ch;

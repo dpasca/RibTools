@@ -104,7 +104,8 @@ static void handlePreproOnly( const char *pSLFName, const char *pBuiltinPathFNam
 		fatBase.AppendNewFile( source, pSLFName, (const U8 *)&inData[0], inData.size() );
 		DVec<RSLC::Fat8>	processedSource;
 
-		RSLC::Prepro	prepro(
+		RSLC::PREPRO::Prepro
+						prepro(
 							fmanager,
 							fatBase,
 							source,

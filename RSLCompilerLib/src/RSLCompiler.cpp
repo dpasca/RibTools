@@ -42,12 +42,13 @@ RSLCompiler::RSLCompiler(
 	fatBase.AppendNewFile( source, pSLFName, (const U8 *)pSource, sourceSize );
 	DVec<Fat8>	processedSource;
 
-	Prepro	prepro(
-				*params.mpFileManager,
-				fatBase,
-				source,
-				pBaseInclude,
-				processedSource );
+	PREPRO::Prepro
+				prepro(
+					*params.mpFileManager,
+					fatBase,
+					source,
+					pBaseInclude,
+					processedSource );
 
 	Tokenizer( mTokens, fatBase, processedSource );
 
