@@ -229,6 +229,46 @@ void CutVector( DVec<_T> &vec, size_t start, size_t end )
 }
 
 //==================================================================
+template <class _T>
+void ReplaceSubVector( DVec<_T> &vec, size_t start, size_t end, const DVec<_T> &newSpan )
+{
+	// VEC  : -----------|start------------|end-----------|vec.size()
+	// EXPA :            |newSpan-------------|newSpan.size()
+	// CONTR:            |newSpan--------|newSpan.size()
+
+	DASSERT( start <= end );
+
+	size_t		oldSpanLen = end - start;
+
+	ptrdiff_t	oldToNewSizeDiff = (ptrdiff_t)newSpan.size() - (ptrdiff_t)oldSpanLen;
+
+	if ( oldToNewSizeDiff > 0 )
+	{
+		// expand
+		size_t	oldVecSize = vec.size();
+
+		vec.resize( oldVecSize + oldToNewSizeDiff );	// enlarge the vec
+
+		// move the elements down to make space
+		for (size_t i=oldVecSize; i > end; --i)
+			vec[i-1+oldToNewSizeDiff] = vec[i-1];
+	}
+	else
+	if ( oldToNewSizeDiff < 0 )
+	{
+		// contract
+		for (size_t i=end; i < vec.size(); ++i)
+			vec[i+oldToNewSizeDiff] = vec[i];
+
+		vec.resize( vec.size() + oldToNewSizeDiff );
+	}
+
+	// finally copy the new span
+	for (size_t i=0; i < newSpan.size(); ++i)
+		vec[start+i] = newSpan[i];
+}
+
+//==================================================================
 static void handleInclude(
 				DVec<Fat8>				&text,
 				size_t					i,
@@ -356,23 +396,34 @@ static void handleDefine(
 }
 
 //==================================================================
-static void applySymbols(
+static size_t applySymbols(
 				DVec<Fat8>			&text,
-				size_t				i,
+				size_t				start,
 				size_t				lineEnd,
-				const SymbolsMap	&symbols
+				const SymbolsMap	&symbols,
+				DVec<Fat8>			&scrcpad
 				)
 {
 	std::string	tmp;
 
+	bool		replacementHappened = false;
+	scrcpad.clear();
+
+	size_t		i = start;
+
 	// this one sort of tokenizes.. we just need to find
 	// the alphanumeric stuff separated by special symbols
-	// or whitespaces.. and completely skip strings
+	// or white-spaces.. and completely skip strings
+
+	// NOTE that we copy into the line scratchpad as we go
+	// but only apply the scratchpad if an actual substitution
+	// has happened
 	for (; i < lineEnd; ++i)
 	{
 		char c = text[i].Ch;
 		if ( c == ' ' || c == '\t' )
 		{
+			scrcpad.push_back( text[i] );
 			continue;
 		}
 		else
@@ -382,8 +433,14 @@ static void applySymbols(
 			for (; i < lineEnd; ++i)
 			{
 				c = text[i].Ch;
+				scrcpad.push_back( text[i] );
+	
 				if ( c == '\\' )
+				{
 					++i;
+					if ( i < lineEnd )
+						scrcpad.push_back( text[i] );
+				}
 				else
 				if ( c == '"' )
 					break;
@@ -392,19 +449,60 @@ static void applySymbols(
 		else
 		if ( isAlphaNumStart( c ) )
 		{
-			tmp.clear();
 			// grab this alphanum
-			for (; i < lineEnd; ++i)
+			tmp.clear();
+			size_t j = i;
+			for (; j < lineEnd; ++j)
 			{
-				if NOT( isAlphaNumBody( text[i].Ch ) )
+				if NOT( isAlphaNumBody( text[j].Ch ) )
 					break;
 
-				tmp += text[i].Ch;
+				tmp += text[j].Ch;
 			}
 
-			symbols.find( tmp );
+			SymbolsMap::const_iterator foundIt = symbols.find( tmp );
+			if ( foundIt != symbols.end() )
+			{
+				replacementHappened = true;
+
+				const std::string &symbVal = foundIt->second;
+
+				// copy defined symbol, using the current text location
+				// ..current file name and line number
+				for (size_t k=0; k < symbVal.length(); ++k)
+				{
+					Fat8 *pFatChar = scrcpad.grow();
+					pFatChar->Ch		= symbVal[k];
+					pFatChar->FNameIdx	= text[i].FNameIdx;
+					pFatChar->SrcPos	= text[i].SrcPos;
+				}
+
+				i = j;
+			}
+			else
+			{
+				// copy the captured alphanumeric
+				for (; i < j; ++i)
+					scrcpad.push_back( text[i] );
+
+			}
+
+			// go back one to compensate for the for-loop next increment
+			if ( i ) --i;
 		}
+		else
+			scrcpad.push_back( text[i] );
 	}
+
+	if ( replacementHappened )
+	{
+		ReplaceSubVector( text, start, lineEnd, scrcpad );
+
+		// return the new lineEnd position
+		return start + scrcpad.size();
+	}
+	else
+		return lineEnd;
 }
 
 //==================================================================
@@ -415,6 +513,10 @@ static void processFile(
 				const char				*pIncFileName )
 {
 	SymbolsMap	symbols;
+
+	// use this as a scratch-pad to avoid countless reallocations
+	// on every macro substitution
+	DVec<Fat8>	workTextLine;
 
 	for (size_t i=0; i < text.size();)
 	{
@@ -450,7 +552,9 @@ static void processFile(
 			}
 		}
 		else
-			applySymbols( text, i, lineEnd, symbols );
+		{
+			lineEnd = applySymbols( text, i, lineEnd, symbols, workTextLine );
+		}
 
 		i = lineEnd+1;
 	}
