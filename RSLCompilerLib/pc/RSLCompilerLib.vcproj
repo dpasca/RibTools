@@ -357,30 +357,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\RSLC_Prepro.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RSLC_Prepro.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RSLC_Prepro_ClearChunk.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RSLC_Prepro_ClearChunk.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\RSLC_Prepro_Utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\RSLC_Prepro_Utils.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\RSLC_Register.cpp"
 				>
 			</File>
@@ -476,6 +452,54 @@
 				RelativePath="..\include\RSLCompiler.h"
 				>
 			</File>
+			<Filter
+				Name="Prepro"
+				>
+				<File
+					RelativePath="..\src\RSLC_Prepro.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RSLC_Prepro.h"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RSLC_Prepro_Base.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RSLC_Prepro_ClearChunk.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RSLC_Prepro_ClearChunk.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RSLC_Prepro_Conditionals.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RSLC_Prepro_Conditionals.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RSLC_Prepro_Include.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RSLC_Prepro_Include.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\RSLC_Prepro_Utils.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\include\RSLC_Prepro_Utils.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

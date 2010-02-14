@@ -39,6 +39,9 @@ void CutVector( DVec<_T> &vec, size_t start, size_t end )
 }
 
 //==================================================================
+void CutVectorInclusive( DVec<Fat8> &vec, size_t start, size_t end );
+
+//==================================================================
 template <class _T>
 void ReplaceSubVector( DVec<_T> &vec, size_t start, size_t end, const DVec<_T> &newSpan )
 {
@@ -78,6 +81,13 @@ void ReplaceSubVector( DVec<_T> &vec, size_t start, size_t end, const DVec<_T> &
 		vec[start+i] = newSpan[i];
 }
 
+//==================================================================
+size_t GetAlphaNumBetweenSpaces(
+				DVec<Fat8>	&text,
+				size_t		i,
+				size_t		lineEnd,
+				FatBase		&fatBase,
+				std::string	&out_symName );
 
 //==================================================================
 }

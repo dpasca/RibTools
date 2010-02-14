@@ -1,15 +1,15 @@
 //==================================================================
-/// RSLC_Prepro_ClearChunk.h
+/// RSLC_Prepro_Include.h
 ///
-/// Created by Davide Pasca - 2010/2/14
+/// Created by Davide Pasca - 2010/2/15
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RSLC_PREPRO_CLEARCHUNK_H
-#define RSLC_PREPRO_CLEARCHUNK_H
+#ifndef RSLC_PREPRO_INCLUDE_H
+#define RSLC_PREPRO_INCLUDE_H
 
-#include "DSystem/include/DContainers.h"
+#include "DSystem/include/DIO_FileManager.h"
 #include "RSLC_FatChars.h"
 
 //==================================================================
@@ -20,8 +20,13 @@ namespace PREPRO
 {
 
 //==================================================================
-size_t ClearChunk( DVec<Fat8> &text, size_t start=0, size_t end=NPOS );
-
+void HandleInclude(
+				DVec<Fat8>				&text,
+				size_t					i,
+				size_t					lineEnd,
+				size_t					includePoint,
+				DIO::FileManagerBase	&fmanager,
+				FatBase					&fatBase );
 
 //==================================================================
 }

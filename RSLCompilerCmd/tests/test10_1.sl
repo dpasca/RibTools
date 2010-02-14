@@ -36,5 +36,19 @@ surface test10_1()
 
 	Oi = SAME;		// should become 1234
 	
+#ifdef PLAIN_SYMBOL1
 	PLAIN_SYMBOL1;	// should become just ;
+	
+	Oi = 7;			// this should appear
+	
+	#ifdef SOMETHING_NOT_DEFINED
+	Oi = 8;			// this should be ignored
+	#endif
+	
+#endif
+
+#ifndef PLAIN_SYMBOL1
+	Oi = 9;			// this should be ignored
+#endif
+
 }

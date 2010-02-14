@@ -6,11 +6,13 @@
 /// copyright info. 
 //==================================================================
 
-#include <hash_map>
 #include "RSLC_TextUtils.h"
 #include "RSLC_Exceptions.h"
+#include "RSLC_Prepro_Base.h"
 #include "RSLC_Prepro_Utils.h"
+#include "RSLC_Prepro_Include.h"
 #include "RSLC_Prepro_ClearChunk.h"
+#include "RSLC_Prepro_Conditionals.h"
 #include "RSLC_Prepro.h"
 
 //==================================================================
@@ -19,59 +21,6 @@ namespace RSLC
 //==================================================================
 namespace PREPRO
 {
-
-typedef stdext::hash_map<std::string,std::string>	SymbolsMap;
-
-//==================================================================
-static void handleInclude(
-				DVec<Fat8>				&text,
-				size_t					i,
-				size_t					lineEnd,
-				size_t					includePoint,
-				DIO::FileManagerBase	&fmanager,
-				FatBase					&fatBase
-				)
-{
-	SkipHWhites( text, i, lineEnd );
-
-	U8	closingSymbol;
-	if ( text[i].Ch == '"' )	closingSymbol = '"';	else
-	if ( text[i].Ch == '<' )	closingSymbol = '>';
-	else
-		throw Exception( fatBase, text[i], "No parameter for 'include' ?" );
-
-	size_t nameStartIdx = i + 1;
-
-	DStr	includeName;
-
-	for (++i; i < lineEnd; ++i)
-	{
-		if ( text[i].Ch == closingSymbol )
-		{
-			DVec<U8> incFileData;
-			fmanager.GrabFile( includeName.c_str(), incFileData );
-			size_t insertEnd =
-				fatBase.InsertNewFile(
-						text,
-						includePoint,
-						lineEnd,
-						includeName.c_str(),
-						&incFileData[0],
-						incFileData.size() );
-
-			size_t newEnd = ClearChunk( text, includePoint, insertEnd );
-			DASSERT( newEnd <= insertEnd );
-
-			CutVector( text, newEnd, insertEnd );
-
-			return;
-		}
-
-		includeName += (char)text[i].Ch;
-	}
-
-	throw Exception( fatBase, text[nameStartIdx], "No closing symbol for 'include'" );
-}
 
 //==================================================================
 static void handleDefine(
@@ -83,24 +32,8 @@ static void handleDefine(
 				SymbolsMap	&symbols
 				)
 {
-	SkipHWhites( text, i, lineEnd );
-	size_t	symbolStartIdx = i;
-
-	for (; i < lineEnd; ++i)
-		if ( text[i].Ch == ' ' || text[i].Ch == '\t' )
-			break;
-	size_t	symbolEndIdx = i;
-
-	std::string	symbolName;
-	for (size_t j=symbolStartIdx; j < symbolEndIdx; ++j)
-		symbolName += text[j].Ch;
-
-	if NOT( IsAlphaNumStr( symbolName ) )
-		throw Exception(
-					fatBase,
-					text[symbolStartIdx],
-					"Expecting an alphanumeric but found '%s'",
-					symbolName.c_str() );
+	std::string	symName;
+	i = GetAlphaNumBetweenSpaces( text, i, lineEnd, fatBase, symName );
 
 	//---
 	SkipHWhites( text, i, lineEnd );
@@ -115,9 +48,9 @@ static void handleDefine(
 	for (size_t j=valueStartIdx; j < valueEndIdx; ++j)
 		valueStr += text[j].Ch;
 
-	symbols[symbolName] = valueStr;
+	symbols[symName] = valueStr;
 
-	CutVector( text, startPoint, lineEnd );
+	CutVectorInclusive( text, startPoint, lineEnd );
 }
 
 //==================================================================
@@ -236,7 +169,11 @@ static void processFile(
 				DVec<Fat8>				&text,
 				const char				*pIncFileName )
 {
+	// map of preprocessor symbols
 	SymbolsMap	symbols;
+
+	// stack that keeps track of #if/#endif blocks
+	ActiveStack	actStack;
 
 	// use this as a scratch-pad to avoid countless reallocations
 	// on every macro substitution
@@ -254,6 +191,8 @@ static void processFile(
 			}
 		}
 
+		bool	isBlockActive = (actStack.size() == 0 || actStack.back() == true);
+
 		if ( text[i].Ch == '#' )
 		{
 			size_t	startPoint = i;
@@ -261,22 +200,70 @@ static void processFile(
 			++i;
 			SkipHWhites( text, i, lineEnd );
 
-			if ( MatchesAdvance( text, i, lineEnd, "include" ) )
+			// #if, #ifdef, #ifndef and #endif are always processed
+			// regardless of the block being active or not.. because
+			// we need to keep track of when a #if*/#endif block is
+			// closed
+			if ( MatchesAdvance( text, i, lineEnd, "ifdef" ) )
 			{
-				handleInclude( text, i, lineEnd, startPoint, fmanager, fatBase );
+				HandleIfDef( text, i, lineEnd, startPoint, fatBase, symbols, actStack, true );
 				i = startPoint;
 				continue;
 			}
 			else
-			if ( MatchesAdvance( text, i, lineEnd, "define" ) )
+			if ( MatchesAdvance( text, i, lineEnd, "ifndef" ) )
 			{
-				handleDefine( text, i, lineEnd, startPoint, fatBase, symbols );
+				HandleIfDef( text, i, lineEnd, startPoint, fatBase, symbols, actStack, false );
 				i = startPoint;
 				continue;
+			}
+			else
+			if ( MatchesAdvance( text, i, lineEnd, "if" ) )
+			{
+				throw Exception( fatBase, text[i], "#if is currently unsupported (^^;)" );
+				continue;
+			}
+			else
+			if ( MatchesAdvance( text, i, lineEnd, "endif" ) )
+			{
+				HandleEndIf( text, i, lineEnd, startPoint, fatBase, actStack );
+				i = startPoint;
+				continue;
+			}
+			else
+			{
+				if NOT( isBlockActive )
+				{
+					// cut the line and ignore the rest
+					CutVectorInclusive( text, startPoint, lineEnd );
+					i = startPoint;
+					continue;
+				}
+
+				if ( MatchesAdvance( text, i, lineEnd, "include" ) )
+				{
+					HandleInclude( text, i, lineEnd, startPoint, fmanager, fatBase );
+					i = startPoint;
+					continue;
+				}
+				else
+				if ( MatchesAdvance( text, i, lineEnd, "define" ) )
+				{
+					handleDefine( text, i, lineEnd, startPoint, fatBase, symbols );
+					i = startPoint;
+					continue;
+				}
 			}
 		}
 		else
 		{
+			if NOT( isBlockActive )
+			{
+				// cut the line and ignore the rest
+				CutVectorInclusive( text, i, lineEnd );
+				continue;
+			}
+
 			lineEnd = applySymbols( text, i, lineEnd, symbols, workTextLine );
 		}
 
