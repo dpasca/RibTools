@@ -70,6 +70,25 @@ void HandleEndIf(
 }
 
 //==================================================================
+void HandleElse(
+				DVec<Fat8>	&text,
+				size_t		i,
+				size_t		lineEnd,
+				size_t		startPoint,
+				FatBase		&fatBase,
+				ActiveStack	&actStack )
+{
+	if ( actStack.size() == 0 )
+		throw Exception(
+					fatBase,
+					text[i],
+					"#else not matching any #if/#ifdef/#ifndef" );
+
+	actStack.back() = !actStack.back();
+	CutVectorInclusive( text, startPoint, lineEnd );
+}
+
+//==================================================================
 }
 //==================================================================
 }

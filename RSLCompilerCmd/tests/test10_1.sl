@@ -49,6 +49,8 @@ surface test10_1()
 
 #ifndef PLAIN_SYMBOL1
 	Oi = 9;			// this should be ignored
+#else
+	Oi = 10;		// this should appear
 #endif
 
 }

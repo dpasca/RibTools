@@ -218,9 +218,22 @@ static void processFile(
 				continue;
 			}
 			else
+			if ( MatchesAdvance( text, i, lineEnd, "else" ) )
+			{
+				HandleElse( text, i, lineEnd, startPoint, fatBase, actStack );
+				i = startPoint;
+				continue;
+			}
+			else
 			if ( MatchesAdvance( text, i, lineEnd, "if" ) )
 			{
 				throw Exception( fatBase, text[i], "#if is currently unsupported (^^;)" );
+				continue;
+			}
+			else
+			if ( MatchesAdvance( text, i, lineEnd, "elif" ) )
+			{
+				throw Exception( fatBase, text[i], "#elif is currently unsupported (^^;)" );
 				continue;
 			}
 			else
