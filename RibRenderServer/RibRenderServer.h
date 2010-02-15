@@ -25,6 +25,6 @@
 #include "DSystem/include/DCriticalSection.h"
 
 #define APPNAME		"RibRenderServer"
-#define APPVERSION	"0.9"
+#define APPVERSION	"0.10"
 
 #endif

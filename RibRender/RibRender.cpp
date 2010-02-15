@@ -6,8 +6,9 @@
 /// copyright info.
 //==================================================================
 
-#include "RibRender.h"
+#include "RibToolsBase/include/RibToolsBase.h"
 #include "DispWindows.h"
+#include "RibRender.h"
 
 //==================================================================
 static void printUsage( int argc, char **argv )
@@ -20,6 +21,7 @@ static void printUsage( int argc, char **argv )
 	printf( "    -help | --help | -h             -- Show this help\n" );
 	printf( "    -server <address>:<port>        -- Specify an IP and port number for a render server\n" );
 	printf( "    -forcedlongdim <size in pixels> -- Force the largest dimension's rendering size in pixels\n" );
+	printf( "    -colorgrids                     -- Show grids in false colors (for debugging)\n" );
 
 	printf( "\nExamples:\n" );
 	printf( "    %s TestScenes/Airplane.rib\n", argv[0] );
@@ -69,6 +71,11 @@ static bool getCmdParams( int argc, char **argv, CmdParams &out_cmdPars )
 			{
 				printf( "Invalid value for %s.\n", argv[i] );
 			}
+		}
+		else
+		if ( 0 == strcasecmp( "-colorgrids", argv[i] ) )
+		{
+			out_cmdPars.doColorGrids = true;
 		}
 	}
 
@@ -127,7 +134,7 @@ static int clientMain( int argc, char **argv )
 	char	defaultResDir[2048];
 	char	defaultShadersDir[4096];
 
-	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
+	DStr	exePath = RTB::FindRibToolsDir( argv );
 
 	if ( exePath.length() )
 		sprintf_s( defaultResDir, "%s/Resources", exePath.c_str() );
@@ -152,6 +159,13 @@ static int clientMain( int argc, char **argv )
 	params.mTrans.mForcedLongDim			= cmdPars.forcedlongdim;
 	params.mpFileName						= cmdPars.pInFileName;
 	params.mpOnFrameEndCB					= handleDisplays;
+
+	// setup for color coded grids
+	if ( cmdPars.doColorGrids )
+	{
+		hiderParams.mDbgColorCodedGrids = true;
+		params.mTrans.mState.mForcedSurfaceShader = "constant";
+	}
 
 	try
 	{

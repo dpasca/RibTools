@@ -151,50 +151,84 @@ State::State( const Params &params ) :
 }
 
 //==================================================================
-void State::addDefShader( const char *pBasePath, const char *pSName )
+SVM::Shader *State::GetShader( const char *pShaderName, const char *pAlternateName )
 {
-	char	buff[1024];
+	// try see if we have it loaded already
+	SVM::Shader	*pShader =
+			(SVM::Shader *)mResManager.FindResource( pShaderName,
+													ResourceBase::TYPE_SHADER );
 
-	SVM::Shader::CtorParams	params;
-	params.pName			= pSName;
-	params.pSourceFileName	= buff;
-	params.pBaseIncDir		= mParams.mDefaultShadersDir.c_str();
+	if ( pShader )
+		return pShader;
 
-	SVM::Shader *pShader = NULL;
-	try 
+	DStr	tmpFName;
+	DStr	shaderFullPathName;
+
+	// try .sl
+	tmpFName = DStr( pShaderName ) + ".sl";
+	shaderFullPathName = FindResFile( tmpFName.c_str(), Options::SEARCHPATH_SHADER );
+
+	if NOT( shaderFullPathName.length() )
 	{
-		sprintf( buff, "%s/%s.sl", pBasePath, params.pName );
-		if ( mParams.mpFileManager->FileExists( buff ) )
-		{
-			pShader = DNEW SVM::Shader( params, *mParams.mpFileManager );
-			mResManager.AddResource( pShader );
-		}
-		else
-		{
-			sprintf( buff, "%s/%s.rrasm", pBasePath, params.pName );
-			if ( mParams.mpFileManager->FileExists( buff ) )
-			{
-				pShader = DNEW SVM::Shader( params, *mParams.mpFileManager );
-				mResManager.AddResource( pShader );
-			}
-		}
+		// try .rrasm
+		tmpFName = DStr( pShaderName ) + ".rrasm";
+		shaderFullPathName = FindResFile( tmpFName.c_str(), Options::SEARCHPATH_SHADER );
 	}
-	catch ( ... )
+
+	if ( shaderFullPathName.length() )
 	{
-		printf( "Error: Failed to load the shader %s\n", params.pName );
+		SVM::Shader::CtorParams	params;
+		params.pName			= pShaderName;
+		params.pBaseIncDir		= GetDefShadersDir();
+		params.pSourceFileName	= shaderFullPathName.c_str();
+
+		try {
+			pShader = DNEW SVM::Shader( params, GetFileManager() );
+		} catch ( ... )
+		{
+			ERRPrintf( "Could not compile '%s' !", params.pSourceFileName );
+			return NULL;
+		}
+
+		mResManager.AddResource( pShader );
+
+		return pShader;
 	}
+	else
+	{
+		return NULL;
+	}
+		
+	if ( pAlternateName )
+	{
+		if ( pShader =
+				(SVM::Shader *)mResManager.FindResource( pAlternateName,
+														ResourceBase::TYPE_SHADER ) )
+			return pShader;
+	}
+
+	return NULL;
 }
 
 //==================================================================
 void State::makeDefaultShaders( const char *pBasePath )
 {
-	addDefShader( pBasePath, "constant"			);
-	addDefShader( pBasePath, "matte"			);
-	addDefShader( pBasePath, "dbg_normal_col"	);
-	addDefShader( pBasePath, "test"				);
-	//addDefShader( pBasePath, "ambientlight"		);
-	//addDefShader( pBasePath, "distantlight"		);
-	//addDefShader( pBasePath, "arealight"		);
+	const char *pDefShaders[] =
+	{
+		"constant",
+		"matte",
+		"dbg_normal_col",
+		NULL
+	};
+
+	// load the default shaders.. these must be found
+	for (size_t i=0; pDefShaders[i]; ++i)
+	{
+		SVM::Shader *pShader = GetShader( pDefShaders[i], NULL );
+
+		DASSTHROW( pShader != NULL,
+				("Could not find the shader '%s'", pDefShaders[i]) );
+	}
 }
 
 //==================================================================
@@ -643,7 +677,7 @@ size_t State::AddLightSource( LightSourceT *pLSource )
 }
 
 //==================================================================
-DStr State::FindResFile( const char *pFindFileName, Options::SearchPath spathType )
+DStr State::FindResFile( const char *pFindFileName, Options::SearchPathh spathType )
 {
 	const DVec<DStr>	&spaths = GetCurOptions().mSearchPaths[ spathType ];
 

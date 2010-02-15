@@ -25,7 +25,7 @@
 #include "DSystem/include/DCriticalSection.h"
 
 #define APPNAME		"RibRender"
-#define APPVERSION	"0.9"
+#define APPVERSION	"0.10"
 
 //==================================================================
 struct CmdParams
@@ -33,12 +33,14 @@ struct CmdParams
 	const char				*pInFileName;
 	int						forcedlongdim;
 	DVec<RRL::NET::Server>	servList;
+	bool					doColorGrids;
 
 	DStr					baseDir;
 
 	CmdParams() :
 		pInFileName		(NULL),
-		forcedlongdim	(-1)
+		forcedlongdim	(-1),
+		doColorGrids	(false)
 	{
 	}
 };

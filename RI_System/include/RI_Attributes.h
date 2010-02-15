@@ -123,7 +123,6 @@ public:
 	Texture *GetTexture( const char *pTextureName ) const;
 
 private:
-	SVM::Shader *getShader( const char *pShaderName, const char *pAlternateName );
 	void getShaderParams( ParamList &params, size_t fromIdx, SVM::ShaderInst &shaderInst, const Matrix44 &mtxLocalCam );
 };
 

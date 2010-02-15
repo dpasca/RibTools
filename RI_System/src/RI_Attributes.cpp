@@ -122,9 +122,14 @@ void Attributes::Init(
 	mColor.Set( 1, 1, 1 );
 	mOpacity.Set( 1, 1, 1 );
 
-	moSurfaceSHI = DNEW SVM::ShaderInst( 
-		(SVM::Shader *)pResManager->FindResource( "dbg_normal_col",
-													ResourceBase::TYPE_SHADER ) );
+	SVM::Shader	*pShader =
+		(SVM::Shader *)pResManager->FindResource(
+										"dbg_normal_col",
+										ResourceBase::TYPE_SHADER );
+
+	DASSERT( pShader != NULL );
+
+	moSurfaceSHI = DNEW SVM::ShaderInst( pShader );
 }
 
 //==================================================================
@@ -304,7 +309,7 @@ void Attributes::cmdLightSource( ParamList &params )
 
 	const char *pShaderName = params[0].PChar();
 
-	SVM::Shader	*pShader = getShader( pShaderName, NULL );
+	SVM::Shader	*pShader = mpState->GetShader( pShaderName, NULL );
 
 	if NOT( pShader )
 	{
@@ -365,7 +370,7 @@ void Attributes::cmdSurface( ParamList &params )
 	else
 		pShaderName = params[0].PChar();
 
-	SVM::Shader	*pShader = getShader( pShaderName, "matte" );
+	SVM::Shader	*pShader = mpState->GetShader( pShaderName, "matte" );
 
 	if ( pShader )
 	{
@@ -389,7 +394,7 @@ void Attributes::cmdDisplacement( ParamList &params )
 
 	const char *pShaderName = params[0].PChar();
 
-	SVM::Shader	*pShader = getShader( pShaderName, NULL );
+	SVM::Shader	*pShader = mpState->GetShader( pShaderName, NULL );
 
 	if ( pShader )
 	{

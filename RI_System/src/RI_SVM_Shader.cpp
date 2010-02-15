@@ -153,6 +153,7 @@ ShaderInst::ShaderInst( Shader *pShader, size_t maxPointsN ) :
 	moShader(pShader),
 	mMaxPointsN(maxPointsN)
 {
+	DASSERT( pShader != NULL );
 }
 
 //==================================================================

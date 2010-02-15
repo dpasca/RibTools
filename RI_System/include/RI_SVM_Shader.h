@@ -213,12 +213,14 @@ public:
 
 	ShaderInst( const ShaderInst &right )
 	{
+		DASSERT( right.moShader.Use() != NULL );
 		moShader.Borrow( right.moShader );
 		//mCallSymIList	= right.mCallSymIList;
 	}
 
 	void operator = ( const ShaderInst &right )
 	{
+		DASSERT( right.moShader.Use() != NULL );
 		moShader.Borrow( right.moShader );
 		//mCallSymIList	= right.mCallSymIList;
 	}

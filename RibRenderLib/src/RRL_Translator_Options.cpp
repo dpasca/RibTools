@@ -73,7 +73,7 @@ static void processSearchPath( DVec<DStr> &curSPathList, DVec<DStr> &newStrings 
 }
 
 //==================================================================
-static RI::Options::SearchPath findSearchPathType( const char *pPathType )
+static RI::Options::SearchPathh findSearchPathType( const char *pPathType )
 {
 	char buff[1024];
 	strcpy_s( buff, pPathType );
@@ -120,7 +120,7 @@ bool Translator::addCommand_options(
 			const char *pPathType = p[1].PChar();
 			const char *pPathString = p[2].PChar();
 
-			RI::Options::SearchPath	idx = findSearchPathType( pPathType );
+			RI::Options::SearchPathh	idx = findSearchPathType( pPathType );
 
 			if ( idx == RI::Options::SEARCHPATH_UNKNOWN )
 			{

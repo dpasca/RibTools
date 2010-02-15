@@ -86,7 +86,7 @@ public:
 	u_int			mPixSamples[2];
 	DVec<Display *>	mpDisplays;
 
-	enum SearchPath
+	enum SearchPathh
 	{
 		SEARCHPATH_SHADER,
 		SEARCHPATH_TEXTURE,

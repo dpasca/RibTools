@@ -104,7 +104,7 @@ public:
 	const char *GetBaseDir()		const	{	return mParams.mBaseDir.c_str();			}
 	const char *GetDefShadersDir() const	{	return mParams.mDefaultShadersDir.c_str();	}
 
-	DStr		FindResFile( const char *pFileName, Options::SearchPath spathType );
+	DStr		FindResFile( const char *pFileName, Options::SearchPathh spathType );
 
 	Options			&GetCurOptions()			{	return mOptionsStack.top();	}
 	const Options	&GetCurOptions() const		{	return mOptionsStack.top();	}
@@ -203,6 +203,8 @@ public:
 	void Polygon( ParamList &params );
 	void PointsGeneralPolygons( ParamList &params );
 
+	// --- Non RI commands
+
 	void ErrHandler( Error errCode );
 	void ErrHandler( Error errCode, const char *pFmt, ... );
 
@@ -217,6 +219,8 @@ public:
 	const Matrix44 &GetCurTransformCloseMtx() const	{	return mTransformCloseStack.top().GetMatrix();	}
 
 	const Matrix44 &GetWorldCameraMtx() const		{	return mMtxWorldCamera;	}
+
+	SVM::Shader *GetShader( const char *pShaderName, const char *pAlternateName );
 
 private:
 	bool checkPopMode( Mode expectedMode );

@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdexcept>
+#include "RibToolsBase/include/RibToolsBase.h"
 #include "RibRenderLib/include/RibRenderLib.h"
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DUtils_Files.h"
@@ -407,7 +408,7 @@ int main(int argc, char** argv)
 
     glutInit( &argc, argv );
 
-	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
+	DStr	exePath = RTB::FindRibToolsDir( argv );
 
 	RibRendToy	toy( exePath.c_str() );
 

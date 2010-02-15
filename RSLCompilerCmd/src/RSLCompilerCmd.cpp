@@ -9,11 +9,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "DSystem/include/DUtils_Files.h"
+#include "RibToolsBase/include/RibToolsBase.h"
 #include "RSLCompilerLib/include/RSLCompiler.h"
 #include "RSLCompilerLib/include/RSLC_Prepro.h"
 
 #define APPNAME		"RSLCompilerCmd"
-#define APPVERSION	"0.4a"
+#define APPVERSION	"0.5"
 
 //==================================================================
 struct CmdParams
@@ -138,7 +139,7 @@ int main( int argc, char *argv[] )
 
 	char	defaultResDir[2048];
 	char	builtinPathFName[4096];
-	DStr	exePath = DUT::GetDirNameFromFPathName( argv[0] );
+	DStr	exePath = RTB::FindRibToolsDir( argv );
 	if ( exePath.length() )
 		sprintf_s( defaultResDir, "%s/Resources", exePath.c_str() );
 	else
