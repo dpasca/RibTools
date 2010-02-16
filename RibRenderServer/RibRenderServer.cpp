@@ -67,9 +67,19 @@ static int serverTask( SOCKET clientSock )
 	{
 		RRL::Render	render( params );
 	}
+	catch ( std::bad_alloc )
+	{
+		printf( "Out of Memory !!!\n" );
+		return -1;
+	}
+	catch ( RI::Exception &e )
+	{
+		printf( "%s\nAborting.\n", e.GetMessage().c_str() );
+		return -1;
+	}
 	catch ( ... )
 	{
-		printf( "Render failed !\n" );
+		printf( "Unknown exception. Aborting.\n" );
 		return -1;
 	}
 

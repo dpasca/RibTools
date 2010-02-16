@@ -16,6 +16,7 @@
 #include "RI_System/include/RI_Net_Protocol.h"
 #include "RI_System/include/RI_Framework.h"
 #include "RI_System/include/RI_Parser.h"
+#include "RI_System/include/RI_Exceptions.h"
 
 #include "RRL_Translator.h"
 #include "RRL_Net.h"

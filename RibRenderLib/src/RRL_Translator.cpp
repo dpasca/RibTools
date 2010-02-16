@@ -25,7 +25,11 @@ Translator::Translator( const Params &params ) :
 //==================================================================
 void Translator::unknownCommand( const char *pCmdName )
 {
-	printf( "Unknown command %s !\n", pCmdName );
+	//printf( "Unknown command %s !\n", pCmdName );
+	throw std::runtime_error(
+				std::string("Unknown command '") +
+					pCmdName +
+						"'" );
 }
 
 //==================================================================
@@ -155,6 +159,7 @@ Translator::RetCmd
 	if ( nm == "WorldEnd" )			{ exN( 0, p ); mState.WorldEnd();	return CMD_WORLDEND; }	else
 	if ( nm == "AttributeBegin" )	{ exN( 0, p ); mState.AttributeBegin();		}	else
 	if ( nm == "AttributeEnd" )		{ exN( 0, p ); mState.AttributeEnd();		}	else
+	if ( nm == "Attribute" )		{ geN( 1, p );								}	else	// simply ignore custom attributes for now
 	if ( nm == "TransformBegin" )	{ exN( 0, p ); mState.TransformBegin();		}	else
 	if ( nm == "TransformEnd" )		{ exN( 0, p ); mState.TransformEnd();		}	else
 	if ( nm == "SolidBegin" )		{ exN( 1, p ); mState.SolidBegin( matchToken( p[0], tlSolidBegin ) );	}	else
@@ -236,6 +241,13 @@ Translator::RetCmd
 		exN( 1, p );
 		mReadArchivePathFName = mState.FindResFile( p[0], RI::Options::SEARCHPATH_ARCHIVE );
 		return CMD_READARCHIVE;
+	}
+	else
+	if ( nm == "version" )
+	{
+		// ignore this for now, really
+		exN( 1, p );
+		return CMD_GENERIC;
 	}
 	else
 	{

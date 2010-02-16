@@ -61,13 +61,18 @@ static void compileSLToAsm(
 	catch ( RSLC::Exception &e )
 	{
 		printf(
-			"ERROR: while compiling '%s'..\n%s\n",
-			pSrcFPathName,
-			e.GetMessage().c_str() );
+			"%s"
+			"SHADER ERR> FROM: %s\n\n",
+			e.GetMessage().c_str(),
+			pSrcFPathName
+			);
 	}
 	catch ( ... )
 	{
-		printf( "ERROR while compiling '%s'\n", pSrcFPathName );
+		printf(
+			"SHADER ERR> FROM: %s\n\n",
+			pSrcFPathName
+			);
 	}
 }
 

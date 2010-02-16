@@ -186,7 +186,7 @@ SVM::Shader *State::GetShader( const char *pShaderName, const char *pAlternateNa
 			pShader = DNEW SVM::Shader( params, GetFileManager() );
 		} catch ( ... )
 		{
-			ERRPrintf( "Could not compile '%s' !", params.pSourceFileName );
+			//ERRPrintf( "Could not compile '%s' !", params.pSourceFileName );
 			return NULL;
 		}
 

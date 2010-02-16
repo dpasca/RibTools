@@ -26,7 +26,8 @@ void HandleInclude(
 				size_t					lineEnd,
 				size_t					includePoint,
 				DIO::FileManagerBase	&fmanager,
-				FatBase					&fatBase );
+				FatBase					&fatBase,
+				const char				*pCurShaderDir );
 
 //==================================================================
 }

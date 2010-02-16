@@ -42,12 +42,15 @@ RSLCompiler::RSLCompiler(
 	fatBase.AppendNewFile( source, pSLFName, (const U8 *)pSource, sourceSize );
 	DVec<Fat8>	processedSource;
 
+	DStr	curShaderDir = DUT::GetDirNameFromFPathName( pSLFName );
+
 	PREPRO::Prepro
 				prepro(
 					*params.mpFileManager,
 					fatBase,
 					source,
 					pBaseInclude,
+					curShaderDir.c_str(),
 					processedSource );
 
 	Tokenizer( mTokens, fatBase, processedSource );

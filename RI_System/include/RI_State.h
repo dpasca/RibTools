@@ -208,10 +208,6 @@ public:
 	void ErrHandler( Error errCode );
 	void ErrHandler( Error errCode, const char *pFmt, ... );
 
-	void WarnPrintf( const char *pFmt, ... );
-	void ERRPrintf( const char *pFmt, ... );
-	void EXCEPTPrintf( const char *pFmt, ... );
-
 	size_t AddLightSource( LightSourceT *pLSource );
 	const DVec<LightSourceT *>	&GetLightSources()	{	return mpLightSources;	}
 

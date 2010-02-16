@@ -18,15 +18,26 @@ namespace RSLC
 {
 
 //==================================================================
+static void makeMsg(
+				std::string &out_msg,
+				const char *pFile,
+				int line,
+				const char *pSrcMsg )
+{
+	out_msg = DUT::SSPrintFS(
+				"SHADER ERR> MSG : %s\n"
+				"SHADER ERR> AT  : %s : %i\n",
+				pSrcMsg,
+				pFile ? pFile : "<NO FILE>", line
+				);
+}
+
+//==================================================================
 Exception::Exception( const std::string &msg, const Token *pTok/*=NULL */ )
 {
 	if ( pTok )
 	{
-		mMsg = DUT::SSPrintFS(
-					"%s ...\n...%s -- %i",
-					msg.c_str(),
-					pTok->pSourceFileName ? pTok->pSourceFileName : "<NO FILE>",
-					pTok->sourceLine );
+		makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, msg.c_str() );
 	}
 	else
 		mMsg = msg;
@@ -38,11 +49,7 @@ Exception::Exception( const std::string &msg, const TokNode *pTokNode )
 	if ( pTokNode && pTokNode->mpToken )
 	{
 		const Token *pTok = pTokNode->mpToken;
-		mMsg = DUT::SSPrintFS(
-					"%s ...\n...%s -- %i",
-					msg.c_str(),
-					pTok->pSourceFileName ? pTok->pSourceFileName : "<NO FILE>",
-					pTok->sourceLine );
+		makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, msg.c_str() );
 	}
 	else
 		mMsg = msg;
@@ -54,7 +61,7 @@ Exception::Exception( const TokNode *pTokNode, const char *pFmt, ... )
 	va_list	vl;
 	va_start( vl, pFmt );
 
-	char	buff[2048];
+	char	buff[4096];
 
 	vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
 	va_end( vl );
@@ -63,11 +70,7 @@ Exception::Exception( const TokNode *pTokNode, const char *pFmt, ... )
 	if ( pTokNode && pTokNode->mpToken )
 	{
 		const Token *pTok = pTokNode->mpToken;
-		mMsg = DUT::SSPrintFS(
-					"%s ...\n...%s -- %i",
-					buff,
-					pTok->pSourceFileName ? pTok->pSourceFileName : "<NO FILE>",
-					pTok->sourceLine );
+		makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, buff );
 	}
 	else
 	{
@@ -86,11 +89,7 @@ Exception::Exception( const FatBase &fatBase, const Fat8 &ch, const char *pFmt, 
 	vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
 	va_end( vl );
 
-	mMsg = DUT::SSPrintFS(
-					"%s ...\n...%s -- %i",
-					buff,
-					fatBase.mFileNames[ ch.FNameIdx ].c_str(),
-					ch.SrcPos );
+	makeMsg( mMsg, fatBase.mFileNames[ ch.FNameIdx ].c_str(), ch.SrcPos, buff );
 }
 
 //==================================================================

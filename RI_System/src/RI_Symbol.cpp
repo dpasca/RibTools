@@ -311,7 +311,7 @@ static void newSymParamsFromDecl(
 
 	pTok = strtok_r( buff, " \t", &pTokCtx );
 	if NOT( pTok )
-		DASSTHROW( 0, ("Nothing to declare ?!") );
+		throw Exception( "Nothing to declare ?!" );
 
 	char *pType = NULL;
 
@@ -332,7 +332,7 @@ static void newSymParamsFromDecl(
 
 			// we got a non-terminal symbol.. then we expect nothing else to follow !
 			if ( pTok = strtok_r(NULL, " \t", &pTokCtx) )
-				DASSTHROW( 0, ("Bad declaration: '%s'", pDecl) );
+				throw Exception( "Bad declaration: '%s'", pDecl );
 
 			return;
 		}
@@ -343,9 +343,8 @@ static void newSymParamsFromDecl(
 
 			// if we don't have a default class, and the class is not defined by the current token
 			// then we have a problem 8)
-			DASSTHROW( 
-				defaultClass != Symbol::CLASS_MSK_UNDEFINED,
-					("Bad declaration, expecting symbol class in '%s'", pDecl) );
+			if ( defaultClass == Symbol::CLASS_MSK_UNDEFINED )
+				throw Exception( "Bad declaration, expecting symbol class in '%s'", pDecl );
 		}
 	}
 
@@ -353,7 +352,7 @@ static void newSymParamsFromDecl(
 	{
 		pType = strtok_r(NULL, " \t", &pTokCtx);
 		if NOT( pType )
-			DASSTHROW( 0, ("Bad declaration, expecting symbol type in '%s'", pDecl) );
+			throw Exception( "Bad declaration, expecting symbol type in '%s'", pDecl );
 	}
 
 	// type ..
@@ -367,7 +366,7 @@ static void newSymParamsFromDecl(
 	if ( 0 == strcmp( pType, "string" ) ) { ++typCnt; out_params.mType = Symbol::TYP_STRING	;	}	else
 	if ( 0 == strcmp( pType, "bool"   ) ) { ++typCnt; out_params.mType = Symbol::TYP_BOOL	;	}	else
 	{
-		DASSTHROW( 0, ("Bad declaration, expecting symbol type: '%s'", pDecl) );
+		throw Exception( "Bad declaration, expecting symbol type: '%s'", pDecl );
 	}
 
 	pTok = strtok_r(NULL, " \t", &pTokCtx);
@@ -375,18 +374,19 @@ static void newSymParamsFromDecl(
 	if ( expectingName )
 	{
 		if NOT( pTok )
-			DASSTHROW( 0, ("Bad declaration, expecting symbol name: '%s'", pDecl) );
+			throw Exception( "Bad declaration, expecting symbol name: '%s'", pDecl );
 
 		// found symbol name
 		*out_name = pTok;
 
 		// trailing trash ?
 		if ( pTok = strtok_r(NULL, " \t", &pTokCtx) )
-			DASSTHROW( 0, ("Bad declaration, what's after the symbol name ?: '%s'", pDecl) );
+			throw Exception( "Bad declaration, what's after the symbol name ?: '%s'", pDecl );
 	}
 	else
 	{
-		DASSTHROW( pTok == NULL, ("Bad declaration, what's after the symbol class ?: '%s'", pDecl) );
+		if ( pTok != NULL )
+			throw Exception( "Bad declaration, what's after the symbol class ?: '%s'", pDecl );
 	}
 }
 

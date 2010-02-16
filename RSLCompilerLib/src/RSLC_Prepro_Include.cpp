@@ -25,7 +25,8 @@ void HandleInclude(
 				size_t					lineEnd,
 				size_t					includePoint,
 				DIO::FileManagerBase	&fmanager,
-				FatBase					&fatBase )
+				FatBase					&fatBase,
+				const char				*pCurShaderDir )
 {
 	SkipHWhites( text, i, lineEnd );
 
@@ -44,7 +45,30 @@ void HandleInclude(
 		if ( text[i].Ch == closingSymbol )
 		{
 			DVec<U8> incFileData;
-			fmanager.GrabFile( includeName.c_str(), incFileData );
+
+			// try the plain name first
+			if ( fmanager.FileExists( includeName.c_str() ) )
+			{
+				fmanager.GrabFile( includeName.c_str(), incFileData );
+			}
+			else
+			{
+				// try from the current shader's pathname
+				DStr	curPathFName(
+							DStr( pCurShaderDir ) +
+							"/" +
+							includeName );
+
+				if ( fmanager.FileExists( curPathFName.c_str() ) )
+				{
+					fmanager.GrabFile( curPathFName.c_str(), incFileData );
+				}
+				else
+				{
+					DASSTHROW( 0, ("Could not find '%s' for inclusion", includeName.c_str()) );
+				}
+			}
+
 			size_t insertEnd =
 				fatBase.InsertNewFile(
 						text,

@@ -1,11 +1,10 @@
-/*
- *  RI_State_Error.cpp
- *  RibTools
- *
- *  Created by Davide Pasca on 09/01/12.
- *  Copyright 2009 Davide Pasca. All rights reserved.
- *
- */
+//==================================================================
+/// RI_State_Error.cpp
+///
+/// Created by Davide Pasca - 2009/01/12
+/// See the file "license.txt" that comes with this project for
+/// copyright info. 
+//==================================================================
 
 #include "stdafx.h"
 #include <stdarg.h>
@@ -18,8 +17,7 @@ namespace RI
 //==================================================================
 void State::ErrHandler( Error errCode )
 {
-	//printf( "Error %s\n", ErrorToString( errCode ) );
-	DASSTHROW( 0, ("Error %s\n", ErrorToString( errCode )) );
+	throw Exception( "Error %s\n", ErrorToString( errCode ) );
 }
 
 //==================================================================
@@ -33,52 +31,7 @@ void State::ErrHandler( Error errCode, const char *pFmt, ... )
 
 	va_end( vl );
 
-	//printf( "Error %s -- %s\n", ErrorToString( errCode ), buff );
-	DASSTHROW( 0, ("Error %s -- %s\n", ErrorToString( errCode ), buff) );
-}
-
-//==================================================================
-void State::WarnPrintf( const char *pFmt, ... )
-{
-	va_list	vl;
-	va_start( vl, pFmt );
-
-	char	buff[1024];
-	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
-
-	va_end( vl );
-
-	printf( "* Warning: %s\n", buff );
-}
-
-//==================================================================
-void State::ERRPrintf( const char *pFmt, ... )
-{
-	va_list	vl;
-	va_start( vl, pFmt );
-
-	char	buff[1024];
-	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
-
-	va_end( vl );
-
-	printf( "* ERROR: %s\n", buff );
-}
-
-//==================================================================
-void State::EXCEPTPrintf( const char *pFmt, ... )
-{
-	va_list	vl;
-	va_start( vl, pFmt );
-
-	char	buff[1024];
-	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
-
-	va_end( vl );
-
-	printf( "* ERROR: %s\n", buff );
-
-	throw std::runtime_error( buff );
+	throw Exception( "Error %s -- %s\n", ErrorToString( errCode ), buff );
 }
 
 //==================================================================

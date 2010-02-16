@@ -105,12 +105,15 @@ static void handlePreproOnly( const char *pSLFName, const char *pBuiltinPathFNam
 		fatBase.AppendNewFile( source, pSLFName, (const U8 *)&inData[0], inData.size() );
 		DVec<RSLC::Fat8>	processedSource;
 
+		DStr	curShaderDir = DUT::GetDirNameFromFPathName( pSLFName );
+
 		RSLC::PREPRO::Prepro
 						prepro(
 							fmanager,
 							fatBase,
 							source,
 							pBuiltinPathFName,
+							curShaderDir.c_str(),
 							processedSource );
 
 		for (size_t i=0; i < processedSource.size(); ++i)

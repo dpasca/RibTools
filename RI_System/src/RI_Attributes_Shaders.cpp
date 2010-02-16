@@ -32,7 +32,7 @@ static void addShaderParam(
 	bool	hasNextParam = ( ( fromIdx + 1 ) < params.size() );
 	if NOT( hasNextParam )
 	{
-		state.EXCEPTPrintf( "Expecting parameter !" );
+		throw Exception( "Expecting parameter !" );
 	}
 
 	// HACK: "direction" becomes "to" ..for distant light annotation..
@@ -50,7 +50,7 @@ static void addShaderParam(
 	if ( pSym )
 	{
 		if NOT( pSym->IsUniform() )
-			state.EXCEPTPrintf( "Inline params must be uniform ! (for now.. 8)" );
+			throw Exception( "Inline params must be uniform ! (for now.. 8)" );
 	}
 	else
 	{
@@ -125,7 +125,7 @@ static void addShaderParam(
 	case Symbol::TYP_STRING:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PChar()		 ); break;
 	case Symbol::TYP_MATRIX:pSym->FillDataFromSISD( pData, 1, params[fromIdx+1].PFlt( 16 )	 ); break;
 	default:
-		state.EXCEPTPrintf( "Unsupported data type or this operation (?)" );
+		throw Exception( "Unsupported data type or this operation (?)" );
 		break;
 	}
 }
@@ -150,7 +150,7 @@ void Attributes::getShaderParams(
 		bool	hasNextParam = ((i+1) < params.size());
 		if NOT( hasNextParam )
 		{
-			mpState->EXCEPTPrintf( "Expecting parameter !" );
+			throw Exception( "Expecting parameter !" );
 			//return;
 		}
 

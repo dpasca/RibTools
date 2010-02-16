@@ -89,10 +89,13 @@ void Render::readArchive(
 					break;
 
 				case Translator::CMD_READARCHIVE:
+					{
+					std::string tmpFName = translator.GetReadArchivePathFName();
 					readArchive(
-							translator.GetReadArchivePathFName(),
+							tmpFName.c_str(),
 							params,
 							translator );
+					}
 					break;
 
 				default:
@@ -100,17 +103,16 @@ void Render::readArchive(
 					break;
 				}
 
-			} catch ( std::runtime_error ex )
+			}
+			catch ( RI::Exception &e )
 			{
-				printf( "ERROR at %s -- %i -- (Command: %s)\n", pFileName, cmdLine, cmdName.c_str() );
-/*
-				printf( "Error while parsing line %i\n> CMD: %s\n",
-					cmdLine,
-					cmdName.c_str() );
-*/
-
-				//throw;
-				//break;
+				printf( "SCENE ERR> MSG: %s\n", e.GetMessage().c_str() );
+				printf( "SCENE ERR> AT : %s : %i - (cmd: '%s')\n\n", pFileName, cmdLine, cmdName.c_str() );
+			}
+			catch ( std::runtime_error &e )
+			{
+				printf( "SCENE ERR> MSG: %s\n", e.what() );
+				printf( "SCENE ERR> AT : %s : %i - (cmd: '%s')\n\n", pFileName, cmdLine, cmdName.c_str() );
 			}
 		}
 	}

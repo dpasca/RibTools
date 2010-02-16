@@ -191,12 +191,12 @@ void Attributes::cmdOrientation( RtToken orientation )
 	else
 	if ( 0 == strcasecmp( orientation, RI_LH ) )
 	{
-		printf( "WARNING: Unsupported LH orientation\n" );	// TODO
+		mOrientationFlipped = false;
 	}
 	else
 	if ( 0 == strcasecmp( orientation, RI_RH ) )
 	{
-		printf( "WARNING: Unsupported RH orientation\n" );	// TODO
+		mOrientationFlipped = true;
 	}
 
 	mpRevision->BumpRevision();
@@ -303,7 +303,7 @@ void Attributes::cmdLightSource( ParamList &params )
 	// get type and ID
 	if ( params.size() < 2 || !params[0].IsString() || !params[1].IsIntVal() )
 	{
-		mpState->EXCEPTPrintf( "Bad LightSource definition !" );
+		throw Exception( "Bad LightSource definition !" );
 		//return;
 	}
 
@@ -313,7 +313,7 @@ void Attributes::cmdLightSource( ParamList &params )
 
 	if NOT( pShader )
 	{
-		mpState->EXCEPTPrintf( "Could not find the light shader '%s' !", params[0].PChar() );
+		throw Exception( "Could not find the light shader '%s' !", params[0].PChar() );
 		//return;
 	}
 
@@ -360,7 +360,7 @@ void Attributes::cmdSurface( ParamList &params )
 {
 	if ( params.size() < 1 )
 	{
-		onError( "Missing parameters for 'surface' command !" );
+		throw Exception( "Missing parameters" );
 	}
 
 	const char *pShaderName;
@@ -389,7 +389,7 @@ void Attributes::cmdDisplacement( ParamList &params )
 {
 	if ( params.size() < 1 )
 	{
-		onError( "Missing parameters for 'displacement' command !" );
+		throw Exception( "Missing parameters" );
 	}
 
 	const char *pShaderName = params[0].PChar();
@@ -408,7 +408,7 @@ void Attributes::cmdDisplacement( ParamList &params )
 	}
 	else
 	{
-		onError( "Could not find the shader %s", pShaderName );
+		throw Exception( "Failed getting the shader '%s'", pShaderName );
 	}
 }
 

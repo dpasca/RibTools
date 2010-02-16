@@ -66,7 +66,10 @@ void MemFile::Init( const char *pFileName )
 
 	if NOT( GrabFile( pFileName, mOwnData ) )
 	{
-		DASSTHROW( 0, ("Could not open the file %s in input.", pFileName) );
+		throw std::runtime_error(
+				std::string("Could not open the file '") +
+					pFileName + 
+						"' for reading." );
 	}
 
 	mpData = (const U8 *)&mOwnData[0];

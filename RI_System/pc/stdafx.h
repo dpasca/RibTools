@@ -18,3 +18,4 @@
 #include "RI_Base.h"
 #include "RI_Resource.h"
 #include "RI_Attributes.h"
+#include "RI_Exceptions.h"

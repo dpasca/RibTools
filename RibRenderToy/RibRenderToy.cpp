@@ -272,8 +272,14 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 		printf( "Out of Memory !!!\n" );
 		return false;
 	}
+	catch ( RI::Exception &e )
+	{
+		printf( "%s\nAborting.\n", e.GetMessage().c_str() );
+		return false;
+	}
 	catch ( ... )
 	{
+		printf( "Unknown exception. Aborting.\n" );
 		return false;
 	}
 

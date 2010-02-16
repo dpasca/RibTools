@@ -339,6 +339,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RI_Exceptions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RI_Exceptions.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RI_Framework.cpp"
 				>
 			</File>

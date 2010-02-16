@@ -167,7 +167,8 @@ static void processFile(
 				DIO::FileManagerBase	&fmanager,
 				FatBase					&fatBase,
 				DVec<Fat8>				&text,
-				const char				*pIncFileName )
+				const char				*pIncFileName,
+				const char				*pCurShaderDir )
 {
 	// map of preprocessor symbols
 	SymbolsMap	symbols;
@@ -255,7 +256,7 @@ static void processFile(
 
 				if ( MatchesAdvance( text, i, lineEnd, "include" ) )
 				{
-					HandleInclude( text, i, lineEnd, startPoint, fmanager, fatBase );
+					HandleInclude( text, i, lineEnd, startPoint, fmanager, fatBase, pCurShaderDir );
 					i = startPoint;
 					continue;
 				}
@@ -290,6 +291,7 @@ Prepro::Prepro(
 		FatBase					&fatBase,
 		const DVec<Fat8>		&inText,
 		const char				*pBaseInclude,
+		const char				*pCurShaderDir,
 		DVec<Fat8>				&out_text )
 {
 	out_text.clear();
@@ -308,7 +310,7 @@ Prepro::Prepro(
 	size_t newEnd = ClearChunk( out_text );
 	out_text.resize( newEnd );
 
-	processFile( fmanager, fatBase, out_text, pBaseInclude );
+	processFile( fmanager, fatBase, out_text, pBaseInclude, pCurShaderDir );
 }
 
 //==================================================================

@@ -195,8 +195,14 @@ static int clientMain( int argc, char **argv )
 		printf( "Out of Memory !!!\n" );
 		return -1;
 	}
+	catch ( RI::Exception &e )
+	{
+		printf( "%s\nAborting.\n", e.GetMessage().c_str() );
+		return -1;
+	}
 	catch ( ... )
 	{
+		printf( "Unknown exception. Aborting.\n" );
 		return -1;
 	}
 
