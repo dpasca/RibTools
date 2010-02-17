@@ -115,6 +115,24 @@ static bool doVTypesMatch(
 }
 
 //==================================================================
+static void verifyFunctionCallParams( const TokNode &callParams )
+{
+	//const TokNode	*pFCallParams = callNode.GetChildTry( 0 );
+
+	for (size_t i=0; i < callParams.mpChilds.size(); ++i)
+	{
+		const TokNode	&parNode = *callParams.mpChilds[i];
+		VarType	varType = parNode.GetVarType();
+
+		if ( varType == VT_UNKNOWN )
+			throw Exception(
+						&parNode,
+						"Unknown parameter %s",
+						parNode.GetTokStr() );
+	}
+}
+
+//==================================================================
 const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function> &funcs )
 {
 	Function	*pFound = NULL;
@@ -126,6 +144,9 @@ const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function>
 	Function	*pBestMatch = NULL;
 	size_t		convertMatches = 0;
 	size_t		exactMatches = 0;
+
+	if ( pFCallParams )
+		verifyFunctionCallParams( *pFCallParams );
 
 	// try exact matches first
 	for (size_t i=0; i < funcs.size(); ++i)
