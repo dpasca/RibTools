@@ -225,14 +225,15 @@ void AddSelfVariable(
 static bool fndVarDefBeginInBlock(
 		size_t &i,
 		TokNode *pNode,
-		TokNode	*pChild0,
-		TokNode	*pChild1,
-		TokNode	*pChild2,
 		TokNode	* &out_pDTypeNode,
 		TokNode	* &out_pDetailNode,
 		TokNode	* &out_pOutputNode
 		)
 {
+	TokNode	*pChild0 = pNode->GetChildTry( i + 0 );
+	TokNode	*pChild1 = pNode->GetChildTry( i + 1 );
+	TokNode	*pChild2 = pNode->GetChildTry( i + 2 );
+
 	out_pDTypeNode	= NULL;
 	out_pDetailNode	= NULL;
 	out_pOutputNode	= NULL;
@@ -246,10 +247,6 @@ static bool fndVarDefBeginInBlock(
 
 		if ( pChilds[j]->mpToken->idType == T_TYPE_DATATYPE )
 		{
-			// TEMP - allow point point()
-			//if ( out_pDTypeNode )
-			//	throw Exception( "Broken variable declaration", pChilds[j] );
-
 			out_pDTypeNode = pChilds[j];
 			++i;
 		}
@@ -303,9 +300,6 @@ static size_t discoverVariablesDeclarations_sub2( TokNode *pNode, size_t i )
 	while ( fndVarDefBeginInBlock(
 					i,
 					pNode,
-					pNode->GetChildTry( i + 0 ),
-					pNode->GetChildTry( i + 1 ),
-					pNode->GetChildTry( i + 2 ),
 					pDTypeNode,
 					pDetailNode,
 					pOutputNode ) )
