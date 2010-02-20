@@ -350,7 +350,7 @@ color texture( string texname; float s0, t0, s1, t1, s2, t2, s3, t3 ){
 }
 /*================================================================*/
 float texture( string texname ){
-	float	val; _asm_texture_sxss( val, texname, s0, t0 );
+	float	val; _asm_texture_sxss( val, texname, s, t );
 	return val;
 }
 /*================================================================*/

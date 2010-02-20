@@ -189,7 +189,7 @@ int main( int argc, char *argv[] )
 	}
 	catch ( RSLC::Exception &e )
 	{
-		printf( "ERROR: %s !\n", e.GetMessage().c_str() );
+		printf( "%s\n", e.GetMessage().c_str() );
 	}
 	catch ( ... )
 	{
