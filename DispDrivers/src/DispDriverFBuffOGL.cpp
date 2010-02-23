@@ -82,13 +82,8 @@ DispDriverFBuffOGL::DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::I
 	{
 		mTexWd = mImage.mWd;
 		mTexHe = mImage.mHe;
-	}
-	else
-	{
-		mTexWd = getNextPow2( mImage.mWd );
-		mTexHe = getNextPow2( mImage.mHe );
-	}
-	glTexImage2D(
+
+		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
 			GL_RGBA,
@@ -98,6 +93,34 @@ DispDriverFBuffOGL::DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::I
 			GL_RGBA,
 			GL_UNSIGNED_BYTE,
 			mImage.GetPixelPtrR(0,0) );
+	}
+	else
+	{
+		mTexWd = getNextPow2( mImage.mWd );
+		mTexHe = getNextPow2( mImage.mHe );
+	
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_RGBA,
+			mTexWd,
+			mTexHe,
+			0,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			NULL );
+
+		glTexSubImage2D(
+			GL_TEXTURE_2D,
+			0,
+			0,
+			0,
+			mImage.mWd,
+			mImage.mHe,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			mImage.GetPixelPtrR(0,0) );
+	}
 }
 
 //==================================================================
