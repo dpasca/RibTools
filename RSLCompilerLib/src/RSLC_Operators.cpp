@@ -15,10 +15,32 @@ namespace RSLC
 {
 
 //==================================================================
-static void doReparent( TokNode *pNode, size_t &out_parentIdx )
+static void doReparent( TokNode *pOper, size_t &out_parentIdx )
 {
-	TokNode	*pLValue = pNode->GetLeft();
-	TokNode	*pRValue = pNode->GetRight();
+	// get leaves ont he left and right of the operand
+	TokNode	*pLValue = pOper->GetLeft();
+	TokNode	*pRValue = pOper->GetRight();
+
+	// here is a special case for when leaves are an expression block
+	// .. basically an open bracket
+	// Expression blocks, like any open brackets, do actually have
+	// different parenting. Example:
+	//
+	// dude + food    <- all with the same parents
+	//
+	// dude +
+	//        (       <- two added levels of parenting
+	//          food
+	//
+	// So, the following try to look for parent or child expressions..
+
+/*
+	if ( !pLValue && pOper->mpParent && pOper->mpParent->IsExpressionBlock() )
+		pLValue = pOper->mpParent;
+
+	if ( !pRValue && pOper->mpChilds.size() == 1 && pOper->mpChilds[0]->IsExpressionBlock() )
+		pRValue = pOper->mpChilds[0];
+*/
 
 	//if NOT( pLValue )
 	//	throw Exception( "Missing left value in expression assignment.", pNode->mpToken );
@@ -55,16 +77,16 @@ static void doReparent( TokNode *pNode, size_t &out_parentIdx )
 				}
 			}
 
-			pRValue->Reparent( pNode );
-			pNode->mpChilds.push_front( pRValue );
+			pRValue->Reparent( pOper );
+			pOper->mpChilds.push_front( pRValue );
 		}
 		//	L	=
 		//			R
 
 		if ( pLValue )
 		{
-			pLValue->Reparent( pNode );
-			pNode->mpChilds.push_front( pLValue );
+			pLValue->Reparent( pOper );
+			pOper->mpChilds.push_front( pLValue );
 		}
 		//		=
 		//	L		R
@@ -92,9 +114,9 @@ static void reparentBiOperators(
 			{
 				BlockType	blkType = pNode->mpParent->GetBlockType();
 
-				if (   blkType == BLKT_FUNCCALL
-					|| blkType == BLKT_FUNCOPEXPR
-					|| blkType == BLKT_FNPARAMS )
+				if (   blkType == BLKT_CALL_PARAMS_FN
+					|| blkType == BLKT_DECL_PARAMS_FN
+					|| blkType == BLKT_CALL_OR_DELC_PARAMS_FN )
 					dontProcess = true;
 			}
 		}

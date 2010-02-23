@@ -40,6 +40,8 @@ public:
 	const std::string &GetMessage() const	{	return mMsg;	}
 };
 
+//==================================================================
+void Warning( const TokNode *pTokNode, const char *pFmt, ... );
 
 //==================================================================
 }

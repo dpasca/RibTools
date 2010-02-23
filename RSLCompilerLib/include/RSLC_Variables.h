@@ -26,7 +26,8 @@ Variable *AddVariable(
 			TokNode *pDTypeNode,
 			TokNode *pDetailNode,
 			TokNode *pSpaceCastTok,
-			TokNode *pNameNode );
+			TokNode *pNameNode,
+			bool	isArray );
 
 void AddSelfVariable(
 			TokNode *pNode,

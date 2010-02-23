@@ -122,13 +122,33 @@ static void verifyFunctionCallParams( const TokNode &callParams )
 	for (size_t i=0; i < callParams.mpChilds.size(); ++i)
 	{
 		const TokNode	&parNode = *callParams.mpChilds[i];
-		VarType	varType = parNode.GetVarType();
 
-		if ( varType == VT_UNKNOWN )
-			throw Exception(
-						&parNode,
-						"Unknown parameter %s",
-						parNode.GetTokStr() );
+		// is this a square bracket ?
+		if ( parNode.IsTokenID( T_OP_LFT_SQ_BRACKET ) )
+		{
+			const TokNode	*pLeftOrParent = parNode.GetPrev();
+
+			// it's array indirection
+			if NOT( pLeftOrParent )
+				throw Exception( &parNode, "Where is the array ?" );
+
+			const Variable *pVar = pLeftOrParent->GetVarPtr();
+
+			if ( !pVar || !pVar->mIsArray )
+			{
+				throw Exception( pLeftOrParent, "Not an array" );
+			}
+		}
+		else
+		{
+			VarType	varType = parNode.GetVarType();
+
+			if ( varType == VT_UNKNOWN )
+				throw Exception(
+							&parNode,
+							"Unknown parameter %s",
+							parNode.GetTokStr() );
+		}
 	}
 }
 
@@ -332,7 +352,8 @@ static void resolveFunctionCalls(
 					DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
 					DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL ),	// %%% forced varying for now !
 					NULL,
-					pClonedParamsHooks );
+					pClonedParamsHooks,
+					false );
 			}
 
 			const TokNode	*pPassParams = pNode->GetChildTry( 0 );
@@ -416,13 +437,16 @@ static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsT
 		TokNode	*pFnParams = pReturnNode;	// start from "return"
 		while ( pFnParams )
 		{
-			if ( pFnParams->GetBlockType() == BLKT_FNPARAMS )
+			BlockType	blkType = pFnParams->GetBlockType();
+
+			if (	blkType == BLKT_DECL_PARAMS_FN
+				 || blkType == BLKT_CALL_OR_DELC_PARAMS_FN )
 			{
 				break;
 			}
 			pFnParams = pFnParams->mpParent;
 		}
-		DASSERT( pFnParams->GetBlockType() == BLKT_FNPARAMS );
+		//DASSERT( pFnParams->GetBlockType() == BLKT_DECL_PARAMS_FN );
 
 		// do we actually have any params in input ?
 		if ( pFnParams->mVarLink.IsValid() )

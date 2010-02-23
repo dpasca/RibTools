@@ -34,6 +34,8 @@ public:
 	bool			mIsVariabilityFinalized;
 	bool			mIsForcedDetail;
 
+	bool			mIsArray;
+
 	bool			mIsLValue;
 	bool			mIsGlobal;
 	bool			mIsSHParam;
@@ -91,6 +93,7 @@ public:
 		mIsVarying(false),
 		mIsVariabilityFinalized(false),
 		mIsForcedDetail(false),
+		mIsArray(false),
 		mIsLValue(false),
 		mIsGlobal(false),
 		mIsSHParam(false),
@@ -163,6 +166,8 @@ public:
 	{
 		return mBaseVal.mUse && !mIsGlobal && !mIsSHParam && !mIsVarying;
 	}
+
+	bool IsArray() const { return mIsArray; }
 };
 
 //==================================================================

@@ -377,7 +377,7 @@ size_t Hider::GetOutputBucketMemSize( size_t buckIdx ) const
 	u_int	wd = (u_int)(buck.mX2 - buck.mX1);
 	u_int	he = (u_int)(buck.mY2 - buck.mY1);
 
-	return sizeof(float) * NCOLS * wd * he;
+	return sizeof(float) * NOUTCOLS * wd * he;
 }
 
 //==================================================================
@@ -390,7 +390,7 @@ void Hider::CopyOutputBucket( size_t buckIdx, float *pDest, size_t destMaxSize )
 
 	const float *pSrc = GetOutputData( buck.mX1, buck.mY1 );
 
-	size_t wdStride = wd * NCOLS;
+	size_t wdStride = wd * NOUTCOLS;
 	size_t srcStride = GetOutputDataStride();
 
 	U8	*pDestEnd = (U8 *)pDest + destMaxSize;
@@ -416,7 +416,7 @@ void Hider::StoreOutputBucket( size_t buckIdx, const float *pSrc, size_t srcSize
 	float *pDest = GetOutputDataRW( buck.mX1, buck.mY1 );
 	size_t desStride = GetOutputDataStride();
 
-	size_t wdStride = wd * NCOLS;
+	size_t wdStride = wd * NOUTCOLS;
 
 	U8	*pSrcEnd = (U8 *)pSrc + srcSize;
 

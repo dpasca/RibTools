@@ -99,7 +99,7 @@ static void writeShaderParamVariables( FILE *pFile, TokNode *pNode )
 	{
 		//fprintf_s( pFile, "\t; -- vars for block %i\n", pNode->GetBlockID() );
 
-		if ( pNode->GetBlockType() == BLKT_SHPARAMS )
+		if ( pNode->GetBlockType() == BLKT_DECL_PARAMS_SH )
 		{
 			for (size_t i=0; i < vars.size(); ++i)
 			{

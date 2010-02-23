@@ -60,7 +60,7 @@ private:
 	friend class Framework;
 
 	Options					mOptions;
-	Buffer2D<NCOLS>			mFinalBuff;
+	Buffer2D<NOUTCOLS>		mFinalBuff;
 	DVec<HiderBucket *>		mpBuckets;
 	HiderSampleCoordsBuffer	mSampCoordBuffs[4];
 	Params					mParams;
@@ -104,7 +104,7 @@ public:
 					DVec<HiderPixel>	&pixels,
 					HiderBucket			&buck );
 
-	u_int		GetOutputDataStride() const	{ return mFinalBuff.GetWd() * NCOLS;	}
+	u_int		GetOutputDataStride() const	{ return mFinalBuff.GetWd() * NOUTCOLS;	}
 	u_int		GetOutputDataWd() const		{ return mFinalBuff.GetWd();			}
 	u_int		GetOutputDataHe() const		{ return mFinalBuff.GetHe();			}
 

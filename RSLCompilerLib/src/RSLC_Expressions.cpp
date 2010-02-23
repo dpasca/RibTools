@@ -15,62 +15,110 @@
 namespace RSLC
 {
 
-/*
-About varying ...
+//==================================================================
+static void getTwoOperands(
+						TokNode *pNode,
+						TokNode *out_pOperands[2],
+						VarType	out_vtypes[2] )
+{
+	out_pOperands[0] = NULL;
+	out_pOperands[1] = NULL;
+	out_vtypes[0] = VT_UNKNOWN;
+	out_vtypes[1] = VT_UNKNOWN;
 
-	// strings are always uniform !!!
-	DASSERT( pOperand1->IsVarying() == false );
-	DASSERT( pOperand2->IsVarying() == false );
-
-	
-	// is this an assignment ?
-	if ( pNode->mpToken->IsAssignOp() )
+	for (size_t opIdx=0; opIdx < 2; ++opIdx)
 	{
-		// ..are we dealing with varying data at all ?
-		if ( opResIsVarying )
+		for (out_pOperands[opIdx] = pNode->GetChildTry( opIdx );
+				true;
+			out_pOperands[opIdx] = out_pOperands[opIdx]->GetChildTry( 0 ))
 		{
-			Variable	*pOp1Var = pOperand1->mVarLink.GetVarPtr();
+			if NOT( out_pOperands[opIdx] )
+				throw Exception( pNode, "Unknown operand '%s'", pNode->GetTokStr() );
 
-			// is the destination not varying ?
-			if NOT( pOp1Var->IsVarying() )
+			VarType	vtype = out_pOperands[opIdx]->GetVarType();
+			if ( vtype != VT_UNKNOWN )
 			{
-				if ( pOp1Var->IsForcedDetail() )
-				{
-					// this is the end of it..
-					throw Exception( "Cannot assign a varying variable to an 'uniform' destination", pNode );
-				}
-				else
-				{
-					pOp1Var->SetVarying( opResIsVarying );
-				}
+				out_vtypes[opIdx] = vtype;
+				break;
 			}
-		}			
+		}
 	}
-*/
+
+}
+
+//==================================================================
+static void solveConstExpressions_BiOp( TokNode *pNode, DynConst &io_dynConst )
+{
+	TokNode *pOperands[2];
+	VarType	vtypes[2];
+
+	getTwoOperands( pNode, pOperands, vtypes );
+
+	VarType	opResVarType;
+
+	SolveBiOpType(	pNode,
+					vtypes[0],
+					vtypes[1],
+					opResVarType );
+
+	if ( !pNode->mpToken->IsAssignOp() && pNode->mpToken->idType != T_TYPE_VALUE )
+	{
+		// if it's not an assignment nor an immediate value
+		throw Exception( "Not a constant expression !", pNode );
+	}
+
+	for (size_t i=0; i < 2; ++i)
+	{
+		switch ( vtypes[i] )
+		{
+		case VT_FLOAT:
+		case VT_STRING:
+		case VT_BOOL:
+			break;
+		
+		default:
+			throw Exception( pNode, "Invalid type for operand %i for a constant expression", i+1 );
+			break;
+		}
+	}
+
+	if ( vtypes[0] == VT_FLOAT )
+	{
+		if ( vtypes[1] == VT_FLOAT )
+		{
+		}
+	}
+	else
+	if ( vtypes[0] == VT_STRING )
+	{
+	}
+	else	// VT_BOOL
+	{
+	}
+}
+
+//==================================================================
+void SolveConstantExpression( TokNode *pNode, DynConst &out_dynConst )
+{
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		SolveConstantExpression( pNode->mpChilds[i], out_dynConst );
+
+	if NOT( pNode->mpToken )
+		return;
+
+	if ( pNode->mpToken->IsBiOp() )
+	{
+		solveConstExpressions_BiOp( pNode, out_dynConst );
+	}
+}
 
 //==================================================================
 static void solveExpressions_sub_BiOp( TokNode *pNode, const DVec<Function> &funcs )
 {
 	TokNode *pOperands[2];
-	VarType	vtypes[2] = { VT_UNKNOWN, VT_UNKNOWN };
+	VarType	vtypes[2];
 
-	for (size_t opIdx=0; opIdx < 2; ++opIdx)
-	{
-		for (pOperands[opIdx] = pNode->GetChildTry( opIdx );
-				true;
-			pOperands[opIdx] = pOperands[opIdx]->GetChildTry( 0 ))
-		{
-			if NOT( pOperands[opIdx] )
-				throw Exception( "Unknown operand", pNode );
-
-			VarType	vtype = pOperands[opIdx]->GetVarType();
-			if ( vtype != VT_UNKNOWN )
-			{
-				vtypes[opIdx] = vtype;
-				break;
-			}
-		}
-	}
+	getTwoOperands( pNode, pOperands, vtypes );
 
 	VarType	opResVarType;
 

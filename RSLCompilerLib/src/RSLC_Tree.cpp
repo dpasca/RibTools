@@ -217,18 +217,31 @@ void TokNode::UnlinkFromParent()
 }
 
 //==================================================================
-void TokNode::ReplaceNode( TokNode *pNode )
+void TokNode::Reparent( TokNode *pNewParent )
 {
-	if NOT( pNode->mpParent )
+	if ( mpParent == pNewParent )
+	{
+		DASSERT( 0 );
+		return;
+	}
+
+	UnlinkFromParent();
+	mpParent = pNewParent;
+}
+
+//==================================================================
+void TokNode::ReplaceNode( TokNode *pOldNode )
+{
+	if NOT( pOldNode->mpParent )
 		return;
 
-	for (size_t i=0; i < pNode->mpParent->mpChilds.size(); ++i)
+	for (size_t i=0; i < pOldNode->mpParent->mpChilds.size(); ++i)
 	{
-		if ( pNode->mpParent->mpChilds[i] == pNode )
+		if ( pOldNode->mpParent->mpChilds[i] == pOldNode )
 		{
-			pNode->mpParent->mpChilds[i] = this;
-			mpParent = pNode->mpParent;
-			pNode->mpParent = NULL;
+			pOldNode->mpParent->mpChilds[i] = this;
+			mpParent = pOldNode->mpParent;
+			pOldNode->mpParent = NULL;
 			return;
 		}
 	}
@@ -337,47 +350,64 @@ bool TokNode::TrySetVarying_AndForceIfTrue( bool onoff )
 }
 
 //==================================================================
-static bool defineBlockTypeAndID_DeclFunctionOrShader( TokNode *pNode )
+static void defineBlockTypeAndID_OnBracket( TokNode *pBracketNode )
 {
-	// are we at root level ?
-	if NOT( pNode->mpParent && pNode->mpParent->mpParent == NULL )
-		return false;
+	DASSERT( pBracketNode->GetBlockType() == BLKT_UNKNOWN );
 
-	TokNode	*pFnName = pNode->GetLeft();
-	if ( pFnName )
+	TokNode	*pFnName = pBracketNode->GetLeft();
+	if NOT( pFnName )
 	{
+		// set as a plain expression and return
+		pBracketNode->SetBlockType( BLKT_EXPRESSION );
+		return;
+	}
+
+	// preceded by a non-terminal ?
+	// ..see if it's a function call or a function declaration..
+	if ( pFnName->IsNonTerminal() )
+	{
+		// what's before the function name ?
 		TokNode	*pFnType = pFnName->GetLeft();
 		if ( pFnType )
 		{
-			// do we have something like.. ?
-			// uniform vector AA = vector(1,2,3);
-			if ( pFnType->mpToken->id == T_OP_ASSIGN )
+			// __funcop keyword.. ? then it's a declaration
+			if ( pFnType->mpToken->id == T_KW___funcop )
 			{
-				//pFnType = pFnType->GetLeft();
-			}
-			else
-			{
-				// shader
-				if ( pFnType && pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
-					pNode->SetBlockType( BLKT_SHPARAMS );
-				else	// function
-				if ( pFnType &&
-						(pFnType->mpToken->idType == T_TYPE_DATATYPE ||
-						 pFnType->mpToken->id == T_KW___funcop) )
-				{
-					pNode->SetBlockType( BLKT_FNPARAMS );
-				}
-				else
-				{
-					throw Exception( "Return type unknown", pNode );
-				}
+				pBracketNode->SetBlockType( BLKT_DECL_PARAMS_FN );
+				return;
 			}
 
-			return true;
+			// shader type ? Then it's shader params block for sure
+			if ( pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
+			{
+				pBracketNode->SetBlockType( BLKT_DECL_PARAMS_SH );
+				return;
+			}
 		}
+
+		// here fn-type could be a datatype or nothing at all..
+		// ..but at this stage we just care to know that it's
+		// not an expression.. but rather the params block
+		// of a function definition or a function call
+		pBracketNode->SetBlockType( BLKT_CALL_OR_DELC_PARAMS_FN );
+		return;
+	}
+	else // is it a constructor instead ? e.g. color(0,0,1)
+	if ( pFnName->IsDataType() )
+	{
+		pBracketNode->SetBlockType( BLKT_CALL_OR_DELC_PARAMS_FN );
+		return;
+	}
+	else // is it a space-casted constructor instead ? e.g. color "rgb" (0,0,1)
+	if ( pFnName->mpToken->id == T_VL_STRING )
+	{
+		pBracketNode->SetBlockType( BLKT_CALL_OR_DELC_PARAMS_FN );
+		return;
 	}
 
-	return false;
+	// set as a plain expression otherwise
+	pBracketNode->SetBlockType( BLKT_EXPRESSION );
+	return;
 }
 
 //==================================================================
@@ -385,19 +415,12 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 {
 	if ( pNode->mpToken )
 	{
-		if ( pNode->mpToken->id == T_OP_LFT_BRACKET )
+		if ( pNode->IsTokenID( T_OP_LFT_BRACKET ) )
 		{
-			if NOT( defineBlockTypeAndID_DeclFunctionOrShader( pNode ) )
-			{
-				if ( pNode->GetBlockType() == BLKT_UNKNOWN )
-				{
-					// set as a plain expression otherwise
-					pNode->SetBlockType( BLKT_EXPRESSION );
-				}
-			}
+			defineBlockTypeAndID_OnBracket( pNode );
 		}
 		else
-		if ( pNode->mpToken->id == T_OP_LFT_CRL_BRACKET )
+		if ( pNode->IsTokenID( T_OP_LFT_CRL_BRACKET ) )
 		{
 			pNode->SetBlockType( BLKT_CODEBLOCK );
 		}
@@ -416,9 +439,7 @@ static void defineBlockTypeAndID( TokNode *pNode, u_int &blockCnt )
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-	{
 		defineBlockTypeAndID( pNode->mpChilds[i], blockCnt );
-	}
 }
 
 //==================================================================
@@ -437,9 +458,11 @@ void MakeTree( TokNode *pRoot, DVec<Token> &tokens )
 {
 	//pRoot->mBlockType = AT_ROOT;
 
-	TokNode	*pCurNode = pRoot;
+	//TokNode	*pParent = pRoot;
+	TokNode	*pNode = pRoot;
 
 	DVec<TokenID>	bracketsMemory;
+	//DVec<TokNode*>	pParentsMemory;
 
 	for (size_t i=0; i < tokens.size(); ++i)
 	{
@@ -449,26 +472,29 @@ void MakeTree( TokNode *pRoot, DVec<Token> &tokens )
 		case RSLC::T_OP_LFT_SQ_BRACKET	:
 		case RSLC::T_OP_LFT_CRL_BRACKET	:
 			bracketsMemory.push_back( tokens[i].id );
-			pCurNode = pCurNode->AddNewChild( &tokens[i] );
+			//pParentsMemory.push_back( pParent );
+			pNode = pNode->AddNewChild( &tokens[i] );
+			//pPrev = pParent = pParent->AddNewChild( &tokens[i] );
 			break;
 
 		case RSLC::T_OP_RGT_BRACKET		:
 		case RSLC::T_OP_RGT_SQ_BRACKET	:
 		case RSLC::T_OP_RGT_CRL_BRACKET	:
-			if (!pCurNode->mpParent ||
+			if (!pNode->mpParent ||
 				!bracketsMemory.size() ||
 				!doBracketsMatch( bracketsMemory.back(), tokens[i].id ) )
 			{
 				throw Exception( "Mismatched brackets ?", &tokens[i] );
 			}
-			bracketsMemory.pop_back();
 
-			pCurNode = pCurNode->mpParent;
-			pCurNode->AddNewChild( &tokens[i] );
+			pNode = pNode->mpParent;
+
+			bracketsMemory.pop_back();
+			//pParentsMemory.pop_back();
 			break;
 
 		default:
-			pCurNode->AddNewChild( &tokens[i] );
+			pNode->AddNewChild( &tokens[i] );
 			break;
 		}
 	}
@@ -478,6 +504,7 @@ void MakeTree( TokNode *pRoot, DVec<Token> &tokens )
 }
 
 //==================================================================
+#if 0
 void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx )
 {
 	if ( pNode->mpToken )
@@ -506,6 +533,43 @@ void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx )
 		RemoveClosingBrackets( pNode->mpChilds[i], &i );
 	}
 }
+#endif
+
+#if 0
+//==================================================================
+void RemoveOpeningExprBrackets( TokNode *pNode, int *pParentScanIdx )
+{
+	if ( pNode->mpToken )
+	{
+		if ( pNode->IsExpressionBlock() )
+		{
+			// TODO: Cannot really assume that it's always "1"
+			DASSERT( pNode->mpChilds.size() == 1 );
+
+			TokNode	*pChildToKeep = pNode->mpChilds[0];
+
+			TokNode	*pParent = pNode->mpParent;
+
+			pChildToKeep->ReplaceNode( pNode );
+			//pChildToKeep->Reparent( pParent );
+			
+			pNode->UnlinkFromParent();
+			pNode->mpChilds.clear();
+			DSAFE_DELETE( pNode );
+
+			if ( pParentScanIdx )
+				*pParentScanIdx -= 1;
+
+			return;
+		}
+	}
+
+	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
+	{
+		RemoveOpeningExprBrackets( pNode->mpChilds[i], &i );
+	}
+}
+#endif
 
 //==================================================================
 void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx )
@@ -531,6 +595,8 @@ void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx )
 }
 
 //==================================================================
+
+//==================================================================
 void TraverseTree( TokNode *pNode, int depth )
 {
 	for (int i=0; i < depth; ++i)
@@ -552,7 +618,7 @@ void TraverseTree( TokNode *pNode, int depth )
 			{
 				std::string regName = reg.GetName();
 
-				printf( " // %s - %s - %s",
+				printf( "        // %s - %s - %s",
 					regName.c_str(),
 					pNode->mVarLink.GetVarPtr()->mInternalName.c_str(),
 					pNode->mVarLink.GetVarPtr()->IsVarying() ? "varying" : "uniform"
@@ -560,22 +626,34 @@ void TraverseTree( TokNode *pNode, int depth )
 			}
 			else
 			{
-				printf( " // %s - %s",
+				printf( "        // %s - %s",
 					pNode->mVarLink.GetVarPtr()->mInternalName.c_str(),
 					pNode->mVarLink.GetVarPtr()->IsVarying() ? "varying" : "uniform"
 					);
 			}
 		}
+		else
+		{
+			printf( "        //" );
+		}
 	}
+
+	if ( pNode->mNodeType == TokNode::TYPE_FUNCDEF )
+		printf( " <FUNCDEF> " );
 
 	switch ( pNode->GetBlockType() )
 	{
-	case BLKT_UNKNOWN:		break;
-	case BLKT_ROOT:			printf( " <ROOT %i> ", pNode->mBlockID );	break;
-	case BLKT_SHPARAMS:		printf( " <SH PARAMS %i> ", pNode->mBlockID );	break;
-	case BLKT_FNPARAMS:		printf( " <FN PARAMS %i> ", pNode->mBlockID );	break;
-	case BLKT_CODEBLOCK:	printf( " <CODEBLK %i> ", pNode->mBlockID );	break;
-	case BLKT_EXPRESSION:	printf( " <EXPR %i> ", pNode->mBlockID );		break;
+	case BLKT_UNKNOWN:			break;
+	case BLKT_ROOT:				printf( " <ROOT %i> ", pNode->mBlockID );	break;
+	case BLKT_CALL_OR_DELC_PARAMS_FN: printf( " <CALL OR DECL PARAMS %i> ", pNode->mBlockID );	break;
+	case BLKT_DECL_PARAMS_SH:	printf( " <DECL PARAMS SH %i> ", pNode->mBlockID );	break;
+	case BLKT_DECL_PARAMS_FN:	printf( " <DECL PARAMS FN %i> ", pNode->mBlockID );	break;
+	case BLKT_CALL_PARAMS_FN:	printf( " <CALL PARAMS FN %i> ", pNode->mBlockID );	break;
+	case BLKT_CODEBLOCK:		printf( " <CODEBLOCK %i> ", pNode->mBlockID );	break;
+	case BLKT_EXPRESSION:		printf( " <EXPRESSION %i> ", pNode->mBlockID );		break;
+	default:
+		DASSERT( 0 );
+		break;
 	}
 
 	const DVec<Variable> &vars = pNode->GetVars();

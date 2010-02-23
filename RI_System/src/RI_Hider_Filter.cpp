@@ -56,7 +56,7 @@ static void sortSampData(
 
 //==================================================================
 inline void filterPixelBox(
-				Float3				&pixCol,
+				Float4				&pixCol,
 				const HiderPixel	&pixel,
 				u_int				sampsPerPixel,
 				float				ooSampsPerPixel )
@@ -83,7 +83,8 @@ inline void filterPixelBox(
 		// TODO: optimize by considering only until the first fully
 		//       opaque sample from front
 
-		Vec3<float>	accCol( 0.f );
+		Float3	accCol( 0.f );
+		Float3	accOpa( 0.f );
 
 		for (int i=(int)dataN-1; i >= 0; --i)
 		{
@@ -91,9 +92,14 @@ inline void filterPixelBox(
 			Vec3<float>	opa = Vec3<float>( pSampDataListSort[i]->mOi );
 
 			accCol = accCol * (one - opa) + col;
+			accOpa += opa;
 		}
 
-		pixCol += accCol;
+		float	accSingleOpa = (accOpa.x() + accOpa.y() + accOpa.z()) / 3;
+
+		accSingleOpa = D::Clamp( accSingleOpa, 0.f, 1.f );
+
+		pixCol += Float4( accCol.x(), accCol.y(), accCol.z(), accSingleOpa );
 		//pixCol = pSampDataListSort[0]->mCi;
 	}
 
@@ -127,7 +133,7 @@ void Hider::Hide(
 	{
 		for (u_int x=0; x < buckWd; ++x, ++pixIdx)
 		{
-			Float3	pixCol( 0.f );
+			Float4	pixCol( 0.f );
 
 			filterPixelBox( pixCol, pixels[pixIdx], sampsPerPixel, ooSampsPerPixel );
 

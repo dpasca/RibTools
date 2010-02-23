@@ -6,7 +6,7 @@
 /// copyright info. 
 //================================================================*/
 
-surface test9( float rgbcol[3] ) //{.5,.5,.5} 
+surface test11( float rgbcol[(1+1+1)] ) //{.5,.5,.5} 
 {
 	Ci = color( rgbcol[0], rgbcol[0+1], rgbcol[2] );
 	Oi = 1;

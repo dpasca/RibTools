@@ -389,6 +389,7 @@ struct Bound
 
 //==================================================================
 static const size_t	NCOLS = 3;	// temporary !!
+static const size_t	NOUTCOLS = 4;	// temporary !!
 
 //==================================================================
 }

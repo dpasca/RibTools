@@ -77,12 +77,10 @@ RSLCompiler::RSLCompiler(
 	// discover functions declarations and usage
 	DiscoverFunctions( mpRoot );
 
-	// remove closing brackets as they serve no additional purpose
-	// ..since the tree has already been defined at this point
-	RemoveClosingBrackets( mpRoot );
-
 	// remove semicolons as they serve no additional purpose
 	RemoveSemicolons( mpRoot );
+
+	//RemoveOpeningExprBrackets( mpRoot );
 
 	// develop the tree based on operators with the proper precedence
 	ReparentOperators( mpRoot );

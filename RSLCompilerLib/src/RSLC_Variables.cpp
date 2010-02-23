@@ -11,6 +11,7 @@
 #include "RSLC_Variables.h"
 #include "RSLC_Exceptions.h"
 #include "RSLC_Registers.h"
+#include "RSLC_Expressions.h"
 
 //==================================================================
 namespace RSLC
@@ -109,7 +110,8 @@ Variable *AddVariable(
 			TokNode *pDTypeNode,
 			TokNode *pDetailNode,
 			TokNode *pSpaceCastTok,
-			TokNode *pNameNode )
+			TokNode *pNameNode,
+			bool	isArray )
 {
 	// setup the var link
 	if ( pNameNode )
@@ -124,6 +126,7 @@ Variable *AddVariable(
 	pVar->mpDetailTok		= pDetailNode ? pDetailNode->mpToken : NULL;
 	pVar->mpSpaceCastTok	= pSpaceCastTok ? pSpaceCastTok->mpToken : NULL;
 	pVar->mpDefNameTok		= pNameNode ? pNameNode->mpToken : NULL;
+	pVar->mIsArray			= isArray;
 
 	if ( pVar->mpDefNameTok )
 	{
@@ -155,13 +158,6 @@ Variable *AddVariable(
 		if ( pVar->mpDetailTok->idType != T_TYPE_DETAIL )
 			throw Exception( "Bad detail type !", pVar->mpDetailTok );
 
-/*
-		// ensure that it's uniform for root parent
-		if ( pNode->GetBlockType() == BLKT_ROOT )
-			if ( pVar->mpDetailTok->id != T_DE_uniform )
-				throw Exception( "Globals must be uniform !", pVar->mpDetailTok );
-*/
-
 		if ( pVar->mpDetailTok->id == T_DE_varying )
 			pVar->mIsVarying = true;
 		else
@@ -179,15 +175,26 @@ Variable *AddVariable(
 		}
 		else
 		{
+			BlockType	blkType = pNode->GetBlockType();
 			// local variables are varying by default, params uniform by default
 			// ..see RenderMan Companion p.297
-			if ( pNode->GetBlockType() == BLKT_CODEBLOCK || pNode->GetBlockType() == BLKT_EXPRESSION )
+			switch ( blkType )
+			{
+			case BLKT_CODEBLOCK:
+			case BLKT_EXPRESSION:
 				pVar->mIsVarying = true;
-			else
-			if ( pNode->GetBlockType() == BLKT_SHPARAMS || pNode->GetBlockType() == BLKT_FNPARAMS )
+				break;
+
+			case BLKT_DECL_PARAMS_SH:
+			case BLKT_DECL_PARAMS_FN:
+			case BLKT_CALL_OR_DELC_PARAMS_FN:
 				pVar->mIsVarying = false;
-			else
+				break;
+
+			default:
 				pVar->mIsVarying = true;
+				break;
+			}
 
 			pVar->mIsForcedDetail = false;	// detail temporarily assumed
 		}
@@ -221,163 +228,6 @@ void AddSelfVariable(
 	pVar->mIsForcedDetail	= isDetailForced;
 }
 
-//==================================================================
-static bool fndVarDefBeginInBlock(
-		size_t &i,
-		TokNode *pNode,
-		TokNode	* &out_pDTypeNode,
-		TokNode	* &out_pDetailNode,
-		TokNode	* &out_pOutputNode
-		)
-{
-	TokNode	*pChild0 = pNode->GetChildTry( i + 0 );
-	TokNode	*pChild1 = pNode->GetChildTry( i + 1 );
-	TokNode	*pChild2 = pNode->GetChildTry( i + 2 );
-
-	out_pDTypeNode	= NULL;
-	out_pDetailNode	= NULL;
-	out_pOutputNode	= NULL;
-
-	TokNode	*pChilds[3] = { pChild0, pChild1, pChild2 };
-
-	for (size_t j=0; j < 3; ++j)
-	{
-		if NOT( pChilds[j] )
-			break;
-
-		if ( pChilds[j]->mpToken->idType == T_TYPE_DATATYPE )
-		{
-			out_pDTypeNode = pChilds[j];
-			++i;
-		}
-		else
-		if ( pChilds[j]->mpToken->idType == T_TYPE_DETAIL )
-		{
-			if ( out_pDetailNode )
-				throw Exception( "Broken variable declaration", pChilds[j] );
-
-			out_pDetailNode = pChilds[j];
-			++i;
-		}
-		else
-		if ( pChilds[j]->mpToken->id == T_KW_output )
-		{
-			if ( out_pOutputNode )
-				throw Exception( "Broken variable declaration", pChilds[j] );
-
-			out_pOutputNode = pChilds[j];
-			++i;
-		}
-	}
-
-	if ( out_pDTypeNode || out_pDetailNode || out_pOutputNode )
-		return true;
-	else
-		return false;
-}
-
-//==================================================================
-static Function *findFunctionByNameNode( DVec<Function> &funcs, TokNode *pFindNode )
-{
-	for (size_t i=0; i < funcs.size(); ++i)
-	{
-		if ( funcs[i].mpNameNode == pFindNode )
-			return &funcs[i];
-	}
-
-	return NULL;
-}
-
-//==================================================================
-static size_t discoverVariablesDeclarations_sub2( TokNode *pNode, size_t i )
-{
-	BlockType	blkType = pNode->GetBlockType();
-
-	TokNode	*pDTypeNode	= NULL;
-	TokNode	*pDetailNode= NULL;
-	TokNode	*pOutputNode= NULL;
-
-	while ( fndVarDefBeginInBlock(
-					i,
-					pNode,
-					pDTypeNode,
-					pDetailNode,
-					pOutputNode ) )
-	{
-		if ( pOutputNode && blkType == BLKT_CODEBLOCK )
-			throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pOutputNode );
-
-		bool	isFunctionName = false;
-
-		for (; i < pNode->mpChilds.size(); ++i)
-		{
-			TokNode	*pChild = pNode->GetChildTry( i );
-
-			if ( pChild->IsTokenID( T_OP_SEMICOL ) ||
-				 pChild->IsTokenID( T_OP_RGT_BRACKET ) )
-			{
-				++i;
-				break;
-			}
-			else
-			if ( pChild->IsTokenID( T_OP_COMMA ) )
-			{
-				continue;
-			}
-			else
-			{
-				// it's a variable declaration if it's non terminal..
-				// ..and it's not followed by an opening bracket
-				// ..or followed by no sibling.. which is the end of params in
-				// a function/shader params block (ehm ?)
-				if ( pChild->IsNonTerminal() )
-				{
-					TokNode	*pChild2 = pNode->GetChildTry( i+1 );
-
-					isFunctionName = (pChild2 && pChild2->IsTokenID( T_OP_LFT_BRACKET ));
-					if ( isFunctionName )
-						break;
-
-					if ( !isFunctionName )
-					{
-						if NOT( pDTypeNode )
-							throw Exception( "Missing type for definition ?", pChild );
-
-						// no "space cast" in the declaration in the curl braces
-						Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pChild );
-
-						if ( blkType == BLKT_SHPARAMS )
-						{
-							pVar->mIsSHParam = true;	// mark as shader param
-						}
-					}
-				}
-				else
-				{
-					if ( blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS )
-					{
-						// functions and shader params are allowed to change type after
-						// a comma !
-
-						if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
-							pDTypeNode = pChild;
-						else
-						if ( pChild->mpToken->idType == T_TYPE_DETAIL )
-							pDetailNode = pChild;
-					}
-					//else
-					//	throw Exception( "Expecting a variable name !" );
-				}
-			}
-		}
-
-		if ( i >= pNode->mpChilds.size() || isFunctionName )
-			break;
-	}
-
-	return i;
-}
-
 // TODO: functions and shader params are allowed to change type after a comma !
 //==================================================================
 static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i )
@@ -387,50 +237,14 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 	TokNode	*pOutputNode= NULL;
 	TokNode *pLastNonTerm=NULL;
 
-	int		rndBracketCnt = 0;
-	int		crlBracketCnt = 0;
 	bool	intoRValue = false;
+	bool	isArray = false;
 
 	BlockType	blkType = pNode->GetBlockType();
 
 	for (; i < pNode->mpChilds.size(); ++i)
 	{
 		TokNode	*pChild = pNode->mpChilds[i];
-
-		if ( pChild->mpToken->id == T_OP_LFT_BRACKET )
-		{
-			++rndBracketCnt;
-			continue;
-		}
-		if ( pChild->mpToken->id == T_OP_LFT_CRL_BRACKET )
-		{
-			++crlBracketCnt;
-			continue;
-		}
-		else
-		if ( pChild->mpToken->id == T_OP_RGT_BRACKET )
-		{
-			--rndBracketCnt;
-			continue;
-		}
-		if ( pChild->mpToken->id == T_OP_RGT_CRL_BRACKET )
-		{
-			--crlBracketCnt;
-			continue;
-		}
-		else
-		{
-			// no variable declarations possible inside any expression (round brackets)
-			if ( rndBracketCnt )
-				continue;
-
-			// only inside code block, curl bracket allow for variables declaration
-			if ( crlBracketCnt )
-			{
-				if ( blkType != BLKT_CODEBLOCK )
-					continue;
-			}
-		}
 
 		// NOTE: a valid variable declaration must be followed by any of the following symbols
 		// ',', ';', '='
@@ -457,8 +271,8 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 
 			if ( pDTypeNode && pLastNonTerm )
 			{
-				Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
-				if ( blkType == BLKT_SHPARAMS )
+				Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm, isArray );
+				if ( blkType == BLKT_DECL_PARAMS_SH )
 				{
 					pVar->mIsSHParam = true;	// mark as shader param
 				}
@@ -474,8 +288,8 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 
 			if ( pDTypeNode && pLastNonTerm )
 			{
-				Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );
-				if ( blkType == BLKT_SHPARAMS )
+				Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm, isArray );
+				if ( blkType == BLKT_DECL_PARAMS_SH )
 				{
 					pVar->mIsSHParam = true;	// mark as shader param
 				}
@@ -503,8 +317,15 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 			else
 			if ( pChild->mpToken->id == T_KW_output )
 			{
-				if ( pOutputNode && (blkType != BLKT_SHPARAMS && blkType != BLKT_FNPARAMS) )
-					throw Exception( "Keyword 'output' can be specified only in function and shader parameters declaration", pChild );
+				if ( pOutputNode &&
+					(	blkType != BLKT_DECL_PARAMS_SH
+					 && blkType != BLKT_DECL_PARAMS_FN
+					 && blkType != BLKT_CALL_OR_DELC_PARAMS_FN) )
+				{
+					throw Exception(
+							"Keyword 'output' can be specified only in "
+							"function and shader parameters declaration", pChild );
+				}
 
 				pOutputNode = pChild;
 			}
@@ -512,15 +333,44 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 			if ( pChild->IsNonTerminal() )
 			{
 				pLastNonTerm = pChild;
+				// new name, we don't know if it's an array yet
+				isArray = false;
+			}
+			else
+			if ( pChild->mpToken->id == T_OP_LFT_SQ_BRACKET )
+			{
+				// is this maybe an array declaration ?
+				if NOT( pLastNonTerm )
+					throw Exception( "Where is the array name ?", pChild );
+
+				for (; i < pNode->mpChilds.size(); ++i)
+				{
+					TokNode	*pChild = pNode->mpChilds[i];
+					if ( pChild->IsTokenID( T_OP_RGT_SQ_BRACKET ) )
+					{
+						// mark as an array
+						isArray = true;
+						break;
+					}
+				}
+
+				if NOT( isArray )
+					throw Exception( "Bad array declaration", pNode );
 			}
 		}
 	}
 
-	// check for last declaration in case of shadow or function params
-	if ( (blkType == BLKT_SHPARAMS || blkType == BLKT_FNPARAMS) && pLastNonTerm && pDTypeNode )
+	// check for last declaration in case of shader or function params
+	if (
+		(	blkType == BLKT_DECL_PARAMS_SH
+		 || blkType == BLKT_DECL_PARAMS_FN
+		 || blkType == BLKT_CALL_OR_DELC_PARAMS_FN )
+
+		 && pLastNonTerm
+		 && pDTypeNode )
 	{
-		Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm );		
-		if ( blkType == BLKT_SHPARAMS )
+		Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm, isArray );		
+		if ( blkType == BLKT_DECL_PARAMS_SH )
 		{
 			pVar->mIsSHParam = true;	// mark as shader param
 		}
@@ -557,18 +407,13 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	for (size_t i = 0; i < pNode->mpChilds.size(); ++i)
-	{
-		if ( pNode->mpChilds[i]->mpToken->id == T_OP_LFT_CRL_BRACKET ||
-			 pNode->mpChilds[i]->mpToken->id == T_OP_LFT_BRACKET )
-		{
-			DiscoverVariablesDeclarations( pNode->mpChilds[i] );
-		}
-	}
+		DiscoverVariablesDeclarations( pNode->mpChilds[i] );
 
 	BlockType	blkType = pNode->GetBlockType();
 
-	if (	blkType == BLKT_SHPARAMS	// $$$ NOT REALLY THE SAME ..but for now, it's ok
-		 || blkType == BLKT_FNPARAMS
+	if (	blkType == BLKT_DECL_PARAMS_SH	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+		 || blkType == BLKT_DECL_PARAMS_FN
+		 || blkType == BLKT_CALL_OR_DELC_PARAMS_FN
 		 || blkType == BLKT_CODEBLOCK
 		 || blkType == BLKT_ROOT )
 	{
@@ -592,7 +437,6 @@ void DiscoverVariablesUsage( TokNode *pNode )
 			if ( pVarDefBlock->GetVars().size() )
 			{
 				VarLink varLink = pVarDefBlock->FindVariableByDefName( pNode->GetTokStr() );
-
 				if ( varLink.IsValid() )
 				{
 					pNode->mVarLink = varLink;

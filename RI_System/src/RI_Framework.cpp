@@ -327,10 +327,10 @@ void Framework::WorldEnd()
 		DIMG::Image	hiderImg(
 					mHider.GetOutputDataWd(),
 					mHider.GetOutputDataHe(),
-					NCOLS,
+					NOUTCOLS,
 					DIMG::Image::ST_F32,
 					mHider.GetOutputDataStride() * sizeof(float),
-					"rgb",	// depends on NCOLS too !
+					"rgba",	// depends on NOUTCOLS too !
 					(const U8 *)mHider.GetOutputData(0,0) );
 
 		for (size_t i=0; i < mOptions.mpDisplays.size(); ++i)

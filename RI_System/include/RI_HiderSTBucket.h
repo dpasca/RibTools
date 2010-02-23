@@ -29,7 +29,7 @@ public:
 	int							mY1;
 	int							mX2;
 	int							mY2;
-	Buffer2D<NCOLS>				mCBuff;
+	Buffer2D<NOUTCOLS>			mCBuff;
 	DVec<SimplePrimitiveBase *>	mpPrims;
 	HiderSampleCoordsBuffer		*mpSampCoordsBuff;
 
@@ -66,7 +66,7 @@ public:
 		mCBuff.Clear();
 	}
 
-	void EndRender( Buffer2D<NCOLS> &outCBuff )
+	void EndRender( Buffer2D<NOUTCOLS> &outCBuff )
 	{
 		outCBuff.CopyRect( mX1, mY1, mCBuff );
 		mCBuff.Free();

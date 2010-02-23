@@ -93,4 +93,38 @@ Exception::Exception( const FatBase &fatBase, const Fat8 &ch, const char *pFmt, 
 }
 
 //==================================================================
+void Warning( const TokNode *pTokNode, const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[4096];
+
+	vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
+	va_end( vl );
+
+
+	if ( pTokNode && pTokNode->mpToken )
+	{
+		const Token *pTok = pTokNode->mpToken;
+
+		printf(
+			"SHADER WARN> MSG : %s\n"
+			"SHADER WARN> AT  : %s : %i\n",
+			buff,
+			pTok->pSourceFileName ? pTok->pSourceFileName : "<NO FILE>",
+			pTok->sourceLine
+			);
+
+	}
+	else
+	{
+		printf(
+			"SHADER WARN> MSG : %s\n",
+			buff
+			);
+	}
+}
+
+//==================================================================
 }

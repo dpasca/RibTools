@@ -94,24 +94,8 @@ public:
 
 	void SetBlockType( BlockType blockType )
 	{
-		DASSERT( mBlockType == BLKT_UNKNOWN && mNodeType == TYPE_STANDARD );
-
 		mBlockType	= blockType;
 		mNodeType	= TYPE_BLOCK;
-	}
-
-	void UpdateBlockTypeToFuncCall()
-	{
-		DASSERT( mBlockType == BLKT_EXPRESSION && mNodeType == TYPE_BLOCK );
-
-		mBlockType	= BLKT_FUNCCALL;
-	}
-
-	void UpdateBlockTypeToFuncOpExpression()
-	{
-		DASSERT( mBlockType == BLKT_EXPRESSION && mNodeType == TYPE_BLOCK );
-
-		mBlockType	= BLKT_FUNCOPEXPR;
 	}
 
 	BlockType GetBlockType() const
@@ -155,10 +139,10 @@ public:
 	TokNode	*GetPrev();
 	TokNode	*GetNext();
 
-	const TokNode *GetLeft()	const {	return ((const TokNode *)this)->GetLeft();	}
-	const TokNode *GetRight()	const {	return ((const TokNode *)this)->GetRight();	}
-	const TokNode *GetPrev()	const {	return ((const TokNode *)this)->GetPrev();	}
-	const TokNode *GetNext()	const {	return ((const TokNode *)this)->GetNext();	}
+	const TokNode *GetLeft()	const {	return ((TokNode *)this)->GetLeft();	}
+	const TokNode *GetRight()	const {	return ((TokNode *)this)->GetRight();	}
+	const TokNode *GetPrev()	const {	return ((TokNode *)this)->GetPrev();	}
+	const TokNode *GetNext()	const {	return ((TokNode *)this)->GetNext();	}
 
 	TokNode *GetChildTry( size_t i ) const { return i < mpChilds.size() ? mpChilds[i] : NULL; }
 
@@ -181,13 +165,9 @@ public:
 
 	void UnlinkFromParent();
 
-	void Reparent( TokNode *pNewParent )
-	{
-		UnlinkFromParent();
-		mpParent = pNewParent;
-	}
+	void Reparent( TokNode *pNewParent );
 
-	void ReplaceNode( TokNode *pNode );
+	void ReplaceNode( TokNode *pOldNode );
 
 	const	Variable *GetVarPtr() const	{	return mVarLink.GetVarPtr();	}
 			Variable *GetVarPtr()		{	return mVarLink.GetVarPtr();	}
@@ -202,7 +182,7 @@ public:
 
 //==================================================================
 void MakeTree( TokNode *pNode, DVec<Token> &tokens );
-void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx=NULL );
+void RemoveOpeningExprBrackets( TokNode *pNode, int *pParentScanIdx=NULL );
 void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx=NULL );
 void TraverseTree( TokNode *pNode, int depth );
 
