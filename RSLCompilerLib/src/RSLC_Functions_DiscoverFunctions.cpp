@@ -38,9 +38,62 @@ static void removeCommasFromParams( TokNode *pNode )
 }
 
 //==================================================================
+static void convertFCallParamsToExpressions( TokNode *pNode, u_int &io_blockCnt )
+{
+	if NOT( pNode->mpChilds.size() )
+		return;
+
+/* convert
+
+func
+	(
+	p1
+	,
+	p2
+
+..to..
+
+func
+	( <CALL PARAMS>
+		( <EXPR>
+			p1
+		( <EXPR>
+			p2
+*/
+
+	// set as a plain expression and return
+
+	TokNode	*pParamExpr = DNEW TokNode( "(", T_OP_LFT_BRACKET, T_TYPE_OPERATOR );
+	pParamExpr->mpToken->pSourceFileName = pNode->mpToken->pSourceFileName;
+	pParamExpr->mpToken->sourceLine = pNode->mpToken->sourceLine;
+	pNode->AddChildFront( pParamExpr );
+	pParamExpr->SetBlockType( BLKT_EXPRESSION );
+	pParamExpr->mBlockID = io_blockCnt++;
+
+	for (size_t j=1; j < pNode->mpChilds.size();)
+	{
+		TokNode	*pChild = pNode->mpChilds[j];
+		if ( pChild->mpToken->id == T_OP_COMMA )
+		{
+			pChild->mpToken->str = "(";
+			pChild->mpToken->id = T_OP_LFT_BRACKET;
+			pChild->SetBlockType( BLKT_EXPRESSION );
+			pChild->mBlockID = io_blockCnt++;
+			pParamExpr = pChild;
+			++j;
+			continue;
+		}
+
+		TokNode	*pSrcParam = pNode->mpChilds[j];
+		pSrcParam->Reparent( pParamExpr );
+		pParamExpr->mpChilds.push_back( pSrcParam );
+
+	}
+}
+
+//==================================================================
 static const Function *getFunctionByName(
 					const char *pFindName,
-					const TokNode *pNode,
 					const DVec<Function> &funcs )
 {
 	// TODO: will need to eventually support nested functions
@@ -55,6 +108,28 @@ static const Function *getFunctionByName(
 	}
 
 	return NULL;
+}
+
+//==================================================================
+static bool isParamLessFuncop(
+					const char *pFindName,
+					const DVec<Function> &funcs )
+{
+	// TODO: will need to eventually support nested functions
+
+	for (size_t i=0; i < funcs.size(); ++i)
+	{
+		const char *pFuncName = funcs[i].mpNameNode->GetTokStr();
+
+		if (	funcs[i].IsFuncOp()
+			 && !funcs[i].HasParams()
+			 && 0 == strcmp( pFuncName, pFindName ) )
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 //==================================================================
@@ -90,7 +165,7 @@ static bool handleRetValueForFuncDeclaration(
 		//  ..is this a nested function with no return value or is it a
 		//  funcop call such as "illuminance()" ?
 		const Function *pFoundFunc =
-					getFunctionByName( pFuncName->GetTokStr(), pNode, funcs );
+					getFunctionByName( pFuncName->GetTokStr(), funcs );
 
 		if ( pFoundFunc )
 		{
@@ -121,35 +196,20 @@ static bool handleRetValueForFuncDeclaration(
 //==================================================================
 static void discoverFuncsDeclarations_sub(
 								TokNode *pNode,
-								DVec<Function> &funcs )
+								TokNode	*pDeclParamsBlk,
+								DVec<Function> &funcs,
+								u_int &io_blockCnt )
 {
 	if ( !pNode->IsNonTerminal() && !pNode->IsDataType() )
 		return;
 
 	TokNode	*pFuncName	= pNode;
-	TokNode	*pParamsBlk	= pNode->GetRight();
-
-	// do we have a potential params block
-	if ( !pParamsBlk )
-		return;
-
-	// does it look like a params block ?
-	switch ( pParamsBlk->GetBlockType() )
-	{
-	case BLKT_DECL_PARAMS_SH:
-	case BLKT_DECL_PARAMS_FN:
-	case BLKT_CALL_OR_DELC_PARAMS_FN:
-		break;
-
-	default:
-		return;
-	}
 
 	TokNode	*pRetType	= pNode->GetLeft();
 	if NOT( pRetType )
 		return;
 
-	TokNode	*pCodeBlock	= pParamsBlk->GetRight();
+	TokNode	*pCodeBlock	= pDeclParamsBlk->GetRight();
 	if ( !pCodeBlock || !pCodeBlock->IsCodeBlock() )
 		return;
 
@@ -168,12 +228,15 @@ static void discoverFuncsDeclarations_sub(
 		return;
 
 	// if it is a function declaration, then proceed
+	if ( pDeclParamsBlk->GetBlockType() == BLKT_CALL_OR_DELC_PARAMS_FN )
+		pDeclParamsBlk->SetBlockType( BLKT_DECL_PARAMS_FN );
 
 	Function	*pFunc = funcs.grow();
 
-	removeCommasFromParams( pParamsBlk );
+	removeCommasFromParams( pDeclParamsBlk );
+	//convertFCallParamsToExtressions( pParamsBlk, io_blockCnt );
 
-	pFunc->mpParamsNode		= pParamsBlk;
+	pFunc->mpParamsNode		= pDeclParamsBlk;
 	pFunc->mpCodeBlkNode	= pCodeBlock;
 	pFunc->mpNameNode		= pFuncName;
 	pFunc->mpRetTypeTok		= pRetType->mpToken;
@@ -205,65 +268,42 @@ static void discoverFuncsDeclarations_sub(
 }
 
 //==================================================================
-static void discoverFuncsDeclarations(
-								TokNode *pNode,
-								DVec<Function> &funcs )
-{
-	discoverFuncsDeclarations_sub( pNode, funcs );
-
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-		discoverFuncsDeclarations( pNode->mpChilds[i], funcs );
-}
-
-//==================================================================
 static void discoverFuncsCalls_sub(
-						TokNode				 *pFuncCallNode,
-						const DVec<Function> &funcs,
-						int					 &out_parentIdx )
+						TokNode					*pFuncCallNode,
+						TokNode					*pSpaceCastNode,
+						TokNode					*pCallParamsBlk,
+						const DVec<Function>	&funcs,
+						u_int					&io_blockCnt,
+						int						&out_parentIdx )
 {
-	// constructor ?
-	bool	isDataType = pFuncCallNode->IsDataType();
-
-	TokNode *pRightNode = pFuncCallNode->GetRight();
-
-	if ( pRightNode && pRightNode->mpToken->id == T_VL_STRING )
+	if ( pSpaceCastNode )
 	{
-		if ( isDataType )
+		/*
+			func
+			"dude"
+			(
+			a
+			)
+					..becomes..
+			func
+			(
+			"dude"
+			,
+			a
+			)
+		*/
+
+		if ( pCallParamsBlk->mpChilds.size() )
 		{
-			// ok, it's just a space cast..
-
-			// ..next should be a bracket
-			TokNode *pParamsList = pRightNode->GetRight();
-
-			pRightNode->Reparent( pParamsList );
-			pParamsList->mpChilds.push_front( pRightNode );
-
-			pRightNode = pParamsList;
-/*
-			// ..reparent the cast string as child of the function call node
-			out_parentIdx -= 1;
-
-			pRightNode->Reparent( pFuncCallNode );
-			pFuncCallNode->mpChilds.push_back( pRightNode );
-*/
+			TokNode	*pCommaNode = DNEW TokNode( ",", T_OP_COMMA, T_TYPE_OPERATOR );
+			pCommaNode->mpToken->pSourceFileName = pSpaceCastNode->mpToken->pSourceFileName;
+			pCommaNode->mpToken->sourceLine = pSpaceCastNode->mpToken->sourceLine;
+			pCallParamsBlk->AddChildFront( pCommaNode );
 		}
-		else
-		{
-			throw Exception( "Unknown usage, why a string ?",  pFuncCallNode );
-		}
-	}
 
-	// should have something following because it has to be one of the following case
-	// - an actual function call, in which case there should be an open bracket
-	// - a funcop such as "else", with no params, but that should have a following
-	//   statement or block
-	if NOT( pRightNode )
-	{
-		return;
-		//throw Exception( "Incomplete statement", pFuncCallNode );
+		pSpaceCastNode->Reparent( pCallParamsBlk );
+		pCallParamsBlk->mpChilds.push_front( pSpaceCastNode );
 	}
-
-	//if ( pFunc->mpRetTypeTok->id == T_KW___funcop )
 
 	// do an early match to see if there is at least one function call
 	// with this name  ..actual match will happen later in resolveFunctionCalls()
@@ -272,12 +312,11 @@ static void discoverFuncsCalls_sub(
 	bool isFuncOp = false;
 
 	// if it doesn't start by "_asm_"
-	if ( pFuncCallNode->GetTokStr() != strstr( pFuncCallNode->GetTokStr(), "_asm_" ) )
+	if NOT( IsAsmFunc( pFuncCallNode->GetTokStr() ) )
 	{
 		const Function *pFunc =
 				getFunctionByName(
 						pFuncCallNode->GetTokStr(),
-						pFuncCallNode,
 						funcs );
 
 		if NOT( pFunc )
@@ -288,9 +327,9 @@ static void discoverFuncsCalls_sub(
 			isFuncOp = true;
 	}
 
-	if ( pRightNode->GetBlockType() == BLKT_CALL_OR_DELC_PARAMS_FN )
+	if ( pCallParamsBlk->GetBlockType() == BLKT_CALL_OR_DELC_PARAMS_FN )
 	{
-		pRightNode->SetBlockType( BLKT_CALL_PARAMS_FN );
+		pCallParamsBlk->SetBlockType( BLKT_CALL_PARAMS_FN );
 
 		/*
 			b
@@ -308,47 +347,115 @@ static void discoverFuncsCalls_sub(
 
 		out_parentIdx -= 1;
 
-		pRightNode->Reparent( pFuncCallNode );
-		pFuncCallNode->mpChilds.push_back( pRightNode );
+		pCallParamsBlk->Reparent( pFuncCallNode );
+		pFuncCallNode->mpChilds.push_back( pCallParamsBlk );
 
 		pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
 
-		removeCommasFromParams( pRightNode );
+		convertFCallParamsToExpressions( pCallParamsBlk, io_blockCnt );
 	}
 	else
 	if ( isFuncOp )
 	{
 		// funcops with no params can be called without the brackets
 		// ..for example "else()" is a funcop and it can be called as "else"
-		// Note: funcops sch as "else" and "if" are defined in RSLC_Builtins.sl 
+		// Note: funcops such as "else" and "if" are defined in RSLC_Builtins.sl 
 
 		pFuncCallNode->mNodeType = TokNode::TYPE_FUNCCALL;
 
-		removeCommasFromParams( pRightNode );
+		convertFCallParamsToExpressions( pCallParamsBlk, io_blockCnt );
 	}
 }
 
 //==================================================================
-static void discoverFuncsCalls( TokNode *pNode, const DVec<Function> &funcs, int &out_parentIdx )
+static void discoverFuncsDecls(
+							TokNode *pNode,
+							DVec<Function> &funcs,
+							u_int &io_blockCnt )
 {
-	if ( (pNode->IsNonTerminal() ||
-		  pNode->IsDataType()) &&
-			pNode->mNodeType == TokNode::TYPE_STANDARD )
+	TokNode	*pDeclParamsBlk	= pNode->GetRight();
+
+	// do we have a potential params block
+	if ( pDeclParamsBlk )
 	{
-		discoverFuncsCalls_sub( pNode, funcs, out_parentIdx );
+		// does it look like a params block ?
+		switch ( pDeclParamsBlk->GetBlockType() )
+		{
+		case BLKT_DECL_PARAMS_SH:
+		case BLKT_DECL_PARAMS_FN:
+		case BLKT_CALL_OR_DELC_PARAMS_FN:
+			discoverFuncsDeclarations_sub( pNode, pDeclParamsBlk, funcs, io_blockCnt );
+			break;
+		}
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		discoverFuncsDecls( pNode->mpChilds[i], funcs, io_blockCnt );
+}
+
+//==================================================================
+static void discoverFuncsCalls(
+							TokNode *pNode,
+							const DVec<Function> &funcs,
+							u_int &io_blockCnt,
+							int &out_parentIdx )
+{
+	// is it a potential function name ?
+	if ( pNode->IsNonTerminal() || pNode->IsDataType() )
+	{
+		TokNode	*pRightNode	= pNode->GetRight();
+
+		// do we have a potential params block
+		if ( pRightNode )
+		{
+			TokNode	*pCallParamsBlk = NULL;
+			TokNode	*pSpaceCastNode = NULL;
+
+			// space cast ?
+			if ( pRightNode->mpToken->id == T_VL_STRING )
+			{
+				pSpaceCastNode = pRightNode;
+				pCallParamsBlk = pRightNode->GetRight();
+			}
+			else
+				pCallParamsBlk = pRightNode;
+
+			// does it look like a params block ?
+			switch ( pCallParamsBlk->GetBlockType() )
+			{
+			case BLKT_CALL_PARAMS_FN:
+			case BLKT_CALL_OR_DELC_PARAMS_FN:
+				discoverFuncsCalls_sub(
+							pNode,
+							pSpaceCastNode,
+							pCallParamsBlk,
+							funcs,
+							io_blockCnt,
+							out_parentIdx );
+				break;
+
+			default:
+				if (	pNode->mNodeType == TokNode::TYPE_STANDARD
+					 && isParamLessFuncop( pNode->GetTokStr(), funcs ) )
+				{
+					pNode->mNodeType = TokNode::TYPE_FUNCCALL;
+				}
+				break;
+			}
+		}
 	}
 
 	for (int i=0; i < (int)pNode->mpChilds.size(); ++i)
-		discoverFuncsCalls( pNode->mpChilds[i], funcs, i );
+		discoverFuncsCalls( pNode->mpChilds[i], funcs, io_blockCnt, i );
 }
 
 //==================================================================
-void DiscoverFunctions( TokNode *pRoot )
+void DiscoverFunctions( TokNode *pRoot, u_int &io_blockCnt )
 {
-	discoverFuncsDeclarations( pRoot, pRoot->GetFuncs() );
+	discoverFuncsDecls( pRoot, pRoot->GetFuncs(), io_blockCnt );
 
 	int	idx = 0;
-	discoverFuncsCalls( pRoot, pRoot->GetFuncs(), idx );
+	discoverFuncsCalls( pRoot, pRoot->GetFuncs(), io_blockCnt, idx );
 }
 
 //==================================================================

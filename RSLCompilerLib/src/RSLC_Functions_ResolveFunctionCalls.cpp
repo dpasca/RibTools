@@ -121,8 +121,32 @@ static void verifyFunctionCallParams( const TokNode &callParams )
 
 	for (size_t i=0; i < callParams.mpChilds.size(); ++i)
 	{
-		const TokNode	&parNode = *callParams.mpChilds[i];
+		const TokNode	*pParNode = callParams.mpChilds[i];
 
+		VarType	varType = pParNode->GetVarType();
+/*
+		while ( pParNode )
+		{
+			VarType	varType = pParNode->GetVarType();
+
+			if ( varType != VT_UNKNOWN )
+			{
+				break;
+			}
+
+			pParNode = pParNode->GetChildTry( 0 );
+		}
+*/
+
+		if NOT( pParNode )
+		{
+			throw Exception(
+						callParams.mpChilds[0],
+						"Unknown parameter %s",
+						callParams.mpChilds[0]->GetTokStr() );
+		}
+
+/*
 		// is this a square bracket ?
 		if ( parNode.IsTokenID( T_OP_LFT_SQ_BRACKET ) )
 		{
@@ -140,15 +164,7 @@ static void verifyFunctionCallParams( const TokNode &callParams )
 			}
 		}
 		else
-		{
-			VarType	varType = parNode.GetVarType();
-
-			if ( varType == VT_UNKNOWN )
-				throw Exception(
-							&parNode,
-							"Unknown parameter %s",
-							parNode.GetTokStr() );
-		}
+*/
 	}
 }
 
@@ -316,76 +332,79 @@ static void resolveFunctionCalls(
 
 	if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL )
 	{
+		// do we have any params ?
+		if ( pNode->mpChilds.size() )
+		{
+			const TokNode	*pParamsList = pNode->mpChilds[0];
+
+			// bogus params ?
+			for (size_t i=0; i < pParamsList->mpChilds.size(); ++i)
+			{
+				VarType vtype = pParamsList->mpChilds[i]->GetVarType();
+				if ( vtype == VT_UNKNOWN )
+				{
+					throw Exception( pNode, "Unknown type for parameter %i", i+1 );
+					//break;
+				}
+			}
+		}
+
 		const Function	*pFunc = NULL;
 
-		// bogus params ?
-		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-		{
-			VarType vtype = pNode->mpChilds[i]->GetVarType();
-			if ( vtype == VT_UNKNOWN )
-			{
-				break;
-			}
-		}
+		// is asm func ? If so, then no need to process anything else here
+		if ( IsAsmFunc( pNode->GetTokStr() ) )
+			return;
 
+		// find the function by its name and it's parameters types
 		pFunc = MatchFunctionByParams( pNode, funcs );
 
-		if ( pFunc )
+		if NOT( pFunc )
 		{
-			TokNode	*pClonedParamsHooks = cloneBranch( pFunc->mpParamsNode );
-
-			TokNode	*pFollowingStatement = NULL;
-			if ( pFunc->mpRetTypeTok->id == T_KW___funcop )
-			{
-				pFollowingStatement = pNode->GetRight();
-			}
-
-			// place the params block where the function call (name) currently is
-			pClonedParamsHooks->ReplaceNode( pNode );
-
-			// don't add the return value for "void" functions !
-			if ( pFunc->mRetVarType != VT_VOID )
-			{
-				// add a return node/variable
-				AddVariable(
-					pClonedParamsHooks->mpParent,
-					DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
-					DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL ),	// %%% forced varying for now !
-					NULL,
-					pClonedParamsHooks,
-					false );
-			}
-
-			const TokNode	*pPassParams = pNode->GetChildTry( 0 );
-
-			assignPassingParams( pClonedParamsHooks, pPassParams );
-
-			// a funcop ?
-			if ( pFunc->mpRetTypeTok->id == T_KW___funcop )
-			{
-				// NOTE: do re really need to do this reparenting ??!
-
-				if NOT( pFollowingStatement )
-					throw Exception( "Missing statement !", pNode );
-
-				pClonedParamsHooks->mIsFuncOp = true;
-
-				handleFuncopEndForIfElse( pClonedParamsHooks );
-			}
+			// if not, then throw an exception
+			throw Exception(
+				DUT::SSPrintFS( "Could not find the function: %s", pNode->GetTokStr() ),
+				pNode );
 		}
-		else
-		{
-			// not found ?
-			const char *pFuncName = pNode->mpToken->GetStrChar();
 
-			// is it an asm intrinsic ?
-			if ( pFuncName != strstr( pFuncName, "_asm_" ) )
-			{
-				// if not, then throw an exception
-				throw Exception(
-							DUT::SSPrintFS( "Could not find the function: %s", pFuncName ),
-							pNode );
-			}
+		TokNode	*pClonedParamsHooks = cloneBranch( pFunc->mpParamsNode );
+
+		TokNode	*pFollowingStatement = NULL;
+		if ( pFunc->mpRetTypeTok->id == T_KW___funcop )
+		{
+			pFollowingStatement = pNode->GetRight();
+		}
+
+		// place the params block where the function call (name) currently is
+		pClonedParamsHooks->ReplaceNode( pNode );
+
+		// don't add the return value for "void" functions !
+		if ( pFunc->mRetVarType != VT_VOID )
+		{
+			// add a return node/variable
+			AddVariable(
+				pClonedParamsHooks->mpParent,
+				DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
+				DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL ),	// %%% forced varying for now !
+				NULL,
+				pClonedParamsHooks,
+				false );
+		}
+
+		const TokNode	*pPassParams = pNode->GetChildTry( 0 );
+
+		assignPassingParams( pClonedParamsHooks, pPassParams );
+
+		// a funcop ?
+		if ( pFunc->mpRetTypeTok->id == T_KW___funcop )
+		{
+			// NOTE: do re really need to do this reparenting ??!
+
+			if NOT( pFollowingStatement )
+				throw Exception( "Missing statement !", pNode );
+
+			pClonedParamsHooks->mIsFuncOp = true;
+
+			handleFuncopEndForIfElse( pClonedParamsHooks );
 		}
 	}
 }
@@ -483,7 +502,10 @@ static void closeFuncOps_sub( TokNode *pNode )
 	{
 		TokNode	*pFuncOpEndMarker = DNEW TokNode( "_asm_funcopend", T_NONTERM, T_TYPE_NONTERM );
 		pFuncOpEndMarker->mNodeType = TokNode::TYPE_FUNCCALL;
-		pNode->GetRight()->AddChild( pFuncOpEndMarker );
+		
+		TokNode	*pNext = pNode->GetNext();
+		
+		pNext->AddAfterThis( pFuncOpEndMarker );
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)

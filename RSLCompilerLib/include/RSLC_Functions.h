@@ -18,6 +18,12 @@ namespace RSLC
 class TokNode;
 
 //==================================================================
+inline bool IsAsmFunc( const char *pFuncName )
+{
+	return pFuncName == strstr( pFuncName, "_asm_" );
+}
+
+//==================================================================
 class Function
 {
 public:
@@ -46,10 +52,15 @@ public:
 		return mpRetTypeTok->idType == T_TYPE_SHADERTYPE;
 	}
 
+	bool IsAsmFunc() const;
+
+	bool IsFuncOp() const	{	return mpRetTypeTok->id == T_KW___funcop; }
+
+	bool HasParams() const;
 };
 
 //==================================================================
-void DiscoverFunctions( TokNode *pRoot );
+void DiscoverFunctions( TokNode *pRoot, u_int &io_blockCnt );
 
 const Function *MatchFunctionByParams( TokNode *pFCallNode, const DVec<Function> &funcs );
 

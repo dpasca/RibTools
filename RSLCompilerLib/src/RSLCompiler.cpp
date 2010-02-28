@@ -69,21 +69,22 @@ RSLCompiler::RSLCompiler(
 	mpRoot = DNEW TokNode( (Token *)NULL );
 
 	// make the basic tree with nested blocks based on brackets
-	MakeTree( mpRoot, mTokens );
+	u_int	blockCnt = 0;
+	MakeTree( mpRoot, mTokens, blockCnt );
 
 	// discover variables declarations
 	DiscoverVariablesDeclarations( mpRoot );
 
 	// discover functions declarations and usage
-	DiscoverFunctions( mpRoot );
+	DiscoverFunctions( mpRoot, blockCnt );
 
 	// remove semicolons as they serve no additional purpose
 	RemoveSemicolons( mpRoot );
 
-	//RemoveOpeningExprBrackets( mpRoot );
-
 	// develop the tree based on operators with the proper precedence
 	ReparentOperators( mpRoot );
+
+	RemoveOpeningExprBrackets( mpRoot );
 
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );

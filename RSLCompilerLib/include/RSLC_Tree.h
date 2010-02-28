@@ -122,6 +122,8 @@ public:
 		return pNode;
 	}
 
+	void AddAfterThis( TokNode *pNode );
+
 	TokNode *AddNewChild( Token *pObj )
 	{
 		return AddChild( DNEW TokNode( pObj ) );
@@ -181,7 +183,7 @@ public:
 };
 
 //==================================================================
-void MakeTree( TokNode *pNode, DVec<Token> &tokens );
+void MakeTree( TokNode *pNode, DVec<Token> &tokens, u_int &out_blockCnt );
 void RemoveOpeningExprBrackets( TokNode *pNode, int *pParentScanIdx=NULL );
 void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx=NULL );
 void TraverseTree( TokNode *pNode, int depth );

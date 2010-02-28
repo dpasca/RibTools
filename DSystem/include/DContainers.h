@@ -225,7 +225,9 @@ public:
 
 	void erase( iterator it )
 	{
-		DASSTHROW( it >= mpData && it < (mpData+mSize), ("Out of bounds !") );
+		if NOT( it >= mpData && it < (mpData+mSize) )
+			throw std::out_of_range( "Out of bounds !" );
+
 		size_t	idx = it - mpData;
 		mpData[idx].~T();
 		for (size_t i=idx; i < mSize-1; ++i)
@@ -233,6 +235,21 @@ public:
 			mpData[i] = mpData[i+1];
 		}
 		mSize -= 1;
+	}
+
+	void insert( iterator itBefore, T &val )
+	{
+		if NOT( itBefore >= mpData && itBefore < (mpData+mSize) )
+			throw std::out_of_range( "Out of bounds !" );
+
+		size_t	idx = itBefore - mpData;
+
+		resize( mSize + 1 );
+
+		for (size_t i=mSize; i > (idx+1); --i)
+			mpData[i-1] = mpData[i-2];
+
+		mpData[idx] = val;
 	}
 
 	void push_front( const T &val )

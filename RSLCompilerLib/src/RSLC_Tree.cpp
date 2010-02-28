@@ -153,30 +153,52 @@ TokNode *TokNode::GetPrev()
 TokNode *TokNode::GetNext()
 {
 	if NOT( mpParent )
-	{
-		if ( mpChilds.size() && mpChilds[0] )
-			return mpChilds[0];
-		else
-			return NULL;
-	}
+		return NULL;
 
 	for (size_t i=0; i < mpParent->mpChilds.size(); ++i)
 	{
 		if ( mpParent->mpChilds[i] == this )
 		{
+			size_t nextIdx = i + 1;
 			// return a sibling if any...
-			if ( (i+1) < mpParent->mpChilds.size() )
-				return mpParent->mpChilds[i+1];
-			else	// ..return the first child if exists..
-			if ( mpChilds.size() && mpChilds[0] )
-				return mpChilds[0];
-			else	// otherwise just give up (it's a leaf)
+			if ( nextIdx < mpParent->mpChilds.size() )
+				return mpParent->mpChilds[ nextIdx ];
+			else	// otherwise NULL
 				return NULL;
 		}
 	}
 
 	DASSTHROW( 0, ("Bad tree ?!") );
 	return NULL;
+}
+
+//==================================================================
+void TokNode::AddAfterThis( TokNode *pNode )
+{
+	for (size_t i=0; i < mpParent->mpChilds.size(); ++i)
+	{
+		if ( mpParent->mpChilds[i] == this )
+		{
+			pNode->mpParent = mpParent;
+
+			size_t nextIdx = i + 1;
+
+			if ( nextIdx < mpParent->mpChilds.size() )
+			{
+				mpParent->mpChilds.insert(
+					mpParent->mpChilds.begin() + nextIdx,
+					pNode );
+			}
+			else
+			{
+				mpParent->mpChilds.push_back( pNode );
+			}
+
+			return;
+		}
+	}
+
+	DASSTHROW( 0, ("Broken tree ?") );
 }
 
 //==================================================================
@@ -407,7 +429,6 @@ static void defineBlockTypeAndID_OnBracket( TokNode *pBracketNode )
 
 	// set as a plain expression otherwise
 	pBracketNode->SetBlockType( BLKT_EXPRESSION );
-	return;
 }
 
 //==================================================================
@@ -454,8 +475,10 @@ static bool doBracketsMatch( TokenID lastOpenBraket, TokenID thisCloseBracket )
 }
 
 //==================================================================
-void MakeTree( TokNode *pRoot, DVec<Token> &tokens )
+void MakeTree( TokNode *pRoot, DVec<Token> &tokens, u_int &out_blockCnt )
 {
+	out_blockCnt = 0;
+
 	//pRoot->mBlockType = AT_ROOT;
 
 	//TokNode	*pParent = pRoot;
@@ -499,8 +522,7 @@ void MakeTree( TokNode *pRoot, DVec<Token> &tokens )
 		}
 	}
 
-	u_int	blockCnt = 0;
-	defineBlockTypeAndID( pRoot, blockCnt );
+	defineBlockTypeAndID( pRoot, out_blockCnt );
 }
 
 //==================================================================
@@ -535,7 +557,7 @@ void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx )
 }
 #endif
 
-#if 0
+#if 1
 //==================================================================
 void RemoveOpeningExprBrackets( TokNode *pNode, int *pParentScanIdx )
 {
@@ -543,7 +565,6 @@ void RemoveOpeningExprBrackets( TokNode *pNode, int *pParentScanIdx )
 	{
 		if ( pNode->IsExpressionBlock() )
 		{
-			// TODO: Cannot really assume that it's always "1"
 			DASSERT( pNode->mpChilds.size() == 1 );
 
 			TokNode	*pChildToKeep = pNode->mpChilds[0];

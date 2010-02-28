@@ -230,7 +230,7 @@ void AddSelfVariable(
 
 // TODO: functions and shader params are allowed to change type after a comma !
 //==================================================================
-static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i )
+static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 {
 	TokNode	*pDTypeNode	= NULL;
 	TokNode	*pDetailNode= NULL;
@@ -343,19 +343,12 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 				if NOT( pLastNonTerm )
 					throw Exception( "Where is the array name ?", pChild );
 
-				for (; i < pNode->mpChilds.size(); ++i)
-				{
-					TokNode	*pChild = pNode->mpChilds[i];
-					if ( pChild->IsTokenID( T_OP_RGT_SQ_BRACKET ) )
-					{
-						// mark as an array
-						isArray = true;
-						break;
-					}
-				}
+				// TODO: discriminate between array element addressing and
+				//  texture map channel (in case it needs to be explicit)
+				isArray = true;
 
-				if NOT( isArray )
-					throw Exception( "Bad array declaration", pNode );
+				//if NOT( isArray )
+				//	throw Exception( "Bad array declaration", pNode );
 			}
 		}
 	}
@@ -380,30 +373,6 @@ static size_t discoverVariablesDeclarations_rootBlock( TokNode *pNode, size_t i 
 }
 
 //==================================================================
-static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
-{
-	for (; i < pNode->mpChilds.size(); ++i)
-	{
-		TokNode	*pTokNode = pNode->GetChildTry( i + 0 );
-
-		if (pTokNode->mpToken->idType != T_TYPE_DATATYPE &&
-			pTokNode->mpToken->idType != T_TYPE_DETAIL &&
-			pTokNode->mpToken->idType != T_KW_output )
-		{
-			continue;
-		}
-
-		if ( pNode->GetBlockType() == BLKT_ROOT )
-			i = discoverVariablesDeclarations_rootBlock( pNode, i );
-		else
-			i = discoverVariablesDeclarations_rootBlock( pNode, i );
-			//i = discoverVariablesDeclarations_sub2( pNode, i );
-	}
-
-	return i;
-}
-
-//==================================================================
 void DiscoverVariablesDeclarations( TokNode *pNode )
 {
 	for (size_t i = 0; i < pNode->mpChilds.size(); ++i)
@@ -411,7 +380,7 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 
 	BlockType	blkType = pNode->GetBlockType();
 
-	if (	blkType == BLKT_DECL_PARAMS_SH	// $$$ NOT REALLY THE SAME ..but for now, it's ok
+	if (	blkType == BLKT_DECL_PARAMS_SH
 		 || blkType == BLKT_DECL_PARAMS_FN
 		 || blkType == BLKT_CALL_OR_DELC_PARAMS_FN
 		 || blkType == BLKT_CODEBLOCK
@@ -419,7 +388,17 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 	{
 		for (size_t i=0; i < pNode->mpChilds.size();)
 		{
-			i = discoverVariablesDeclarations_sub( pNode, i );
+			TokNode	*pTokNode = pNode->GetChildTry( i );
+			TokenIDType	idType = pTokNode->mpToken->idType;
+
+			if (idType == T_TYPE_DATATYPE ||
+				idType == T_TYPE_DETAIL ||
+				idType == T_KW_output )
+			{
+				i = discoverVariablesDeclarations_sub( pNode, i );
+			}
+			else
+				++i;
 		}
 	}
 }
