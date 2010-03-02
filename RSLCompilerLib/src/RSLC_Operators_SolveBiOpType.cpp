@@ -49,7 +49,7 @@ void SolveBiOpType(	const TokNode *pOperator,
 	// search for a rule that matches
 	for (size_t i=0; i < _countof(_sBiOpConvertRules); ++i)
 	{
-		if NOT( pOperator->mpToken->id == _sBiOpConvertRules[i].mOper )
+		if NOT( pOperator->GetTokID() == _sBiOpConvertRules[i].mOper )
 			continue;
 
 		if NOT(

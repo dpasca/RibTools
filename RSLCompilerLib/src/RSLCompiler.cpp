@@ -86,6 +86,8 @@ RSLCompiler::RSLCompiler(
 
 	RemoveOpeningExprBrackets( mpRoot );
 
+	OptimizeConstantExpressions( mpRoot );
+
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
 

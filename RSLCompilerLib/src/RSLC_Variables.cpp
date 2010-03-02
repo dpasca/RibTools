@@ -249,7 +249,7 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 		// NOTE: a valid variable declaration must be followed by any of the following symbols
 		// ',', ';', '='
 
-		if ( pChild->mpToken->id == T_OP_ASSIGN )
+		if ( pChild->GetTokID() == T_OP_ASSIGN )
 		{
 			// except in cases like: float a = (b = 3)
 			if ( intoRValue )
@@ -263,7 +263,7 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 			}
 		}
 		else
-		if ( pChild->mpToken->id == T_OP_COMMA )
+		if ( pChild->GetTokID() == T_OP_COMMA )
 		{
 			// comma brings out of "right value" state.
 			// e.g. float a = 4, c ...
@@ -279,7 +279,7 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 			}
 		}
 		else
-		if ( pChild->mpToken->id == T_OP_SEMICOL )
+		if ( pChild->GetTokID() == T_OP_SEMICOL )
 		{
 			// semi-colon brings out of "right value" state and resets
 			// all types, detail..
@@ -302,12 +302,12 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 		else
 		if NOT( intoRValue )
 		{
-			if ( pChild->mpToken->idType == T_TYPE_DATATYPE )
+			if ( pChild->GetTokIDType() == T_TYPE_DATATYPE )
 			{
 				pDTypeNode = pChild;
 			}
 			else
-			if ( pChild->mpToken->idType == T_TYPE_DETAIL )
+			if ( pChild->GetTokIDType() == T_TYPE_DETAIL )
 			{
 				if ( pDetailNode )
 					throw Exception( "Broken variable declaration", pChild );
@@ -315,7 +315,7 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 				pDetailNode = pChild;
 			}
 			else
-			if ( pChild->mpToken->id == T_KW_output )
+			if ( pChild->GetTokID() == T_KW_output )
 			{
 				if ( pOutputNode &&
 					(	blkType != BLKT_DECL_PARAMS_SH
@@ -337,7 +337,7 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 				isArray = false;
 			}
 			else
-			if ( pChild->mpToken->id == T_OP_LFT_SQ_BRACKET )
+			if ( pChild->GetTokID() == T_OP_LFT_SQ_BRACKET )
 			{
 				// is this maybe an array declaration ?
 				if NOT( pLastNonTerm )
@@ -389,7 +389,7 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 		for (size_t i=0; i < pNode->mpChilds.size();)
 		{
 			TokNode	*pTokNode = pNode->GetChildTry( i );
-			TokenIDType	idType = pTokNode->mpToken->idType;
+			TokenIDType	idType = pTokNode->GetTokIDType();
 
 			if (idType == T_TYPE_DATATYPE ||
 				idType == T_TYPE_DETAIL ||
@@ -468,7 +468,7 @@ void SolveGlobalConstants( TokNode *pRoot )
 	{
 		TokNode	*pNode = pRoot->mpChilds[i];
 
-		if NOT( pNode->mpToken->id == T_OP_ASSIGN )
+		if NOT( pNode->GetTokID() == T_OP_ASSIGN )
 			continue;
 
 		TokNode	*pDest = pNode->GetChildTry( 0 );

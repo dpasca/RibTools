@@ -45,23 +45,20 @@ public:
 	const char	*pSourceFileName;
 	int			sourceLine;
 
-	Token() :
-		id(TOKEN_N),	// init with a non-plausible value
-		idType(T_TYPE_NONTERM),
-		isPrecededByWS(false),
-		isBadNumber(false),
-		pSourceFileName(NULL),
-		sourceLine(0)
-		{}
+	double		ConstNum;	// valid only if id == T_VL_NUMBER
 
-	Token( const char *pStr_, TokenID id_, TokenIDType idType_ ) :
-		str(pStr_),
-		id(id_),
-		idType(idType_),
-		isPrecededByWS(false),
-		isBadNumber(false),
-		sourceLine(0)
-		{}
+	Token();
+
+	Token(
+			const char	*pStr_,
+			TokenID		id_,
+			TokenIDType	idType_,
+			const Token	*pInheritTokPos_=NULL );
+
+	void SetAsStringValue( const char *srcStr );
+	void SetAsStringValue( const DStr &srcStr );
+	void SetAsBoolValue( bool onoff );
+	void SetAsNumValue( double num );
 
 	// kind of lame function used during construction..
 	bool IsSet() const
@@ -96,6 +93,9 @@ public:
 			id == T_OP_EQ	||
 			id == T_OP_NEQ	;
 	}
+
+	void UpdateConstNum();
+	void UpdateStrFromValue();
 };
 
 //==================================================================

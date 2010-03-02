@@ -1,23 +1,25 @@
 //==================================================================
-/// RSLC_Expressions.h
+/// RSLC_TokenCalc.h
 ///
-/// Created by Davide Pasca - 2009/11/1
+/// Created by Davide Pasca - 2010/3/3
 /// See the file "license.txt" that comes with this project for
 /// copyright info. 
 //==================================================================
 
-#ifndef RSLC_EXPRESSIONS_H
-#define RSLC_EXPRESSIONS_H
+#ifndef RSLC_TOKENCALC_H
+#define RSLC_TOKENCALC_H
+
+#include "RSLC_Token.h"
 
 //==================================================================
 namespace RSLC
 {
 
-void SolveExpressions( class TokNode *pNode, bool processShaderOnly );
-void SolveGlobalConstants( TokNode *pRoot );
-void SolveVariablesDetail( TokNode *pRoot );
-
-void OptimizeConstantExpressions( TokNode *pNode );
+//==================================================================
+Token *TokenCalcBiOp(
+				TokenID			operTokID,
+				const Token		&val1,
+				const Token		&val2 );
 
 //==================================================================
 }

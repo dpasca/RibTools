@@ -58,6 +58,7 @@ public:
 	Token			*mpToken;
 
 private:
+	bool			mOwnToken;
 	DVec<Variable>	mVariables;
 	DVec<Function>	mFunctions;
 
@@ -84,13 +85,24 @@ public:
 #endif
 
 public:
-	TokNode( Token *pObj );
+	TokNode( const Token *pObj );
 
-	TokNode( const char *pTokStr, TokenID tokId, TokenIDType tokIdType );
+	TokNode(
+		const char		*pTokStr,
+		TokenID			tokId,
+		TokenIDType		tokIdType,
+		const TokNode	*pInheritNodeTokPos = NULL );
 
 	TokNode( const TokNode &from );
 
 	~TokNode();
+
+	TokenID			GetTokID()		const {	return mpToken->id;		}
+	TokenIDType 	GetTokIDType()	const {	return mpToken->idType; }
+
+	void			SetTokID( TokenID id )	{ mpToken->id = id;		}
+
+	void DeleteReplaceToken( Token *pToken );
 
 	void SetBlockType( BlockType blockType )
 	{
@@ -158,10 +170,10 @@ public:
 
 	bool IsCodeBlock() const			{ return mBlockType == BLKT_CODEBLOCK; }
 	bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
-	bool IsNonTerminal() const			{ return mpToken ? mpToken->idType == T_TYPE_NONTERM : false; }
-	bool IsFuncOp() const				{ return mpToken ? mpToken->idType == T_TYPE_FUNCOP : false; }
-	bool IsDataType() const				{ return mpToken ? mpToken->idType == T_TYPE_DATATYPE : false; }
-	bool IsTokenID( TokenID id ) const	{ return mpToken ? mpToken->id == id : false; }
+	bool IsNonTerminal() const			{ return mpToken ? GetTokIDType() == T_TYPE_NONTERM : false; }
+	bool IsFuncOp() const				{ return mpToken ? GetTokIDType() == T_TYPE_FUNCOP : false; }
+	bool IsDataType() const				{ return mpToken ? GetTokIDType() == T_TYPE_DATATYPE : false; }
+	bool IsTokenID( TokenID id ) const	{ return mpToken ? GetTokID() == id : false; }
 
 	bool IsParentRoot() const			{ return mpParent && mpParent->mpParent == NULL;	}
 

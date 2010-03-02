@@ -401,11 +401,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RSLC_TokenCalc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_TokenCalc.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_TokenDefs.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\include\RSLC_TokenDefs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_Tokenize.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Tokenize.h"
 				>
 			</File>
 			<File

@@ -16,7 +16,7 @@ namespace RSLC
 //==================================================================
 static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 {
-	DASSERT( pNode->mpToken->idType == T_TYPE_VALUE );
+	DASSERT( pNode->GetTokIDType() == T_TYPE_VALUE );
 
 	VarType		vtype;
 	float		floatVal = 0;
@@ -26,7 +26,7 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 
 	// see if it matches and existing constant..
 
-	if ( pNode->mpToken->id == T_VL_NUMBER )
+	if ( pNode->GetTokID() == T_VL_NUMBER )
 	{
 		vtype = VT_FLOAT;
 		floatVal = (float)atof( pNode->GetTokStr() );
@@ -44,7 +44,7 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 		}
 	}
 	else
-	if ( pNode->mpToken->id == T_VL_STRING )
+	if ( pNode->GetTokID() == T_VL_STRING )
 	{
 		vtype = VT_STRING;
 		pStrVal = pNode->GetTokStr();
@@ -62,8 +62,8 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 		}
 	}
 	else
-	if ( pNode->mpToken->id == T_VL_BOOL_TRUE ||
-		 pNode->mpToken->id == T_VL_BOOL_FALSE )
+	if ( pNode->GetTokID() == T_VL_BOOL_TRUE ||
+		 pNode->GetTokID() == T_VL_BOOL_FALSE )
 	{
 		//DASSERT( 0 );
 		vtype = VT_BOOL;
@@ -88,27 +88,27 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 
 	pVar->mVarType			= vtype;
 
-	if ( pNode->mpToken->id == T_VL_NUMBER )
+	if ( pNode->GetTokID() == T_VL_NUMBER )
 	{
 		pVar->mBaseVal.Set( floatVal );
 	}
 	else
-	if ( pNode->mpToken->id == T_VL_STRING )
+	if ( pNode->GetTokID() == T_VL_STRING )
 	{
 		pVar->mBaseVal.Set( pStrVal );
 	}
 	else
-	if ( pNode->mpToken->id == T_VL_BOOL_TRUE ||
-		 pNode->mpToken->id == T_VL_BOOL_FALSE )
+	if ( pNode->GetTokID() == T_VL_BOOL_TRUE ||
+		 pNode->GetTokID() == T_VL_BOOL_FALSE )
 	{
-		pVar->mBaseVal.Set( pNode->mpToken->id == T_VL_BOOL_TRUE );
+		pVar->mBaseVal.Set( pNode->GetTokID() == T_VL_BOOL_TRUE );
 	}
 }
 
 //==================================================================
 static void realizeConstants_rec( TokNode *pNode, TokNode *pRoot )
 {
-	if ( pNode->mpToken && pNode->mpToken->idType == T_TYPE_VALUE )
+	if ( pNode->mpToken && pNode->GetTokIDType() == T_TYPE_VALUE )
 	{
 		addConstVariable( pNode, pRoot );
 	}
@@ -124,40 +124,7 @@ static void realizeConstants_rec( TokNode *pNode, TokNode *pRoot )
 //==================================================================
 void RealizeConstants( TokNode *pRoot )
 {
-#if 0
-	const DVec<Function> &funcs = pRoot->GetFuncs();
-
-	for (size_t i=0; i < funcs.size(); ++i)
-	{
-		const Function	&func = funcs[i];
-
-/*
-		if NOT( func.IsShader() )
-			continue;
-*/
-
-		if ( func.mpParamsNode )
-		{
-			for (size_t j=0; j < func.mpParamsNode->mpChilds.size(); ++j)
-			{
-				TokNode	*pParamNode = func.mpParamsNode->mpChilds[j];
-				realizeConstants_rec( pParamNode, pRoot );
-			}
-		}
-
-		for (size_t j=0; j < func.mpCodeBlkNode->mpChilds.size(); ++j)
-		{
-			TokNode	*pNode = func.mpCodeBlkNode->mpChilds[j];
-
-			realizeConstants_rec( pNode, pRoot );
-		}
-	}
-
-#else
-
 	realizeConstants_rec( pRoot, pRoot );
-
-#endif
 }
 
 //==================================================================

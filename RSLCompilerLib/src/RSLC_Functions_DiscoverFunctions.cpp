@@ -23,7 +23,7 @@ static void removeCommasFromParams( TokNode *pNode )
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 	{
 		TokNode	*pChild = pNode->mpChilds[i];
-		if ( pChild->mpToken->id == T_OP_COMMA )
+		if ( pChild->GetTokID() == T_OP_COMMA )
 		{
 			if ( pChild->mpChilds.size() != 0 )
 			{
@@ -63,9 +63,7 @@ func
 
 	// set as a plain expression and return
 
-	TokNode	*pParamExpr = DNEW TokNode( "(", T_OP_LFT_BRACKET, T_TYPE_OPERATOR );
-	pParamExpr->mpToken->pSourceFileName = pNode->mpToken->pSourceFileName;
-	pParamExpr->mpToken->sourceLine = pNode->mpToken->sourceLine;
+	TokNode	*pParamExpr = DNEW TokNode( "(", T_OP_LFT_BRACKET, T_TYPE_OPERATOR, pNode );
 	pNode->AddChildFront( pParamExpr );
 	pParamExpr->SetBlockType( BLKT_EXPRESSION );
 	pParamExpr->mBlockID = io_blockCnt++;
@@ -73,10 +71,10 @@ func
 	for (size_t j=1; j < pNode->mpChilds.size();)
 	{
 		TokNode	*pChild = pNode->mpChilds[j];
-		if ( pChild->mpToken->id == T_OP_COMMA )
+		if ( pChild->GetTokID() == T_OP_COMMA )
 		{
 			pChild->mpToken->str = "(";
-			pChild->mpToken->id = T_OP_LFT_BRACKET;
+			pChild->SetTokID( T_OP_LFT_BRACKET );
 			pChild->SetBlockType( BLKT_EXPRESSION );
 			pChild->mBlockID = io_blockCnt++;
 			pParamExpr = pChild;
@@ -146,14 +144,14 @@ static bool handleRetValueForFuncDeclaration(
 	out_isFuncopDecl	= false;
 
 	// is it a funcop ?
-	if ( pRetType->mpToken->id == T_KW___funcop )
+	if ( pRetType->GetTokID() == T_KW___funcop )
 	{
 		out_isFuncopDecl = true;
 		out_retVarType = VT_VOID;	// funcops return nothing !
 		return true;
 	}
 	else	// is ti a datatype instead ?
-	if ( pRetType->mpToken->idType == T_TYPE_DATATYPE )
+	if ( pRetType->GetTokIDType() == T_TYPE_DATATYPE )
 	{
 		// something properly specified ?
 		out_retVarType = VarTypeFromToken( pRetType->mpToken );
@@ -295,9 +293,7 @@ static void discoverFuncsCalls_sub(
 
 		if ( pCallParamsBlk->mpChilds.size() )
 		{
-			TokNode	*pCommaNode = DNEW TokNode( ",", T_OP_COMMA, T_TYPE_OPERATOR );
-			pCommaNode->mpToken->pSourceFileName = pSpaceCastNode->mpToken->pSourceFileName;
-			pCommaNode->mpToken->sourceLine = pSpaceCastNode->mpToken->sourceLine;
+			TokNode	*pCommaNode = DNEW TokNode( ",", T_OP_COMMA, T_TYPE_OPERATOR, pSpaceCastNode );
 			pCallParamsBlk->AddChildFront( pCommaNode );
 		}
 
@@ -412,7 +408,7 @@ static void discoverFuncsCalls(
 			TokNode	*pSpaceCastNode = NULL;
 
 			// space cast ?
-			if ( pRightNode->mpToken->id == T_VL_STRING )
+			if ( pRightNode->GetTokID() == T_VL_STRING )
 			{
 				pSpaceCastNode = pRightNode;
 				pCallParamsBlk = pRightNode->GetRight();

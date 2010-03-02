@@ -105,9 +105,6 @@ TokenDef _TokenDefs[TOKEN_N] =
 };
 
 //==================================================================
-static size_t _sTokenDefsIdxInvSortLen[TOKEN_N];
-
-//==================================================================
 #undef OP_DEF
 #undef DT_DEF
 #undef ST_DEF

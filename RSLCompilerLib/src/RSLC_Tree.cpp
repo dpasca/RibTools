@@ -20,8 +20,9 @@ size_t	TokNode::sUIDCnt;
 #endif
 
 //==================================================================
-TokNode::TokNode( Token *pObj ) :
-	mpToken(pObj),
+TokNode::TokNode( const Token *pObj ) :
+	mpToken((Token *)pObj),
+	mOwnToken(false),
 	mpParent(NULL),
 	mNodeType(TYPE_STANDARD),
 	mBlockType(BLKT_UNKNOWN),
@@ -35,8 +36,18 @@ TokNode::TokNode( Token *pObj ) :
 }
 
 //==================================================================
-TokNode::TokNode( const char *pTokStr, TokenID tokId, TokenIDType tokIdType ) :
-	mpToken( DNEW Token( pTokStr, tokId, tokIdType ) ),
+TokNode::TokNode(
+			const char		*pTokStr,
+			TokenID			tokId,
+			TokenIDType		tokIdType,
+			const TokNode	*pInheritNodeTokPos ) :
+	mpToken(
+		DNEW Token(
+				pTokStr,
+				tokId,
+				tokIdType,
+				pInheritNodeTokPos ? pInheritNodeTokPos->mpToken : NULL ) ),
+	mOwnToken(true),
 	mpParent(NULL),
 	mNodeType(TYPE_STANDARD),
 	mBlockType(BLKT_UNKNOWN),
@@ -51,7 +62,8 @@ TokNode::TokNode( const char *pTokStr, TokenID tokId, TokenIDType tokIdType ) :
 
 //==================================================================
 TokNode::TokNode( const TokNode &from ) :
-	mpToken			(from.mpToken),
+	mpToken			((from.mOwnToken && from.mpToken) ? DNEW Token( *from.mpToken ) : from.mpToken ),
+	mOwnToken		(from.mOwnToken),
 	mVariables		(from.mVariables),
 	mFunctions		(from.mFunctions),
 	mpParent		(NULL),
@@ -74,6 +86,9 @@ TokNode::~TokNode()
 	for (size_t i=0; i < mpChilds.size(); ++i)
 		DSAFE_DELETE( mpChilds[i] );
 
+	if ( mOwnToken )
+		DSAFE_DELETE( mpToken );
+
 #ifdef _DEBUG
 	for (size_t i=0; i < mpReferringVarLinks.size(); ++i)
 	{
@@ -83,6 +98,16 @@ TokNode::~TokNode()
 		}
 	}
 #endif
+}
+
+//==================================================================
+void TokNode::DeleteReplaceToken( Token *pToken )
+{
+	if ( mOwnToken )
+		DSAFE_DELETE( mpToken );
+
+	mpToken		= pToken;
+	mOwnToken	= true;
 }
 
 //==================================================================
@@ -285,18 +310,18 @@ RSLC::Register TokNode::GetRegister() const
 //==================================================================
 RSLC::VarType TokNode::GetVarType() const
 {
-	if ( mpToken->idType == T_TYPE_VALUE )
+	if ( GetTokIDType() == T_TYPE_VALUE )
 	{
-		if ( mpToken->id == T_VL_NUMBER )
+		if ( GetTokID() == T_VL_NUMBER )
 			return VT_FLOAT;
 		else
-		if ( mpToken->id == T_VL_STRING )
+		if ( GetTokID() == T_VL_STRING )
 			return VT_STRING;
 		else
-		if ( mpToken->id == T_VL_BOOL_TRUE )
+		if ( GetTokID() == T_VL_BOOL_TRUE )
 			return VT_BOOL;
 		else
-		if ( mpToken->id == T_VL_BOOL_FALSE )
+		if ( GetTokID() == T_VL_BOOL_FALSE )
 			return VT_BOOL;
 
 		DASSERT( 0 );
@@ -320,7 +345,7 @@ RSLC::VarType TokNode::GetVarType() const
 //==================================================================
 bool TokNode::IsVarying() const
 {
-	if ( mpToken->idType == T_TYPE_VALUE )
+	if ( GetTokIDType() == T_TYPE_VALUE )
 		return false;
 	else
 	if ( mVarLink.IsValid() )
@@ -335,7 +360,7 @@ bool TokNode::IsVarying() const
 //==================================================================
 bool TokNode::TrySetVarying_AndForceIfTrue( bool onoff )
 {
-	if ( mpToken->idType == T_TYPE_VALUE )
+	if ( GetTokIDType() == T_TYPE_VALUE )
 		return !onoff;	// if it's a value then it's ok if "uniform" is expected
 	else
 	if ( mVarLink.IsValid() )
@@ -393,14 +418,14 @@ static void defineBlockTypeAndID_OnBracket( TokNode *pBracketNode )
 		if ( pFnType )
 		{
 			// __funcop keyword.. ? then it's a declaration
-			if ( pFnType->mpToken->id == T_KW___funcop )
+			if ( pFnType->GetTokID() == T_KW___funcop )
 			{
 				pBracketNode->SetBlockType( BLKT_DECL_PARAMS_FN );
 				return;
 			}
 
 			// shader type ? Then it's shader params block for sure
-			if ( pFnType->mpToken->idType == T_TYPE_SHADERTYPE )
+			if ( pFnType->GetTokIDType() == T_TYPE_SHADERTYPE )
 			{
 				pBracketNode->SetBlockType( BLKT_DECL_PARAMS_SH );
 				return;
@@ -421,7 +446,7 @@ static void defineBlockTypeAndID_OnBracket( TokNode *pBracketNode )
 		return;
 	}
 	else // is it a space-casted constructor instead ? e.g. color "rgb" (0,0,1)
-	if ( pFnName->mpToken->id == T_VL_STRING )
+	if ( pFnName->GetTokID() == T_VL_STRING )
 	{
 		pBracketNode->SetBlockType( BLKT_CALL_OR_DELC_PARAMS_FN );
 		return;
@@ -531,7 +556,7 @@ void RemoveClosingBrackets( TokNode *pNode, int *pParentScanIdx )
 {
 	if ( pNode->mpToken )
 	{
-		switch ( pNode->mpToken->id )
+		switch ( pNode->GetTokID() )
 		{
 		case RSLC::T_OP_RGT_BRACKET		:
 		case RSLC::T_OP_RGT_SQ_BRACKET	:
@@ -595,7 +620,7 @@ void RemoveOpeningExprBrackets( TokNode *pNode, int *pParentScanIdx )
 //==================================================================
 void RemoveSemicolons( TokNode *pNode, int *pParentScanIdx )
 {
-	if ( pNode->mpToken && pNode->mpToken->id == RSLC::T_OP_SEMICOL )
+	if ( pNode->mpToken && pNode->GetTokID() == RSLC::T_OP_SEMICOL )
 	{
 		// right brackets should have no children !
 		DASSERT( pNode->mpChilds.size() == 0 );

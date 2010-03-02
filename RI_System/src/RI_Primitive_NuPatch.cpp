@@ -48,7 +48,7 @@ NuPatch::NuPatch(
 			) :
 		SimplePrimitiveBase(PrimitiveBase::NUPATCH, umin, umax, vmin, vmax)
 {
-	moBaseDef = new BaseDef( uorder, vorder, nu, nv );
+	moBaseDef = DNEW BaseDef( uorder, vorder, nu, nv );
 
 	DASSTHROW( uorder > 1 && vorder > 1, ("Patch order must be 2 or larger") );
 	DASSTHROW( uorder <= MAXORDER && vorder <= MAXORDER, ("Patch order must be no higher than %i", MAXORDER) );

@@ -9,6 +9,7 @@
 #include "RSLC_Tree.h"
 #include "RSLC_Exceptions.h"
 #include "RSLC_Operators.h"
+#include "RSLC_TokenCalc.h"
 #include "RSLC_Expressions.h"
 
 //==================================================================
@@ -47,68 +48,73 @@ static void getTwoOperands(
 }
 
 //==================================================================
-static void solveConstExpressions_BiOp( TokNode *pNode, DynConst &io_dynConst )
+static bool solveConstExpressions_BiOp( TokNode *pNode )
 {
-	TokNode *pOperands[2];
+	if ( pNode->mpToken->IsAssignOp() )
+		return false;
+
+	TokNode *pOperands[2] =
+	{
+		pNode->GetChildTry( 0 ),
+		pNode->GetChildTry( 1 )
+	};
+
 	VarType	vtypes[2];
 
-	getTwoOperands( pNode, pOperands, vtypes );
+	for (size_t i=0; i < 2; ++i)
+	{
+		if NOT( pOperands[i] )
+			return false;
+
+		vtypes[i] = pOperands[i]->GetVarType();
+		if ( vtypes[i] == VT_UNKNOWN )
+			return false;
+	}
 
 	VarType	opResVarType;
-
 	SolveBiOpType(	pNode,
 					vtypes[0],
 					vtypes[1],
 					opResVarType );
 
-	if ( !pNode->mpToken->IsAssignOp() && pNode->mpToken->idType != T_TYPE_VALUE )
-	{
-		// if it's not an assignment nor an immediate value
-		throw Exception( "Not a constant expression !", pNode );
-	}
+	// should always be two consts
+	if (	pOperands[0]->GetTokIDType() != T_TYPE_VALUE
+		||	pOperands[1]->GetTokIDType() != T_TYPE_VALUE )
+		return false;
+
+	Token *pNewValToken =
+			TokenCalcBiOp(
+				pNode->GetTokID(),
+				*pOperands[0]->mpToken,
+				*pOperands[1]->mpToken
+				);
+
+	if NOT( pNewValToken )
+		return false;
+
+	pNode->DeleteReplaceToken( pNewValToken );
 
 	for (size_t i=0; i < 2; ++i)
 	{
-		switch ( vtypes[i] )
-		{
-		case VT_FLOAT:
-		case VT_STRING:
-		case VT_BOOL:
-			break;
-		
-		default:
-			throw Exception( pNode, "Invalid type for operand %i for a constant expression", i+1 );
-			break;
-		}
+		pOperands[i]->UnlinkFromParent();
+		DSAFE_DELETE( pOperands[i] );
 	}
 
-	if ( vtypes[0] == VT_FLOAT )
-	{
-		if ( vtypes[1] == VT_FLOAT )
-		{
-		}
-	}
-	else
-	if ( vtypes[0] == VT_STRING )
-	{
-	}
-	else	// VT_BOOL
-	{
-	}
+	return true;
 }
 
 //==================================================================
-void SolveConstantExpression( TokNode *pNode, DynConst &out_dynConst )
+void OptimizeConstantExpressions( TokNode *pNode )
 {
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-		SolveConstantExpression( pNode->mpChilds[i], out_dynConst );
+		OptimizeConstantExpressions( pNode->mpChilds[i] );
 
-	if NOT( pNode->mpToken )
-		return;
-
-	if ( pNode->mpToken->IsBiOp() )
+	if ( pNode->mpToken )
 	{
-		solveConstExpressions_BiOp( pNode, out_dynConst );
+		if ( pNode->mpToken->IsBiOp() && !pNode->mpToken->IsAssignOp() )
+		{
+			solveConstExpressions_BiOp( pNode );
+		}
 	}
 }
 
@@ -127,7 +133,7 @@ static void solveExpressions_sub_BiOp( TokNode *pNode, const DVec<Function> &fun
 					vtypes[1],
 					opResVarType );
 
-	if ( !pNode->mpToken->IsAssignOp() && pNode->mpToken->idType != T_TYPE_VALUE )
+	if ( !pNode->mpToken->IsAssignOp() && pNode->GetTokIDType() != T_TYPE_VALUE )
 	{
 		// if it's not an assignment nor an immediate value
 		AddSelfVariable( pNode, opResVarType, false, false );

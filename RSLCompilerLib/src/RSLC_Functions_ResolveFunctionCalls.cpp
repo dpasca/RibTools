@@ -59,10 +59,6 @@ static void cloneBranch_RemapVarlinks(
 
 			pNode->mVarLink.ReplaceNode( pReplaceNode );
 		}
-		else
-		{
-			//DASSERT( 0 );
-		}
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
@@ -117,26 +113,11 @@ static bool doVTypesMatch(
 //==================================================================
 static void verifyFunctionCallParams( const TokNode &callParams )
 {
-	//const TokNode	*pFCallParams = callNode.GetChildTry( 0 );
-
 	for (size_t i=0; i < callParams.mpChilds.size(); ++i)
 	{
 		const TokNode	*pParNode = callParams.mpChilds[i];
 
 		VarType	varType = pParNode->GetVarType();
-/*
-		while ( pParNode )
-		{
-			VarType	varType = pParNode->GetVarType();
-
-			if ( varType != VT_UNKNOWN )
-			{
-				break;
-			}
-
-			pParNode = pParNode->GetChildTry( 0 );
-		}
-*/
 
 		if NOT( pParNode )
 		{
@@ -145,26 +126,6 @@ static void verifyFunctionCallParams( const TokNode &callParams )
 						"Unknown parameter %s",
 						callParams.mpChilds[0]->GetTokStr() );
 		}
-
-/*
-		// is this a square bracket ?
-		if ( parNode.IsTokenID( T_OP_LFT_SQ_BRACKET ) )
-		{
-			const TokNode	*pLeftOrParent = parNode.GetPrev();
-
-			// it's array indirection
-			if NOT( pLeftOrParent )
-				throw Exception( &parNode, "Where is the array ?" );
-
-			const Variable *pVar = pLeftOrParent->GetVarPtr();
-
-			if ( !pVar || !pVar->mIsArray )
-			{
-				throw Exception( pLeftOrParent, "Not an array" );
-			}
-		}
-		else
-*/
 	}
 }
 
@@ -248,7 +209,7 @@ node1           node1
 */
 static void insertAssignToNode( TokNode *pDestNode, const TokNode *pSrcNode )
 {
-	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR );
+	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR, pSrcNode );
 	TokNode *pSrcClone = cloneBranch( pSrcNode );
 
 	pAssgnNode->ReplaceNode( pDestNode );
@@ -262,13 +223,14 @@ static TokNode *insertAssignToVar(
 						const VarLink	&destVLink,
 						const TokNode	*pSrcNode )
 {
-	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR );
+	TokNode	*pAssgnNode = DNEW TokNode( "=", T_OP_ASSIGN, T_TYPE_OPERATOR, pSrcNode );
 	TokNode	*pSrcClone = cloneBranch( pSrcNode );
 	
 	TokNode	*pNewDest = DNEW TokNode(
 								destVLink.GetVarPtr()->GetUseName().c_str(),
 								T_TD_TEMPDEST,
-								T_TYPE_TEMPDEST );
+								T_TYPE_TEMPDEST,
+								pSrcNode );
 	pNewDest->mVarLink = destVLink;
 
 	pAssgnNode->AddChild( pNewDest );
@@ -282,7 +244,7 @@ static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassPara
 {
 	for (size_t i=0,j=0; i < pParamsHooks->mpChilds.size(); ++i)
 	{
-		if ( pParamsHooks->mpChilds[i]->mpToken->id != T_NONTERM )
+		if ( pParamsHooks->mpChilds[i]->GetTokID() != T_NONTERM )
 			continue;
 
 		TokNode	*pPassParam = pPassParams->GetChildTry( j++ );
@@ -291,19 +253,13 @@ static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassPara
 			throw Exception( "Missing parameter ?", pPassParams );
 
 		insertAssignToNode( pParamsHooks->mpChilds[i], pPassParam );
-		//printf( "PASSSS %s = %s\n", pClonedParamsHooks->mpChilds[i]->GetTokStr(), pPassParam->GetTokStr() );
-
-		// $$$ need to get the function params types from definition here..
 	}
-
 }
 
 //==================================================================
 // Kind of a nasty special case.. but what can you do ?
 static void handleFuncopEndForIfElse( TokNode *pFuncParamsHooks )
 {
-	//pFuncParamsHooks->mpN
-
 	TokNode	*pRight = pFuncParamsHooks->GetRight();
 
 	if ( pRight )
@@ -384,7 +340,7 @@ static void resolveFunctionCalls(
 			AddVariable(
 				pClonedParamsHooks->mpParent,
 				DNEW TokNode( DNEW Token( *pFunc->mpRetTypeTok ) ),
-				DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL ),	// %%% forced varying for now !
+				DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL, pClonedParamsHooks ),	// %%% forced varying for now !
 				NULL,
 				pClonedParamsHooks,
 				false );
@@ -449,7 +405,7 @@ of pFnParams->mVarLink
 */
 static void resolveFunctionReturns( TokNode *pNode, DVec<TokNode *> &pAssignOpsToRemove )
 {
-	if ( pNode->mpToken && pNode->mpToken->id == T_KW_return )
+	if ( pNode->mpToken && pNode->GetTokID() == T_KW_return )
 	{
 		TokNode *pReturnNode = pNode;
 
@@ -500,7 +456,13 @@ static void closeFuncOps_sub( TokNode *pNode )
 {
 	if ( pNode->mIsFuncOp && pNode->mOutputFuncOpEnd )
 	{
-		TokNode	*pFuncOpEndMarker = DNEW TokNode( "_asm_funcopend", T_NONTERM, T_TYPE_NONTERM );
+		TokNode	*pFuncOpEndMarker =
+					DNEW TokNode(
+							"_asm_funcopend",
+							T_NONTERM, 
+							T_TYPE_NONTERM,
+							pNode );
+
 		pFuncOpEndMarker->mNodeType = TokNode::TYPE_FUNCCALL;
 		
 		TokNode	*pNext = pNode->GetNext();

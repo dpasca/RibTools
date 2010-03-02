@@ -125,7 +125,7 @@ static void reparentBiOperators(
 		{
 			for (size_t i=0; i < matchIDsN; ++i)
 			{
-				if ( pMatchingIDs[i] == pNode->mpToken->id )
+				if ( pMatchingIDs[i] == pNode->GetTokID() )
 				{
 					doReparent( pNode, out_parentIdx );
 					break;

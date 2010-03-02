@@ -40,7 +40,7 @@ static const std::string getOperand(
 			return pVar->GetUseName();
 		}
 		else
-		if ( pOperand->mpToken->idType == T_TYPE_VALUE )
+		if ( pOperand->GetTokIDType() == T_TYPE_VALUE )
 		{
 			out_varType = VT_FLOAT;
 			return pOperand->GetTokStr();
@@ -88,7 +88,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 	{
 		TokNode *pChild = pNode->mpChilds[ i ];
 
-		if ( pChild->mpToken->id == T_OP_COMMA )
+		if ( pChild->GetTokID() == T_OP_COMMA )
 			continue;
 
 		VarType	varType;
@@ -156,7 +156,7 @@ static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
 	TokNode *pOperand2 = pNode->GetChildTry( 1 );
 
 	// no assignment for function call as it's done above
-	if ( pNode->mpToken->id == T_OP_ASSIGN &&
+	if ( pNode->GetTokID() == T_OP_ASSIGN &&
 		 pOperand1->mNodeType == TokNode::TYPE_FUNCCALL )
 		return;
 
@@ -177,7 +177,7 @@ static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
 
 		if ( doAssign )
 		{
-			if ( pNode->mpToken->id == T_OP_ASSIGN )
+			if ( pNode->GetTokID() == T_OP_ASSIGN )
 			{
 				// build either a load instruction or a move
 /*
@@ -252,7 +252,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 
 		std::string	asmName = resolveIntrinsics( pNode->GetTokStr() );
 
-		if ( pChild && pChild->mpToken->id == T_VL_STRING )
+		if ( pChild && pChild->GetTokID() == T_VL_STRING )
 		{
 			fprintf_s( pFile, "\t%-14s %s", asmName.c_str(), pChild->GetTokStr() );
 			pChild = NULL;
@@ -266,7 +266,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 		// get the params bracket.. if any !
 		if ( pBracket )
 		{
-			DASSERT( pBracket->mpToken->id == T_OP_LFT_BRACKET );
+			DASSERT( pBracket->GetTokID() == T_OP_LFT_BRACKET );
 			writeFuncParams( pFile, pBracket );
 		}
 		else

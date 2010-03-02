@@ -119,7 +119,7 @@ void WorkGrid::Setup(
 	DASSERT( mPointsN <= MP_GRID_MAX_SIZE );
 
 	// $$$ why +1 ? For derivatives ?
-	//mpPoints = new Point3[ (xdim+1) * (ydim+1) ];
+	//mpPoints = DNEW Point3[ (xdim+1) * (ydim+1) ];
 
 	fillColArray( mpDataCi, mPointsN, 1.0f, 0.0f, 0.0f );
 	fillColArray( mpDataOi, mPointsN, 0.0f, 1.0f, 0.0f );

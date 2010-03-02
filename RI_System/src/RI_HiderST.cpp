@@ -119,7 +119,7 @@ void Hider::WorldBegin(
 #if 0
 	// DNEW instead ?
 	mpBuckets.push_back(
-			new Bucket( 0, 0, opt.mXRes, opt.mYRes ) );
+			DNEW Bucket( 0, 0, opt.mXRes, opt.mYRes ) );
 #else
 	for (int y=0; y < opt.mYRes; y += BUCKET_SIZE)
 	{
