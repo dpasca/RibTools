@@ -426,9 +426,23 @@ void DiscoverVariablesUsage( TokNode *pNode )
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-	{
 		DiscoverVariablesUsage( pNode->mpChilds[i] );
+}
+
+//==================================================================
+void RealizeArraysSizes( TokNode *pNode )
+{
+	DVec<Variable>	&vars = pNode->GetVars();
+	for (size_t i=0; i < vars.size(); ++i)
+	{
+	    if NOT( vars[i].mIsArray )
+			continue;
+
+
 	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		RealizeArraysSizes( pNode->mpChilds[i] );
 }
 
 //==================================================================

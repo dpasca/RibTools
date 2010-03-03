@@ -45,7 +45,8 @@ bool IsSameVarType( VarType vta, VarType vtb, bool laxCheck );
 void MarkUsedVariables( TokNode *pRoot );
 void DiscoverVariablesDeclarations( TokNode *pNode );
 void DiscoverVariablesUsage( TokNode *pNode );
-void DiscoverVariables( TokNode *pNode );
+
+void RealizeArraysSizes( TokNode *pNode );
 
 //==================================================================
 }

@@ -88,6 +88,8 @@ RSLCompiler::RSLCompiler(
 
 	OptimizeConstantExpressions( mpRoot );
 
+	RealizeArraysSizes( mpRoot );
+
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
 
