@@ -8,7 +8,7 @@
 
 surface test11( float rgbcol[(1+1+1)] ) //{.5,.5,.5} 
 {
-	//Ci = color( rgbcol[0]+(3), rgbcol[0+1], rgbcol[2] );
-	Ci = color( rgbcol+(3), rgbcol+1*2, rgbcol );
+	Ci = color( rgbcol[0]+(3), rgbcol[0+1], rgbcol[2] );
+	//Ci = color( rgbcol+(3), rgbcol+1*2, rgbcol );
 	Oi = 1;
 }
