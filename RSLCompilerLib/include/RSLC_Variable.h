@@ -18,6 +18,8 @@
 namespace RSLC
 {
 
+class TokNode;
+
 //==================================================================
 class Variable
 {
@@ -26,7 +28,7 @@ public:
 	Token			*mpDTypeTok;
 	Token			*mpDetailTok;
 	Token			*mpSpaceCastTok;
-	Token			*mpDefNameTok;
+	TokNode			*mpDefNameNode;
 	DVec<Token*>	mpDefValToks;
 	VarType			mVarType;
 
@@ -35,6 +37,7 @@ public:
 	bool			mIsForcedDetail;
 
 	bool			mIsArray;
+	U32				mArraySize;
 
 	bool			mIsLValue;
 	bool			mIsGlobal;
@@ -88,12 +91,13 @@ public:
 		mpDTypeTok(NULL),
 		mpDetailTok(NULL),
 		mpSpaceCastTok(NULL),
-		mpDefNameTok(NULL),
+		mpDefNameNode(NULL),
 		mVarType(VT_UNKNOWN),
 		mIsVarying(false),
 		mIsVariabilityFinalized(false),
 		mIsForcedDetail(false),
 		mIsArray(false),
+		mArraySize(0),
 		mIsLValue(false),
 		mIsGlobal(false),
 		mIsSHParam(false),
@@ -140,16 +144,9 @@ public:
 		return mBaseVal.mUse && (varType == VT_UNKNOWN || mVarType == varType);
 	}
 
-	bool HasDefName() const { return mpDefNameTok != NULL;	}
+	bool HasDefName() const { return mpDefNameNode != NULL;	}
 
-	const char *GetDefName() const
-	{
-		if ( mpDefNameTok )
-			return mpDefNameTok->str.c_str();
-		else
-			return NULL;
-	}
-
+	const char *GetDefName() const;
 	std::string GetUseName() const;
 
 	void AssignRegister( int regIdx );

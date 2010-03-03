@@ -7,6 +7,7 @@
 //==================================================================
 
 #include <stdlib.h>
+#include <math.h>
 #include "RSLC_Tree.h"
 #include "RSLC_Variables.h"
 #include "RSLC_Exceptions.h"
@@ -119,38 +120,30 @@ Variable *AddVariable(
 		pNameNode->mVarLink.Setup( pNode, pNode->GetVars().size() );
 	}
 
+	DASSERT( pNameNode->mpToken != NULL );
+
 	Variable	*pVar = pNode->GetVars().grow();
 
 	pVar->mpDTypeTok		= pDTypeNode->mpToken;
 	//pVar->mpOwnerNode		= pNode;
 	pVar->mpDetailTok		= pDetailNode ? pDetailNode->mpToken : NULL;
 	pVar->mpSpaceCastTok	= pSpaceCastTok ? pSpaceCastTok->mpToken : NULL;
-	pVar->mpDefNameTok		= pNameNode ? pNameNode->mpToken : NULL;
+	pVar->mpDefNameNode		= pNameNode;
 	pVar->mIsArray			= isArray;
 
-	if ( pVar->mpDefNameTok )
-	{
-		if ( 0 == strcmp( pVar->mpDefNameTok->str.c_str(), "(" ) )
-		{
-			u_int	tmpID = (u_int)pNode->GetVars().size() - 1;
-
-			pVar->mInternalName =
-					DUT::SSPrintFS( "_%i@_brkt%i", pNode->mBlockID, tmpID );
-		}
-		else
-		{
-			pVar->mInternalName =
-					DUT::SSPrintFS( "_%i@_%s",
-								pNode->mBlockID,
-									pVar->mpDefNameTok->str.c_str() );
-		}
-	}
-	else
+	if ( 0 == strcmp( pVar->mpDefNameNode->GetTokStr(), "(" ) )
 	{
 		u_int	tmpID = (u_int)pNode->GetVars().size() - 1;
 
 		pVar->mInternalName =
-				DUT::SSPrintFS( "_%i@_tmp%i", pNode->mBlockID, tmpID );
+				DUT::SSPrintFS( "_%i@_brkt%i", pNode->mBlockID, tmpID );
+	}
+	else
+	{
+		pVar->mInternalName =
+				DUT::SSPrintFS( "_%i@_%s",
+							pNode->mBlockID,
+								pVar->mpDefNameNode->GetTokStr() );
 	}
 
 	if ( pVar->mpDetailTok )
@@ -438,7 +431,25 @@ void RealizeArraysSizes( TokNode *pNode )
 	    if NOT( vars[i].mIsArray )
 			continue;
 
+		TokNode *pSqBracket = vars[i].mpDefNameNode->GetRight();
+		DASSERT( pSqBracket != NULL );
 
+		TokNode	*pArrSizeNode = pSqBracket->GetChildTry( 0 );
+		DASSERT( pArrSizeNode != NULL );
+
+		double	arrSize = pArrSizeNode->mpToken->ConstNum;
+		U64		arrSizeInt = (U64)ceil( arrSize );
+
+		// if it's negative or if it's not an integral value
+		if ( arrSize < 0 || arrSizeInt != arrSize )
+			throw Exception( pSqBracket, "Array size must be positive integral value" );
+
+		// enforce a "large enough" maximum size
+		if ( arrSize > (double)(1 << 24) )
+			throw Exception( pSqBracket, "Array size is currently limited to %i !", 1 << 24 );
+
+		// finally set the array size
+		vars[i].mArraySize = (U32)arrSizeInt;
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)

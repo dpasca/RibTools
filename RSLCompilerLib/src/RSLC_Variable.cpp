@@ -7,6 +7,7 @@
 //==================================================================
 
 #include "RSLC_Variable.h"
+#include "RSLC_Tree.h"
 
 //==================================================================
 namespace RSLC
@@ -76,7 +77,7 @@ void Variable::SetVarying( bool varying )
 std::string Variable::GetUseName() const
 {
 	if ( mIsGlobal || mIsSHParam )
-		return mpDefNameTok->str;
+		return mpDefNameNode->GetTokStr();
 	else
 	if ( mBuild_Register.IsValid() )
 	{
@@ -86,6 +87,14 @@ std::string Variable::GetUseName() const
 		return mInternalName;
 }
 
+//==================================================================
+const char * Variable::GetDefName() const
+{
+	if ( mpDefNameNode )
+		return mpDefNameNode->GetTokStr();
+	else
+		return NULL;
+}
 
 //==================================================================
 }

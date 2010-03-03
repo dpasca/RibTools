@@ -710,19 +710,24 @@ void TraverseTree( TokNode *pNode, int depth )
 
 		for (size_t i=0; i < vars.size(); ++i)
 		{
-			printf( " %s %s %s (%s),",
+			printf( " %s %s %s (%s)",
 						vars[i].IsVarying() ? 
 							"varying" :
 							"uniform",
 
 						VarTypeToString( vars[i].GetVarType() ),
 
-						vars[i].mpDefNameTok ?
-							vars[i].mpDefNameTok->str.c_str() :
+						vars[i].mpDefNameNode ?
+							vars[i].mpDefNameNode->GetTokStr() :
 							"N/A",
 
 						vars[i].mInternalName.c_str()
 					);
+
+			if ( vars[i].IsArray() )
+				printf( "[%u]", vars[i].mArraySize );
+
+			printf( "," );
 		}
 
 		printf( ">>" );
