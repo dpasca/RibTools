@@ -349,6 +349,23 @@ void Parser::parseDataLine( char lineBuff[], int lineCnt )
 	if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
 		onError( "Expecting type definition" );
 
+	if ( 0 == strcmp( pTok, "array" ) )
+	{
+		params.mIsArray = true;
+
+		if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+			onError( "Expecting array size" );
+
+		u_int	arraySize = 0;
+		if ( 1 != sscanf_s( pTok, "%u", &arraySize ) )
+			onError( "Could not read the array size" );
+
+		if ( arraySize >= (1024*1024) )
+			onError( "Array size awfully large... perhaps this is not a job for a shader..." );
+
+		params.mArraySize = arraySize;
+	}
+
 	if ( 0 == strcmp( pTok, "float"  ) ) params.mType = Symbol::TYP_FLOAT ; else
 	if ( 0 == strcmp( pTok, "point"  ) ) params.mType = Symbol::TYP_POINT ; else
 	if ( 0 == strcmp( pTok, "hpoint"  ) )params.mType = Symbol::TYP_HPOINT; else

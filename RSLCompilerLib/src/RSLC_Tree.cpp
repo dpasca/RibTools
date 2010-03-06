@@ -502,32 +502,43 @@ static bool doBracketsMatch( TokenID lastOpenBraket, TokenID thisCloseBracket )
 //==================================================================
 void MakeTree( TokNode *pRoot, DVec<Token> &tokens, u_int &out_blockCnt )
 {
+	//TokNode	*pParent = pRoot;
+	//DVec<TokNode*>	pParentsMemory;
+	//pParentsMemory.push_back( pParent );
+	//pPrev = pParent = pParent->AddNewChild( &tokens[i] );
+	//pParentsMemory.pop_back();
+
 	out_blockCnt = 0;
 
-	//pRoot->mBlockType = AT_ROOT;
-
-	//TokNode	*pParent = pRoot;
-	TokNode	*pNode = pRoot;
-
+	TokNode			*pNode = pRoot;
 	DVec<TokenID>	bracketsMemory;
-	//DVec<TokNode*>	pParentsMemory;
 
 	for (size_t i=0; i < tokens.size(); ++i)
 	{
 		switch ( tokens[i].id )
 		{
 		case RSLC::T_OP_LFT_BRACKET		:
-		case RSLC::T_OP_LFT_SQ_BRACKET	:
 		case RSLC::T_OP_LFT_CRL_BRACKET	:
+		case RSLC::T_OP_LFT_SQ_BRACKET	:
 			bracketsMemory.push_back( tokens[i].id );
-			//pParentsMemory.push_back( pParent );
-			pNode = pNode->AddNewChild( &tokens[i] );
-			//pPrev = pParent = pParent->AddNewChild( &tokens[i] );
+
+			// square bracket is indents itself
+			if ( tokens[i].id == RSLC::T_OP_LFT_SQ_BRACKET )
+			{		
+				if NOT( pNode->mpChilds.size() )
+					throw Exception( "Misplaced square bracket ?", &tokens[i] );
+
+				pNode = pNode->mpChilds[pNode->mpChilds.size()-1]->AddNewChild( &tokens[i] );
+			}
+			else
+			{
+				pNode = pNode->AddNewChild( &tokens[i] );
+			}
 			break;
 
 		case RSLC::T_OP_RGT_BRACKET		:
-		case RSLC::T_OP_RGT_SQ_BRACKET	:
 		case RSLC::T_OP_RGT_CRL_BRACKET	:
+		case RSLC::T_OP_RGT_SQ_BRACKET	:
 			if (!pNode->mpParent ||
 				!bracketsMemory.size() ||
 				!doBracketsMatch( bracketsMemory.back(), tokens[i].id ) )
@@ -536,9 +547,11 @@ void MakeTree( TokNode *pRoot, DVec<Token> &tokens, u_int &out_blockCnt )
 			}
 
 			pNode = pNode->mpParent;
+			// square bracket is indented itself
+			if ( tokens[i].id == RSLC::T_OP_RGT_SQ_BRACKET )
+				pNode = pNode->mpParent;
 
 			bracketsMemory.pop_back();
-			//pParentsMemory.pop_back();
 			break;
 
 		default:

@@ -326,22 +326,12 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 			if ( pChild->IsNonTerminal() )
 			{
 				pLastNonTerm = pChild;
-				// new name, we don't know if it's an array yet
-				isArray = false;
-			}
-			else
-			if ( pChild->GetTokID() == T_OP_LFT_SQ_BRACKET )
-			{
+
+				const TokNode	*pChildChild = pChild->GetChildTry( 0 );
+
 				// is this maybe an array declaration ?
-				if NOT( pLastNonTerm )
-					throw Exception( "Where is the array name ?", pChild );
-
-				// TODO: discriminate between array element addressing and
-				//  texture map channel (in case it needs to be explicit)
-				isArray = true;
-
-				//if NOT( isArray )
-				//	throw Exception( "Bad array declaration", pNode );
+				if ( pChildChild && pChildChild->GetTokID() == T_OP_LFT_SQ_BRACKET )
+					isArray = true;
 			}
 		}
 	}
@@ -431,7 +421,7 @@ void RealizeArraysSizes( TokNode *pNode )
 	    if NOT( vars[i].mIsArray )
 			continue;
 
-		TokNode *pSqBracket = vars[i].mpDefNameNode->GetRight();
+		TokNode *pSqBracket = vars[i].mpDefNameNode->GetChildTry( 0 );
 		DASSERT( pSqBracket != NULL );
 
 		TokNode	*pArrSizeNode = pSqBracket->GetChildTry( 0 );

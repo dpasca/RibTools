@@ -57,16 +57,16 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	}
 	fprintf_s( pFile, "%-8s ", pClass );
 
-	//--- write the name
-	VarType	varType = var.GetVarType();
-
-	fprintf_s( pFile, "%-7s ", VarTypeToString( varType ) );
-
 	//--- eventual array definition
 	if ( var.IsArray() )
 	{
 		fprintf_s( pFile, " array %u ", var.mArraySize );
 	}
+
+	//--- write the name
+	VarType	varType = var.GetVarType();
+
+	fprintf_s( pFile, "%-7s ", VarTypeToString( varType ) );
 
 	//--- write the eventual constant value
 	if ( var.HasBaseVal() )

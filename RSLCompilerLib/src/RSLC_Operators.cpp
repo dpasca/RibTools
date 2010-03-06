@@ -21,30 +21,6 @@ static void doReparent( TokNode *pOper, size_t &out_parentIdx )
 	TokNode	*pLValue = pOper->GetLeft();
 	TokNode	*pRValue = pOper->GetRight();
 
-	// here is a special case for when leaves are an expression block
-	// .. basically an open bracket
-	// Expression blocks, like any open brackets, do actually have
-	// different parenting. Example:
-	//
-	// dude + food    <- all with the same parents
-	//
-	// dude +
-	//        (       <- two added levels of parenting
-	//          food
-	//
-	// So, the following try to look for parent or child expressions..
-
-/*
-	if ( !pLValue && pOper->mpParent && pOper->mpParent->IsExpressionBlock() )
-		pLValue = pOper->mpParent;
-
-	if ( !pRValue && pOper->mpChilds.size() == 1 && pOper->mpChilds[0]->IsExpressionBlock() )
-		pRValue = pOper->mpChilds[0];
-*/
-
-	//if NOT( pLValue )
-	//	throw Exception( "Missing left value in expression assignment.", pNode->mpToken );
-
 	if ( pRValue && pLValue )
 	{
 		//	L	=	R

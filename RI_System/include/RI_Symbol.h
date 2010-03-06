@@ -110,6 +110,8 @@ public:
 		Symbol::Type	mType;
 		Symbol::Storage	mStorage;
 		u_int			mClass;
+		bool			mIsArray;
+		u_int			mArraySize;
 		const void		*mpSrcData;
 
 		CtorParams() :
@@ -117,6 +119,8 @@ public:
 			mType(Symbol::TYP_UNKNOWN),
 			mStorage(Symbol::STOR_TEMPORARY),
 			mClass(0),
+			mIsArray(false),
+			mArraySize(0),
 			mpSrcData(NULL)
 		{
 		}
