@@ -25,6 +25,7 @@ bool EndGrabFile( FILE *pFile, void *pDest, size_t readSize );
 bool FileExists( const char *pFileName );
 
 DStr GetDirNameFromFPathName( const char *pInFPathname );
+DStr GetFullDirNameFromFPathName( const char *pInFPathname );
 
 const char *GetFileNameOnly( const char *pPathFileName );
 

@@ -6,6 +6,14 @@
 /// copyright info. 
 //==================================================================
 
+#if defined(WIN32)
+#include <Windows.h>
+
+#elif defined(__linux__)
+
+#endif
+
+#include <direct.h>
 #include "DUtils_Files.h"
 
 //==================================================================
@@ -129,6 +137,30 @@ DStr GetDirNameFromFPathName( const char *pInFPathname )
 
 		return tmp;
 	}
+}
+
+//==================================================================
+// Not really needed for now by RibTools
+DStr GetFullDirNameFromFPathName( const char *pInFPathname )
+{
+#if 0
+	return GetDirNameFromFPathName( pInFPathname );
+
+#else
+	DStr	tmp = GetDirNameFromFPathName( pInFPathname );
+
+#if defined(WIN32)
+	char	buff[2048];
+	GetFullPathNameA( tmp.c_str(), _countof(buff), buff, NULL );
+
+#elif defined(__linux__)
+	DASSERT( 0 );	// TODO
+
+#endif
+
+	return buff;
+#endif
+
 }
 
 //==================================================================
