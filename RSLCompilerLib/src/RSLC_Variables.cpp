@@ -322,16 +322,25 @@ static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
 
 				pOutputNode = pChild;
 			}
+			else // ..an array declaration ?
+			if ( pChild->GetTokID() == T_OP_LFT_SQ_BRACKET )
+			{
+				isArray = true;
+				pLastNonTerm = pChild->GetChildTry( 0 );
+				DASSERT( pLastNonTerm != NULL );
+			}
 			else
 			if ( pChild->IsNonTerminal() )
 			{
 				pLastNonTerm = pChild;
 
+				/*
 				const TokNode	*pChildChild = pChild->GetChildTry( 0 );
 
 				// is this maybe an array declaration ?
 				if ( pChildChild && pChildChild->GetTokID() == T_OP_LFT_SQ_BRACKET )
 					isArray = true;
+				*/
 			}
 		}
 	}

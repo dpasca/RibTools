@@ -17,7 +17,7 @@ namespace RSLC
 //==================================================================
 static void doReparent( TokNode *pOper, size_t &out_parentIdx )
 {
-	// get leaves ont he left and right of the operand
+	// get leaves on the left and right of the operand
 	TokNode	*pLValue = pOper->GetLeft();
 	TokNode	*pRValue = pOper->GetRight();
 
@@ -155,6 +155,7 @@ void ReparentOperators( TokNode *pNode )
 	};
 	static TokenID	priority1[] = {
 		T_OP_DOT		,
+		T_OP_LFT_SQ_BRACKET		
 	};
 	static TokenID	priority2[] = {
 		T_OP_DIV		,

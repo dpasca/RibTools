@@ -522,15 +522,31 @@ void MakeTree( TokNode *pRoot, DVec<Token> &tokens, u_int &out_blockCnt )
 		case RSLC::T_OP_LFT_SQ_BRACKET	:
 			bracketsMemory.push_back( tokens[i].id );
 
-			// square bracket is indents itself
 			if ( tokens[i].id == RSLC::T_OP_LFT_SQ_BRACKET )
-			{		
-				if NOT( pNode->mpChilds.size() )
-					throw Exception( "Misplaced square bracket ?", &tokens[i] );
+			{
+				pNode->AddNewChild( &tokens[i] );
 
-				pNode = pNode->mpChilds[pNode->mpChilds.size()-1]->AddNewChild( &tokens[i] );
+				Token	*pNewBrkTok =
+					DNEW Token(
+							"(",
+							RSLC::T_OP_LFT_BRACKET,
+							RSLC::T_TYPE_OPERATOR,
+							&tokens[i] );
+
+				pNode = pNode->AddNewChild( pNewBrkTok );
+
+				//pNode = pNewParent;
 			}
 			else
+			// square bracket is indents itself
+			//if ( tokens[i].id == RSLC::T_OP_LFT_SQ_BRACKET )
+			//{		
+			//	if NOT( pNode->mpChilds.size() )
+			//		throw Exception( "Misplaced square bracket ?", &tokens[i] );
+
+			//	pNode = pNode->mpChilds[pNode->mpChilds.size()-1]->AddNewChild( &tokens[i] );
+			//}
+			//else
 			{
 				pNode = pNode->AddNewChild( &tokens[i] );
 			}
@@ -548,8 +564,8 @@ void MakeTree( TokNode *pRoot, DVec<Token> &tokens, u_int &out_blockCnt )
 
 			pNode = pNode->mpParent;
 			// square bracket is indented itself
-			if ( tokens[i].id == RSLC::T_OP_RGT_SQ_BRACKET )
-				pNode = pNode->mpParent;
+			//if ( tokens[i].id == RSLC::T_OP_RGT_SQ_BRACKET )
+			//	pNode = pNode->mpParent;
 
 			bracketsMemory.pop_back();
 			break;
