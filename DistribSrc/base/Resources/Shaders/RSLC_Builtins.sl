@@ -279,7 +279,7 @@ color	diffuse( normal nor )
 
 	illuminance ( P, nn, PI/2 )
 	{
-		C = C + Cl * (normalize(L) . nn);
+		C += Cl * (normalize(L) . nn);
 	}
 
 	return C;

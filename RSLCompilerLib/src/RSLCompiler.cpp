@@ -87,13 +87,13 @@ RSLCompiler::RSLCompiler(
 
 	RemoveOpeningExprBrackets( mpRoot );
 
-	//ExpandAssingOperators();
+	// simplify assign-with-arthimetic operators
+	// example: a += b  ..becomes..  a = a + b
+	ExpandAssingOperators( mpRoot );
 
 	OptimizeConstantExpressions( mpRoot );
 
 	RealizeArraysSizes( mpRoot );
-
-	//ExpandAssingOperators();
 
 	GenerateArrayAssignOperators( mpRoot );
 

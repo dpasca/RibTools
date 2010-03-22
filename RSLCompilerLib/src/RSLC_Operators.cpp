@@ -238,4 +238,67 @@ void ReparentOperators( TokNode *pNode )
 }
 
 //==================================================================
+void ExpandAssingOperators( TokNode *pNode )
+{
+	bool isComplexAssign = true;
+
+	char	*operNewStr		= "";
+	TokenID	operNewTokID	= TOKEN_N;
+
+	if ( pNode->mpToken )
+	{
+		switch ( pNode->GetTokID() )
+		{
+		case T_OP_PLUSASS	:	operNewStr = "+"; operNewTokID = T_OP_PLUS; break;
+		case T_OP_MINUSASS	:	operNewStr = "-"; operNewTokID = T_OP_MINUS; break;
+		case T_OP_MULASS	:	operNewStr = "*"; operNewTokID = T_OP_MUL; break;
+		case T_OP_DIVASS	:	operNewStr = "/"; operNewTokID = T_OP_DIV; break;
+
+		default:
+			isComplexAssign = false;
+			break;
+		}
+
+		//	+=
+		//		a
+		//		b
+		// ..becomes..
+		//	=			// pNewAssign
+		//		a		// pCloneDest
+		//		+		// pNode 
+		//			a
+		//			b
+
+		if ( isComplexAssign )
+		{
+			const TokNode	*pDest = pNode->GetChildTry( 0 );
+			DASSERT( pDest != NULL );
+
+			TokNode *pNewAssign =
+				DNEW TokNode(
+						"=",
+						T_OP_ASSIGN,
+						T_TYPE_OPERATOR,
+						pNode );
+
+			TokNode *pCloneDest = DNEW TokNode( *pDest );
+			pNewAssign->AddChild( pCloneDest );
+
+			// += becomes +
+			pNode->mpToken->id	= operNewTokID;
+			pNode->mpToken->str	= operNewStr;
+
+			pNode->AddAfterThis( pNewAssign );
+			pNode->UnlinkFromParent();
+			pNewAssign->AddChild( pNode );
+		}
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		ExpandAssingOperators( pNode->mpChilds[i] );
+	}
+}
+
+//==================================================================
 }
