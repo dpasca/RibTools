@@ -95,7 +95,8 @@ bool Token::IsBiOp() const
 		id == T_OP_MUL			||
 		id == T_OP_DIV			||
 		id == T_OP_POW			||
-		id == T_OP_DOT			;
+		id == T_OP_DOT			||
+		id == T_OP_LFT_SQ_BRACKET;	// array indicization !
 }
 
 //==================================================================

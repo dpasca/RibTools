@@ -22,6 +22,7 @@
 #include "RSLCompiler.h"
 #include "RSLC_RRASMOut.h"
 #include "RSLC_Prepro.h"
+#include "RSLC_Arrays.h"
 
 //==================================================================
 using namespace	RSLC;
@@ -86,9 +87,15 @@ RSLCompiler::RSLCompiler(
 
 	RemoveOpeningExprBrackets( mpRoot );
 
+	//ExpandAssingOperators();
+
 	OptimizeConstantExpressions( mpRoot );
 
 	RealizeArraysSizes( mpRoot );
+
+	//ExpandAssingOperators();
+
+	GenerateArrayAssignOperators( mpRoot );
 
 	// discover variables usage
 	DiscoverVariablesUsage( mpRoot );
@@ -123,6 +130,8 @@ RSLCompiler::~RSLCompiler()
 //==================================================================
 void RSLCompiler::SaveASM( const char *pFName, const char *pRefSourceName )
 {
+	// return;
+
 	FILE	*pFile;
 
 	if ( fopen_s( &pFile, pFName, "wb" ) )

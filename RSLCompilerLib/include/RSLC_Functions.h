@@ -32,14 +32,17 @@ public:
 	Token			*mpRetTypeTok;
 	TokNode			*mpNameNode;
 	VarType			mRetVarType;
+	bool			mRetVarIsArray;	
 	DVec<VarType>	mParamsVarTypes;
+	DVec<bool>		mParamsVarIsArray;
 
 	Function() :
 		mpParamsNode(NULL),
 		mpCodeBlkNode(NULL),
 		mpRetTypeTok(NULL),
 		mpNameNode(NULL),
-		mRetVarType(VT_UNKNOWN)
+		mRetVarType(VT_UNKNOWN),
+		mRetVarIsArray(false)
 	{
 	}
 

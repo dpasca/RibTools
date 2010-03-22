@@ -188,6 +188,7 @@ public:
 
 	Register GetRegister() const;
 
+	bool	IsVarArray() const;
 	VarType GetVarType() const;
 
 	bool IsVarying() const;

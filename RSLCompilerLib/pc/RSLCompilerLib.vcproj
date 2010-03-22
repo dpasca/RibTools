@@ -293,6 +293,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\src\RSLC_Arrays.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\RSLC_Arrays.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RSLC_Constants.cpp"
 				>
 			</File>
@@ -446,6 +454,10 @@
 			</File>
 			<File
 				RelativePath="..\include\RSLC_Variables.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RSLC_Variables_Decl.cpp"
 				>
 			</File>
 			<File

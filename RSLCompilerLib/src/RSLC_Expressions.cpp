@@ -161,6 +161,12 @@ static void solveExpressions_sub( TokNode *pNode, const DVec<Function> &funcs )
 	else
 	if ( pNode->mpToken->IsBiOp() )
 	{
+		// ignore square bracket when it's for an assignment
+		// to array, such as: arr[i] = val
+		// if ( pNode->IsTokenID( T_OP_LFT_SQ_BRACKET ) )
+		// 	if ( IsArrayItemAssignment( pNode ) )
+		// 		return;
+
 		solveExpressions_sub_BiOp( pNode, funcs );
 	}
 }
@@ -288,6 +294,37 @@ void SolveVariablesDetail( TokNode *pRoot )
 		else
 			solveVariablesDetail_sub( func.mpCodeBlkNode );
 	}
+}
+
+//==================================================================
+bool IsArrayItemAssignment( const TokNode *pSqBrkNode )
+{
+	// is the parent operator an assign array ?
+	const TokNode	*pOperParent = pSqBrkNode->mpParent;
+
+	if ( !pOperParent || !pOperParent->mpToken )
+		throw Exception( "Stray vector access in the code ?", pSqBrkNode ); 
+
+	// is this array access child of an assignment and
+	// is the array access a destination of the assignment
+	// operator ?
+	// such as:
+	//	=				// pOperParent
+	//		[			// pSqBrkNode
+	//			arr		// 
+	//			i		//
+	//		1			//
+	if (
+		pOperParent->mpToken->IsAssignOp() &&		// parent is an assignment and
+		pOperParent->GetChildTry( 0 ) == pSqBrkNode // ...the destination is an array element
+		)
+	{
+		DASSERT( pOperParent->IsTokenID( T_OP_ASSIGN ) );
+
+		return true;
+	}
+	else
+		return false;
 }
 
 //==================================================================

@@ -59,6 +59,8 @@ enum TokenID
 	T_VL_BOOL_TRUE,
 	T_VL_BOOL_FALSE,
 
+	T_OP_ASSIGN_ARR_ITEM,					// operator used internally
+
 	OP_DEF(	"="		,	ASSIGN		)	,	// assign ops
 	OP_DEF(	"+="	,	PLUSASS		)	,
 	OP_DEF(	"-="	,	MINUSASS	)	,

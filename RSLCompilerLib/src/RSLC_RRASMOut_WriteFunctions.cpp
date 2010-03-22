@@ -9,6 +9,7 @@
 #include "RSLC_Tree.h"
 #include "RSLC_Functions.h"
 #include "RSLC_Exceptions.h"
+#include "RSLC_Expressions.h"
 #include "RSLC_Registers.h"
 
 #include "RSLC_Functions.h"
@@ -23,7 +24,7 @@ namespace RRASMOut
 
 //==================================================================
 static const std::string getOperand(
-					TokNode *pOperand,
+					const TokNode *pOperand,
 					VarType &out_varType )
 {
 	out_varType = VT_UNKNOWN;
@@ -105,12 +106,13 @@ static const char *asmOpCodeFromOpToken( const Token *pTok )
 {
 	switch ( pTok->id )
 	{
-	case T_OP_MUL:		return "mul";
-	case T_OP_DIV:		return "div";
-	case T_OP_PLUS:		return "add";
-	case T_OP_MINUS:	return "sub";
-	case T_OP_POW:		return "pow";
-	case T_OP_DOT:		return "dot";
+	case T_OP_MUL:				return "mul";
+	case T_OP_DIV:				return "div";
+	case T_OP_PLUS:				return "add";
+	case T_OP_MINUS:			return "sub";
+	case T_OP_POW:				return "pow";
+	case T_OP_DOT:				return "dot";
+	case T_OP_LFT_SQ_BRACKET:	return "arrld";	// load an item from an array
 
 	case T_OP_LSEQ	:	return "setle";
 	case T_OP_GEEQ	:	return "setge";
@@ -150,90 +152,175 @@ static std::string resolveIntrinsics( const char *pIntrName )
 }
 
 //==================================================================
-static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
+static bool buildExpression_biOp_handleArrSet(
+					FILE				*pFile, 
+					TokNode				*pSqBrkNode,
+					const std::string	&o1Str,
+					const std::string	&o2Str,
+					char				sqOp1AsmTypeID,
+					char				sqOp2AsmTypeID
+					)
 {
-	TokNode *pOperand1 = pNode->GetChildTry( 0 );
-	TokNode *pOperand2 = pNode->GetChildTry( 1 );
+	// is the parent operator an assign array ?
+	const TokNode	*pOperParent = pSqBrkNode->mpParent;
 
-	// no assignment for function call as it's done above
-	if ( pNode->GetTokID() == T_OP_ASSIGN &&
-		 pOperand1->mNodeType == TokNode::TYPE_FUNCCALL )
-		return;
+	if ( !pOperParent || !pOperParent->mpToken )
+		throw Exception( "Stray vector access in the code ?", pSqBrkNode ); 
 
-	if ( pOperand1 && pOperand2 )
+	// is this array access child of an assignment and
+	// is the array access a destination of the assignment
+	// operator ?
+	// such as:
+	//	=				// pOperParent
+	//		[			// pSqBrkNode
+	//			arr		// pArrName
+	//			i		// pArrIdx
+	//		1			// pSrcVar
+	if ( IsArrayItemAssignment( pSqBrkNode ) )
 	{
-		VarType	varType1;
-		VarType	varType2;
+		DASSERT( pOperParent->IsTokenID( T_OP_ASSIGN ) );
 
-		std::string	o1Str = getOperand( pOperand1, varType1 );
-		std::string	o2Str = getOperand( pOperand2, varType2 );
+		const TokNode *pSrcVar = pOperParent->GetChildTry( 1 );
 
-		bool	doAssign = pNode->mpToken->IsAssignOp();
+		const TokNode *pArrName = pSqBrkNode->GetChildTry( 0 );
+		const TokNode *pArrIdx = pSqBrkNode->GetChildTry( 1 );
 
-		char l1 = VarTypeToLetter(varType1);
-		char l2 = VarTypeToLetter(varType2);
+		VarType		srcVarType;
+		std::string	srcOperandStr = getOperand( pSrcVar, srcVarType );
+		char		srcAsmTypeID = VarTypeToLetter( srcVarType );
 
 		char	instrBuff[256];
 
-		if ( doAssign )
-		{
-			if ( pNode->GetTokID() == T_OP_ASSIGN )
-			{
-				// build either a load instruction or a move
-/*
-				if ( isValue2 )
-					fprintf_s(
-							pFile,
-							"\tld%c\t%s\t%s\n",
-							l1,
-							o1Str.c_str(),
-							o2Str.c_str() );
-				else
-*/
-				// rudimentary form of optimization !
-				// WARNING: careful with jumps ?
-				if NOT( l1 == l2 && o1Str == o2Str )
-				{
-					sprintf_s( instrBuff, "mov.%c%c", l1, l2 );
+		// then explicitly transform the access to an array
+		// item storage
+		sprintf_s(
+			instrBuff,
+			"arrst.%c%c%c",
+			srcAsmTypeID,
+			sqOp1AsmTypeID,
+			sqOp2AsmTypeID );
 
-					fprintf_s(
-							pFile,
-							"\t%-14s %-6s\t%-6s\n",
-							instrBuff,
-							o1Str.c_str(),
-							o2Str.c_str() );
-				}
-			}
+		fprintf_s(
+			pFile,
+			"\t%-14s %-6s\t%-6s\t%-6s\n",
+			instrBuff,
+			srcOperandStr.c_str(),
+			o1Str.c_str(),
+			o2Str.c_str() );
+
+		return true;
+	}
+	else
+		return false;
+}
+
+//==================================================================
+static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
+{
+	const TokNode *pOperand1 = pNode->GetChildTry( 0 );
+	const TokNode *pOperand2 = pNode->GetChildTry( 1 );
+
+	// must have two operands
+	if ( !pOperand1 || !pOperand2 )
+		return;
+
+	TokenID	operatorTokID = pNode->GetTokID();
+
+	// no assignment for function call as it's done above (?)
+	if ( operatorTokID == T_OP_ASSIGN &&
+		 pOperand1->mNodeType == TokNode::TYPE_FUNCCALL )
+		return;
+
+	VarType	varType1;
+	VarType	varType2;
+
+	std::string	o1Str = getOperand( pOperand1, varType1 );
+	std::string	o2Str = getOperand( pOperand2, varType2 );
+
+	bool	doAssign = pNode->mpToken->IsAssignOp();
+
+	char l1 = VarTypeToLetter(varType1);
+	char l2 = VarTypeToLetter(varType2);
+
+	char	instrBuff[256];
+
+	if ( doAssign )
+	{
+		// the case:
+		//	=
+		//		[
+		//			array
+		//			arrIdx
+		//		srcVal
+		//
+		// ...is handled by the "[" operator, so ignore it at the "=" level (here)
+		if ( pOperand1->IsTokenID( T_OP_LFT_SQ_BRACKET ) )
+			return;
+
+		if ( operatorTokID == T_OP_ASSIGN )
+		{
+			// build either a load instruction or a move
+/*
+			if ( isValue2 )
+				fprintf_s(
+						pFile,
+						"\tld%c\t%s\t%s\n",
+						l1,
+						o1Str.c_str(),
+						o2Str.c_str() );
 			else
+*/
+			// rudimentary form of optimization !
+			// WARNING: careful with jumps ?
+			if NOT( l1 == l2 && o1Str == o2Str )
 			{
-				sprintf_s( instrBuff, "%s.%c%c", asmOpCodeFromOpToken( pNode->mpToken ), l1, l2 );
+				sprintf_s( instrBuff, "mov.%c%c", l1, l2 );
 
 				fprintf_s(
 						pFile,
-						"\t%-14s %-6s\t%-6s\t%-6s\n",
+						"\t%-14s %-6s\t%-6s\n",
 						instrBuff,
-						o1Str.c_str(),
 						o1Str.c_str(),
 						o2Str.c_str() );
 			}
 		}
 		else
 		{
-			Register	reg = pNode->GetRegister();
-			std::string regName = reg.GetName();
-
-			char		lreg = VarTypeToLetter( reg.GetVarType() );
-
-			sprintf_s( instrBuff, "%s.%c%c%c", asmOpCodeFromOpToken( pNode->mpToken ), lreg, l1, l2 );
+			sprintf_s( instrBuff, "%s.%c%c", asmOpCodeFromOpToken( pNode->mpToken ), l1, l2 );
 
 			fprintf_s(
 					pFile,
 					"\t%-14s %-6s\t%-6s\t%-6s\n",
 					instrBuff,
-					regName.c_str(),
+					o1Str.c_str(),
 					o1Str.c_str(),
 					o2Str.c_str() );
 		}
+	}
+	else
+	{
+		// look for an assignment to array -> arr[i] = 1
+		// are we dealing with an array ?
+		if ( operatorTokID == T_OP_LFT_SQ_BRACKET )
+		{
+			if ( buildExpression_biOp_handleArrSet( pFile, pNode, o1Str, o2Str, l1, l2 ) )
+				return;
+		}
+
+		Register	reg = pNode->GetRegister();
+		std::string regName = reg.GetName();
+
+		char		lreg = VarTypeToLetter( reg.GetVarType() );
+
+		sprintf_s( instrBuff, "%s.%c%c%c", asmOpCodeFromOpToken( pNode->mpToken ), lreg, l1, l2 );
+
+		fprintf_s(
+				pFile,
+				"\t%-14s %-6s\t%-6s\t%-6s\n",
+				instrBuff,
+				regName.c_str(),
+				o1Str.c_str(),
+				o2Str.c_str() );
 	}
 }
 

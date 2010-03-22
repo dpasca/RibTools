@@ -239,6 +239,7 @@ static void discoverFuncsDeclarations_sub(
 	pFunc->mpNameNode		= pFuncName;
 	pFunc->mpRetTypeTok		= pRetType->mpToken;
 	pFunc->mRetVarType		= retVarType;
+	pFunc->mRetVarIsArray	= false; // false for now, and probably forever 8)
 
 	// params block becomes children of the function body:
 	// pFuncName			  pFuncName
@@ -261,6 +262,7 @@ static void discoverFuncsDeclarations_sub(
 			DASSERT( pParamNode->mVarLink.IsValid() );
 
 			pFunc->mParamsVarTypes.push_back( pParamNode->GetVarType() );
+			pFunc->mParamsVarIsArray.push_back( pParamNode->IsVarArray() );
 		}
 	}
 }

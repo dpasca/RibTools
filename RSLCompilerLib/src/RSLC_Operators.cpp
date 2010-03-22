@@ -15,61 +15,72 @@ namespace RSLC
 {
 
 //==================================================================
-static void doReparent( TokNode *pOper, size_t &out_parentIdx )
+static void doReparent( TokNode *pOper, size_t &out_parentIdx, bool swapOrder )
 {
 	// get leaves on the left and right of the operand
 	TokNode	*pLValue = pOper->GetLeft();
 	TokNode	*pRValue = pOper->GetRight();
 
-	if ( pRValue && pLValue )
+	if NOT( pRValue && pLValue )
+		return;
+
+	//	oper
+	//	L
+	//	R
+
+	if ( pRValue )
 	{
-		//	L	=	R
+		// Handle the funky RSL return value typecast. Example:
+		// val = float texture( "yoyo" )
+		// col = color texture( "yoyo" )
+		//
+		// which in the AST at this point would look like:
+		//	col
+		//	=
+		//	color	// pRValue - it's a data type and has no children
+		//	texture
+		//		(
 
-		if ( pRValue )
+		// if R a data type ? (float, color, etc)
+		// ..and does it not have any children
+		if ( pRValue->IsDataType() && pRValue->mpChilds.size() == 0 )
 		{
-			// Handle the funky RSL return value typecast. Example:
-			// val = float texture( "yoyo" )
-			// col = color texture( "yoyo" )
+			TokNode	*pFuncNode = pRValue->GetRight();
 
-			// if R a data type ? (float, color, etc)
-			if ( pRValue->IsDataType() )
+			// is it followed by a function call ?
+			if ( pFuncNode && pFuncNode->mNodeType == TokNode::TYPE_FUNCCALL )
 			{
-				TokNode	*pFuncNode = pRValue->GetRight();
+				// set the the return value cast data type
+				pFuncNode->mFuncCall.mReturnCastVType = VarTypeFromToken( pRValue->mpToken );
 
-				// is it followed by a function call ?
-				if ( pFuncNode && pFuncNode->mNodeType == TokNode::TYPE_FUNCCALL )
-				{
-					// set the the return value cast data type
-					pFuncNode->mFuncCall.mReturnCastVType = VarTypeFromToken( pRValue->mpToken );
+				// we can now remove R...
+				pRValue->UnlinkFromParent();
+				DSAFE_DELETE( pRValue );
 
-					// we can now remove R...
-					DASSERT( pRValue->mpChilds.size() == 0 );
-					pRValue->UnlinkFromParent();
-					DSAFE_DELETE( pRValue );
-
-					// R becomes the function call node ..which we proceed to
-					// make it into a child for the operator
-					pRValue = pFuncNode;
-				}
+				// R becomes the function call node ..which we proceed to
+				// make it into a child for the operator
+				pRValue = pFuncNode;
 			}
-
-			pRValue->Reparent( pOper );
-			pOper->mpChilds.push_front( pRValue );
 		}
-		//	L	=
-		//			R
 
-		if ( pLValue )
-		{
-			pLValue->Reparent( pOper );
-			pOper->mpChilds.push_front( pLValue );
-		}
-		//		=
-		//	L		R
-
-		DASSERT( out_parentIdx > 0 );
-		out_parentIdx -= 1;
+		pRValue->Reparent( pOper );
+		pOper->mpChilds.push_front( pRValue );
 	}
+	//	oper
+	//		R
+	//	L
+
+	if ( pLValue )
+	{
+		pLValue->Reparent( pOper );
+		pOper->mpChilds.push_front( pLValue );
+	}
+	//	oper
+	//		L
+	//		R
+
+	DASSERT( out_parentIdx > 0 );
+	out_parentIdx -= 1;
 }
 
 //==================================================================
@@ -78,7 +89,8 @@ static void reparentBiOperators(
 						const TokenID *pMatchingIDs,
 						size_t matchIDsN,
 						size_t &out_parentIdx,
-						bool excludeIfFuncParam=false )
+						bool excludeIfFuncParam=false ,
+						bool rightToLeftAssoc=false )
 {
 	if ( pNode->mpToken )
 	{
@@ -103,21 +115,42 @@ static void reparentBiOperators(
 			{
 				if ( pMatchingIDs[i] == pNode->GetTokID() )
 				{
-					doReparent( pNode, out_parentIdx );
+					doReparent( pNode, out_parentIdx, rightToLeftAssoc );
 					break;
 				}
 			}
 		}
 	}
 
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	if ( rightToLeftAssoc )
 	{
-		reparentBiOperators(
-					pNode->mpChilds[i],
-					pMatchingIDs,
-					matchIDsN,
-					i,
-					excludeIfFuncParam );
+		for (ptrdiff_t ii=(ptrdiff_t)pNode->mpChilds.size()-1; ii >= 0; --ii)
+		{
+			size_t i = ii;
+
+			reparentBiOperators(
+				pNode->mpChilds[i],
+				pMatchingIDs,
+				matchIDsN,
+				i,
+				excludeIfFuncParam, 
+				rightToLeftAssoc );
+
+			ii = i;
+		}
+	}
+	else
+	{
+		for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+		{
+			reparentBiOperators(
+				pNode->mpChilds[i],
+				pMatchingIDs,
+				matchIDsN,
+				i,
+				excludeIfFuncParam, 
+				rightToLeftAssoc );
+		}
 	}
 }
 
@@ -201,7 +234,7 @@ void ReparentOperators( TokNode *pNode )
 	reparentBiOperators( pNode, priority5, _countof(priority5),	idx );
 	reparentBiOperators( pNode, priority6, _countof(priority6),	idx );
 	reparentBiOperators( pNode, priority7, _countof(priority7),	idx );
-	reparentBiOperators( pNode, priority8, _countof(priority8),	idx );
+	reparentBiOperators( pNode, priority8, _countof(priority8),	idx, false, true );
 }
 
 //==================================================================

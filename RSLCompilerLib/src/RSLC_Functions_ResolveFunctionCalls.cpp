@@ -76,7 +76,6 @@ static TokNode *cloneBranch( const TokNode *pNode )
 
 	cloneBranch_RemapVarlinks( pNewBase, oldToNewMap );
 
-
 	return pNewBase;
 }
 
@@ -100,9 +99,14 @@ static bool doVTypesMatch(
 	for (size_t i=0; i < callNode.mpChilds.size(); ++i)
 	{
 		VarType	vtype = callNode.mpChilds[i]->GetVarType();
-
 		DASSERT( vtype != VT_UNKNOWN );
 
+		// are they both array or non-array ?
+		bool	isArr = callNode.mpChilds[i]->IsVarArray();
+		if ( isArr != func.mParamsVarIsArray[i] )
+			return false;
+
+		// are they both of the same type (or similar type if being lax)
 		if NOT( IsSameVarType( vtype, func.mParamsVarTypes[i], laxTypes ) )
 			return false;
 	}
@@ -242,9 +246,12 @@ static TokNode *insertAssignToVar(
 //==================================================================
 static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassParams )
 {
-	for (size_t i=0,j=0; i < pParamsHooks->mpChilds.size(); ++i)
+	for (int i=0,j=0; i < (int)pParamsHooks->mpChilds.size(); ++i)
 	{
-		if ( pParamsHooks->mpChilds[i]->GetTokID() != T_NONTERM )
+		TokNode	*pDestNode = pParamsHooks->mpChilds[i];
+
+		TokenID	desTokID = pDestNode->GetTokID();
+		if ( desTokID != T_NONTERM && desTokID != T_OP_LFT_SQ_BRACKET )
 			continue;
 
 		TokNode	*pPassParam = pPassParams->GetChildTry( j++ );
@@ -252,7 +259,17 @@ static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassPara
 		if NOT( pPassParam )
 			throw Exception( "Missing parameter ?", pPassParams );
 
-		insertAssignToNode( pParamsHooks->mpChilds[i], pPassParam );
+		if ( desTokID == T_OP_LFT_SQ_BRACKET )
+		{
+			// special case for arrays
+			pDestNode->UnlinkFromParent();
+			DSAFE_DELETE( pDestNode );
+			i -= 1;
+		}
+		else
+		{
+			insertAssignToNode( pDestNode, pPassParam );
+		}
 	}
 }
 
@@ -343,7 +360,8 @@ static void resolveFunctionCalls(
 				DNEW TokNode( "varying", T_DE_varying, T_TYPE_DETAIL, pClonedParamsHooks ),	// %%% forced varying for now !
 				NULL,
 				pClonedParamsHooks,
-				false );
+				false,
+				true );
 		}
 
 		const TokNode	*pPassParams = pNode->GetChildTry( 0 );
@@ -384,7 +402,7 @@ static TokNode *instrumentFCallReturn( TokNode *pReturnNode, const VarLink &dest
 //==================================================================
 /*
 BLKT_FNPARAMS individuates the parameters.. however, after previous
-processing, the first node in the params is he "return value" node
+processing, the first node in the params is the "return value" node
 ..there may not be one, so we have to be careful about the validity
 of pFnParams->mVarLink
 

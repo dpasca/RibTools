@@ -139,6 +139,17 @@ static BiOpConvertRule	_sBiOpConvertRules[] =
 	T_OP_NEQ		,	VT_BOOL,	VT_MATRIX	,	VT_MATRIX	,
 	T_OP_NEQ		,	VT_BOOL,	VT_STRING	,	VT_STRING	,
 	T_OP_NEQ		,	VT_BOOL,	VT_BOOL		,	VT_BOOL		,
+
+	// array indicization.. can only indicize using "float"
+	// [ 
+	T_OP_LFT_SQ_BRACKET,	VT_FLOAT	,	VT_FLOAT	,	VT_FLOAT	,
+	T_OP_LFT_SQ_BRACKET,	VT_POINT	,	VT_POINT	,	VT_FLOAT	,
+	T_OP_LFT_SQ_BRACKET,	VT_COLOR	,	VT_COLOR	,	VT_FLOAT	,
+	T_OP_LFT_SQ_BRACKET,	VT_VECTOR	,	VT_VECTOR	,	VT_FLOAT	,
+	T_OP_LFT_SQ_BRACKET,	VT_NORMAL	,	VT_NORMAL	,	VT_FLOAT	,
+	T_OP_LFT_SQ_BRACKET,	VT_MATRIX	,	VT_MATRIX	,	VT_FLOAT	,
+	T_OP_LFT_SQ_BRACKET,	VT_STRING	,	VT_STRING	,	VT_FLOAT	,
+	T_OP_LFT_SQ_BRACKET,	VT_BOOL		,	VT_BOOL		,	VT_FLOAT	,
 };
 
 //==================================================================

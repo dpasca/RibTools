@@ -39,6 +39,8 @@ public:
 	bool			mIsArray;
 	U32				mArraySize;
 
+	bool			mIsOutput;
+
 	bool			mIsLValue;
 	bool			mIsGlobal;
 	bool			mIsSHParam;
@@ -97,6 +99,7 @@ public:
 		mIsVariabilityFinalized(false),
 		mIsForcedDetail(false),
 		mIsArray(false),
+		mIsOutput(false),
 		mArraySize(0),
 		mIsLValue(false),
 		mIsGlobal(false),
@@ -165,6 +168,7 @@ public:
 	}
 
 	bool IsArray() const { return mIsArray; }
+	bool IsOutput() const { return mIsOutput; }
 };
 
 //==================================================================

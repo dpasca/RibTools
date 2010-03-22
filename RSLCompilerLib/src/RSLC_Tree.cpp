@@ -308,6 +308,28 @@ RSLC::Register TokNode::GetRegister() const
 }
 
 //==================================================================
+bool TokNode::IsVarArray() const
+{
+	if ( GetTokIDType() == T_TYPE_VALUE )
+	{
+		return false;
+	}
+	else
+	if ( mVarLink.IsValid() )
+		return mVarLink.GetVarPtr()->IsArray();
+	else
+	if ( mFuncCall.mpFunc )
+	{
+		return mFuncCall.mpFunc->mRetVarIsArray;
+	}
+	else
+	{
+		DASSERT( 0 );
+		return false;
+	}
+}
+
+//==================================================================
 RSLC::VarType TokNode::GetVarType() const
 {
 	if ( GetTokIDType() == T_TYPE_VALUE )

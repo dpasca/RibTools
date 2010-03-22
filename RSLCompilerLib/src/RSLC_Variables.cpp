@@ -112,7 +112,8 @@ Variable *AddVariable(
 			TokNode *pDetailNode,
 			TokNode *pSpaceCastTok,
 			TokNode *pNameNode,
-			bool	isArray )
+			bool	isArray,
+			bool	isOutput )
 {
 	// setup the var link
 	if ( pNameNode )
@@ -130,6 +131,7 @@ Variable *AddVariable(
 	pVar->mpSpaceCastTok	= pSpaceCastTok ? pSpaceCastTok->mpToken : NULL;
 	pVar->mpDefNameNode		= pNameNode;
 	pVar->mIsArray			= isArray;
+	pVar->mIsOutput			= isOutput;
 
 	if ( 0 == strcmp( pVar->mpDefNameNode->GetTokStr(), "(" ) )
 	{
@@ -221,180 +223,6 @@ void AddSelfVariable(
 	pVar->mIsForcedDetail	= isDetailForced;
 }
 
-// TODO: functions and shader params are allowed to change type after a comma !
-//==================================================================
-static size_t discoverVariablesDeclarations_sub( TokNode *pNode, size_t i )
-{
-	TokNode	*pDTypeNode	= NULL;
-	TokNode	*pDetailNode= NULL;
-	TokNode	*pOutputNode= NULL;
-	TokNode *pLastNonTerm=NULL;
-
-	bool	intoRValue = false;
-	bool	isArray = false;
-
-	BlockType	blkType = pNode->GetBlockType();
-
-	for (; i < pNode->mpChilds.size(); ++i)
-	{
-		TokNode	*pChild = pNode->mpChilds[i];
-
-		// NOTE: a valid variable declaration must be followed by any of the following symbols
-		// ',', ';', '='
-
-		if ( pChild->GetTokID() == T_OP_ASSIGN )
-		{
-			// except in cases like: float a = (b = 3)
-			if ( intoRValue )
-				throw Exception( "Broken variable declaration", pChild );
-
-			intoRValue = true;
-
-			if ( pDTypeNode )
-			{
-				DASSERT( !!pLastNonTerm );
-			}
-		}
-		else
-		if ( pChild->GetTokID() == T_OP_COMMA )
-		{
-			// comma brings out of "right value" state.
-			// e.g. float a = 4, c ...
-			intoRValue = false;
-
-			if ( pDTypeNode && pLastNonTerm )
-			{
-				Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm, isArray );
-				if ( blkType == BLKT_DECL_PARAMS_SH )
-				{
-					pVar->mIsSHParam = true;	// mark as shader param
-				}
-			}
-		}
-		else
-		if ( pChild->GetTokID() == T_OP_SEMICOL )
-		{
-			// semi-colon brings out of "right value" state and resets
-			// all types, detail..
-			// e.g. float a = 4, c;
-			intoRValue = false;
-
-			if ( pDTypeNode && pLastNonTerm )
-			{
-				Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm, isArray );
-				if ( blkType == BLKT_DECL_PARAMS_SH )
-				{
-					pVar->mIsSHParam = true;	// mark as shader param
-				}
-			}
-
-			pDTypeNode	= NULL;
-			pDetailNode	= NULL;
-			pOutputNode	= NULL;
-		}
-		else
-		if NOT( intoRValue )
-		{
-			if ( pChild->GetTokIDType() == T_TYPE_DATATYPE )
-			{
-				pDTypeNode = pChild;
-			}
-			else
-			if ( pChild->GetTokIDType() == T_TYPE_DETAIL )
-			{
-				if ( pDetailNode )
-					throw Exception( "Broken variable declaration", pChild );
-
-				pDetailNode = pChild;
-			}
-			else
-			if ( pChild->GetTokID() == T_KW_output )
-			{
-				if ( pOutputNode &&
-					(	blkType != BLKT_DECL_PARAMS_SH
-					 && blkType != BLKT_DECL_PARAMS_FN
-					 && blkType != BLKT_CALL_OR_DELC_PARAMS_FN) )
-				{
-					throw Exception(
-							"Keyword 'output' can be specified only in "
-							"function and shader parameters declaration", pChild );
-				}
-
-				pOutputNode = pChild;
-			}
-			else // ..an array declaration ?
-			if ( pChild->GetTokID() == T_OP_LFT_SQ_BRACKET )
-			{
-				isArray = true;
-				pLastNonTerm = pChild->GetChildTry( 0 );
-				DASSERT( pLastNonTerm != NULL );
-			}
-			else
-			if ( pChild->IsNonTerminal() )
-			{
-				pLastNonTerm = pChild;
-
-				/*
-				const TokNode	*pChildChild = pChild->GetChildTry( 0 );
-
-				// is this maybe an array declaration ?
-				if ( pChildChild && pChildChild->GetTokID() == T_OP_LFT_SQ_BRACKET )
-					isArray = true;
-				*/
-			}
-		}
-	}
-
-	// check for last declaration in case of shader or function params
-	if (
-		(	blkType == BLKT_DECL_PARAMS_SH
-		 || blkType == BLKT_DECL_PARAMS_FN
-		 || blkType == BLKT_CALL_OR_DELC_PARAMS_FN )
-
-		 && pLastNonTerm
-		 && pDTypeNode )
-	{
-		Variable *pVar = AddVariable( pNode, pDTypeNode, pDetailNode, NULL, pLastNonTerm, isArray );		
-		if ( blkType == BLKT_DECL_PARAMS_SH )
-		{
-			pVar->mIsSHParam = true;	// mark as shader param
-		}
-	}
-
-	return i;
-}
-
-//==================================================================
-void DiscoverVariablesDeclarations( TokNode *pNode )
-{
-	for (size_t i = 0; i < pNode->mpChilds.size(); ++i)
-		DiscoverVariablesDeclarations( pNode->mpChilds[i] );
-
-	BlockType	blkType = pNode->GetBlockType();
-
-	if (	blkType == BLKT_DECL_PARAMS_SH
-		 || blkType == BLKT_DECL_PARAMS_FN
-		 || blkType == BLKT_CALL_OR_DELC_PARAMS_FN
-		 || blkType == BLKT_CODEBLOCK
-		 || blkType == BLKT_ROOT )
-	{
-		for (size_t i=0; i < pNode->mpChilds.size();)
-		{
-			TokNode	*pTokNode = pNode->GetChildTry( i );
-			TokenIDType	idType = pTokNode->GetTokIDType();
-
-			if (idType == T_TYPE_DATATYPE ||
-				idType == T_TYPE_DETAIL ||
-				idType == T_KW_output )
-			{
-				i = discoverVariablesDeclarations_sub( pNode, i );
-			}
-			else
-				++i;
-		}
-	}
-}
-
 //==================================================================
 void DiscoverVariablesUsage( TokNode *pNode )
 {
@@ -419,40 +247,6 @@ void DiscoverVariablesUsage( TokNode *pNode )
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
 		DiscoverVariablesUsage( pNode->mpChilds[i] );
-}
-
-//==================================================================
-void RealizeArraysSizes( TokNode *pNode )
-{
-	DVec<Variable>	&vars = pNode->GetVars();
-	for (size_t i=0; i < vars.size(); ++i)
-	{
-	    if NOT( vars[i].mIsArray )
-			continue;
-
-		TokNode *pSqBracket = vars[i].mpDefNameNode->GetChildTry( 0 );
-		DASSERT( pSqBracket != NULL );
-
-		TokNode	*pArrSizeNode = pSqBracket->GetChildTry( 0 );
-		DASSERT( pArrSizeNode != NULL );
-
-		double	arrSize = pArrSizeNode->mpToken->ConstNum;
-		U64		arrSizeInt = (U64)ceil( arrSize );
-
-		// if it's negative or if it's not an integral value
-		if ( arrSize < 0 || arrSizeInt != arrSize )
-			throw Exception( pSqBracket, "Array size must be positive integral value" );
-
-		// enforce a "large enough" maximum size
-		if ( arrSize > (double)(1 << 24) )
-			throw Exception( pSqBracket, "Array size is currently limited to %i !", 1 << 24 );
-
-		// finally set the array size
-		vars[i].mArraySize = (U32)arrSizeInt;
-	}
-
-	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
-		RealizeArraysSizes( pNode->mpChilds[i] );
 }
 
 //==================================================================
