@@ -87,7 +87,7 @@ RSLCompiler::RSLCompiler(
 
 	RemoveOpeningExprBrackets( mpRoot );
 
-	// simplify assign-with-arthimetic operators
+	// simplify assign-with-arithmetic operators
 	// example: a += b  ..becomes..  a = a + b
 	ExpandAssingOperators( mpRoot );
 
