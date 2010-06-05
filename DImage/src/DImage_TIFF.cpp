@@ -8,8 +8,8 @@
 
 extern "C"
 {
-	#include "externals/local/libtiff_pc/tif_config.h"
-	#include "externals/local/libtiff_pc/tiffconf.h"
+	#include "externals/local/libtiff/tif_config.h"
+	#include "externals/local/libtiff/tiffconf.h"
 	#include "tiff.h"
 	#include "tiffio.h"
 	#include "tiffiop.h"

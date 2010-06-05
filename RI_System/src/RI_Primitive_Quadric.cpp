@@ -7,7 +7,6 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "DMath.h"
 #include "RI_Options.h"
 #include "RI_Attributes.h"
 #include "RI_Transform.h"

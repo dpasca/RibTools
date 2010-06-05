@@ -9,8 +9,8 @@
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
 
-#include "DTypes.h"
-#include "DContainers.h"
+#include "DSystem/include/DTypes.h"
+#include "DSystem/include/DContainers.h"
 #include <string>
 
 //===============================================================

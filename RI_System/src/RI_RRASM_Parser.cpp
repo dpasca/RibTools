@@ -10,7 +10,6 @@
 #include <memory>
 #include <stdexcept>
 #include <stdarg.h>
-#include "DUtils.h"
 #include "RI_MicroPolygonGrid.h"
 #include "RI_SVM_Context.h"
 #include "RI_RRASM_Parser.h"
