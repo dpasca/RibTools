@@ -28,29 +28,36 @@ if (MSVC)
 	add_definitions( "/GR-" )
 endif (MSVC)
 
+# Find OpenMP and set the flags for the compiler
 find_package(OpenMP)
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
+# Add the source dir as a common include path
 include_directories( . )
 
+# Specify the destination directly into the Distrib directory
+# ..also avoid the /Release and /Debug additional subdirs created by
+# Visual Studio
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Distrib )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Distrib )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Distrib )
 
-
+# Various libs
 add_subdirectory( DSystem )
 add_subdirectory( DMath )
 add_subdirectory( DImage )
-add_subdirectory( externals/local/libtiff )
-add_subdirectory( externals/local/libjpeg )
-
-add_subdirectory( externals/local/freeglut )
-
 add_subdirectory( RI_System )
 add_subdirectory( RibRenderLib )
 add_subdirectory( RibToolsBase )
 add_subdirectory( RSLCompilerLib )
 
+# external libs
+add_subdirectory( externals/local/libtiff )
+add_subdirectory( externals/local/libjpeg )
+add_subdirectory( externals/local/freeglut )
+
+# -- executables --
 add_subdirectory( RibRender )
+add_subdirectory( RibRenderServer )
 
