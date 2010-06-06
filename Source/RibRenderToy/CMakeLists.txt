@@ -1,4 +1,4 @@
-project( RibRender )
+project( RibRenderToy )
 
 find_package(OpenGL)
 

@@ -57,7 +57,9 @@ add_subdirectory( externals/local/libtiff )
 add_subdirectory( externals/local/libjpeg )
 add_subdirectory( externals/local/freeglut )
 
-# -- executables --
+# executables
 add_subdirectory( RibRender )
 add_subdirectory( RibRenderServer )
+add_subdirectory( RibRenderToy )
+add_subdirectory( RSLCompilerCmd )
 
