@@ -21,7 +21,12 @@ ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 #=============================================
 project (RibTools)
 
-add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /nologo" )
+if (MSVC)
+	# disable annoying secure CRT warnings
+	add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /nologo" )
+	# disable RTTI
+	add_definitions( "/GR-" )
+endif (MSVC)
 
 find_package(OpenMP)
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
