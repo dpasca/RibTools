@@ -1,15 +1,14 @@
-mkdir build
-mkdir build\Distrib
-copy readme.html build\Distrib\
-xcopy /E /Y DistribSrc\base build\Distrib
+mkdir ..\Distrib
+copy readme.html ..\Distrib\
+xcopy /E /Y DistribSrc\base ..\Distrib
 
 REM == remove this for the time being
-del build\Distrib\rendermn.ini
+del ..\Distrib\rendermn.ini
 
-xcopy /E /Y DistribSrc\pc build\Distrib
-mkdir build\Distrib\docs
-mkdir build\Distrib\docs\docs_content
-xcopy /E /Y docs\*.txt build\Distrib\docs\
-xcopy /E /Y docs\*.html build\Distrib\docs\
-xcopy /E /Y docs\*.pdf build\Distrib\docs\
-xcopy /E /Y docs\docs_content build\Distrib\docs\docs_content
+xcopy /E /Y DistribSrc\pc ..\Distrib
+mkdir ..\Distrib\docs
+mkdir ..\Distrib\docs\docs_content
+xcopy /E /Y docs\*.txt ..\Distrib\docs\
+xcopy /E /Y docs\*.html ..\Distrib\docs\
+xcopy /E /Y docs\*.pdf ..\Distrib\docs\
+xcopy /E /Y docs\docs_content ..\Distrib\docs\docs_content
