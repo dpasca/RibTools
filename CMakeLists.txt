@@ -23,7 +23,16 @@ project (RibTools)
 
 add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /nologo" )
 
+find_package(OpenMP)
+set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+
 include_directories( . )
+
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Distrib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Distrib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Distrib )
+
 
 add_subdirectory( DSystem )
 add_subdirectory( DMath )
