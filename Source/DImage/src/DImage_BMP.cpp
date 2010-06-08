@@ -99,7 +99,7 @@ void LoadBMP( Image &img, DUT::MemFile &readFile, const char *pFName )
 
 	Image::SampType	sampType = Image::ST_UNKNOWN;
 	U32				sampPerPix = 0;
-	char			*pSampNames = NULL;
+	const char		*pSampNames = NULL;
 
 	bool			convertingToTrueCol = false;
 

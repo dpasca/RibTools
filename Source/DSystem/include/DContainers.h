@@ -10,6 +10,7 @@
 #define DCONTAINERS_H
 
 #include <memory.h>
+#include <stdexcept>
 #include "DTypes.h"
 #include "DMemory.h"
 #include "DUtils_Base.h"

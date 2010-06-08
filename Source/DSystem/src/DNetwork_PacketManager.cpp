@@ -49,7 +49,9 @@ void PacketManager::Send( const void *pData, size_t dataSize )
 			dataSize );
 	}
 
+#if defined(WIN32)
 	ResumeThread( mThreadHandle );
+#endif
 }
 
 //==================================================================
@@ -77,7 +79,9 @@ void PacketManager::SendEnd( Packet *pPacket )
 		mSendList.mInQueue.push_back( pPacket );
 	}
 
+#if defined(WIN32)
 	ResumeThread( mThreadHandle );
+#endif
 }
 
 //==================================================================

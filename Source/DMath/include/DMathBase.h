@@ -9,6 +9,10 @@
 #ifndef DMATHBASE_H
 #define DMATHBASE_H
 
+#if defined(__linux__) || (__APPLE__)
+	#include <inttypes.h>
+#endif
+
 #define DMATH_USE_M128
 //#define DMATH_USE_M512
 
@@ -221,6 +225,12 @@ template <class T>	inline T		DMax( const T &a, const T &b )
 
 typedef unsigned char		DU8;
 typedef unsigned int		DU32;
+
+#if defined(__linux__) || (__APPLE__)
+typedef uint64_t			DU64;
+#else
 typedef unsigned __int64	DU64;
+#endif
 
 #endif
+

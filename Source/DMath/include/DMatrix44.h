@@ -22,7 +22,9 @@
 
 //==================================================================
 //__declspec(align(64))
+#if defined(_MSC_VER)
 __declspec(align(DMT_SIMD_ALIGN_SIZE))
+#endif
 class Matrix44
 {
 public:
@@ -133,7 +135,11 @@ public:
 	friend bool operator ==( const Matrix44 &lval, const Matrix44 &rval ) { return lval.v16 == rval.v16; }
 	friend bool operator !=( const Matrix44 &lval, const Matrix44 &rval ) { return lval.v16 != rval.v16; }
 #endif
-};
+}
+#if defined(__GNUC__)
+__attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)))
+#endif
+;
 
 //==================================================================
 inline Matrix44 Matrix44::GetTranspose() const

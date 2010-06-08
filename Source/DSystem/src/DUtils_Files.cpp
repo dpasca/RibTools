@@ -7,13 +7,14 @@
 //==================================================================
 
 #if defined(WIN32)
+
 #include <Windows.h>
+#include <direct.h>
 
 #elif defined(__linux__)
 
 #endif
 
-#include <direct.h>
 #include "DUtils_Files.h"
 
 //==================================================================
@@ -153,12 +154,12 @@ DStr GetFullDirNameFromFPathName( const char *pInFPathname )
 	char	buff[2048];
 	GetFullPathNameA( tmp.c_str(), _countof(buff), buff, NULL );
 
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
 	DASSERT( 0 );	// TODO
 
 #endif
 
-	return buff;
+	DASSERT( 0 );	// TODO
 #endif
 
 }

@@ -52,7 +52,7 @@
 #define ESTALE                  WSAESTALE
 #define EREMOTE                 WSAEREMOTE
 
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
 
 #include <netdb.h>
 #include <fcntl.h>
@@ -61,9 +61,12 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <errno.h>
 
 typedef int	SOCKET;
 static const SOCKET	INVALID_SOCKET = -1;
+static const int	SOCKET_ERROR = -1;
+
 
 #define closesocket	close
 
