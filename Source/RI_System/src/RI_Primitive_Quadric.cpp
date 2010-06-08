@@ -10,7 +10,6 @@
 #include "RI_Options.h"
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
-#include "RI_Primitive.h"
 #include "RI_Primitive_Quadric.h"
 
 //==================================================================

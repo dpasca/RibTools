@@ -10,7 +10,6 @@
 #define RI_FRAMEWORK_H
 
 #include "RI_Base.h"
-#include "RI_Primitive.h"
 #include "RI_Options.h"
 #include "RI_HiderST.h"
 

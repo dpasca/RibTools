@@ -7,7 +7,6 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_Primitive.h"
 #include "RI_HiderST.h"
 #include "RI_Transform.h"
 #include "RI_MicroPolygon.h"

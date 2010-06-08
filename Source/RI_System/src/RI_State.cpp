@@ -7,7 +7,6 @@
 //==================================================================
 
 #include "stdafx.h"
-#include "RI_Primitive.h"
 #include "RI_State.h"
 #include "RI_Res_SearchPathScanner.h"
 

@@ -16,7 +16,6 @@
 #include "RI_Attributes.h"
 #include "RI_Transform.h"
 #include "RI_Framework.h"
-#include "RI_Primitive.h"
 #include "RI_LightSource.h"
 
 //==================================================================
