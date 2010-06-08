@@ -1,6 +1,6 @@
 project( DImage )
 
-include_directories( ../externals/tiff-3.9.2/libtiff )
+include_directories( ../externals/tiff/libtiff )
 
 include_directories( ../externals/libjpeg )
 
