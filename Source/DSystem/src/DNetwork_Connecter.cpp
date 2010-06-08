@@ -6,6 +6,7 @@
 /// copyright info. 
 //==================================================================
 
+#include <memory.h>
 #include "DUtils_Base.h"
 #include "DNetwork_Connecter.h"
 

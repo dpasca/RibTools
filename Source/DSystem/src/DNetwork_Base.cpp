@@ -92,7 +92,10 @@ const char *GetSockErrStr( int err )
 	case EHOSTDOWN      : return "EHOSTDOWN";
 	case EHOSTUNREACH   : return "EHOSTUNREACH";
 	case ENOTEMPTY      : return "ENOTEMPTY";
+// TODO fix at some point
+#if defined(WIN32)
 	case EPROCLIM       : return "EPROCLIM";
+#endif
 	case EUSERS         : return "EUSERS";
 	case EDQUOT         : return "EDQUOT";
 	case ESTALE         : return "ESTALE";

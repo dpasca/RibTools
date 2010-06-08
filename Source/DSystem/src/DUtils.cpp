@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <stdarg.h>
+#include <string.h>
 #include "DTypes.h"
 #include "DUtils.h"
 #include "DMemory.h"
