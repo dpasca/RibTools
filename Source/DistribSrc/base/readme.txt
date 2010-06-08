@@ -1,5 +1,5 @@
 ==============
-RibTools 0.9
+RibTools 0.11
 ==============
 
 See the `User Manual`_
