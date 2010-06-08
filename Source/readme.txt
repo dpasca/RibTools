@@ -2,6 +2,20 @@
 Building RibTools
 ====================
 
+:Authors: Davide Pasca
+:Version: 2010/6/8
+
+.. contents::
+
+Preface
+=======
+
+This document is about building *RibTools*.
+
+For usage, see the `User Manual`_
+
+.. _User Manual: DistribSrc/base/docs/User_Manual.html
+
 Requirements
 ============
 
@@ -9,7 +23,7 @@ Requirements
 
 On Windows the required tools are:
 
- * Visual Studio 2008
+ * Microsoft Visual Studio 2008
  * CMake_ 2.8 or better
 
 .. _CMake: http://www.cmake.org
@@ -17,7 +31,7 @@ On Windows the required tools are:
 The Code
 ===========
 
-*RibTools* is released under the `New BSD license`_
+*RibTools* is released under the `New BSD license`_.
 
 .. _New BSD license: http://www.opensource.org/licenses/bsd-license.php 
 
@@ -25,7 +39,8 @@ The code is officially located at http://ribtools.googlecode.com .
 
 Directory Structure
 ===================
-As obtained from the Subversion repository:
+
+As obtained from the repository:
 
 **Source/**
 
@@ -67,67 +82,33 @@ For more informations on how to setup the environment variable, see the instruct
 Compiling and running from VS
 =============================
 
-Unpack libtiff
---------------
-
-**libtiff**'s source code is kept as the *tiff-3.9.2.zip* archive under the **externals/** folder.
-Unzip the *tiff-3.9.2.zip* in its own location.
-
-As the result of unzipping, the following directory structure is expected:
-
-**ribtools**
-
-* **externals/**
- * **tiff-3.9.2/**
-    * **build/**
-    * **libtiff/**
-    * **COPYRIGHT**
-    * **[...]**
-
 Building the solution
 ---------------------
 
-#. Double click on ***build.bat*** to run a script that will create the directory **Distrib/**
-# .Open the directory **pc/** from the main directory<br/> 
+From the *Source* directory launch the batch ``make_build.bat``
+This script will create he ``build`` directory and automatically call ``make_distrib.bat`` to create the ``Distrib`` directory.
 
-# .Double click on ***RibTools.sln*** inside **pc/** to launch the main solution with Visual Studio 2008
-# .From the Standard Toolbar select a *solution configuration* (**Debug** or **Release**) and a *platform configuration* (**Win32** or **x64**)
+Launch the newly created Visual Studio solution that can be found at ``build/RibTools.sln``.
 
-# .Build the solution by selecting the option from the **Build** menu (or press F7 or Ctrl+Alt+B, depending on the VS configuration)
+From the Standard Toolbar select a *solution configuration* (**Debug** or **Release**).
 
-Once the build is finished the **Distrib/** directory should contain 3 executables:
+Build the solution by selecting the option from the **Build** menu (or press F7 or Ctrl+Alt+B, depending on the VS configuration)
 
-* **Extras/**
-* **Install/**
-* **TestScenes/**
-* **TestsOutput/**
-* **Resources/**
-* *DelCompiledShaders.bat*
-* *MakeTests.bat*
-* *readme.html*
-* *RibRender.exe*
-* *RibRender.pdb*
-* *RibRenderServer.exe*
-* *RibRenderServer.pdb*
-* *RibRenderToy.exe*
-* *RibRenderToy.pdb*
-* *RSLCompilerCmd.exe*
-* *RSLCompilerCmd.pdb*
+Once the build is finished the ``Distrib`` directory should contain 4 executables:
 
-Note that for every *.exe* file there is a corresponding *.pdb* file.
+    * *RibRender.exe*
+    * *RibRenderServer.exe*
+    * *RibRenderToy.exe*
+    * *RSLCompilerCmd.exe*
 
-PDB files hold debug data necessary to display symbols when debugging with Visual Studio's debugger.
+Note that for every *.exe* file there is a corresponding *.idb* file. These files hold debug data necessary to display symbols when debugging with Visual Studio's debugger.
 
 A little test
 -------------
-* From the **Distrib/** directory, launch ***RibRenderToy.exe***
-* Right-click inside the RibRenderToy window and select a test scene from the pop-up menu (*Airplane.rib* is a safe bet)
 
-[[Image:develop-select-airplane-scene.png|200px]]
-
-* After a little while the scene should appear in all it's beauty (!)
-
-[[Image:Airplane.png|200px]]
+    * From the ``Distrib`` directory, launch ``RibRenderToy.exe``
+    * Right-click inside the RibRenderToy window and select a test scene from the pop-up menu (*Airplane.rib* is a safe bet)
+    * After a little while the scene should appear in all it's beauty (!)
 
 Running from Visual Studio
 --------------------------
@@ -137,23 +118,20 @@ In order to run form visual studio, a one time setup is necessary.
 Set the choosen application as the StartUp project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Right-click on an executable project (e.g. RibRenderToy), and choose **Set as StartUp Project** from the pop-up menu.
-
-[[Image:Develop-set-as-startup-prj.png|200px]]
+Right-click on an executable project (e.g. *RibRenderToy*), and choose **Set as StartUp Project** from the pop-up menu.
 
 Setup the working directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Right-click on the application project (e.g. RibRenderToy) and select **Properties **from the pop-up menu
-* Find the **Working Directory **setting in the **Properties **dialog by selecting *Configuration Properties*** **-> *Debugging*
-* Set the **Working Directory** to **..\..\Distrib** 
+    * Right-click on the application project (e.g. *RibRenderToy*) and select **Properties** from the pop-up menu
+    * From the list at the left of the dialog, select ***Configuration Properties -> Debugging***
+        * Where it says ***Working Directory*** set it to ``..\..\Distrib`` 
 
-[[Image:Develop-working-dir.png|200px]]
-
-**Note:** Set this for all the configurations (*Release* and *Debug*) and all platforms (*Win32* and *x64*).
-A common mistake is to set up the Working Directory only for the current configuration and forget about the other configurations.
+**Note:** Set this for all the configurations (*Release* and *Debug*).
+A common mistake is to set up the *Working Directory* only for the current configuration and forget about the other configurations.
 
 Run (!!!)
 ~~~~~~~~~
 
 Run the application with or without the debugger by pressing F5, Ctrl+F5 (or whatever is your configuration 8)
+

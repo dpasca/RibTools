@@ -1,0 +1,113 @@
+====================
+RibTools User Manual
+====================
+
+:Authors: Davide Pasca
+:Version: 2010/6/8
+
+.. contents::
+
+Installation
+============
+
+You may need to perform a one-time install of the freely redistributable CRT libraries from Microsoft, downloadable here_ or from the **RibTools** binaries package at ``Install\vcredist_x86.exe``.
+
+.. _here: http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en 
+
+Quick Start
+===========
+
+From the *RibTools* distribution directory, launch the file ``MakeTests.bat``, wait for it to complete and enjoy some fine renderings generated in the ``TestsOutput`` directory.
+
+Three executables are currently distributed: *RibRenderToy*, *RibRender*, *RibRenderServer* and *RSLCompilerCmd*.
+
+RibRenderToy
+------------
+
+This is a minimally interactive application that will render any RIB file present in the ``TestScenes`` directory.
+
+Launch the application, **right click** in the window to open a menu from which to choose a file to render.
+
+|MenuImg|  |RendImg|
+
+.. |MenuImg| image:: images/develop-select-airplane-scene.png
+    :width: 300px
+
+.. |RendImg| image:: images/airplane.png
+    :width: 300px
+
+***Note*** that *RibRenderToy* always redirects the rendering to the application window, ignoring any target specified by the ``Display`` command in the RIB files.
+
+RibRender
+------------
+
+This command will render a scene described by a `RIB file`_ into an image file or in a window.
+
+.. _RIB file: http://www.3dartist.com/WP/formats/index.html#rib
+
+From a command line, type ``RibRender -h`` to get the following help:
+
+::
+
+ ==== RibRender v0.9 -- (Feb 16 2010 - 02:54:03) ====
+ 
+ RibRender <rib file> [options]
+ 
+ Options:
+     -help | --help | -h             -- Show this help
+     -server <address>:<port>        -- Specify an IP and port number for a render server
+     -forcedlongdim <size in pixels> -- Force the largest dimension's rendering size in pixels
+     -colorgrids                     -- Show grids in false colors (for debugging)
+ 
+ Examples:
+     RibRender TestScenes/Airplane.rib
+     RibRender TestScenes/Airplane.rib -server 192.168.1.107 -server 192.168.1.108:30000
+     RibRender TestScenes/Airplane.rib -forcedlongdim 1024
+
+***Note***: RIB scene description files usually specify the output format with an explicit ``Display`` command.
+Therefore, a RIB file may decide whether the output will be in the form of an image file (usually TIFF) or in a window for display.
+If no ``Display`` command is found, *RibRender* will automatically generate an RGBA TIFF image named ``frame0001.tif``.
+
+RibRenderServer
+----------------
+
+This command acts for a render server for any *RibRender* command that will accesses this application thought the machine's IP and selected port.
+
+From a command line, type ``RibRender -h`` to get the following help:
+
+::
+
+ ==== RibRenderServer v0.9 -- (Feb 16 2010 - 02:54:00) ====
+ 
+ RibRenderServer [options]
+ 
+ Options:
+     -help | --help | -h  -- Show this help
+     -port <port>         -- Wait for connection at port <port>
+ 
+ Examples:
+     RibRenderServer
+     RibRenderServer -port 31111
+
+***Note***: *RibRenderServer* gives an additional capability to distribute rendering but it is **not** necessary as *RibRender* is fully capable of rendering on its own.
+
+RSLCompilerCmd
+---------------
+
+This command is included only for **internal testing purposes**. It compiles a .sl file into a RibRender .rrasm file type. Such operation is done internally by the renderer, and ***the user does not normally need to run this*** command explicitly.
+
+General Usage
+=============
+
+In order to run the *RibRender*, *RibRenderServer* and *RSLCompilerCmd* commands from the command line shell from any directory in the system, the ``RIBTOOLS_DIR`` environment variable must be set.
+
+In DOS/Windows this is accomplished by doing:
+
+ SET RIBTOOLS_DIR=<Path>
+
+Where ``<Path>`` is the pathname where the executables are, along with the ``ribtools.ini`` file (this file is used also to confirm that the directory is indeed RibTools' directory).
+
+``SET`` however is not permament. To set an environment variable that persists after a reboot in Windows XP and above, use the `following instruction`_ from Microsoft.
+
+.. _following instruction: http://support.microsoft.com/default.aspx?scid=kb;en-us;310519
+

@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>RibTools User Manual</title>
+<meta name="Generator" content="Vim reStructured Text 140 - Vim 7.2" />
+
+<style type="text/css">
+/*<![CDATA[*/
+body { color: #000; background-color: #fff; margin: 0px 10%; min-width: 720px; font-family: Verdana, sans-serif;
+       counter-reset: chapter section subsection subsubsection paragraph lchapter lsection lsubsection lsubsubsection lparagraph}
+div.footnote { border-left: 1px solid #000; margin-left: 0em; clear: both }
+div.ftext { position: relative; margin-left: 50px }
+div.fnumber { float: left; width: 40px; padding: 0em; margin-left: 0.5em; margin-top: 0em }
+div.fnumber a { margin: 0px; padding: 0px }
+div.ctext { position: relative; margin-left: 100px }
+div.cnumber { float: left; width: 90px; padding: 0em; margin-left: 0.5em; margin-top: 0em }
+div.cnumber a { margin: 0px; padding: 0px }
+div.tip { border: 2px solid #0d0; margin: 0.5em 2em 1em 2em; padding: 0em 1em }
+div.warning, div.caution, div.danger, div.error { border: 2px solid #f00; margin: 0.5em 2em 1em 2em; padding: 0em 1em }
+div.note, div.hint, div.important { border: 2px solid #000; margin: 0.5em 2em 1em 2em; padding: 0em 1em }
+div.figure { display: block; padding: 1em; width: 400px; clear: both}
+div.topic { margin: 2em }
+div.vstsidebar, div.sidebar { border: 2px solid #aaa; color: #000; background-color: #ffffee; float: right; width: 40%; margin-left: 1em; margin-right: -1em; padding: 1em }
+span.strike { text-decoration: line-through }
+span.big { font-size: large }
+span.small { font-size: small }
+span.title { font-style: italic }
+span.notetitle { font-size: large; font-weight: 900; font-family: Verdana, sans-serif }
+p.toc { font-size: large; font-weight: 900 }
+p.notesubtitle { font-weight: 900; font-family: Verdana, sans-serif }
+p.attribution { font-style: italic; margin-left: 8em; text-indent: -1.4em }
+.vstright { float: right; margin: 1em }
+.vstleft { float: left; margin: 1em }
+.vstcenter { margin: 1em auto }
+blockquote.pull { font-size: large }
+p.rubric { font-size: large; margin-left: 2em }
+dd.normal { margin-bottom: 0.5em }
+dt.option { float: left; margin: 0em 0em 5px 2em; padding: 0px; font-family: monospace }
+dd.option { padding: 0px; margin: 0em 0em 5px 10em; text-indent: 0.5em }
+dd.option > p { margin: 0px }
+dd.normal > p { margin: 0px }
+table { border-collapse: collapse; margin: 0.5em 0em }
+thead, tfoot { text-align: center; font-weight: bold }
+td { border: 1px solid #000; padding: 0.25em; _top: 0%; vertical-align: top }
+td blockquote p{ margin: 0px; padding: 0px}
+td blockquote { margin: 0px; padding: 0px}
+table.vstbless td { border: 0px solid #000; padding: 0.25em; _top: 0%; vertical-align: top }
+td > p { margin: 0px }
+table.field { border: 0px solid #000; margin-left: 2em; padding: 0.25em; _top: 0%; vertical-align: top }
+td.fkey { font-weight: 900 }
+td.fval { border: 0px solid #000; padding: 0.25em; _top: 0%; vertical-align: top }
+td.fkey { font-weight: 900; border: 0px solid #000; padding: 0.25em; _top: 0%; vertical-align: top }
+td.fdkey { text-align: center; font-weight: 900 }
+td.fdval { text-align: center; font-style: italic }
+td.fakey { text-align: center; font-weight: 900 }
+td.faval { border: 0px solid #000; padding: 0.25em; _top: 0%; vertical-align: top }
+hr { width: 80%; margin: 1.5em auto }
+h1 { text-align: center; clear: both }
+h2, h3, h4, h5, h6 { text-align: left; margin-top: 1em; clear: both }
+h2 { counter-reset: section subsection subsubsection paragraph }
+h3 { counter-reset: subsection subsubsection paragraph }
+h4 { counter-reset: subsubsection paragraph }
+h5 { counter-reset: paragraph }
+h1 a { color: #000; background-color: transparent }
+h2 a { color: #000; background-color: transparent }
+h3 a { color: #000; background-color: transparent }
+h4 a { color: #000; background-color: transparent }
+h5 a { color: #000; background-color: transparent }
+h6 a { color: #000; background-color: transparent }
+p.subh1 { text-align: center; font-size: 120%; font-variant: small-caps }
+p.subh2, p.subh3, p.subh4, p.subh5, p.subh6 { text-align: left; font-size: 120%; font-variant: small-caps }
+h2:before { content: counter(chapter)" "; counter-increment: chapter }
+h3:before { content: counter(chapter)"."counter(section)" "; counter-increment: section }
+h4:before { content: counter(chapter)"."counter(section)"."counter(subsection)" "; counter-increment: subsection }
+h5:before { content: counter(chapter)"."counter(section)"."counter(subsection)"."counter(subsubsection)" "; counter-increment: subsubsection }
+h6:before { content: counter(chapter)"."counter(section)"."counter(subsection)"."counter(subsubsection)"."counter(paragraph)" "; counter-increment: paragraph}
+li.h1 { margin-left: 0em }
+li.h2 { margin-left: 1em; counter-reset: lsection lsubsection lsubsubsection lparagraph }
+li.h3 { margin-left: 2em; counter-reset: lsubsection lsubsubsection lparagraph }
+li.h4 { margin-left: 3em; counter-reset: lsubsubsection lparagraph }
+li.h5 { margin-left: 4em; counter-reset: lparagraph }
+li.h2:before { content: counter(lchapter)" "; counter-increment: lchapter }
+li.h3:before { content: counter(lchapter)"."counter(lsection)" "; counter-increment: lsection }
+li.h4:before { content: counter(lchapter)"."counter(lsection)"."counter(lsubsection)" "; counter-increment: lsubsection }
+li.h5:before { content: counter(lchapter)"."counter(lsection)"."counter(lsubsection)"."counter(lsubsubsection)" "; counter-increment: lsubsubsection }
+li.h6:before { content: counter(lchapter)"."counter(lsection)"."counter(lsubsection)"."counter(lsubsubsection)"."counter(lparagraph)" "; counter-increment: lparagraph}
+li.h6 { margin-left: 5em }
+ol, ul { margin-bottom: 0.5em; margin-top: 0.5em }
+ol.loweralpha { list-style-type: lower-alpha }
+ol.upperalpha { list-style-type: upper-alpha }
+ol.lowerroman { list-style-type: lower-roman }
+ol.upperroman { list-style-type: upper-roman }
+ol.decimal { list-style-type: decimal }
+ul.square { list-style-type: square }
+ul.circle { list-style-type: circle }
+ul.disc { list-style-type: disc }
+li > p { margin: 0em }
+img { border: 1px solid #000; padding: 0em; display: block; margin: 1em auto }
+img.inline { border: 1px solid #000; padding: 0em; margin: 0em; display: inline }
+pre { color: #000; background-color: #eee; margin-left: 2em; clear: both; overflow: auto }
+div.unknown { font-family: monospace; color: #000; background-color: #fff; margin: 1em; padding: 1em; clear: both; border: 3px solid red}
+pre.quoted { color: #000; background-color: #eee; margin-left: 0em; clear: both; overflow: auto  }
+pre.rawlatex { color: #000; background-color: #ddd; border: 1px solid #000; padding: 0.1em; clear: both; overflow: auto  }
+pre.address { font-family: Verdana, sans-serif; display: inline; margin: 0px; color: #000; background-color: #fff; overflow: auto }
+span.target { text-decoration: underline }
+div.vstfooter hr { width: 100%; margin: 0px }
+div.vstfooter p { margin: 0px }
+/*]]>*/
+</style>
+
+</head>
+<body>
+
+<h1 id="lribtools-user-manual"><a href="#toc-lribtools-user-manual">RibTools User Manual</a></h1>
+<table class="field" summary="Field list"><tr><td class="fkey">Authors:</td><td class="fval"> Davide Pasca</td></tr>
+
+<tr><td class="fkey">Version:</td><td class="fval"> 2010/6/8</td></tr>
+</table>
+<p id="tocheader" class="toc">Contents</p>
+<ul class="toc">
+ <li class="h1" id="toc-lribtools-user-manual"><a href="#lribtools-user-manual">RibTools User Manual</a></li>
+  <li class="h2" id="toc-linstallation"><a href="#linstallation">Installation</a></li>
+  <li class="h2" id="toc-lquick-start"><a href="#lquick-start">Quick Start</a></li>
+   <li class="h3" id="toc-lribrendertoy"><a href="#lribrendertoy">RibRenderToy</a></li>
+   <li class="h3" id="toc-lribrender"><a href="#lribrender">RibRender</a></li>
+   <li class="h3" id="toc-lribrenderserver"><a href="#lribrenderserver">RibRenderServer</a></li>
+   <li class="h3" id="toc-lrslcompilercmd"><a href="#lrslcompilercmd">RSLCompilerCmd</a></li>
+  <li class="h2" id="toc-lgeneral-usage"><a href="#lgeneral-usage">General Usage</a></li>
+</ul>
+<!--.. comment:: end of toc -->
+<h2 id="linstallation"><a href="#toc-linstallation">Installation</a></h2>
+
+<p>
+You may need to perform a one-time install of the freely redistributable CRT libraries from Microsoft, downloadable <a href="http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en" title="here">here</a> or from the <strong>RibTools</strong> binaries package at <code>Install\vcredist_x86.exe</code>.
+</p>
+
+
+<h2 id="lquick-start"><a href="#toc-lquick-start">Quick Start</a></h2>
+
+<p>
+From the <em>RibTools</em> distribution directory, launch the file <code>MakeTests.bat</code>, wait for it to complete and enjoy some fine renderings generated in the <code>TestsOutput</code> directory.
+</p>
+
+<p>
+Three executables are currently distributed: <em>RibRenderToy</em>, <em>RibRender</em>, <em>RibRenderServer</em> and <em>RSLCompilerCmd</em>.
+</p>
+
+<h3 id="lribrendertoy"><a href="#toc-lribrendertoy">RibRenderToy</a></h3>
+
+<p>
+This is a minimally interactive application that will render any RIB file present in the <code>TestScenes</code> directory.
+</p>
+
+<p>
+Launch the application, <strong>right click</strong> in the window to open a menu from which to choose a file to render.
+</p>
+
+<p>
+
+<img src="images/develop-select-airplane-scene.png" width="300px" class="inline" alt="images/develop-select-airplane-scene.png" />  
+<img src="images/airplane.png" width="300px" class="inline" alt="images/airplane.png" />
+</p>
+
+<p>
+<strong><em>Note</em></strong> that <em>RibRenderToy</em> always redirects the rendering to the application window, ignoring any target specified by the <code>Display</code> command in the RIB files.
+</p>
+
+<h3 id="lribrender"><a href="#toc-lribrender">RibRender</a></h3>
+
+<p>
+This command will render a scene described by a <a href="http://www.3dartist.com/WP/formats/index.html#rib" title="RIB file">RIB file</a> into an image file or in a window.
+</p>
+
+
+<p>
+From a command line, type <code>RibRender -h</code> to get the following help:
+</p>
+
+<pre>
+ ==== RibRender v0.9 -- (Feb 16 2010 - 02:54:03) ====
+
+ RibRender &lt;rib file&gt; [options]
+
+ Options:
+     -help | --help | -h             -- Show this help
+     -server &lt;address&gt;:&lt;port&gt;        -- Specify an IP and port number for a render server
+     -forcedlongdim &lt;size in pixels&gt; -- Force the largest dimension's rendering size in pixels
+     -colorgrids                     -- Show grids in false colors (for debugging)
+
+ Examples:
+     RibRender TestScenes/Airplane.rib
+     RibRender TestScenes/Airplane.rib -server 192.168.1.107 -server 192.168.1.108:30000
+     RibRender TestScenes/Airplane.rib -forcedlongdim 1024
+</pre>
+
+<p>
+<strong><em>Note</em></strong>: RIB scene description files usually specify the output format with an explicit <code>Display</code> command.
+Therefore, a RIB file may decide whether the output will be in the form of an image file (usually TIFF) or in a window for display.
+If no <code>Display</code> command is found, <em>RibRender</em> will automatically generate an RGBA TIFF image named <code>frame0001.tif</code>.
+</p>
+
+<h3 id="lribrenderserver"><a href="#toc-lribrenderserver">RibRenderServer</a></h3>
+
+<p>
+This command acts for a render server for any <em>RibRender</em> command that will accesses this application thought the machine's IP and selected port.
+</p>
+
+<p>
+From a command line, type <code>RibRender -h</code> to get the following help:
+</p>
+
+<pre>
+ ==== RibRenderServer v0.9 -- (Feb 16 2010 - 02:54:00) ====
+
+ RibRenderServer [options]
+
+ Options:
+     -help | --help | -h  -- Show this help
+     -port &lt;port&gt;         -- Wait for connection at port &lt;port&gt;
+
+ Examples:
+     RibRenderServer
+     RibRenderServer -port 31111
+</pre>
+
+<p>
+<strong><em>Note</em></strong>: <em>RibRenderServer</em> gives an additional capability to distribute rendering but it is <strong>not</strong> necessary as <em>RibRender</em> is fully capable of rendering on its own.
+</p>
+
+<h3 id="lrslcompilercmd"><a href="#toc-lrslcompilercmd">RSLCompilerCmd</a></h3>
+
+<p>
+This command is included only for <strong>internal testing purposes</strong>. It compiles a .sl file into a RibRender .rrasm file type. Such operation is done internally by the renderer, and <strong><em>the user does not normally need to run this</em></strong> command explicitly.
+</p>
+
+<h2 id="lgeneral-usage"><a href="#toc-lgeneral-usage">General Usage</a></h2>
+
+<p>
+In order to run the <em>RibRender</em>, <em>RibRenderServer</em> and <em>RSLCompilerCmd</em> commands from the command line shell from any directory in the system, the <code>RIBTOOLS_DIR</code> environment variable must be set.
+</p>
+
+<p>
+In DOS/Windows this is accomplished by doing:
+</p>
+
+ <blockquote>
+
+ <p>
+ SET RIBTOOLS_DIR=&lt;Path&gt;
+ </p>
+
+ </blockquote>
+
+<p>
+Where <code>&lt;Path&gt;</code> is the pathname where the executables are, along with the <code>ribtools.ini</code> file (this file is used also to confirm that the directory is indeed RibTools' directory).
+</p>
+
+<p>
+<code>SET</code> however is not permament. To set an environment variable that persists after a reboot in Windows XP and above, use the <a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;310519" title="following instruction">following instruction</a> from Microsoft.
+</p>
+
+</body>
+</html>
+

@@ -113,8 +113,40 @@ div.vstfooter p { margin: 0px }
 </head>
 <body>
 
-<h1 id="lbuilding-ribtools">Building RibTools</h1>
-<h2 id="lrequirements">Requirements</h2>
+<h1 id="lbuilding-ribtools"><a href="#toc-lbuilding-ribtools">Building RibTools</a></h1>
+<table class="field" summary="Field list"><tr><td class="fkey">Authors:</td><td class="fval"> Davide Pasca</td></tr>
+
+<tr><td class="fkey">Version:</td><td class="fval"> 2010/6/8</td></tr>
+</table>
+<p id="tocheader" class="toc">Contents</p>
+<ul class="toc">
+ <li class="h1" id="toc-lbuilding-ribtools"><a href="#lbuilding-ribtools">Building RibTools</a></li>
+  <li class="h2" id="toc-lpreface"><a href="#lpreface">Preface</a></li>
+  <li class="h2" id="toc-lrequirements"><a href="#lrequirements">Requirements</a></li>
+  <li class="h2" id="toc-lthe-code"><a href="#lthe-code">The Code</a></li>
+  <li class="h2" id="toc-ldirectory-structure"><a href="#ldirectory-structure">Directory Structure</a></li>
+  <li class="h2" id="toc-lthe-distrib-directory"><a href="#lthe-distrib-directory">The Distrib Directory</a></li>
+  <li class="h2" id="toc-lcompiling-and-running-from-vs"><a href="#lcompiling-and-running-from-vs">Compiling and running from VS</a></li>
+   <li class="h3" id="toc-lbuilding-the-solution"><a href="#lbuilding-the-solution">Building the solution</a></li>
+   <li class="h3" id="toc-la-little-test"><a href="#la-little-test">A little test</a></li>
+   <li class="h3" id="toc-lrunning-from-visual-studio"><a href="#lrunning-from-visual-studio">Running from Visual Studio</a></li>
+    <li class="h4" id="toc-lset-the-choosen-application-as-the-startup-project"><a href="#lset-the-choosen-application-as-the-startup-project">Set the choosen application as the StartUp project</a></li>
+    <li class="h4" id="toc-lsetup-the-working-directory"><a href="#lsetup-the-working-directory">Setup the working directory</a></li>
+    <li class="h4" id="toc-lrun-4033333341"><a href="#lrun-4033333341">Run (!!!)</a></li>
+</ul>
+<!--.. comment:: end of toc -->
+<h2 id="lpreface"><a href="#toc-lpreface">Preface</a></h2>
+
+<p>
+This document is about building <em>RibTools</em>.
+</p>
+
+<p>
+For usage, see the <a href="DistribSrc/base/docs/User_Manual.html" title="User Manual">User Manual</a>
+</p>
+
+
+<h2 id="lrequirements"><a href="#toc-lrequirements">Requirements</a></h2>
 
 <p>
 <em>RibTools</em> currently only compiles for Windows, although the code is written with portability in mind and Windows-specific code is kept to a minimum.
@@ -128,7 +160,7 @@ On Windows the required tools are:
 <li>
 
 <p>
-Visual Studio 2008
+Microsoft Visual Studio 2008
 </p>
 
 </li>
@@ -142,10 +174,10 @@ Visual Studio 2008
 </li>
 </ul>
 
-<h2 id="lthe-code">The Code</h2>
+<h2 id="lthe-code"><a href="#toc-lthe-code">The Code</a></h2>
 
 <p>
-<em>RibTools</em> is released under the <a href="http://www.opensource.org/licenses/bsd-license.php" title="New BSD license">New BSD license</a>
+<em>RibTools</em> is released under the <a href="http://www.opensource.org/licenses/bsd-license.php" title="New BSD license">New BSD license</a>.
 </p>
 
 
@@ -153,10 +185,10 @@ Visual Studio 2008
 The code is officially located at <a href="http://ribtools.googlecode.com">http://ribtools.googlecode.com</a> .
 </p>
 
-<h2 id="ldirectory-structure">Directory Structure</h2>
+<h2 id="ldirectory-structure"><a href="#toc-ldirectory-structure">Directory Structure</a></h2>
 
-<p class="subh2">
-As obtained from the Subversion repository:
+<p>
+As obtained from the repository:
 </p>
 
 <p>
@@ -451,7 +483,7 @@ Readme file in HTML format
 
 </td></tr>
 </table>
-<h2 id="lthe-distrib-directory">The Distrib Directory</h2>
+<h2 id="lthe-distrib-directory"><a href="#toc-lthe-distrib-directory">The Distrib Directory</a></h2>
 
 <p>
 A directory named <code>Distrib</code> is generated outside <code>Source</code> as part of the build process. This directory is automatically generated, and it can therefore be safely erased (unless one has any important changes in it !)
@@ -466,155 +498,35 @@ When running, it's is advised to have the environment variable <code>RIBTOOLS_DI
 For more informations on how to setup the environment variable, see the instructions at the [[User_Manual#General_Usage|General Usage]] section of the <em>User Manual</em>.
 </p>
 
-<h2 id="lcompiling-and-running-from-vs">Compiling and running from VS</h2>
-<h3 id="lunpack-libtiff">Unpack libtiff</h3>
+<h2 id="lcompiling-and-running-from-vs"><a href="#toc-lcompiling-and-running-from-vs">Compiling and running from VS</a></h2>
+<h3 id="lbuilding-the-solution"><a href="#toc-lbuilding-the-solution">Building the solution</a></h3>
 
 <p>
-<strong>libtiff</strong>'s source code is kept as the <em>tiff-3.9.2.zip</em> archive under the <strong>externals/</strong> folder.
-Unzip the <em>tiff-3.9.2.zip</em> in its own location.
+From the <em>Source</em> directory launch the batch <code>make_build.bat</code>
+This script will create he <code>build</code> directory and automatically call <code>make_distrib.bat</code> to create the <code>Distrib</code> directory.
 </p>
 
 <p>
-As the result of unzipping, the following directory structure is expected:
+Launch the newly created Visual Studio solution that can be found at <code>build/RibTools.sln</code>.
 </p>
 
 <p>
-<strong>ribtools</strong>
-</p>
-
-<ul class="circle">
-<li>
-
-<p>
-<strong>externals/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>tiff-3.9.2/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>build/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>libtiff/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>COPYRIGHT</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>[...]</strong>
-</p>
-
-
-</li>
-</ul>
-<h3 id="lbuilding-the-solution">Building the solution</h3>
-
-<p>
-#. Double click on <strong><em>build.bat</em></strong> to run a script that will create the directory <strong>Distrib/</strong>
-# .Open the directory <strong>pc/</strong> from the main directory&lt;br/&gt;
+From the Standard Toolbar select a <em>solution configuration</em> (<strong>Debug</strong> or <strong>Release</strong>).
 </p>
 
 <p>
-# .Double click on <strong><em>RibTools.sln</em></strong> inside <strong>pc/</strong> to launch the main solution with Visual Studio 2008
-# .From the Standard Toolbar select a <em>solution configuration</em> (<strong>Debug</strong> or <strong>Release</strong>) and a <em>platform configuration</em> (<strong>Win32</strong> or <strong>x64</strong>)
+Build the solution by selecting the option from the <strong>Build</strong> menu (or press F7 or Ctrl+Alt+B, depending on the VS configuration)
 </p>
 
 <p>
-# .Build the solution by selecting the option from the <strong>Build</strong> menu (or press F7 or Ctrl+Alt+B, depending on the VS configuration)
+Once the build is finished the <code>Distrib</code> directory should contain 4 executables:
 </p>
 
-<p>
-Once the build is finished the <strong>Distrib/</strong> directory should contain 3 executables:
-</p>
-
-<ul class="circle">
-<li>
-
-<p>
-<strong>Extras/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>Install/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>TestScenes/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>TestsOutput/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<strong>Resources/</strong>
-</p>
-
-</li>
-<li>
-
-<p>
-<em>DelCompiledShaders.bat</em>
-</p>
-
-</li>
-<li>
-
-<p>
-<em>MakeTests.bat</em>
-</p>
-
-</li>
-<li>
-
-<p>
-<em>readme.html</em>
-</p>
-
-</li>
+    <ul class="circle">
 <li>
 
 <p>
 <em>RibRender.exe</em>
-</p>
-
-</li>
-<li>
-
-<p>
-<em>RibRender.pdb</em>
 </p>
 
 </li>
@@ -628,21 +540,7 @@ Once the build is finished the <strong>Distrib/</strong> directory should contai
 <li>
 
 <p>
-<em>RibRenderServer.pdb</em>
-</p>
-
-</li>
-<li>
-
-<p>
 <em>RibRenderToy.exe</em>
-</p>
-
-</li>
-<li>
-
-<p>
-<em>RibRenderToy.pdb</em>
 </p>
 
 </li>
@@ -652,31 +550,20 @@ Once the build is finished the <strong>Distrib/</strong> directory should contai
 <em>RSLCompilerCmd.exe</em>
 </p>
 
-</li>
-<li>
-
-<p>
-<em>RSLCompilerCmd.pdb</em>
-</p>
-
 
 </li>
 </ul>
 
 <p>
-Note that for every <em>.exe</em> file there is a corresponding <em>.pdb</em> file.
+Note that for every <em>.exe</em> file there is a corresponding <em>.idb</em> file. These files hold debug data necessary to display symbols when debugging with Visual Studio's debugger.
 </p>
 
-<p>
-PDB files hold debug data necessary to display symbols when debugging with Visual Studio's debugger.
-</p>
-
-<h3 id="la-little-test">A little test</h3>
-<ul class="circle">
+<h3 id="la-little-test"><a href="#toc-la-little-test">A little test</a></h3>
+    <ul class="circle">
 <li>
 
 <p>
-From the <strong>Distrib/</strong> directory, launch <strong><em>RibRenderToy.exe</em></strong>
+From the <code>Distrib</code> directory, launch <code>RibRenderToy.exe</code>
 </p>
 
 </li>
@@ -686,15 +573,7 @@ From the <strong>Distrib/</strong> directory, launch <strong><em>RibRenderToy.ex
 Right-click inside the RibRenderToy window and select a test scene from the pop-up menu (<em>Airplane.rib</em> is a safe bet)
 </p>
 
-
 </li>
-</ul>
-
-<p>
-[[Image:develop-select-airplane-scene.png|200px]]
-</p>
-
-<ul class="circle">
 <li>
 
 <p>
@@ -704,47 +583,38 @@ After a little while the scene should appear in all it's beauty (!)
 
 </li>
 </ul>
-
-<p>
-[[Image:Airplane.png|200px]]
-</p>
-
-<h3 id="lrunning-from-visual-studio">Running from Visual Studio</h3>
+<h3 id="lrunning-from-visual-studio"><a href="#toc-lrunning-from-visual-studio">Running from Visual Studio</a></h3>
 
 <p>
 In order to run form visual studio, a one time setup is necessary.
 </p>
 
-<h4 id="lset-the-choosen-application-as-the-startup-project">Set the choosen application as the StartUp project</h4>
+<h4 id="lset-the-choosen-application-as-the-startup-project"><a href="#toc-lset-the-choosen-application-as-the-startup-project">Set the choosen application as the StartUp project</a></h4>
 
 <p>
-Right-click on an executable project (e.g. RibRenderToy), and choose <strong>Set as StartUp Project</strong> from the pop-up menu.
+Right-click on an executable project (e.g. <em>RibRenderToy</em>), and choose <strong>Set as StartUp Project</strong> from the pop-up menu.
 </p>
 
-<p>
-[[Image:Develop-set-as-startup-prj.png|200px]]
-</p>
-
-<h4 id="lsetup-the-working-directory">Setup the working directory</h4>
-<ul class="circle">
+<h4 id="lsetup-the-working-directory"><a href="#toc-lsetup-the-working-directory">Setup the working directory</a></h4>
+    <ul class="circle">
 <li>
 
 <p>
-Right-click on the application project (e.g. RibRenderToy) and select <em>*Properties **from the pop-up menu
+Right-click on the application project (e.g. <em>RibRenderToy</em>) and select <strong>Properties</strong> from the pop-up menu
 </p>
 
 </li>
 <li>
 
 <p>
-Find the <strong>Working Directory <em>*setting in the **Properties **dialog by selecting *Configuration Properties</em></strong> <em></em>-&gt; *Debugging</em>
+From the list at the left of the dialog, select <strong><em>Configuration Properties -&gt; Debugging</em></strong>
 </p>
 
 </li>
 <li>
 
 <p>
-Set the <strong>Working Directory</strong> to <strong>..\..\Distrib</strong>
+Where it says <strong><em>Working Directory</em></strong> set it to <code>..\..\Distrib</code>
 </p>
 
 
@@ -752,15 +622,11 @@ Set the <strong>Working Directory</strong> to <strong>..\..\Distrib</strong>
 </ul>
 
 <p>
-[[Image:Develop-working-dir.png|200px]]
+<strong>Note:</strong> Set this for all the configurations (<em>Release</em> and <em>Debug</em>).
+A common mistake is to set up the <em>Working Directory</em> only for the current configuration and forget about the other configurations.
 </p>
 
-<p>
-<strong>Note:</strong> Set this for all the configurations (<em>Release</em> and <em>Debug</em>) and all platforms (<em>Win32</em> and <em>x64</em>).
-A common mistake is to set up the Working Directory only for the current configuration and forget about the other configurations.
-</p>
-
-<h4 id="lrun-4033333341">Run (!!!)</h4>
+<h4 id="lrun-4033333341"><a href="#toc-lrun-4033333341">Run (!!!)</a></h4>
 
 <p>
 Run the application with or without the debugger by pressing F5, Ctrl+F5 (or whatever is your configuration 8)
