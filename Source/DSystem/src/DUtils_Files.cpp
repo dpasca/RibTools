@@ -150,18 +150,19 @@ DStr GetFullDirNameFromFPathName( const char *pInFPathname )
 #else
 	DStr	tmp = GetDirNameFromFPathName( pInFPathname );
 
-#if defined(WIN32)
 	char	buff[2048];
+
+#if defined(WIN32)
 	GetFullPathNameA( tmp.c_str(), _countof(buff), buff, NULL );
 
 #elif defined(__linux__) || defined(__APPLE__)
+	buff[0] = 0;
 	DASSERT( 0 );	// TODO
 
 #endif
 
-	DASSERT( 0 );	// TODO
+	return buff;
 #endif
-
 }
 
 //==================================================================
