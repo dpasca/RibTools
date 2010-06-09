@@ -39,10 +39,23 @@ set( SRCS
 ../../tiff/libtiff/tif_tile.c
 ../../tiff/libtiff/tif_version.c
 ../../tiff/libtiff/tif_warning.c
-../../tiff/libtiff/tif_win32.c
 ../../tiff/libtiff/tif_write.c
 ../../tiff/libtiff/tif_zip.c
 )
+
+if (MSVC)
+
+	set( SRCS_PLATFORM
+	../../tiff/libtiff/tif_win32.c
+	)
+	
+else (MSVC)
+
+	set( SRCS_PLATFORM
+	../../tiff/libtiff/tif_unix.c
+	)
+
+endif (MSVC)
 
 set( INCS
 ../../tiff/libtiff/tif_dir.h
@@ -60,7 +73,6 @@ include_directories( . )
 include_directories( ../../tiff/libtiff )
 
 source_group( Conf FILES ${CONF_INCS} )
-source_group( Sources FILES ${SRCS} ${INCS} )
+source_group( Sources FILES ${SRCS} ${SRCS_PLATFORM} ${INCS} )
 
-add_library( ${PROJECT_NAME} STATIC ${SRCS} ${CONF_INCS} ${INCS} )
-
+add_library( ${PROJECT_NAME} STATIC ${SRCS} ${SRCS_PLATFORM} ${CONF_INCS} ${INCS} )
