@@ -322,7 +322,9 @@ VecNMask CmpMaskNE( const Vec4<_S> &lval, const Vec4<_S> &rval )
 //==================================================================
 //==================================================================
 #if defined(_MSC_VER)
-#define DVECTOR_SIMD_ALIGN( _X_ )	__declspec(align(DMT_SIMD_ALIGN_SIZE))	_X_
+#define DVECTOR_SIMD_ALIGN( _X_ )				__declspec(align(DMT_SIMD_ALIGN_SIZE))	_X_
+#define DVECTOR_SIMD_ALIGN_ARRAY( _X_ )			__declspec(align(DMT_SIMD_ALIGN_SIZE))	_X_ []
+#define DVECTOR_SIMD_ALIGN_ARRAYN( _X_, _N_ )	__declspec(align(DMT_SIMD_ALIGN_SIZE))	_X_ [_N_]
 
 typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) VecN<float,DMT_SIMD_FLEN>			Float_;
 typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) VecN<int,DMT_SIMD_FLEN>			Int_;
@@ -333,7 +335,9 @@ typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) Vec3< VecN<float,DMT_SIMD_FLEN> >
 typedef __declspec(align(DMT_SIMD_ALIGN_SIZE)) Vec4< VecN<float,DMT_SIMD_FLEN> >	Float4_;
 
 #elif defined(__GNUC__)
-#define DVECTOR_SIMD_ALIGN( _X_ )	_X_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)))
+#define DVECTOR_SIMD_ALIGN( _X_ )				_X_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)))
+#define DVECTOR_SIMD_ALIGN_ARRAY( _X_ )			_X_ [] __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)))
+#define DVECTOR_SIMD_ALIGN_ARRAYN( _X_, _N_ )	_X_ [_N_] __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)))
 
 typedef	VecN<float,DMT_SIMD_FLEN>			Float_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)));
 typedef	VecN<int,DMT_SIMD_FLEN>				Int_ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)));

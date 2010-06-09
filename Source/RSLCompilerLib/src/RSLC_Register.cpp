@@ -43,7 +43,7 @@ std::string Register::GetName() const
 		break;
 	}
 
-	char *pStrFmt;
+	const char *pStrFmt;
 
 	if ( IsVarying() )
 		pStrFmt = "$%s%i";

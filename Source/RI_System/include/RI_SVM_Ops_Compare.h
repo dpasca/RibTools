@@ -9,6 +9,8 @@
 #ifndef RI_SVM_OPS_COMPARE_H
 #define RI_SVM_OPS_COMPARE_H
 
+#include "RI_SVM_Context.h"
+
 //==================================================================
 namespace RI
 {

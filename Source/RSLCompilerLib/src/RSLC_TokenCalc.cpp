@@ -6,6 +6,7 @@
 /// copyright info. 
 //==================================================================
 
+#include <memory>
 #include "RSLC_TokenCalc.h"
 
 //==================================================================
@@ -23,7 +24,7 @@ Token *TokenCalcBiOp(
 		  (val2.id != T_VL_BOOL_TRUE && val2.id != T_VL_BOOL_FALSE)) )
 		return NULL;
 
-	std::auto_ptr<Token> pOut_Tok( DNEW Token( val1 ) );
+	std::unique_ptr<Token> pOut_Tok( DNEW Token( val1 ) );
 
 	switch ( val1.id )
 	{

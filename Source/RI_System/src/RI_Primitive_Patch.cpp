@@ -119,7 +119,7 @@ void PatchMesh::Simplify( Hider &hider )
 	}
 	else
 	{
-		DASSTHROW( 0, ("Unrecognized Patch type %s", mpPatchType->mName ) );
+		DASSTHROW( 0, ("Unrecognized Patch type %s", mpPatchType->mName.c_str() ) );
 		//ErrHandler( E_BADARGUMENT );
 	}	
 }

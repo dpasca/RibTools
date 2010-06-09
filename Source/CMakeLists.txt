@@ -21,6 +21,10 @@ ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 #=============================================
 project (RibTools)
 
+if (CMAKE_COMPILER_IS_GNUCXX)
+	ADD_DEFINITIONS(-std=c++0x) # Enable C++0x mode for unordered_map
+ENDIF()
+
 if (MSVC)
 	# disable annoying secure CRT warnings
 	add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /nologo" )

@@ -242,7 +242,7 @@ void ExpandAssingOperators( TokNode *pNode )
 {
 	bool isComplexAssign = true;
 
-	char	*operNewStr		= "";
+	const char	*operNewStr		= "";
 	TokenID	operNewTokID	= TOKEN_N;
 
 	if ( pNode->mpToken )

@@ -7,6 +7,7 @@
 //==================================================================
 
 #include <string.h>
+#include "DUtils_Base.h"
 #include "DSafeCrt.h"
 
 //===============================================================
@@ -30,6 +31,17 @@ void strtime( char *pDest, size_t maxLen )
 	t = time( NULL );
 
 	strcpy_s( pDest, ctime( &t ) );
+}
+
+//==================================================================
+int vsnprintf_s( char *str, size_t strMaxLen, size_t size, const char *format, va_list ap )
+{
+	int len = vsnprintf( str, size, format, ap );
+
+	// verify only later.. better than nothing !
+	DASSERT( (len+1) <= strMaxLen );
+
+	return len;
 }
 
 #endif

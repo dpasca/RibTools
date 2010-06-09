@@ -519,7 +519,7 @@ size_t Parser::findOrAddTempSymbol( const char *pName )
 		isVarying = false;
 	}
 
-	auto_ptr<Symbol>	pSymbol( DNEW Symbol() );
+	std::unique_ptr<Symbol>	pSymbol( DNEW Symbol() );
 	pSymbol->mName		= pName;
 	pSymbol->mStorage	= Symbol::STOR_TEMPORARY;
 

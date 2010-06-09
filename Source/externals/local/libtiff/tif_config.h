@@ -32,11 +32,21 @@
 /* The size of a `long', as computed by sizeof. */
 #define SIZEOF_LONG 4
 
-/* Signed 64-bit type */
-#define TIFF_INT64_T signed __int64
+#if defined(_MSC_VER)
+	/* Signed 64-bit type */
+	#define TIFF_INT64_T signed __int64
 
-/* Unsigned 64-bit type */
-#define TIFF_UINT64_T unsigned __int64
+	/* Unsigned 64-bit type */
+	#define TIFF_UINT64_T unsigned __int64
+
+#else
+	/* Signed 64-bit type */
+	#define TIFF_INT64_T signed long long
+
+	/* Unsigned 64-bit type */
+	#define TIFF_UINT64_T unsigned long long
+
+#endif
 
 /* Set the native cpu bit order */
 #define HOST_FILLORDER FILLORDER_LSB2MSB

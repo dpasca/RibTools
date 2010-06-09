@@ -61,7 +61,7 @@ void Render::readArchive(
 				printf( "CMD %s ", cmdName.c_str() );
 
 				if ( cmdParams.size() )
-					printf( "(%i params)", cmdParams.size() );
+					printf( "("SIZE_T_FMT" params)", cmdParams.size() );
 
 				puts( "" );
 			}

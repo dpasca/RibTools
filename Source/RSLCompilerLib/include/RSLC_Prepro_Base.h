@@ -9,7 +9,7 @@
 #ifndef RSLC_PREPRO_BASE_H
 #define RSLC_PREPRO_BASE_H
 
-#include <hash_map>
+#include <unordered_map>
 #include "RSLC_FatChars.h"
 
 //==================================================================
@@ -20,7 +20,7 @@ namespace PREPRO
 {
 
 //==================================================================
-typedef stdext::hash_map<std::string,std::string>	SymbolsMap;
+typedef std::unordered_map<std::string,std::string>	SymbolsMap;
 
 //==================================================================
 }

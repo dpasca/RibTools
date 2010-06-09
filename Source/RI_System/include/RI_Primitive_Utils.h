@@ -9,6 +9,8 @@
 #ifndef RI_PRIMITIVE_UTILS_H
 #define RI_PRIMITIVE_UTILS_H
 
+#include "DMath/include/DVector.h"
+
 //==================================================================
 namespace RI
 {
@@ -21,8 +23,8 @@ bool MakeBoundFromUVRange( const _S &This, Bound &out_bound )
 
 	out_bound.Reset();
 
-	float	DVECTOR_SIMD_ALIGN( us ) [] = { This.mURange[0], This.mURange[1], This.mURange[0], This.mURange[1] };
-	float	DVECTOR_SIMD_ALIGN( vs ) [] = { This.mVRange[0], This.mVRange[0], This.mVRange[1], This.mVRange[1] };
+	float	DVECTOR_SIMD_ALIGN_ARRAY( us ) = { This.mURange[0], This.mURange[1], This.mURange[0], This.mURange[1] };
+	float	DVECTOR_SIMD_ALIGN_ARRAY( vs ) = { This.mVRange[0], This.mVRange[0], This.mVRange[1], This.mVRange[1] };
 
 	Float3_	Po[ DMT_SIMD_PADSIZE(4) ];
 
@@ -93,8 +95,8 @@ void MakeBoundFromUVRangeN( const _S &This, Bound &out_bound, Float3_ *out_pPo )
 	static const size_t	N_ELEMS = _DIM_LEN*_DIM_LEN;
 	static const size_t	N_ELEMS_PAD = DMT_SIMD_PADSIZE( N_ELEMS );
 
-	float	DVECTOR_SIMD_ALIGN( us ) [N_ELEMS_PAD];
-	float	DVECTOR_SIMD_ALIGN( vs ) [N_ELEMS_PAD];
+	float	DVECTOR_SIMD_ALIGN_ARRAYN( us, N_ELEMS_PAD );
+	float	DVECTOR_SIMD_ALIGN_ARRAYN( vs, N_ELEMS_PAD );
 
 	bilinearFill(
 		us,

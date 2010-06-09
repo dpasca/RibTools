@@ -93,4 +93,10 @@ typedef unsigned int	u_int;
 
 //#endif
 
+#if defined(_MSC_VER)
+	#define SIZE_T_FMT	"%Id"
+#else
+	#define SIZE_T_FMT	"%zd"
+#endif
+
 #endif

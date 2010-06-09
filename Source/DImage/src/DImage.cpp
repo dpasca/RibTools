@@ -6,9 +6,10 @@
 /// copyright info. 
 //==================================================================
 
-#include "DImage.h"
+#include <string.h>
 #include "DSystem/include/DMemory.h"
 #include "DSystem/include/DUtils.h"
+#include "DImage.h"
 
 //==================================================================
 namespace DIMG

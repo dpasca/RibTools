@@ -78,7 +78,7 @@ void Token::SetAsNumValue( double num )
 	ConstNum = num;
 
 	char buff[512];
-	sprintf_s( buff, "%Lf", ConstNum );
+	sprintf_s( buff, "%lf", ConstNum );
 	str = buff;
 }
 
@@ -103,7 +103,7 @@ bool Token::IsBiOp() const
 void Token::UpdateConstNum()
 {
 	DASSERT( id == T_VL_NUMBER );
-	sscanf_s( str.c_str(), "%Lf", &ConstNum );
+	sscanf_s( str.c_str(), "%lf", &ConstNum );
 }
 
 //==================================================================
@@ -114,7 +114,7 @@ void Token::UpdateStrFromValue()
 	if ( id == T_VL_NUMBER )
 	{
 		char buff[512];
-		sprintf_s( buff, "%Lf", ConstNum );
+		sprintf_s( buff, "%lf", ConstNum );
 		str = buff;
 	}
 	else

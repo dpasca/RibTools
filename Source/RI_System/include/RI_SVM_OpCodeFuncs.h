@@ -18,7 +18,7 @@ namespace SVM
 
 typedef void (*SlOpCodeFunc)( Context &ctx, u_int blocksN );
 
-SlOpCodeFunc	_gSlOpCodeFuncs[];
+extern SlOpCodeFunc	_gSlOpCodeFuncs[];
 
 //==================================================================
 }
