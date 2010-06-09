@@ -18,7 +18,14 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <io.h> header file. */
-#define HAVE_IO_H 1
+#if defined(_MSC_VER)
+	#define HAVE_IO_H 1
+#endif
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#if !defined(_MSC_VER)
+	#define HAVE_UNISTD_H 1
+#endif
 
 /* Define to 1 if you have the <search.h> header file. */
 #define HAVE_SEARCH_H 1
