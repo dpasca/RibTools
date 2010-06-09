@@ -11,12 +11,19 @@
 
 #include <memory.h>
 #include <stdexcept>
+#include <unordered_map>
 #include "DTypes.h"
 #include "DMemory.h"
 #include "DUtils_Base.h"
 
 //==================================================================
 static const size_t	NPOS = (size_t)-1;
+
+#if defined(_MSC_VER) && _MSC_VER < 1600	// before VS 2010 ?
+	#define DUNORD_MAP	std::tr1::unordered_map
+#else
+	#define DUNORD_MAP	std::unordered_map
+#endif
 
 //==================================================================
 template <class T>

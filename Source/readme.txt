@@ -23,9 +23,10 @@ Requirements
 
 On Windows the required tools are:
 
- * Microsoft Visual Studio 2008
+ * Microsoft Visual Studio 2008 SP1_
  * CMake_ 2.8 or better
 
+.. _SP1: http://www.microsoft.com/downloads/details.aspx?FamilyId=FBEE1648-7106-44A7-9649-6D9F6D58056E&displaylang=en
 .. _CMake: http://www.cmake.org
 
 The Code

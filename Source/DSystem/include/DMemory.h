@@ -10,6 +10,7 @@
 #define DMEMORY_H
 
 #include <new>
+#include <memory>
 
 //==================================================================
 #if defined(_MSC_VER)
@@ -46,5 +47,9 @@ namespace DMEM
 
 //==================================================================
 }
+
+#if defined(_MSC_VER) && _MSC_VER < 1600	// before VS 2010 ?
+	#define unique_ptr	auto_ptr	// WARNING: not STL-safe
+#endif
 
 #endif

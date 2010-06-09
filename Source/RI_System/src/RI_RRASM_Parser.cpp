@@ -16,9 +16,6 @@
 #include "RI_RRASM_OpCodeDefs.h"
 
 //==================================================================
-using std::auto_ptr;
-
-//==================================================================
 namespace RI
 {
 //==================================================================
@@ -377,7 +374,7 @@ void Parser::parseDataLine( char lineBuff[], int lineCnt )
 		onError( "Invalid type definition: '%s'", pTok );
 	}
 
-	auto_ptr<Symbol>	pSymbol( DNEW Symbol( params ) );
+	std::unique_ptr<Symbol>	pSymbol( DNEW Symbol( params ) );
 
 	int	defParamCnt = 0;
 

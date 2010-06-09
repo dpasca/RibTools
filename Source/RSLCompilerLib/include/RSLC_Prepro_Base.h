@@ -9,7 +9,7 @@
 #ifndef RSLC_PREPRO_BASE_H
 #define RSLC_PREPRO_BASE_H
 
-#include <unordered_map>
+#include "DSystem/include/DContainers.h"
 #include "RSLC_FatChars.h"
 
 //==================================================================
@@ -20,7 +20,7 @@ namespace PREPRO
 {
 
 //==================================================================
-typedef std::unordered_map<std::string,std::string>	SymbolsMap;
+typedef DUNORD_MAP<std::string,std::string>	SymbolsMap;
 
 //==================================================================
 }

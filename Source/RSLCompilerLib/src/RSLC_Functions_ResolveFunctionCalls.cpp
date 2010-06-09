@@ -6,7 +6,6 @@
 /// copyright info. 
 //==================================================================
 
-#include <unordered_map>
 #include "RSLC_Tree.h"
 #include "RSLC_Functions.h"
 #include "RSLC_Exceptions.h"
@@ -18,7 +17,7 @@
 namespace RSLC
 {
 
-typedef std::unordered_map<const TokNode*,TokNode*>	NodeToNodeMap;
+typedef DUNORD_MAP<const TokNode*,TokNode*>	NodeToNodeMap;
 
 //==================================================================
 static TokNode *cloneBranch_BuildNodes(
