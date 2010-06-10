@@ -56,15 +56,17 @@ As obtained from the repository:
 **externals/**          External libraries included automatically by SVN
 **RI_System/**          Core rendering engine and RenderMan-interface
 **RibRender/**          RibRender application project and sources
-**RibRenderLib/**       A library that groups most functionalities used by both *RibRender *and *RibRenderToy*
+**RibRenderLib/**       A library that groups most functionalities used by both *RibRender* and *RibRenderToy*
 **RibRenderServer/**    RibRenderServer application project and sources
 **RibRenderToy/**       RibRenderToy application project and sources
 **RSLCompilerCmd/**     RSLCompilerCmd application project and sources
 **RSLCompilerLib/**     RSL compiler library
 *CMakeLists.txt*        Root CMake file to create the build files
 *license.txt*           License file
-*make_build.bat*        Script that creates the ``../build`` directory and its contents
-*make_distrib.bat*      Script that creates the ``../Distrib`` directory and its contents
+*make_build.bat*        Script that creates the ``../build`` directory and its contents (Windows)
+*make_build.sh*         Script that creates the ``../build`` directory and its contents (Linux/OSX)
+*make_distrib.bat*      Script that creates the ``../Distrib`` directory and its contents (Windows)
+*make_distrib.sh*       Script that creates the ``../Distrib`` directory and its contents (Linux/OSX)
 *make_install.bat*      Script that builds a .zip file for binary distribution (assumes EXEs have been manually compiled with VS)
 *readme.txt*            Readme file in txt format (and reST)
 *readme.html*           Readme file in HTML format
