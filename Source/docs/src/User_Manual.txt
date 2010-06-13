@@ -30,13 +30,13 @@ Launch the application, **right click** in the window to open a menu from which 
 
 |MenuImg|  |RendImg|
 
-.. |MenuImg| image:: images/develop-select-airplane-scene.png
-    :width: 300px
+.. |MenuImg| image:: ../images/develop-select-airplane-scene.png
+    :width: 7cm
 
-.. |RendImg| image:: images/airplane.png
-    :width: 300px
+.. |RendImg| image:: ../images/sample_renders/airplane.png
+    :width: 7cm
 
-***Note*** that *RibRenderToy* always redirects the rendering to the application window, ignoring any target specified by the ``Display`` command in the RIB files.
+**Note** that *RibRenderToy* always redirects the rendering to the application window, ignoring any target specified by the ``Display`` command in the RIB files.
 
 RibRender
 ------------
@@ -64,7 +64,8 @@ From a command line, type ``RibRender -h`` to get the following help:
      RibRender TestScenes/Airplane.rib -server 192.168.1.107 -server 192.168.1.108:30000
      RibRender TestScenes/Airplane.rib -forcedlongdim 1024
 
-***Note***: RIB scene description files usually specify the output format with an explicit ``Display`` command.
+
+**Note**: RIB scene description files usually specify the output format with an explicit ``Display`` command.
 Therefore, a RIB file may decide whether the output will be in the form of an image file (usually TIFF) or in a window for display.
 If no ``Display`` command is found, *RibRender* will automatically generate an RGBA TIFF image named ``frame0001.tif``.
 
@@ -89,12 +90,12 @@ From a command line, type ``RibRender -h`` to get the following help:
      RibRenderServer
      RibRenderServer -port 31111
 
-***Note***: *RibRenderServer* gives an additional capability to distribute rendering but it is **not** necessary as *RibRender* is fully capable of rendering on its own.
+**Note**: *RibRenderServer* gives an additional capability to distribute rendering but it is **not** necessary as *RibRender* is fully capable of rendering on its own.
 
 RSLCompilerCmd
 ---------------
 
-This command is included only for **internal testing purposes**. It compiles a .sl file into a RibRender .rrasm file type. Such operation is done internally by the renderer, and ***the user does not normally need to run this*** command explicitly.
+This command is included only for **internal testing purposes**. It compiles a .sl file into a RibRender .rrasm file type. Such operation is done internally by the renderer, and **the user does not normally need to run this** command explicitly.
 
 General Usage
 =============

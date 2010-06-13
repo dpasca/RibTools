@@ -14,7 +14,7 @@ This document is about building *RibTools*.
 
 For usage, see the `User Manual`_
 
-.. _User Manual: DistribSrc/base/docs/User_Manual.html
+.. _User Manual: docs/User_Manual.pdf
 
 Requirements
 ============
@@ -45,32 +45,32 @@ As obtained from the repository:
 
 **Source/**
 
-======================  =======================================================
-**DImage/**             Bitmap images library
-**DispDrivers/**        Display drivers sources
-**DistribSrc/**         Source assets
-**DMath/**              Math library sources and project
-**docs/**               Documentation related files (currently just some images)
-**DSystem/**            Base system library sources and projects
-**external/**           External libraries, directly included
-**externals/**          External libraries included automatically by SVN
-**RI_System/**          Core rendering engine and RenderMan-interface
-**RibRender/**          RibRender application project and sources
-**RibRenderLib/**       A library that groups most functionalities used by both *RibRender* and *RibRenderToy*
-**RibRenderServer/**    RibRenderServer application project and sources
-**RibRenderToy/**       RibRenderToy application project and sources
-**RSLCompilerCmd/**     RSLCompilerCmd application project and sources
-**RSLCompilerLib/**     RSL compiler library
-*CMakeLists.txt*        Root CMake file to create the build files
-*license.txt*           License file
-*make_build.bat*        Script that creates the ``../build`` directory and its contents (Windows)
-*make_build.sh*         Script that creates the ``../build`` directory and its contents (Linux/OSX)
-*make_distrib.bat*      Script that creates the ``../Distrib`` directory and its contents (Windows)
-*make_distrib.sh*       Script that creates the ``../Distrib`` directory and its contents (Linux/OSX)
-*make_install.bat*      Script that builds a .zip file for binary distribution (assumes EXEs have been manually compiled with VS)
-*readme.txt*            Readme file in txt format (and reST)
-*readme.html*           Readme file in HTML format
-======================  =======================================================
+========================   =======================================================
+**DImage/**                Bitmap images library
+**DispDrivers/**           Display drivers sources
+**DistribSrc/**            Source assets
+**DMath/**                 Math library sources and project
+**docs/**                  Documentation related files (currently just some images)
+**DSystem/**               Base system library sources and projects
+**external/**              External libraries, directly included
+**externals/**             External libraries included automatically by SVN
+**RI_System/**             Core rendering engine and RenderMan-interface
+**RibRender/**             RibRender application project and sources
+**RibRenderLib/**          A library that groups most functionalities used by both *RibRender* and *RibRenderToy*
+**RibRenderServer/**       RibRenderServer application project and sources
+**RibRenderToy/**          RibRenderToy application project and sources
+**RSLCompilerCmd/**        RSLCompilerCmd application project and sources
+**RSLCompilerLib/**        RSL compiler library
+*CMakeLists.txt*           Root CMake file to create the build files
+*license.txt*              License file
+*make_build.bat*           Script that creates the ``../build`` directory and its contents (Windows)
+*make_build.sh*            Script that creates the ``../build`` directory and its contents (Linux/OSX)
+*make_distrib.bat*         Script that creates the ``../Distrib`` directory and its contents (Windows)
+*make_distrib.sh*          Script that creates the ``../Distrib`` directory and its contents (Linux/OSX)
+*make_install.bat*         Script that builds a .zip file for binary distribution (assumes EXEs have been manually compiled with VS)
+*readme.txt*               Readme file in txt format (and reST)
+*readme.html*              Readme file in HTML format
+========================   =======================================================
 
 The Distrib Directory
 ======================
@@ -80,7 +80,7 @@ A directory named ``Distrib`` is generated outside ``Source`` as part of the bui
 The ``Distrib`` directory contains both data coming from ``DistribSrc`` and executables generated when compiling with Visual Studio (see below).
 
 When running, it's is advised to have the environment variable ``RIBTOOLS_DIR`` set to the ``Distrib`` directory.
-For more informations on how to setup the environment variable, see the instructions at the [[User_Manual#General_Usage|General Usage]] section of the *User Manual*.
+For more informations on how to setup the environment variable, see the instructions at the *General Usage* section of the `User Manual`_.
 
 Compiling and running from VS
 =============================
@@ -127,8 +127,8 @@ Setup the working directory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     * Right-click on the application project (e.g. *RibRenderToy*) and select **Properties** from the pop-up menu
-    * From the list at the left of the dialog, select ***Configuration Properties -> Debugging***
-        * Where it says ***Working Directory*** set it to ``..\..\Distrib`` 
+    * From the list at the left of the dialog, select **Configuration Properties -> Debugging**
+        * Where it says **Working Directory** set it to ``..\..\Distrib`` 
 
 **Note:** Set this for all the configurations (*Release* and *Debug*).
 A common mistake is to set up the *Working Directory* only for the current configuration and forget about the other configurations.
