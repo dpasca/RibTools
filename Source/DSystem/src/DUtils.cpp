@@ -149,17 +149,22 @@ void StrStripBeginEndWhite( char *pStr )
 //==================================================================
 const char *StrStrI( const char *pStr, const char *pSearch )
 {
+	// ANSI strstr behavior: it's a match if search is empty
+	if NOT( pSearch[0] )
+		return pStr;
+
 	for (size_t i=0; pStr[i]; ++i)
 	{
 		if ( tolower(pSearch[0]) == tolower(pStr[i]) )
 		{
-			for (size_t j=0; pSearch[j]; ++j)
-			{
+			size_t	j = 0;
+			for (; pSearch[j]; ++j)
 				if ( tolower(pStr[i+j]) != tolower(pSearch[j]) )
-					return NULL;
-			}
+					break;
 
-			return pStr + i;
+			// reached the end of the search string ?
+			if ( pSearch[j] == 0 )
+				return pStr + i;	// it's a match
 		}
 	}
 
