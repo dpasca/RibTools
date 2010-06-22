@@ -33,7 +33,7 @@ bool	Noise::mStart = true;
 	r1 = r0 - 1.f;
 
 //==================================================================
-void normalize2( float v[2] )
+inline void normalize2( float v[2] )
 {
 	float s = DSqrt(v[0] * v[0] + v[1] * v[1]);
 	v[0] = v[0] / s;
@@ -41,7 +41,7 @@ void normalize2( float v[2] )
 }
 
 //==================================================================
-void normalize3( float v[3] )
+inline void normalize3( float v[3] )
 {
 	float s = DSqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 	v[0] = v[0] / s;
