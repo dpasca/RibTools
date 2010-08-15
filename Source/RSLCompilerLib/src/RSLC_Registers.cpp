@@ -31,6 +31,7 @@ static void assignRegisters_sub( TokNode *pNode, int &io_regIdx )
 	{
 		if (!pVar->HasBaseVal() &&
 			!pVar->mIsGlobal &&
+			!pVar->mIsArray &&
 			!pVar->IsRegisterAssigned() )
 		{
 			pNode->GetVarPtr()->AssignRegister( io_regIdx );

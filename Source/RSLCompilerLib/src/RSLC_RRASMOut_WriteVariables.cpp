@@ -29,7 +29,7 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	//--- write storage
 	const char *pStorage = "ERROR!!!";
 
-	if ( var.HasBaseVal() )	pStorage = "temporary"; else
+	if ( var.HasBaseVal() || var.mIsArray )	pStorage = "temporary"; else
 	if ( var.mIsGlobal )	pStorage = "global"; else
 	if ( var.mIsSHParam )	pStorage = "parameter"; else
 	{
@@ -124,20 +124,40 @@ static void writeShaderParamVariables( FILE *pFile, TokNode *pNode )
 }
 
 //==================================================================
+static void writeVarsRec( FILE *pFile, TokNode *pNode )
+{
+	// write all used global vars and constants
+	switch ( pNode->GetBlockType() )
+	{
+	case BLKT_ROOT:
+	case BLKT_CODEBLOCK:
+		{
+		const DVec<Variable> &vars = pNode->GetVars();
+		for (size_t i=0; i < vars.size(); ++i)
+		{
+			const Variable	&var = vars[i];
+
+			// only write variables that are not shader params
+			// that are used and that are not registers
+			if (!var.mIsSHParam &&
+				var.mIsUsed &&
+				!var.IsRegisterAssigned() )
+				writeVariable( pFile, var );
+		}
+		}
+		break;
+	}
+
+	for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+	{
+		writeVarsRec( pFile, pNode->mpChilds[i] );
+	}
+}
+
+//==================================================================
 void WriteVariables( FILE *pFile, TokNode *pNode )
 {
-	const DVec<Variable> &vars = pNode->GetVars();
-
-	// write all used global vars and constants
-
-	for (size_t i=0; i < vars.size(); ++i)
-	{
-		const Variable	&var = vars[i];
-
-		//if ( !var.mIsSHParam && ((var.mIsGlobal && var.mIsUsed) || !var.mIsGlobal) )
-		if ( !var.mIsSHParam && var.mIsUsed )
-			writeVariable( pFile, var );
-	}
+	writeVarsRec( pFile, pNode );
 
 	fprintf_s( pFile, "\n" );
 

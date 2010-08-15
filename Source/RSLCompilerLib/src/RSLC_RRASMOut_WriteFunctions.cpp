@@ -305,6 +305,12 @@ static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
 		{
 			if ( buildExpression_biOp_handleArrSet( pFile, pNode, o1Str, o2Str, l1, l2 ) )
 				return;
+
+			// is the child of this square braket a function declaration ?
+			// if so, skip this, because it's only a declaration
+			const TokNode *pVarNode = pNode->GetChildTry( 0 );
+			if ( pVarNode->mVarLink.GetVarPtr()->mpDefNameNode == pVarNode )
+				return;
 		}
 
 		Register	reg = pNode->GetRegister();

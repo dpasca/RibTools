@@ -17,6 +17,7 @@ void arrUse( float rgb[3] )
 {
 	float a = rgb[0];
 	Oi = a;
+	float localArr[3];
 }
 
 //==================================================================
@@ -25,6 +26,12 @@ surface test11( float rgbcol[(1+1+1)] ) //{.5,.5,.5}
 	float	a, b, c;
 
 	a = b = c = 1;
+
+	float localArr[4];
+	localArr[0] = 1;
+	localArr[1] = b;
+
+	Oi = localArr[1];
 
 	arrChange( 2, rgbcol );
 
