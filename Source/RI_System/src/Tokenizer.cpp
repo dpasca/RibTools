@@ -134,9 +134,29 @@ bool Tokenizer::AddChar( char ch )
 	{
 		if ( ch == '#' )
 		{
-			//setDataType();
-			mStateInComment = true;
-			//mState = COMMENT;
+			if ( mStateInComment )
+			{
+				// handle the ## case
+				if ( mStateCommentStarted )
+				{
+					// not a comment anymore
+					// and return
+					mStateInComment = false;
+					mStateCommentStarted = false;
+					return false;
+				}
+			}
+			else
+			{
+				// it's a comment, and it's the first char of it
+				mStateInComment = true;
+
+				// This is to handle ## at the beginning of the line
+				// ... for the time being, simply ignore it
+				//mStateCommentStarted = true;
+				mStateCommentStarted = false;
+				return false;
+			}
 		}
 	}
 	
@@ -150,6 +170,9 @@ bool Tokenizer::AddChar( char ch )
 			mStateInComment = false;
 			//ResetState();
 		}
+
+		// not start of a comment anymore 8)
+		mStateCommentStarted = false;
 	}
 	else
 	if ( mState == UNKNOWN )

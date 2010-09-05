@@ -200,6 +200,7 @@ public:
 		);
 
 	void Polygon( ParamList &params );
+	void PointsPolygons( ParamList &params );
 	void PointsGeneralPolygons( ParamList &params );
 
 	// --- Non RI commands

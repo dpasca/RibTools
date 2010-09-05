@@ -26,6 +26,7 @@ class Tokenizer
 	
 	StateEnum		mState;
 	bool			mStateInComment;
+	bool			mStateCommentStarted;
 	int				mLineNumber;
 
 	int				mDataInt;
@@ -82,6 +83,7 @@ public:
 	{
 		mState = UNKNOWN;
 		mStateInComment = false;
+		mStateCommentStarted = false;
 		mCurToken = "";
 		mArrayType = 0;
 	}

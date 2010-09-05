@@ -61,6 +61,7 @@ bool Translator::addCommand_prims(
 									}	else
 
 	if ( nm == "Polygon" )				{ geN( 2, p ); mState.Polygon( p ); }	else
+	if ( nm == "PointsPolygons" )		{ geN( 4, p ); mState.PointsPolygons( p ); } else
 	if ( nm == "PointsGeneralPolygons" ){ geN( 5, p ); mState.PointsGeneralPolygons( p ); }
 	else
 		return false;

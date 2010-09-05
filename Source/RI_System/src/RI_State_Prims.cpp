@@ -118,6 +118,12 @@ void State::Polygon( ParamList &params )
 }
 
 //==================================================================
+void State::PointsPolygons( ParamList &params )
+{
+	insertPrimitive( DNEW RI::PointsPolygons( params, mGlobalSyms ) );
+}
+	
+//==================================================================
 void State::PointsGeneralPolygons( ParamList &params )
 {
 	insertPrimitive( DNEW RI::PointsGeneralPolygons( params, mGlobalSyms ) );

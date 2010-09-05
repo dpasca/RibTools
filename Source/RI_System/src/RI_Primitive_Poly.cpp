@@ -107,14 +107,7 @@ void Polygon::Simplify( Hider &hider )
 }
 
 //==================================================================
-/// 
-//==================================================================
-PointsGeneralPolygons::PointsGeneralPolygons( ParamList &params, const SymbolList &globalSymbols ) :
-	ComplexPrimitiveBase(POINTSGENERALPOLYGONS),
-	mParams(params)
-{
-}
-
+// VertInfo
 //==================================================================
 static const size_t MAX_VERT_INFO = 32;
 struct VertInfo
@@ -167,6 +160,103 @@ static void tessellateToBilinearPatches(
 }
 
 //==================================================================
+/// 
+//==================================================================
+PointsPolygons::PointsPolygons( ParamList &params, const SymbolList &globalSymbols ) :
+	ComplexPrimitiveBase(POINTSGENERALPOLYGONS),
+	mParams(params)
+{
+}
+
+//==================================================================
+static void buildVInfoForPoly( const ParamList &params, size_t fromParamIdx, int &out_PValuesParIdx, VertInfo out_vinfo[MAX_VERT_INFO] )
+{
+	out_PValuesParIdx = -1;
+	size_t		vinfoN = 0;
+
+	for (size_t pi=fromParamIdx; pi < params.size(); ++pi)
+	{
+		if NOT( params[pi].IsString() )
+		{
+			DASSTHROW( 0, ("Expecting parameter name !") );
+			return;
+		}
+
+		if ( (pi+1) >= params.size() )
+		{
+			DASSTHROW( 0, ("Missing values") );
+		}
+
+		const char *pNameParam = params[pi].PChar();
+
+		++pi;
+
+		if ( 0 == strcasecmp( pNameParam, "P" ) )
+		{
+			out_PValuesParIdx = (int)pi;
+		}
+
+		out_vinfo[vinfoN].pName	= pNameParam;
+		out_vinfo[vinfoN].parIdx= (int)pi;
+		++vinfoN;
+	}
+
+	if ( out_PValuesParIdx == -1 )
+	{
+		DASSTHROW( 0, ("Missing 'P'") );
+		return;
+	}
+
+}
+
+//==================================================================
+void PointsPolygons::Simplify( Hider &hider )
+{
+	size_t		nvertsN = mParams[0].IntArrSize();
+	const int	*pNVerts = mParams[0].PInt();
+
+	size_t		vertsN = mParams[1].IntArrSize();
+	const int	*pVerts = mParams[1].PInt();
+
+	VertInfo	vinfo[MAX_VERT_INFO];
+	int			PValuesParIdx;
+	buildVInfoForPoly( mParams, 2, PValuesParIdx, vinfo );
+
+	const FltVec	&paramP = mParams[PValuesParIdx].NumVec();
+
+	size_t nVertsIdx	= 0;
+	size_t idxVertsIdx	= 0;
+
+	for (size_t i=0; i < nvertsN; ++i)
+	{
+		DASSTHROW( pNVerts[i] >= 0, ("Negative verts count ?!") );
+
+		size_t nVerts = (size_t)pNVerts[i];
+
+		DASSERT( (nVertsIdx+nVerts) <= nvertsN );
+
+		tessellateToBilinearPatches(
+						hider,
+						paramP,
+						&pVerts[ idxVertsIdx ],
+						nVerts,
+						mParams,
+						*this );
+
+		idxVertsIdx += nVerts;
+	}
+}
+
+//==================================================================
+/// 
+//==================================================================
+PointsGeneralPolygons::PointsGeneralPolygons( ParamList &params, const SymbolList &globalSymbols ) :
+	ComplexPrimitiveBase(POINTSGENERALPOLYGONS),
+	mParams(params)
+{
+}
+
+//==================================================================
 void PointsGeneralPolygons::Simplify( Hider &hider )
 {
 	size_t		nloopsN = mParams[0].IntArrSize();
@@ -179,42 +269,8 @@ void PointsGeneralPolygons::Simplify( Hider &hider )
 	const int	*pVerts = mParams[2].PInt();
 
 	VertInfo	vinfo[MAX_VERT_INFO];
-	size_t		vinfoN = 0;
-
-	int	PValuesParIdx = -1;
-
-	for (size_t pi=3; pi < mParams.size(); ++pi)
-	{
-		if NOT( mParams[pi].IsString() )
-		{
-			DASSTHROW( 0, ("Expecting parameter name !") );
-			return;
-		}
-
-		if ( (pi+1) >= mParams.size() )
-		{
-			DASSTHROW( 0, ("Missing values") );
-		}
-
-		const char *pNameParam = mParams[pi].PChar();
-
-		++pi;
-
-		if ( 0 == strcasecmp( pNameParam, "P" ) )
-		{
-			PValuesParIdx = (int)pi;
-		}
-
-		vinfo[vinfoN].pName	= pNameParam;
-		vinfo[vinfoN].parIdx= (int)pi;
-		++vinfoN;
-	}
-
-	if ( PValuesParIdx == -1 )
-	{
-		DASSTHROW( 0, ("Missing 'P'") );
-		return;
-	}
+	int			PValuesParIdx;
+	buildVInfoForPoly( mParams, 3, PValuesParIdx, vinfo );
 
 	const FltVec	&paramP = mParams[PValuesParIdx].NumVec();
 

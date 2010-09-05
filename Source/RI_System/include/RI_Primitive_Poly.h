@@ -32,6 +32,20 @@ public:
 };
 
 //==================================================================
+/// PointsPolygons
+//==================================================================
+class PointsPolygons : public ComplexPrimitiveBase
+{
+public:
+	ParamList		mParams;
+
+public:
+	PointsPolygons( ParamList &params, const SymbolList &globalSymbols );
+
+		void Simplify( Hider &hider );
+};
+
+//==================================================================
 /// PointsGeneralPolygons
 //==================================================================
 class PointsGeneralPolygons : public ComplexPrimitiveBase
