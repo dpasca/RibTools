@@ -32,6 +32,13 @@ class PrimitiveBase
 {
 	RefCount	mRefCnt;
 
+#if defined(DEBUG) || defined(_DEBUG)
+public:
+	const char	*mpDbg_SrcArchive;
+	int			mDbg_SrcLine;
+private:
+#endif
+
 public:
 	enum Type
 	{
@@ -70,6 +77,10 @@ public:
 */
 
 	PrimitiveBase( Type type ) :
+#if defined(DEBUG) || defined(_DEBUG)
+		mpDbg_SrcArchive(NULL),
+		mDbg_SrcLine(-1),
+#endif
 		mType(type),
 		mpAttribs(NULL),
 		mpTransform(NULL)

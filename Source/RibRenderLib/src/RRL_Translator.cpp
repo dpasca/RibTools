@@ -140,8 +140,10 @@ void Translator::addFormatCmd( RI::ParamList &p )
 //==================================================================
 Translator::RetCmd
 	Translator::AddCommand(
-					const DStr		&cmdName,
-					RI::ParamList	&cmdParams )
+				const DStr		&cmdName,
+				RI::ParamList	&cmdParams,
+				const char		*pFileName,
+				int				cmdLine )
 {
 	const DStr	&nm = cmdName;
 	RI::ParamList	&p = cmdParams;
@@ -252,7 +254,7 @@ Translator::RetCmd
 	else
 	{
 		// primitives
-		if ( addCommand_prims( nm, p ) )
+		if ( addCommand_prims( nm, p, pFileName, cmdLine ) )
 			return CMD_GENERIC;
 
 		// transformations

@@ -15,8 +15,10 @@ namespace RRL
 
 //==================================================================
 bool Translator::addCommand_prims(
-							const DStr		&nm,
-							RI::ParamList	&p )
+		const DStr		&nm,
+		RI::ParamList	&p,
+		const char		*pFileName,
+		int				cmdLine )
 {
 	static RtToken tlPatch0[]			= { RI_BILINEAR, RI_BICUBIC, 0 };
 
@@ -65,6 +67,10 @@ bool Translator::addCommand_prims(
 	if ( nm == "PointsGeneralPolygons" ){ geN( 5, p ); mState.PointsGeneralPolygons( p ); }
 	else
 		return false;
+
+#if defined(DEBUG) || defined(_DEBUG)
+	mState.mParams.mpFramework->Dbg_MarkLastPrim( pFileName, cmdLine );
+#endif
 
 	return true;
 }

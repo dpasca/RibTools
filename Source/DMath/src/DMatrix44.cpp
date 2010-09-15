@@ -73,7 +73,7 @@ Matrix44 Matrix44::GetInverse( bool *out_pSuccess ) const
 
 	float det = det4x4(a1,a2,a3,a4,b1,b2,b3,b4,c1,c2,c3,c4,d1,d2,d3,d4);
 
-	if ( fabs(det) < 0.000001f )
+	if ( fabs(det) < 1e-11f )
 	{
 		DASSERT( 0 );
 		return out;

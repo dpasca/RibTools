@@ -28,8 +28,10 @@ void Inst_Texture( Context &ctx, u_int blocksN )
 	int				stOffs[8][2];
 	int				stSteps[8][2];
 
+	Texture	*pTexture = ctx.mpAttribs->GetTexture( pName->mStr );
+	DASSERT( pTexture != NULL );
 	RCOwn<Texture>	oTex;
-	oTex.Borrow( ctx.mpAttribs->GetTexture( pName->mStr ) );
+	oTex.Borrow( pTexture );
 
 	if ( N_COORDS >= 1 )
 	{

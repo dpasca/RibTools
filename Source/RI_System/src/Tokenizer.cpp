@@ -130,7 +130,7 @@ static bool isNewLine( char ch )
 //===============================================================
 bool Tokenizer::AddChar( char ch )
 {
-	if ( mState != STRING )
+	if ( mState != STRING && !mIsInArrayItemQuotedString )
 	{
 		if ( ch == '#' )
 		{
@@ -246,6 +246,35 @@ bool Tokenizer::AddChar( char ch )
 bool Tokenizer::inputHandleArray( char ch )
 {
 	bool	isEndOfArray = (ch == ']');
+
+	if ( ch == '"' )
+	{
+		if ( mIsInArrayItemQuotedString )
+		{
+			mIsInArrayItemQuotedString = false;
+			if ( mArrayType && mArrayType != 's' )
+			{
+				DASSTHROW( false, ("Cannot mix strings with numerical values in arrays") );
+			}
+			//mCurToken += ch;
+			return false;
+		}
+		else
+		{
+			mIsInArrayItemQuotedString = true;
+			mArrayType = 's';
+			//mCurToken += ch;
+			return false;
+		}
+	}
+	else
+	{
+		if ( mIsInArrayItemQuotedString )
+		{
+			mCurToken += ch;
+			return false;
+		}
+	}
 	
 	if ( isWhite( ch ) || isEndOfArray )
 	{
@@ -256,7 +285,7 @@ bool Tokenizer::inputHandleArray( char ch )
 		{
 			if ( isStringStr( mCurToken.c_str() ) )
 			{
-				// initialize this array to sring
+				// initialize this array to string
 				if ( mArrayType == 0 )
 					mArrayType = 's';
 
@@ -299,14 +328,7 @@ bool Tokenizer::inputHandleArray( char ch )
 			else
 			if ( mArrayType == 's' )
 			{
-				if ( mCurToken.length() >= 2 )
-				{
-					std::string	tmp = mCurToken.substr( 1, mCurToken.length()-2 );
-
-					mStringArray.push_back( tmp );
-				}
-				else
-					mStringArray.push_back( "" );
+				mStringArray.push_back( mCurToken );
 			}
 			
 			mCurToken = "";

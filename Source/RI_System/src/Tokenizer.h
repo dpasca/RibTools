@@ -37,6 +37,8 @@ class Tokenizer
 	DVec<int>		mIntArray;
 	DVec<DStr>		mStringArray;
 	char			mArrayType;
+	bool			mIsArrayOfQuotedStrings;
+	bool			mIsInArrayItemQuotedString;
 	std::string		mCurToken;
 
 public:
@@ -86,6 +88,8 @@ public:
 		mStateCommentStarted = false;
 		mCurToken = "";
 		mArrayType = 0;
+		mIsArrayOfQuotedStrings = false;
+		mIsInArrayItemQuotedString = false;
 	}
 
 	const char			*GetDataAphaNum()		const { DASSERT( mDataType == DT_ALPHANUMERIC ); return mDataAlphanum.c_str();	}

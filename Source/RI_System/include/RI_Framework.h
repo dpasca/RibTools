@@ -39,6 +39,10 @@ private:
 //==================================================================
 class Framework
 {
+#if defined(DEBUG) || defined(_DEBUG)
+	DVec<DStr>	mDbg_SrcFileNames;
+#endif
+
 public:
 	class Params
 	{
@@ -90,6 +94,10 @@ public:
 	void Insert(	PrimitiveBase		*pPrim,
 					const Attributes	&attr,
 					const Transform		&xform );
+
+#if defined(DEBUG) || defined(_DEBUG)
+	void Dbg_MarkLastPrim( const char *pSrcFileName, int srcLine );
+#endif
 
 	void WorldEnd();
 

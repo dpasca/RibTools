@@ -350,6 +350,27 @@ void Framework::WorldEnd()
 	}
 }
 
+//==================================================================
+#if defined(DEBUG) || defined(_DEBUG)
+void Framework::Dbg_MarkLastPrim( const char *pSrcFileName, int srcLine )
+{
+	mHider.mpPrims.back()->mDbg_SrcLine = srcLine;
+
+	for (size_t i=0; i < mDbg_SrcFileNames.size(); ++i)
+	{
+		const char *pStr = mDbg_SrcFileNames[i].c_str();
+		if ( 0 == strcasecmp( pStr, pSrcFileName ) )
+		{
+			mHider.mpPrims.back()->mpDbg_SrcArchive = pStr;
+			return;
+		}
+	}
+
+	mDbg_SrcFileNames.push_back( pSrcFileName );
+	mHider.mpPrims.back()->mpDbg_SrcArchive = mDbg_SrcFileNames.back().c_str();
+}
+#endif
+
 
 
 //==================================================================

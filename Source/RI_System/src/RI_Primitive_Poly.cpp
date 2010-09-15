@@ -233,7 +233,7 @@ void PointsPolygons::Simplify( Hider &hider )
 
 		size_t nVerts = (size_t)pNVerts[i];
 
-		DASSERT( (nVertsIdx+nVerts) <= nvertsN );
+		DASSERT( (nVertsIdx+nVerts) <= vertsN );
 
 		tessellateToBilinearPatches(
 						hider,

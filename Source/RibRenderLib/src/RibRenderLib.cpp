@@ -68,7 +68,12 @@ void Render::readArchive(
 
 			try {
 				// add a command
-				Translator::RetCmd	retCmd = translator.AddCommand( cmdName, cmdParams );
+				Translator::RetCmd	retCmd =
+								translator.AddCommand(
+												cmdName,
+												cmdParams,
+												pFileName,
+												cmdLine );
 
 				switch ( retCmd )
 				{

@@ -55,7 +55,9 @@ public:
 
 	RetCmd AddCommand(
 				const DStr		&cmdName,
-				RI::ParamList	&cmdParams );
+				RI::ParamList	&cmdParams,
+				const char		*pFileName,
+				int				cmdLine );
 
 	void ErrHandler( RI::Error errCode )
 	{
@@ -73,7 +75,12 @@ private:
 
 	void addFormatCmd( RI::ParamList &p );
 
-	bool addCommand_prims( const DStr &nm, RI::ParamList &p );
+	bool addCommand_prims(
+		const DStr		&nm,
+		RI::ParamList	&p,
+		const char		*pFileName,
+		int				cmdLine );
+
 	bool addCommand_options( const DStr &nm, RI::ParamList &p );
 	bool addCommand_transforms( const DStr &nm, RI::ParamList &p );
 
