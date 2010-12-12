@@ -23,6 +23,8 @@ public:
 	{
 		m_w = (DU32)(seed & 0xffffffff);
 		m_z = (DU32)((seed >> 32) & 0xffffffff);
+		m_w += 36969;
+		m_z += 18000;
 	}
 
 	DU32 NextU32()

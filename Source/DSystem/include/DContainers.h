@@ -212,7 +212,14 @@ public:
 
 			if ( mpData )
 			{
-				memcpy( newPData, mpData, mSize * sizeof(T) );
+				//memcpy( newPData, mpData, mSize * sizeof(T) );
+
+				for (size_t i=0; i < mSize; ++i)
+				{
+					new (&newPData[i]) T;
+					newPData[i] = mpData[i];
+					mpData[i].~T();
+				}
 
 				DDELETE_ARRAY( (u_char *)mpData );
 			}
@@ -284,7 +291,8 @@ public:
 
 	void push_back( const T &val )
 	{
-		T	tmp = val;	// TODO: why needs this ?!
+		// necessary for things such as push_back( back() );
+		T	tmp = val;
 		*grow() = tmp;
 	}
 
