@@ -124,7 +124,7 @@ public:
 	Vec3 operator +=(const Vec3 &rval)	{ *this = *this + rval; return *this; }
 
 	friend bool operator ==( const Vec3 &lval, const Vec3 &rval ) { return (lval.v3[0] == rval.v3[0]) && (lval.v3[1] == rval.v3[1]) && (lval.v3[2] == rval.v3[2]); }
-	friend bool operator !=( const Vec3 &lval, const Vec3 &rval ) { return (lval.v3[0] != rval.v3[0]) && (lval.v3[1] != rval.v3[1]) && (lval.v3[2] != rval.v3[2]); }
+	friend bool operator !=( const Vec3 &lval, const Vec3 &rval ) { return (lval.v3[0] != rval.v3[0]) || (lval.v3[1] != rval.v3[1]) || (lval.v3[2] != rval.v3[2]); }
 
 	Vec3 GetNormalized() const
 	{
@@ -252,7 +252,7 @@ public:
 	Vec4 operator +=(const Vec4 &rval)	{ *this = *this + rval; return *this; }
 
 	friend bool operator ==( const Vec4 &lval, const Vec4 &rval ) { return (lval.v4[0] == rval.v4[0]) && (lval.v4[1] == rval.v4[1]) && (lval.v4[2] == rval.v4[2]) && (lval.v4[3] == rval.v4[3]); }
-	friend bool operator !=( const Vec4 &lval, const Vec4 &rval ) { return (lval.v4[0] != rval.v4[0]) && (lval.v4[1] != rval.v4[1]) && (lval.v4[2] != rval.v4[2]) && (lval.v4[3] != rval.v4[3]); }
+	friend bool operator !=( const Vec4 &lval, const Vec4 &rval ) { return (lval.v4[0] != rval.v4[0]) || (lval.v4[1] != rval.v4[1]) || (lval.v4[2] != rval.v4[2]) || (lval.v4[3] != rval.v4[3]); }
 
 	const _S &x() const { return v4[0];	}
 	const _S &y() const { return v4[1];	}

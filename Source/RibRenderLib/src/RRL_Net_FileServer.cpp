@@ -124,7 +124,7 @@ void FileServer::threadMain()
 
 				writer.WriteValue( (U32)MSGID_FILEREQANS_DATA );
 
-				DUT::EndGrabFile( pFile, writer.GetDataPtr( fileSize ), fileSize );
+				DUT::EndGrabFile( pFile, writer.Grow( fileSize ), fileSize );
 
 				printf( "NETLOG: SEND MSGID_FILEREQANS_DATA (%s)\n", buff );
 				mpPakMan->SendEnd( pOutPacket );

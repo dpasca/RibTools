@@ -86,7 +86,7 @@ public:
 		}
 	}
 
-	U8 *GetDataPtr( size_t cnt )
+	U8 *Grow( size_t cnt )
 	{
 		U8	*ptr = mpDest + mIdx;
 
@@ -96,6 +96,40 @@ public:
 	}
 
 	size_t GetCurSize() const { return mIdx; }
+};
+
+//==================================================================
+/// MemWriterDynamic
+//==================================================================
+class MemWriterDynamic
+{
+	DVec<U8>	mDest;
+
+public:
+	template <class T>
+	void WriteValue( const T &from )
+	{
+		size_t	idx = mDest.size();
+		mDest.resize( idx + sizeof(T) );
+		memcpy( &mDest[idx], &from, sizeof(T) );
+	}
+
+	template <class T>
+	void WriteArray( const T *pFrom, size_t cnt )
+	{
+		size_t	idx = mDest.size();
+		mDest.resize( idx + sizeof(T)*cnt );
+		memcpy( &mDest[idx], pFrom, sizeof(T)*cnt );
+	}
+
+	U8 *Grow( size_t cnt )
+	{
+		return mDest.grow( cnt );
+	}
+
+	const U8 *GetDataBegin() const { return &mDest[0]; }
+
+	size_t GetCurSize() const { return mDest.size(); }
 };
 
 //==================================================================
