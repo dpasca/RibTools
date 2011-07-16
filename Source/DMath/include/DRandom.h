@@ -21,6 +21,17 @@ class DRandom
 public:
 	DRandom( DU64 seed )
 	{
+		Init( seed );
+	}
+
+	DRandom()
+	{
+		m_w = 0;
+		m_z = 0;
+	}
+
+	void Init( DU64 seed )
+	{
 		m_w = (DU32)(seed & 0xffffffff);
 		m_z = (DU32)((seed >> 32) & 0xffffffff);
 		m_w += 36969;
@@ -42,6 +53,19 @@ public:
 	float NextF0_1()
 	{
 		return NextU32() / (float)0xffffffff;
+	}
+
+	static float RandRangeF_ID_s( DU32 id, float a, float b )
+	{
+		DU32 w = id & 0x0000ffff;
+		DU32 z = id >> 16;
+		w += 36969;
+		z += 18000;
+		z = 36969 * (z & 65535) + (z >> 16);
+		w = 18000 * (w & 65535) + (w >> 16);
+		float val = (float)((z << 16) + w);
+
+		return a + (b - a) * val * (1.f / (float)0xffffffff);
 	}
 
 	int Next32Range( int rmin, int rmax )

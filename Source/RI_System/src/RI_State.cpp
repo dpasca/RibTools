@@ -646,7 +646,7 @@ void State::Rotate( float angDeg, float ax, float ay, float az )
 	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
 		return;
 
-	mTransformOpenStack.top().ConcatTransform( Matrix44::Rot( angDeg * DEG2RAD, ax, ay, az ) );
+	mTransformOpenStack.top().ConcatTransform( Matrix44::Rot( DEG2RAD(angDeg), ax, ay, az ) );
 }
 
 //==================================================================

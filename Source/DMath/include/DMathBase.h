@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2009/5/6
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DMATHBASE_H
@@ -41,9 +41,9 @@
 		} u;
 
 		VecNMask()						{}
-		
+
 		VecNMask( const __m128 &from )	{	u.v = from; }
-		
+
 		VecNMask( unsigned int a, unsigned int b, unsigned int c, unsigned int d )
 		{
 			u.m[0] = a;
@@ -145,10 +145,14 @@
 #include <float.h>
 #include <assert.h>
 
-#define DEG2RAD	(3.14159265f/180)
+#define DEG2RAD(_X_)	((_X_) * (3.14159265f/180))
 
 //==================================================================
-template <class _S,class _T> inline _S DMix( const _S &a, const _S &b, const _T &t ){ return a + (b - a) * t; }
+template < typename _TA , typename _TB >
+inline _TA DMix( const _TA &a, const _TA &b,  const _TB &t )
+{
+    return a + (b - a) * t;
+}
 
 //==================================================================
 template <class T>	inline T		DCos( const T &a )				{ assert( 0 );	return T();	}
@@ -215,6 +219,7 @@ template <class T>	inline T		DMax( const T &a, const T &b )
 #define FM_LN2      ((float)M_LN2     )
 #define FM_LN10     ((float)M_LN10    )
 #define FM_PI       ((float)M_PI      )
+#define FM_2PI      ((float)(M_PI * 2))
 #define FM_PI_2     ((float)M_PI_2    )
 #define FM_PI_4     ((float)M_PI_4    )
 #define FM_1_PI     ((float)M_1_PI    )
@@ -226,7 +231,7 @@ template <class T>	inline T		DMax( const T &a, const T &b )
 typedef unsigned char		DU8;
 typedef unsigned int		DU32;
 
-#if defined(__linux__) || (__APPLE__)
+#if defined(__linux__) || (__APPLE__) || defined(ANDROID)
 typedef uint64_t			DU64;
 #else
 typedef unsigned __int64	DU64;

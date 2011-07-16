@@ -16,29 +16,29 @@
 //==================================================================
 
 //==================================================================
-#define FOR_I_N	for (int i=0; i<_N; ++i)
+#define FOR_I_N	for (size_t i=0; i<_TN; ++i)
 
-template<class _S, size_t _N>
+template<class _TS, size_t _TN>
 class VecN
 {
 public:
-	_S	v[_N];
+	_TS	v[_TN];
 
 	//==================================================================
 	VecN()						{}
 	VecN( const VecN &v_ )		{ FOR_I_N v[i] = v_.v[i]; }
-	VecN( const _S& a_ )		{ FOR_I_N v[i] = a_;		}
-	VecN( const _S *p_ )		{ FOR_I_N v[i] = p_[i];	}
+	VecN( const _TS& a_ )		{ FOR_I_N v[i] = a_;		}
+	VecN( const _TS *p_ )		{ FOR_I_N v[i] = p_[i];	}
 
-	void Set( const _S *p_ )	{ FOR_I_N v[i] = p_[i];	}
+	void Set( const _TS *p_ )	{ FOR_I_N v[i] = p_[i];	}
 	void SetZero()				{ FOR_I_N v[i] = 0;		}
 
-	_S	AddReduce() const		{ _S acc=_S(0); FOR_I_N acc += v[i]; return acc; }
+	_TS	AddReduce() const		{ _TS acc=_TS(0); FOR_I_N acc += v[i]; return acc; }
 
-	VecN operator + (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval; return tmp; }
-	VecN operator - (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval; return tmp; }
-	VecN operator * (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval; return tmp; }
-	VecN operator / (const _S& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] / rval; return tmp; }
+	VecN operator + (const _TS& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval; return tmp; }
+	VecN operator - (const _TS& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval; return tmp; }
+	VecN operator * (const _TS& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval; return tmp; }
+	VecN operator / (const _TS& rval) const	{ VecN tmp; FOR_I_N tmp.v[i] = v[i] / rval; return tmp; }
 	VecN operator + (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] + rval.v[i]; return tmp; }
 	VecN operator - (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] - rval.v[i]; return tmp; }
 	VecN operator * (const VecN &rval) const{ VecN tmp; FOR_I_N tmp.v[i] = v[i] * rval.v[i]; return tmp; }
@@ -48,11 +48,11 @@ public:
 
 	VecN operator +=(const VecN &rval)	{ *this = *this + rval; return *this; }
 
-	friend bool operator ==( const VecN &lval, const VecN &rval ) { FOR_I_N if NOT( lval[i] == rval[i] ) return false; return true; }
-	friend bool operator !=( const VecN &lval, const VecN &rval ) { FOR_I_N if NOT( lval[i] == rval[i] ) return true; return false; }
+	friend bool operator ==( const VecN &lval, const VecN &rval ) { FOR_I_N if (NOT( lval[i] == rval[i] )) return false; return true; }
+	friend bool operator !=( const VecN &lval, const VecN &rval ) { FOR_I_N if (NOT( lval[i] == rval[i] )) return true; return false; }
 
-	const _S &operator [] (size_t i) const	{ return v[i]; }
-		  _S &operator [] (size_t i)		{ return v[i]; }
+	const _TS &operator [] (size_t i) const	{ return v[i]; }
+		  _TS &operator [] (size_t i)		{ return v[i]; }
 
 	friend VecN	DSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
 	friend VecN	DRSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
@@ -65,18 +65,18 @@ public:
 	friend VecN	DCos( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
 };
 
-template <class _S, size_t _N> VecN<_S,_N> operator + (const _S &lval, const VecN<_S,_N> &rval) { return rval + lval; }
-template <class _S, size_t _N> VecN<_S,_N> operator - (const _S &lval, const VecN<_S,_N> &rval) { return rval - lval; }
-template <class _S, size_t _N> VecN<_S,_N> operator * (const _S &lval, const VecN<_S,_N> &rval) { return rval * lval; }
-template <class _S, size_t _N> VecN<_S,_N> operator / (const _S &lval, const VecN<_S,_N> &rval) { return rval / lval; }
+template <class _TS, size_t _TN> VecN<_TS,_TN> operator + (const _TS &lval, const VecN<_TS,_TN> &rval) { return rval + lval; }
+template <class _TS, size_t _TN> VecN<_TS,_TN> operator - (const _TS &lval, const VecN<_TS,_TN> &rval) { return rval - lval; }
+template <class _TS, size_t _TN> VecN<_TS,_TN> operator * (const _TS &lval, const VecN<_TS,_TN> &rval) { return rval * lval; }
+template <class _TS, size_t _TN> VecN<_TS,_TN> operator / (const _TS &lval, const VecN<_TS,_TN> &rval) { return rval / lval; }
 
 /*
-template <class _S, size_t _N> VecNMask CmpMaskLT( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskGT( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskEQ( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskNE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskLE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
-template <class _S, size_t _N> VecNMask CmpMaskGE( const VecN<_S,_N> &lval, const VecN<_S,_N> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
+template <class _TS, size_t _TN> VecNMask CmpMaskLT( const VecN<_TS,_TN> &lval, const VecN<_TS,_TN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
+template <class _TS, size_t _TN> VecNMask CmpMaskGT( const VecN<_TS,_TN> &lval, const VecN<_TS,_TN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
+template <class _TS, size_t _TN> VecNMask CmpMaskEQ( const VecN<_TS,_TN> &lval, const VecN<_TS,_TN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
+template <class _TS, size_t _TN> VecNMask CmpMaskNE( const VecN<_TS,_TN> &lval, const VecN<_TS,_TN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
+template <class _TS, size_t _TN> VecNMask CmpMaskLE( const VecN<_TS,_TN> &lval, const VecN<_TS,_TN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
+template <class _TS, size_t _TN> VecNMask CmpMaskGE( const VecN<_TS,_TN> &lval, const VecN<_TS,_TN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
 */
 
 #undef FOR_I_N

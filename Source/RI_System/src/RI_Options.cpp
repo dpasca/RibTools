@@ -301,7 +301,7 @@ void Options::Finalize(
 					float fov = mProjectionParams[++i].Flt();
 
 					mMtxCamProj =
-						Matrix44::Perspective( fov * DEG2RAD,
+						Matrix44::Perspective( DEG2RAD( fov ),
 											  mFrameAspectRatio,
 											  mNearClip, mFarClip );
 				}

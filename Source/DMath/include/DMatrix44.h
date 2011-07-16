@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2008/12/22
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DMATRIX44_H
@@ -86,7 +86,7 @@ public:
 
 		mij(0,0) = mij(1,1) = mij(2,2) = mij(3,3) = 1.0f;
 	}
-		
+
 	inline Matrix44 GetTranspose() const;
 	inline Matrix44 GetAs33() const;
 	inline Matrix44 GetOrthonormal() const;
@@ -94,8 +94,16 @@ public:
 	Matrix44 GetInverse( bool *out_pSuccess=0 ) const;
 
 	inline static Matrix44 Scale( float sx, float sy, float sz );
+	inline static Matrix44 Translate( const Float3 &tra );
 	inline static Matrix44 Translate( float tx, float ty, float tz );
 	inline static Matrix44 Rot( float ang, float ax, float ay, float az );
+	inline static Matrix44 OrthoRH(
+						float left,
+						float right,
+						float bottom,
+						float top,
+						float nearr,
+						float farr );
 	inline static Matrix44 Perspective( float fov, float aspect, float n, float f );
 	inline static Matrix44 PerspectiveRH0( float fov, float aspect, float n, float f );
 
@@ -107,7 +115,7 @@ public:
 		memcpy( v16, pSrcMtx, sizeof(v16) );
 	#endif
 	}
-	
+
 	Float3 GetTranslation() const
 	{
 		return Float3(
@@ -175,9 +183,9 @@ inline Matrix44 Matrix44::GetOrthonormal() const
 	Float3	v1 = GetV3(1);
 	Float3	v2 = GetV3(2);
 
-	v0 = v0.GetNormalized(); 
+	v0 = v0.GetNormalized();
 	v1 = v2.GetCross( v0 );
-	v1 = v1.GetNormalized(); 
+	v1 = v1.GetNormalized();
 	v2 = v0.GetCross( v1 );
 
 	out.SetV3( 0, v0 );
@@ -201,8 +209,13 @@ inline Matrix44 Matrix44::Scale( float sx, float sy, float sz )
 	m.mij(1,1) = sy;
 	m.mij(2,2) = sz;
 	m.mij(3,3) = 1.0f;
-	
+
 	return m;
+}
+//==================================================================
+inline Matrix44 Matrix44::Translate( const Float3 &tra )
+{
+	return Translate( tra.x(), tra.y(), tra.z() );
 }
 //==================================================================
 inline Matrix44 Matrix44::Translate( float tx, float ty, float tz )
@@ -212,7 +225,7 @@ inline Matrix44 Matrix44::Translate( float tx, float ty, float tz )
 	m.mij(3,1) = ty;
 	m.mij(3,2) = tz;
 	m.mij(3,3) = 1.0f;
-	
+
 	return m;
 }
 //==================================================================
@@ -233,6 +246,32 @@ inline Matrix44 Matrix44::Rot( float ang, float ax, float ay, float az )
 			(one_c * xy) - zs,	(one_c * yy) + c,	(one_c * yz) + xs,	0,
 			(one_c * zx) + ys,	(one_c * yz) - xs,	(one_c * zz) + c,	0,
 			0,					0,					0,					1 );
+}
+
+//==================================================================
+inline Matrix44 Matrix44::OrthoRH(
+						float left,
+						float right,
+						float bottom,
+						float top,
+						float nearr,
+						float farr )
+{
+	DASSERT( right != left && top != bottom && farr != nearr );
+
+	float	rl = right - left;
+	float	tb = top - bottom;
+	float	fn = farr - nearr;
+
+	float tx = -(right + left) / rl;
+	float ty = -(top + bottom) / tb;
+	float tz = -(farr + nearr) / fn;
+
+	return Matrix44(
+			2 / rl,	0,		0,			0,
+			0,		2 / tb,	0,			0,
+			0,		0,		-2 / fn,	0,
+			tx,		ty,		tz,			1 );
 }
 
 //==================================================================
@@ -268,25 +307,111 @@ inline Matrix44 Matrix44::PerspectiveRH0( float fov, float aspect, float n, floa
 }
 
 //==================================================================
+#if defined(_ARM_ARCH_7)
+
+//==================================================================
+// Note: from oolong engine
+inline void NEON_Matrix4Mul( const float* a, const float* b, float* output )
+{
+	_asm volatile
+	(
+	// Store A & B leaving room at top of registers for result (q0-q3)
+	"vldmia %1, { q4-q7 }  \n\t"
+	"vldmia %2, { q8-q11 } \n\t"
+
+	// result = first column of B x first row of A
+	"vmul.f32 q0, q8, d8[0]\n\t"
+	"vmul.f32 q1, q8, d10[0]\n\t"
+	"vmul.f32 q2, q8, d12[0]\n\t"
+	"vmul.f32 q3, q8, d14[0]\n\t"
+
+	// result += second column of B x second row of A
+	"vmla.f32 q0, q9, d8[1]\n\t"
+	"vmla.f32 q1, q9, d10[1]\n\t"
+	"vmla.f32 q2, q9, d12[1]\n\t"
+	"vmla.f32 q3, q9, d14[1]\n\t"
+
+	// result += third column of B x third row of A
+	"vmla.f32 q0, q10, d9[0]\n\t"
+	"vmla.f32 q1, q10, d11[0]\n\t"
+	"vmla.f32 q2, q10, d13[0]\n\t"
+	"vmla.f32 q3, q10, d15[0]\n\t"
+
+	// result += last column of B x last row of A
+	"vmla.f32 q0, q11, d9[1]\n\t"
+	"vmla.f32 q1, q11, d11[1]\n\t"
+	"vmla.f32 q2, q11, d13[1]\n\t"
+	"vmla.f32 q3, q11, d15[1]\n\t"
+
+	// output = result registers
+	"vstmia %0, { q0-q3 }"
+	: // no output
+	: "r" (output), "r" (a), "r" (b)       // input - note *value* of pointer doesn't change
+	: "memory", "q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q11" //clobber
+	);
+}
+
+//==================================================================
+inline void NEON_Matrix4Vector3Mul(const float* m, const float* v, float* output)
+{
+	_asm volatile
+	(
+	 // Store m & v leaving room at top of registers for result (q0)
+	 "vldmia %1, {q1-q4 }   \n\t"   // q2-q5 = m
+	 "vldmia %2, {q5}               \n\t"   // q1    = v
+	 
+	 // result = first column of A x V.x
+	 "vmul.f32 q0, q1, d10[0]\n\t"
+	 
+	 // result += second column of A x V.y
+	 "vmla.f32 q0, q2, d10[1]\n\t"
+	 
+	 // result += third column of A x V.z
+	 "vmla.f32 q0, q3, d11[0]\n\t"
+	 
+	 //// result += last column of A x V.w
+	 //"vmla.f32 q0, q4, d11[1]\n\t"
+
+	 // result += last column of A
+	 "vadd.f32 q0, q0, q4\n\t"
+	 
+	 // output = result registers
+	 "vstmia %0, {q0}"
+	 
+	 : // no output
+	 : "r" (output), "r" (m), "r" (v)       // input - note *value* of pointer doesn't change
+	 : "memory", "q0", "q1", "q2", "q3", "q4", "q5" //clobber
+	 );
+}
+
+#endif
+
+//==================================================================
 inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 {
-	Matrix44	tmp;
+	Matrix44        tmp;
+#if !defined(_ARM_ARCH_7)
 	for (size_t r=0; r < 4; ++r)
 	{
 		for (size_t c=0; c < 4; ++c)
 		{
-			float	sum = 0;
+			float   sum = 0;
 			for (size_t i=0; i < 4; ++i)
-				#ifdef DMATRIX44_ROWMTX_MODE
+#ifdef DMATRIX44_ROWMTX_MODE
 				sum += m1.mij(i,c) * m2.mij(r,i);
-				#else
-				sum += m1.mij(r,i) * m2.mij(i,c);
-				#endif
-
+#else
+			sum += m1.mij(r,i) * m2.mij(i,c);
+#endif
+			
 			tmp.mij(r,c) = sum;
 		}
 		
 	}
+#else
+	
+	NEON_Matrix4Mul( (const float *)&m1, (const float *)&m2, (float *)&tmp );
+	
+#endif
 	return tmp;
 }
 
@@ -303,6 +428,17 @@ inline Float4 V4__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
 	);
 }
 
+//==================================================================
+inline Float3 V3__M44_Mul_V3W0( const Matrix44 &a, const Float3 &v )
+{
+	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
+
+	return Float3(
+		a.mij(0,0) * x + a.mij(0,1) * y + a.mij(0,2) * z,
+		a.mij(1,0) * x + a.mij(1,1) * y + a.mij(1,2) * z,
+		a.mij(2,0) * x + a.mij(2,1) * y + a.mij(2,2) * z
+	);
+}
 //==================================================================
 inline Float3 V3__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
 {
@@ -365,14 +501,14 @@ inline _S4 V4__V3W0_Mul_M44( const _S3 &v, const Matrix44 &a )
 }
 
 //==================================================================
-template <class _S>
-inline Vec3<_S> V3__V3W1_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
+template <class _TS>
+inline Vec3<_TS> V3__V3W1_Mul_M44( const Vec3<_TS> &v, const Matrix44 &a )
 {
-	const _S	&x = v.v3[0];
-	const _S	&y = v.v3[1];
-	const _S	&z = v.v3[2];
+	const _TS	&x = v.v3[0];
+	const _TS	&y = v.v3[1];
+	const _TS	&z = v.v3[2];
 
-	return Vec3<_S>(
+	return Vec3<_TS>(
 		x * a.mij(0,0) + y * a.mij(1,0) + z * a.mij(2,0) + a.mij(3,0),
 		x * a.mij(0,1) + y * a.mij(1,1) + z * a.mij(2,1) + a.mij(3,1),
 		x * a.mij(0,2) + y * a.mij(1,2) + z * a.mij(2,2) + a.mij(3,2)
@@ -380,17 +516,46 @@ inline Vec3<_S> V3__V3W1_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
 }
 
 //==================================================================
-template <class _S>
-inline Vec3<_S> V3__V3W0_Mul_M44( const Vec3<_S> &v, const Matrix44 &a )
+/*
+#if defined(_ARM_ARCH_7)
+template <>
+inline Vec3<float> V3__V3W1_Mul_M44( const Vec3<float> &v, const Matrix44 &a )
 {
-	const _S	&x = v.v3[0];
-	const _S	&y = v.v3[1];
-	const _S	&z = v.v3[2];
+	Vec3<float>	outVec;
+	
+	NEON_Matrix4Vector3Mul( (const float *)&a, &v[0], &outVec[0] );
+	
+	return outVec;
+}
+#endif
+*/
 
-	return Vec3<_S>(
+//==================================================================
+template <class _TS>
+inline Vec3<_TS> V3__V3W0_Mul_M44( const Vec3<_TS> &v, const Matrix44 &a )
+{
+	const _TS	&x = v.v3[0];
+	const _TS	&y = v.v3[1];
+	const _TS	&z = v.v3[2];
+
+	return Vec3<_TS>(
 		x * a.mij(0,0) + y * a.mij(1,0) + z * a.mij(2,0),
 		x * a.mij(0,1) + y * a.mij(1,1) + z * a.mij(2,1),
 		x * a.mij(0,2) + y * a.mij(1,2) + z * a.mij(2,2)
+	);
+}
+
+//==================================================================
+template <class _TS>
+inline Vec3<_TS> V3__V2_Mul_M44( const Vec2<_TS> &v, const Matrix44 &a )
+{
+	const _TS	&x = v.v2[0];
+	const _TS	&y = v.v2[1];
+
+	return Vec3<_TS>(
+		x * a.mij(0,0) + y * a.mij(1,0),
+		x * a.mij(0,1) + y * a.mij(1,1),
+		x * a.mij(0,2) + y * a.mij(1,2)
 	);
 }
 

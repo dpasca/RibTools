@@ -33,7 +33,7 @@ public:
 		mRadius(radius),
 		mZMin(zmin),
 		mZMax(zmax),
-		mThetamaxRad(thetamax*DEG2RAD)
+		mThetamaxRad(DEG2RAD(thetamax))
 	{
 	}
 
@@ -67,7 +67,7 @@ public:
 		SimplePrimitiveBase(CONE),
 		mHeight(height),
 		mRadius(radius),
-		mThetamaxRad(thetamax*DEG2RAD)
+		mThetamaxRad(DEG2RAD(thetamax))
 	{
 	}
 
@@ -103,7 +103,7 @@ public:
 		mRadius(radius),
 		mZMin(zmin),
 		mZMax(zmax),
-		mThetamaxRad(thetamax*DEG2RAD)
+		mThetamaxRad(DEG2RAD(thetamax))
 	{
 	}
 
@@ -137,7 +137,7 @@ public:
 		SimplePrimitiveBase(HYPERBOLOID),
 		mP1(p1),
 		mP2(p2),
-		mThetamaxRad(thetamax*DEG2RAD)
+		mThetamaxRad(DEG2RAD(thetamax))
 	{
 	}
 
@@ -173,7 +173,7 @@ public:
 		mRmax(rmax),
 		mZmin(zmin),
 		mZmax(zmax),
-		mThetamaxRad(thetamax*DEG2RAD)
+		mThetamaxRad(DEG2RAD(thetamax))
 	{
 	}
 
@@ -211,9 +211,9 @@ public:
 		SimplePrimitiveBase(TORUS),
 		mMaxRadius(maxRadius),
 		mMinRadius(minRadius),
-		mPhiminRad(phimin*DEG2RAD),
-		mPhimaxRad(phimax*DEG2RAD),
-		mThetamaxRad(thetamax*DEG2RAD)
+		mPhiminRad(DEG2RAD(phimin)),
+		mPhimaxRad(DEG2RAD(phimax)),
+		mThetamaxRad(DEG2RAD(thetamax))
 	{
 	}
 	
