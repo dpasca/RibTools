@@ -10,6 +10,7 @@
 #define RSLC_REGISTER_H
 
 #include "RSLC_VarType.h"
+#include "DSystem/include/DStr.h"
 #include "DSystem/include/DUtils_Base.h"
 
 //==================================================================
@@ -64,7 +65,7 @@ public:
 	bool IsAssigned() const			{ return mRegIdx != -1; }
 
 	//==================================================================
-	std::string GetName() const;
+	DStr GetName() const;
 };
 
 //==================================================================

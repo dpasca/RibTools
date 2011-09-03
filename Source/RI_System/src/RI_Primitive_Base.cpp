@@ -365,11 +365,11 @@ bool ParamsFindP(	ParamList &params,
 		const Symbol* pSymbol = globalSymbols.FindSymbol( params[i] );
 		if ( pSymbol && pSymbol->IsName( "P" ) )
 		{
-			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );
+			DASSTHROW( (i+1) < params.size(), "Invalid number of arguments" );
 			
 			const FltVec	&fltVec = params[ i+1 ].NumVec();
 			
-			DASSTHROW( (fltVec.size() % 3) == 0, ("Invalid number of arguments") );
+			DASSTHROW( (fltVec.size() % 3) == 0, "Invalid number of arguments" );
 			
 			out_vectorP.resize( fltVec.size() / 3 );
 
@@ -399,17 +399,17 @@ bool ParamsFindP(	ParamList &params,
 		const Symbol* pSymbol = globalSymbols.FindSymbol( params[i] );
 		if ( pSymbol && pSymbol->IsName( "P" ) )
 		{
-			DASSTHROW( (i+1) < params.size(), ("Invalid number of arguments") );
+			DASSTHROW( (i+1) < params.size(), "Invalid number of arguments" );
 			
 			const FltVec	&fltVec = params[ i+1 ].NumVec();
 
 			DASSTHROW( (int)fltVec.size() == 3 * expectedN,
-							("Invalid number of arguments."
-							 " Expecting %i but it's %u", 3 * expectedN, fltVec.size() ) );
+							"Invalid number of arguments."
+							 " Expecting %i but it's %u", 3 * expectedN, fltVec.size() );
 
 			DASSTHROW( (int)(fltVec.size() % 3) == 0,
-							("Invalid number of arguments."
-							 " Should be multiple of 3 but it's %u", fltVec.size()) );
+							"Invalid number of arguments."
+							 " Should be multiple of 3 but it's %u", fltVec.size() );
 
 			size_t	srcN = fltVec.size();
 

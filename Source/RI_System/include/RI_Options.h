@@ -31,9 +31,9 @@ public:
 	class Display
 	{
 	public:
-		std::string		mName;
-		std::string		mType;
-		std::string		mMode;
+		DStr			mName;
+		DStr			mType;
+		DStr			mMode;
 		DIMG::Image		mImage;
 		int				mValZero;
 		int				mValOne;

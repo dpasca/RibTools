@@ -31,15 +31,15 @@ class Tokenizer
 
 	int				mDataInt;
 	float			mDataFloat;
-	std::string		mDataString;
-	std::string		mDataAlphanum;
+	DStr			mDataString;
+	DStr			mDataAlphanum;
 	DVec<float>		mFloatArray;
 	DVec<int>		mIntArray;
 	DVec<DStr>		mStringArray;
 	char			mArrayType;
 	bool			mIsArrayOfQuotedStrings;
 	bool			mIsInArrayItemQuotedString;
-	std::string		mCurToken;
+	DStr			mCurToken;
 
 public:
 	enum DataType

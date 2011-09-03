@@ -24,7 +24,7 @@ static void fillKnot( DVec<float> &out_knots, const float *pSrcKnots, int n, int
 	for (size_t i=0; i < out_knots.size(); ++i)
 	{
 		if ( i > 0 )
-			DASSTHROW( pSrcKnots[i-1] <= pSrcKnots[i], ("Invalid knot value") );
+			DASSTHROW( pSrcKnots[i-1] <= pSrcKnots[i], "Invalid knot value" );
 
 		out_knots[i] = pSrcKnots[i];
 	}
@@ -50,9 +50,9 @@ NuPatch::NuPatch(
 {
 	moBaseDef = DNEW BaseDef( uorder, vorder, nu, nv );
 
-	DASSTHROW( uorder > 1 && vorder > 1, ("Patch order must be 2 or larger") );
-	DASSTHROW( uorder <= MAXORDER && vorder <= MAXORDER, ("Patch order must be no higher than %i", MAXORDER) );
-	DASSTHROW( umin < umax && vmin < vmax, ("'min' parameter must be less than 'max'") );
+	DASSTHROW( uorder > 1 && vorder > 1, "Patch order must be 2 or larger" );
+	DASSTHROW( uorder <= MAXORDER && vorder <= MAXORDER, "Patch order must be no higher than %i", MAXORDER );
+	DASSTHROW( umin < umax && vmin < vmax, "'min' parameter must be less than 'max'" );
 
 	fillKnot( moBaseDef->mUKnots, pUknot, nu, uorder );
 	fillKnot( moBaseDef->mVKnots, pVknot, nv, vorder );
@@ -61,12 +61,12 @@ NuPatch::NuPatch(
 	DASSTHROW(
 		umin >= moBaseDef->mUKnots[ uorder-2 ] &&
 		vmin >= moBaseDef->mVKnots[ vorder-2 ],
-		("'min' parameter must be larger or equal of knot[ order-2 ]") );
+		"'min' parameter must be larger or equal of knot[ order-2 ]" );
 
 	DASSTHROW(
 		umax <= moBaseDef->mUKnots[ nu ] &&
 		vmax <= moBaseDef->mVKnots[ nv ],
-		("'max' less than knot[ n-1 ]") );
+		"'max' less than knot[ n-1 ]" );
 
 	int	udegree = uorder - 1;
 	int	vdegree = vorder - 1;
@@ -74,7 +74,7 @@ NuPatch::NuPatch(
 	int	uSegmentsN = nu - udegree;
 	int	vSegmentsN = nv - udegree;
 
-	DASSTHROW( uSegmentsN <= 0 || vSegmentsN, ("The patch generates no segments !") );
+	DASSTHROW( uSegmentsN <= 0 || vSegmentsN, "The patch generates no segments !" );
 
 	size_t	nVarsUniform = (size_t)(uSegmentsN * vSegmentsN);
 	size_t	nVarsVarying = (size_t)((uSegmentsN + 1) * (vSegmentsN + 1));
@@ -93,7 +93,7 @@ NuPatch::NuPatch(
 		PValuesParIdx = FindParam( "Pw", Param::FLT_ARR, (int)curParamIdx, params );
 		if ( PValuesParIdx == -1 )
 		{
-			DASSTHROW( 0, ("Missing P or Pw parameter") );
+			DASSTHROW( 0, "Missing P or Pw parameter" );
 			return;
 		}
 

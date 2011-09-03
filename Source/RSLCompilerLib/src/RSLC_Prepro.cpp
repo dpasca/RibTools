@@ -32,7 +32,7 @@ static void handleDefine(
 				SymbolsMap	&symbols
 				)
 {
-	std::string	symName;
+	DStr	symName;
 	i = GetAlphaNumBetweenSpaces( text, i, lineEnd, fatBase, symName );
 
 	//---
@@ -44,11 +44,11 @@ static void handleDefine(
 			break;
 	size_t	valueEndIdx = i;
 
-	std::string	valueStr;
+	DStr	valueStr;
 	for (size_t j=valueStartIdx; j < valueEndIdx; ++j)
 		valueStr += text[j].Ch;
 
-	symbols[symName] = valueStr;
+	symbols[symName.c_str()] = valueStr;
 
 	CutVectorInclusive( text, startPoint, lineEnd );
 }
@@ -62,7 +62,7 @@ static size_t applySymbols(
 				DVec<Fat8>			&scrcpad
 				)
 {
-	std::string	tmp;
+	DStr	tmp;
 
 	bool		replacementHappened = false;
 	scrcpad.clear();
@@ -118,12 +118,12 @@ static size_t applySymbols(
 				tmp += text[j].Ch;
 			}
 
-			SymbolsMap::const_iterator foundIt = symbols.find( tmp );
+			SymbolsMap::const_iterator foundIt = symbols.find( tmp.c_str() );
 			if ( foundIt != symbols.end() )
 			{
 				replacementHappened = true;
 
-				const std::string &symbVal = foundIt->second;
+				const DStr &symbVal = foundIt->second;
 
 				// copy defined symbol, using the current text location
 				// ..current file name and line number

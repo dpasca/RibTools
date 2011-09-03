@@ -7,6 +7,7 @@
 //==================================================================
 
 #include "DSystem/include/DTypes.h"
+#include "DSystem/include/DUtils.h"
 #include "RSLC_Register.h"
 
 //==================================================================
@@ -14,7 +15,7 @@ namespace RSLC
 {
 
 //==================================================================
-std::string Register::GetName() const
+DStr Register::GetName() const
 {
 	char	regBase[16] = {0};
 

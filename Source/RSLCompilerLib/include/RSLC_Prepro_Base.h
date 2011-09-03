@@ -20,7 +20,7 @@ namespace PREPRO
 {
 
 //==================================================================
-typedef DUNORD_MAP<std::string,std::string>	SymbolsMap;
+typedef DUNORD_MAP<const char *,DStr>	SymbolsMap;
 
 //==================================================================
 }

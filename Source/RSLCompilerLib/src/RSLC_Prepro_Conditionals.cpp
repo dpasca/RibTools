@@ -38,11 +38,11 @@ void HandleIfDef(
 	}
 
 	// process it
-	std::string	symName;
+	DStr	symName;
 	i = GetAlphaNumBetweenSpaces( text, i, lineEnd, fatBase, symName );
 
 	// do we have this sample ?
-	bool found = (symbols.end() != symbols.find( symName ));
+	bool found = (symbols.end() != symbols.find( symName.c_str() ));
 
 	// push the status into the stack
 	actStack.push_back( found == expectFound );

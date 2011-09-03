@@ -1,4 +1,4 @@
-//============f======================================================
+//==================================================================
 /// DUtils.cpp
 ///
 /// Created by Davide Pasca - 2009/5/1
@@ -12,10 +12,19 @@
     #include <sys/time.h>
 #endif
 
+#ifdef __APPLE__
+    #include "TargetConditionals.h"
+    #include <signal.h>
+#endif
+
 #include <stdio.h>
-#include <stdexcept>
+#if !defined(ANDROID)
+# include <stdexcept>
+#else
+# include <ctype.h>
+# include "native.h"
+#endif
 #include <stdarg.h>
-#include <string.h>
 #include "DTypes.h"
 #include "DUtils.h"
 #include "DMemory.h"
@@ -25,7 +34,7 @@ namespace DUT
 {
 
 //==================================================================
-char *SSPrintF( const char *pFmt, ... )
+DStr SSPrintFS( const char *pFmt, ... )
 {
 	va_list	vl;
 	va_start( vl, pFmt );
@@ -35,35 +44,18 @@ char *SSPrintF( const char *pFmt, ... )
 
 	va_end( vl );
 
-	char *p = DNEW char [ strlen(buff)+1 ];
-	strcpy( p, buff );
-
-	return p;
-}
-
-//==================================================================
-std::string SSPrintFS( const char *pFmt, ... )
-{
-	va_list	vl;
-	va_start( vl, pFmt );
-
-	char	buff[1024];
-	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
-
-	va_end( vl );
-
-	return std::string( buff );
+	return DStr( buff );
 }
 
 //===============================================================
-void DAssert( bool ok, const char *pFile, int line )
+void DAssert( bool ok, const char *pFile, int line, const char *msg )
 {
 	if ( ok )
 		return;
 
 	char	buff[1024];
 
-	sprintf( buff, "ASSERT: %s %i\n", pFile, line );
+	sprintf(buff, "ASSERT: %s:%i '%s'\n", pFile, line, (msg==0)?(""):msg);
 
 	puts( buff );
 
@@ -71,15 +63,53 @@ void DAssert( bool ok, const char *pFile, int line )
 
 #if defined(_MSC_VER)
 	DebugBreak();
+
+#elif defined(TARGET_OS_IPHONE)
+	kill( getpid(), SIGINT );
+
+#elif defined(ANDROID)
+    PlatformAssertRaise(buff);
+
+#elif defined(MACOSX)
+    //
+    abort();
+
 #else
-	__asm__ ( "int3" );
+# error Assert not defined on this platform
+
 #endif
 
 #endif
 }
 
 //===============================================================
-void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
+void DAssThrow( bool ok, const char *pFile, int line, const char *pFmt, ... )
+{
+	if ( ok )
+		return;
+
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	DVAssThrow( ok, pFile, line, pFmt, vl );
+
+	va_end( vl );
+}
+
+//===============================================================
+void DVAssThrow( bool ok, const char *pFile, int line, const char *pFmt, va_list vl )
+{
+	if ( ok )
+		return;
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	DSAssThrow( ok, pFile, line, buff );
+}
+
+//===============================================================
+void DSAssThrow( bool ok, const char *pFile, int line, const char *pNewCharMsg )
 {
 	if ( ok )
 		return;
@@ -89,25 +119,39 @@ void DAssThrow( bool ok, const char *pFile, int line, char *pNewCharMsg )
 	if ( pNewCharMsg )
 	{
 		sprintf( buff, "ASSERT EXCEPT: %s - %s %i\n", pNewCharMsg, pFile, line );
-
-		DSAFE_DELETE_ARRAY( pNewCharMsg );
 	}
 	else
 	{
 		sprintf( buff, "ASSERT EXCEPT: %s %i\n", pFile, line );
 	}
 
-	puts( buff );
+	//puts( buff );
 
-#if !defined(NDEBUG)
-#endif
+#if defined(ANDROID)
+    PlatformAssertRaise(buff);
+#else
 	throw std::runtime_error( buff );
+#endif
 }
 
 //==================================================================
-static bool isWhite( char ch )
+void DVerbose(const char *fmt, ... )
 {
-	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f';
+	va_list	vl;
+	va_start( vl, fmt );
+
+    DVVerbose(fmt, vl);
+}
+
+//==================================================================
+void DVVerbose(const char *fmt, va_list vl)
+{
+#if defined(ANDROID)
+    __android_log_vprint(ANDROID_LOG_INFO, "oyatsukai", fmt, vl);
+#else
+    vprintf(fmt, vl);
+	puts("");
+#endif
 }
 
 //==================================================================
@@ -118,11 +162,11 @@ void StrStripBeginEndWhite( char *pStr )
 	if NOT( len )
 		return;
 
-	int	newLen = (int)len;
+	int	newLen = len;
 	for (int i=(int)len-1; i >= 0; --i)
 	{
 		char ch = pStr[i];
-		if ( isWhite( ch ) )
+		if ( IsWhite( ch ) )
 			pStr[i] = 0;
 		else
 		{
@@ -137,7 +181,7 @@ void StrStripBeginEndWhite( char *pStr )
 	{
 		char ch = pStr[si];
 
-		if ( foundNonWhite || !isWhite( ch ) )
+		if ( foundNonWhite || !IsWhite( ch ) )
 		{
 			pStr[di++] = pStr[si];
 			foundNonWhite = true;
@@ -169,6 +213,45 @@ const char *StrStrI( const char *pStr, const char *pSearch )
 	}
 
 	return NULL;
+}
+
+//==================================================================
+bool StrStartsWithI( const char *pStr, const char *pSearch )
+{
+	return pStr == StrStrI( pStr, pSearch );
+}
+
+//==================================================================
+bool StrEndsWithI( const char *pStr, const char *pSearch )
+{
+	size_t	strLen = strlen( pStr );
+	size_t	searchLen = strlen( pSearch );
+
+	if ( searchLen > strLen )
+		return false;
+
+	return 0 == strcasecmp( pStr + strLen - searchLen, pSearch );
+}
+
+//==================================================================
+void StrToUpper( DStr &str )
+{
+	for (size_t i=0; i < str.size(); ++i)
+		str[i] = toupper( str[i] );
+}
+
+//==================================================================
+void StrToUpper( char *pStr )
+{
+	for (size_t i=0; pStr[i]; ++i)
+		pStr[i] = toupper( pStr[i] );
+}
+
+//==================================================================
+void StrToLower( DStr &str )
+{
+	for (size_t i=0; i < str.size(); ++i)
+		str[i] = tolower( str[i] );
 }
 
 //==================================================================

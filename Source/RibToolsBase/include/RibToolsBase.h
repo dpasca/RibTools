@@ -10,6 +10,7 @@
 #define RIBTOOLSBASE_H
 
 #include "DSystem/include/DTypes.h"
+#include "DSystem/include/DStr.h"
 
 //==================================================================
 namespace RTB

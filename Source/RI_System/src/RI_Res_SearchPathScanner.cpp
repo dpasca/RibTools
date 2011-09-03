@@ -26,7 +26,7 @@ SearchPathScanner::SearchPathScanner(
 }
 
 //==================================================================
-bool SearchPathScanner::GetNext( std::string &out_path, bool &out_pathIsAbsolute )
+bool SearchPathScanner::GetNext( DStr &out_path, bool &out_pathIsAbsolute )
 {
 	// no search paths ?
 	if NOT( mpSearchPaths->size() )
@@ -55,7 +55,7 @@ static void strRemoveTrailingDirDiv( DStr &io_str )
 }
 
 //==================================================================
-bool SearchPathScanner::getNextNoSPathList( std::string &out_path, bool &out_pathIsAbsolute )
+bool SearchPathScanner::getNextNoSPathList( DStr &out_path, bool &out_pathIsAbsolute )
 {
 	out_pathIsAbsolute = true;
 
@@ -86,7 +86,7 @@ bool SearchPathScanner::getNextNoSPathList( std::string &out_path, bool &out_pat
 }
 
 //==================================================================
-bool SearchPathScanner::getNextWithSPathList( std::string &out_path, bool &out_pathIsAbsolute )
+bool SearchPathScanner::getNextWithSPathList( DStr &out_path, bool &out_pathIsAbsolute )
 {
 	// not given the base dir yet ?
 	if ( mpBaseDir )

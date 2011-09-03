@@ -713,7 +713,7 @@ void TraverseTree( TokNode *pNode, int depth )
 
 			if ( reg.IsValid() )
 			{
-				std::string regName = reg.GetName();
+				DStr regName = reg.GetName();
 
 				printf( "        // %s - %s - %s",
 					regName.c_str(),

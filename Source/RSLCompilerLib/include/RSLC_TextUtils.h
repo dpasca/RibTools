@@ -9,7 +9,7 @@
 #ifndef RSLC_TEXTUTILS_H
 #define RSLC_TEXTUTILS_H
 
-#include <string>
+#include "DSystem/include/DStr.h"
 
 //==================================================================
 namespace RSLC
@@ -18,7 +18,7 @@ namespace RSLC
 //==================================================================
 bool IsAlphaNumStart( char c );
 bool IsAlphaNumBody( char c );
-bool IsAlphaNumStr( const std::string &str );
+bool IsAlphaNumStr( const DStr &str );
 
 //==================================================================
 }

@@ -1,11 +1,12 @@
 //==================================================================
-/// DMemFile.cpp
+/// DUtils_MemFile.cpp
 ///
 /// Created by Davide Pasca - 2009/8/2
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
+#include <string>
 #include "DUtils_Files.h"
 #include "DUtils_MemFile.h"
 

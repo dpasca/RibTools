@@ -26,7 +26,7 @@ bool IsAlphaNumBody( char c )
 }
 
 //==================================================================
-bool IsAlphaNumStr( const std::string &str )
+bool IsAlphaNumStr( const DStr &str )
 {
 	if NOT( str.length() )
 		return false;

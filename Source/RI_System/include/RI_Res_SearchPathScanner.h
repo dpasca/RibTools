@@ -27,11 +27,11 @@ public:
 				const char *pDefaultDir,
 				const DVec<DStr> &searchPaths );
 
-	bool GetNext( std::string &out_path, bool &out_pathIsAbsolute );
+	bool GetNext( DStr &out_path, bool &out_pathIsAbsolute );
 
 private:
-	bool getNextNoSPathList( std::string &out_path, bool &out_pathIsAbsolute );
-	bool getNextWithSPathList( std::string &out_path, bool &out_pathIsAbsolute );
+	bool getNextNoSPathList( DStr &out_path, bool &out_pathIsAbsolute );
+	bool getNextWithSPathList( DStr &out_path, bool &out_pathIsAbsolute );
 };
 
 

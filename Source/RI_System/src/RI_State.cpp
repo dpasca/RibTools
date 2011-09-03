@@ -693,7 +693,7 @@ DStr State::FindResFile( const char *pFindFileName, Options::SearchPathh spathTy
 
 	while ( pathScanner.GetNext( usePath, usePathIsAbsolute ) )
 	{
-		DStr	fullPathName = usePath + "/" + pFindFileName;
+		DStr fullPathName = DUT::SSPrintFS( "%s/%s", usePath.c_str(), pFindFileName );
 
 		if ( GetFileManager().FileExists( fullPathName.c_str() ) )
 		{
@@ -704,7 +704,7 @@ DStr State::FindResFile( const char *pFindFileName, Options::SearchPathh spathTy
 			if ( !usePathIsAbsolute )
 			{
 				// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
-				fullPathName = std::string( GetBaseDir() ) + "/" + fullPathName;
+				fullPathName = DUT::SSPrintFS( "%s/%s", GetBaseDir(), fullPathName.c_str() );
 
 				if ( GetFileManager().FileExists( fullPathName.c_str() ) )
 				{

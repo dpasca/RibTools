@@ -19,7 +19,7 @@ namespace RSLC
 
 //==================================================================
 static void makeMsg(
-				std::string &out_msg,
+				DStr &out_msg,
 				const char *pFile,
 				int line,
 				const char *pSrcMsg )
@@ -33,7 +33,7 @@ static void makeMsg(
 }
 
 //==================================================================
-Exception::Exception( const std::string &msg, const Token *pTok/*=NULL */ )
+Exception::Exception( const DStr &msg, const Token *pTok/*=NULL */ )
 {
 	if ( pTok )
 	{
@@ -44,7 +44,7 @@ Exception::Exception( const std::string &msg, const Token *pTok/*=NULL */ )
 }
 
 //==================================================================
-Exception::Exception( const std::string &msg, const TokNode *pTokNode )
+Exception::Exception( const DStr &msg, const TokNode *pTokNode )
 {
 	if ( pTokNode && pTokNode->mpToken )
 	{

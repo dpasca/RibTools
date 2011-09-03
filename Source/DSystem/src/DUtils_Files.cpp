@@ -73,10 +73,23 @@ bool EndGrabFile( FILE *pFile, void *pDest, size_t readSize )
 }
 
 //==================================================================
-bool FileExists( const char *pFileName )
+bool FileExists( const char *pFileName, bool prefs )
 {
+#if defined(ANDROID)
+
+    // TODO: This is terrible...  We end up loading the whole file,
+    // but pref files should be small anyway.
+
+    DASSTHROW(prefs, "FileExists() only supported for preference files");
+
+    DVec<U8> data;
+    return GrabFile(pFileName, data, prefs);
+
+#else
+
+    (void )prefs;
 	FILE	*pFile = fopen( pFileName, "rb" );
-	
+
 	if ( pFile )
 	{
 		fclose( pFile );
@@ -85,32 +98,32 @@ bool FileExists( const char *pFileName )
 	else
 	{
 		return false;
-	}	
+	}
+
+#endif
 }
 
 //==================================================================
 const char *GetFileNameOnly( const char *pPathFileName )
 {
-	int	idx = 0;
-	int	len = (int)strlen( pPathFileName );
-	
+	int	len = strlen( pPathFileName );
+
 	for (int i=len-1; i >= 0; --i)
 		if ( pPathFileName[i] == '/' || pPathFileName[i] == '\\' )
 			return pPathFileName + i + 1;
-			
+
 	return pPathFileName + len;
 }
 
 //==================================================================
 const char *GetFileNameExt( const char *pPathFileName )
 {
-	int	idx = 0;
-	int	len = (int)strlen( pPathFileName );
-	
+	int	len = strlen( pPathFileName );
+
 	for (int i=len-1; i >= 0; --i)
 		if ( pPathFileName[i] == '.' )
 			return pPathFileName + i + 1;
-			
+
 	return pPathFileName + len;
 }
 
@@ -132,7 +145,7 @@ DStr GetDirNameFromFPathName( const char *pInFPathname )
 	else
 	{
 		size_t	len = pFNamePtr - pInFPathname - 1;
-		
+
 		DStr	tmp( pInFPathname );
 		tmp.resize( len );
 

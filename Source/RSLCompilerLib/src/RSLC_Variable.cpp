@@ -74,7 +74,7 @@ void Variable::SetVarying( bool varying )
 }
 
 //==================================================================
-std::string Variable::GetUseName() const
+DStr Variable::GetUseName() const
 {
 	if ( mIsGlobal || mIsSHParam )
 		return mpDefNameNode->GetTokStr();

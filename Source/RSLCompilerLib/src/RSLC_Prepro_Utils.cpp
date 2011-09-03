@@ -53,7 +53,7 @@ size_t GetAlphaNumBetweenSpaces(
 				size_t		i,
 				size_t		lineEnd,
 				FatBase		&fatBase,
-				std::string	&out_symName )
+				DStr	&out_symName )
 {
 	SkipHWhites( text, i, lineEnd );
 
@@ -67,7 +67,7 @@ size_t GetAlphaNumBetweenSpaces(
 
 	out_symName.clear();
 
-	std::string	symbolName;
+	DStr	symbolName;
 	for (size_t j=symStart; j < symEnd; ++j)
 		out_symName += text[j].Ch;
 

@@ -11,6 +11,7 @@
 
 #include "DSystem/include/DTypes.h"
 #include "DSystem/include/DContainers.h"
+#include "DSystem/include/DStr.h"
 
 //==================================================================
 namespace RSLC

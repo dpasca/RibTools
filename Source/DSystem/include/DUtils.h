@@ -11,6 +11,7 @@
 
 #include "DTypes.h"
 #include "DUtils_Base.h"
+#include "DStr.h"
 //#include "DUtils_Files.h"
 //#include "DUtils_MemFile.h"
 //#include "DUtils_FileManager.h"
@@ -19,9 +20,22 @@
 namespace DUT
 {
 
+DStr SSPrintFS( const char *pFmt, ... );
+
+//==================================================================
+inline bool IsWhite( char ch )
+{
+	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f';
+}
+
 //==================================================================
 void StrStripBeginEndWhite( char *pStr );
 const char *StrStrI( const char *pStr, const char *pSearch );
+bool StrStartsWithI( const char *pStr, const char *pSearch );
+bool StrEndsWithI( const char *pStr, const char *pSearch );
+void StrToUpper( DStr &str );
+void StrToUpper( char *pStr );
+void StrToLower( DStr &str );
 
 I64 GetTimeTicks();
 double TimeTicksToMS( I64 ticks );

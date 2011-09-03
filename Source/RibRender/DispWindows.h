@@ -28,7 +28,7 @@ class DispWindows
 
 	int					mArgc;
 	char				**mppArgv;
-	std::string			mWindowBaseName;
+	DStr				mWindowBaseName;
 
 public:
 	DispWindows();

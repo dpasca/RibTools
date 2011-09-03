@@ -105,7 +105,7 @@ void Image::Init(
 	DASSTHROW(
 		wd > 0 && wd <= MAX_DIM_SIZE &&
 		he > 0 && he <= MAX_DIM_SIZE,
-			("Unholy image dimensions ! (%ui, %ui)", wd, he) );
+			"Unholy image dimensions ! (%ui, %ui)", wd, he );
 
 	DASSTHROW(
 		len == (size_t)mSampPerPix &&

@@ -27,9 +27,8 @@ void Translator::unknownCommand( const char *pCmdName )
 {
 	//printf( "Unknown command %s !\n", pCmdName );
 	throw std::runtime_error(
-				std::string("Unknown command '") +
-					pCmdName +
-						"'" );
+				DUT::SSPrintFS( "Unknown command '%s'", pCmdName ).c_str()
+				);
 }
 
 //==================================================================

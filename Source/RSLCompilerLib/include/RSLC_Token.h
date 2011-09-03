@@ -37,7 +37,7 @@ enum BlockType
 class Token
 {
 public:
-	std::string	str;
+	DStr		str;
 	TokenID		id;
 	TokenIDType	idType;
 	bool		isPrecededByWS;

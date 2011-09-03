@@ -87,7 +87,7 @@ size_t GetAlphaNumBetweenSpaces(
 				size_t		i,
 				size_t		lineEnd,
 				FatBase		&fatBase,
-				std::string	&out_symName );
+				DStr	&out_symName );
 
 //==================================================================
 }

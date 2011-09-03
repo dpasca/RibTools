@@ -43,7 +43,7 @@ void DispWindows::AddWindow( const RI::Options::Display &disp )
 
 	glutInitWindowSize( disp.mImage.mWd, disp.mImage.mHe );
 
-	std::string	winName = mWindowBaseName + " -- " + disp.mName;
+	DStr	winName = mWindowBaseName + " -- " + disp.mName;
 	msWindows.back().mWinId = glutCreateWindow( winName.c_str() );
 
 	glutDisplayFunc( sDisplayFunc );

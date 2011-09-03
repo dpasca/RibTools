@@ -141,7 +141,7 @@ void LoadBMP( Image &img, DUT::MemFile &readFile, const char *pFName )
 		break;
 
 	default:
-		DASSTHROW( 0, ("Cannot read BMP files with %i bits per pixel", pInfoHead->biBitCount) );
+		DASSTHROW( 0, "Cannot read BMP files with %i bits per pixel", pInfoHead->biBitCount );
 		return;
 	}
 

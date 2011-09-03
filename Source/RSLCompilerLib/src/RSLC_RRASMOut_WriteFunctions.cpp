@@ -23,7 +23,7 @@ namespace RRASMOut
 {
 
 //==================================================================
-static const std::string getOperand(
+static const DStr getOperand(
 					const TokNode *pOperand,
 					VarType &out_varType )
 {
@@ -80,7 +80,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 
 		Register	reg = pChild->GetRegister();
 
-		std::string regName = reg.GetName();
+		DStr regName = reg.GetName();
 
 		fprintf_s( pFile, " %s", regName.c_str() );
 	}
@@ -93,7 +93,7 @@ static void writeFuncParams( FILE *pFile, TokNode *pNode )
 			continue;
 
 		VarType	varType;
-		std::string opStr = getOperand( pChild, varType );
+		DStr opStr = getOperand( pChild, varType );
 
 		fprintf_s( pFile, " %-6s", opStr.c_str() );
 	}
@@ -127,7 +127,7 @@ static const char *asmOpCodeFromOpToken( const Token *pTok )
 }
 
 //==================================================================
-static std::string resolveIntrinsics( const char *pIntrName )
+static DStr resolveIntrinsics( const char *pIntrName )
 {
 	static size_t		sBaseLen;
 	static const char	*spBaseStr = "_asm_";
@@ -137,7 +137,7 @@ static std::string resolveIntrinsics( const char *pIntrName )
 
 	if ( pIntrName == strstr( pIntrName, spBaseStr ) )
 	{
-		std::string	str = pIntrName + sBaseLen;
+		DStr	str = pIntrName + sBaseLen;
 
 		for (size_t i=0; i < str.length(); ++i)
 		{
@@ -155,8 +155,8 @@ static std::string resolveIntrinsics( const char *pIntrName )
 static bool buildExpression_biOp_handleArrSet(
 					FILE				*pFile, 
 					TokNode				*pSqBrkNode,
-					const std::string	&o1Str,
-					const std::string	&o2Str,
+					const DStr	&o1Str,
+					const DStr	&o2Str,
 					char				sqOp1AsmTypeID,
 					char				sqOp2AsmTypeID
 					)
@@ -186,7 +186,7 @@ static bool buildExpression_biOp_handleArrSet(
 		const TokNode *pArrIdx = pSqBrkNode->GetChildTry( 1 );
 
 		VarType		srcVarType;
-		std::string	srcOperandStr = getOperand( pSrcVar, srcVarType );
+		DStr	srcOperandStr = getOperand( pSrcVar, srcVarType );
 		char		srcAsmTypeID = VarTypeToLetter( srcVarType );
 
 		char	instrBuff[256];
@@ -234,8 +234,8 @@ static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
 	VarType	varType1;
 	VarType	varType2;
 
-	std::string	o1Str = getOperand( pOperand1, varType1 );
-	std::string	o2Str = getOperand( pOperand2, varType2 );
+	DStr	o1Str = getOperand( pOperand1, varType1 );
+	DStr	o2Str = getOperand( pOperand2, varType2 );
 
 	bool	doAssign = pNode->mpToken->IsAssignOp();
 
@@ -314,7 +314,7 @@ static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
 		}
 
 		Register	reg = pNode->GetRegister();
-		std::string regName = reg.GetName();
+		DStr regName = reg.GetName();
 
 		char		lreg = VarTypeToLetter( reg.GetVarType() );
 
@@ -343,7 +343,7 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
 		size_t	nextChild = 0;
 		TokNode *pChild = pNode->GetChildTry( nextChild );
 
-		std::string	asmName = resolveIntrinsics( pNode->GetTokStr() );
+		DStr	asmName = resolveIntrinsics( pNode->GetTokStr() );
 
 		if ( pChild && pChild->GetTokID() == T_VL_STRING )
 		{

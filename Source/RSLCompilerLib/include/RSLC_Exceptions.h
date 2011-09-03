@@ -9,7 +9,7 @@
 #ifndef RSLC_EXCEPTIONS_H
 #define RSLC_EXCEPTIONS_H
 
-#include <string>
+#include "DSystem/include/DStr.h"
 
 //==================================================================
 namespace RSLC
@@ -24,11 +24,11 @@ class Fat8;
 //==================================================================
 class Exception
 {
-	std::string	mMsg;
+	DStr	mMsg;
 
 public:
-	Exception( const std::string &msg, const Token *pTok=NULL );
-	Exception( const std::string &msg, const TokNode *pTokNode );
+	Exception( const DStr &msg, const Token *pTok=NULL );
+	Exception( const DStr &msg, const TokNode *pTokNode );
 	Exception( const TokNode *pTokNode, const char *pFmt, ... );
 
 	Exception( const FatBase &fatBase, const Fat8 &ch, const char *pFmt, ...  );
@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-	const std::string &GetMessage() const	{	return mMsg;	}
+	const DStr &GetMessage() const	{	return mMsg;	}
 };
 
 //==================================================================

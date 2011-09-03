@@ -83,8 +83,8 @@ void PatchMesh::Simplify( Hider &hider )
 		int uSteps = attr.mUSteps;
 		int vSteps = attr.mVSteps;
 
-		DASSTHROW( uSteps >= 1 && uSteps <= 16, ("Invalid uSteps %i", uSteps) );
-		DASSTHROW( vSteps >= 1 && vSteps <= 16, ("Invalid vSteps %i", vSteps) );
+		DASSTHROW( uSteps >= 1 && uSteps <= 16, "Invalid uSteps %i", uSteps );
+		DASSTHROW( vSteps >= 1 && vSteps <= 16, "Invalid vSteps %i", vSteps );
 		
 		int	nUPatches = uPeriodic ? nu / uSteps : (nu-4) / uSteps + 1;
 		int	nVPatches = vPeriodic ? nv / vSteps : (nv-4) / vSteps + 1;

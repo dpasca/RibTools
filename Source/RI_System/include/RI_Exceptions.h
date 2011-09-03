@@ -9,7 +9,7 @@
 #ifndef RI_EXCEPTIONS_H
 #define RI_EXCEPTIONS_H
 
-#include <string>
+#include "DSystem/include/DStr.h"
 
 //==================================================================
 namespace RI
@@ -18,7 +18,7 @@ namespace RI
 //==================================================================
 class Exception
 {
-	std::string	mMsg;
+	DStr	mMsg;
 
 public:
 	Exception( const char *pFmt, ... );
@@ -27,7 +27,7 @@ public:
 	{
 	}
 
-	const std::string &GetMessage() const
+	const DStr &GetMessage() const
 	{
 		return mMsg;
 	}

@@ -11,6 +11,7 @@
 
 #include "DTypes.h"
 #include "DContainers.h"
+#include "DStr.h"
 
 //==================================================================
 namespace DUT
@@ -19,10 +20,12 @@ namespace DUT
 //==================================================================
 bool GrabFile( const char *pFileName, DVec<U8> &out_data );
 
+bool FileExists( const char *pFileName, bool prefs = false );
+
+#if !defined(ANDROID)
 FILE *BeginGrabFile( const char *pFileName, size_t &out_fileSize );
 bool EndGrabFile( FILE *pFile, void *pDest, size_t readSize );
-
-bool FileExists( const char *pFileName );
+#endif
 
 DStr GetDirNameFromFPathName( const char *pInFPathname );
 DStr GetFullDirNameFromFPathName( const char *pInFPathname );

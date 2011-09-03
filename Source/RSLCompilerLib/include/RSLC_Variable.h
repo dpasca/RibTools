@@ -24,7 +24,7 @@ class TokNode;
 class Variable
 {
 public:
-	std::string		mInternalName;
+	DStr			mInternalName;
 	Token			*mpDTypeTok;
 	Token			*mpDetailTok;
 	Token			*mpSpaceCastTok;
@@ -54,7 +54,7 @@ public:
 		
 		bool			mUse;
 		DVec<float>		mNumVec;
-		std::string		mStr;
+		DStr			mStr;
 		bool			mBool;
 	
 	public:
@@ -150,7 +150,7 @@ public:
 	bool HasDefName() const { return mpDefNameNode != NULL;	}
 
 	const char *GetDefName() const;
-	std::string GetUseName() const;
+	DStr GetUseName() const;
 
 	void AssignRegister( int regIdx );
 	bool IsRegisterAssigned() const;
