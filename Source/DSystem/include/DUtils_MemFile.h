@@ -1,56 +1,24 @@
 //==================================================================
-/// DMemFile.h
+/// DUtils_MemFile.h
 ///
 /// Created by Davide Pasca - 2009/8/2
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DMEMFILE_H
 #define DMEMFILE_H
 
+#include <memory.h>
 #include "DTypes.h"
 #include "DContainers.h"
+#include "DExceptions.h"
+
+class DStr;
 
 //==================================================================
 namespace DUT
 {
-
-//==================================================================
-/// MemFile
-//==================================================================
-class MemFile
-{
-	DVec<U8>	mOwnData;
-	const U8	*mpData;
-	size_t		mDataSize;
-	size_t		mReadPos;
-	bool		mIsReadOnly;
-
-public:
-	MemFile();
-	MemFile( const void *pDataSrc, size_t dataSize );
-	MemFile( const char *pFileName );
-	~MemFile();
-
-	void Init( const void *pDataSrc, size_t dataSize );
-	void Init( const char *pFileName );
-	void InitExclusiveOwenership( DVec<U8> &fromData );
-
-	const U8 *GetData() const	{	return mpData;		}
-	size_t GetDataSize() const	{	return mDataSize;	}
-
-	bool ReadTextLine( char *pDestStr, size_t destStrMaxSize );
-
-	void ReadData( void *pDest, size_t readSize );
-	const void *ReadDataPtr( size_t readSize );
-
-	void SeekSet( size_t pos );
-	void SeekFromCur( ptrdiff_t offset );
-	void SeekFromEnd( ptrdiff_t offset );
-
-	size_t GetCurPos() const { return mReadPos; }
-};
 
 //==================================================================
 /// MemWriter
@@ -95,6 +63,8 @@ public:
 		return ptr;
 	}
 
+	const U8 *GetDataBegin() const { return mpDest; }
+
 	size_t GetCurSize() const { return mIdx; }
 };
 
@@ -103,9 +73,30 @@ public:
 //==================================================================
 class MemWriterDynamic
 {
+	friend class MemFile;
+
 	DVec<U8>	mDest;
+	U32			mBits;
+	int			mBitsCnt;
 
 public:
+	MemWriterDynamic() :
+				mBits(0),
+				mBitsCnt(0)
+	{
+	}
+
+	void Resize( size_t size )
+	{
+		DASSTHROW(
+			size <= mDest.size(),
+			"MemWriteDynamic::Resize() can only shorten" );
+
+		mBits = 0;
+		mBitsCnt = 0;
+		mDest.resize( size );
+	}
+
 	template <class T>
 	void WriteValue( const T &from )
 	{
@@ -122,9 +113,53 @@ public:
 		memcpy( &mDest[idx], pFrom, sizeof(T)*cnt );
 	}
 
+	void WriteBits( U16 bits, size_t cnt )
+	{
+		// max 16 bits at once
+		DASSERT( cnt <= 16 );
+
+		// push the new bits at the back
+		mBits <<= cnt;
+		// mask the bits to make sure that
+		// the output doesn't go beyond cnt-bits
+		mBits |= bits & ((1 << cnt) - 1);
+		// increase the count of bits
+		mBitsCnt += cnt;
+
+		while ( mBitsCnt >= 8 )
+		{
+			// write out the topmost 8 bits
+			WriteValue( (U8)(mBits >> (mBitsCnt - 8)) );
+			// update the number of bits stored
+			mBitsCnt -= 8;
+		}
+	}
+
+	void WriteBitsEnd()
+	{
+		// WriteBits shouldn't have let this happen
+		DASSERT( mBitsCnt < 8 );
+
+		// flush out the remaining bits with zeros
+		if ( mBitsCnt )
+			WriteBits( 0x00, 8 - mBitsCnt );
+
+		DASSERT( mBitsCnt == 0 );
+	}
+
+	void WriteString( const DStr &str );
+	void WriteString( const char *pStr );
+
+	void PrintF( const char *pFmt, ... );
+
 	U8 *Grow( size_t cnt )
 	{
 		return mDest.grow( cnt );
+	}
+
+	void Reserve( size_t siz )
+	{
+		mDest.force_reserve( siz );
 	}
 
 	const U8 *GetDataBegin() const { return &mDest[0]; }
@@ -140,19 +175,25 @@ class MemReader
 	const U8	*mpSrc;
 	size_t		mIdx;
 	size_t		mMaxSize;
+	U32			mBits;
+	int			mBitsCnt;
 
 public:
 	MemReader( const void *pDest, size_t maxSize ) :
 		mpSrc((const U8 *)pDest),
 		mIdx(0),
-		mMaxSize(maxSize)
+		mMaxSize(maxSize),
+		mBits(0),
+		mBitsCnt(0)
 	{
 	}
 
 	MemReader( const DVec<U8> &vec ) :
 		mpSrc((const U8 *)&vec[0]),
 		mIdx(0),
-		mMaxSize(vec.size())
+		mMaxSize(vec.size()),
+		mBits(0),
+		mBitsCnt(0)
 	{
 	}
 
@@ -161,17 +202,67 @@ public:
 	{
 		size_t	idx = mIdx;
 		mIdx += sizeof(T);
+		if ( mIdx > mMaxSize )
+			DEX_OUT_OF_RANGE( "ReadValue" );
+
+	#if defined(D_UNALIGNED_MEM_ACCESS)
 		return *((T *)(mpSrc + idx));
+	#else
+		// make a buffer long enough AND aligned
+		U64 tmp[ (sizeof(T) + sizeof(U64)-1) / sizeof(U64) ];
+		// copy into the temporary buffer
+		memcpy( tmp, mpSrc + idx, sizeof(T) );
+
+		return *(const T *)tmp;
+	#endif
 	}
 
 	template <class T>
 	void ReadArray( T *pDest, size_t cnt )
 	{
+		DASSTHROW( (mIdx+cnt) <= mMaxSize, "Out of bounds!" );
+
+	#if defined(D_UNALIGNED_MEM_ACCESS)
 		for (size_t i=0; i < cnt; ++i)
 		{
 			pDest[i] = *((T *)(mpSrc + mIdx));
 			mIdx += sizeof(T);
 		}
+	#else
+		memcpy( pDest, mpSrc + mIdx, cnt * sizeof(T) );
+		mIdx += sizeof(T) * cnt;
+	#endif
+	}
+
+	U32 ReadBits( size_t cnt )
+	{
+		U32	bits = 0;
+
+		// does it have enough bits ?
+		while ( mBitsCnt < (int)cnt )
+		{
+			// ..if not, get a new byte
+			U8 val = ReadValue<U8>();
+
+			// add the new byte at the back of the bits stream
+			mBits <<= 8;
+			mBits |= val;
+			mBitsCnt += 8;
+		}
+
+		bits = mBits;
+		bits >>= mBitsCnt - cnt;
+		bits &= (1 << cnt) - 1;
+
+		mBitsCnt -= cnt;
+
+		return bits;
+	}
+
+	void ReadBitsEnd()
+	{
+		mBits		= 0;
+		mBitsCnt	= 0;
 	}
 
 	const U8 *GetDataPtr( size_t cnt )
@@ -180,6 +271,52 @@ public:
 		mIdx += cnt;
 		return (const U8 *)(mpSrc + idx);
 	}
+
+	void SkipBytes( size_t cnt )
+	{
+		mIdx += cnt;
+
+		if ( mIdx > mMaxSize )
+			DEX_OUT_OF_RANGE( "SkipBytes" ); 
+	}
+};
+
+//==================================================================
+/// MemFile
+//==================================================================
+class MemFile
+{
+	DVec<U8>	mOwnData;
+	const U8	*mpData;
+	size_t		mDataSize;
+	size_t		mReadPos;
+	bool		mIsReadOnly;
+
+public:
+	MemFile();
+	MemFile( const void *pDataSrc, size_t dataSize );
+	MemFile( const char *pFileName );
+	MemFile( MemWriterDynamic &mw );
+	~MemFile();
+
+	void Init( const void *pDataSrc, size_t dataSize );
+	void Init( const char *pFileName );
+	bool InitNoThrow( const char *pFileName );
+	void InitExclusiveOwenership( DVec<U8> &fromData );
+	void InitExclusiveOwenership( MemWriterDynamic &mw );
+
+	const U8 *GetData() const	{	return mpData;		}
+	size_t GetDataSize() const	{	return mDataSize;	}
+
+	bool ReadTextLine( char *pDestStr, size_t destStrMaxSize );
+	void ReadData( void *pDest, size_t readSize );
+	const void *ReadDataPtr( size_t readSize );
+
+	void SeekSet( size_t pos );
+	void SeekFromCur( ptrdiff_t offset );
+	void SeekFromEnd( ptrdiff_t offset );
+
+	size_t GetCurPos() const { return mReadPos; }
 };
 
 //==================================================================

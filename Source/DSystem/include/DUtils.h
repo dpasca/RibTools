@@ -20,6 +20,7 @@
 namespace DUT
 {
 
+DStr VSSPrintFS( const char *pFmt, va_list vl );
 DStr SSPrintFS( const char *pFmt, ... );
 
 //==================================================================

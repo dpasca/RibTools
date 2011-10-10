@@ -55,11 +55,11 @@ namespace DUT
 #endif
 
 #if defined(ANDROID)
-	#define DTRY
-	#define DCATCH_ALL
+# define DTRY       if (true)
+# define DCATCH_ALL else
 #else
-	#define DTRY		try
-	#define DCATCH_ALL	catch(...)
+# define DTRY		try
+# define DCATCH_ALL	catch(...)
 #endif
 
 //==================================================================

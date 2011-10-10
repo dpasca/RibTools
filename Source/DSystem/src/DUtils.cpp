@@ -33,18 +33,26 @@
 namespace DUT
 {
 
+//===============================================================
+DStr VSSPrintFS( const char *pFmt, va_list vl )
+{
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	return DStr( buff );
+}
+
 //==================================================================
 DStr SSPrintFS( const char *pFmt, ... )
 {
 	va_list	vl;
 	va_start( vl, pFmt );
 
-	char	buff[1024];
-	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+	DStr ret = VSSPrintFS( pFmt, vl );
 
 	va_end( vl );
 
-	return DStr( buff );
+	return ret;
 }
 
 //===============================================================

@@ -10,33 +10,21 @@
 #define DCONTAINERS_H
 
 #include <memory.h>
-#include <stdexcept>
 #include "DTypes.h"
 #include "DMemory.h"
 #include "DUtils_Base.h"
+#include "DExceptions.h"
 
-//==================================================================
-static const size_t	NPOS = (size_t)-1;
-
-#if defined(_MSC_VER)
-
-	#include <unordered_map>
-
-	#if _MSC_VER < 1600	// before VS 2010 ?
-		#define DUNORD_MAP	std::tr1::unordered_map
-	#else
-		#define DUNORD_MAP	std::unordered_map
-	#endif
-
-#elif defined(__GNUC__)
-
-	#include <ext/hash_map>
-
-	#define DUNORD_MAP	__gnu_cxx::hash_map
-
+#if defined(__APPLE__)
+# include <tr1/unordered_map>
+#else
+# include <unordered_map>
 #endif
 
+#define DUNORD_MAP	std::tr1::unordered_map
+
 //==================================================================
+/*
 template <class T>
 class DVecRO
 {
@@ -90,9 +78,8 @@ public:
 
 	const T &operator[]( size_t idx ) const { DASSERT( idx < mSize ); return mpData[ idx ]; }
 };
+*/
 
-
-#if 1
 //==================================================================
 template <class T>
 class DVec
@@ -121,8 +108,7 @@ public:
 		copyFrom( from );
 	}
 
-	// virtual
-	~DVec()
+	virtual ~DVec()
 	{
 		clear();
 		freeAll();
@@ -156,6 +142,7 @@ private:
 
 public:
 	size_t size() const { return mSize; }
+	size_t size_bytes() const { return mSize * sizeof(T); }
 
 	iterator		begin()			{ return mpData;	}
 	const_iterator	begin()	const	{ return mpData;	}
@@ -168,16 +155,20 @@ public:
 		resize( 0 );
 	}
 
-	void reserve( size_t newSizeAlloc )
+	void clear_free()
 	{
+		resize( 0 );
+		freeAll();
+	}
+
+	void force_reserve( size_t reserveSize )
+	{
+		size_t newSizeAlloc = mSize + reserveSize;
+
 		if ( newSizeAlloc <= mSizeAlloc )
 			return;
 
 		T *newPData = (T *)DNEW u_char [ sizeof(T) * newSizeAlloc ];
-
-		// return silently on failure
-		if NOT( newPData )
-			return;
 
 		if ( mpData )
 		{
@@ -188,6 +179,11 @@ public:
 
 		mpData = newPData;
 		mSizeAlloc = newSizeAlloc;
+	}
+
+	void reserve( size_t newSizeAlloc )
+	{
+		force_reserve( newSizeAlloc );
 	}
 
 	void resize( size_t newSize )
@@ -201,7 +197,6 @@ public:
 
 			if ( newSizeAlloc == 0 )
 			{
-				size_t dude = sizeof(T);
 				newSizeAlloc = (sizeof(T) < 128 ? 128 : sizeof(T)) / sizeof(T);
 			}
 
@@ -252,7 +247,7 @@ public:
 	void erase( iterator it )
 	{
 		if NOT( it >= mpData && it < (mpData+mSize) )
-			throw std::out_of_range( "Out of bounds !" );
+			DEX_OUT_OF_RANGE( "Out of bounds !" );
 
 		size_t	idx = it - mpData;
 		mpData[idx].~T();
@@ -266,7 +261,7 @@ public:
 	void insert( iterator itBefore, T &val )
 	{
 		if NOT( itBefore >= mpData && itBefore < (mpData+mSize) )
-			throw std::out_of_range( "Out of bounds !" );
+			DEX_OUT_OF_RANGE( "Out of bounds !" );
 
 		size_t	idx = itBefore - mpData;
 
@@ -325,7 +320,7 @@ public:
 			}
 		}
 
-		return NPOS;
+		return DNPOS;
 	}
 
 	void find_or_push_back( const T &val )
@@ -333,7 +328,8 @@ public:
 		if ( find( val ) != end() )
 			return;
 
-		T	tmp = val;	// TODO: why needs this ?!
+		// necessary for things such as push_back( back() );
+		T	tmp = val;
 		*grow() = tmp;
 	}
 
@@ -376,20 +372,25 @@ public:
 #endif
 
 };
-#else
+
 //==================================================================
-template<class T>
-class DVec : public std::vector<T>
+
+template <size_t _NUM>
+class DVecBits
 {
+	U8	mData[_NUM];
+
 public:
-	T *grow( size_t n=1 )
+	DVecBits()
 	{
-		size_t	fromIdx = this->size();
-		this->resize( fromIdx + n );
-		return &(*this)[fromIdx];
+		clear();
 	}
+
+	void clear()					{ memset( &mData[0], 0, sizeof(mData) ); }
+	void Set( size_t i )			{ DASSERT( i < _NUM ); mData[ i >> 3 ] |= 1 << (i & 7); }
+	void Reset( size_t i )			{ DASSERT( i < _NUM ); mData[ i >> 3 ] &= ~(1 << (i & 7)); }
+	bool IsSet( size_t i ) const	{ DASSERT( i < _NUM ); return !!(mData[ i >> 3 ] & (1 << (i & 7))); }
 };
-#endif
 
 //==================================================================
 template <class T>

@@ -143,7 +143,7 @@ static size_t optimizeWhitespaces( DVec<Fat8> &text, size_t start, size_t end )
 //==================================================================
 size_t ClearChunk( DVec<Fat8> &text, size_t start, size_t end )
 {
-	if ( end == NPOS )
+	if ( end == DNPOS )
 		end = text.size();
 
 	size_t newEnd;

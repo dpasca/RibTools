@@ -16,7 +16,7 @@
 //==================================================================
 errno_t fopen_s( FILE **out_ppFile, const char *pFName, const char *pMode )
 {
-	if ( *out_ppFile = fopen( pFName, pMode ) )
+	if ( (*out_ppFile = fopen( pFName, pMode )) )
 		return 0;
 	else
 		return -1;
@@ -42,6 +42,80 @@ int vsnprintf_s( char *str, size_t strMaxLen, size_t size, const char *format, v
 	DASSERT( (len+1) <= strMaxLen );
 
 	return len;
+}
+
+//==================================================================
+// WARNING: not really safe !!!
+const char *strtok_s( char *pSrcStr, const char *pDelim, char **ppContext )
+{
+	if ( pSrcStr )
+	{
+		*ppContext = pSrcStr;
+		return strtok( pSrcStr, pDelim );
+	}
+	else
+	{
+		return strtok( NULL, pDelim );
+	}
+}
+
+//==================================================================
+char *strcpy_s( char *pDest, size_t destSize, const char *pSrc )
+{
+	size_t	srcLen = strlen( pSrc );
+	DASSTHROW( (srcLen+1) <= destSize, ("Out of bounds !") );
+	return strcpy( pDest, pSrc );
+}
+
+//==================================================================
+char *strcat_s( char *pDest, size_t destSize, const char *pSrc )
+{
+	size_t	srcLen = strlen( pSrc );
+	size_t	curDestLen = strlen( pDest );
+	DASSTHROW( (curDestLen+srcLen+1) <= destSize, ("Out of bounds !") );
+	return strcat( pDest, pSrc );
+}
+
+//==================================================================
+int vsprintf_s( char *str, const char *pFmt, va_list vl )
+{
+	return vsprintf( str, pFmt, vl );
+}
+
+//==================================================================
+int vsprintf_s( char *str, size_t destMaxSize, const char *pFmt, va_list vl )
+{
+	return vsprintf( str, pFmt, vl );
+}
+
+//==================================================================
+int sprintf_s( char *str, const char *format, ...)
+{
+	int	ret;
+	
+	va_list	vl;
+	va_start( vl, format );
+	
+	ret = vsprintf_s( str, format, vl );
+	
+	va_end( vl );
+	
+	return ret;
+}
+
+//==================================================================
+int sprintf_s( char *str, size_t destMaxSize, const char *format, ...)
+{
+	int	ret;
+	
+	va_list	vl;
+	va_start( vl, format );
+	
+	ret = vsprintf_s( str, format, vl );
+	
+	va_end( vl );
+	
+	return ret;
 }
 
 #endif

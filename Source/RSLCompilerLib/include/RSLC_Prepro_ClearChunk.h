@@ -20,7 +20,7 @@ namespace PREPRO
 {
 
 //==================================================================
-size_t ClearChunk( DVec<Fat8> &text, size_t start=0, size_t end=NPOS );
+size_t ClearChunk( DVec<Fat8> &text, size_t start=0, size_t end=DNPOS );
 
 
 //==================================================================

@@ -11,9 +11,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
 #include <time.h>
+#include <stdarg.h>
 
 //===============================================================
 #if !defined(_MSC_VER)
@@ -23,8 +22,14 @@
 #define strcat_s	strcat
 #define _strdate_s	strdate
 #define _strtime_s	strtime
-#define sprintf_s	sprintf
 #define sscanf_s	sscanf
+
+//#define vsnprintf_s(_DST_,_DSTSIZ_,_MAXCNT_,_FMT_,_ARGS_)	vsnprintf(_DST_,_MAXCNT_,_FMT_,_ARGS_)
+
+int vsprintf_s( char *str, const char *pFmt, va_list vl );
+int vsprintf_s( char *str, size_t destMaxSize, const char *pFmt, va_list vl );
+int sprintf_s( char *str, const char *format, ...);
+int sprintf_s( char *str, size_t destMaxSize, const char *format, ...);
 
 #define	_getcwd		getcwd
 
@@ -36,6 +41,21 @@ int vsnprintf_s( char *str, size_t strMaxLen, size_t size, const char *format, v
 
 void strtime( char *pDest, size_t maxLen=0 );
 
+const char *strtok_s( char *pSrcStr, const char *pDelim, char **ppContext );
+
+char *strcpy_s( char *pDest, size_t destSize, const char *pSrc );
+char *strcat_s( char *pDest, size_t destSize, const char *pSrc );
+
+#else
+
+#define snprintf	_snprintf
+
+#endif
+
+#if defined(_DEBUG)
+# define ASSTHROW(_X_,_MSG_, ...)   DASSTHROW(_X_,_MSG_, ##__VA_ARGS__)
+#else
+# define ASSTHROW(_X_,_MSG_, ...)
 #endif
 
 void numstrdate( char *pDest, size_t maxLen=0 );

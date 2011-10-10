@@ -10,43 +10,43 @@
 #define DMEMORY_H
 
 #include <new>
-#include <memory>
+
+#if defined(_MSC_VER)
+#define D_OVERRIDE_NEW_DEL
+//#defined D_FILE_LINE_NEW_DEL
+#endif
 
 //==================================================================
-#if defined(_MSC_VER)
+#if defined(D_FILE_LINE_NEW_DEL) && defined(D_OVERRIDE_NEW_DEL)
 
-#define DNEW				new			(__FILE__, __LINE__)
-#define DDELETE(_X_)		delete		(__FILE__, __LINE__, (_X_))
-#define DDELETE_ARRAY(_X_)	delete []	(__FILE__, __LINE__, (_X_))
+	#define DNEW				new			(__FILE__, __LINE__)
+	#define DDELETE(_X_)		delete		(__FILE__, __LINE__, (_X_))
+	#define DDELETE_ARRAY(_X_)	delete []	(__FILE__, __LINE__, (_X_))
+
+	void *operator new( size_t size, const char *pFile, int line );
+	void *operator new [] ( size_t size, const char *pFile, int line );
+	void operator delete( void *p, const char *pFile, int line );
+	void operator delete [] ( void *p, const char *pFile, int line );
 
 #else
 
-#define DNEW				new
-#define DDELETE(_X_)		delete		(_X_)
-#define DDELETE_ARRAY(_X_)	delete []	(_X_)
+	#define DNEW				new
+	#define DDELETE(_X_)		delete		(_X_)
+	#define DDELETE_ARRAY(_X_)	delete []	(_X_)
+
+#endif
+
+#if defined(D_OVERRIDE_NEW_DEL)
+
+	void *operator new( size_t size );
+	void *operator new [] ( size_t size );
+	void operator delete( void *p );
+	void operator delete [] ( void *p );
 
 #endif
 
 #define DSAFE_DELETE(_X_)		{ if ( _X_ ) { DDELETE		(_X_); (_X_) = 0; } }
 #define DSAFE_DELETE_ARRAY(_X_)	{ if ( _X_ ) { DDELETE_ARRAY(_X_); (_X_) = 0; } }
-
-//==================================================================
-void *operator new( size_t size, const char *pFile, int line );
-void *operator new [] ( size_t size, const char *pFile, int line );
-void operator delete( void *p, const char *pFile, int line );
-void operator delete [] ( void *p, const char *pFile, int line );
-
-void *operator new( size_t size );
-void *operator new [] ( size_t size );
-void operator delete( void *p );
-void operator delete [] ( void *p );
-
-//==================================================================
-namespace DMEM
-{
-
-//==================================================================
-}
 
 #if defined(_MSC_VER) && _MSC_VER < 1600	// before VS 2010 ?
 	#define unique_ptr	auto_ptr	// WARNING: not STL-safe
