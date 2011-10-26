@@ -387,6 +387,10 @@ typedef	Vec2<float>												Float2;
 typedef	Vec3<float>												Float3;
 typedef	Vec4<float>												Float4;
 
+typedef	Vec2<int>												Int2;
+typedef	Vec3<int>												Int3;
+typedef	Vec4<int>												Int4;
+
 //==================================================================
 typedef	Float2		Point2;
 typedef	Float3		Point3;

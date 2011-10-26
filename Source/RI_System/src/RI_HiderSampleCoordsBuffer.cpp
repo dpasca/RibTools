@@ -43,7 +43,7 @@ void HiderSampleCoordsBuffer::Init( u_int wd, u_int he, u_int subPixelDimLog2 )
 	mpSampCoords = DNEW HiderSampleCoords [ sampArrSize ];
 	mpBaseSampCoords = DNEW HiderBaseSampleCoords [ sampArrSize ];
 
-	DRandom	randGen( 0x11112222 );
+	DRandom	randGen( (U32)0x11112222 );
 
 	size_t sampsCnt = 0;
 	for (u_int y=0; y < mHe; ++y)

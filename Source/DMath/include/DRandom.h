@@ -21,6 +21,11 @@ class DRandom
 public:
 	DRandom( DU64 seed )
 	{
+		Init( (DU32)((seed & 0x00000000ffffffff) | (seed >> 32)) );
+	}
+
+	DRandom( DU32 seed )
+	{
 		Init( seed );
 	}
 
@@ -30,10 +35,10 @@ public:
 		m_z = 0;
 	}
 
-	void Init( DU64 seed )
+	void Init( DU32 seed )
 	{
-		m_w = (DU32)(seed & 0xffffffff);
-		m_z = (DU32)((seed >> 32) & 0xffffffff);
+		m_w = (DU32)(seed & 0x33333333);
+		m_z = (DU32)(seed & 0xcccccccc);
 		m_w += 36969;
 		m_z += 18000;
 	}
