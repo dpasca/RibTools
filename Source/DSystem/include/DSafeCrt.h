@@ -41,8 +41,6 @@ int vsnprintf_s( char *str, size_t strMaxLen, size_t size, const char *format, v
 
 void strtime( char *pDest, size_t maxLen=0 );
 
-const char *strtok_s( char *pSrcStr, const char *pDelim, char **ppContext );
-
 char *strcpy_s( char *pDest, size_t destSize, const char *pSrc );
 char *strcat_s( char *pDest, size_t destSize, const char *pSrc );
 

@@ -262,46 +262,6 @@ void PatchBicubic::setupEvalCalc()
 }
 
 //==================================================================
-template <class _S, class _T>
-inline _S spline(
-				const _T &t,
-				const RtBasis &b,
-				const _S &p0,
-				const _S &p1,
-				const _S &p2,
-				const _S &p3 )
-{
-	_S v0(p0*b.mij(0,0) + p1*b.mij(0,1) + p2*b.mij(0,2) + p3*b.mij(0,3));
-	_S v1(p0*b.mij(1,0) + p1*b.mij(1,1) + p2*b.mij(1,2) + p3*b.mij(1,3));
-	_S v2(p0*b.mij(2,0) + p1*b.mij(2,1) + p2*b.mij(2,2) + p3*b.mij(2,3));
-	_S v3(p0*b.mij(3,0) + p1*b.mij(3,1) + p2*b.mij(3,2) + p3*b.mij(3,3));
-
-	return	v0 *t*t*t +
-			v1 *t*t +
-			v2 *t +
-			v3 ;
-}
-
-//==================================================================
-template <class _S, class _T>
-inline _S splineDeriv(
-					const _T &t,
-					const RtBasis &b,
-					const _S &p0,
-					const _S &p1,
-					const _S &p2,
-					const _S &p3 )
-{
-	_S v0(p0*b.mij(0,0) + p1*b.mij(0,1) + p2*b.mij(0,2) + p3*b.mij(0,3));
-	_S v1(p0*b.mij(1,0) + p1*b.mij(1,1) + p2*b.mij(1,2) + p3*b.mij(1,3));
-	_S v2(p0*b.mij(2,0) + p1*b.mij(2,1) + p2*b.mij(2,2) + p3*b.mij(2,3));
-
-	return	v0 *3*t*t +
-			v1 *2*t +
-			v2 ;
-}
-
-//==================================================================
 /*
 void PatchBicubic::Eval_dPdu_dPdv(
 			float u,
@@ -349,18 +309,18 @@ void PatchBicubic::Eval_dPdu_dPdv(
 	Float3_ uMid2	= mCalcU[2].Eval( uv[0] );
 	Float3_ uTop		= mCalcU[3].Eval( uv[0] );
 
-	out_pt = spline( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
+	out_pt = DMT::Spline( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
 
 	if ( out_dPdu )
 	{
-		*out_dPdv = splineDeriv( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
+		*out_dPdv = DMT::SplineDeriv( uv[1], vBasis, uBottom, uMid1, uMid2, uTop );
 
 		Float3_ vBottom	= mCalcV[0].Eval( uv[1] );
 		Float3_ vMid1	= mCalcV[1].Eval( uv[1] );
 		Float3_ vMid2	= mCalcV[2].Eval( uv[1] );
 		Float3_ vTop	= mCalcV[3].Eval( uv[1] );
 
-		*out_dPdu = splineDeriv( uv[0], uBasis, vBottom, vMid1, vMid2, vTop );
+		*out_dPdu = DMT::SplineDeriv( uv[0], uBasis, vBottom, vMid1, vMid2, vTop );
 	}
 }
 

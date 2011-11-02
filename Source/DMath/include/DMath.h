@@ -13,5 +13,6 @@
 #include "DVector.h"
 #include "DMatrix44.h"
 #include "DRandom.h"
+#include "DMT_Spline.h"
 
 #endif

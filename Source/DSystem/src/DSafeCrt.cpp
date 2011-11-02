@@ -45,21 +45,6 @@ int vsnprintf_s( char *str, size_t strMaxLen, size_t size, const char *format, v
 }
 
 //==================================================================
-// WARNING: not really safe !!!
-const char *strtok_s( char *pSrcStr, const char *pDelim, char **ppContext )
-{
-	if ( pSrcStr )
-	{
-		*ppContext = pSrcStr;
-		return strtok( pSrcStr, pDelim );
-	}
-	else
-	{
-		return strtok( NULL, pDelim );
-	}
-}
-
-//==================================================================
 char *strcpy_s( char *pDest, size_t destSize, const char *pSrc )
 {
 	size_t	srcLen = strlen( pSrc );
