@@ -37,6 +37,7 @@ bool StrEndsWithI( const char *pStr, const char *pSearch );
 void StrToUpper( DStr &str );
 void StrToUpper( char *pStr );
 void StrToLower( DStr &str );
+const char *StrFindLastOf( const char *pStr, char searchCh );
 
 I64 GetTimeTicks();
 double TimeTicksToMS( I64 ticks );
@@ -85,6 +86,11 @@ public:
 		I64 delta = GetTimeTicks() - mStartTicks;
 
 		return TimeTicksToMS( delta ) > mTimeOutMS;
+	}
+
+	void Reset()
+	{
+		mStartTicks = GetTimeTicks();
 	}
 };
 

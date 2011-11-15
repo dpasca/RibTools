@@ -57,9 +57,11 @@ namespace DUT
 #if defined(ANDROID)
 # define DTRY       if (true)
 # define DCATCH_ALL else
+# define DTHROW	
 #else
 # define DTRY		try
 # define DCATCH_ALL	catch(...)
+# define DTHROW		throw
 #endif
 
 //==================================================================

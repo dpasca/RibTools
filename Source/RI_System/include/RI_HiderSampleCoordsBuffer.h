@@ -9,6 +9,8 @@
 #ifndef RI_HIDERSAMPLECOORDSBUFFER_H
 #define RI_HIDERSAMPLECOORDSBUFFER_H
 
+#include "DUtils_Random.h"
+
 //==================================================================
 namespace RI
 {
@@ -87,7 +89,7 @@ private:
 				HiderSampleCoords		*pSampCoods,
 				HiderBaseSampleCoords	*pBaseSampleCoords,
 				u_int					subPixelDimLog2,
-				DRandom					&randGen );
+				DUT::RandMT				&randGen );
 
 	void setupPixel(
 				HiderSampleCoords		*pSampCoods,

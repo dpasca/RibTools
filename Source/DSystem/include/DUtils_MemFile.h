@@ -295,13 +295,13 @@ class MemFile
 public:
 	MemFile();
 	MemFile( const void *pDataSrc, size_t dataSize );
-	MemFile( const char *pFileName );
+	MemFile( const char *pFileName, bool prefs = false );
 	MemFile( MemWriterDynamic &mw );
 	~MemFile();
 
 	void Init( const void *pDataSrc, size_t dataSize );
-	void Init( const char *pFileName );
-	bool InitNoThrow( const char *pFileName );
+	void Init( const char *pFileName, bool prefs = false );
+	bool InitNoThrow( const char *pFileName, bool prefs = false );
 	void InitExclusiveOwenership( DVec<U8> &fromData );
 	void InitExclusiveOwenership( MemWriterDynamic &mw );
 

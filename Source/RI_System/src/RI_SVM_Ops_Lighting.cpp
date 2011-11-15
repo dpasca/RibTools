@@ -52,7 +52,7 @@ void Inst_Ambient( Context &ctx, u_int blocksN )
 			// setup the new context
 			pCtx->SetupIfChanged(
 						*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
-						pLight->moShaderInst.Use(),	// shader instance from the light source
+						pLight->moShaderInst.get(),	// shader instance from the light source
 						ctx.mBlocksXN,				// same dimensions as the current shader
 						ctx.mPointsYN );			// ...
 
@@ -106,7 +106,7 @@ void FuncOpEnd_Illuminance( Context &ctx )
 			// setup the new context
 			pCtx->SetupIfChanged(
 						*ctx.mpAttribs,				// same attribs as the current (surface only ?) shader
-						pLight->moShaderInst.Use(),	// shader instance from the light source
+						pLight->moShaderInst.get(),	// shader instance from the light source
 						ctx.mBlocksXN,				// same dimensions as the current shader
 						ctx.mPointsYN );			// ...
 

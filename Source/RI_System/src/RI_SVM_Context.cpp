@@ -100,7 +100,7 @@ void Context::SetupIfChanged(
 		mpShaderInst	= pShaderInst;
 		mpAttribs		= &attribs;
 
-		DASSERT( 0 != mpShaderInst->moShader.Use() );
+		DASSERT( 0 != mpShaderInst->moShader.get() );
 		mpDataSegment =
 			mpShaderInst->Bind(
 						mpAttribs->GetGlobalSymList(),

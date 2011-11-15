@@ -43,7 +43,7 @@ void HiderSampleCoordsBuffer::Init( u_int wd, u_int he, u_int subPixelDimLog2 )
 	mpSampCoords = DNEW HiderSampleCoords [ sampArrSize ];
 	mpBaseSampCoords = DNEW HiderBaseSampleCoords [ sampArrSize ];
 
-	DRandom	randGen( (U32)0x11112222 );
+	DUT::RandMT	randGen( (U32)0x11112222 );
 
 	size_t sampsCnt = 0;
 	for (u_int y=0; y < mHe; ++y)
@@ -82,10 +82,10 @@ void HiderSampleCoordsBuffer::Setup( float openTime, float closeTime )
 
 //==================================================================
 void HiderSampleCoordsBuffer::initPixel(
-							HiderSampleCoords		*pSampCoods,
-							HiderBaseSampleCoords	*pBaseSampleCoords,
-							u_int					subPixelDimLog2,
-							DRandom					&randGen )
+				HiderSampleCoords		*pSampCoods,
+				HiderBaseSampleCoords	*pBaseSampleCoords,
+				u_int					subPixelDimLog2,
+				DUT::RandMT				&randGen )
 {
 	u_int subPixelDim = 1 << subPixelDimLog2;
 	u_int randPosMask = (1 << subPixelDimLog2) - 1;
@@ -108,7 +108,7 @@ void HiderSampleCoordsBuffer::initPixel(
 	{
 		for (u_int x=0; x < subPixelDim; ++x)
 		{
-			int	k = randGen.Next32Range( 0, subPixelDim-1-y );
+			int	k = randGen.randomMT() % (subPixelDim-y);
 
 			u_int idx = (y << subPixelDimLog2) + x;
 			u_int idxK = (k << subPixelDimLog2) + x;
@@ -136,7 +136,7 @@ void HiderSampleCoordsBuffer::initPixel(
 		{
 			u_int idx = (y << subPixelDimLog2) + x;
 
-			float t = timeRun + randGen.NextF0_1() * dtime;
+			float t = timeRun + randGen.randomMT() / (float)((U32)-1);
 			
 			pSampCoods[ idx ].mTime			= 0;
 			pBaseSampleCoords[ idx ].mTime	= t;

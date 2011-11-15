@@ -10,15 +10,33 @@
 #define DUTILS_FILES_H
 
 #include "DTypes.h"
-#include "DContainers.h"
 #include "DStr.h"
+#include "DContainers.h"
+#include "DUtils_MemFile.h"
 
 //==================================================================
 namespace DUT
 {
 
 //==================================================================
-bool GrabFile( const char *pFileName, DVec<U8> &out_data );
+
+/// prefs indicates whether the system preferences storage should be
+/// used.  On some platforms (android) this is the only system by
+/// which persistent data can be loaded and saved.  On other
+/// platforms, this may be completely ignored.
+bool GrabFile( const char *pFileName, DVec<U8> &out_data, bool prefs=false );
+
+bool SaveFile( const char *pFileName, const U8 *pInData, size_t dataSize,
+               bool prefs=false );
+
+// utility version that connects to the frequently (?) used memo writer
+inline bool SaveFile(
+				const char *pFileName,
+				const MemWriterDynamic &mw,
+				bool prefs=false )
+{
+	return SaveFile( pFileName, mw.GetDataBegin(), mw.GetCurSize(), prefs );
+}
 
 bool FileExists( const char *pFileName, bool prefs = false );
 

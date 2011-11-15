@@ -3,7 +3,7 @@
 ///
 /// Created by Davide Pasca - 2011/11/2
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
 #ifndef DMT_SPLINE_H
@@ -15,20 +15,22 @@
 namespace DMT
 {
 
+// _S, _N and probably some others conflict with the android headers.
+
 //==================================================================
-template <class _S, class _T>
-inline _S Spline(
+template <class _SS, class _T>
+inline _SS Spline(
 				const _T &t,
 				const Matrix44 &b,
-				const _S &p0,
-				const _S &p1,
-				const _S &p2,
-				const _S &p3 )
+				const _SS &p0,
+				const _SS &p1,
+				const _SS &p2,
+				const _SS &p3 )
 {
-	_S v0(p0*b.mij(0,0) + p1*b.mij(0,1) + p2*b.mij(0,2) + p3*b.mij(0,3));
-	_S v1(p0*b.mij(1,0) + p1*b.mij(1,1) + p2*b.mij(1,2) + p3*b.mij(1,3));
-	_S v2(p0*b.mij(2,0) + p1*b.mij(2,1) + p2*b.mij(2,2) + p3*b.mij(2,3));
-	_S v3(p0*b.mij(3,0) + p1*b.mij(3,1) + p2*b.mij(3,2) + p3*b.mij(3,3));
+	_SS v0(p0*b.mij(0,0) + p1*b.mij(0,1) + p2*b.mij(0,2) + p3*b.mij(0,3));
+	_SS v1(p0*b.mij(1,0) + p1*b.mij(1,1) + p2*b.mij(1,2) + p3*b.mij(1,3));
+	_SS v2(p0*b.mij(2,0) + p1*b.mij(2,1) + p2*b.mij(2,2) + p3*b.mij(2,3));
+	_SS v3(p0*b.mij(3,0) + p1*b.mij(3,1) + p2*b.mij(3,2) + p3*b.mij(3,3));
 
 	return	v0 *t*t*t +
 			v1 *t*t +
@@ -37,18 +39,18 @@ inline _S Spline(
 }
 
 //==================================================================
-template <class _S, class _T>
-inline _S SplineDeriv(
+template <class _SS, class _T>
+inline _SS SplineDeriv(
 					const _T &t,
 					const Matrix44 &b,
-					const _S &p0,
-					const _S &p1,
-					const _S &p2,
-					const _S &p3 )
+					const _SS &p0,
+					const _SS &p1,
+					const _SS &p2,
+					const _SS &p3 )
 {
-	_S v0(p0*b.mij(0,0) + p1*b.mij(0,1) + p2*b.mij(0,2) + p3*b.mij(0,3));
-	_S v1(p0*b.mij(1,0) + p1*b.mij(1,1) + p2*b.mij(1,2) + p3*b.mij(1,3));
-	_S v2(p0*b.mij(2,0) + p1*b.mij(2,1) + p2*b.mij(2,2) + p3*b.mij(2,3));
+	_SS v0(p0*b.mij(0,0) + p1*b.mij(0,1) + p2*b.mij(0,2) + p3*b.mij(0,3));
+	_SS v1(p0*b.mij(1,0) + p1*b.mij(1,1) + p2*b.mij(1,2) + p3*b.mij(1,3));
+	_SS v2(p0*b.mij(2,0) + p1*b.mij(2,1) + p2*b.mij(2,2) + p3*b.mij(2,3));
 
 	return	v0 *3*t*t +
 			v1 *2*t +

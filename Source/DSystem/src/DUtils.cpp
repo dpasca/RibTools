@@ -263,6 +263,20 @@ void StrToLower( DStr &str )
 }
 
 //==================================================================
+const char *StrFindLastOf( const char *pStr, char searchCh )
+{
+	size_t	len = strlen( pStr );
+
+	for (size_t i=0; i < len; ++i)
+	{
+		if ( pStr[ len-1 - i ] == searchCh )
+			return &pStr[ len-1 - i];
+	}
+
+	return NULL;
+}
+
+//==================================================================
 I64 GetTimeTicks()
 {
 	I64	val;

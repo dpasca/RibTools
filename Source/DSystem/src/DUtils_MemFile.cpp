@@ -8,6 +8,7 @@
 
 #include "DUtils_Files.h"
 #include "DUtils_MemFile.h"
+#include "DExceptions.h"
 
 //==================================================================
 namespace DUT
@@ -34,13 +35,13 @@ MemFile::MemFile( const void *pDataSrc, size_t dataSize ) :
 }
 
 //==================================================================
-MemFile::MemFile( const char *pFileName ) :
+MemFile::MemFile( const char *pFileName, bool prefs ) :
 	mpData(NULL),
 	mDataSize(0),
 	mReadPos(0),
 	mIsReadOnly(true)
 {
-	Init( pFileName );
+	Init( pFileName, prefs );
 }
 
 //==================================================================
@@ -66,11 +67,11 @@ void MemFile::Init( const void *pDataSrc, size_t dataSize )
 }
 
 //==================================================================
-void MemFile::Init( const char *pFileName )
+void MemFile::Init( const char *pFileName, bool prefs )
 {
 	DASSERT( mpData == NULL && mDataSize == 0 && mReadPos == 0 );
 
-	if NOT( GrabFile( pFileName, mOwnData ) )
+	if NOT( GrabFile( pFileName, mOwnData, prefs ) )
 	{
 		DEX_RUNTIME_ERROR( "Could not open the file '%s' for reading.", pFileName );
 	}
@@ -80,11 +81,11 @@ void MemFile::Init( const char *pFileName )
 }
 
 //==================================================================
-bool MemFile::InitNoThrow( const char *pFileName )
+bool MemFile::InitNoThrow( const char *pFileName, bool prefs )
 {
 	DASSERT( mpData == NULL && mDataSize == 0 && mReadPos == 0 );
 
-	if NOT( GrabFile( pFileName, mOwnData ) )
+	if NOT( GrabFile( pFileName, mOwnData, prefs ) )
 	{
 		return false;
 	}
@@ -192,8 +193,8 @@ const void *MemFile::ReadDataPtr( size_t readSize )
 //==================================================================
 void MemFile::SeekSet( size_t pos )
 {
-	if ( pos < 0 || pos > mDataSize )
-		throw std::out_of_range( "Writing out of bounds !" );
+	if ( pos > mDataSize )
+		DEX_OUT_OF_RANGE( "Writing out of bounds !" );
 
 	mReadPos = pos;
 }

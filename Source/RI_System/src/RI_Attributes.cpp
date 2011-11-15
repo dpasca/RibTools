@@ -79,8 +79,8 @@ void Attributes::copyFrom(const Attributes& rhs)
 	mVSteps				= rhs.mVSteps				;
 	mColor				= rhs.mColor				;
 	mOpacity			= rhs.mOpacity				;
-	moSurfaceSHI.Borrow(  rhs.moSurfaceSHI )		;
-	moDisplaceSHI.Borrow( rhs.moDisplaceSHI )		;
+	moSurfaceSHI		= rhs.moSurfaceSHI 			;
+	moDisplaceSHI		= rhs.moDisplaceSHI			;
 	mActiveLights		= rhs.mActiveLights			;
 }
 
@@ -344,7 +344,7 @@ void Attributes::cmdLightSource( ParamList &params )
 	pLight->mIsAmbient = !pShader->mHasDirPosInstructions;
 
 	Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
-	getShaderParams( params, 2, *pLight->moShaderInst.Use(), mtxLocalCam );
+	getShaderParams( params, 2, *pLight->moShaderInst.get(), mtxLocalCam );
 
 	size_t listIdx = mpState->AddLightSource( pLight );
 
@@ -377,7 +377,7 @@ void Attributes::cmdSurface( ParamList &params )
 		moSurfaceSHI = DNEW SVM::ShaderInst( pShader );
 
 		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
-		getShaderParams( params, 1, *moSurfaceSHI.Use(), mtxLocalCam );
+		getShaderParams( params, 1, *moSurfaceSHI.get(), mtxLocalCam );
 	}
 
 	// $$$ should really check if the shader or any params really changed
@@ -401,7 +401,7 @@ void Attributes::cmdDisplacement( ParamList &params )
 		moDisplaceSHI = DNEW SVM::ShaderInst( pShader );
 
 		Matrix44 mtxLocalCam = mpState->GetCurTransformOpenMtx() * mpState->GetWorldCameraMtx();
-		getShaderParams( params, 1, *moDisplaceSHI.Use(), mtxLocalCam );
+		getShaderParams( params, 1, *moDisplaceSHI.get(), mtxLocalCam );
 
 		// $$$ should really check if the shader or any params really changed
 		mpRevision->BumpRevision();

@@ -233,7 +233,7 @@ class RCOwn
 public:
 	RCOwn()						: mPtr(NULL)	{ }
 	RCOwn( T *ptr )				: mPtr(NULL)	{ Borrow( ptr ); }
-	RCOwn( const RCOwn &from )	: mPtr(NULL)	{ Borrow( from ); }
+	RCOwn( const RCOwn &from )	: mPtr(NULL)	{ Borrow( from.get() ); }
 
 	virtual ~RCOwn()
 	{
@@ -241,10 +241,11 @@ public:
 			mPtr->SubRef();
 	}
 
-	RCOwn &operator=( const RCOwn &from )	{	Borrow( from );	return *this; }
-	RCOwn &operator=( T *ptr )				{	Borrow( ptr );	return *this; }
-	RCOwn &operator=( const T *ptr )		{	Borrow( ptr );	return *this; }
+	RCOwn &operator=( const RCOwn &from )	{	Borrow( from.get() );	return *this; }
+	RCOwn &operator=( T *ptr )				{	Borrow( ptr );			return *this; }
+	RCOwn &operator=( const T *ptr )		{	Borrow( ptr );			return *this; }
 
+private:
 	void Borrow( T *ptr )
 	{
 		if ( ptr == mPtr )
@@ -269,19 +270,15 @@ public:
 			mPtr->AddRef();
 	}
 
-	void Borrow( const RCOwn &from )
-	{
-		Borrow( from.Use() );
-	}
-
-	const T *Use() const
+public:
+	const T *get() const
 	{
 		DASSERT( !mPtr || mPtr->GetRef() > 0 );
 
 		return mPtr;
 	}
 
-	T *Use()
+	T *get()
 	{
 		DASSERT( !mPtr || mPtr->GetRef() > 0 );
 

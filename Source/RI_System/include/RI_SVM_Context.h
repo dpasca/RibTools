@@ -199,7 +199,7 @@ public:
 
 	const Shader *GetShader() const
 	{
-		return mpShaderInst->moShader.Use();
+		return mpShaderInst->moShader.get();
 	}
 
 	bool IsInFuncop() const

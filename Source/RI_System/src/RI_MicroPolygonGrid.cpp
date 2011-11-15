@@ -130,11 +130,11 @@ void WorkGrid::Setup(
 //==================================================================
 void WorkGrid::Displace( const Attributes &attribs )
 {
-	if ( attribs.moDisplaceSHI.Use() )
+	if ( attribs.moDisplaceSHI.get() )
 	{
 		mDispRunCtx.SetupIfChanged(
 						attribs,
-						attribs.moDisplaceSHI.Use(),
+						attribs.moDisplaceSHI.get(),
 						DMT_SIMD_BLOCKS( mXDim ),
 						mYDim,
 						mPointsN );
@@ -148,7 +148,7 @@ void WorkGrid::Shade( const Attributes &attribs )
 {
 	mSurfRunCtx.SetupIfChanged(
 					attribs,
-					attribs.moSurfaceSHI.Use(),
+					attribs.moSurfaceSHI.get(),
 					DMT_SIMD_BLOCKS( mXDim ),
 					mYDim,
 					mPointsN );

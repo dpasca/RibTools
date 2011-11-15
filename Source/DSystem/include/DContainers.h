@@ -24,63 +24,6 @@
 #define DUNORD_MAP	std::tr1::unordered_map
 
 //==================================================================
-/*
-template <class T>
-class DVecRO
-{
-	const T	*mpData;
-	size_t	mSize;
-
-public:
-	typedef const T	*const_iterator;
-	typedef T		*iterator;
-
-public:
-	DVecRO( const T *pSrc, size_t srcSize ) :
-		mpData(pSrc),
-		mSize(srcSize)
-	{
-	}
-
-	DVecRO( const DVecRO &from ) :
-		mpData(from.mpData),
-		mSize(from.mSize)
-	{
-	}
-
-	DVecRO &operator=(const DVecRO& rhs)
-	{
-		mpData	= rhs.mpData;
-		mSize	= rhs.mSize;
-
-		return *this;
-	}
-
-public:
-	size_t size() const { return mSize; }
-
-	const_iterator	begin()	const	{ return mpData;	}
-
-	const_iterator	end()	const	{ return mpData + mSize;	}
-
-	iterator find( const T &val )
-	{
-		for (size_t i=0; i < mSize; ++i)
-		{
-			if ( mpData[i] == val )
-			{
-				return mpData + i;
-			}
-		}
-
-		return end();
-	}
-
-	const T &operator[]( size_t idx ) const { DASSERT( idx < mSize ); return mpData[ idx ]; }
-};
-*/
-
-//==================================================================
 template <class T>
 class DVec
 {

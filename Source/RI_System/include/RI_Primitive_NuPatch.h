@@ -60,12 +60,12 @@ public:
 			);
 
 	NuPatch( const NuPatch &from ) :
-		SimplePrimitiveBase(from)
+		SimplePrimitiveBase(from),
+		moBaseDef(from.moBaseDef)
 	{
-		moBaseDef.Borrow( from.moBaseDef );
 	}
 
-	void operator = ( const NuPatch &from )	{	moBaseDef.Borrow( from.moBaseDef );	}
+	void operator = ( const NuPatch &from )	{	moBaseDef = from.moBaseDef;	}
 
 		NuPatch	*Clone() const {	return DNEW NuPatch( *this ); }
 

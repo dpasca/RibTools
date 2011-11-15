@@ -9,6 +9,7 @@
 #ifndef DMT_VECN_H
 #define DMT_VECN_H
 
+#include "DTypes.h"
 #include "DMathBase.h"
 
 //==================================================================
