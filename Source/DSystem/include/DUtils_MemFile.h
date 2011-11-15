@@ -6,8 +6,8 @@
 /// copyright info.
 //==================================================================
 
-#ifndef DMEMFILE_H
-#define DMEMFILE_H
+#ifndef DUTILS_MEMFILE_H
+#define DUTILS_MEMFILE_H
 
 #include <memory.h>
 #include "DTypes.h"

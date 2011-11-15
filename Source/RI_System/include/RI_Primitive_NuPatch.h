@@ -42,7 +42,7 @@ class NuPatch : public SimplePrimitiveBase
 		}
 	};
 
-	RCOwn<BaseDef>	moBaseDef;
+	RCSha<BaseDef>	moBaseDef;
 
 public:
 	NuPatch(

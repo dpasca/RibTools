@@ -65,8 +65,8 @@ public:
 
 	Color				mColor;
 	Color				mOpacity;
-	RCOwn<SVM::ShaderInst>	moSurfaceSHI;
-	RCOwn<SVM::ShaderInst>	moDisplaceSHI;
+	RCSha<SVM::ShaderInst>	moSurfaceSHI;
+	RCSha<SVM::ShaderInst>	moDisplaceSHI;
 
 	DVec<U16>			mActiveLights;
 

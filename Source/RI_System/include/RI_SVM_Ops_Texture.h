@@ -28,7 +28,7 @@ void Inst_Texture( Context &ctx, u_int blocksN )
 	int				stOffs[8][2];
 	int				stSteps[8][2];
 
-	RCOwn<Texture>	oTex( ctx.mpAttribs->GetTexture( pName->mStr ) );
+	RCSha<Texture>	oTex( ctx.mpAttribs->GetTexture( pName->mStr ) );
 
 	DASSERT( oTex.get() != NULL );
 

@@ -200,7 +200,7 @@ class ShaderInst : public RCBase
 {
 	friend class Context;
 
-	RCOwn<Shader>		moShader;
+	RCSha<Shader>		moShader;
 	size_t				mMaxPointsN;
 
 public:

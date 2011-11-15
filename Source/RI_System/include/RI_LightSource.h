@@ -26,7 +26,7 @@ class Transform;
 class LightSourceT
 {
 public:
-	RCOwn<SVM::ShaderInst>	moShaderInst;
+	RCSha<SVM::ShaderInst>	moShaderInst;
 
 public:
 	enum Type

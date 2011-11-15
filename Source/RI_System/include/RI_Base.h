@@ -226,27 +226,27 @@ private:
 /// RefCount
 //==================================================================
 template <class T>
-class RCOwn
+class RCSha
 {
 	T	*mPtr;
 
 public:
-	RCOwn()						: mPtr(NULL)	{ }
-	RCOwn( T *ptr )				: mPtr(NULL)	{ Borrow( ptr ); }
-	RCOwn( const RCOwn &from )	: mPtr(NULL)	{ Borrow( from.get() ); }
+	RCSha()						: mPtr(NULL)	{ }
+	RCSha( T *ptr )				: mPtr(NULL)	{ borrow( ptr ); }
+	RCSha( const RCSha &from )	: mPtr(NULL)	{ borrow( from.get() ); }
 
-	virtual ~RCOwn()
+	virtual ~RCSha()
 	{
 		if ( mPtr )
 			mPtr->SubRef();
 	}
 
-	RCOwn &operator=( const RCOwn &from )	{	Borrow( from.get() );	return *this; }
-	RCOwn &operator=( T *ptr )				{	Borrow( ptr );			return *this; }
-	RCOwn &operator=( const T *ptr )		{	Borrow( ptr );			return *this; }
+	RCSha &operator=( const RCSha &from )	{	borrow( from.get() );	return *this; }
+	RCSha &operator=( T *ptr )				{	borrow( ptr );			return *this; }
+	RCSha &operator=( const T *ptr )		{	borrow( ptr );			return *this; }
 
 private:
-	void Borrow( T *ptr )
+	void borrow( T *ptr )
 	{
 		if ( ptr == mPtr )
 			return;
@@ -258,7 +258,7 @@ private:
 			mPtr->AddRef();
 	}
 
-	void Borrow( const T *ptr )
+	void borrow( const T *ptr )
 	{
 		if ( ptr == mPtr )
 			return;
