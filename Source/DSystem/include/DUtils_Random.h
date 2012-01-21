@@ -18,6 +18,7 @@ namespace DUT
 {
 
 //==================================================================
+// Taken from http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/VERSIONS/C-LANG/RandMT.cc
 class RandMT
 {
 	static const int N =	624;                // length of state vector

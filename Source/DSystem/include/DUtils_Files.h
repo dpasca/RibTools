@@ -29,14 +29,8 @@ bool GrabFile( const char *pFileName, DVec<U8> &out_data, bool prefs=false );
 bool SaveFile( const char *pFileName, const U8 *pInData, size_t dataSize,
                bool prefs=false );
 
-// utility version that connects to the frequently (?) used memo writer
-inline bool SaveFile(
-				const char *pFileName,
-				const MemWriterDynamic &mw,
-				bool prefs=false )
-{
-	return SaveFile( pFileName, mw.GetDataBegin(), mw.GetCurSize(), prefs );
-}
+bool GrabFile( const char *pFileName, MemReader &reader, bool prefs=false );
+bool SaveFile( const char *pFileName, const MemWriterDynamic &mw, bool prefs=false );
 
 bool FileExists( const char *pFileName, bool prefs = false );
 

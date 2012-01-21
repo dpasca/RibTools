@@ -9,19 +9,25 @@
 #ifndef DCONTAINERS_H
 #define DCONTAINERS_H
 
-#include <memory.h>
+#if !defined(NACL)
+# include <memory.h>
+#endif
 #include "DTypes.h"
 #include "DMemory.h"
 #include "DUtils_Base.h"
 #include "DExceptions.h"
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || (defined(__linux__) && !defined(ANDROID))
 # include <tr1/unordered_map>
 #else
 # include <unordered_map>
 #endif
 
-#define DUNORD_MAP	std::tr1::unordered_map
+#if defined(NACL)
+# define DUNORD_MAP	std::unordered_map
+#else
+# define DUNORD_MAP	std::tr1::unordered_map
+#endif
 
 //==================================================================
 template <class T>
@@ -106,7 +112,7 @@ public:
 
 	void force_reserve( size_t reserveSize )
 	{
-		size_t newSizeAlloc = mSize + reserveSize;
+		size_t newSizeAlloc = reserveSize;
 
 		if ( newSizeAlloc <= mSizeAlloc )
 			return;
@@ -126,7 +132,11 @@ public:
 
 	void reserve( size_t newSizeAlloc )
 	{
-		force_reserve( newSizeAlloc );
+		DTRY {
+			force_reserve( newSizeAlloc );
+		} DCATCH_ALL {
+			return;
+		}
 	}
 
 	void resize( size_t newSize )
@@ -312,6 +322,201 @@ public:
 		  T &operator[]( size_t idx )		{ return mpData[ idx ]; }
 #else
 		  T &operator[]( size_t idx )		{ DASSERT( idx < mSize ); return mpData[ idx ]; }
+#endif
+
+};
+
+//==================================================================
+template <class _T, size_t _N>
+class DArray
+{
+	U32		mBuff[ (sizeof(_T) * _N + 3) / 4 ];
+	size_t	mSize;
+	
+
+public:
+	typedef const _T	*const_iterator;
+	typedef _T			*iterator;
+
+public:
+	DArray() :
+		mSize(0)
+	{
+	}
+
+	DArray( const DArray &from ) :
+		mSize(0)
+	{
+		copyFrom( from );
+	}
+
+	DArray &operator=(const DArray& rhs)
+	{
+		copyFrom( rhs );
+
+		return *this;
+	}
+
+private:
+	void copyFrom( const DArray& from )
+	{
+		for (size_t i=0; i < mSize; ++i)
+			((_T *)mBuff)[i] = ((const _T *)from.mBuff)[i];
+	}
+
+public:
+	size_t size() const { return mSize; }
+	size_t size_bytes() const { return mSize * sizeof(_T); }
+
+	size_t capacity() const { return _N; }
+
+	iterator		begin()			{ return (_T *)mBuff;	}
+	const_iterator	begin()	const	{ return (const _T *)mBuff;	}
+
+	iterator		end()			{ return (_T *)mBuff + mSize;	}
+	const_iterator	end()	const	{ return (const _T *)mBuff + mSize;	}
+
+	void resize( size_t newSize )
+	{
+		if ( newSize == mSize )
+			return;
+
+		if ( newSize > _N )
+			DEX_BAD_ALLOC( "Failed to resize() a DArray. Max alloed is "SIZE_T_FMT" requested is "SIZE_T_FMT".", _N, newSize );
+
+		if ( newSize < mSize )
+		{
+			for (size_t i=newSize; i < mSize; ++i)
+				((_T *)mBuff)[i].~_T();
+		}
+		else
+		{
+			for (size_t i=mSize; i < newSize; ++i)
+				new (&((_T *)mBuff)[i]) _T;
+		}
+
+		mSize = newSize;
+	}
+
+	_T *grow( size_t n=1 )
+	{
+		size_t	fromIdx = size();
+		resize( fromIdx + n );
+		return (_T *)mBuff + fromIdx;
+	}
+
+	void erase( iterator it )
+	{
+		if NOT( it >= (_T *)mBuff && it < ((_T *)mBuff+mSize) )
+			DEX_OUT_OF_RANGE( "Out of bounds !" );
+
+		size_t	idx = it - (_T *)mBuff;
+		((_T *)mBuff)[idx].~_T();
+		for (size_t i=idx; i < mSize-1; ++i)
+		{
+			((_T *)mBuff)[i] = ((_T *)mBuff)[i+1];
+		}
+		mSize -= 1;
+	}
+
+	void insert( iterator itBefore, _T &val )
+	{
+		if NOT( itBefore >= (_T *)mBuff && itBefore < ((_T *)mBuff+mSize) )
+			DEX_OUT_OF_RANGE( "Out of bounds !" );
+
+		size_t	idx = itBefore - (_T *)mBuff;
+
+		resize( mSize + 1 );
+
+		for (size_t i=mSize; i > (idx+1); --i)
+			((_T *)mBuff)[i-1] = ((_T *)mBuff)[i-2];
+
+		((_T *)mBuff)[idx] = val;
+	}
+
+	void push_front( const _T &val )
+	{
+		grow();
+		for (size_t i=mSize; i > 1; --i)
+		{
+			((_T *)mBuff)[i-1] = ((_T *)mBuff)[i-2];
+		}
+
+		((_T *)mBuff)[0] = val;
+	}
+
+	void push_back( const _T &val )
+	{
+		// necessary for things such as push_back( back() );
+		_T	tmp = val;
+		*grow() = tmp;
+	}
+
+	void pop_back()
+	{
+		DASSERT( mSize >= 1 );
+		resize( mSize - 1 );
+	}
+
+	iterator find( const _T &val )
+	{
+		for (size_t i=0; i < mSize; ++i)
+		{
+			if ( ((_T *)mBuff)[i] == val )
+			{
+				return ((_T *)mBuff) + i;
+			}
+		}
+
+		return end();
+	}
+
+	size_t find_idx( const _T &val, size_t from=0 )
+	{
+		for (size_t i=from; i < mSize; ++i)
+		{
+			if ( ((_T *)mBuff)[i] == val )
+			{
+				return i;
+			}
+		}
+
+		return DNPOS;
+	}
+
+	void find_or_push_back( const _T &val )
+	{
+		if ( find( val ) != end() )
+			return;
+
+		// necessary for things such as push_back( back() );
+		_T	tmp = val;
+		*grow() = tmp;
+	}
+
+	void append_array( const _T *pSrc, size_t cnt )
+	{
+		_T	*pDes = grow( cnt );
+		for (size_t i=0; i < cnt; ++i)
+		{
+			pDes[i] = pSrc[i];
+		}
+	}
+
+	void append( const DVec<_T> &srcVec )
+	{
+		append_array( &srcVec[0], srcVec.size() );
+	}
+
+	const	_T &back() const { DASSERT( mSize >= 1 ); return ((const _T*)mBuff)[mSize-1]; }
+			_T &back()		{ DASSERT( mSize >= 1 ); return ((_T*)mBuff)[mSize-1]; }
+
+	const _T &operator[]( size_t idx ) const { DASSERT( idx < mSize ); return ((const _T*)mBuff)[ idx ]; }
+
+#if defined(__GNUC__)	// WTF ?!
+		  _T &operator[]( size_t idx )		{ return ((_T*)mBuff)[ idx ]; }
+#else
+		  _T &operator[]( size_t idx )		{ DASSERT( idx < mSize ); return ((_T*)mBuff)[ idx ]; }
 #endif
 
 };

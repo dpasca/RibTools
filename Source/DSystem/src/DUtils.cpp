@@ -82,6 +82,10 @@ void DAssert( bool ok, const char *pFile, int line, const char *msg )
     //
     abort();
 
+#elif defined(NACL)
+
+    *(int *)0 = 0;
+
 #else
 # error Assert not defined on this platform
 
@@ -160,120 +164,6 @@ void DVVerbose(const char *fmt, va_list vl)
     vprintf(fmt, vl);
 	puts("");
 #endif
-}
-
-//==================================================================
-void StrStripBeginEndWhite( char *pStr )
-{
-	size_t	len = strlen( pStr );
-
-	if NOT( len )
-		return;
-
-	int	newLen = len;
-	for (int i=(int)len-1; i >= 0; --i)
-	{
-		char ch = pStr[i];
-		if ( IsWhite( ch ) )
-			pStr[i] = 0;
-		else
-		{
-			newLen = i + 1;
-			break;
-		}
-	}
-
-	size_t	di = 0;
-	bool	foundNonWhite = false;
-	for (int si=0; si < newLen; ++si)
-	{
-		char ch = pStr[si];
-
-		if ( foundNonWhite || !IsWhite( ch ) )
-		{
-			pStr[di++] = pStr[si];
-			foundNonWhite = true;
-		}
-	}
-	pStr[di] = 0;
-}
-
-//==================================================================
-const char *StrStrI( const char *pStr, const char *pSearch )
-{
-	// ANSI strstr behavior: it's a match if search is empty
-	if NOT( pSearch[0] )
-		return pStr;
-
-	for (size_t i=0; pStr[i]; ++i)
-	{
-		if ( tolower(pSearch[0]) == tolower(pStr[i]) )
-		{
-			size_t	j = 0;
-			for (; pSearch[j]; ++j)
-				if ( tolower(pStr[i+j]) != tolower(pSearch[j]) )
-					break;
-
-			// reached the end of the search string ?
-			if ( pSearch[j] == 0 )
-				return pStr + i;	// it's a match
-		}
-	}
-
-	return NULL;
-}
-
-//==================================================================
-bool StrStartsWithI( const char *pStr, const char *pSearch )
-{
-	return pStr == StrStrI( pStr, pSearch );
-}
-
-//==================================================================
-bool StrEndsWithI( const char *pStr, const char *pSearch )
-{
-	size_t	strLen = strlen( pStr );
-	size_t	searchLen = strlen( pSearch );
-
-	if ( searchLen > strLen )
-		return false;
-
-	return 0 == strcasecmp( pStr + strLen - searchLen, pSearch );
-}
-
-//==================================================================
-void StrToUpper( DStr &str )
-{
-	for (size_t i=0; i < str.size(); ++i)
-		str[i] = toupper( str[i] );
-}
-
-//==================================================================
-void StrToUpper( char *pStr )
-{
-	for (size_t i=0; pStr[i]; ++i)
-		pStr[i] = toupper( pStr[i] );
-}
-
-//==================================================================
-void StrToLower( DStr &str )
-{
-	for (size_t i=0; i < str.size(); ++i)
-		str[i] = tolower( str[i] );
-}
-
-//==================================================================
-const char *StrFindLastOf( const char *pStr, char searchCh )
-{
-	size_t	len = strlen( pStr );
-
-	for (size_t i=0; i < len; ++i)
-	{
-		if ( pStr[ len-1 - i ] == searchCh )
-			return &pStr[ len-1 - i];
-	}
-
-	return NULL;
 }
 
 //==================================================================

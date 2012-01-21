@@ -537,4 +537,19 @@ DStr GetFullDirNameFromFPathName( const char *pInFPathname )
 #endif
 
 //==================================================================
+bool GrabFile( const char *pFileName, MemReader &reader, bool prefs )
+{
+	DVec<U8> data;
+	bool ret = GrabFile( pFileName, data, prefs );
+	reader.InitOwnVec( data );
+	return ret;
+}
+
+//==================================================================
+bool SaveFile( const char *pFileName, const MemWriterDynamic &mw, bool prefs )
+{
+	return SaveFile( pFileName, mw.GetDataBegin(), mw.GetCurSize(), prefs );
+}
+
+//==================================================================
 }

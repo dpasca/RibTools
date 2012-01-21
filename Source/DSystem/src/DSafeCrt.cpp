@@ -39,7 +39,7 @@ int vsnprintf_s( char *str, size_t strMaxLen, size_t size, const char *format, v
 	int len = vsnprintf( str, size, format, ap );
 
 	// verify only later.. better than nothing !
-	DASSERT( (len+1) <= strMaxLen );
+	DASSERT( (size_t )(len+1) <= strMaxLen );
 
 	return len;
 }
@@ -77,14 +77,14 @@ int vsprintf_s( char *str, size_t destMaxSize, const char *pFmt, va_list vl )
 int sprintf_s( char *str, const char *format, ...)
 {
 	int	ret;
-	
+
 	va_list	vl;
 	va_start( vl, format );
-	
+
 	ret = vsprintf_s( str, format, vl );
-	
+
 	va_end( vl );
-	
+
 	return ret;
 }
 
@@ -92,14 +92,14 @@ int sprintf_s( char *str, const char *format, ...)
 int sprintf_s( char *str, size_t destMaxSize, const char *format, ...)
 {
 	int	ret;
-	
+
 	va_list	vl;
 	va_start( vl, format );
-	
+
 	ret = vsprintf_s( str, format, vl );
-	
+
 	va_end( vl );
-	
+
 	return ret;
 }
 

@@ -9,7 +9,9 @@
 #ifndef DUTILS_MEMFILE_H
 #define DUTILS_MEMFILE_H
 
-#include <memory.h>
+#if !defined(NACL)
+# include <memory.h>
+#endif
 #include "DTypes.h"
 #include "DContainers.h"
 #include "DExceptions.h"
@@ -172,6 +174,7 @@ public:
 //==================================================================
 class MemReader
 {
+	DVec<U8>	mOwnedData;
 	const U8	*mpSrc;
 	size_t		mIdx;
 	size_t		mMaxSize;
@@ -197,24 +200,48 @@ public:
 	{
 	}
 
-	template <class T>
-	T ReadValue()
+	MemReader( DVec<U8> &vec ) :
+		mpSrc(NULL),
+		mIdx(0),
+		mMaxSize(0),
+		mBits(0),
+		mBitsCnt(0)
 	{
-		size_t	idx = mIdx;
-		mIdx += sizeof(T);
-		if ( mIdx > mMaxSize )
+		InitOwnVec( vec );
+	}
+
+	void InitOwnVec( DVec<U8> &vec )
+	{
+		mOwnedData.get_ownership( vec );
+		mpSrc = (const U8 *)&mOwnedData[0];
+		mMaxSize = mOwnedData.size();
+	}
+
+	template <class T>
+	T PeekValue() const
+	{
+		if ( (mIdx + sizeof(T)) > mMaxSize )
 			DEX_OUT_OF_RANGE( "ReadValue" );
 
 	#if defined(D_UNALIGNED_MEM_ACCESS)
-		return *((T *)(mpSrc + idx));
+		return *((T *)(mpSrc + mIdx));
 	#else
 		// make a buffer long enough AND aligned
 		U64 tmp[ (sizeof(T) + sizeof(U64)-1) / sizeof(U64) ];
 		// copy into the temporary buffer
-		memcpy( tmp, mpSrc + idx, sizeof(T) );
+		memcpy( tmp, mpSrc + mIdx, sizeof(T) );
 
 		return *(const T *)tmp;
 	#endif
+	}
+
+	template <class T>
+	T ReadValue()
+	{
+		T val = PeekValue<T>();
+		mIdx += sizeof(T);
+
+		return val;
 	}
 
 	template <class T>
@@ -277,7 +304,33 @@ public:
 		mIdx += cnt;
 
 		if ( mIdx > mMaxSize )
-			DEX_OUT_OF_RANGE( "SkipBytes" ); 
+			DEX_OUT_OF_RANGE( "SkipBytes" );
+	}
+
+	void SeekFromStart( size_t offset )
+	{
+		if ( offset > mMaxSize )
+			DEX_OUT_OF_RANGE( "SeekFromStart" );
+
+		mIdx = offset;
+	}
+
+	void SeekFromCurPos( ptrdiff_t offset )
+	{
+		if ( (mIdx+offset) > mMaxSize )
+			DEX_OUT_OF_RANGE( "SeekFromCurPos" );
+
+		mIdx += offset;
+	}
+
+	size_t GetCurPos() const
+	{
+		return mIdx;
+	}
+
+	bool IsEOF() const
+	{
+		return mIdx >= mMaxSize;
 	}
 };
 

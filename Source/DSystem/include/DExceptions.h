@@ -10,17 +10,18 @@
 #define DEXCEPTIONS_H
 
 #include "DUtils_Base.h"
-#include "DSafeCrt.h"
 
 //==================================================================
 #if !defined(ANDROID)
 
+# include <new>
 # include <stdexcept>
 # include <memory>
 
-# define	DEX_RUNTIME_ERROR(_FMT_,...)	{ char buff[512]; sprintf_s( buff, _FMT_, ##__VA_ARGS__ ); throw std::runtime_error( std::string(buff) ); }
-# define	DEX_OUT_OF_RANGE(_FMT_,...)		{ char buff[512]; sprintf_s( buff, _FMT_, ##__VA_ARGS__ ); throw std::out_of_range( std::string(buff) ); }
-# define	DEX_BAD_ALLOC(_FMT_,...)		{ char buff[512]; sprintf_s( buff, _FMT_, ##__VA_ARGS__ ); throw std::bad_alloc( buff ); }
+# define	DEX_RUNTIME_ERROR(_FMT_,...)	{ char buff[512]; snprintf( buff, sizeof(buff), _FMT_, ##__VA_ARGS__ ); throw std::runtime_error( std::string(buff) ); }
+# define	DEX_OUT_OF_RANGE(_FMT_,...)		{ char buff[512]; snprintf( buff, sizeof(buff), _FMT_, ##__VA_ARGS__ ); throw std::out_of_range( std::string(buff) ); }
+//# define	DEX_BAD_ALLOC(_FMT_,...)		{ char buff[512]; snprintf( buff, sizeof(buff), _FMT_, ##__VA_ARGS__ ); throw std::bad_alloc( buff ); }
+# define	DEX_BAD_ALLOC(_FMT_,...)		{ DUT::DVerbose( _FMT_, ##__VA_ARGS__ ); throw std::bad_alloc(); }
 
 #else
 

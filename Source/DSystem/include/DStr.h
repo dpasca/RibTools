@@ -87,6 +87,19 @@ public:
         return newStr;
     }
 
+    void operator +=( char ch )
+    {
+		mData[ mData.size() - 1 ] = ch;
+		mData.push_back( 0 );
+    }
+
+    DStr operator + ( char ch ) const
+    {
+        DStr newStr( *this );
+        newStr += ch;
+        return newStr;
+    }
+
     void resize(size_t newsize)
     {
         if (newsize < size())
