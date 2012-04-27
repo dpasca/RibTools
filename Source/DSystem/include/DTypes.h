@@ -50,6 +50,13 @@ inline int strncasecmp( const char *a, const char *b, size_t len )
 #define	DMAX(_A_,_B_)			((_A_) > (_B_) ? (_A_) : (_B_))
 
 //===============================================================
+#if defined(_MSC_VER)
+# define DFORCEINLINE __forceinline
+#else
+# define DFORCEINLINE inline __attribute__((always_inline)) 
+#endif
+
+//===============================================================
 namespace D
 {
 
@@ -60,14 +67,10 @@ T Lerp( const T& left, const T& right, float t )
 	return (T)(left * (1-t) + right * t);
 }
 
-//===============================================================
 template <class T>
-float InvLerp( const T& left, const T& right, const T& x )
+T Lerp( const T& left, const T& right, double t )
 {
-	if ( x < left  ) return 0.f; else
-	if ( x > right ) return 1.f;
-
-	return (float)(x - left) / (float)(right - left);
+	return (T)(left * (1-t) + right * t);
 }
 
 //===============================================================

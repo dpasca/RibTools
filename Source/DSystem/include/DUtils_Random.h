@@ -11,7 +11,7 @@
 
 #include "DTypes.h"
 
-#define DUT_USE_CHEAP_RANDOM
+//#define DUT_USE_CHEAP_RANDOM
 
 //==================================================================
 namespace DUT
@@ -68,6 +68,26 @@ public:
 		y ^= (y << 15) & 0xEFC60000U;
 		return(y ^ (y >> 18));
 	}
+
+	template <U32 precisionLog2>
+	float RandomFloat()
+	{
+		U32		precisionN1 = (1 << precisionLog2) - 1;
+		float	ooPrecision = 1.f / (float)precisionN1;
+
+		return (float)(randomMT() & precisionN1) * ooPrecision;
+	}
+
+	template <U32 precisionLog2>
+	float RandomFloatRange( float x0, float x1 )
+	{
+		U32		precisionN1 = (1 << precisionLog2) - 1;
+		float	ooPrecision = 1.f / (float)precisionN1;
+
+		float t = (float)(randomMT() & precisionN1) * ooPrecision;
+
+		return t * (x1 - x0) + x0;
+	}
 };
 
 //==================================================================
@@ -80,8 +100,8 @@ inline u_int RandomU32()				{ extern RandMT _gsRandMT; return _gsRandMT.randomMT
 //==================================================================
 inline float Random()
 {
-	U32 val = RandomU32();
-	return (float)(val & 0xfffffff) / (float)0x10000000;
+	extern RandMT _gsRandMT;
+	return _gsRandMT.RandomFloat<14>();
 }
 
 #else

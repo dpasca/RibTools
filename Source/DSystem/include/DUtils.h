@@ -29,6 +29,8 @@ double TimeTicksToMS( I64 ticks );
 
 void SleepMS( U32 sleepMS );
 
+void OpenURL( const char *pURL );
+
 //==================================================================
 /// QuickProf
 //==================================================================

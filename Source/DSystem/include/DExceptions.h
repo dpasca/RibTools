@@ -17,11 +17,17 @@
 # include <new>
 # include <stdexcept>
 # include <memory>
+# include <string.h>
 
-# define	DEX_RUNTIME_ERROR(_FMT_,...)	{ char buff[512]; snprintf( buff, sizeof(buff), _FMT_, ##__VA_ARGS__ ); throw std::runtime_error( std::string(buff) ); }
-# define	DEX_OUT_OF_RANGE(_FMT_,...)		{ char buff[512]; snprintf( buff, sizeof(buff), _FMT_, ##__VA_ARGS__ ); throw std::out_of_range( std::string(buff) ); }
-//# define	DEX_BAD_ALLOC(_FMT_,...)		{ char buff[512]; snprintf( buff, sizeof(buff), _FMT_, ##__VA_ARGS__ ); throw std::bad_alloc( buff ); }
-# define	DEX_BAD_ALLOC(_FMT_,...)		{ DUT::DVerbose( _FMT_, ##__VA_ARGS__ ); throw std::bad_alloc(); }
+# define __DSHORT_FILE__ \
+	(strrchr(__FILE__,'/') ? strrchr(__FILE__,'/')+1 : \
+		(strrchr(__FILE__,'\\') ? strrchr(__FILE__,'\\')+1 : __FILE__) )
+
+
+# define	DEX_RUNTIME_ERROR(_FMT_,...)	{ char buff[512]; snprintf( buff, sizeof(buff), "%s (%i) -> "_FMT_, __DSHORT_FILE__, __LINE__, ##__VA_ARGS__ ); throw std::runtime_error( std::string(buff) ); }
+# define	DEX_OUT_OF_RANGE(_FMT_,...)		{ char buff[512]; snprintf( buff, sizeof(buff), "%s (%i) -> "_FMT_, __DSHORT_FILE__, __LINE__, ##__VA_ARGS__ ); throw std::out_of_range( std::string(buff) ); }
+//# define	DEX_BAD_ALLOC(_FMT_,...)		{ char buff[512]; snprintf( buff, sizeof(buff), "%s:%i -> "_FMT_, __DSHORT_FILE__, __LINE__, ##__VA_ARGS__ ); throw std::bad_alloc( buff ); }
+# define	DEX_BAD_ALLOC(_FMT_,...)		{ DUT::DVerbose(  "%s:%i -> "_FMT_, __DSHORT_FILE__, __LINE__, ##__VA_ARGS__ ); throw std::bad_alloc(); }
 
 #else
 

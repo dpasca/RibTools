@@ -149,32 +149,6 @@ bool MemFile::ReadTextLine( char *pDestStr, size_t destStrMaxSize )
 }
 
 //==================================================================
-void MemWriterDynamic::WriteString( const DStr &str )
-{
-	WriteArray( str.c_str(), str.size() );
-}
-
-//==================================================================
-void MemWriterDynamic::WriteString( const char *pStr )
-{
-	WriteArray( pStr, strlen(pStr) );
-}
-
-//==================================================================
-void MemWriterDynamic::PrintF( const char *pFmt, ... )
-{
-	va_list	vl;
-	va_start( vl, pFmt );
-
-	char	buff[1024];
-	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
-
-	va_end( vl );
-
-	WriteString( buff );
-}
-
-//==================================================================
 void MemFile::ReadData( void *pDest, size_t readSize )
 {
 	memcpy( pDest, ReadDataPtr( readSize ), readSize );
@@ -209,6 +183,45 @@ void MemFile::SeekFromCur( ptrdiff_t offset )
 void MemFile::SeekFromEnd( ptrdiff_t offset )
 {
 	SeekSet( (ptrdiff_t)mDataSize + offset );
+}
+
+//==================================================================
+void MemWriterDynamic::WriteString( const DStr &str )
+{
+	WriteArray( str.c_str(), str.size() );
+}
+
+//==================================================================
+void MemWriterDynamic::WriteString( const char *pStr )
+{
+	WriteArray( pStr, strlen(pStr) );
+}
+
+//==================================================================
+void MemWriterDynamic::WritePStr16( const DStr &str )
+{
+	size_t len = str.size();
+
+	if ( len >= (1<<16) )
+		DEX_OUT_OF_RANGE( "String too large" );
+
+	WriteValue<U16>( (U16)len );
+	if ( len )
+		WriteArray( str.c_str(), len );
+}
+
+//==================================================================
+void MemWriterDynamic::PrintF( const char *pFmt, ... )
+{
+	va_list	vl;
+	va_start( vl, pFmt );
+
+	char	buff[1024];
+	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+
+	va_end( vl );
+
+	WriteString( buff );
 }
 
 //==================================================================

@@ -31,11 +31,15 @@ void StrToUpper( char *pStr );
 void StrToLower( DStr &str );
 const char *StrFindLastOf( const char *pStr, char searchCh );
 const char *StrTok_StrQuot( char *pSrcStr, char **ppContext );
+DStr StrGetDirPath( const char *pStr );
 
 inline bool CharIsWhite( char ch )
 {
 	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f';
 }
+
+size_t VecStr_find_by_idx_case( DVec<DStr> &v, const char *pVal );
+void VecStr_push_back_unique_case( DVec<DStr> &v, const char *pVal );
 
 //==================================================================
 }

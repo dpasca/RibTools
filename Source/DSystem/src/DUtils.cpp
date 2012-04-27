@@ -15,6 +15,14 @@
 #ifdef __APPLE__
     #include "TargetConditionals.h"
     #include <signal.h>
+
+# if defined(MACOSX)
+#  undef TARGET_OS_IPHONE
+# endif
+#endif
+
+#if defined(TARGET_OS_IPHONE)
+# include "ios/IPH_Utils.h"
 #endif
 
 #include <stdio.h>
@@ -162,7 +170,9 @@ void DVVerbose(const char *fmt, va_list vl)
     __android_log_vprint(ANDROID_LOG_INFO, "oyatsukai", fmt, vl);
 #else
     vprintf(fmt, vl);
+# if !defined(NACL)
 	puts("");
+# endif // defined(NACL)
 #endif
 }
 
@@ -212,6 +222,30 @@ void SleepMS( U32 sleepMS )
 {
 #if defined(WIN32)
 	Sleep( sleepMS );
+#endif
+}
+
+//==================================================================
+void OpenURL( const char *pURL )
+{
+#if defined(TARGET_OS_IPHONE)
+
+	IPHUT::OpenURL( pURL );
+
+#elif defined(WIN32)
+
+	ShellExecute( NULL, "open", pURL, NULL, NULL, SW_SHOWNORMAL );
+
+#elif defined(ANDROID)
+
+    GameWindowOpenURL(pURL);
+
+#else
+
+	// DAVIDE - DPRINT seems to be undefined (?)
+    //DPRINT("(unimplemented) OpenURL: %s", pURL);
+    printf("(unimplemented) OpenURL: %s\n", pURL);
+
 #endif
 }
 

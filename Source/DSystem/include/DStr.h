@@ -12,6 +12,13 @@
 #include "DUtils_Base.h"
 #include "DContainers.h"
 
+#include <string>
+
+#if 1
+
+typedef std::string DStr;
+
+#else
 //===============================================================
 // Horrid and probably leaks, but (hopefully) only used for setup
 class DStr
@@ -117,63 +124,6 @@ public:
 	const char &operator[]( size_t idx ) const	{ return mData[ idx ]; }
 		  char &operator[]( size_t idx )		{ return mData[ idx ]; }
 };
-
-//===============================================================
-class DVecStr
-{
-	DVec<DStr>	mVec;
-
-public:
-	void push_back_unique( const char *pVal )
-	{
-		if ( DNPOS != find_by_idx( pVal ) )
-			return;
-
-		push_back( pVal );
-	}
-
-	void push_back_unique_case( const char *pVal )
-	{
-		if ( DNPOS != find_by_idx_case( pVal ) )
-			return;
-
-		push_back( pVal );
-	}
-
-	void push_back( const DStr &val )	{ mVec.push_back( val ); }
-	void push_back( const char *pVal )	{ mVec.push_back( pVal ); }
-
-    void resize( size_t newsize )	{ mVec.resize( newsize ); }
-
-	size_t size() const				{ return mVec.size(); }
-
-	size_t find_by_idx( const char *pVal )
-	{
-		for (size_t i=0; i < mVec.size(); ++i)
-			if ( 0 == strcmp( mVec[i].c_str(), pVal ) )
-				return i;
-
-		return DNPOS;
-	}
-
-	size_t find_by_idx_case( const char *pVal )
-	{
-		for (size_t i=0; i < mVec.size(); ++i)
-			if ( 0 == strcasecmp( mVec[i].c_str(), pVal ) )
-				return i;
-
-		return DNPOS;
-	}
-
-	void erase( size_t idx )
-	{
-		mVec.erase( mVec.begin() + idx );
-	}
-
-	//const DStr &operator[]( size_t idx ) const	{ return mVec[ idx ]; }
-		  DStr &operator[]( size_t idx )		{ return mVec[ idx ]; }
-
-	const char *operator[]( size_t idx ) const	{ return mVec[ idx ].c_str(); }
-};
+#endif
 
 #endif

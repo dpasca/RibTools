@@ -13,10 +13,9 @@
 # include <memory.h>
 #endif
 #include "DTypes.h"
+#include "DStr.h"
 #include "DContainers.h"
 #include "DExceptions.h"
-
-class DStr;
 
 //==================================================================
 namespace DUT
@@ -151,6 +150,7 @@ public:
 
 	void WriteString( const DStr &str );
 	void WriteString( const char *pStr );
+	void WritePStr16( const DStr &str );
 
 	void PrintF( const char *pFmt, ... );
 
@@ -261,6 +261,18 @@ public:
 	#endif
 	}
 
+	DStr ReadPStr16()
+	{
+		size_t len = ReadValue<U16>();
+
+		if NOT( len )
+			return DStr();
+
+		const U8 *pData = GetDataPtr( len );
+
+		return DStr( (const char *)pData, len );
+	}
+
 	U32 ReadBits( size_t cnt )
 	{
 		U32	bits = 0;
@@ -294,17 +306,21 @@ public:
 
 	const U8 *GetDataPtr( size_t cnt )
 	{
+		if ( (mIdx+cnt) > mMaxSize )
+			DEX_OUT_OF_RANGE( "GetDataPtr" );
+
 		size_t	idx = mIdx;
 		mIdx += cnt;
+
 		return (const U8 *)(mpSrc + idx);
 	}
 
 	void SkipBytes( size_t cnt )
 	{
-		mIdx += cnt;
-
-		if ( mIdx > mMaxSize )
+		if ( (mIdx+cnt) > mMaxSize )
 			DEX_OUT_OF_RANGE( "SkipBytes" );
+
+		mIdx += cnt;
 	}
 
 	void SeekFromStart( size_t offset )

@@ -128,6 +128,30 @@ const char *StrFindLastOf( const char *pStr, char searchCh )
 }
 
 //==================================================================
+DStr StrGetDirPath( const char *pStr )
+{
+	const char *pLastSlash = StrFindLastOf( pStr, '/' );
+	const char *pLastBSlash = StrFindLastOf( pStr, '\\' );
+	const char *pLastColon = StrFindLastOf( pStr, ':' );
+
+	size_t	n = 0;
+
+	if ( pLastBSlash )
+		n = std::max( n, (size_t)(pLastBSlash - pStr + 1) );
+
+	if ( pLastSlash )
+		n = std::max( n, (size_t)(pLastSlash - pStr + 1) );
+
+	if ( pLastColon )
+		n = std::max( n, (size_t)(pLastColon - pStr + 1) );
+
+	if ( n )
+		return DStr( pStr, n );
+	else
+		return DStr();
+}
+
+//==================================================================
 const char *StrTok_StrQuot( char *pSrcStr, char **ppContext )
 {
 	if ( pSrcStr )
@@ -175,6 +199,25 @@ const char *StrTok_StrQuot( char *pSrcStr, char **ppContext )
 
 	*ppContext = NULL;
 	return p + start;
+}
+
+//==================================================================
+size_t VecStr_find_by_idx_case( DVec<DStr> &v, const char *pVal )
+{
+	for (size_t i=0; i < v.size(); ++i)
+		if ( 0 == strcasecmp( v[i].c_str(), pVal ) )
+			return i;
+
+	return DNPOS;
+}
+
+//==================================================================
+void VecStr_push_back_unique_case( DVec<DStr> &v, const char *pVal )
+{
+	if ( DNPOS != VecStr_find_by_idx_case( v, pVal ) )
+		return;
+
+	v.push_back( pVal );
 }
 
 //==================================================================

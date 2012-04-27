@@ -23,6 +23,8 @@
 # include <unordered_map>
 #endif
 
+#include <string>
+
 #if defined(NACL)
 # define DUNORD_MAP	std::unordered_map
 #else
@@ -209,6 +211,8 @@ public:
 			mpData[i] = mpData[i+1];
 		}
 		mSize -= 1;
+		if ( mSize )
+			mpData[mSize].~T();
 	}
 
 	void insert( iterator itBefore, T &val )
@@ -325,14 +329,37 @@ public:
 #endif
 
 };
+//------------------------------------------------------------------
+// specialized version that doesn't call the destructor for a
+// string (otherwise could crash on iPhone it seems !)
+// WARNING: but does it leak ?!
+template<> inline void DVec<std::string>::erase( iterator it )
+{
+	if NOT( it >= mpData && it < (mpData+mSize) )
+		DEX_OUT_OF_RANGE( "Out of bounds !" );
+
+	size_t	idx = it - mpData;
+	//mpData[idx].~T();
+	for (size_t i=idx; i < mSize-1; ++i)
+	{
+		mpData[i] = mpData[i+1];
+	}
+	mSize -= 1;
+	if ( mSize )
+		mpData[mSize].clear();
+}
 
 //==================================================================
-template <class _T, size_t _N>
+
+// android headers define _N (and others), so that can't be used as a
+// template parameter.
+
+template <class _T, size_t _SIZE>
 class DArray
 {
-	U32		mBuff[ (sizeof(_T) * _N + 3) / 4 ];
+	U32		mBuff[ (sizeof(_T) * _SIZE + 3) / 4 ];
 	size_t	mSize;
-	
+
 
 public:
 	typedef const _T	*const_iterator;
@@ -368,7 +395,7 @@ public:
 	size_t size() const { return mSize; }
 	size_t size_bytes() const { return mSize * sizeof(_T); }
 
-	size_t capacity() const { return _N; }
+	size_t capacity() const { return _SIZE; }
 
 	iterator		begin()			{ return (_T *)mBuff;	}
 	const_iterator	begin()	const	{ return (const _T *)mBuff;	}
@@ -381,8 +408,8 @@ public:
 		if ( newSize == mSize )
 			return;
 
-		if ( newSize > _N )
-			DEX_BAD_ALLOC( "Failed to resize() a DArray. Max alloed is "SIZE_T_FMT" requested is "SIZE_T_FMT".", _N, newSize );
+		if ( newSize > _SIZE )
+			DEX_BAD_ALLOC( "Failed to resize() a DArray. Max alloed is "SIZE_T_FMT" requested is "SIZE_T_FMT".", _SIZE, newSize );
 
 		if ( newSize < mSize )
 		{
