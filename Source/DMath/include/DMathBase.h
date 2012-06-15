@@ -151,7 +151,22 @@
 template < typename _TA , typename _TB >
 inline _TA DMix( const _TA &a, const _TA &b,  const _TB &t )
 {
-    return a + (b - a) * t;
+    return (_TA)(a + (b - a) * t);
+}
+template < typename _TA , typename _TB >
+inline _TA DLerp( const _TA &a, const _TA &b,  const _TB &t )
+{
+    return (_TA)(a + (b - a) * t);
+}
+
+//===============================================================
+template <class T>
+inline float DInvLerp( const T& left, const T& right, const T& x )
+{
+	if ( x < left  ) return 0.f; else
+	if ( x > right ) return 1.f;
+
+	return (float)(x - left) / (float)(right - left);
 }
 
 //==================================================================
@@ -213,6 +228,14 @@ template <class T>	inline T		DMax( const T &a, const T &b )
 					return b;
 }
 
+//==================================================================
+template <class T>	inline T		DClamp( const T& a, const T& x0, const T& x1 )
+{
+	if ( a < x0 )	return x0;	else
+	if ( a > x1 )	return x1;	else
+					return a;
+}
+
 #define FM_E        ((float)M_E       )
 #define FM_LOG2E    ((float)M_LOG2E   )
 #define FM_LOG10E   ((float)M_LOG10E  )
@@ -231,7 +254,7 @@ template <class T>	inline T		DMax( const T &a, const T &b )
 typedef unsigned char		DU8;
 typedef unsigned int		DU32;
 
-#if defined(__linux__) || (__APPLE__) || defined(ANDROID)
+#if defined(__linux__) || (__APPLE__) || defined(ANDROID) || defined(NACL)
 typedef uint64_t			DU64;
 #else
 typedef unsigned __int64	DU64;

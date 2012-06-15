@@ -46,7 +46,7 @@ public:
 
 	void SetZero()
 	{
-		v2[0] = v2[1] = 0.f;
+		v2[0] = v2[1] = (_TS)0;
 	}
 
 	Vec2 operator + (const _TS& rval) const { return Vec2( v2[0] + rval, v2[1] + rval ); }
@@ -105,6 +105,7 @@ public:
 	//==================================================================
 	Vec3()											{}
 	Vec3( const Vec3 &v_ )							{ v3[0] = v_[0]; v3[1] = v_[1]; v3[2] = v_[2]; }
+	Vec3( const Vec2<_TS> &v_ )						{ v3[0] = v_[0]; v3[1] = v_[1]; v3[2] = 0; }
 
 	template <class _T>
 	Vec3( const Vec3<_T> &v_ )						{ v3[0] = v_[0]; v3[1] = v_[1]; v3[2] = v_[2]; }
@@ -129,7 +130,7 @@ public:
 
 	void SetZero()
 	{
-		v3[0] = v3[1] = v3[2] = 0.f;
+		v3[0] = v3[1] = v3[2] = (_TS)0;
 	}
 
 	Vec3 operator + (const _TS& rval) const { return Vec3( v3[0] + rval, v3[1] + rval, v3[2] + rval ); }
@@ -259,7 +260,7 @@ public:
 
 	void SetZero()
 	{
-		v4[0] = v4[1] = v4[2] = v4[3] = 0.f;
+		v4[0] = v4[1] = v4[2] = v4[3] = (_TS)0;
 	}
 
 	Vec3<_TS> GetAsV3() const
@@ -350,6 +351,27 @@ VecNMask CmpMaskNE( const Vec4<_TS> &lval, const Vec4<_TS> &rval )
 			| CmpMaskNE( lval[2], rval[2] )
 			| CmpMaskNE( lval[3], rval[3] );
 }
+
+//===============================================================
+#define _DTPL template <class _TS> DFORCEINLINE
+_DTPL _TS		DDot( const Vec2<_TS>& a, const Vec2<_TS>& b ) { return a[0] * b[0] + a[1] * b[1]; }
+_DTPL _TS		DDot( const Vec3<_TS>& a, const Vec3<_TS>& b ) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+_DTPL _TS		DDot( const Vec4<_TS>& a, const Vec4<_TS>& b ) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]; }
+_DTPL _TS		DLengthSqr( const Vec2<_TS>& a ) { return DDot( a, a ); }
+_DTPL _TS		DLengthSqr( const Vec3<_TS>& a ) { return DDot( a, a ); }
+_DTPL _TS		DLengthSqr( const Vec4<_TS>& a ) { return DDot( a, a ); }
+_DTPL _TS		DLength( const Vec2<_TS>& a ) { return DSqrt( DLengthSqr( a ) ); }
+_DTPL _TS		DLength( const Vec3<_TS>& a ) { return DSqrt( DLengthSqr( a ) ); }
+_DTPL _TS		DLength( const Vec4<_TS>& a ) { return DSqrt( DLengthSqr( a ) ); }
+_DTPL Vec2<_TS> DNormalize( const Vec2<_TS>& v ) { return v * DRSqrt( DLengthSqr( v ) ); }
+_DTPL Vec3<_TS> DNormalize( const Vec3<_TS>& v ) { return v * DRSqrt( DLengthSqr( v ) ); }
+_DTPL Vec4<_TS> DNormalize( const Vec4<_TS>& v ) { return v * DRSqrt( DLengthSqr( v ) ); }
+_DTPL Vec3<_TS> DCross( const Vec3<_TS>& a, const Vec3<_TS>& b ) { return Vec3<_TS>(
+																		a[1] * b[2] - a[2] * b[1],
+																		a[2] * b[0] - a[0] * b[2],
+																		a[0] * b[1] - a[1] * b[0] ); }
+#undef _DTPL
+
 
 //==================================================================
 /// float implementations

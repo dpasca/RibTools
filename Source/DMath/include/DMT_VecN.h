@@ -55,21 +55,27 @@ public:
 	const _TS &operator [] (size_t i) const	{ return v[i]; }
 		  _TS &operator [] (size_t i)		{ return v[i]; }
 
-	friend VecN	DSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
-	friend VecN	DRSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
-	friend VecN	DPow( const VecN &a,  const VecN &b ){ VecN tmp; FOR_I_N tmp[i] = DPow( a[i], b[i] ); return tmp; }
-	friend VecN	DSign( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp; }
-	friend VecN	DAbs( const VecN &a	)				 { VecN tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
-	friend VecN	DMin( const VecN &a, const VecN &b ) { VecN tmp; FOR_I_N tmp[i] = DMin( a[i], b[i] ); return tmp; }
-	friend VecN	DMax( const VecN &a, const VecN &b ) { VecN tmp; FOR_I_N tmp[i] = DMax( a[i], b[i] ); return tmp; }
-	friend VecN	DSin( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
-	friend VecN	DCos( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
 };
 
-template <class _TS, size_t _TN> VecN<_TS,_TN> operator + (const _TS &lval, const VecN<_TS,_TN> &rval) { return rval + lval; }
-template <class _TS, size_t _TN> VecN<_TS,_TN> operator - (const _TS &lval, const VecN<_TS,_TN> &rval) { return rval - lval; }
-template <class _TS, size_t _TN> VecN<_TS,_TN> operator * (const _TS &lval, const VecN<_TS,_TN> &rval) { return rval * lval; }
-template <class _TS, size_t _TN> VecN<_TS,_TN> operator / (const _TS &lval, const VecN<_TS,_TN> &rval) { return rval / lval; }
+#define _DTPL template<class _TS,size_t _TN> DFORCEINLINE
+#define _DTYP VecN<_TS,_TN>
+
+_DTPL _DTYP DSqrt( const _DTYP &a )					{ _DTYP tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
+_DTPL _DTYP DRSqrt(const _DTYP &a )					{ _DTYP tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
+_DTPL _DTYP DPow(  const _DTYP &a,  const _DTYP &b)	{ _DTYP tmp; FOR_I_N tmp[i] = DPow( a[i], b[i] ); return tmp; }
+_DTPL _DTYP DSign( const _DTYP &a )					{ _DTYP tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp; }
+_DTPL _DTYP DAbs(  const _DTYP &a	)				{ _DTYP tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
+_DTPL _DTYP DMin(  const _DTYP &a, const _DTYP &b )	{ _DTYP tmp; FOR_I_N tmp[i] = DMin( a[i], b[i] ); return tmp; }
+_DTPL _DTYP DMax(  const _DTYP &a, const _DTYP &b )	{ _DTYP tmp; FOR_I_N tmp[i] = DMax( a[i], b[i] ); return tmp; }
+_DTPL _DTYP DSin(  const _DTYP &a )				 	{ _DTYP tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
+_DTPL _DTYP DCos(  const _DTYP &a )				 	{ _DTYP tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
+_DTPL _DTYP operator + (const _TS &lval, const _DTYP &rval) { return rval + lval; }
+_DTPL _DTYP operator - (const _TS &lval, const _DTYP &rval) { return rval - lval; }
+_DTPL _DTYP operator * (const _TS &lval, const _DTYP &rval) { return rval * lval; }
+_DTPL _DTYP operator / (const _TS &lval, const _DTYP &rval) { return rval / lval; }
+
+#undef _DTPL
+#undef _DTYP
 
 /*
 template <class _TS, size_t _TN> VecNMask CmpMaskLT( const VecN<_TS,_TN> &lval, const VecN<_TS,_TN> &rval ) { DASSERT( 0 ); return VecNMaskEmpty; }
@@ -141,43 +147,6 @@ public:
 		  float &operator [] (size_t i)			{ return ((float *)&v)[i]; }
 //#endif
 
-	friend VecN	DSqrt( const VecN &a )	{ return _mm_sqrt_ps( a.v );	}
-	friend VecN	DRSqrt( const VecN &a )	{ return _mm_rsqrtnr_ps( a.v );	}
-	//friend VecN	DRSqrt( const VecN &a )	{ return _mm_rsqrt_ps( a.v );	}
-
-	// TODO: get a proper _mm_pow_ps !!!
-	//friend VecN	DPow( const VecN &a, const VecN &b ){ return _mm_pow_ps( a.v, b.v );	}
-	friend VecN	DPow( const VecN &a, const VecN &b )
-	{
-		VecN tmp;
-		for (size_t i=0; i < DMT_SIMD_FLEN; ++i)
-			tmp[i] = powf( a[i], b[i] );
-		
-		return tmp;
-	}
-
-	//==================================================================
-	friend VecN	DSign( const VecN &a )
-	{
-		const __m128	zero		= _mm_setzero_ps();
-		const __m128	selectPos	= _mm_cmpgt_ps( a.v, zero );	// > 0
-		const __m128	selectNeg	= _mm_cmplt_ps( a.v, zero );	// < 0
-
-		__m128	res =		  _mm_and_ps( selectPos, _mm_set_ps1(  1.0f ) );
-		res = _mm_or_ps( res, _mm_and_ps( selectNeg, _mm_set_ps1( -1.0f ) ) );
-
-		return res;
-	}
-
-	friend VecN	DAbs( const VecN &a )
-	{
-		static const U32 notSignBitMask = ~0x80000000;
-		return _mm_and_ps( a.v, _mm_set_ps1( *(float *)&notSignBitMask ) );
-	}
-
-	friend VecN	DMin( const VecN &a, const VecN &b )	{	return _mm_min_ps( a.v, b.v );	}
-	friend VecN	DMax( const VecN &a, const VecN &b )	{	return _mm_max_ps( a.v, b.v );	}
-
 #elif defined(DMATH_USE_M512)
 //==================================================================
 /// 512 bit 16-way float SIMD
@@ -224,33 +193,6 @@ public:
 	const float &operator [] (size_t i) const	{ return v.v[i]; }
 		  float &operator [] (size_t i)			{ return v.v[i]; }
 
-
-	friend VecN	DSqrt( const VecN &a )	{ return _mm512_sqrt_ps( a.v );	}
-	friend VecN	DRSqrt( const VecN &a )	{ return _mm512_rsqrt_ps( a.v );	}
-
-	friend VecN	DPow( const VecN &a, const VecN &b ){ return _mm512_pow_ps( a.v, b.v );	}
-
-	//==================================================================
-	friend VecN	DSign( const VecN &a )
-	{
-		const __m512	zero		= _mm512_setzero_ps();
-		const __mmask	selectPos	= _mm512_cmpnle_ps( a.v, zero );	// >
-		const __mmask	selectNeg	= _mm512_cmplt_ps( a.v, zero );		// <
-
-		__m512	res = _mm512_mask_movd( zero, selectPos, _mm512_set_1to16_ps(  1.0f ) );
-				res = _mm512_mask_movd( res , selectNeg, _mm512_set_1to16_ps( -1.0f ) );
-
-		return res;
-	}
-
-	friend VecN	DAbs( const VecN &a )
-	{
-		return _mm512_maxabs_ps( a.v, a.v );
-	}
-
-	friend VecN	DMin( const VecN &a, const VecN &b )	{	return _mm512_min_ps( a.v, b.v );	}
-	friend VecN	DMax( const VecN &a, const VecN &b )	{	return _mm512_max_ps( a.v, b.v );	}
-
 #else
 //==================================================================
 /// No hardware SIMD
@@ -294,23 +236,91 @@ public:
 
 	const float &operator [] (size_t i) const	{ return v[i]; }
 		  float &operator [] (size_t i)		{ return v[i]; }
+#endif
+};
 
-	friend VecN	DSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSqrt( a[i] ); return tmp; }
-	friend VecN	DRSqrt( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DRSqrt( a[i] ); return tmp; }
-	friend VecN	DPow( const VecN &a,  const VecN &b ){ VecN tmp; FOR_I_N tmp[i] = DPow( a[i], b[i] ); return tmp; }
-	friend VecN	DSign( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSign( a[i] ); return tmp; }
-	friend VecN	DAbs( const VecN &a	)				 { VecN tmp; FOR_I_N tmp[i] = DAbs( a[i] ); return tmp; }
-	friend VecN	DMin( const VecN &a, const VecN &b ) { VecN tmp; FOR_I_N tmp[i] = DMin( a[i], b[i] ); return tmp; }
-	friend VecN	DMax( const VecN &a, const VecN &b ) { VecN tmp; FOR_I_N tmp[i] = DMax( a[i], b[i] ); return tmp; }
-	//friend VecN	DSin( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
-	//friend VecN	DCos( const VecN &a )				 { VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
+// specialization of functions
+#define _DTPL template<> DFORCEINLINE
+#define _DTYP VecN<float,DMT_SIMD_FLEN>
 
+#if defined(DMATH_USE_M128)
+//==================================================================
+//==================================================================
+//==================================================================
+_DTPL _DTYP	DSqrt( const _DTYP &a )	{ return _mm_sqrt_ps( a.v );	}
+_DTPL _DTYP	DRSqrt( const _DTYP &a )	{ return _mm_rsqrtnr_ps( a.v );	}
+//_DTPL _DTYP	DRSqrt( const _DTYP &a )	{ return _mm_rsqrt_ps( a.v );	}
+
+// TODO: get a proper _mm_pow_ps !!!
+//_DTPL _DTYP	DPow( const _DTYP &a, const _DTYP &b ){ return _mm_pow_ps( a.v, b.v );	}
+_DTPL _DTYP	DPow( const _DTYP &a, const _DTYP &b )
+{
+	_DTYP tmp;
+	for (size_t i=0; i < DMT_SIMD_FLEN; ++i)
+		tmp[i] = powf( a[i], b[i] );
+	
+	return tmp;
+}
+
+//==================================================================
+_DTPL _DTYP	DSign( const _DTYP &a )
+{
+	const __m128	zero		= _mm_setzero_ps();
+	const __m128	selectPos	= _mm_cmpgt_ps( a.v, zero );	// > 0
+	const __m128	selectNeg	= _mm_cmplt_ps( a.v, zero );	// < 0
+
+	__m128	res =		  _mm_and_ps( selectPos, _mm_set_ps1(  1.0f ) );
+	res = _mm_or_ps( res, _mm_and_ps( selectNeg, _mm_set_ps1( -1.0f ) ) );
+
+	return res;
+}
+
+_DTPL _DTYP	DAbs( const _DTYP &a )
+{
+	static const U32 notSignBitMask = ~0x80000000;
+	return _mm_and_ps( a.v, _mm_set_ps1( *(float *)&notSignBitMask ) );
+}
+
+_DTPL _DTYP	DMin( const _DTYP &a, const _DTYP &b )	{	return _mm_min_ps( a.v, b.v );	}
+_DTPL _DTYP	DMax( const _DTYP &a, const _DTYP &b )	{	return _mm_max_ps( a.v, b.v );	}
+
+#elif defined(DMATH_USE_M512)
+//==================================================================
+//==================================================================
+//==================================================================
+_DTPL _DTYP	DSqrt( const _DTYP &a )		{ return _mm512_sqrt_ps( a.v );	}
+_DTPL _DTYP	DRSqrt( const _DTYP &a )	{ return _mm512_rsqrt_ps( a.v );	}
+
+_DTPL _DTYP	DPow( const _DTYP &a, const _DTYP &b ){ return _mm512_pow_ps( a.v, b.v );	}
+
+//==================================================================
+_DTPL _DTYP	DSign( const _DTYP &a )
+{
+	const __m512	zero		= _mm512_setzero_ps();
+	const __mmask	selectPos	= _mm512_cmpnle_ps( a.v, zero );	// >
+	const __mmask	selectNeg	= _mm512_cmplt_ps( a.v, zero );		// <
+
+	__m512	res = _mm512_mask_movd( zero, selectPos, _mm512_set_1to16_ps(  1.0f ) );
+			res = _mm512_mask_movd( res , selectNeg, _mm512_set_1to16_ps( -1.0f ) );
+
+	return res;
+}
+
+_DTPL _DTYP	DAbs( const _DTYP &a )
+{
+	return _mm512_maxabs_ps( a.v, a.v );
+}
+
+_DTPL _DTYP	DMin( const _DTYP &a, const _DTYP &b )	{	return _mm512_min_ps( a.v, b.v );	}
+_DTPL _DTYP	DMax( const _DTYP &a, const _DTYP &b )	{	return _mm512_max_ps( a.v, b.v );	}
+#else
+//==================================================================
+//==================================================================
+//==================================================================
 #endif
 
-	friend VecN	DSin( const VecN &a ) { VecN tmp; FOR_I_N tmp[i] = DSin( a[i] ); return tmp; }
-	friend VecN	DCos( const VecN &a ) { VecN tmp; FOR_I_N tmp[i] = DCos( a[i] ); return tmp; }
-	//friend VecN operator * (const float &lval, const VecN &rval) { return rval * lval; }
-};
+#undef _DTPL
+#undef _DTYP
 
 #undef FOR_I_N
 
