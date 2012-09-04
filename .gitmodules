@@ -1,9 +1,0 @@
-[submodule "Source/externals/libjpeg"]
-	path = Source/externals/libjpeg
-	url = git://anongit.freedesktop.org/libjpeg
-[submodule "Source/externals/tiff"]
-	path = Source/externals/tiff
-	url = git://git.iplinux.org/libtiff.git
-[submodule "Source/externals/freeglut"]
-	path = Source/externals/freeglut
-	url = https://github.com/LuaDist/freeglut.git
