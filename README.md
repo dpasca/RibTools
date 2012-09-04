@@ -1,6 +1,21 @@
 RibTools
 ========
 
+**RibTools** is an experiment in writing an off-line renderer based on Pixar's [RenderMan interface] and the [REYES] rendering architecture.
+
+[RenderMan interface]: http://en.wikipedia.org/wiki/RenderMan_Interface_Specification
+[REYES]: http://en.wikipedia.org/wiki/Reyes_rendering
+
+At the core of **RibTools** there is **RibRender**, the rendering engine, built with speed and scalability in mind.
+
+Parallelism is implemented at all levels:
+* Instruction level (adaptive N-way SIMD)
+* Many-core hardware (multi-threading)
+* Network-distributed rendering (custom protocol over TCP/IP)
+
+**RibTools** is a rather crude experiment and it's only tested against a small selection of simple scenes included in the project.
+
+
 Building & running
 ------------------
 
