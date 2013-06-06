@@ -29,7 +29,7 @@ State::State( const Params &params ) :
 	if ( mParams.mDefaultShadersDir == "" )
 		mParams.mDefaultShadersDir = ".";
 
-	mModeStack.push( MD_UNDEFINED );
+	mModeStack.push_back( MD_UNDEFINED );
 
 	mMtxWorldCamera.Identity();
 

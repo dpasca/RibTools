@@ -37,14 +37,14 @@ void State::ErrHandler( Error errCode, const char *pFmt, ... )
 //==================================================================
 bool State::checkPopMode( Mode expectedMode )
 {
-	if ( mModeStack.top() != expectedMode )
+	if ( mModeStack.back() != expectedMode )
 	{
 		ErrHandler( E_NESTING );
 		return false;
 	}
 	else
 	{
-		mModeStack.pop();
+		mModeStack.pop_back();
 		return true;
 	}
 }
@@ -52,7 +52,7 @@ bool State::checkPopMode( Mode expectedMode )
 //==================================================================
 bool State::verifyOpType( OpType optype )
 {
-	Mode	curMode = mModeStack.top();
+	Mode	curMode = mModeStack.back();
 
 	if ( optype == OPTYPE_OPTS )
 	{

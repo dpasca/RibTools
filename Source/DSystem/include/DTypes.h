@@ -53,7 +53,11 @@ inline int strncasecmp( const char *a, const char *b, size_t len )
 #if defined(_MSC_VER)
 # define DFORCEINLINE __forceinline
 #else
-# define DFORCEINLINE inline __attribute__((always_inline)) 
+# if defined(DEBUG)
+#  define DFORCEINLINE inline
+# else
+#  define DFORCEINLINE inline __attribute__((always_inline))
+# endif
 #endif
 
 //===============================================================

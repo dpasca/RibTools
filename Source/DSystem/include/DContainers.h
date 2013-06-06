@@ -17,18 +17,22 @@
 #include "DUtils_Base.h"
 #include "DExceptions.h"
 
-#if defined(__APPLE__) || (defined(__linux__) && !defined(ANDROID))
+#if defined(ANDROID) || defined(MACOSX) || (defined(TARGET_OS_IPHONE) && !defined(__clang__))
 # include <tr1/unordered_map>
+# include <tr1/unordered_set>
 #else
 # include <unordered_map>
+# include <unordered_set>
 #endif
 
 #include <string>
 
-#if defined(NACL)
+#if defined(NACL) || (defined(__APPLE__) && !defined(MACOSX) && defined(__clang__))
 # define DUNORD_MAP	std::unordered_map
+# define DUNORD_SET	std::unordered_set
 #else
 # define DUNORD_MAP	std::tr1::unordered_map
+# define DUNORD_SET	std::tr1::unordered_set
 #endif
 
 //==================================================================
@@ -44,17 +48,21 @@ public:
 	typedef T		*iterator;
 
 public:
-	DVec() :
-		mpData(NULL),
-		mSize(0),
-		mSizeAlloc(0)
-	{
-	}
+	DVec() : mpData(NULL), mSize(0), mSizeAlloc(0) { }
 
-	DVec( const DVec &from ) :
-		mpData(NULL),
-		mSize(0),
-		mSizeAlloc(0)
+    DVec( size_t initSize ) : mpData(NULL), mSize(0), mSizeAlloc(0)
+    {
+        resize( initSize );
+    }
+
+    DVec( size_t initSize, const T &initVal ) : mpData(NULL), mSize(0), mSizeAlloc(0)
+    {
+        resize( initSize );
+        for (size_t i=0; i != initSize; ++i)
+            (*this)[i] = initVal;
+    }
+
+	DVec( const DVec &from ) : mpData(NULL), mSize(0), mSizeAlloc(0)
 	{
 		copyFrom( from );
 	}
@@ -87,13 +95,15 @@ private:
 	{
 		mSizeAlloc = 0;
 		if ( mpData )
-			DDELETE_ARRAY( (u_char *)mpData );
+			DDELETE_ARRAY( (u_char *)(void*)mpData );
 		mpData = NULL;
 	}
 
 public:
 	size_t size() const { return mSize; }
 	size_t size_bytes() const { return mSize * sizeof(T); }
+
+	size_t capacity() const { return mSizeAlloc; }
 
 	iterator		begin()			{ return mpData;	}
 	const_iterator	begin()	const	{ return mpData;	}
@@ -121,12 +131,17 @@ public:
 
 		T *newPData = (T *)DNEW u_char [ sizeof(T) * newSizeAlloc ];
 
-		if ( mpData )
-		{
-			memcpy( newPData, mpData, mSize * sizeof(T) );
+        if ( mpData )
+        {
+            for (size_t i=0; i < mSize; ++i)
+            {
+                new (&newPData[i]) T;
+                newPData[i] = mpData[i];
+                mpData[i].~T();
+            }
 
-			DDELETE_ARRAY( (u_char *)mpData );
-		}
+            DDELETE_ARRAY( (u_char *)(void*)mpData );
+        }
 
 		mpData = newPData;
 		mSizeAlloc = newSizeAlloc;
@@ -171,7 +186,7 @@ public:
 					mpData[i].~T();
 				}
 
-				DDELETE_ARRAY( (u_char *)mpData );
+				DDELETE_ARRAY( (u_char *)(void*)mpData );
 			}
 
 			mpData = newPData;
@@ -205,7 +220,7 @@ public:
 			DEX_OUT_OF_RANGE( "Out of bounds !" );
 
 		size_t	idx = it - mpData;
-		mpData[idx].~T();
+		// mpData[idx].~T(); -- DON'T !!!
 		for (size_t i=idx; i < mSize-1; ++i)
 		{
 			mpData[i] = mpData[i+1];
@@ -255,6 +270,19 @@ public:
 	}
 
 	iterator find( const T &val )
+	{
+		for (size_t i=0; i < mSize; ++i)
+		{
+			if ( mpData[i] == val )
+			{
+				return mpData + i;
+			}
+		}
+
+		return end();
+	}
+
+	const_iterator find( const T &val ) const
 	{
 		for (size_t i=0; i < mSize; ++i)
 		{
@@ -327,27 +355,7 @@ public:
 #else
 		  T &operator[]( size_t idx )		{ DASSERT( idx < mSize ); return mpData[ idx ]; }
 #endif
-
 };
-//------------------------------------------------------------------
-// specialized version that doesn't call the destructor for a
-// string (otherwise could crash on iPhone it seems !)
-// WARNING: but does it leak ?!
-template<> inline void DVec<std::string>::erase( iterator it )
-{
-	if NOT( it >= mpData && it < (mpData+mSize) )
-		DEX_OUT_OF_RANGE( "Out of bounds !" );
-
-	size_t	idx = it - mpData;
-	//mpData[idx].~T();
-	for (size_t i=idx; i < mSize-1; ++i)
-	{
-		mpData[i] = mpData[i+1];
-	}
-	mSize -= 1;
-	if ( mSize )
-		mpData[mSize].clear();
-}
 
 //==================================================================
 
@@ -359,7 +367,6 @@ class DArray
 {
 	U32		mBuff[ (sizeof(_T) * _SIZE + 3) / 4 ];
 	size_t	mSize;
-
 
 public:
 	typedef const _T	*const_iterator;
@@ -397,11 +404,15 @@ public:
 
 	size_t capacity() const { return _SIZE; }
 
-	iterator		begin()			{ return (_T *)mBuff;	}
-	const_iterator	begin()	const	{ return (const _T *)mBuff;	}
+	void clear()	{ return resize( 0 ); }
 
-	iterator		end()			{ return (_T *)mBuff + mSize;	}
-	const_iterator	end()	const	{ return (const _T *)mBuff + mSize;	}
+    bool is_full() const { return size() == capacity(); }
+
+	iterator		begin()			{ return (_T *)(void*)mBuff;	}
+	const_iterator	begin()	const	{ return (const _T *)(void*)mBuff;	}
+
+	iterator		end()			{ return (_T *)(void*)mBuff + mSize;	}
+	const_iterator	end()	const	{ return (const _T *)(void*)mBuff + mSize;	}
 
 	void resize( size_t newSize )
 	{
@@ -409,17 +420,17 @@ public:
 			return;
 
 		if ( newSize > _SIZE )
-			DEX_BAD_ALLOC( "Failed to resize() a DArray. Max alloed is "SIZE_T_FMT" requested is "SIZE_T_FMT".", _SIZE, newSize );
+			DEX_BAD_ALLOC( "Failed to resize() a DArray. Max allowed is " SIZE_T_FMT " requested is " SIZE_T_FMT ".", _SIZE, newSize );
 
 		if ( newSize < mSize )
 		{
 			for (size_t i=newSize; i < mSize; ++i)
-				((_T *)mBuff)[i].~_T();
+				((_T *)(void*)mBuff)[i].~_T();
 		}
 		else
 		{
 			for (size_t i=mSize; i < newSize; ++i)
-				new (&((_T *)mBuff)[i]) _T;
+				new (&((_T *)(void*)mBuff)[i]) _T;
 		}
 
 		mSize = newSize;
@@ -429,36 +440,49 @@ public:
 	{
 		size_t	fromIdx = size();
 		resize( fromIdx + n );
-		return (_T *)mBuff + fromIdx;
+		return (_T *)(void*)mBuff + fromIdx;
 	}
 
 	void erase( iterator it )
 	{
-		if NOT( it >= (_T *)mBuff && it < ((_T *)mBuff+mSize) )
+		if NOT( it >= (_T *)(void*)mBuff && it < ((_T *)(void*)mBuff+mSize) )
 			DEX_OUT_OF_RANGE( "Out of bounds !" );
 
-		size_t	idx = it - (_T *)mBuff;
-		((_T *)mBuff)[idx].~_T();
+		size_t	idx = it - (_T *)(void*)mBuff;
+		((_T *)(void*)mBuff)[idx].~_T();
 		for (size_t i=idx; i < mSize-1; ++i)
 		{
-			((_T *)mBuff)[i] = ((_T *)mBuff)[i+1];
+			((_T *)(void*)mBuff)[i] = ((_T *)(void*)mBuff)[i+1];
 		}
 		mSize -= 1;
 	}
 
 	void insert( iterator itBefore, _T &val )
 	{
-		if NOT( itBefore >= (_T *)mBuff && itBefore < ((_T *)mBuff+mSize) )
+        if ( mSize == 0 ) // being stl-like.. I hope !
+        {
+    		resize( 1 );
+    		((_T *)(void*)mBuff)[0] = val;
+            return;
+        }
+        else
+        if ( itBefore == ((_T *)(void*)mBuff+mSize) )
+        {
+            push_back( val );
+            return;
+        }
+
+		if NOT( itBefore >= (_T *)(void*)mBuff && itBefore < ((_T *)(void*)mBuff+mSize) )
 			DEX_OUT_OF_RANGE( "Out of bounds !" );
 
-		size_t	idx = itBefore - (_T *)mBuff;
+		size_t	idx = itBefore - (_T *)(void*)mBuff;
 
 		resize( mSize + 1 );
 
 		for (size_t i=mSize; i > (idx+1); --i)
-			((_T *)mBuff)[i-1] = ((_T *)mBuff)[i-2];
+			((_T *)(void*)mBuff)[i-1] = ((_T *)(void*)mBuff)[i-2];
 
-		((_T *)mBuff)[idx] = val;
+		((_T *)(void*)mBuff)[idx] = val;
 	}
 
 	void push_front( const _T &val )
@@ -466,10 +490,10 @@ public:
 		grow();
 		for (size_t i=mSize; i > 1; --i)
 		{
-			((_T *)mBuff)[i-1] = ((_T *)mBuff)[i-2];
+			((_T *)(void*)mBuff)[i-1] = ((_T *)(void*)mBuff)[i-2];
 		}
 
-		((_T *)mBuff)[0] = val;
+		((_T *)(void*)mBuff)[0] = val;
 	}
 
 	void push_back( const _T &val )
@@ -489,9 +513,9 @@ public:
 	{
 		for (size_t i=0; i < mSize; ++i)
 		{
-			if ( ((_T *)mBuff)[i] == val )
+			if ( ((_T *)(void*)mBuff)[i] == val )
 			{
-				return ((_T *)mBuff) + i;
+				return ((_T *)(void*)mBuff) + i;
 			}
 		}
 
@@ -502,7 +526,7 @@ public:
 	{
 		for (size_t i=from; i < mSize; ++i)
 		{
-			if ( ((_T *)mBuff)[i] == val )
+			if ( ((_T *)(void*)mBuff)[i] == val )
 			{
 				return i;
 			}
@@ -535,21 +559,36 @@ public:
 		append_array( &srcVec[0], srcVec.size() );
 	}
 
-	const	_T &back() const { DASSERT( mSize >= 1 ); return ((const _T*)mBuff)[mSize-1]; }
-			_T &back()		{ DASSERT( mSize >= 1 ); return ((_T*)mBuff)[mSize-1]; }
+	const	_T &back() const { DASSERT( mSize >= 1 ); return ((const _T*)(void*)mBuff)[mSize-1]; }
+			_T &back()		{ DASSERT( mSize >= 1 ); return ((_T*)(void*)mBuff)[mSize-1]; }
 
-	const _T &operator[]( size_t idx ) const { DASSERT( idx < mSize ); return ((const _T*)mBuff)[ idx ]; }
+	const _T &operator[]( size_t idx ) const { DASSERT( idx < mSize ); return ((const _T*)(void*)mBuff)[ idx ]; }
 
 #if defined(__GNUC__)	// WTF ?!
-		  _T &operator[]( size_t idx )		{ return ((_T*)mBuff)[ idx ]; }
+		  _T &operator[]( size_t idx )		{ return ((_T*)(void*)mBuff)[ idx ]; }
 #else
-		  _T &operator[]( size_t idx )		{ DASSERT( idx < mSize ); return ((_T*)mBuff)[ idx ]; }
+		  _T &operator[]( size_t idx )		{ DASSERT( idx < mSize ); return ((_T*)(void*)mBuff)[ idx ]; }
 #endif
 
 };
 
 //==================================================================
+template <class _T>
+void Dpush_back_unique( DVec<_T> &vec, const _T &val )
+{
+	if ( vec.find( val ) == vec.end() )
+		vec.push_back( val );
+}
 
+//==================================================================
+template <class _T>
+_T &Dgrow( DVec<_T> &vec )
+{
+    vec.resize( vec.size() + 1 );
+    return vec.back();
+}
+
+//==================================================================
 template <size_t _NUM>
 class DVecBits
 {
@@ -565,125 +604,6 @@ public:
 	void Set( size_t i )			{ DASSERT( i < _NUM ); mData[ i >> 3 ] |= 1 << (i & 7); }
 	void Reset( size_t i )			{ DASSERT( i < _NUM ); mData[ i >> 3 ] &= ~(1 << (i & 7)); }
 	bool IsSet( size_t i ) const	{ DASSERT( i < _NUM ); return !!(mData[ i >> 3 ] & (1 << (i & 7))); }
-};
-
-//==================================================================
-template <class T>
-class Stack
-{
-	DVec<T>	mVec;
-
-public:
-	void push( const T &val )
-	{
-		mVec.push_back( val );
-	}
-
-	void pop()
-	{
-		mVec.pop_back();
-	}
-
-	const T &top() const
-	{
-		return mVec.back();
-	}
-
-	T &top()
-	{
-		return mVec.back();
-	}
-
-	void clear()
-	{
-		mVec.clear();
-	}
-};
-
-//==================================================================
-template <class T>
-class CopyStack
-{
-	DVec<T>	mVec;
-
-public:
-	CopyStack()
-	{
-		mVec.resize(1);
-	}
-	void push()
-	{
-		mVec.push_back( top() );
-	}
-
-	void pop()
-	{
-		mVec.pop_back();
-	}
-
-	const T &top() const
-	{
-		return mVec.back();
-	}
-
-	T &top()
-	{
-		return mVec.back();
-	}
-
-	void clear()
-	{
-		mVec.clear();
-	}
-};
-
-//==================================================================
-template <class T, size_t MAX>
-class CopyStackMax
-{
-	U8		mVec[ sizeof(T) * MAX ];
-	size_t	mSize;
-
-public:
-	CopyStackMax()
-	{
-		T	*p = (T *)&mVec[0];
-		new ( p ) T;
-		mSize = 1;
-	}
-
-	void push()
-	{
-		DASSTHROW( mSize < MAX, ("Out of bounds !") );
-
-		*(T *)&mVec[mSize * sizeof(T)] = top();
-
-		mSize += 1;
-	}
-
-	void pop()
-	{
-		DASSTHROW( mSize >= 0, ("Out of bounds !") );
-		mSize -= 1;
-	}
-
-	const T &top() const
-	{
-		return *(const T *)&mVec[(mSize-1) * sizeof(T)];
-	}
-
-	T &top()
-	{
-		return *(T *)&mVec[(mSize-1) * sizeof(T)];
-	}
-
-	void clear()
-	{
-		for (size_t i=0; i < mSize; ++i)
-			mVec[i].~T();
-
-		mSize = 0;
-	}
 };
 
 #endif

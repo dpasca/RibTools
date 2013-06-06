@@ -45,6 +45,19 @@ Transform
 */
 
 //==================================================================
+template <class T> class CopyStack
+{
+	DVec<T>	mVec;
+public:
+    CopyStack()          { mVec.resize(1); }
+    void push()          { mVec.push_back( top() ); }
+    void pop()           { mVec.pop_back(); }
+    const T &top() const { return mVec.back(); }
+          T &top()       { return mVec.back(); }
+    void clear()         { mVec.clear(); }
+};
+
+//==================================================================
 //
 //==================================================================
 class State
@@ -67,7 +80,7 @@ public:
 
 private:
 	SymbolList				mGlobalSyms;
-	Stack<Mode>				mModeStack;
+    DVec<Mode>	            mModeStack;
 	CopyStack<Options	>	mOptionsStack;
 	CopyStack<Attributes>	mAttributesStack;
 	CopyStack<Transform	>	mTransformOpenStack;
@@ -225,7 +238,7 @@ private:
 
 	void pushMode( Mode mode )
 	{
-		mModeStack.push( mode );
+		mModeStack.push_back( mode );
 	}
 
 	void popMode( Mode expectedMode )
