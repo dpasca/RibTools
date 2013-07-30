@@ -1,3 +1,6 @@
 .DS_Store
 tags
+.ctags
+Distrib/
+build/
 
