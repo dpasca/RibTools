@@ -7,14 +7,21 @@ MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar
 	SET(PrecompiledBinary "$(IntDir)/${PrecompiledBasename}.pch")
 	SET(Sources ${${SourcesVar}})
 
-	SET_SOURCE_FILES_PROPERTIES(${PrecompiledSource}
-								PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
-										   OBJECT_OUTPUTS "${PrecompiledBinary}")
-	SET_SOURCE_FILES_PROPERTIES(${Sources}
-								PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
-										   OBJECT_DEPENDS "${PrecompiledBinary}")  
+	SET_SOURCE_FILES_PROPERTIES(
+			${PrecompiledSource}
+			PROPERTIES
+			COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+			OBJECT_OUTPUTS "${PrecompiledBinary}")
+
+	SET_SOURCE_FILES_PROPERTIES(
+			${Sources}
+			PROPERTIES
+			COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+			OBJECT_DEPENDS "${PrecompiledBinary}")  
+
 	# Add precompiled header to SourcesVar
 	LIST(APPEND ${SourcesVar} ${PrecompiledSource})
+
   ENDIF(MSVC)
 ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 
@@ -25,20 +32,42 @@ project (RibTools)
 # 	ADD_DEFINITIONS(-std=c++0x) # Enable C++0x mode for unordered_map
 # ENDIF()
 
-if (MSVC)
-	# disable annoying secure CRT warnings
-	add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /nologo" )
-	# disable RTTI
-	add_definitions( "/GR-" )
-endif (MSVC)
-
 # Find OpenMP and set the flags for the compiler
-find_package(OpenMP)
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+#find_package(OpenMP)
+#set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+
+if(MSVC) #((((((((((((((((
+    set(CMAKE_C_FLAGS_RELEASE   "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy /arch:SSE2")
+    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy /arch:SSE2")
+    set(CMAKE_C_FLAGS_DEBUG     "/D_DEBUG /DWIN32 /Zi /MDd /Od                      /arch:SSE2")
+    set(CMAKE_CXX_FLAGS_DEBUG   "/D_DEBUG /DWIN32 /Zi /MDd /Od                      /arch:SSE2")
+    add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /nologo" ) # disable annoying secure CRT warnings
+    add_definitions( "/GR-" ) # disable RTTI
+else()
+    set(OSMACRO "")
+    if(APPLE)
+        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+            set(OSMACRO "-DMACOSX")
+        else()
+            set(OSMACRO "-DTARGET_OS_IPHONE")
+        endif()
+    endif()
+    set(CMAKE_C_FLAGS   "${OSMACRO}")
+    set(CMAKE_CXX_FLAGS "${OSMACRO} -std=c++11 -stdlib=libc++")
+    set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS}   -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG")
+    set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS}   -D_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS} -D_DEBUG")
+endif() #))))))))))))))))
+
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" CACHE STRING "Release link flags")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG}"   CACHE STRING "Debug link flags")
 
 # Add the source dir as a common include path
-include_directories( . DSystem/include )
+include_directories( . )
+include_directories( DMath/include )
+include_directories( DSystem/include )
 
 # Specify the destination directly into the Distrib directory
 # ..also avoid the /Release and /Debug additional subdirs created by
