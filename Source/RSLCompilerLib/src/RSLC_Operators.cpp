@@ -64,7 +64,8 @@ static void doReparent( TokNode *pOper, size_t &out_parentIdx, bool swapOrder )
 		}
 
 		pRValue->Reparent( pOper );
-		pOper->mpChilds.push_front( pRValue );
+        // insert at the front
+		pOper->mpChilds.insert( pOper->mpChilds.begin(), pRValue );
 	}
 	//	oper
 	//		R
@@ -73,7 +74,8 @@ static void doReparent( TokNode *pOper, size_t &out_parentIdx, bool swapOrder )
 	if ( pLValue )
 	{
 		pLValue->Reparent( pOper );
-		pOper->mpChilds.push_front( pLValue );
+        // insert at the front
+		pOper->mpChilds.insert( pOper->mpChilds.begin(), pLValue );
 	}
 	//	oper
 	//		L

@@ -25,12 +25,12 @@ static void splitSearchPath( const char *pSrc, DVec<DStr> &out_strings )
 	char *pTokCtx;
 	char *pTok;
 
-	if ( pTok = strtok_r( buff, ":", &pTokCtx ) )
+	if ( (pTok = strtok_r( buff, ":", &pTokCtx )) )
 	{
 		do 
 		{
 			out_strings.push_back( pTok );
-		} while ( pTok = strtok_r(NULL, ":", &pTokCtx) );
+		} while ( (pTok = strtok_r(NULL, ":", &pTokCtx)) );
 	}
 }
 

@@ -47,10 +47,10 @@ void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
 	while ( true )
 	{
 		if NOT( mpPakMan->IsConnected() )
-			DASSTHROW( 0, ("Could not read %s, connection broken !", pFileName) )
+			DEX_RUNTIME_ERROR( "Could not read %s, connection broken !", pFileName );
 
 		U32 ids[] = { MSGID_FILEREQANS_DATA, MSGID_FILEREQANS_FAIL };
-		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 10 );
+		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatchID32( true, ids, _countof(ids), 10 );
 
 		if ( pPacket )
 		{
@@ -69,7 +69,11 @@ void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
 
 			case MSGID_FILEREQANS_FAIL:
 				printf( "NETLOG: RECV MSGID_FILEREQANS_FAIL\n" );
-				DASSTHROW( 0, ( "ERROR: Could not retrieve the file %s !\n", pFileName ) );
+				DEX_RUNTIME_ERROR( "ERROR: Could not retrieve the file %s !\n", pFileName );
+				break;
+
+            default:
+				printf( "NETLOG: RECV *UNKNOWN*\n" );
 				break;
 			}
 
@@ -101,10 +105,10 @@ bool FileManagerNet::FileExists( const char *pFileName )
 	while ( true )
 	{
 		if NOT( mpPakMan->IsConnected() )
-			DASSTHROW( 0, ("Could not read %s, connection broken !", pFileName) )
+			DEX_RUNTIME_ERROR( "Could not read %s, connection broken !", pFileName );
 
 		U32 ids[] = { MSGID_FILEEXISTANSYES, MSGID_FILEEXISTANSNO };
-		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 10 );
+		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatchID32( true, ids, _countof(ids), 10 );
 
 		if ( pPacket )
 		{
@@ -118,6 +122,10 @@ bool FileManagerNet::FileExists( const char *pFileName )
 			case MSGID_FILEEXISTANSNO:
 				printf( "NETLOG: RECV MSGID_FILEEXISTANSNO\n" );
 				return false;
+
+            default:
+				printf( "NETLOG: RECV *UNKNOWN*\n" );
+                break;
 			}
 
 			mpPakMan->DeletePacket( pPacket );

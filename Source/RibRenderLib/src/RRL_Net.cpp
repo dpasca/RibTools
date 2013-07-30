@@ -60,13 +60,13 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 			if ( !pConn || pConn->IsConnected() )
 				continue;
 
-			switch ( pConn->TryConnect() )
+			switch ( pConn->IdleConnect() )
 			{
-			case DNET::Connecter::RETVAL_WAITING:
+			case DNET::Connecter::IDLERET_WAITING:
 				isSomeConnectionWaiting = true;
 				break;
 
-			case DNET::Connecter::RETVAL_CONNECTED:
+			case DNET::Connecter::IDLERET_CONNECTED:
 				DASSERT( srvList[i].mpPakMan == NULL );
 				srvList[i].Init( 
 							DNEW DNET::PacketManager( pConn->GetSocket() ) );
@@ -74,7 +74,7 @@ void ConnectToServers( DVec<Server> &srvList, U32 timeoutMS )
 				printf( "* Successfully connected to %s..\n", srvList[i].mAddressName.c_str() );
 				break;
 
-			case DNET::Connecter::RETVAL_ERROR:
+			case DNET::Connecter::IDLERET_ERROR:
 				printf( "! Failed to connect to %s..\n", srvList[i].mAddressName.c_str() );
 				srvList[i].mIsValid = false;
 				break;

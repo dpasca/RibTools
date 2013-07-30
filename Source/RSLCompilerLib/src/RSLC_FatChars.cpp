@@ -44,10 +44,10 @@ size_t FatBase::InsertNewFile( DVec<Fat8> &desData, size_t inserStart, size_t in
 			}
 		}
 
-		Fat8	*pFat = desData.grow();
-		pFat->Ch = srcCh;
-		pFat->FNameIdx = idx;
-		pFat->SrcPos = curLine;
+		Fat8 &fat = Dgrow( desData );
+		fat.Ch = srcCh;
+		fat.FNameIdx = idx;
+		fat.SrcPos = curLine;
 
 		// a LF ?
 		if ( srcCh == 0x0a )
@@ -94,10 +94,10 @@ void FatBase::AppendNewFile( DVec<Fat8> &desData, const char *pSrcFName, const U
 			}
 		}
 
-		Fat8	*pFat = desData.grow();
-		pFat->Ch = srcCh;
-		pFat->FNameIdx = idx;
-		pFat->SrcPos = curLine;
+		Fat8 &fat = Dgrow( desData );
+		fat.Ch = srcCh;
+		fat.FNameIdx = idx;
+		fat.SrcPos = curLine;
 
 		// a LF ?
 		if ( srcCh == 0x0a )

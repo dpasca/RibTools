@@ -150,6 +150,7 @@ static bool discoverVars_FindNext( TokNode *pBlkNode, size_t &i, bool &out_isFun
 				{
 				case T_OP_COMMA:	return false;	// continue
 				case T_OP_SEMICOL:	return true;	// is done
+                default: break;
 				}
 			}
 
@@ -280,7 +281,8 @@ void DiscoverVariablesDeclarations( TokNode *pNode )
 
 			if (idType == T_TYPE_DATATYPE ||
 				idType == T_TYPE_DETAIL ||
-				idType == T_KW_output )
+				// idType == T_KW_output ) -- TODO: verify this
+				pTokNode->GetTokID() == T_KW_output )
 			{
 				i = discoverVariablesDeclarations_sub( pNode, i );
 			}

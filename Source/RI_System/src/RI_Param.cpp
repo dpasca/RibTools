@@ -101,26 +101,26 @@ const char *Param::PChar() const
 //==================================================================
 void ParamList::Add( const char *pStr )
 {
-	Param	*p = this->grow();
+    auto &p = Dgrow( *this );
 
-	p->type = Param::STR;
-	p->u.stringVal = pStr;
+	p.type = Param::STR;
+	p.u.stringVal = pStr;
 }
 
 void ParamList::Add( float val )
 {
-	Param	*p = this->grow();
+    auto &p = Dgrow( *this );
 
-	p->type = Param::FLT;
-	p->u.floatVal = val;
+	p.type = Param::FLT;
+	p.u.floatVal = val;
 }
 
 void ParamList::Add( int val )
 {
-	Param	*p = this->grow();
+    auto &p = Dgrow( *this );
 
-	p->type = Param::INT;
-	p->u.intVal = val;
+	p.type = Param::INT;
+	p.u.intVal = val;
 }
 
 //==================================================================

@@ -67,7 +67,7 @@ Texture::Texture( const char *pName, DUT::MemFile &file ) :
 
 	if NOT( pDotExt )
 	{
-		DASSTHROW( 0, ("Missing file extension ! %s", pName) );
+		DEX_RUNTIME_ERROR( "Missing file extension ! %s", pName );
 	}
 	
 	if ( 0 == strcasecmp( pDotExt, ".tif" ) || 0 == strcasecmp( pDotExt, ".mip" ) )

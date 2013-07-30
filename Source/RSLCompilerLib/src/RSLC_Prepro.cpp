@@ -129,10 +129,10 @@ static size_t applySymbols(
 				// ..current file name and line number
 				for (size_t k=0; k < symbVal.length(); ++k)
 				{
-					Fat8 *pFatChar = scrcpad.grow();
-					pFatChar->Ch		= symbVal[k];
-					pFatChar->FNameIdx	= text[i].FNameIdx;
-					pFatChar->SrcPos	= text[i].SrcPos;
+					Fat8 &fatChar = Dgrow( scrcpad );
+					fatChar.Ch		= symbVal[k];
+					fatChar.FNameIdx= text[i].FNameIdx;
+					fatChar.SrcPos	= text[i].SrcPos;
 				}
 
 				i = j;

@@ -130,7 +130,7 @@ public:
 	TokNode *AddChildFront( TokNode *pNode )
 	{
 		pNode->mpParent = this;
-		mpChilds.push_front( pNode );
+		mpChilds.insert( mpChilds.begin(), pNode );
 		return pNode;
 	}
 

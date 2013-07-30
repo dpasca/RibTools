@@ -131,10 +131,10 @@ void Hider::WorldBegin(
 			x2 = DMIN( x2, opt.mXRes );
 
 			if ( mParams.mDbgOnlyBucketAtX == -1 ||
-				 mParams.mDbgOnlyBucketAtX >= x &&
-				 mParams.mDbgOnlyBucketAtY >= y &&
-				 mParams.mDbgOnlyBucketAtX < x2 &&
-				 mParams.mDbgOnlyBucketAtY < y2 )
+				 (mParams.mDbgOnlyBucketAtX >= x &&
+				  mParams.mDbgOnlyBucketAtY >= y &&
+				  mParams.mDbgOnlyBucketAtX < x2 &&
+				  mParams.mDbgOnlyBucketAtY < y2) )
 			{
 				HiderSampleCoordsBuffer	*pSampCoordsBuff =
 						findOrAddSampCoordBuff( x2 - x, y2 - y, subPixDimLog2 );

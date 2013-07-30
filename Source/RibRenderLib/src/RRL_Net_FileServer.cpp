@@ -60,7 +60,7 @@ void FileServer::threadMain()
 		}
 
 		U32 ids[] = { MSGID_FILEEXISTREQ, MSGID_FILEREQ };
-		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 20 );
+		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatchID32( true, ids, _countof(ids), 20 );
 
 		if NOT( pPacket )
 			continue;

@@ -28,7 +28,7 @@ void SimplePrimitiveBase::Split( Hider &hider, bool uSplit, bool vSplit )
 	if ( mSplitCnt > 9 )
 	{
 		// $$$ too many splits !!!
-		mSplitCnt = mSplitCnt;
+		(void)mSplitCnt;
 		return;
 	}
 

@@ -88,7 +88,7 @@ static bool isStringStr( const char *pStr )
 static bool isIntStr( const char *pStr )
 {
 	char ch;
-	while ( ch = *pStr++ )
+	while ( (ch = *pStr++) )
 	{
 		if NOT( (ch >= '0' && ch <= '9') ||
 				ch == '-' ||

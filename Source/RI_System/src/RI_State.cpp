@@ -200,9 +200,12 @@ SVM::Shader *State::GetShader( const char *pShaderName, const char *pAlternateNa
 		
 	if ( pAlternateName )
 	{
-		if ( pShader =
-				(SVM::Shader *)mResManager.FindResource( pAlternateName,
-														ResourceBase::TYPE_SHADER ) )
+		pShader =
+            (SVM::Shader *)mResManager.FindResource(
+                    pAlternateName,
+                    ResourceBase::TYPE_SHADER );
+
+		if ( pShader )
 			return pShader;
 	}
 
@@ -225,8 +228,10 @@ void State::makeDefaultShaders( const char *pBasePath )
 	{
 		SVM::Shader *pShader = GetShader( pDefShaders[i], NULL );
 
-		DASSTHROW( pShader != NULL,
-				("Could not find the shader '%s'", pDefShaders[i]) );
+        if NOT( pShader )
+            DEX_RUNTIME_ERROR(
+                    "Could not find the shader '%s'",
+                    pDefShaders[i] );
 	}
 }
 

@@ -10,7 +10,7 @@
 #include "RI_Base.h"
 #include "RI_State.h"
 #include "RI_Framework.h"
-#include <omp.h>
+//#include <omp.h>
 
 //==================================================================
 namespace RI
@@ -233,8 +233,9 @@ void Framework::worldEnd_setupDisplays()
 		}
 		else
 		{
-			DASSTHROW( 0,
-				("Invalid quantization value for the display '%s'", disp.mName.c_str()) );
+            DEX_RUNTIME_ERROR(
+                    "Invalid quantization value for the display '%s'",
+                    disp.mName.c_str() );
 		}
 
 		disp.mImage.Init(	(U32)mOptions.mXRes,

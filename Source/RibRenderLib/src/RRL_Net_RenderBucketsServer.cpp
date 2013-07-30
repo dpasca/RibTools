@@ -30,7 +30,7 @@ void RenderBucketsServer::Render( RI::Hider &hider )
 	while ( true )
 	{
 		U32 ids[] = { MSGID_RENDBUCKETS, MSGID_RENDDONE };
-		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatch( true, ids, _countof(ids), 10 );
+		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatchID32( true, ids, _countof(ids), 10 );
 
 		if NOT( pPacket )
 		{

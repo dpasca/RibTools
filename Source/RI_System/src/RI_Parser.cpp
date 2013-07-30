@@ -93,43 +93,43 @@ void Parser::AddChar( char ch )
 			break;
 			
 	case Tokenizer::DT_INT:
-			param = mCurParams.grow();
+			param = &Dgrow( mCurParams );
 			param->type				= Param::INT;
 			param->u.intVal			= mpTokenizer->GetDataInt();
 			break;
 	
 	case Tokenizer::DT_FLOAT:
-			param = mCurParams.grow();
+			param = &Dgrow( mCurParams );
 			param->type				= Param::FLT;
 			param->u.floatVal		= mpTokenizer->GetDataFloat();
 			break;
 	
 	case Tokenizer::DT_STRING:
-			param = mCurParams.grow();
+			param = &Dgrow( mCurParams );
 			param->type				= Param::STR;
 			param->u.stringVal		= mpTokenizer->GetDataString();
 			break;
 
 	case Tokenizer::DT_INT_ARRAY:
-			param = mCurParams.grow();
+			param = &Dgrow( mCurParams );
 			param->type				= Param::INT_ARR;
 			param->u.intArrayVal		= mpTokenizer->GetDataIntArray();
 			break;
 
 	case Tokenizer::DT_FLOAT_ARRAY:
-			param = mCurParams.grow();
+			param = &Dgrow( mCurParams );
 			param->type				= Param::FLT_ARR;
 			param->u.floatArrayVal	= mpTokenizer->GetDataFloatArray();
 			break;
 
 	case Tokenizer::DT_STRING_ARRAY:
-			param = mCurParams.grow();
+			param = &Dgrow( mCurParams );
 			param->type				= Param::STR_ARR;
 			param->u.stringArrayVal	= mpTokenizer->GetDataStringArray();
 			break;
 
 	default:
-			param = mCurParams.grow();
+			param = &Dgrow( mCurParams );
 			param->type = Param::UNKNOWN;
 			//puts( "Unknown !!!" );
 			break;

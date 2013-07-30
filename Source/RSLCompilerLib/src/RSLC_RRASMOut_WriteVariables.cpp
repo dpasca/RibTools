@@ -42,9 +42,10 @@ static void writeVariable( FILE *pFile, const Variable &var )
 	const char *pClass;
 	if ( var.mIsVarying )
 	{
-		DASSTHROW( var.HasBaseVal() == false,
-				("Internal error ! Variable '%s' is varying but has a base value !",
-					var.GetUseName().c_str()) );
+        if ( var.HasBaseVal() )
+            DEX_RUNTIME_ERROR(
+                    "Internal error ! Variable '%s' is varying but has a base value !",
+					var.GetUseName().c_str() );
 
 		pClass = "varying";
 	}
@@ -146,6 +147,9 @@ static void writeVarsRec( FILE *pFile, TokNode *pNode )
 		}
 		}
 		break;
+
+    default:
+        break;
 	}
 
 	for (size_t i=0; i < pNode->mpChilds.size(); ++i)

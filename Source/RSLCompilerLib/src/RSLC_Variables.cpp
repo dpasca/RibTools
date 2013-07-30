@@ -34,6 +34,8 @@ VarType VarTypeFromToken( const Token *pTok )
 	case T_DT_string: return VT_STRING;
 	case T_DT_bool:	  return VT_BOOL;
 	case T_DT_void:	  return VT_VOID;
+    default:
+        break;
 	}
 
 	DASSERT( 0 );
@@ -91,6 +93,8 @@ bool IsSameVarType( VarType vta, VarType vtb, bool laxTypes )
 		case VT_POINT:
 		case VT_NORMAL:
 			vta = VT_VECTOR;
+        default:
+            break;
 		}
 
 		switch ( vtb )
@@ -99,6 +103,8 @@ bool IsSameVarType( VarType vta, VarType vtb, bool laxTypes )
 		case VT_POINT:
 		case VT_NORMAL:
 			vtb = VT_VECTOR;
+        default:
+            break;
 		}
 	}
 
@@ -123,7 +129,7 @@ Variable *AddVariable(
 
 	DASSERT( pNameNode->mpToken != NULL );
 
-	Variable	*pVar = pNode->GetVars().grow();
+	Variable	*pVar = &Dgrow( pNode->GetVars() );
 
 	pVar->mpDTypeTok		= pDTypeNode->mpToken;
 	//pVar->mpOwnerNode		= pNode;
@@ -216,7 +222,7 @@ void AddSelfVariable(
 	// setup the var link
 	pNode->mVarLink.Setup( pNode, pNode->GetVars().size() );
 
-	Variable	*pVar = pNode->GetVars().grow();
+	Variable	*pVar = &Dgrow( pNode->GetVars() );
 
 	pVar->mVarType			= varType;
 	pVar->mIsVarying		= isVarying;

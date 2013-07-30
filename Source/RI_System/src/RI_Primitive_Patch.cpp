@@ -50,8 +50,8 @@ void PatchMesh::Simplify( Hider &hider )
 
 	if ( mpPatchType->IsName( RI_BILINEAR ) )
 	{
-		int	nUPatches = nu - 1 + uPeriodic ? 1 : 0;
-		int	nVPatches = nv - 1 + vPeriodic ? 1 : 0;
+		int	nUPatches = nu - 1 + (uPeriodic ? 1 : 0);
+		int	nVPatches = nv - 1 + (vPeriodic ? 1 : 0);
 
 		Float3	hullv3[4];
 
@@ -119,7 +119,9 @@ void PatchMesh::Simplify( Hider &hider )
 	}
 	else
 	{
-		DASSTHROW( 0, ("Unrecognized Patch type %s", mpPatchType->mName.c_str() ) );
+		DEX_RUNTIME_ERROR(
+                "Unrecognized Patch type %s",
+                mpPatchType->mName.c_str() );
 		//ErrHandler( E_BADARGUMENT );
 	}	
 }

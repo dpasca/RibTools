@@ -49,7 +49,7 @@ public:
 
 	void Append( DVec<Fat8> &desData, const DVec<Fat8> &srcData )
 	{
-		desData.append( srcData );
+        desData.insert( desData.end(), srcData.begin(), srcData.end() );
 	}
 };
 

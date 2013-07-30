@@ -93,6 +93,7 @@ public:
 	RefCount &operator=( const RefCount &from )
 	{
 		mRefCount = 0;
+        return *this;
 	}
 
 	RefCount() :
@@ -173,6 +174,7 @@ private:
 	RCBase &operator=( const RCBase &from )
 	{
 		mCount = 0;
+        return *this;
 	}
 };
 
@@ -219,6 +221,7 @@ private:
 	RCBaseNoDel &operator=( const RCBaseNoDel &from )
 	{
 		mCount = 0;
+        return *this;
 	}
 };
 
@@ -254,7 +257,7 @@ private:
 		if ( mPtr )
 			mPtr->SubRef();
 
-		if ( mPtr = ptr )
+		if ( (mPtr = ptr) )
 			mPtr->AddRef();
 	}
 
@@ -266,7 +269,7 @@ private:
 		if ( mPtr )
 			mPtr->SubRef();
 
-		if ( mPtr = (T *)ptr )
+		if ( (mPtr = (T *)ptr) )
 			mPtr->AddRef();
 	}
 

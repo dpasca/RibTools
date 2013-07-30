@@ -229,7 +229,7 @@ static void discoverFuncsDeclarations_sub(
 	if ( pDeclParamsBlk->GetBlockType() == BLKT_CALL_OR_DELC_PARAMS_FN )
 		pDeclParamsBlk->SetBlockType( BLKT_DECL_PARAMS_FN );
 
-	Function	*pFunc = funcs.grow();
+	Function	*pFunc = &Dgrow( funcs );
 
 	removeCommasFromParams( pDeclParamsBlk );
 	//convertFCallParamsToExtressions( pParamsBlk, io_blockCnt );
@@ -300,7 +300,10 @@ static void discoverFuncsCalls_sub(
 		}
 
 		pSpaceCastNode->Reparent( pCallParamsBlk );
-		pCallParamsBlk->mpChilds.push_front( pSpaceCastNode );
+
+		pCallParamsBlk->mpChilds.insert(
+                pCallParamsBlk->mpChilds.begin(),
+                pSpaceCastNode );
 	}
 
 	// do an early match to see if there is at least one function call
@@ -384,6 +387,9 @@ static void discoverFuncsDecls(
 		case BLKT_CALL_OR_DELC_PARAMS_FN:
 			discoverFuncsDeclarations_sub( pNode, pDeclParamsBlk, funcs, io_blockCnt );
 			break;
+
+        default:
+            break;
 		}
 	}
 

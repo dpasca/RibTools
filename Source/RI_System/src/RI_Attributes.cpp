@@ -350,7 +350,7 @@ void Attributes::cmdLightSource( ParamList &params )
 
 	DASSERT( listIdx < 65536 );	// 16 bit limit..
 
-	mActiveLights.find_or_push_back( (U16)listIdx );
+    Dpush_back_unique( mActiveLights, (U16)listIdx );
 
 	mpRevision->BumpRevision();
 }

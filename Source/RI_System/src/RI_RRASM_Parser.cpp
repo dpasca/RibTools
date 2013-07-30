@@ -435,6 +435,10 @@ void Parser::parseDataLine( char lineBuff[], int lineCnt )
 		case Symbol::TYP_MATRIX:
 				onError( "Currently unsupported default value (^^;> '%s'", pTok );
 				break;
+
+        default:
+            DASSERT( 0 );
+            break;
 		}
 	}
 	else
@@ -572,9 +576,9 @@ void Parser::parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpD
 	if ( expectedType == Symbol::TYP_ADDR )
 	{
 		// look for a label
-		Label	*pLabel = mLabelRefs.grow();
-		pLabel->mAddress = (u_int)mpShader->mCode.size();	// pointer to the CPU word that needs to be resolved later
-		pLabel->mName	 = pTok;
+		Label &label = Dgrow( mLabelRefs );
+		label.mAddress = (u_int)mpShader->mCode.size();	// pointer to the CPU word that needs to be resolved later
+		label.mName	 = pTok;
 		word.mAddress.mOffset = 0xcfcfcfcf;	// dummy value for now..
 	}
 	else
@@ -630,12 +634,12 @@ bool Parser::parseLabelDef( const char *pTok )
 		if ( len < 2 )
 			onError( "Label has no name ?!\n" );
 
-		Label *pLabel = mLabelDefs.grow();
+		Label &label = Dgrow( mLabelDefs );
 
-		pLabel->mName = pTok;	// copy without the colon..
-		pLabel->mName.resize( len - 1 );
+		label.mName = pTok;	// copy without the colon..
+		label.mName.resize( len - 1 );
 
-		pLabel->mAddress = (u_int)mpShader->mCode.size();	// pointer to the CPU word of this label
+		label.mAddress = (u_int)mpShader->mCode.size();	// pointer to the CPU word of this label
 
 		return true;
 	}

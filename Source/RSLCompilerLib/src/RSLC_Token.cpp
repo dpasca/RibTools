@@ -192,7 +192,7 @@ void Tokenizer( DVec<Token> &tokens, FatBase &fatBase, const Fat8Vec &str )
 	bool	isInBlockComment	= false;
 	bool	isInLineComment		= false;
 
-	tokens.grow();
+	Dgrow( tokens );
 
 	TokenDef	*pCurTDef = NULL;
 

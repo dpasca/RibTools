@@ -79,7 +79,7 @@ static void addConstVariable( TokNode *pNode, TokNode *pRoot )
 	// setup the var link
 	pNode->mVarLink.Setup( pRoot, pRoot->GetVars().size() );
 
-	Variable	*pVar = pRoot->GetVars().grow();
+	Variable	*pVar = &Dgrow( pRoot->GetVars() );
 
 	pVar->mIsVarying		= false;
 	pVar->mIsForcedDetail	= false;

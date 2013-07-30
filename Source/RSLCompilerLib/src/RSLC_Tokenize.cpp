@@ -88,7 +88,7 @@ void Tokenize::newToken( const Fat8 &fatCh )
 {
 	if ( mTokens.back().IsSet() )
 	{
-		mTokens.grow();
+		Dgrow( mTokens );
 		mTokens.back().sourceLine = fatCh.SrcPos;
 		mTokens.back().pSourceFileName = mFatBase.mFileNames[ fatCh.FNameIdx ].c_str();
 	}

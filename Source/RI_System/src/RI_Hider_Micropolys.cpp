@@ -96,17 +96,17 @@ inline void addMPSamples(
 					(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 && crs3 >= 0)
 					)
 				{
-					HiderSampleData *pSampData = pixel.mpSampDataLists[i].grow();
+					HiderSampleData &sampData = Dgrow( pixel.mpSampDataLists[i] );
 
-					pSampData->mOi[0] = valOi[0];
-					pSampData->mOi[1] = valOi[1];
-					pSampData->mOi[2] = valOi[2];
+					sampData.mOi[0] = valOi[0];
+					sampData.mOi[1] = valOi[1];
+					sampData.mOi[2] = valOi[2];
 
-					pSampData->mCi[0] = valCi[0];
-					pSampData->mCi[1] = valCi[1];
-					pSampData->mCi[2] = valCi[2];
+					sampData.mCi[0] = valCi[0];
+					sampData.mCi[1] = valCi[1];
+					sampData.mCi[2] = valCi[2];
 
-					pSampData->mDepth = microquad[0][2];
+					sampData.mDepth = microquad[0][2];
 				}
 			}
 		}
@@ -183,17 +183,17 @@ void Hider::Bust(
 				{
 					HiderPixel	&pixel = pixels[ pixY * buckWd + pixX ];
 
-					HiderSampleData *pSampData = pixel.mpSampDataLists[0].grow();
+					HiderSampleData &sampData = Dgrow( pixel.mpSampDataLists[0] );
 
-					pSampData->mOi[0] = shadGrid.mpOi[ blk ][0][ sub ];
-					pSampData->mOi[1] = shadGrid.mpOi[ blk ][1][ sub ];
-					pSampData->mOi[2] = shadGrid.mpOi[ blk ][2][ sub ];
+					sampData.mOi[0] = shadGrid.mpOi[ blk ][0][ sub ];
+					sampData.mOi[1] = shadGrid.mpOi[ blk ][1][ sub ];
+					sampData.mOi[2] = shadGrid.mpOi[ blk ][2][ sub ];
 
-					pSampData->mCi[0] = shadGrid.mpCi[ blk ][0][ sub ];
-					pSampData->mCi[1] = shadGrid.mpCi[ blk ][1][ sub ];
-					pSampData->mCi[2] = shadGrid.mpCi[ blk ][2][ sub ];
+					sampData.mCi[0] = shadGrid.mpCi[ blk ][0][ sub ];
+					sampData.mCi[1] = shadGrid.mpCi[ blk ][1][ sub ];
+					sampData.mCi[2] = shadGrid.mpCi[ blk ][2][ sub ];
 
-					pSampData->mDepth = shadGrid.mpPointsCS[ blk ][2][ sub ];
+					sampData.mDepth = shadGrid.mpPointsCS[ blk ][2][ sub ];
 				}
 			}
 

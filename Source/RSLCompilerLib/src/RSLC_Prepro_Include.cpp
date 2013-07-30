@@ -65,7 +65,9 @@ void HandleInclude(
 				}
 				else
 				{
-					DASSTHROW( 0, ("Could not find '%s' for inclusion", includeName.c_str()) );
+					DEX_RUNTIME_ERROR(
+                            "Could not find '%s' for inclusion",
+                            includeName.c_str() );
 				}
 			}
 

@@ -331,7 +331,7 @@ static void newSymParamsFromDecl(
 			*out_name = pTok;
 
 			// we got a non-terminal symbol.. then we expect nothing else to follow !
-			if ( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+			if ( (pTok = strtok_r(NULL, " \t", &pTokCtx)) )
 				throw Exception( "Bad declaration: '%s'", pDecl );
 
 			return;
@@ -380,7 +380,7 @@ static void newSymParamsFromDecl(
 		*out_name = pTok;
 
 		// trailing trash ?
-		if ( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+		if ( (pTok = strtok_r(NULL, " \t", &pTokCtx)) )
 			throw Exception( "Bad declaration, what's after the symbol name ?: '%s'", pDecl );
 	}
 	else
@@ -419,8 +419,10 @@ Symbol *SymbolList::AddByString( const char *pDeclName, Symbol::Storage storage,
 
 	params.mpName	= name.c_str();
 
-	DASSTHROW( params.mType != Symbol::TYP_UNKNOWN,
-			("Bad symbol declaration. Type is missing: '%s'", pDeclName) );
+    if ( params.mType == Symbol::TYP_UNKNOWN )
+        DEX_RUNTIME_ERROR(
+                "Bad symbol declaration. Type is missing: '%s'",
+                pDeclName );
 
 	return AddByParams( params );
 }
