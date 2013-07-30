@@ -1,2 +1,3 @@
-build/*
-Distrib/*
+.DS_Store
+tags
+
