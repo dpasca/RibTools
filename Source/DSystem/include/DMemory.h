@@ -48,11 +48,4 @@
 #define DSAFE_DELETE(_X_)		{ if ( _X_ ) { DDELETE		(_X_); (_X_) = 0; } }
 #define DSAFE_DELETE_ARRAY(_X_)	{ if ( _X_ ) { DDELETE_ARRAY(_X_); (_X_) = 0; } }
 
-#if defined(_MSC_VER) && _MSC_VER < 1600	// before VS 2010 ?
-	#define unique_ptr	auto_ptr	// WARNING: not STL-safe
-#else
-	// ..for the time being..
-	#define unique_ptr	auto_ptr	// WARNING: not STL-safe
-#endif
-
 #endif

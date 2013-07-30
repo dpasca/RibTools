@@ -9,9 +9,6 @@
 #ifndef DCRITICALSECTION_H
 #define DCRITICALSECTION_H
 
-#if defined(WIN32)
-#include <windows.h>
-#endif
 #include "DUtils.h"
 
 //==================================================================
@@ -24,7 +21,7 @@ class CriticalSection
 	friend class Block;
 
 #if defined(WIN32)
-	CRITICAL_SECTION	mCSection;
+	void				*mCSection;
 #endif
 
 public:
@@ -47,48 +44,15 @@ public:
 	};
 
 public:
-	void Enter()
-	{
-	#if defined(WIN32)
-		EnterCriticalSection( &mCSection );
+	CriticalSection();
+	~CriticalSection();
 
-	#elif defined(__linux__)
-
-	#endif
-	}
-
-	void Leave()
-	{
-	#if defined(WIN32)
-		LeaveCriticalSection( &mCSection );
-
-	#elif defined(__linux__)
-
-	#endif
-	}
-
-	CriticalSection()
-	{
-	#if defined(WIN32)
-		InitializeCriticalSection( &mCSection );
-		
-	#elif defined(__linux__)
-
-	#endif
-	}
-
-	~CriticalSection()
-	{
-	#if defined(WIN32)
-		DeleteCriticalSection( &mCSection );
-		
-	#elif defined(__linux__)
-
-	#endif
-	}
+	void Enter();
+	void Leave();
 };
 
 //===============================================================
+#if 1
 class LongCriticalSection
 {
 	friend class Block;
@@ -131,8 +95,10 @@ public:
 	{
 	}
 };
+#endif
 
 //==================================================================
 }
 
 #endif
+

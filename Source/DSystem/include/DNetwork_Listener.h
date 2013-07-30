@@ -31,11 +31,12 @@ public:
 	};
 
 public:
-	Listener( U32 port );
+	Listener( u_short port=0 );
 	~Listener();
 
-	bool		Start();
+	bool		Start( u_short port=0 );
 	void		Stop();
+	bool		IsListening() const;
 	IdleRetType Idle( SOCKET &out_acceptedSock, U32 waitMSec );
 };
 

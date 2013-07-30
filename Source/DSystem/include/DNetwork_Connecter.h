@@ -19,28 +19,37 @@ namespace DNET
 class Connecter
 {
 	SOCKET		mSock;
-	sockaddr_in	mSockAddr;
 	bool		mIsConnected;
 
 public:
-	enum RetVal
+	enum StartRet
 	{
-		RETVAL_WAITING,
-		RETVAL_CONNECTED,
-		RETVAL_ERROR,
-		RETVAL_N,
+		STARTRET_OK,
+		STARTRET_INVALID_ADDR,
+		STARTRET_GENERIC_ERROR,
+		STARTRET_N
+	};
+
+	enum IdleRet
+	{
+		IDLERET_WAITING,
+		IDLERET_CONNECTED,
+		IDLERET_ERROR,
+		IDLERET_N,
 	};
 
 public:
 	//==================================================================
-	Connecter( const char *pIPName, int port );
+	Connecter( const char *pIPName=NULL, u_short port=0 );
 	~Connecter();
 
+	StartRet StartConnect( const char *pIPName, u_short port );
+
+	//bool HasStarted() const { return mSock != INVALID_SOCKET;	}
 	bool IsConnected() const { return mIsConnected;	}
 
-	RetVal TryConnect();
+	IdleRet IdleConnect();
 	SOCKET GetSocket();
-
 };
 
 

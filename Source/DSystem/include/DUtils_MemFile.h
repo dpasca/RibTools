@@ -41,6 +41,7 @@ public:
 	template <class T>
 	void WriteValue( const T &from )
 	{
+        DASSERT( mIdx + sizeof(T) <= mMaxSize );
 		*((T *)(mpDest + mIdx)) = from;
 		mIdx += sizeof(T);
 	}
@@ -48,6 +49,7 @@ public:
 	template <class T>
 	void WriteArray( const T *pFrom, size_t cnt )
 	{
+        DASSERT( mIdx + cnt*sizeof(T) <= mMaxSize );
 		for (size_t i=0; i < cnt; ++i)
 		{
 			*((T *)(mpDest + mIdx)) = pFrom[i];
@@ -57,6 +59,8 @@ public:
 
 	U8 *Grow( size_t cnt )
 	{
+        DASSERT( mIdx + cnt <= mMaxSize );
+
 		U8	*ptr = mpDest + mIdx;
 
 		mIdx += cnt;
@@ -75,6 +79,7 @@ public:
 class MemWriterDynamic
 {
 	friend class MemFile;
+	friend class MemReader;
 
 	DVec<U8>	mDest;
 	U32			mBits;
@@ -109,6 +114,9 @@ public:
 	template <class T>
 	void WriteArray( const T *pFrom, size_t cnt )
 	{
+        if NOT( cnt )
+            return;
+
 		size_t	idx = mDest.size();
 		mDest.resize( idx + sizeof(T)*cnt );
 		memcpy( &mDest[idx], pFrom, sizeof(T)*cnt );
@@ -156,15 +164,17 @@ public:
 
 	U8 *Grow( size_t cnt )
 	{
-		return mDest.grow( cnt );
+		return Dgrow( mDest, cnt );
 	}
 
-	void Reserve( size_t siz )
+	void Reserve( size_t siz ) // actually prealloc
 	{
-		mDest.force_reserve( siz );
+        size_t oldSiz = mDest.size();
+		mDest.resize( siz );
+		mDest.resize( oldSiz );
 	}
 
-	const U8 *GetDataBegin() const { return &mDest[0]; }
+	const U8 *GetDataBegin() const { return mDest.size() ? &mDest[0] : NULL; }
 
 	size_t GetCurSize() const { return mDest.size(); }
 };
@@ -182,6 +192,15 @@ class MemReader
 	int			mBitsCnt;
 
 public:
+	MemReader() :
+		mpSrc(NULL),
+		mIdx(0),
+		mMaxSize(0),
+		mBits(0),
+		mBitsCnt(0)
+	{
+	}
+
 	MemReader( const void *pDest, size_t maxSize ) :
 		mpSrc((const U8 *)pDest),
 		mIdx(0),
@@ -210,9 +229,28 @@ public:
 		InitOwnVec( vec );
 	}
 
+	/*
+	MemReader( MemWriterDynamic &mw ) :
+		mpSrc(NULL),
+		mIdx(0),
+		mMaxSize(0),
+		mBits(0),
+		mBitsCnt(0)
+	{
+		InitOwnVec( mw.mDest );
+	}
+	*/
+
 	void InitOwnVec( DVec<U8> &vec )
 	{
-		mOwnedData.get_ownership( vec );
+		Dmove( mOwnedData, vec );
+		mpSrc = (const U8 *)&mOwnedData[0];
+		mMaxSize = mOwnedData.size();
+	}
+
+	void InitOwnMemWriterDyn( MemWriterDynamic &mw )
+	{
+		Dmove( mOwnedData, mw.mDest );
 		mpSrc = (const U8 *)&mOwnedData[0];
 		mMaxSize = mOwnedData.size();
 	}
@@ -231,7 +269,7 @@ public:
 		// copy into the temporary buffer
 		memcpy( tmp, mpSrc + mIdx, sizeof(T) );
 
-		return *(const T *)tmp;
+		return *(const T *)(void *)tmp;
 	#endif
 	}
 
@@ -272,6 +310,8 @@ public:
 
 		return DStr( (const char *)pData, len );
 	}
+
+    bool ReadTextLine( char *pDestStr, size_t destStrMaxSize );
 
 	U32 ReadBits( size_t cnt )
 	{

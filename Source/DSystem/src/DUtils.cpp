@@ -6,15 +6,21 @@
 /// copyright info.
 //==================================================================
 
+#define D_LOGGINGx
+#define D_TRACKINGx
+
+#include "dlog.h"
+
 #if defined(_MSC_VER)
-    #include <Windows.h>
+# include <Windows.h>
 #else
-    #include <sys/time.h>
+# include <sys/time.h>
 #endif
 
 #ifdef __APPLE__
-    #include "TargetConditionals.h"
-    #include <signal.h>
+# include "TargetConditionals.h"
+# include <signal.h>
+# include <unistd.h>
 
 # if defined(MACOSX)
 #  undef TARGET_OS_IPHONE
@@ -22,7 +28,7 @@
 #endif
 
 #if defined(TARGET_OS_IPHONE)
-# include "ios/IPH_Utils.h"
+# include "IPH_Utils.h"
 #endif
 
 #include <stdio.h>
@@ -45,7 +51,7 @@ namespace DUT
 DStr VSSPrintFS( const char *pFmt, va_list vl )
 {
 	char	buff[1024];
-	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+	vsnprintf( buff, sizeof(buff), pFmt, vl );
 
 	return DStr( buff );
 }
@@ -73,31 +79,33 @@ void DAssert( bool ok, const char *pFile, int line, const char *msg )
 
 	sprintf(buff, "ASSERT: %s:%i '%s'\n", pFile, line, (msg==0)?(""):msg);
 
-	puts( buff );
+	printf( "%s", buff );
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) || defined(DEBUG)
 
-#if defined(_MSC_VER)
+# if defined(_MSC_VER)
+
+    OutputDebugString( buff );
 	DebugBreak();
 
-#elif defined(TARGET_OS_IPHONE)
+# elif defined(TARGET_OS_IPHONE)
 	kill( getpid(), SIGINT );
 
-#elif defined(ANDROID)
+# elif defined(ANDROID)
     PlatformAssertRaise(buff);
 
-#elif defined(MACOSX)
+# elif defined(MACOSX)
     //
     abort();
 
-#elif defined(NACL)
+# elif defined(NACL)
 
     *(int *)0 = 0;
 
-#else
-# error Assert not defined on this platform
+# else
+#  error Assert not defined on this platform
 
-#endif
+# endif
 
 #endif
 }
@@ -123,7 +131,7 @@ void DVAssThrow( bool ok, const char *pFile, int line, const char *pFmt, va_list
 		return;
 
 	char	buff[1024];
-	vsnprintf( buff, _countof(buff)-1, pFmt, vl );
+	vsnprintf( buff, sizeof(buff), pFmt, vl );
 
 	DSAssThrow( ok, pFile, line, buff );
 }
@@ -170,9 +178,27 @@ void DVVerbose(const char *fmt, va_list vl)
     __android_log_vprint(ANDROID_LOG_INFO, "oyatsukai", fmt, vl);
 #else
     vprintf(fmt, vl);
-# if !defined(NACL)
-	puts("");
-# endif // defined(NACL)
+#endif
+}
+
+//==================================================================
+void DDebugOut(const char *fmt, ... )
+{
+	va_list	vl;
+	va_start( vl, fmt );
+
+    DVDebugOut(fmt, vl);
+}
+//==================================================================
+void DVDebugOut(const char *fmt, va_list vl)
+{
+    DVVerbose( fmt, vl );
+
+    // like DVVerbose, but with additional debugger output
+#if defined(_MSC_VER)
+	char	buff[2048];
+    vsnprintf( buff, sizeof(buff), fmt, vl);
+    OutputDebugString( buff );
 #endif
 }
 
@@ -247,6 +273,54 @@ void OpenURL( const char *pURL )
     printf("(unimplemented) OpenURL: %s\n", pURL);
 
 #endif
+}
+
+//==================================================================
+void ShowAlert( const char *pTitle, const char *pText )
+{
+#if defined(TARGET_OS_IPHONE)
+
+    IPHUT::ShowAlert( pTitle, pText );
+
+#elif defined(ANDROID)
+
+    DPRINT("Alert: %s: %s", pTitle, pText);
+    GameWindowNotifyUser(pTitle, pText);
+
+#else
+
+    printf("(unimplemented)\nTitle: %s\nText:\n%s\n", pTitle, pText );
+
+#endif
+}
+
+//==================================================================
+void CharScreen::clear()
+{
+	mLines.clear();
+	mNX = 0;
+}
+
+//==================================================================
+void CharScreen::AddLine( const char *pFmt, ... )
+{
+	char	buff[1024];
+
+	va_list	vl;
+	va_start( vl, pFmt );
+	vsnprintf( buff, sizeof(buff), pFmt, vl );
+	va_end( vl );
+
+	mLines.push_back( buff );
+
+	if ( (u_int)mLines.back().size() > mNX )
+		mNX = (u_int)mLines.back().size();
+}
+
+//==================================================================
+void CharScreen::AddLine()
+{
+	mLines.push_back( DStr() );
 }
 
 //==================================================================

@@ -31,6 +31,8 @@ void SleepMS( U32 sleepMS );
 
 void OpenURL( const char *pURL );
 
+void ShowAlert( const char *pTitle, const char *pText );
+
 //==================================================================
 /// QuickProf
 //==================================================================
@@ -79,6 +81,40 @@ public:
 	{
 		mStartTicks = GetTimeTicks();
 	}
+};
+
+//==================================================================
+class CharScreen
+{
+public:
+	typedef void (* UpdateCBackType)( void *pUserData );
+
+	int				mPx;
+	int				mPy;
+	int				mAlignX;
+	int				mAlignY;
+	UpdateCBackType	mpCBack;
+	void			*mpCtx;
+	u_int			mNX;
+	DVec<DStr>		mLines;
+
+	CharScreen() :
+		mPx(0),
+		mPy(0),
+		mAlignX(-1),
+		mAlignY(-1),
+		mpCBack(NULL),
+		mpCtx(NULL),
+		mNX(0)
+		{}
+
+	void clear();
+
+	void AddLine( const char *pFmt, ... );
+	void AddLine();
+
+	u_int GetNX() const { return mNX; }
+	u_int GetNY() const { return (u_int)mLines.size(); }
 };
 
 //==================================================================

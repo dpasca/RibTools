@@ -6,6 +6,10 @@
 /// copyright info. 
 //==================================================================
 
+#if defined(WIN32)
+# include <winsock2.h>
+#endif
+
 #include "DNetwork.h"
 #include "DNetwork_Listener.h"
 
@@ -14,7 +18,7 @@ namespace DNET
 {
 
 //==================================================================
-Listener::Listener( U32 port ) :
+Listener::Listener( u_short port ) :
 	mPort(port),
 	mListenSock(INVALID_SOCKET)
 {
@@ -27,8 +31,20 @@ Listener::~Listener()
 }
 
 //==================================================================
-bool Listener::Start()
+bool Listener::IsListening() const
 {
+	return mListenSock != INVALID_SOCKET;
+}
+
+//==================================================================
+bool Listener::Start( u_short port )
+{
+	if ( mListenSock != INVALID_SOCKET )
+	{
+		DASSERT( 0 );
+		return false;
+	}
+
 	struct sockaddr_in	in_sa;
 
 	mListenSock = socket(PF_INET, SOCK_STREAM, 0);
@@ -36,29 +52,32 @@ bool Listener::Start()
 	if ( mListenSock == INVALID_SOCKET )
 		return false;
 
+	if ( port == 0 )
+		port = mPort;
+
 	memset( &in_sa, 0, sizeof(in_sa) );
 	in_sa.sin_family = AF_INET;
 	in_sa.sin_addr.s_addr = htonl( INADDR_ANY );
-	in_sa.sin_port        = htons( mPort );
+	in_sa.sin_port        = htons( port );
 
 	if ( -1 == bind( mListenSock, (struct sockaddr *)&in_sa, sizeof(in_sa) ) )
 	{
 		closesocket( mListenSock );
-		mListenSock = -1;
+		mListenSock = INVALID_SOCKET;
 		return false;
 	}
 
 	if ( -1 == listen( mListenSock, SOMAXCONN ) )
 	{
 		closesocket( mListenSock );
-		mListenSock = -1;
+		mListenSock = INVALID_SOCKET;
 		return false;
 	}
 
 	if NOT( SetNonBlocking( mListenSock ) )
 	{
 		closesocket( mListenSock );
-		mListenSock = -1;
+		mListenSock = INVALID_SOCKET;
 		return false;
 	}
 

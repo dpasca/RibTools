@@ -41,6 +41,30 @@
 # include <algorithm>
 
 # define DVec  std::vector
+/*
+template <typename _T> class DVec : public std::vector<_T>
+{
+public:
+    DVec();
+    DVec(size_t l);
+    size_t size_bytes() const;
+};
+
+template <typename _T> inline DVec<_T>::DVec() :
+    std::vector<_T>()
+{
+}
+
+template <typename _T> inline DVec<_T>::DVec(size_t l) :
+    std::vector<_T>(l)
+{
+}
+
+template <typename _T> inline size_t DVec<_T>::size_bytes() const
+{
+    return std::vector<_T>::size() * sizeof(_T);
+}
+*/
 
 // TODO: switch to std::move with C++11 !
 template <class _T>

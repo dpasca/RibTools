@@ -43,7 +43,7 @@ public:
 		void GrabFile( const char *pFileName, DVec<U8> &out_vec )
 		{
 			if NOT( DUT::GrabFile( pFileName, out_vec ) )
-				DASSTHROW( 0, ("Could not grab the file '%s'", pFileName) );
+				DEX_RUNTIME_ERROR( "Could not grab the file '%s'", pFileName );
 		}
 
 		bool FileExists( const char *pFileName )

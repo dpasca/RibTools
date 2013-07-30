@@ -101,7 +101,7 @@ bool MemFile::InitNoThrow( const char *pFileName, bool prefs )
 void MemFile::InitExclusiveOwenership( DVec<U8> &fromData )
 {
 	mDataSize = fromData.size();
-	mOwnData.get_ownership( fromData );
+	Dmove( mOwnData, fromData );
 
 	mpData		= &mOwnData[0];
 	mReadPos	= 0;
@@ -125,6 +125,15 @@ bool MemFile::ReadTextLine( char *pDestStr, size_t destStrMaxSize )
 	{
 		char ch = mpData[ mReadPos++ ];
 
+        if ( ch == '\r' ) // old Mac or DOS format ?
+        {
+            // DOS if \r\n
+            if ( mReadPos < mDataSize && mpData[mReadPos] == '\n' )
+                ++mReadPos;
+
+            break;
+        }
+        else
 		if ( ch == '\n' )
 		{
 			break;
@@ -186,6 +195,7 @@ void MemFile::SeekFromEnd( ptrdiff_t offset )
 }
 
 //==================================================================
+//==================================================================
 void MemWriterDynamic::WriteString( const DStr &str )
 {
 	WriteArray( str.c_str(), str.size() );
@@ -225,5 +235,47 @@ void MemWriterDynamic::PrintF( const char *pFmt, ... )
 }
 
 //==================================================================
+//==================================================================
+bool MemReader::ReadTextLine( char *pDestStr, size_t destStrMaxSize )
+{
+    if ( mIdx >= mMaxSize )
+        return false;
 
+    size_t	destIdx = 0;
+    while ( mIdx < mMaxSize )
+    {
+        char ch = (char)mpSrc[mIdx++];
+
+        if ( ch == '\r' ) // old Mac or DOS format ?
+        {
+            // DOS if \r\n
+            if ( mIdx < mMaxSize && mpSrc[mIdx] == '\n' )
+                ++mIdx;
+
+            break;
+        }
+        else
+        if ( ch == '\n' )
+        {
+            break;
+        }
+        else {
+            if ( destIdx >= destStrMaxSize )
+                DEX_OUT_OF_RANGE( "Writing out of bounds !" );
+
+            pDestStr[ destIdx++ ] = ch;
+        }
+    }
+
+    if ( destIdx >= destStrMaxSize )
+        DEX_OUT_OF_RANGE( "Writing out of bounds !" );
+
+    pDestStr[ destIdx ] = 0;
+
+    DASSERT( mIdx <= mMaxSize );
+
+    return true;
+}
+
+//==================================================================
 }

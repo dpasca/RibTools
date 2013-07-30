@@ -9,10 +9,50 @@
 #ifndef DNETWORK_BASE_H
 #define DNETWORK_BASE_H
 
+#include <errno.h>
+
 #if defined(WIN32)
 
-#include <WinSock2.h>
-//#include <Windows.h>
+#include <winerror.h>
+#include <basetsd.h>
+
+#undef EWOULDBLOCK
+#undef EINPROGRESS
+#undef EALREADY
+#undef ENOTSOCK
+#undef EDESTADDRREQ
+#undef EMSGSIZE
+#undef EPROTOTYPE
+#undef ENOPROTOOPT
+#undef EPROTONOSUPPORT
+#undef ESOCKTNOSUPPORT
+#undef EOPNOTSUPP
+#undef EPFNOSUPPORT
+#undef EAFNOSUPPORT
+#undef EADDRINUSE
+#undef EADDRNOTAVAIL
+#undef ENETDOWN
+#undef ENETUNREACH
+#undef ENETRESET
+#undef ECONNABORTED
+#undef ECONNRESET
+#undef ENOBUFS
+#undef EISCONN
+#undef ENOTCONN
+#undef ESHUTDOWN
+#undef ETOOMANYREFS
+#undef ETIMEDOUT
+#undef ECONNREFUSED
+#undef ELOOP
+#undef ENAMETOOLONG
+#undef EHOSTDOWN
+#undef EHOSTUNREACH
+#undef ENOTEMPTY
+#undef EPROCLIM
+#undef EUSERS
+#undef EDQUOT
+#undef ESTALE
+#undef EREMOTE
 
 #define EWOULDBLOCK             WSAEWOULDBLOCK
 #define EINPROGRESS             WSAEINPROGRESS
@@ -52,6 +92,13 @@
 #define ESTALE                  WSAESTALE
 #define EREMOTE                 WSAEREMOTE
 
+#if !defined(_WINSOCK2API_) && !defined(_WINSOCKAPI_)
+typedef UINT_PTR        SOCKET;
+
+# define INVALID_SOCKET  (SOCKET)(~0)
+
+#endif
+
 #elif defined(__linux__) || defined(__APPLE__)
 
 #include <netdb.h>
@@ -61,7 +108,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <errno.h>
+#include <unistd.h>
 
 typedef int	SOCKET;
 static const SOCKET	INVALID_SOCKET = -1;
@@ -83,14 +130,7 @@ bool InitializeSocket();
 bool SetNonBlocking( SOCKET sock );
 
 //==================================================================
-inline int LastSockErr()
-{
-#if defined(WIN32)
-	return WSAGetLastError();
-#else
-	return errno;
-#endif
-}
+int LastSockErr();
 
 const char *GetSockErrStr( int err );
 

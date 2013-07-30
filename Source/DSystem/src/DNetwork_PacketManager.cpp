@@ -6,6 +6,10 @@
 /// copyright info. 
 //==================================================================
 
+#if defined(WIN32)
+#include <windows.h>
+#endif
+
 #include "DNetwork.h"
 #include "DNetwork_PacketManager.h"
 #include "DUtils.h"
@@ -27,6 +31,12 @@ PacketManager::PacketManager( SOCKET socket ) :
 PacketManager::~PacketManager()
 {
 	DTH::ThreadedBase::KillThread();
+}
+
+//==================================================================
+bool PacketManager::IsConnected() const
+{
+	return mSocket != INVALID_SOCKET && !mFatalError;
 }
 
 //==================================================================
@@ -104,7 +114,7 @@ Packet *PacketManager::GetNextPacket( bool doRemove )
 }
 
 //==================================================================
-Packet *PacketManager::GetNextPacketMatch(
+Packet *PacketManager::GetNextPacketMatchID32(
 							bool doRemove,
 							U32 matchArray[],
 							size_t matchArrayN )
@@ -123,6 +133,41 @@ Packet *PacketManager::GetNextPacketMatch(
 		DASSERT( pOutEntry->mDataBuff.size() >= sizeof(U32) );
 
 		U32 packID = *((const U32 *)&pOutEntry->mDataBuff[0]);
+		for (size_t j=0; j < matchArrayN; ++j)
+		{
+			if ( packID == matchArray[j] )
+			{
+				if ( doRemove )
+					mRecvOutQueue.erase( mRecvOutQueue.begin()+i );
+
+				return pOutEntry;		
+			}
+		}
+	}
+
+	return NULL;
+}
+
+//==================================================================
+Packet *PacketManager::GetNextPacketMatchID8(
+							bool doRemove,
+							U8 matchArray[],
+							size_t matchArrayN )
+{
+	if NOT( mRecvOutQueue.size() )
+		return NULL;
+
+	DUT::CriticalSection::Block	lock( mRecvOutQueueCS );
+
+	if NOT( mRecvOutQueue.size() )
+		return NULL;
+
+	for (size_t i=0; i < mRecvOutQueue.size(); ++i)
+	{
+		Packet	*pOutEntry = mRecvOutQueue[i];
+		DASSERT( pOutEntry->mDataBuff.size() >= sizeof(U8) );
+
+		U8 packID = *((const U8 *)&pOutEntry->mDataBuff[0]);
 		for (size_t j=0; j < matchArrayN; ++j)
 		{
 			if ( packID == matchArray[j] )
@@ -189,7 +234,7 @@ Packet *PacketManager::WaitNextPacket( bool doRemove, U32 timeoutMS )
 }
 
 //==================================================================
-Packet *PacketManager::WaitNextPacketMatch(
+Packet *PacketManager::WaitNextPacketMatchID32(
 					   bool doRemove,
 					   U32 matchArray[],
 					   size_t matchArrayN,
@@ -202,7 +247,7 @@ Packet *PacketManager::WaitNextPacketMatch(
 
 	DUT::TimeOut	timeOut( timeoutMS );
 
-	while ( !(pPacket = GetNextPacketMatch( doRemove, matchArray, matchArrayN )) &&
+	while ( !(pPacket = GetNextPacketMatchID32( doRemove, matchArray, matchArrayN )) &&
 			(timeoutMS == 0 || !timeOut.IsExpired()) )
 	{
 		if ( mFatalError )

@@ -107,7 +107,7 @@ public:
 	PacketManager( SOCKET socket );
 	~PacketManager();
 
-	bool IsConnected() const { return mSocket != INVALID_SOCKET && !mFatalError; }
+	bool IsConnected() const;
 
 	void Send( const void *pData, size_t dataSize );
 
@@ -123,12 +123,17 @@ public:
 	Packet *GetNextPacket( bool doRemove );
 	Packet *WaitNextPacket( bool doRemove, U32 timeoutMS=0 );
 
-	Packet *GetNextPacketMatch(
+	Packet *GetNextPacketMatchID32(
 		bool doRemove,
 		U32 matchArray[],
 		size_t matchArrayN );
 
-	Packet *WaitNextPacketMatch(
+	Packet *GetNextPacketMatchID8(
+		bool doRemove,
+		U8 matchArray[],
+		size_t matchArrayN );
+
+	Packet *WaitNextPacketMatchID32(
 			bool doRemove,
 			U32 matchArray[],
 			size_t matchArrayN,

@@ -6,11 +6,12 @@
 /// copyright info. 
 //==================================================================
 
-#include "DNetwork_Base.h"
-
 #if defined(WIN32)
-	#pragma comment(lib, "Ws2_32.lib")
+# include <WinSock2.h>
+# pragma comment(lib, "Ws2_32.lib")
 #endif
+
+#include "DNetwork_Base.h"
 
 //==================================================================
 namespace DNET
@@ -36,6 +37,16 @@ bool InitializeSocket()
 	initialized = true;
 
 	return true;
+}
+
+//==================================================================
+int LastSockErr()
+{
+#if defined(WIN32)
+	return WSAGetLastError();
+#else
+	return errno;
+#endif
 }
 
 //==================================================================
