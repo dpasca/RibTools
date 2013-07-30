@@ -17,7 +17,7 @@
 #include "DUtils_Base.h"
 #include "DExceptions.h"
 
-#if defined(ANDROID) || defined(MACOSX) || (defined(TARGET_OS_IPHONE) && !defined(__clang__))
+#if defined(ANDROID) || ((defined(MACOSX) || defined(TARGET_OS_IPHONE)) && !defined(__clang__))
 # include <tr1/unordered_map>
 # include <tr1/unordered_set>
 #else
@@ -27,13 +27,42 @@
 
 #include <string>
 
-#if defined(NACL) || (defined(__APPLE__) && !defined(MACOSX) && defined(__clang__))
+#if defined(NACL) || (defined(__APPLE__) && defined(__clang__))
 # define DUNORD_MAP	std::unordered_map
 # define DUNORD_SET	std::unordered_set
 #else
 # define DUNORD_MAP	std::tr1::unordered_map
 # define DUNORD_SET	std::tr1::unordered_set
 #endif
+
+#if 1
+
+# include <vector>
+# include <algorithm>
+
+# define DVec  std::vector
+
+// TODO: switch to std::move with C++11 !
+template <class _T>
+//void Dmove( DVec<_T> &d, DVec<_T> &s )  { d = std::move( s ); }
+void Dmove( DVec<_T> &d, DVec<_T> &s )  { d = s; s = DVec<_T>(); }
+
+template <class _T>
+void Dpush_back_unique( DVec<_T> &vec, const _T &val ) {
+    if ( std::find( vec.begin(), vec.end(), val ) == vec.end() )
+		vec.push_back( val );
+}
+
+template <typename _T>
+typename DVec<_T>::iterator Dfind( DVec<_T> &v, const _T &val ) {
+    return std::find( v.begin(), v.end(), val );
+}
+template <typename _T>
+typename DVec<_T>::const_iterator Dfind( const DVec<_T> &v, const _T &val ) {
+    return std::find( v.begin(), v.end(), val );
+}
+
+#else
 
 //==================================================================
 template <class T>
@@ -230,9 +259,9 @@ public:
 			mpData[mSize].~T();
 	}
 
-	void insert( iterator itBefore, T &val )
+	void insert( iterator itBefore, const T &val )
 	{
-		if NOT( itBefore >= mpData && itBefore < (mpData+mSize) )
+		if ( itBefore < mpData || itBefore > (mpData+mSize) )
 			DEX_OUT_OF_RANGE( "Out of bounds !" );
 
 		size_t	idx = itBefore - mpData;
@@ -243,6 +272,24 @@ public:
 			mpData[i-1] = mpData[i-2];
 
 		mpData[idx] = val;
+	}
+
+	void insert( iterator itBefore, const T *pSrc, const T *pSrcEnd )
+	{
+		if ( itBefore < mpData || itBefore > (mpData+mSize) )
+			DEX_OUT_OF_RANGE( "Out of bounds !" );
+
+		size_t	idx = itBefore - mpData;
+
+        size_t srcN = pSrcEnd - pSrc;
+
+		resize( mSize + srcN );
+
+		for (size_t i=mSize; i != (idx+1); --i)
+			mpData[i-1] = mpData[i-1-srcN];
+
+		for (size_t i=0; i != srcN; ++i)
+			mpData[i + idx] = pSrc[i];
 	}
 
 	void push_front( const T &val )
@@ -356,6 +403,29 @@ public:
 		  T &operator[]( size_t idx )		{ DASSERT( idx < mSize ); return mpData[ idx ]; }
 #endif
 };
+
+//==================================================================
+template <class _T>
+void Dmove( DVec<_T> &d, DVec<_T> &s ) {
+    d.get_ownership( s );
+}
+
+template <class _T>
+void Dpush_back_unique( DVec<_T> &vec, const _T &val ) {
+	if ( vec.find( val ) == vec.end() )
+		vec.push_back( val );
+}
+
+template <typename _T>
+typename DVec<_T>::iterator Dfind( DVec<_T> &v, const _T &val ) {
+    return v.find( val );
+}
+template <typename _T>
+typename DVec<_T>::const_iterator Dfind( const DVec<_T> &v, const _T &val ) {
+    return v.find( val );
+}
+
+#endif
 
 //==================================================================
 
@@ -574,18 +644,51 @@ public:
 
 //==================================================================
 template <class _T>
-void Dpush_back_unique( DVec<_T> &vec, const _T &val )
-{
-	if ( vec.find( val ) == vec.end() )
-		vec.push_back( val );
+void Dclear_free( DVec<_T> &v ) {
+    v = DVec<_T>();
 }
-
+//==================================================================
+template <class _T>
+size_t Dsize_bytes( const DVec<_T> &v ) {
+    return v.size() * sizeof(_T);
+}
 //==================================================================
 template <class _T>
 _T &Dgrow( DVec<_T> &vec )
 {
     vec.resize( vec.size() + 1 );
     return vec.back();
+}
+//==================================================================
+template <class _T>
+_T *Dgrow( DVec<_T> &vec, size_t growN )
+{
+    size_t n = vec.size();
+
+    if ( growN == 0 ) // until we can use .data() ...
+        return nullptr;
+
+    vec.resize( n + growN );
+    return &vec[n];
+}
+//==================================================================
+template <class _T, size_t _SIZE>
+_T &Dgrow( DArray<_T,_SIZE> &arr )
+{
+    arr.resize( arr.size() + 1 );
+    return arr.back();
+}
+//==================================================================
+template <class _T, size_t _SIZE>
+_T *Dgrow( DArray<_T,_SIZE> &arr, size_t growN )
+{
+    size_t n = arr.size();
+
+    if ( growN == 0 ) // until we can use .data() ...
+        return nullptr;
+
+    arr.resize( n + growN );
+    return &arr[n];
 }
 
 //==================================================================
