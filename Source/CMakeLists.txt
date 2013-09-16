@@ -42,7 +42,9 @@ if(MSVC) #((((((((((((((((
     set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy /arch:SSE2")
     set(CMAKE_C_FLAGS_DEBUG     "/D_DEBUG /DWIN32 /Zi /MDd /Od                      /arch:SSE2")
     set(CMAKE_CXX_FLAGS_DEBUG   "/D_DEBUG /DWIN32 /Zi /MDd /Od                      /arch:SSE2")
-    add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /nologo" ) # disable annoying secure CRT warnings
+    # 4996: disable annoying secure CRT warnings
+    # 4316: disable heap allocation may not align warning.. (we overload global new/delete)
+    add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4316 /nologo" )
     add_definitions( "/GR-" ) # disable RTTI
 else()
     set(OSMACRO "")
