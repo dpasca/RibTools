@@ -7,6 +7,7 @@
 //==================================================================
 
 #if defined(WIN32)
+#include <WinSock2.h>
 #include <windows.h>
 #endif
 

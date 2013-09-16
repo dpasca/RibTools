@@ -23,19 +23,19 @@ bool GetServersList( int argc, char **argv, DVec<RRL::NET::Server> &list )
 				return false;
 			}
 
-			RRL::NET::Server	*pServEntry = list.grow();
+            RRL::NET::Server &servEntry = Dgrow( list );
 
 			char	*pContext = NULL;
 			
 			char *pToken = strtok_r( argv[i+1], ":", &pContext );
 			if ( pToken )
 			{
-				pServEntry->mAddressName = pToken;
+				servEntry.mAddressName = pToken;
 				if ( pToken = strtok_r( NULL, ":", &pContext ) )
 				{
-					pServEntry->mPortToCall = atoi( pToken );
+					servEntry.mPortToCall = atoi( pToken );
 
-					if ( pServEntry->mPortToCall <= 0 && pServEntry->mPortToCall >= 65536 )
+					if ( servEntry.mPortToCall <= 0 && servEntry.mPortToCall >= 65536 )
 					{
 						printf( "Invalid port range.\n" );
 						return false;
@@ -43,7 +43,7 @@ bool GetServersList( int argc, char **argv, DVec<RRL::NET::Server> &list )
 				}
 			}
 			else
-				pServEntry->mAddressName = argv[i+1];
+				servEntry.mAddressName = argv[i+1];
 
 			i += 1;
 		}

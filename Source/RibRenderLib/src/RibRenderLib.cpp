@@ -111,7 +111,7 @@ void Render::readArchive(
 			}
 			catch ( RI::Exception &e )
 			{
-				printf( "SCENE ERR> MSG: %s\n", e.GetMessage().c_str() );
+				printf( "SCENE ERR> MSG: %s\n", e.GetMessage_().c_str() );
 				printf( "SCENE ERR> AT : %s : %i - (cmd: '%s')\n\n", pFileName, cmdLine, cmdName.c_str() );
 			}
 			catch ( std::runtime_error &e )

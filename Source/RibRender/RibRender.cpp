@@ -197,7 +197,7 @@ static int clientMain( int argc, char **argv )
 	}
 	catch ( RI::Exception &e )
 	{
-		printf( "%s\nAborting.\n", e.GetMessage().c_str() );
+		printf( "%s\nAborting.\n", e.GetMessage_().c_str() );
 		return -1;
 	}
 	catch ( ... )
@@ -225,7 +225,9 @@ int main( int argc, char **argv )
 					_CRTDBG_CHECK_CRT_DF );
 #endif
 
-	DNET::InitializeSocket();	// bha !
+    DUT::InstallFileManagerStd();
+
+    DNET::InitializeSocket();	// bha !
 
 	// enough params ?
 	if ( argc < 2 )

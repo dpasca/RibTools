@@ -13,6 +13,7 @@
 
 #if defined(WIN32)
 
+#include <WinSock2.h>
 #include <winerror.h>
 #include <basetsd.h>
 

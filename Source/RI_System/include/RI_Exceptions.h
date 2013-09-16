@@ -27,7 +27,7 @@ public:
 	{
 	}
 
-	const DStr &GetMessage() const
+	const DStr &GetMessage_() const
 	{
 		return mMsg;
 	}

@@ -274,7 +274,7 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
 	}
 	catch ( RI::Exception &e )
 	{
-		printf( "%s\nAborting.\n", e.GetMessage().c_str() );
+		printf( "%s\nAborting.\n", e.GetMessage_().c_str() );
 		return false;
 	}
 	catch ( ... )
@@ -411,6 +411,8 @@ int main(int argc, char** argv)
 					_CRTDBG_CHECK_ALWAYS_DF |
 					_CRTDBG_LEAK_CHECK_DF );
 #endif
+
+    DUT::InstallFileManagerStd();
 
     glutInit( &argc, argv );
 

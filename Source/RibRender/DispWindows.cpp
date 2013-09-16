@@ -39,7 +39,7 @@ void DispWindows::AddWindow( const RI::Options::Display &disp )
 	    glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
 	}
 
-	msWindows.grow();
+	Dgrow( msWindows );
 
 	glutInitWindowSize( disp.mImage.mWd, disp.mImage.mHe );
 

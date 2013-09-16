@@ -19,7 +19,7 @@ static int serverTask( SOCKET clientSock )
 
 	try {
 		U32 ids[] = { RRL::NET::MSGID_RENDJOB };
-		DNET::Packet *pPack = packetManager.WaitNextPacketMatch( true, ids, _countof(ids) );
+		DNET::Packet *pPack = packetManager.WaitNextPacketMatchID32( true, ids, _countof(ids) );
 
 		if NOT( pPack )
 		{
@@ -74,7 +74,7 @@ static int serverTask( SOCKET clientSock )
 	}
 	catch ( RI::Exception &e )
 	{
-		printf( "%s\nAborting.\n", e.GetMessage().c_str() );
+		printf( "%s\nAborting.\n", e.GetMessage_().c_str() );
 		return -1;
 	}
 	catch ( ... )
@@ -184,7 +184,9 @@ int main( int argc, char **argv )
 					_CRTDBG_CHECK_CRT_DF );
 #endif
 
-	DNET::InitializeSocket();	// bha !
+    DUT::InstallFileManagerStd();
+
+    DNET::InitializeSocket();	// bha !
 
 	// enough params ?
 	if ( argc > 3 )

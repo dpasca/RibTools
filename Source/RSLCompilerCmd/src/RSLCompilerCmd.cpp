@@ -140,6 +140,8 @@ int main( int argc, char *argv[] )
 					_CRTDBG_CHECK_CRT_DF );
 #endif
 
+    DUT::InstallFileManagerStd();
+
 	CmdParams	params;
 
 	if NOT( getCmdParams( argc, argv, params ) )
