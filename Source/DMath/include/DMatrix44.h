@@ -20,6 +20,11 @@
 
 #define DMT_MTX44_USE_VEC_TEMPLATE
 
+// disable for clang for now
+#if defined(_ARM_ARCH_7) && !defined(__clang__)
+# define DMT_USE_NEON_ASM
+#endif
+
 //==================================================================
 //__declspec(align(64))
 #if defined(_MSC_VER)
@@ -38,18 +43,18 @@ public:
 	{
 	}
 
-	Matrix44( bool setToIdentity )
+	DFORCEINLINE Matrix44( bool setToIdentity )
 	{
-		if ( setToIdentity )
+		DASSERT( setToIdentity == true );
 			Identity();
 	}
 
-	Matrix44( const float *pSrcMtx )
+	DFORCEINLINE Matrix44( const float *pSrcMtx )
 	{
 		CopyRowMajor( pSrcMtx );
 	}
 
-	Matrix44(
+	DFORCEINLINE Matrix44(
 		float m00_, float m01_, float m02_, float m03_,
 		float m10_, float m11_, float m12_, float m13_,
 		float m20_, float m21_, float m22_, float m23_,
@@ -64,19 +69,19 @@ public:
 	const float &mij( size_t y, size_t x ) const	{ return v16[ y * 4 + x ];	}
 		  float &mij( size_t y, size_t x )			{ return v16[ y * 4 + x ];	}
 
-	Float3 GetV3( size_t idx ) const
+	DFORCEINLINE Float3 GetV3( size_t idx ) const
 	{
 		return Float3( mij(idx,0), mij(idx,1), mij(idx,2) );
 	}
 
-	void SetV3( size_t idx, const Float3 &v )
+	DFORCEINLINE void SetV3( size_t idx, const Float3 &v )
 	{
 		mij(idx,0) = v.v3[0];
 		mij(idx,1) = v.v3[1];
 		mij(idx,2) = v.v3[2];
 	}
 
-	void Identity()
+	DFORCEINLINE void Identity()
 	{
 	#ifdef DMT_MTX44_USE_VEC_TEMPLATE
 		v16 = VecN<float,16>( 0.f );
@@ -107,6 +112,8 @@ public:
 	inline static Matrix44 Perspective( float fov, float aspect, float n, float f );
 	inline static Matrix44 PerspectiveRH0( float fov, float aspect, float n, float f );
 
+	static Matrix44 LookAt( const Float3 &at, const Float3 &eye, const Float3 &up );
+
 	void CopyRowMajor( const float *pSrcMtx )
 	{
 	#ifdef DMT_MTX44_USE_VEC_TEMPLATE
@@ -116,7 +123,7 @@ public:
 	#endif
 	}
 
-	Float3 GetTranslation() const
+	DFORCEINLINE Float3 GetTranslation() const
 	{
 		return Float3(
 			mij(3,0),
@@ -150,7 +157,7 @@ __attribute__ ((aligned(DMT_SIMD_ALIGN_SIZE)))
 ;
 
 //==================================================================
-inline Matrix44 Matrix44::GetTranspose() const
+DFORCEINLINE Matrix44 Matrix44::GetTranspose() const
 {
 	Matrix44	out;
 
@@ -162,7 +169,7 @@ inline Matrix44 Matrix44::GetTranspose() const
 }
 
 //==================================================================
-inline Matrix44 Matrix44::GetAs33() const
+DFORCEINLINE Matrix44 Matrix44::GetAs33() const
 {
 	Matrix44	out( true );
 
@@ -197,7 +204,7 @@ inline Matrix44 Matrix44::GetOrthonormal() const
 }
 
 //==================================================================
-inline Matrix44 Matrix44::Scale( float sx, float sy, float sz )
+DFORCEINLINE Matrix44 Matrix44::Scale( float sx, float sy, float sz )
 {
 	Matrix44	m;
 #ifdef DMT_MTX44_USE_VEC_TEMPLATE
@@ -218,7 +225,7 @@ inline Matrix44 Matrix44::Translate( const Float3 &tra )
 	return Translate( tra.x(), tra.y(), tra.z() );
 }
 //==================================================================
-inline Matrix44 Matrix44::Translate( float tx, float ty, float tz )
+DFORCEINLINE Matrix44 Matrix44::Translate( float tx, float ty, float tz )
 {
 	Matrix44	m( true );
 	m.mij(3,0) = tx;
@@ -229,7 +236,7 @@ inline Matrix44 Matrix44::Translate( float tx, float ty, float tz )
 	return m;
 }
 //==================================================================
-inline Matrix44 Matrix44::Rot( float ang, float ax, float ay, float az )
+DFORCEINLINE Matrix44 Matrix44::Rot( float ang, float ax, float ay, float az )
 {
 	float   xx, yy, zz, xy, yz, zx, xs, ys, zs;
 
@@ -307,11 +314,11 @@ inline Matrix44 Matrix44::PerspectiveRH0( float fov, float aspect, float n, floa
 }
 
 //==================================================================
-#if defined(_ARM_ARCH_7)
+#if defined(DMT_USE_NEON_ASM)
 
 //==================================================================
 // Note: from oolong engine
-inline void NEON_Matrix4Mul( const float* a, const float* b, float* output )
+DFORCEINLINE void NEON_Matrix4Mul( const float* a, const float* b, float* output )
 {
 	asm volatile
 	(
@@ -352,7 +359,7 @@ inline void NEON_Matrix4Mul( const float* a, const float* b, float* output )
 }
 
 //==================================================================
-inline void NEON_Matrix4Vector3Mul(const float* m, const float* v, float* output)
+DFORCEINLINE void NEON_Matrix4Vector3Mul(const float* m, const float* v, float* output)
 {
 	asm volatile
 	(
@@ -387,10 +394,10 @@ inline void NEON_Matrix4Vector3Mul(const float* m, const float* v, float* output
 #endif
 
 //==================================================================
-inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
+DFORCEINLINE Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 {
 	Matrix44        tmp;
-#if !defined(_ARM_ARCH_7)
+#if !defined(DMT_USE_NEON_ASM)
 	for (size_t r=0; r < 4; ++r)
 	{
 		for (size_t c=0; c < 4; ++c)
@@ -416,7 +423,7 @@ inline Matrix44 operator * (const Matrix44 &m1, const Matrix44 &m2)
 }
 
 //==================================================================
-inline Float4 V4__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
+DFORCEINLINE Float4 V4__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
 {
 	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
@@ -429,7 +436,7 @@ inline Float4 V4__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
 }
 
 //==================================================================
-inline Float3 V3__M44_Mul_V3W0( const Matrix44 &a, const Float3 &v )
+DFORCEINLINE Float3 V3__M44_Mul_V3W0( const Matrix44 &a, const Float3 &v )
 {
 	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
@@ -440,7 +447,7 @@ inline Float3 V3__M44_Mul_V3W0( const Matrix44 &a, const Float3 &v )
 	);
 }
 //==================================================================
-inline Float3 V3__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
+DFORCEINLINE Float3 V3__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
 {
 	float	x = v.v3[0], y = v.v3[1], z = v.v3[2];
 
@@ -453,7 +460,7 @@ inline Float3 V3__M44_Mul_V3W1( const Matrix44 &a, const Float3 &v )
 
 //==================================================================
 template <class _T>
-inline Vec4<_T> V4__V3W1_Mul_M44( const Vec3<_T> &v, const Matrix44 &a )
+DFORCEINLINE Vec4<_T> V4__V3W1_Mul_M44( const Vec3<_T> &v, const Matrix44 &a )
 {
 	const _T	&x = v.v3[0];
 	const _T	&y = v.v3[1];
@@ -469,7 +476,7 @@ inline Vec4<_T> V4__V3W1_Mul_M44( const Vec3<_T> &v, const Matrix44 &a )
 
 //==================================================================
 template <class _T>
-inline Vec4<_T> V4__V4_Mul_M44( const Vec4<_T> &v, const Matrix44 &a )
+DFORCEINLINE Vec4<_T> V4__V4_Mul_M44( const Vec4<_T> &v, const Matrix44 &a )
 {
 	const _T	&x = v.v4[0];
 	const _T	&y = v.v4[1];
@@ -486,7 +493,7 @@ inline Vec4<_T> V4__V4_Mul_M44( const Vec4<_T> &v, const Matrix44 &a )
 
 //==================================================================
 template <class _S4, class _S3, class _T>
-inline _S4 V4__V3W0_Mul_M44( const _S3 &v, const Matrix44 &a )
+DFORCEINLINE _S4 V4__V3W0_Mul_M44( const _S3 &v, const Matrix44 &a )
 {
 	const _T	&x = v.v3[0];
 	const _T	&y = v.v3[1];
@@ -502,7 +509,7 @@ inline _S4 V4__V3W0_Mul_M44( const _S3 &v, const Matrix44 &a )
 
 //==================================================================
 template <class _TS>
-inline Vec3<_TS> V3__V3W1_Mul_M44( const Vec3<_TS> &v, const Matrix44 &a )
+DFORCEINLINE Vec3<_TS> V3__V3W1_Mul_M44( const Vec3<_TS> &v, const Matrix44 &a )
 {
 	const _TS	&x = v.v3[0];
 	const _TS	&y = v.v3[1];
@@ -517,9 +524,9 @@ inline Vec3<_TS> V3__V3W1_Mul_M44( const Vec3<_TS> &v, const Matrix44 &a )
 
 //==================================================================
 /*
-#if defined(_ARM_ARCH_7)
+#if defined(DMT_USE_NEON_ASM)
 template <>
-inline Vec3<float> V3__V3W1_Mul_M44( const Vec3<float> &v, const Matrix44 &a )
+DFORCEINLINE Vec3<float> V3__V3W1_Mul_M44( const Vec3<float> &v, const Matrix44 &a )
 {
 	Vec3<float>	outVec;
 	
@@ -532,7 +539,7 @@ inline Vec3<float> V3__V3W1_Mul_M44( const Vec3<float> &v, const Matrix44 &a )
 
 //==================================================================
 template <class _TS>
-inline Vec3<_TS> V3__V3W0_Mul_M44( const Vec3<_TS> &v, const Matrix44 &a )
+DFORCEINLINE Vec3<_TS> V3__V3W0_Mul_M44( const Vec3<_TS> &v, const Matrix44 &a )
 {
 	const _TS	&x = v.v3[0];
 	const _TS	&y = v.v3[1];
@@ -547,7 +554,7 @@ inline Vec3<_TS> V3__V3W0_Mul_M44( const Vec3<_TS> &v, const Matrix44 &a )
 
 //==================================================================
 template <class _TS>
-inline Vec3<_TS> V3__V2_Mul_M44( const Vec2<_TS> &v, const Matrix44 &a )
+DFORCEINLINE Vec3<_TS> V3__V2_Mul_M44( const Vec2<_TS> &v, const Matrix44 &a )
 {
 	const _TS	&x = v.v2[0];
 	const _TS	&y = v.v2[1];
@@ -556,6 +563,32 @@ inline Vec3<_TS> V3__V2_Mul_M44( const Vec2<_TS> &v, const Matrix44 &a )
 		x * a.mij(0,0) + y * a.mij(1,0),
 		x * a.mij(0,1) + y * a.mij(1,1),
 		x * a.mij(0,2) + y * a.mij(1,2)
+	);
+}
+
+//==================================================================
+template <class _TS>
+DFORCEINLINE Vec2<_TS> V2__V2_Mul_M44( const Vec2<_TS> &v, const Matrix44 &a )
+{
+	const _TS	&x = v.v2[0];
+	const _TS	&y = v.v2[1];
+
+	return Vec2<_TS>(
+		x * a.mij(0,0) + y * a.mij(1,0),
+		x * a.mij(0,1) + y * a.mij(1,1)
+	);
+}
+
+//==================================================================
+template <class _TS>
+DFORCEINLINE Vec2<_TS> V2__V2W1_Mul_M44( const Vec2<_TS> &v, const Matrix44 &a )
+{
+	const _TS	&x = v.v2[0];
+	const _TS	&y = v.v2[1];
+
+	return Vec2<_TS>(
+		x * a.mij(0,0) + y * a.mij(1,0) + a.mij(3,0),
+		x * a.mij(0,1) + y * a.mij(1,1) + a.mij(3,1)
 	);
 }
 

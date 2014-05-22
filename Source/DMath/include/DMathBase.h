@@ -148,28 +148,6 @@
 #define DEG2RAD(_X_)	((_X_) * (3.14159265f/180))
 
 //==================================================================
-template < typename _TA , typename _TB >
-inline _TA DMix( const _TA &a, const _TA &b,  const _TB &t )
-{
-    return (_TA)(a + (b - a) * t);
-}
-template < typename _TA , typename _TB >
-inline _TA DLerp( const _TA &a, const _TA &b,  const _TB &t )
-{
-    return (_TA)(a + (b - a) * t);
-}
-
-//===============================================================
-template <class T>
-inline float DInvLerp( const T& left, const T& right, const T& x )
-{
-	if ( x < left  ) return 0.f; else
-	if ( x > right ) return 1.f;
-
-	return (float)(x - left) / (float)(right - left);
-}
-
-//==================================================================
 template <class T>	inline T		DCos( const T &a )				{ assert( 0 );	return T();	}
 template <>			inline float	DCos<float>( const float &a )	{ return cosf( a );	}
 template <>			inline double	DCos<double>( const double &a )	{ return cos( a );	}
@@ -200,40 +178,89 @@ template <>			inline float	DPow<float>( const float &a,  const float &b )	 { ret
 template <>			inline double	DPow<double>( const double &a,  const double &b ){ return pow( a, b );	}
 
 //==================================================================
+template <class T>	inline T		DFloor( const T &a )			 { assert( 0 );	return T();	}
+template <class T>	inline T		DCeil( const T &a )				 { assert( 0 );	return T();	}
+
+#if defined(__GNUC__)
+template <>			inline float	DFloor<float>( const float &a )	 { return __builtin_floorf( a );}
+template <>			inline double	DFloor<double>( const double &a ){ return __builtin_floor( a );	}
+template <>			inline float	DCeil<float>( const float &a )	 { return __builtin_ceilf( a );	}
+template <>			inline double	DCeil<double>( const double &a ) { return __builtin_ceil( a );	}
+#else
+template <>			inline float	DFloor<float>( const float &a )	 { return floorf( a );	}
+template <>			inline double	DFloor<double>( const double &a ){ return floor( a );	}
+template <>			inline float	DCeil<float>( const float &a )	 { return ceilf( a );	}
+template <>			inline double	DCeil<double>( const double &a ) { return ceil( a );	}
+#endif
+
+//==================================================================
 template <class T>	inline T		DSign( const T &a )
 {
 	if ( a < 0 )	return T( -1 ); else
 	if ( a > 0 )	return T(  1 ); else
 					return T(  0 );
 }
-
 //==================================================================
 template <class T>	inline T		DAbs( const T &a )
 {
 	if ( a < T(0) )	return -a;	else
 					return  a;
 }
-
 //==================================================================
 template <class T>	inline T		DMin( const T &a, const T &b )
 {
 	if ( a < b )	return a;	else
 					return b;
 }
-
+//==================================================================
+template <class T>	inline T        DMin3( const T &a, const T &b, const T &c )
+{
+    if ( a < b ) return a < c ? a : c; else
+                 return b < c ? b : c;
+}
 //==================================================================
 template <class T>	inline T		DMax( const T &a, const T &b )
 {
 	if ( a > b )	return a;	else
 					return b;
 }
-
+//==================================================================
+template <class T>	inline T        DMax3( const T &a, const T &b, const T &c )
+{
+    if ( a > b ) return a > c ? a : c; else
+                 return b > c ? b : c;
+}
 //==================================================================
 template <class T>	inline T		DClamp( const T& a, const T& x0, const T& x1 )
 {
 	if ( a < x0 )	return x0;	else
 	if ( a > x1 )	return x1;	else
 					return a;
+}
+//==================================================================
+template < typename _TA , typename _TB >
+inline _TA DMix( const _TA &a, const _TA &b,  const _TB &t )
+{
+    return (_TA)(a + (b - a) * t);
+}
+template < typename _TA , typename _TB >
+inline _TA DLerp( const _TA &a, const _TA &b,  const _TB &t )
+{
+    return (_TA)(a + (b - a) * t);
+}
+template <typename _TA, typename _TB>
+inline _TA DInvLerp( const _TA &left, const _TA &right, const _TB &x )
+{
+    if ( x < left  ) return _TA(0); else
+    if ( x > right ) return _TA(1);
+
+	return DClamp( (x - left) / (right - left), _TA(0), _TA(1) );
+}
+template <typename _TA , typename _TB>
+inline _TA DSmoothStep( const _TA &a, const _TA &b,  const _TB &t )
+{
+    auto x = DInvLerp( a, b, t );
+    return x*x*(_TA(3) - _TA(2)*x);
 }
 
 #define FM_E        ((float)M_E       )

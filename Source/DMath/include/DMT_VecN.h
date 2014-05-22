@@ -33,6 +33,7 @@ public:
 
 	void Set( const _TS *p_ )	{ FOR_I_N v[i] = p_[i];	}
 	void SetZero()				{ FOR_I_N v[i] = 0;		}
+    bool IsZero() const         { FOR_I_N if (v[i]) return false; return true; }
 
 	_TS	AddReduce() const		{ _TS acc=_TS(0); FOR_I_N acc += v[i]; return acc; }
 

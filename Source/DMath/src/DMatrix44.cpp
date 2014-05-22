@@ -106,3 +106,33 @@ Matrix44 Matrix44::GetInverse( bool *out_pSuccess ) const
 
 	return out;
 }
+
+//==================================================================
+Matrix44 Matrix44::LookAt( const Float3 &at, const Float3 &eye, const Float3 &up )
+{
+	//return Matrix44::Translate( eye );
+
+	if ( DLengthSqr( at - eye ) < 0.0001f )
+	{
+		DASSERT(0);
+		return Matrix44(true);
+	}
+
+    DASSERT( DLengthSqr( up ) >= 0.0001f );
+
+	Float3	za = DNormalize( eye - at );
+	Float3	xa = DNormalize( DCross( up, za ) );
+	Float3	ya = DCross( za, xa );
+
+	Matrix44 mtx(
+		xa[0], ya[0], za[0], 0,
+		xa[1], ya[1], za[1], 0,
+		xa[2], ya[2], za[2], 0,
+		0, 0, 0, 1 );
+
+	Float3	v = V3__V3W0_Mul_M44( -eye, mtx );
+
+	mtx.SetV3( 3, v );
+
+	return mtx;
+}
