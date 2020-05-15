@@ -258,7 +258,7 @@ public:
 	{
 		DUT::QuickProf	prof( __FUNCTION__ );
 
-		const DVec<HiderBucket *>	buckets = hider.GetBuckets();
+		const auto &buckets = hider.GetBuckets();
 	
 		int	bucketsN = (int)buckets.size();
 
