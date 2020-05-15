@@ -25,6 +25,13 @@ MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar
   ENDIF(MSVC)
 ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 
+# create vcproj.user file for Visual Studio to set debug working directory
+function(app_create_vcxproj_userfile extraPath)
+    if (MSVC)
+        set(APP_WORKING_DIR "${PROJECT_SOURCE_DIR}/../../${extraPath}")
+    endif()
+endfunction()
+
 #=============================================
 project (RibTools)
 
@@ -38,10 +45,13 @@ project (RibTools)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 if(MSVC) #((((((((((((((((
-    set(CMAKE_C_FLAGS_RELEASE   "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy /arch:SSE2")
-    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy /arch:SSE2")
-    set(CMAKE_C_FLAGS_DEBUG     "/D_DEBUG /DWIN32 /Zi /MDd /Od                      /arch:SSE2")
-    set(CMAKE_CXX_FLAGS_DEBUG   "/D_DEBUG /DWIN32 /Zi /MDd /Od                      /arch:SSE2")
+    set(CMAKE_C_FLAGS_RELEASE   "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy")
+    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy")
+    set(CMAKE_C_FLAGS_DEBUG     "/D_DEBUG /DWIN32 /Zi /MDd /Od                     ")
+    set(CMAKE_CXX_FLAGS_DEBUG   "/D_DEBUG /DWIN32 /Zi /MDd /Od                     ")
+
+    add_definitions( "/arch:AVX2" )
+
     # 4996: disable annoying secure CRT warnings
     # 4316: disable heap allocation may not align warning.. (we overload global new/delete)
     add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4316 /nologo" )

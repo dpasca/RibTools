@@ -21,7 +21,7 @@ Building & running
 
 Instructions for Windows and Visual Studio.
 
-1) Go to `Sources/` and launch `make_build.bat`
+1) Go to `Source/` and launch `make_build.bat`
 
 2) Open `build/RibTools.sln` with Visual Studio
 

@@ -37,3 +37,6 @@ target_link_libraries(
 	${OPENGL_LIBRARIES}
 	)
 
+if (MSVC)
+    app_create_vcxproj_userfile("../..Distrib")
+endif()

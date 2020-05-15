@@ -133,7 +133,7 @@ public:
 		// the output doesn't go beyond cnt-bits
 		mBits |= bits & ((1 << cnt) - 1);
 		// increase the count of bits
-		mBitsCnt += cnt;
+		mBitsCnt += (int)cnt;
 
 		while ( mBitsCnt >= 8 )
 		{
@@ -333,7 +333,7 @@ public:
 		bits >>= mBitsCnt - cnt;
 		bits &= (1 << cnt) - 1;
 
-		mBitsCnt -= cnt;
+		mBitsCnt -= (int)cnt;
 
 		return bits;
 	}

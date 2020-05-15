@@ -11,7 +11,7 @@
 //==================================================================
 static int serverTask( SOCKET clientSock )
 {
-	printf( "Rendering for %i... yeah, right !!\n", clientSock );
+	printf( "Rendering for %zi... yeah, right !!\n", clientSock );
 
 	DNET::PacketManager			packetManager( clientSock );
 
@@ -135,7 +135,7 @@ static int serverMain( int argc, char **argv )
 		case DNET::Listener::IRT_CONNECTED:
 			listener.Stop();
 
-			printf( "Accepted socket %i\n", acceptedSock );
+			printf( "Accepted socket %zi\n", acceptedSock );
 			serverTask( acceptedSock );
 
 			closesocket( acceptedSock );
@@ -160,7 +160,7 @@ static int serverMain( int argc, char **argv )
 //==================================================================
 static void printUsage( int argc, char **argv )
 {
-	printf( "\n==== "APPNAME" v"APPVERSION" -- (" __DATE__ " - " __TIME__ ") ====\n" );
+	printf( "\n==== " APPNAME " v" APPVERSION " -- (" __DATE__ " - " __TIME__ ") ====\n" );
 	
 	printf( "\n%s [options]\n", argv[0] );
 

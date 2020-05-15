@@ -13,7 +13,7 @@
 //==================================================================
 static void printUsage( int argc, char **argv )
 {
-	printf( "\n==== "APPNAME" v"APPVERSION" -- (" __DATE__ " - " __TIME__ ") ====\n" );
+	printf( "\n==== " APPNAME " v" APPVERSION " -- (" __DATE__ " - " __TIME__ ") ====\n" );
 
 	printf( "\n%s <rib file> [options]\n", argv[0] );
 
