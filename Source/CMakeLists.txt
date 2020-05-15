@@ -25,53 +25,112 @@ MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar
   ENDIF(MSVC)
 ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
 
-# create vcproj.user file for Visual Studio to set debug working directory
-function(app_create_vcxproj_userfile extraPath)
-    if (MSVC)
-        set(APP_WORKING_DIR "${PROJECT_SOURCE_DIR}/../../${extraPath}")
-    endif()
-endfunction()
+#==================================================================
+# Add new build types
+message("* Adding build types...")
+SET(CMAKE_CXX_FLAGS_DEBUGOPT
+    "${CMAKE_CXX_FLAGS_DEBUG}"
+    CACHE STRING "Flags used by the C++ compiler during DebugOpt builds."
+    FORCE )
+SET(CMAKE_C_FLAGS_DEBUGOPT
+    "${CMAKE_C_FLAGS_DEBUG}"
+    CACHE STRING "Flags used by the C compiler during DebugOpt builds."
+    FORCE )
+SET(CMAKE_EXE_LINKER_FLAGS_DEBUGOPT
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG}"
+    CACHE STRING "Flags used for linking binaries during DebugOpt builds."
+    FORCE )
+SET(CMAKE_SHARED_LINKER_FLAGS_DEBUGOPT
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}"
+    CACHE STRING "Flags used by the shared libraries linker during DebugOpt builds."
+    FORCE )
+MARK_AS_ADVANCED(
+    CMAKE_CXX_FLAGS_DEBUGOPT
+    CMAKE_C_FLAGS_DEBUGOPT
+    CMAKE_EXE_LINKER_FLAGS_DEBUGOPT
+    CMAKE_SHARED_LINKER_FLAGS_DEBUGOPT )
+
+if(CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_CONFIGURATION_TYPES Debug Release DebugOpt)
+  set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
+    "Reset the configurations to what we need"
+    FORCE)
+endif()
+
+# sepcify which are the "debug" configs (for the linker)
+set_property(GLOBAL PROPERTY DEBUG_CONFIGURATIONS "Debug;DebugOpt")
 
 #=============================================
 project (RibTools)
 
-# if (CMAKE_COMPILER_IS_GNUCXX)
-# 	ADD_DEFINITIONS(-std=c++0x) # Enable C++0x mode for unordered_map
-# ENDIF()
-
-# Find OpenMP and set the flags for the compiler
-#find_package(OpenMP)
-#set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-
-if(MSVC) #((((((((((((((((
-    set(CMAKE_C_FLAGS_RELEASE   "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy")
-    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /DWIN32     /MD  /Ox /Ot /Oi /GL /Ob2 /Oy")
-    set(CMAKE_C_FLAGS_DEBUG     "/D_DEBUG /DWIN32 /Zi /MDd /Od                     ")
-    set(CMAKE_CXX_FLAGS_DEBUG   "/D_DEBUG /DWIN32 /Zi /MDd /Od                     ")
-
-    add_definitions( "/arch:AVX2" )
-
-    # 4996: disable annoying secure CRT warnings
-    # 4316: disable heap allocation may not align warning.. (we overload global new/delete)
-    add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4316 /nologo" )
-    add_definitions( "/GR-" ) # disable RTTI
-else()
-    set(OSMACRO "")
-    if(APPLE)
-        if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-            set(OSMACRO "-DMACOSX")
-        else()
-            set(OSMACRO "-DTARGET_OS_IPHONE")
-        endif()
+# create vcproj.user file for Visual Studio to set debug working directory
+function(app_create_vcxproj_userfile extraPath)
+    if (MSVC)
+        set(APP_WORKING_DIR "${PROJECT_SOURCE_DIR}/../../${extraPath}")
+        configure_file(
+              ${CMAKE_SOURCE_DIR}/DebugDir.vcxproj.user.in
+              ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.vcxproj.user
+              @ONLY
+            )
     endif()
-    set(CMAKE_C_FLAGS   "${OSMACRO}")
-    set(CMAKE_CXX_FLAGS "${OSMACRO} -std=c++11 -stdlib=libc++")
-    set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS}   -DNDEBUG")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG")
-    set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS}   -D_DEBUG")
-    set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS} -D_DEBUG")
-endif() #))))))))))))))))
+endfunction()
+
+# Specify the destination directly into the Distrib directory
+# ..also avoid the /Release and /Debug additional subdirs created by
+# Visual Studio
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../Distrib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/../Distrib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/../Distrib )
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+    set(CPPFS_LIBRARIES "stdc++fs")
+endif()
+
+#
+if (MSVC)
+    set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}       /DDEBUG /D_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}     /DDEBUG /D_DEBUG")
+    set(CMAKE_C_FLAGS_DEBUGOPT    "${CMAKE_C_FLAGS_DEBUGOPT}    /DDEBUG /D_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUGOPT  "${CMAKE_CXX_FLAGS_DEBUGOPT}  /DDEBUG /D_DEBUG")
+else()
+    set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}       -DDEBUG -D_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}     -DDEBUG -D_DEBUG")
+    set(CMAKE_C_FLAGS_DEBUGOPT    "${CMAKE_C_FLAGS_DEBUGOPT}    -DDEBUG -D_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUGOPT  "${CMAKE_CXX_FLAGS_DEBUGOPT}  -DDEBUG -D_DEBUG")
+endif()
+
+if (MSVC)
+    # disable annoying secure CRT warnings
+    add_definitions( "/D_CRT_SECURE_NO_WARNINGS /wd4996 /nologo" )
+endif()
+
+if (MSVC)
+    set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}     /Ox /Ot /Oi /Ob2 /Oy /GS-")
+    set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE}   /Ox /Ot /Oi /Ob2 /Oy /GS-")
+    set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}       /Od /Zi")
+    set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}     /Od /Zi")
+    set(CMAKE_C_FLAGS_DEBUGOPT    "${CMAKE_C_FLAGS_DEBUGOPT}    /O2 /Zi /Ot /Oi /Ob2")
+    set(CMAKE_CXX_FLAGS_DEBUGOPT  "${CMAKE_CXX_FLAGS_DEBUGOPT}  /O2 /Zi /Ot /Oi /Ob2")
+
+    # reduce burden on iterators debugging
+    set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}       /D_ITERATOR_DEBUG_LEVEL=1")
+    set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}     /D_ITERATOR_DEBUG_LEVEL=1")
+    set(CMAKE_C_FLAGS_DEBUGOPT    "${CMAKE_C_FLAGS_DEBUGOPT}    /D_ITERATOR_DEBUG_LEVEL=1")
+    set(CMAKE_CXX_FLAGS_DEBUGOPT  "${CMAKE_CXX_FLAGS_DEBUGOPT}  /D_ITERATOR_DEBUG_LEVEL=1")
+
+    string( REPLACE "/RTC1" ""  CMAKE_C_FLAGS_DEBUGOPT    ${CMAKE_C_FLAGS_DEBUGOPT} )
+    string( REPLACE "/RTC1" ""  CMAKE_CXX_FLAGS_DEBUGOPT  ${CMAKE_CXX_FLAGS_DEBUGOPT} )
+
+    add_definitions( "/fp:fast" )            # common params for FPU
+    add_definitions( "/DWIN32" ) # some common params
+    add_definitions( "/DNOMINMAX" )          # avoid crazy old Windows.h min and max macros
+    add_definitions( "/MP" )                 # multi-process compilation
+    add_definitions( "/we4239" )
+endif()
 
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" CACHE STRING "Release link flags")
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG}"   CACHE STRING "Debug link flags")
@@ -80,13 +139,6 @@ set(CMAKE_EXE_LINKER_FLAGS_DEBUG   "${CMAKE_EXE_LINKER_FLAGS_DEBUG}"   CACHE STR
 include_directories( . )
 include_directories( DMath/include )
 include_directories( DSystem/include )
-
-# Specify the destination directly into the Distrib directory
-# ..also avoid the /Release and /Debug additional subdirs created by
-# Visual Studio
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../Distrib )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/../Distrib )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/../Distrib )
 
 # Various libs
 add_subdirectory( DSystem )

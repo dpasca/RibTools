@@ -17,7 +17,7 @@
 namespace RSLC
 {
 
-typedef DUNORD_MAP<const TokNode*,TokNode*>	NodeToNodeMap;
+typedef std::unordered_map<const TokNode*,TokNode*>	NodeToNodeMap;
 
 //==================================================================
 static TokNode *cloneBranch_BuildNodes(

@@ -17,23 +17,10 @@
 #include "DUtils_Base.h"
 #include "DExceptions.h"
 
-#if defined(ANDROID) || ((defined(MACOSX) || defined(TARGET_OS_IPHONE)) && !defined(__clang__))
-# include <tr1/unordered_map>
-# include <tr1/unordered_set>
-#else
-# include <unordered_map>
-# include <unordered_set>
-#endif
+#include <unordered_map>
+#include <unordered_set>
 
 #include <string>
-
-#if defined(NACL) || (defined(__APPLE__) && defined(__clang__))
-# define DUNORD_MAP	std::unordered_map
-# define DUNORD_SET	std::unordered_set
-#else
-# define DUNORD_MAP	std::tr1::unordered_map
-# define DUNORD_SET	std::tr1::unordered_set
-#endif
 
 #if 1
 

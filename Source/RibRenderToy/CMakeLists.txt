@@ -38,5 +38,5 @@ target_link_libraries(
 	)
 
 if (MSVC)
-    app_create_vcxproj_userfile("../..Distrib")
+    app_create_vcxproj_userfile("Distrib")
 endif()
