@@ -34,7 +34,7 @@ struct CmdParams
 //==================================================================
 static void printUsage( int argc, char **argv )
 {
-	printf( "\n==== "APPNAME" v"APPVERSION" -- (" __DATE__ " - " __TIME__ ") ====\n" );
+	printf( "\n==== " APPNAME " v" APPVERSION " -- (" __DATE__ " - " __TIME__ ") ====\n" );
 
 	printf( "\n%s <Input .sl File> <Output .rrasm File>\n", argv[0] );
 	printf( "\n%s -prepro <Input .sl File>\n", argv[0] );
