@@ -15,6 +15,9 @@ Parallelism is implemented at all levels:
 
 **RibTools** is a rather crude experiment and it's only tested against a small selection of simple scenes included in the project.
 
+![Killeroo displaced](Source/docs/progress/2010-01-26_killeroo_properly_displaced.png)
+![Elephant additive](Source/docs/progress/2009-12-15_elephant_funky_translucency.png)
+![Elephant buckets](Source/docs/progress/RibRender-elephant-color-coded-grids-bucketed.png)
 
 Building & running
 ------------------
