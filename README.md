@@ -54,7 +54,7 @@ Other acknowledgements:
 * The *Killeroo* model is Copyright of Headus, used with
 permission: http://www.headus.com.au
 
-* The *Sponza Atrium*  model is originally from Marko Dabrovic: http://hdri.cgtechniques.com/~sponza/files/\
+* The *Sponza Atrium*  model is originally from Marko Dabrovic: http://hdri.cgtechniques.com/~sponza/files/ \
 The RIB version was taken from the *Lucille* renderer
  distribution and modified as needed: http://lucille.sourceforge.net/
 
