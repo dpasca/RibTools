@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body class="vscode-light">
+        <h1 id="ribtools">RibTools</h1>
+<p><strong>RibTools</strong> is an experiment in writing an off-line renderer based on Pixar's <a href="http://en.wikipedia.org/wiki/RenderMan_Interface_Specification">RenderMan interface</a> and the <a href="http://en.wikipedia.org/wiki/Reyes_rendering">REYES</a> rendering architecture.</p>
+<blockquote>
+<p><strong>NOTICE:</strong> Major development was <strong>suspended</strong> in 2010. Only occasional maintenance and refactoring updates are applied.</p>
+</blockquote>
+<p>At the core of <strong>RibTools</strong> there is <strong>RibRender</strong>, the rendering engine, built with speed and scalability in mind.</p>
+<p>Parallelism is implemented at all levels:</p>
+<ul>
+<li>Instruction level (adaptive N-way SIMD)</li>
+<li>Many-core hardware (multi-threading)</li>
+<li>Network-distributed rendering (custom protocol over TCP/IP)</li>
+</ul>
+<p><strong>RibTools</strong> is a rather crude experiment and it's only tested against a small selection of simple scenes included in the project.</p>
+<p><img src="docs/progress/2010-01-26_killeroo_properly_displaced.png" alt="Killeroo displaced">
+<img src="docs/progress/2009-12-15_elephant_funky_translucency.png" alt="Elephant additive">
+<img src="docs/progress/RibRender-elephant-color-coded-grids-bucketed.png" alt="Elephant buckets"></p>
+<h2 id="building--running">Building &amp; running</h2>
+<p>Instructions for Windows and Visual Studio.</p>
+<ol>
+<li>Launch <code>make_build.bat</code></li>
+<li>Launch <code>do_build.bat</code></li>
+<li>Go inside the directory <code>_distrib</code> and launch <code>RibRenderToy.exe</code> <code>*</code></li>
+<li>Run</li>
+<li>Right click in the window to load a test object</li>
+</ol>
+<p>That's all !</p>
+<p><code>*</code> In case of Windows, it's possible to open the Visual Studio solution located inside <code>_build\RibTools.sln</code>.
+Make sure to select the <em>Release</em> build.</p>
+<h2 id="about">About</h2>
+<p><strong>RibTools</strong> was developed by Davide Pasca in 2009-2010. Development is currently suspended.</p>
+<p>This software is released under the <a href="http://www.opensource.org/licenses/bsd-license.php">New BSD license</a> .</p>
+<p>This following software libraries are utilized in the project:</p>
+<ul>
+<li>JPEG library: <a href="http://www.ijg.org">http://www.ijg.org</a></li>
+<li>freeglut: <a href="http://freeglut.sourceforge.net">http://freeglut.sourceforge.net</a></li>
+</ul>
+<p>Other acknowledgements:</p>
+<ul>
+<li>
+<p>The <em>Killeroo</em> model is Copyright of Headus, used with
+permission: <a href="http://www.headus.com.au">http://www.headus.com.au</a></p>
+</li>
+<li>
+<p>The <em>Sponza Atrium</em>  model is originally from Marko Dabrovic: <a href="http://hdri.cgtechniques.com/~sponza/files/">http://hdri.cgtechniques.com/~sponza/files/</a><br>
+The RIB version was taken from the <em>Lucille</em> renderer
+distribution and modified as needed: <a href="http://lucille.sourceforge.net/">http://lucille.sourceforge.net/</a></p>
+</li>
+<li>
+<p>Most of the included RIB files are old samples that I found included in the <em>RenSH</em>
+project: <a href="http://www.dctsystems.co.uk/RenderMan/rensh.html">http://www.dctsystems.co.uk/RenderMan/rensh.html</a></p>
+</li>
+<li>
+<p>Other sample scene files were found on the Internet and are assumed to be freely
+redistributable.</p>
+</li>
+</ul>
+<p>For any issues regarding attribution, please contact me at <code>davide@newtypekk.com</code>.</p>
+<p>The <em>RenderMan® Interface Procedures</em> and RIB Protocol are: Copyright 1988, 1989,
+Pixar. All rights reserved. <em>RenderMan®</em> is a registered trademark of Pixar.</p>
+
+    </body>
+    </html>

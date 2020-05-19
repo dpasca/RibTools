@@ -10,9 +10,9 @@ RibTools User Manual
 Installation
 ============
 
-You may need to perform a one-time install of the freely redistributable CRT libraries from Microsoft, downloadable here_ or from the **RibTools** binaries package at ``Install\vcredist_x86.exe``.
+You may need to perform a one-time install of the freely redistributable CRT libraries from Microsoft (``vc_redist.x64.exe``), downloadable here_.
 
-.. _here: http://www.microsoft.com/downloads/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en 
+.. _here: https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads 
 
 Quick Start
 ===========

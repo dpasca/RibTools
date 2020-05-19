@@ -118,7 +118,7 @@ Run the application with or without the debugger by pressing F5, Ctrl+F5 (or wha
 Code modules overview
 =====================
 
-Code modules are subdivided by directories inside the ``Source`` directory.
+Code modules are subdivided by directories.
 
 DImage
 ------
