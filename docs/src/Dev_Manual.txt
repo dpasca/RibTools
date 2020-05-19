@@ -3,7 +3,7 @@ RibTools Developer Manual
 ===========================
 
 :Authors: Davide Pasca
-:Version: 2010/6/23
+:Version: 2020/5/19
 
 .. contents::
 
@@ -27,18 +27,14 @@ Requirements
 
 On Windows the required tools are:
 
- * Microsoft Visual Studio 2008 SP1_
  * CMake_ 2.8 or better
 
-.. _SP1: http://www.microsoft.com/downloads/details.aspx?FamilyId=FBEE1648-7106-44A7-9649-6D9F6D58056E&displaylang=en
 .. _CMake: http://www.cmake.org
 
 Directory Structure
 ===================
 
 As obtained from the repository:
-
-**Source/**
 
 ========================   =======================================================
 **DImage/**                Bitmap images library
@@ -58,23 +54,23 @@ As obtained from the repository:
 **RSLCompilerLib/**        RSL compiler library
 *CMakeLists.txt*           Root CMake file to create the build files
 *license.txt*              License file
-*make_build.bat*           Script that creates the ``../build`` directory and its contents (Windows)
-*make_build.sh*            Script that creates the ``../build`` directory and its contents (Linux/OSX)
-*make_distrib.bat*         Script that creates the ``../Distrib`` directory and its contents (Windows)
-*make_distrib.sh*          Script that creates the ``../Distrib`` directory and its contents (Linux/OSX)
+*make_build.bat*           Script that creates the ``_build`` directory and its contents (Windows)
+*make_build.sh*            Script that creates the ``_build`` directory and its contents (Linux/OSX)
+*make_distrib.bat*         Script that creates the ``_distrib`` directory and its contents (Windows)
+*make_distrib.sh*          Script that creates the ``_distrib`` directory and its contents (Linux/OSX)
 *make_install.bat*         Script that builds a .zip file for binary distribution (assumes EXEs have been manually compiled with VS)
 *readme.txt*               Readme file in txt format (and reST)
 *readme.html*              Readme file in HTML format
 ========================   =======================================================
 
-The Distrib Directory
+The _distrib Directory
 ======================
 
-A directory named ``Distrib`` is generated outside ``Source`` as part of the build process. This directory is automatically generated, and it can therefore be safely erased (unless one has any important changes in it !)
+A directory named ``_distrib`` is generated as part of the build process. This directory is automatically generated, and it can therefore be safely erased (unless one has any important changes in it !)
 
-The ``Distrib`` directory contains both data coming from ``DistribSrc`` and executables generated when compiling with Visual Studio (see below).
+The ``_distrib`` directory contains both data coming from ``DistribSrc`` and executables generated when compiling with Visual Studio (see below).
 
-When running, it's is advised to have the environment variable ``RIBTOOLS_DIR`` set to the ``Distrib`` directory.
+When running, it's is advised to have the environment variable ``RIBTOOLS_DIR`` set to the ``_distrib`` directory.
 For more informations on how to setup the environment variable, see the instructions at the *General Usage* section of the `User Manual`_.
 
 Compiling and running from VS
@@ -83,16 +79,11 @@ Compiling and running from VS
 Building the solution
 ---------------------
 
-From the *Source* directory launch the batch ``make_build.bat``
-This script will create he ``build`` directory and automatically call ``make_distrib.bat`` to create the ``Distrib`` directory.
+Launch the batch ``make_build.bat`` to create the ``_build`` directory. Then launch ``do_build.bat`` to geenrate the executables.
 
-Launch the newly created Visual Studio solution that can be found at ``build/RibTools.sln``.
+NOTE: In case of Windows, inside the ``_build`` directory there'll be a Visual Studio solution named ``RibTools.sln`` which can be used with the VS IDE.
 
-From the Standard Toolbar select a *solution configuration* (**Debug** or **Release**).
-
-Build the solution by selecting the option from the **Build** menu (or press F7 or Ctrl+Alt+B, depending on the VS configuration)
-
-Once the build is finished the ``Distrib`` directory should contain 4 executables:
+Once the build is finished the ``_distrib`` directory should contain 4 executables:
 
     * *RibRender.exe*
     * *RibRenderServer.exe*
@@ -104,7 +95,7 @@ Note that for every *.exe* file there is a corresponding *.idb* file. These file
 A little test
 -------------
 
-    * From the ``Distrib`` directory, launch ``RibRenderToy.exe``
+    * From the ``_distrib`` directory, launch ``RibRenderToy.exe``
     * Right-click inside the RibRenderToy window and select a test scene from the pop-up menu (*Airplane.rib* is a safe bet)
     * After a little while the scene should appear in all it's beauty (!)
 
@@ -117,16 +108,6 @@ Set the choosen application as the StartUp project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Right-click on an executable project (e.g. *RibRenderToy*), and choose **Set as StartUp Project** from the pop-up menu.
-
-Setup the working directory
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    * Right-click on the application project (e.g. *RibRenderToy*) and select **Properties** from the pop-up menu
-    * From the list at the left of the dialog, select **Configuration Properties -> Debugging**
-      - Where it says **Working Directory** set it to ``..\..\Distrib`` 
-
-**Note:** Set this for all the configurations (*Release* and *Debug*).
-A common mistake is to set up the *Working Directory* only for the current configuration and forget about the other configurations.
 
 Run (!!!)
 ~~~~~~~~~

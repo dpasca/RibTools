@@ -66,7 +66,7 @@ project (RibTools)
 # create vcproj.user file for Visual Studio to set debug working directory
 function(app_create_vcxproj_userfile extraPath)
     if (MSVC)
-        set(APP_WORKING_DIR "${PROJECT_SOURCE_DIR}/../../${extraPath}")
+        set(APP_WORKING_DIR "${PROJECT_SOURCE_DIR}/../${extraPath}")
         configure_file(
               ${CMAKE_SOURCE_DIR}/DebugDir.vcxproj.user.in
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.vcxproj.user
@@ -75,12 +75,12 @@ function(app_create_vcxproj_userfile extraPath)
     endif()
 endfunction()
 
-# Specify the destination directly into the Distrib directory
+# Specify the destination directly into the _distrib directory
 # ..also avoid the /Release and /Debug additional subdirs created by
 # Visual Studio
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../Distrib )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/../Distrib )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/../Distrib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../_distrib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/../_distrib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/../_distrib )
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -1,6 +1,6 @@
 .DS_Store
 tags
 .ctags
-Distrib/
-build/
+_distrib/
+_build/
 
