@@ -77,6 +77,11 @@ static int serverTask( SOCKET clientSock )
         printf( "%s\nAborting.\n", e.GetMessage_().c_str() );
         return -1;
     }
+    catch ( const std::exception &ex )
+    {
+        printf( "Exception: %s\n", ex.what() );
+        return -1;
+    }
     catch ( ... )
     {
         printf( "Unknown exception. Aborting.\n" );

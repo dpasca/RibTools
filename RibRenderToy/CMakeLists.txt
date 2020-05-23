@@ -28,6 +28,7 @@ target_link_libraries(
     freeglut
     libtiff
     libjpeg
+    ${CPPFS_LIBRARIES}
     ${OPENGL_LIBRARY}
     )
 

@@ -79,7 +79,7 @@ private:
     static void sIdleFunc();
     static void sMenuFunc( int id );
 
-    void addDirToMenu( const char *pDirName, const char *pFilesExt );
+    void addDirToMenu( const DStr &dirName, const DStr &matchExt );
 
 };
 

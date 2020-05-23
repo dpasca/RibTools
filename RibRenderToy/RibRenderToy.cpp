@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 #include <stdexcept>
+#include <filesystem>
+#include <iostream>
 #include "RibToolsBase/include/RibToolsBase.h"
 #include "RibRenderLib/include/RibRenderLib.h"
 #include "DSystem/include/DUtils.h"
@@ -15,17 +17,18 @@
 #include "RibRenderToy.h"
 
 #ifdef _MSC_VER
-    #include <GL/glut.h>
-    #include <direct.h>
-    #include <io.h>
+# include <GL/glut.h>
+# include <direct.h>
+# include <io.h>
 
 #elif defined(__linux__)
-    #include <GL/glut.h>
-    #include <sys/types.h>
-    #include <dirent.h>
+# include <GL/glut.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <dirent.h>
 
 #else
-    #include <GLUT/glut.h>
+# include <GLUT/glut.h>
 
 #endif
 
@@ -84,49 +87,30 @@ static void addBoolMenuItem( const char *pName, bool onoff, int id )
 }
 
 //==================================================================
-void RibRendToy::addDirToMenu( const char *pDirName, const char *pFilesExt )
+void RibRendToy::addDirToMenu( const DStr &dirName, const DStr &matchExt )
 {
-#if defined(WIN32)
+    namespace fs = std::filesystem;
 
-    DStr	buff = DUT::SSPrintFS( "%s/*.%s", pDirName, pFilesExt );
-
-    _finddatai64_t	findData;
-    intptr_t	handle = _findfirst64( buff.c_str(), &findData );
-    if ( handle != -1 )
+    auto strFromFSPath = []( const fs::path &s )
     {
-        int	ret = 0;
-        do
+        const DStr u8s = s.u8string();
+        return DStr( u8s.begin(), u8s.end() );
+    };
+
+    const auto matchExtFSP = fs::path( matchExt );
+
+    for (const auto &entry : fs::directory_iterator( dirName ))
+    {
+        if ( entry.path().has_extension() && entry.path().extension() == matchExtFSP  )
         {
-            mTestRibFiles.push_back( findData.name );
-            mTestRibFilesPaths.push_back( pDirName );
+            mTestRibFilesPaths.push_back( strFromFSPath( entry.path().parent_path() ) );
+            mTestRibFiles.push_back(      strFromFSPath( entry.path().filename() ) );
 
             glutAddMenuEntry(
-                DUT::SSPrintFS( "%s / %s", pDirName, findData.name ).c_str(),
+                strFromFSPath( entry.path() ).c_str(),
                 MENUID_FILES + (int)mTestRibFiles.size()-1 );
-
-            ret = _findnext64( handle, &findData );
-        } while ( ret == 0 );
-
-        _findclose( handle );
-    }
-
-#elif defined(__linux__)
-
-    DIR	*pDir = opendir( pDirName );
-    if ( pDir )
-    {
-        struct dirent *pDirent;
-
-        while ( pDirent = readdir( pDir ) )
-        {
-            //pDirent->
         }
-
-        closedir( pDir );
     }
-
-#endif
-
 }
 
 //==================================================================
@@ -149,12 +133,12 @@ void RibRendToy::RebuildMenu()
     mTestRibFiles.clear();
     mTestRibFilesPaths.clear();
 
-    addDirToMenu( "TestScenes", "rib" );
-    addDirToMenu( "TestScenes/KillerooNURBS", "rib" );
-    addDirToMenu( "TestScenes/Sponza", "rib" );
-    addDirToMenu( "TestScenes/LightsTests", "rib" );
-    addDirToMenu( "TestScenes/MiscTests", "rib" );
-    addDirToMenu( "TestScenes/ValuesTests", "rib" );
+    addDirToMenu( "TestScenes",                 ".rib" );
+    addDirToMenu( "TestScenes/KillerooNURBS",   ".rib" );
+    addDirToMenu( "TestScenes/Sponza",          ".rib" );
+    addDirToMenu( "TestScenes/LightsTests",     ".rib" );
+    addDirToMenu( "TestScenes/MiscTests",       ".rib" );
+    addDirToMenu( "TestScenes/ValuesTests",     ".rib" );
 }
 
 //==================================================================
@@ -276,6 +260,11 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
     {
         printf( "%s\nAborting.\n", e.GetMessage_().c_str() );
         return false;
+    }
+    catch ( const std::exception &ex )
+    {
+        printf( "Exception: %s\n", ex.what() );
+        return -1;
     }
     catch ( ... )
     {
