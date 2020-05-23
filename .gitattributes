@@ -1,3 +1,9 @@
 # normalize text files to LF
 * text=lf
-
+*.cpp   filter=spabs
+*.h     filter=spabs
+*.sl    filter=spabs
+*.ini   filter=spabs
+*.rrasm filter=spabs
+*.txt   filter=spabs
+*.rib   filter=spabs
