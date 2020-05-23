@@ -18,82 +18,82 @@ namespace DUT
 //===============================================================
 class CriticalSection
 {
-	friend class Block;
+    friend class Block;
 
 #if defined(WIN32)
-	void				*mCSection;
+    void				*mCSection;
 #endif
 
 public:
-	//===============================================================
-	class Block
-	{
-		CriticalSection *mpCSection;
+    //===============================================================
+    class Block
+    {
+        CriticalSection *mpCSection;
 
-	public:
-		Block( CriticalSection &csection ) :
-			mpCSection(&csection)
-		{
-			mpCSection->Enter();
-		}
+    public:
+        Block( CriticalSection &csection ) :
+            mpCSection(&csection)
+        {
+            mpCSection->Enter();
+        }
 
-		~Block()
-		{
-			mpCSection->Leave();
-		}
-	};
+        ~Block()
+        {
+            mpCSection->Leave();
+        }
+    };
 
 public:
-	CriticalSection();
-	~CriticalSection();
+    CriticalSection();
+    ~CriticalSection();
 
-	void Enter();
-	void Leave();
+    void Enter();
+    void Leave();
 };
 
 //===============================================================
 #if 1
 class LongCriticalSection
 {
-	friend class Block;
+    friend class Block;
 
-	CriticalSection	mCS;
-	volatile bool	mIsBlocked;
+    CriticalSection	mCS;
+    volatile bool	mIsBlocked;
 
 public:
-	//===============================================================
-	class Block
-	{
-		LongCriticalSection *mpLCS;
+    //===============================================================
+    class Block
+    {
+        LongCriticalSection *mpLCS;
 
-	public:
-		Block( LongCriticalSection &lcs ) :
-			mpLCS(&lcs)
-		{
-			mpLCS->mCS.Enter();
-			while ( mpLCS->mIsBlocked )
-			{
-				mpLCS->mCS.Leave();
-				DUT::SleepMS( 1 );
-				mpLCS->mCS.Enter();
-			}
-			mpLCS->mIsBlocked = true;
-			mpLCS->mCS.Leave();
-		}
+    public:
+        Block( LongCriticalSection &lcs ) :
+            mpLCS(&lcs)
+        {
+            mpLCS->mCS.Enter();
+            while ( mpLCS->mIsBlocked )
+            {
+                mpLCS->mCS.Leave();
+                DUT::SleepMS( 1 );
+                mpLCS->mCS.Enter();
+            }
+            mpLCS->mIsBlocked = true;
+            mpLCS->mCS.Leave();
+        }
 
-		~Block()
-		{
-			mpLCS->mCS.Enter();
-			DASSERT( mpLCS->mIsBlocked == true );
-			mpLCS->mIsBlocked = false;
-			mpLCS->mCS.Leave();
-		}
-	};
+        ~Block()
+        {
+            mpLCS->mCS.Enter();
+            DASSERT( mpLCS->mIsBlocked == true );
+            mpLCS->mIsBlocked = false;
+            mpLCS->mCS.Leave();
+        }
+    };
 
-	LongCriticalSection() :
-		mIsBlocked(false)
-	{
-	}
+    LongCriticalSection() :
+        mIsBlocked(false)
+    {
+    }
 };
 #endif
 

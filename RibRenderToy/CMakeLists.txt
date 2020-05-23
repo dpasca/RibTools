@@ -23,19 +23,19 @@ link_directories(
 )
 
 target_link_libraries(
-	${PROJECT_NAME}
-	DSystem
-	DMath
-	DImage
-	RI_System
-	RibRenderLib
-	RibToolsBase
-	RSLCompilerLib
-	freeglut
-	libtiff
-	libjpeg
-	${OPENGL_LIBRARIES}
-	)
+    ${PROJECT_NAME}
+    DSystem
+    DMath
+    DImage
+    RI_System
+    RibRenderLib
+    RibToolsBase
+    RSLCompilerLib
+    freeglut
+    libtiff
+    libjpeg
+    ${OPENGL_LIBRARIES}
+    )
 
 if (MSVC)
     app_create_vcxproj_userfile("_distrib")

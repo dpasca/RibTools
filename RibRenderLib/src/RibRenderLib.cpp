@@ -20,107 +20,107 @@ namespace RRL
 //==================================================================
 Render::Render( Params &params )
 {
-	Translator		translator( params.mTrans );
+    Translator		translator( params.mTrans );
 
-	translator.GetState().Begin( "dummy" );
+    translator.GetState().Begin( "dummy" );
 
-	readArchive( params.mpFileName, params, translator );
+    readArchive( params.mpFileName, params, translator );
 
-	translator.GetState().End();
+    translator.GetState().End();
 }
 
 //==================================================================
 void Render::readArchive(
-					const char *pFileName,
-					const Params &params,
-					Translator &translator )
+                    const char *pFileName,
+                    const Params &params,
+                    Translator &translator )
 {
-	RI::Parser		parser;
+    RI::Parser		parser;
 
-	DUT::MemFile	file;
+    DUT::MemFile	file;
 
-	params.mTrans.mState.mpFileManager->GrabFile( pFileName, file );
+    params.mTrans.mState.mpFileManager->GrabFile( pFileName, file );
 
-	for (size_t i=0; i <= file.GetDataSize(); ++i)
-	{
-		if ( i == file.GetDataSize() )
-			parser.AddChar( 0 );
-		else
-			parser.AddChar( (char)file.GetData()[i] );
+    for (size_t i=0; i <= file.GetDataSize(); ++i)
+    {
+        if ( i == file.GetDataSize() )
+            parser.AddChar( 0 );
+        else
+            parser.AddChar( (char)file.GetData()[i] );
 
-		while ( parser.HasNewCommand() )
-		{
-			DStr			cmdName;
-			RI::ParamList	cmdParams;
-			int				cmdLine;
+        while ( parser.HasNewCommand() )
+        {
+            DStr			cmdName;
+            RI::ParamList	cmdParams;
+            int				cmdLine;
 
-			parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
+            parser.FlushNewCommand( &cmdName, &cmdParams, &cmdLine );
 
-			if ( params.mVerbose )
-			{
-				printf( "CMD %s ", cmdName.c_str() );
+            if ( params.mVerbose )
+            {
+                printf( "CMD %s ", cmdName.c_str() );
 
-				if ( cmdParams.size() )
-					printf( "(" SIZE_T_FMT " params)", cmdParams.size() );
+                if ( cmdParams.size() )
+                    printf( "(" SIZE_T_FMT " params)", cmdParams.size() );
 
-				puts( "" );
-			}
+                puts( "" );
+            }
 
-			try {
-				// add a command
-				Translator::RetCmd	retCmd =
-								translator.AddCommand(
-												cmdName,
-												cmdParams,
-												pFileName,
-												cmdLine );
+            try {
+                // add a command
+                Translator::RetCmd	retCmd =
+                                translator.AddCommand(
+                                                cmdName,
+                                                cmdParams,
+                                                pFileName,
+                                                cmdLine );
 
-				switch ( retCmd )
-				{
-				case Translator::CMD_WORLDEND:
-					{
-						RI::Options	&options = translator.GetState().GetCurOptions();
+                switch ( retCmd )
+                {
+                case Translator::CMD_WORLDEND:
+                    {
+                        RI::Options	&options = translator.GetState().GetCurOptions();
 
-						// if the world definition has ended, then we should have some displays
-						const DisplayList &dispList = options.GetDisplays();
-						
-						// see if we have a callback to process the displays
-						if ( params.mpOnFrameEndCB )
-							params.mpOnFrameEndCB( params.mpOnFrameEndCBData, dispList );
+                        // if the world definition has ended, then we should have some displays
+                        const DisplayList &dispList = options.GetDisplays();
+                        
+                        // see if we have a callback to process the displays
+                        if ( params.mpOnFrameEndCB )
+                            params.mpOnFrameEndCB( params.mpOnFrameEndCBData, dispList );
 
-						// free the displays
-						options.FreeDisplays();
-					}
-					break;
+                        // free the displays
+                        options.FreeDisplays();
+                    }
+                    break;
 
-				case Translator::CMD_READARCHIVE:
-					{
-					std::string tmpFName = translator.GetReadArchivePathFName();
-					readArchive(
-							tmpFName.c_str(),
-							params,
-							translator );
-					}
-					break;
+                case Translator::CMD_READARCHIVE:
+                    {
+                    std::string tmpFName = translator.GetReadArchivePathFName();
+                    readArchive(
+                            tmpFName.c_str(),
+                            params,
+                            translator );
+                    }
+                    break;
 
-				default:
-				case Translator::CMD_GENERIC:
-					break;
-				}
+                default:
+                case Translator::CMD_GENERIC:
+                    break;
+                }
 
-			}
-			catch ( RI::Exception &e )
-			{
-				printf( "SCENE ERR> MSG: %s\n", e.GetMessage_().c_str() );
-				printf( "SCENE ERR> AT : %s : %i - (cmd: '%s')\n\n", pFileName, cmdLine, cmdName.c_str() );
-			}
-			catch ( std::runtime_error &e )
-			{
-				printf( "SCENE ERR> MSG: %s\n", e.what() );
-				printf( "SCENE ERR> AT : %s : %i - (cmd: '%s')\n\n", pFileName, cmdLine, cmdName.c_str() );
-			}
-		}
-	}
+            }
+            catch ( RI::Exception &e )
+            {
+                printf( "SCENE ERR> MSG: %s\n", e.GetMessage_().c_str() );
+                printf( "SCENE ERR> AT : %s : %i - (cmd: '%s')\n\n", pFileName, cmdLine, cmdName.c_str() );
+            }
+            catch ( std::runtime_error &e )
+            {
+                printf( "SCENE ERR> MSG: %s\n", e.what() );
+                printf( "SCENE ERR> AT : %s : %i - (cmd: '%s')\n\n", pFileName, cmdLine, cmdName.c_str() );
+            }
+        }
+    }
 }
 
 //==================================================================

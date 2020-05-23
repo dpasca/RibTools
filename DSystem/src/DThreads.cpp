@@ -55,35 +55,35 @@ CondVar::~CondVar()
 //==================================================================
 //==================================================================
 ThreadedBase::ThreadedBase() :
-	mQuitRequest(false),
-	mQuitAck(false)
+    mQuitRequest(false),
+    mQuitAck(false)
 {
 #if defined(WIN32)
-	mThreadHandle = CreateThread( NULL, 16384, (LPTHREAD_START_ROUTINE)threadMain_s, (void *)this, 0, NULL );
+    mThreadHandle = CreateThread( NULL, 16384, (LPTHREAD_START_ROUTINE)threadMain_s, (void *)this, 0, NULL );
 #endif
 }
 
 //==================================================================
 ThreadedBase::~ThreadedBase()
 {
-	DASSERT( mQuitAck == true );
+    DASSERT( mQuitAck == true );
 }
 
 //==================================================================
 void ThreadedBase::KillThread()
 {
 #if defined(WIN32)
-	// wait for quit to be acknowledged
-	mQuitRequest = true;
-	ResumeThread( mThreadHandle );
-	while ( mQuitAck == false )
-	{
-		ResumeThread( mThreadHandle );
-		//SwitchToThread();
-		DUT::SleepMS( 10 );
-	}
+    // wait for quit to be acknowledged
+    mQuitRequest = true;
+    ResumeThread( mThreadHandle );
+    while ( mQuitAck == false )
+    {
+        ResumeThread( mThreadHandle );
+        //SwitchToThread();
+        DUT::SleepMS( 10 );
+    }
 
-	CloseHandle( mThreadHandle );
+    CloseHandle( mThreadHandle );
 #endif
 }
 

@@ -129,39 +129,39 @@ typedef	void* thandle_t;	/* client data handle */
 typedef	unsigned char TIFFRGBValue;		/* 8-bit samples */
 
 typedef struct {
-	float d_mat[3][3]; 		/* XYZ -> luminance matrix */
-	float d_YCR;			/* Light o/p for reference white */
-	float d_YCG;
-	float d_YCB;
-	uint32 d_Vrwr;			/* Pixel values for ref. white */
-	uint32 d_Vrwg;
-	uint32 d_Vrwb;
-	float d_Y0R;			/* Residual light for black pixel */
-	float d_Y0G;
-	float d_Y0B;
-	float d_gammaR;			/* Gamma values for the three guns */
-	float d_gammaG;
-	float d_gammaB;
+    float d_mat[3][3]; 		/* XYZ -> luminance matrix */
+    float d_YCR;			/* Light o/p for reference white */
+    float d_YCG;
+    float d_YCB;
+    uint32 d_Vrwr;			/* Pixel values for ref. white */
+    uint32 d_Vrwg;
+    uint32 d_Vrwb;
+    float d_Y0R;			/* Residual light for black pixel */
+    float d_Y0G;
+    float d_Y0B;
+    float d_gammaR;			/* Gamma values for the three guns */
+    float d_gammaG;
+    float d_gammaB;
 } TIFFDisplay;
 
 typedef struct {				/* YCbCr->RGB support */
-	TIFFRGBValue* clamptab;			/* range clamping table */
-	int*	Cr_r_tab;
-	int*	Cb_b_tab;
-	int32*	Cr_g_tab;
-	int32*	Cb_g_tab;
+    TIFFRGBValue* clamptab;			/* range clamping table */
+    int*	Cr_r_tab;
+    int*	Cb_b_tab;
+    int32*	Cr_g_tab;
+    int32*	Cb_g_tab;
         int32*  Y_tab;
 } TIFFYCbCrToRGB;
 
 typedef struct {				/* CIE Lab 1976->RGB support */
-	int	range;				/* Size of conversion table */
+    int	range;				/* Size of conversion table */
 #define CIELABTORGB_TABLE_RANGE 1500
-	float	rstep, gstep, bstep;
-	float	X0, Y0, Z0;			/* Reference white point */
-	TIFFDisplay display;
-	float	Yr2r[CIELABTORGB_TABLE_RANGE + 1];  /* Conversion of Yr to r */
-	float	Yg2g[CIELABTORGB_TABLE_RANGE + 1];  /* Conversion of Yg to g */
-	float	Yb2b[CIELABTORGB_TABLE_RANGE + 1];  /* Conversion of Yb to b */
+    float	rstep, gstep, bstep;
+    float	X0, Y0, Z0;			/* Reference white point */
+    TIFFDisplay display;
+    float	Yr2r[CIELABTORGB_TABLE_RANGE + 1];  /* Conversion of Yr to r */
+    float	Yg2g[CIELABTORGB_TABLE_RANGE + 1];  /* Conversion of Yg to g */
+    float	Yb2b[CIELABTORGB_TABLE_RANGE + 1];  /* Conversion of Yb to b */
 } TIFFCIELabToRGB;
 
 /*
@@ -180,44 +180,44 @@ typedef struct _TIFFRGBAImage TIFFRGBAImage;
  */
 typedef void (*tileContigRoutine)
     (TIFFRGBAImage*, uint32*, uint32, uint32, uint32, uint32, int32, int32,
-	unsigned char*);
+    unsigned char*);
 typedef void (*tileSeparateRoutine)
     (TIFFRGBAImage*, uint32*, uint32, uint32, uint32, uint32, int32, int32,
-	unsigned char*, unsigned char*, unsigned char*, unsigned char*);
+    unsigned char*, unsigned char*, unsigned char*, unsigned char*);
 /*
  * RGBA-reader state.
  */
 struct _TIFFRGBAImage {
-	TIFF* tif;                              /* image handle */
-	int stoponerr;                          /* stop on read error */
-	int isContig;                           /* data is packed/separate */
-	int alpha;                              /* type of alpha data present */
-	uint32 width;                           /* image width */
-	uint32 height;                          /* image height */
-	uint16 bitspersample;                   /* image bits/sample */
-	uint16 samplesperpixel;                 /* image samples/pixel */
-	uint16 orientation;                     /* image orientation */
-	uint16 req_orientation;                 /* requested orientation */
-	uint16 photometric;                     /* image photometric interp */
-	uint16* redcmap;                        /* colormap pallete */
-	uint16* greencmap;
-	uint16* bluecmap;
-	/* get image data routine */
-	int (*get)(TIFFRGBAImage*, uint32*, uint32, uint32);
-	/* put decoded strip/tile */
-	union {
-	    void (*any)(TIFFRGBAImage*);
-	    tileContigRoutine contig;
-	    tileSeparateRoutine separate;
-	} put;
-	TIFFRGBValue* Map;                      /* sample mapping array */
-	uint32** BWmap;                         /* black&white map */
-	uint32** PALmap;                        /* palette image map */
-	TIFFYCbCrToRGB* ycbcr;                  /* YCbCr conversion state */
-	TIFFCIELabToRGB* cielab;                /* CIE L*a*b conversion state */
+    TIFF* tif;                              /* image handle */
+    int stoponerr;                          /* stop on read error */
+    int isContig;                           /* data is packed/separate */
+    int alpha;                              /* type of alpha data present */
+    uint32 width;                           /* image width */
+    uint32 height;                          /* image height */
+    uint16 bitspersample;                   /* image bits/sample */
+    uint16 samplesperpixel;                 /* image samples/pixel */
+    uint16 orientation;                     /* image orientation */
+    uint16 req_orientation;                 /* requested orientation */
+    uint16 photometric;                     /* image photometric interp */
+    uint16* redcmap;                        /* colormap pallete */
+    uint16* greencmap;
+    uint16* bluecmap;
+    /* get image data routine */
+    int (*get)(TIFFRGBAImage*, uint32*, uint32, uint32);
+    /* put decoded strip/tile */
+    union {
+        void (*any)(TIFFRGBAImage*);
+        tileContigRoutine contig;
+        tileSeparateRoutine separate;
+    } put;
+    TIFFRGBValue* Map;                      /* sample mapping array */
+    uint32** BWmap;                         /* black&white map */
+    uint32** PALmap;                        /* palette image map */
+    TIFFYCbCrToRGB* ycbcr;                  /* YCbCr conversion state */
+    TIFFCIELabToRGB* cielab;                /* CIE L*a*b conversion state */
 
-	int row_offset;
-	int col_offset;
+    int row_offset;
+    int col_offset;
 };
 
 /*
@@ -238,9 +238,9 @@ struct _TIFFRGBAImage {
  */
 typedef	int (*TIFFInitMethod)(TIFF*, int);
 typedef struct {
-	char*		name;
-	uint16		scheme;
-	TIFFInitMethod	init;
+    char*		name;
+    uint16		scheme;
+    TIFFInitMethod	init;
 } TIFFCodec;
 
 #include <stdio.h>
@@ -301,14 +301,14 @@ extern  ttag_t TIFFGetTagListEntry( TIFF *, int tag_index );
 #define FIELD_CUSTOM    65    
 
 typedef	struct {
-	ttag_t	field_tag;		/* field's tag */
-	short	field_readcount;	/* read count/TIFF_VARIABLE/TIFF_SPP */
-	short	field_writecount;	/* write count/TIFF_VARIABLE */
-	TIFFDataType field_type;	/* type of associated data */
+    ttag_t	field_tag;		/* field's tag */
+    short	field_readcount;	/* read count/TIFF_VARIABLE/TIFF_SPP */
+    short	field_writecount;	/* write count/TIFF_VARIABLE */
+    TIFFDataType field_type;	/* type of associated data */
         unsigned short field_bit;	/* bit in fieldsset bit vector */
-	unsigned char field_oktochange;	/* if true, can change while writing */
-	unsigned char field_passcount;	/* if true, pass dir count on set */
-	char	*field_name;		/* ASCII name */
+    unsigned char field_oktochange;	/* if true, can change while writing */
+    unsigned char field_passcount;	/* if true, pass dir count on set */
+    char	*field_name;		/* ASCII name */
 } TIFFFieldInfo;
 
 typedef struct _TIFFTagValue {
@@ -320,7 +320,7 @@ typedef struct _TIFFTagValue {
 extern	void TIFFMergeFieldInfo(TIFF*, const TIFFFieldInfo[], int);
 extern	const TIFFFieldInfo* TIFFFindFieldInfo(TIFF*, ttag_t, TIFFDataType);
 extern  const TIFFFieldInfo* TIFFFindFieldInfoByName(TIFF* , const char *,
-						     TIFFDataType);
+                             TIFFDataType);
 extern	const TIFFFieldInfo* TIFFFieldWithTag(TIFF*, ttag_t);
 extern	const TIFFFieldInfo* TIFFFieldWithName(TIFF*, const char *);
 
@@ -348,7 +348,7 @@ extern	int TIFFGetFieldDefaulted(TIFF*, ttag_t, ...);
 extern	int TIFFVGetFieldDefaulted(TIFF*, ttag_t, va_list);
 extern	int TIFFReadDirectory(TIFF*);
 extern	int TIFFReadCustomDirectory(TIFF*, toff_t, const TIFFFieldInfo[],
-				    size_t);
+                    size_t);
 extern	int TIFFReadEXIFDirectory(TIFF*, toff_t);
 extern	tsize_t TIFFScanlineSize(TIFF*);
 extern	tsize_t TIFFOldScanlineSize(TIFF*);
@@ -409,7 +409,7 @@ extern	int TIFFReadScanline(TIFF*, tdata_t, uint32, tsample_t = 0);
 extern	int TIFFWriteScanline(TIFF*, tdata_t, uint32, tsample_t = 0);
 extern	int TIFFReadRGBAImage(TIFF*, uint32, uint32, uint32*, int = 0);
 extern	int TIFFReadRGBAImageOriented(TIFF*, uint32, uint32, uint32*,
-				      int = ORIENTATION_BOTLEFT, int = 0);
+                      int = ORIENTATION_BOTLEFT, int = 0);
 #else
 extern	void TIFFPrintDirectory(TIFF*, FILE*, long);
 extern	int TIFFReadScanline(TIFF*, tdata_t, uint32, tsample_t);
@@ -430,11 +430,11 @@ extern	TIFF* TIFFOpenW(const wchar_t*, const char*);
 # endif /* __WIN32__ */
 extern	TIFF* TIFFFdOpen(int, const char*, const char*);
 extern	TIFF* TIFFClientOpen(const char*, const char*,
-	    thandle_t,
-	    TIFFReadWriteProc, TIFFReadWriteProc,
-	    TIFFSeekProc, TIFFCloseProc,
-	    TIFFSizeProc,
-	    TIFFMapFileProc, TIFFUnmapFileProc);
+        thandle_t,
+        TIFFReadWriteProc, TIFFReadWriteProc,
+        TIFFSeekProc, TIFFCloseProc,
+        TIFFSizeProc,
+        TIFFMapFileProc, TIFFUnmapFileProc);
 extern	const char* TIFFFileName(TIFF*);
 extern	const char* TIFFSetFileName(TIFF*, const char *);
 extern void TIFFError(const char*, const char*, ...) __attribute__((format (printf,2,3)));
@@ -450,9 +450,9 @@ extern	ttile_t TIFFComputeTile(TIFF*, uint32, uint32, uint32, tsample_t);
 extern	int TIFFCheckTile(TIFF*, uint32, uint32, uint32, tsample_t);
 extern	ttile_t TIFFNumberOfTiles(TIFF*);
 extern	tsize_t TIFFReadTile(TIFF*,
-	    tdata_t, uint32, uint32, uint32, tsample_t);
+        tdata_t, uint32, uint32, uint32, tsample_t);
 extern	tsize_t TIFFWriteTile(TIFF*,
-	    tdata_t, uint32, uint32, uint32, tsample_t);
+        tdata_t, uint32, uint32, uint32, tsample_t);
 extern	tstrip_t TIFFComputeStrip(TIFF*, uint32, tsample_t);
 extern	tstrip_t TIFFNumberOfStrips(TIFF*);
 extern	tsize_t TIFFReadEncodedStrip(TIFF*, tstrip_t, tdata_t, tsize_t);
@@ -502,13 +502,13 @@ extern	uint32 LogLuv32fromXYZ(float*, int);
     
 extern int TIFFCIELabToRGBInit(TIFFCIELabToRGB*, TIFFDisplay *, float*);
 extern void TIFFCIELabToXYZ(TIFFCIELabToRGB *, uint32, int32, int32,
-			    float *, float *, float *);
+                float *, float *, float *);
 extern void TIFFXYZToRGB(TIFFCIELabToRGB *, float, float, float,
-			 uint32 *, uint32 *, uint32 *);
+             uint32 *, uint32 *, uint32 *);
 
 extern int TIFFYCbCrToRGBInit(TIFFYCbCrToRGB*, float*, float*);
 extern void TIFFYCbCrtoRGB(TIFFYCbCrToRGB *, uint32, int32, int32,
-			   uint32 *, uint32 *, uint32 *);
+               uint32 *, uint32 *, uint32 *);
 
 #if defined(c_plusplus) || defined(__cplusplus)
 }

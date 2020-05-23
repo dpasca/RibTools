@@ -23,176 +23,176 @@ namespace RSLC
 class Node_FuncCall
 {
 public:
-	// TODO: ummmmm !!
-	const Function	*mpFunc;
-	VarType			mReturnCastVType;
+    // TODO: ummmmm !!
+    const Function	*mpFunc;
+    VarType			mReturnCastVType;
 
 public:
-	Node_FuncCall() :
-		mpFunc(NULL),
-		mReturnCastVType(VT_UNKNOWN)	// no cast to begin with
-	{
-	}
+    Node_FuncCall() :
+        mpFunc(NULL),
+        mReturnCastVType(VT_UNKNOWN)	// no cast to begin with
+    {
+    }
 };
 
 //==================================================================
 class TokNode
 {
 #ifdef _DEBUG
-	static size_t	sUIDCnt;
+    static size_t	sUIDCnt;
 
-	size_t			mUIDCnt;
+    size_t			mUIDCnt;
 #endif
 
 public:
-	enum Type
-	{
-		TYPE_STANDARD,
-		TYPE_BLOCK,
-		TYPE_FUNCDEF,
-		TYPE_FUNCCALL,
-		TYPE_FUNCOP,
-		TYPE_N
-	};
+    enum Type
+    {
+        TYPE_STANDARD,
+        TYPE_BLOCK,
+        TYPE_FUNCDEF,
+        TYPE_FUNCCALL,
+        TYPE_FUNCOP,
+        TYPE_N
+    };
 public:
-	Token			*mpToken;
+    Token			*mpToken;
 
 private:
-	bool			mOwnToken;
-	DVec<Variable>	mVariables;
-	DVec<Function>	mFunctions;
+    bool			mOwnToken;
+    DVec<Variable>	mVariables;
+    DVec<Function>	mFunctions;
 
 public:
-	TokNode			*mpParent;
-	Type			mNodeType;
-	bool			mIsFuncOp;
-	bool			mOutputFuncOpEnd;
+    TokNode			*mpParent;
+    Type			mNodeType;
+    bool			mIsFuncOp;
+    bool			mOutputFuncOpEnd;
 
-	Node_FuncCall	mFuncCall;
+    Node_FuncCall	mFuncCall;
 
 private:
-	BlockType		mBlockType;
+    BlockType		mBlockType;
 
 public:
-	u_int			mBlockID;
-	DVec<TokNode*>	mpChilds;
+    u_int			mBlockID;
+    DVec<TokNode*>	mpChilds;
 
-	VarLink			mVarLink;	// this is the variable definition
-								// in case this node is variable usage
+    VarLink			mVarLink;	// this is the variable definition
+                                // in case this node is variable usage
 
 #ifdef _DEBUG
-	DVec<VarLink*>	mpReferringVarLinks;
+    DVec<VarLink*>	mpReferringVarLinks;
 #endif
 
 public:
-	TokNode( const Token *pObj );
+    TokNode( const Token *pObj );
 
-	TokNode(
-		const char		*pTokStr,
-		TokenID			tokId,
-		TokenIDType		tokIdType,
-		const TokNode	*pInheritNodeTokPos = NULL );
+    TokNode(
+        const char		*pTokStr,
+        TokenID			tokId,
+        TokenIDType		tokIdType,
+        const TokNode	*pInheritNodeTokPos = NULL );
 
-	TokNode( const TokNode &from );
+    TokNode( const TokNode &from );
 
-	~TokNode();
+    ~TokNode();
 
-	TokenID			GetTokID()		const {	return mpToken->id;		}
-	TokenIDType 	GetTokIDType()	const {	return mpToken->idType; }
+    TokenID			GetTokID()		const {	return mpToken->id;		}
+    TokenIDType 	GetTokIDType()	const {	return mpToken->idType; }
 
-	void			SetTokID( TokenID id )	{ mpToken->id = id;		}
+    void			SetTokID( TokenID id )	{ mpToken->id = id;		}
 
-	void DeleteReplaceToken( Token *pToken );
+    void DeleteReplaceToken( Token *pToken );
 
-	void SetBlockType( BlockType blockType )
-	{
-		mBlockType	= blockType;
-		mNodeType	= TYPE_BLOCK;
-	}
+    void SetBlockType( BlockType blockType )
+    {
+        mBlockType	= blockType;
+        mNodeType	= TYPE_BLOCK;
+    }
 
-	BlockType GetBlockType() const
-	{
-		return mBlockType;
-	}
+    BlockType GetBlockType() const
+    {
+        return mBlockType;
+    }
 
-	u_int GetBlockID() const
-	{
-		return mBlockID;
-	}
+    u_int GetBlockID() const
+    {
+        return mBlockID;
+    }
 
-	TokNode *AddChild( TokNode *pNode )
-	{
-		pNode->mpParent = this;
-		mpChilds.push_back( pNode );
-		return pNode;
-	}
+    TokNode *AddChild( TokNode *pNode )
+    {
+        pNode->mpParent = this;
+        mpChilds.push_back( pNode );
+        return pNode;
+    }
 
-	TokNode *AddChildFront( TokNode *pNode )
-	{
-		pNode->mpParent = this;
-		mpChilds.insert( mpChilds.begin(), pNode );
-		return pNode;
-	}
+    TokNode *AddChildFront( TokNode *pNode )
+    {
+        pNode->mpParent = this;
+        mpChilds.insert( mpChilds.begin(), pNode );
+        return pNode;
+    }
 
-	void AddAfterThis( TokNode *pNode );
+    void AddAfterThis( TokNode *pNode );
 
-	TokNode *AddNewChild( Token *pObj )
-	{
-		return AddChild( DNEW TokNode( pObj ) );
-	}
+    TokNode *AddNewChild( Token *pObj )
+    {
+        return AddChild( DNEW TokNode( pObj ) );
+    }
 
-	TokNode *AddNewChildFront( Token *pObj )
-	{
-		return AddChildFront( DNEW TokNode( pObj ) );
-	}
+    TokNode *AddNewChildFront( Token *pObj )
+    {
+        return AddChildFront( DNEW TokNode( pObj ) );
+    }
 
-	const char *GetTokStr() const { return mpToken->str.c_str(); }
+    const char *GetTokStr() const { return mpToken->str.c_str(); }
 
-	TokNode	*GetLeft();
-	TokNode	*GetRight();
-	TokNode	*GetPrev();
-	TokNode	*GetNext();
+    TokNode	*GetLeft();
+    TokNode	*GetRight();
+    TokNode	*GetPrev();
+    TokNode	*GetNext();
 
-	const TokNode *GetLeft()	const {	return ((TokNode *)this)->GetLeft();	}
-	const TokNode *GetRight()	const {	return ((TokNode *)this)->GetRight();	}
-	const TokNode *GetPrev()	const {	return ((TokNode *)this)->GetPrev();	}
-	const TokNode *GetNext()	const {	return ((TokNode *)this)->GetNext();	}
+    const TokNode *GetLeft()	const {	return ((TokNode *)this)->GetLeft();	}
+    const TokNode *GetRight()	const {	return ((TokNode *)this)->GetRight();	}
+    const TokNode *GetPrev()	const {	return ((TokNode *)this)->GetPrev();	}
+    const TokNode *GetNext()	const {	return ((TokNode *)this)->GetNext();	}
 
-	TokNode *GetChildTry( size_t i ) const { return i < mpChilds.size() ? mpChilds[i] : NULL; }
+    TokNode *GetChildTry( size_t i ) const { return i < mpChilds.size() ? mpChilds[i] : NULL; }
 
-		  DVec<Variable> &GetVars()			{ return mVariables;	}
-	const DVec<Variable> &GetVars() const	{ return mVariables;	}
+          DVec<Variable> &GetVars()			{ return mVariables;	}
+    const DVec<Variable> &GetVars() const	{ return mVariables;	}
 
-		  DVec<Function> &GetFuncs()		{ return mFunctions;	}
-	const DVec<Function> &GetFuncs() const	{ return mFunctions;	}
+          DVec<Function> &GetFuncs()		{ return mFunctions;	}
+    const DVec<Function> &GetFuncs() const	{ return mFunctions;	}
 
-	VarLink FindVariableByDefName( const char *pName );
+    VarLink FindVariableByDefName( const char *pName );
 
-	bool IsCodeBlock() const			{ return mBlockType == BLKT_CODEBLOCK; }
-	bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
-	bool IsNonTerminal() const			{ return mpToken ? GetTokIDType() == T_TYPE_NONTERM : false; }
-	bool IsFuncOp() const				{ return mpToken ? GetTokIDType() == T_TYPE_FUNCOP : false; }
-	bool IsDataType() const				{ return mpToken ? GetTokIDType() == T_TYPE_DATATYPE : false; }
-	bool IsTokenID( TokenID id ) const	{ return mpToken ? GetTokID() == id : false; }
+    bool IsCodeBlock() const			{ return mBlockType == BLKT_CODEBLOCK; }
+    bool IsExpressionBlock() const		{ return mBlockType == BLKT_EXPRESSION; }
+    bool IsNonTerminal() const			{ return mpToken ? GetTokIDType() == T_TYPE_NONTERM : false; }
+    bool IsFuncOp() const				{ return mpToken ? GetTokIDType() == T_TYPE_FUNCOP : false; }
+    bool IsDataType() const				{ return mpToken ? GetTokIDType() == T_TYPE_DATATYPE : false; }
+    bool IsTokenID( TokenID id ) const	{ return mpToken ? GetTokID() == id : false; }
 
-	bool IsParentRoot() const			{ return mpParent && mpParent->mpParent == NULL;	}
+    bool IsParentRoot() const			{ return mpParent && mpParent->mpParent == NULL;	}
 
-	void UnlinkFromParent();
+    void UnlinkFromParent();
 
-	void Reparent( TokNode *pNewParent );
+    void Reparent( TokNode *pNewParent );
 
-	void ReplaceNode( TokNode *pOldNode );
+    void ReplaceNode( TokNode *pOldNode );
 
-	const	Variable *GetVarPtr() const	{	return mVarLink.GetVarPtr();	}
-			Variable *GetVarPtr()		{	return mVarLink.GetVarPtr();	}
+    const	Variable *GetVarPtr() const	{	return mVarLink.GetVarPtr();	}
+            Variable *GetVarPtr()		{	return mVarLink.GetVarPtr();	}
 
-	Register GetRegister() const;
+    Register GetRegister() const;
 
-	bool	IsVarArray() const;
-	VarType GetVarType() const;
+    bool	IsVarArray() const;
+    VarType GetVarType() const;
 
-	bool IsVarying() const;
-	bool TrySetVarying_AndForceIfTrue( bool onoff );
+    bool IsVarying() const;
+    bool TrySetVarying_AndForceIfTrue( bool onoff );
 };
 
 //==================================================================

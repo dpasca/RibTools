@@ -20,36 +20,36 @@ namespace DIO
 class FileManagerBase
 {
 public:
-	//FileManagerBase() {}
-	virtual ~FileManagerBase() {}
+    //FileManagerBase() {}
+    virtual ~FileManagerBase() {}
 
-	virtual void GrabFile( const char *pFileName, DVec<U8> &out_vec ) = 0;
-	virtual bool FileExists( const char *pFileName ) = 0;
+    virtual void GrabFile( const char *pFileName, DVec<U8> &out_vec ) = 0;
+    virtual bool FileExists( const char *pFileName ) = 0;
 
-	void GrabFile( const char *pFileName, DUT::MemFile &mf )
-	{
-		DVec<U8>	vec;
-		GrabFile( pFileName, vec );
-		mf.InitExclusiveOwenership( vec );
-	}
+    void GrabFile( const char *pFileName, DUT::MemFile &mf )
+    {
+        DVec<U8>	vec;
+        GrabFile( pFileName, vec );
+        mf.InitExclusiveOwenership( vec );
+    }
 };
 
 //==================================================================
 class FileManagerDisk : public FileManagerBase
 {
 public:
-		~FileManagerDisk() {}
+        ~FileManagerDisk() {}
 
-		void GrabFile( const char *pFileName, DVec<U8> &out_vec )
-		{
-			if NOT( DUT::GrabFile( pFileName, out_vec ) )
-				DEX_RUNTIME_ERROR( "Could not grab the file '%s'", pFileName );
-		}
+        void GrabFile( const char *pFileName, DVec<U8> &out_vec )
+        {
+            if NOT( DUT::GrabFile( pFileName, out_vec ) )
+                DEX_RUNTIME_ERROR( "Could not grab the file '%s'", pFileName );
+        }
 
-		bool FileExists( const char *pFileName )
-		{
-			return DUT::FileExists( pFileName );
-		}
+        bool FileExists( const char *pFileName )
+        {
+            return DUT::FileExists( pFileName );
+        }
 };
 
 //==================================================================

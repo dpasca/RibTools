@@ -17,23 +17,23 @@
 //==================================================================
 DispDriverFile::DispDriverFile( const char *pFileName, const DIMG::Image &srcImg )
 {
-	const char *pExt = DUT::GetFileNameExt( pFileName );
+    const char *pExt = DUT::GetFileNameExt( pFileName );
 
-	if ( 0 == strcasecmp( pExt, "jpg" ) ||
-		 0 == strcasecmp( pExt, "jpeg" ) )
-	{
-		DIMG::SaveJPEG( srcImg, pFileName );
-	}
-	else
-	if ( 0 == strcasecmp( pExt, "tif" ) ||
-		 0 == strcasecmp( pExt, "tiff" ) )
-	{
-		DIMG::SaveTIFF( srcImg, pFileName );
-	}
-	else
-	{
-		DASSTHROW( 0, ("Unsupported file type '%s'", pExt) );
-	}
+    if ( 0 == strcasecmp( pExt, "jpg" ) ||
+         0 == strcasecmp( pExt, "jpeg" ) )
+    {
+        DIMG::SaveJPEG( srcImg, pFileName );
+    }
+    else
+    if ( 0 == strcasecmp( pExt, "tif" ) ||
+         0 == strcasecmp( pExt, "tiff" ) )
+    {
+        DIMG::SaveTIFF( srcImg, pFileName );
+    }
+    else
+    {
+        DASSTHROW( 0, ("Unsupported file type '%s'", pExt) );
+    }
 }
 
 //==================================================================

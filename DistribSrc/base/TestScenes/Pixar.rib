@@ -15,12 +15,12 @@ TransformBegin
     TransformBegin
     Cylinder 0.1 -0.5 0.5 360
     TransformEnd
-	TransformBegin
-	Translate .25 0 .25
-	Scale .2 .2 .2
-	Rotate 90.0 1 0 0
-	Torus 1.0 0.5 0 360 360
-	TransformEnd
+    TransformBegin
+    Translate .25 0 .25
+    Scale .2 .2 .2
+    Rotate 90.0 1 0 0
+    Torus 1.0 0.5 0 360 360
+    TransformEnd
 TransformEnd
 
 Translate .9 0 0
@@ -37,8 +37,8 @@ Translate .85 0 0
 
 # X
 TransformBegin
-	Scale .8 1 .5
-	Scale .5 .5 .5
+    Scale .8 1 .5
+    Scale .5 .5 .5
     Translate  0 0  -1 
     Hyperboloid 1 0.3 -1 -1 0.3 1 360 
 TransformEnd
@@ -59,9 +59,9 @@ Translate .7 0 0
 TransformBegin
     Scale 1 1 .5
     Translate 0 0 -.4
-	TransformBegin
-	Cylinder 0.1 -0.6 0.3 360
-	TransformEnd
+    TransformBegin
+    Cylinder 0.1 -0.6 0.3 360
+    TransformEnd
     Translate 0 0 .15
     Rotate 90.0 0 1 0
     Rotate 90.0 0 0 1

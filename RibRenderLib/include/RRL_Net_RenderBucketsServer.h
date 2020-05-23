@@ -28,15 +28,15 @@ namespace NET
 //==================================================================
 class RenderBucketsServer : public RI::RenderBucketsBase
 {
-	DNET::PacketManager	*mpPakMan;
+    DNET::PacketManager	*mpPakMan;
 
 public:
-	RenderBucketsServer( DNET::PacketManager &pakMan );
-	void Render( RI::Hider &hider );
+    RenderBucketsServer( DNET::PacketManager &pakMan );
+    void Render( RI::Hider &hider );
 
 private:
-	void rendBucketsRange( RI::Hider &hider, int buckRangeX1, int buckRangeX2 );
-	void sendBucketsData( RI::Hider &hider, int buckRangeX1, int buckRangeX2 );
+    void rendBucketsRange( RI::Hider &hider, int buckRangeX1, int buckRangeX2 );
+    void sendBucketsData( RI::Hider &hider, int buckRangeX1, int buckRangeX2 );
 };
 
 //==================================================================

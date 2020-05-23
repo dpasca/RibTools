@@ -7,7 +7,7 @@
 //==================================================================
 
 #if !defined(TARGET_OS_IPHONE)
-	#error This is for iPhone only !
+    #error This is for iPhone only !
 #endif
 
 #ifndef IPH_UTILS_H

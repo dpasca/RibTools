@@ -17,8 +17,8 @@
 class DispDriverFile
 {
 public:
-	DispDriverFile( const char *pFileName, const DIMG::Image &srcImg );	
-	~DispDriverFile();
+    DispDriverFile( const char *pFileName, const DIMG::Image &srcImg );	
+    ~DispDriverFile();
 };
 
 #endif

@@ -20,108 +20,108 @@ namespace RI
 //==================================================================
 static void fillKnot( DVec<float> &out_knots, const float *pSrcKnots, int n, int order )
 {
-	out_knots.resize( n + order );
-	for (size_t i=0; i < out_knots.size(); ++i)
-	{
-		if ( i > 0 )
-			DASSTHROW( pSrcKnots[i-1] <= pSrcKnots[i], "Invalid knot value" );
+    out_knots.resize( n + order );
+    for (size_t i=0; i < out_knots.size(); ++i)
+    {
+        if ( i > 0 )
+            DASSTHROW( pSrcKnots[i-1] <= pSrcKnots[i], "Invalid knot value" );
 
-		out_knots[i] = pSrcKnots[i];
-	}
+        out_knots[i] = pSrcKnots[i];
+    }
 }
 
 //==================================================================
 /// NuPatch
 //==================================================================
 NuPatch::NuPatch(
-			int			nu		,
-			int			uorder	,
-			const float	*pUknot	,
-			float		umin	,
-			float		umax	,
-			int			nv		,
-			int			vorder	,
-			const float	*pVknot	,
-			float		vmin	,
-			float		vmax	,
-			ParamList	&params
-			) :
-		SimplePrimitiveBase(PrimitiveBase::NUPATCH, umin, umax, vmin, vmax)
+            int			nu		,
+            int			uorder	,
+            const float	*pUknot	,
+            float		umin	,
+            float		umax	,
+            int			nv		,
+            int			vorder	,
+            const float	*pVknot	,
+            float		vmin	,
+            float		vmax	,
+            ParamList	&params
+            ) :
+        SimplePrimitiveBase(PrimitiveBase::NUPATCH, umin, umax, vmin, vmax)
 {
-	moBaseDef = DNEW BaseDef( uorder, vorder, nu, nv );
+    moBaseDef = DNEW BaseDef( uorder, vorder, nu, nv );
 
-	DASSTHROW( uorder > 1 && vorder > 1, "Patch order must be 2 or larger" );
-	DASSTHROW( uorder <= MAXORDER && vorder <= MAXORDER, "Patch order must be no higher than %i", MAXORDER );
-	DASSTHROW( umin < umax && vmin < vmax, "'min' parameter must be less than 'max'" );
+    DASSTHROW( uorder > 1 && vorder > 1, "Patch order must be 2 or larger" );
+    DASSTHROW( uorder <= MAXORDER && vorder <= MAXORDER, "Patch order must be no higher than %i", MAXORDER );
+    DASSTHROW( umin < umax && vmin < vmax, "'min' parameter must be less than 'max'" );
 
-	fillKnot( moBaseDef->mUKnots, pUknot, nu, uorder );
-	fillKnot( moBaseDef->mVKnots, pVknot, nv, vorder );
+    fillKnot( moBaseDef->mUKnots, pUknot, nu, uorder );
+    fillKnot( moBaseDef->mVKnots, pVknot, nv, vorder );
 
-	// order-1 really ?
-	DASSTHROW(
-		umin >= moBaseDef->mUKnots[ uorder-2 ] &&
-		vmin >= moBaseDef->mVKnots[ vorder-2 ],
-		"'min' parameter must be larger or equal of knot[ order-2 ]" );
+    // order-1 really ?
+    DASSTHROW(
+        umin >= moBaseDef->mUKnots[ uorder-2 ] &&
+        vmin >= moBaseDef->mVKnots[ vorder-2 ],
+        "'min' parameter must be larger or equal of knot[ order-2 ]" );
 
-	DASSTHROW(
-		umax <= moBaseDef->mUKnots[ nu ] &&
-		vmax <= moBaseDef->mVKnots[ nv ],
-		"'max' less than knot[ n-1 ]" );
+    DASSTHROW(
+        umax <= moBaseDef->mUKnots[ nu ] &&
+        vmax <= moBaseDef->mVKnots[ nv ],
+        "'max' less than knot[ n-1 ]" );
 
-	int	udegree = uorder - 1;
-	int	vdegree = vorder - 1;
+    int	udegree = uorder - 1;
+    int	vdegree = vorder - 1;
 
-	int	uSegmentsN = nu - udegree;
-	int	vSegmentsN = nv - udegree;
+    int	uSegmentsN = nu - udegree;
+    int	vSegmentsN = nv - udegree;
 
-	DASSTHROW( uSegmentsN <= 0 || vSegmentsN, "The patch generates no segments !" );
+    DASSTHROW( uSegmentsN <= 0 || vSegmentsN, "The patch generates no segments !" );
 
-	size_t	nVarsUniform = (size_t)(uSegmentsN * vSegmentsN);
-	size_t	nVarsVarying = (size_t)((uSegmentsN + 1) * (vSegmentsN + 1));
-	size_t	nPoints		 = (size_t)(nu * nv);
+    size_t	nVarsUniform = (size_t)(uSegmentsN * vSegmentsN);
+    size_t	nVarsVarying = (size_t)((uSegmentsN + 1) * (vSegmentsN + 1));
+    size_t	nPoints		 = (size_t)(nu * nv);
 
-	size_t	curParamIdx = 10;
+    size_t	curParamIdx = 10;
 
-	int		PValuesParIdx;
-	size_t	dimsN = 3;
+    int		PValuesParIdx;
+    size_t	dimsN = 3;
 
-	// do we have 'P' ?
-	PValuesParIdx = FindParam( "P", Param::FLT_ARR, (int)curParamIdx, params );
-	if ( PValuesParIdx == -1 )
-	{
-		// must have 'Pw' then !
-		PValuesParIdx = FindParam( "Pw", Param::FLT_ARR, (int)curParamIdx, params );
-		if ( PValuesParIdx == -1 )
-		{
-			DASSTHROW( 0, "Missing P or Pw parameter" );
-			return;
-		}
+    // do we have 'P' ?
+    PValuesParIdx = FindParam( "P", Param::FLT_ARR, (int)curParamIdx, params );
+    if ( PValuesParIdx == -1 )
+    {
+        // must have 'Pw' then !
+        PValuesParIdx = FindParam( "Pw", Param::FLT_ARR, (int)curParamIdx, params );
+        if ( PValuesParIdx == -1 )
+        {
+            DASSTHROW( 0, "Missing P or Pw parameter" );
+            return;
+        }
 
-		dimsN = 4;
-	}
+        dimsN = 4;
+    }
 
-	curParamIdx += 1;
+    curParamIdx += 1;
 
-	const float	*pSrcPos = params[PValuesParIdx].PFlt( nPoints * dimsN );
+    const float	*pSrcPos = params[PValuesParIdx].PFlt( nPoints * dimsN );
 
-	if ( dimsN == 3 )
-	{
-		moBaseDef->mCtrlPws.resize( nPoints );
-		for (size_t i=0; i < nPoints; ++i)
-		{
-			Float4	&pw = moBaseDef->mCtrlPws[i];
-			pw.x() = pSrcPos[ i*3 + 0 ];
-			pw.x() = pSrcPos[ i*3 + 1 ];
-			pw.x() = pSrcPos[ i*3 + 2 ];
-			pw.w() = 1.0f;
-		}
-	}
-	else
-	{
-		moBaseDef->mCtrlPws.resize( nPoints );
-		for (size_t i=0; i < nPoints; ++i)
-			moBaseDef->mCtrlPws[i].Set( pSrcPos + i*4 );
-	}
+    if ( dimsN == 3 )
+    {
+        moBaseDef->mCtrlPws.resize( nPoints );
+        for (size_t i=0; i < nPoints; ++i)
+        {
+            Float4	&pw = moBaseDef->mCtrlPws[i];
+            pw.x() = pSrcPos[ i*3 + 0 ];
+            pw.x() = pSrcPos[ i*3 + 1 ];
+            pw.x() = pSrcPos[ i*3 + 2 ];
+            pw.w() = 1.0f;
+        }
+    }
+    else
+    {
+        moBaseDef->mCtrlPws.resize( nPoints );
+        for (size_t i=0; i < nPoints; ++i)
+            moBaseDef->mCtrlPws[i].Set( pSrcPos + i*4 );
+    }
 }
 
 //==================================================================
@@ -135,37 +135,37 @@ NuPatch::NuPatch(
  *	kv  is the knot vector ([0..m+k-1]) to find the break point in.
  */
 static Int_ findBreakPoint(
-					const Float_		&u,
-					const DVec<float>	&kv,
-					int					m,
-					int					k )
+                    const Float_		&u,
+                    const DVec<float>	&kv,
+                    int					m,
+                    int					k )
 {
-	Int_	ret;
+    Int_	ret;
 
-	for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
-	{
-		// make sure that 'u' isn't larger than
-		// the largest node value !!!
-		// (should handle eventual error introduced in uvs
-		// when splitting/dicing)
-		float	useU = D::Min( u[smdx_], kv[m+k] );
+    for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
+    {
+        // make sure that 'u' isn't larger than
+        // the largest node value !!!
+        // (should handle eventual error introduced in uvs
+        // when splitting/dicing)
+        float	useU = D::Min( u[smdx_], kv[m+k] );
 
-		if ( useU == kv[m+1] )	// Special case for closed interval
-		{
-			ret[smdx_] = m;
-		}
-		else
-		{
-			int i = m + k;
+        if ( useU == kv[m+1] )	// Special case for closed interval
+        {
+            ret[smdx_] = m;
+        }
+        else
+        {
+            int i = m + k;
 
-			while ( useU < kv[i] && i > 0 )
-				--i;
+            while ( useU < kv[i] && i > 0 )
+                --i;
 
-			ret[smdx_] = i;
-		}
-	}
+            ret[smdx_] = i;
+        }
+    }
 
-	return ret;
+    return ret;
 }
 
 //==================================================================
@@ -180,67 +180,67 @@ static Int_ findBreakPoint(
  * (From Bartels, Beatty & Barsky, p.387)
  */
 static void basisFunctions(
-					const Float_		&u,
-					const Int_		&brkPoint,
-					const DVec<float>	&kv,
-					int					k,
-					Float_			bvals[] )
+                    const Float_		&u,
+                    const Int_		&brkPoint,
+                    const DVec<float>	&kv,
+                    int					k,
+                    Float_			bvals[] )
 {
     bvals[0] = 1.0f;
 
     for (int r = 2; r <= k; r++)
     {
-		bvals[r - 1] = 0.0f;
+        bvals[r - 1] = 0.0f;
 
-		for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
-		{
-			int i = brkPoint[smdx_] - r + 1;
-			
-			for (int s = r-2; s >= 0; --s)
-			{
-				++i;
+        for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
+        {
+            int i = brkPoint[smdx_] - r + 1;
+            
+            for (int s = r-2; s >= 0; --s)
+            {
+                ++i;
 
-				float omega;
+                float omega;
 
-				if (i < 0)
-					omega = 0;
-				else
-					omega = (u[smdx_] - kv[i]) / (kv[i + r - 1] - kv[i]);
+                if (i < 0)
+                    omega = 0;
+                else
+                    omega = (u[smdx_] - kv[i]) / (kv[i + r - 1] - kv[i]);
 
-				bvals[s + 1][smdx_] += (1 - omega) * bvals[s][smdx_];
-				bvals[s][smdx_] = omega * bvals[s][smdx_];
-			}
-		}
+                bvals[s + 1][smdx_] += (1 - omega) * bvals[s][smdx_];
+                bvals[s][smdx_] = omega * bvals[s][smdx_];
+            }
+        }
     }
 }
 
 //==================================================================
 // Compute derivatives of the basis functions Bi,k(u)'
 static void basisDerivatives(
-					const Float_		&u,
-					const Int_		&brkPoint,
-					const DVec<float>	&kv,
-					int					k,
-					Float_			dvals[] )
+                    const Float_		&u,
+                    const Int_		&brkPoint,
+                    const DVec<float>	&kv,
+                    int					k,
+                    Float_			dvals[] )
 {
     basisFunctions( u, brkPoint, kv, k - 1, dvals );
 
     dvals[k-1] = 0.f;	    // basisFunctions misses this
 
-	for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
-	{
-		float knotScale = kv[brkPoint[smdx_] + 1] - kv[brkPoint[smdx_]];
+    for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
+    {
+        float knotScale = kv[brkPoint[smdx_] + 1] - kv[brkPoint[smdx_]];
 
-		int i = brkPoint[smdx_] - k + 1;
-		for (int s = k - 2; s >= 0; --s)
-		{
-			++i;
+        int i = brkPoint[smdx_] - k + 1;
+        for (int s = k - 2; s >= 0; --s)
+        {
+            ++i;
 
-			float omega = knotScale * ((float)(k-1)) / (kv[i+k-1] - kv[i]);
-			dvals[s + 1][smdx_] += -omega * dvals[s][smdx_];
-			dvals[s    ][smdx_] *= omega;
-		}
-	}
+            float omega = knotScale * ((float)(k-1)) / (kv[i+k-1] - kv[i]);
+            dvals[s + 1][smdx_] += -omega * dvals[s][smdx_];
+            dvals[s    ][smdx_] *= omega;
+        }
+    }
 }
 
 //==================================================================
@@ -252,106 +252,106 @@ static void basisDerivatives(
  * (kvU[orderU] <= u < kvU[numU), (kvV[orderV] <= v < kvV[numV])
  */
 void NuPatch::Eval_dPdu_dPdv(
-				const Float2_ &uv,
-				Float3_ &out_pt,
-				Float3_ *out_dPdu,
-				Float3_ *out_dPdv ) const
+                const Float2_ &uv,
+                Float3_ &out_pt,
+                Float3_ *out_dPdu,
+                Float3_ *out_dPdv ) const
 {
-	int	uorder = moBaseDef->mUOrder;
-	int	vorder = moBaseDef->mVOrder;
+    int	uorder = moBaseDef->mUOrder;
+    int	vorder = moBaseDef->mVOrder;
 
-	int	udegree = uorder - 1;
-	int	vdegree = vorder - 1;
+    int	udegree = uorder - 1;
+    int	vdegree = vorder - 1;
 
-	int	uSegmentsN = moBaseDef->mNu - udegree;
-	int	vSegmentsN = moBaseDef->mNv - vdegree;
+    int	uSegmentsN = moBaseDef->mNu - udegree;
+    int	vSegmentsN = moBaseDef->mNv - vdegree;
 
-	const DVec<float> &uknots =	moBaseDef->mUKnots;
-	const DVec<float> &vknots =	moBaseDef->mVKnots;
+    const DVec<float> &uknots =	moBaseDef->mUKnots;
+    const DVec<float> &vknots =	moBaseDef->mVKnots;
 
-	size_t	stride = uSegmentsN + 1;
+    size_t	stride = uSegmentsN + 1;
 
-	out_pt.SetZero();
+    out_pt.SetZero();
 
-	if ( out_dPdu )
-	{
-		out_dPdu->SetZero();
-		out_dPdv->SetZero();
-	}
+    if ( out_dPdu )
+    {
+        out_dPdu->SetZero();
+        out_dPdv->SetZero();
+    }
 
-	Float_ bu[MAXORDER], buprime[MAXORDER];
+    Float_ bu[MAXORDER], buprime[MAXORDER];
     Float_ bv[MAXORDER], bvprime[MAXORDER];
 
-	Float4_ r( 0.f );
-	Float4_ rutan( 0.f );
-	Float4_ rvtan( 0.f );
+    Float4_ r( 0.f );
+    Float4_ rutan( 0.f );
+    Float4_ rvtan( 0.f );
 
     // Evaluate non-uniform basis functions (and derivatives)
-	Int_ ubrkPoint = findBreakPoint( uv[0], uknots, moBaseDef->mNu-1, uorder );
-	Int_ ufirst = ubrkPoint - uorder + 1;
-	basisFunctions( uv[0], ubrkPoint, uknots, uorder, bu );
+    Int_ ubrkPoint = findBreakPoint( uv[0], uknots, moBaseDef->mNu-1, uorder );
+    Int_ ufirst = ubrkPoint - uorder + 1;
+    basisFunctions( uv[0], ubrkPoint, uknots, uorder, bu );
 
-	if (out_dPdu)
-		basisDerivatives( uv[0], ubrkPoint, uknots, uorder, buprime );
+    if (out_dPdu)
+        basisDerivatives( uv[0], ubrkPoint, uknots, uorder, buprime );
 
-	Int_ vbrkPoint = findBreakPoint( uv[1], vknots, moBaseDef->mNv-1, vorder );
-	Int_ vfirst = vbrkPoint - vorder + 1;
-	basisFunctions( uv[1], vbrkPoint, vknots, vorder, bv );
+    Int_ vbrkPoint = findBreakPoint( uv[1], vknots, moBaseDef->mNv-1, vorder );
+    Int_ vfirst = vbrkPoint - vorder + 1;
+    basisFunctions( uv[1], vbrkPoint, vknots, vorder, bv );
 
-	if (out_dPdv)
-		basisDerivatives( uv[1], vbrkPoint, vknots, vorder, bvprime );
+    if (out_dPdv)
+        basisDerivatives( uv[1], vbrkPoint, vknots, vorder, bvprime );
 
-	// Weight control points against the basis functions
+    // Weight control points against the basis functions
 
-	int	ptsPerRow = moBaseDef->mNu;
+    int	ptsPerRow = moBaseDef->mNu;
 
-	Int_	idx = vfirst * ptsPerRow + ufirst;
+    Int_	idx = vfirst * ptsPerRow + ufirst;
 
-	const DVec<Float4>	&ctrlPws = moBaseDef->mCtrlPws;
+    const DVec<Float4>	&ctrlPws = moBaseDef->mCtrlPws;
 
     for (int i = 0; i < vorder; ++i)
-	{
-		int ri = vorder - 1 - i;
+    {
+        int ri = vorder - 1 - i;
 
-		for (int j = 0; j < uorder; ++j)
-		{
-			int rj = uorder - 1 - j;
+        for (int j = 0; j < uorder; ++j)
+        {
+            int rj = uorder - 1 - j;
 
-		    Float4_	srcPw;		
-			for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
-			{
-				Float4	tmp = ctrlPws[ idx[smdx_] + j ];
-				srcPw.x()[smdx_] = tmp.x();
-				srcPw.y()[smdx_] = tmp.y();
-				srcPw.z()[smdx_] = tmp.z();
-				srcPw.w()[smdx_] = tmp.w();
-			}
+            Float4_	srcPw;		
+            for (size_t smdx_=0; smdx_ < DMT_SIMD_FLEN; ++smdx_)
+            {
+                Float4	tmp = ctrlPws[ idx[smdx_] + j ];
+                srcPw.x()[smdx_] = tmp.x();
+                srcPw.y()[smdx_] = tmp.y();
+                srcPw.z()[smdx_] = tmp.z();
+                srcPw.w()[smdx_] = tmp.w();
+            }
 
-			Float_ tensor = bu[rj] * bv[ri];
+            Float_ tensor = bu[rj] * bv[ri];
 
-			r += srcPw * tensor;
+            r += srcPw * tensor;
 
-			if ( out_dPdu )
-			{
-				tensor = buprime[rj] * bv[ri];
-				rutan += srcPw * tensor;
+            if ( out_dPdu )
+            {
+                tensor = buprime[rj] * bv[ri];
+                rutan += srcPw * tensor;
 
-				tensor = bu[rj] * bvprime[ri];
-				rvtan += srcPw * tensor;
-			}
-		}
+                tensor = bu[rj] * bvprime[ri];
+                rvtan += srcPw * tensor;
+            }
+        }
 
-		idx += ptsPerRow;
-	}
+        idx += ptsPerRow;
+    }
 
-	if ( out_dPdu )
-	{
-		// Project tangents, using the quotient rule for differentiation
-		Float_ wsqrdiv = Float_( 1.f ) / (r.w() * r.w());
+    if ( out_dPdu )
+    {
+        // Project tangents, using the quotient rule for differentiation
+        Float_ wsqrdiv = Float_( 1.f ) / (r.w() * r.w());
 
-		*out_dPdu = (r.w() * rutan.GetAsV3() - rutan.w() * r.GetAsV3()) * wsqrdiv;
-		*out_dPdv = (r.w() * rvtan.GetAsV3() - rvtan.w() * r.GetAsV3()) * wsqrdiv;
-	}
+        *out_dPdu = (r.w() * rutan.GetAsV3() - rutan.w() * r.GetAsV3()) * wsqrdiv;
+        *out_dPdv = (r.w() * rvtan.GetAsV3() - rvtan.w() * r.GetAsV3()) * wsqrdiv;
+    }
 
     out_pt = r.GetAsV3() / r.w();
 }
@@ -359,7 +359,7 @@ void NuPatch::Eval_dPdu_dPdv(
 //==================================================================
 void NuPatch::MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
 {
-	MakeBoundFromUVRangeN<NuPatch,3>( *this, out_bound, out_pPo );
+    MakeBoundFromUVRangeN<NuPatch,3>( *this, out_bound, out_pPo );
 }
 
 //==================================================================

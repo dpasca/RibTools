@@ -15,17 +15,17 @@ namespace DUT {
 //==================================================================
 bool FileManagerStd::FileExists(const char* pFileName, const char* pMode) const
 {
-	FILE	*pFile = fopen( pFileName, "rb" );
+    FILE	*pFile = fopen( pFileName, "rb" );
 
-	if ( pFile )
-	{
-		fclose( pFile );
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    if ( pFile )
+    {
+        fclose( pFile );
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 //==================================================================
@@ -35,24 +35,24 @@ bool FileManagerStd::GrabFile(const char* pFileName, DVec<U8> &out_data, const c
     // DLOG("File: %s", pFileName);
 
     //(void )pMode;
-	out_data.clear();
+    out_data.clear();
 
-	FILE	*pFile = fopen( pFileName, "rb" );
-	if NOT( pFile )
-	{
-		return false;
-	}
+    FILE	*pFile = fopen( pFileName, "rb" );
+    if NOT( pFile )
+    {
+        return false;
+    }
 
-	fseek( pFile, 0, SEEK_END );
-	out_data.resize( ftell( pFile ) );
-	fseek( pFile, 0, SEEK_SET );
+    fseek( pFile, 0, SEEK_END );
+    out_data.resize( ftell( pFile ) );
+    fseek( pFile, 0, SEEK_SET );
 
-	if ( out_data.size() )
-		fread( &out_data[0], 1, out_data.size(), pFile );
+    if ( out_data.size() )
+        fread( &out_data[0], 1, out_data.size(), pFile );
 
-	fclose( pFile );
+    fclose( pFile );
 
-	return true;
+    return true;
 }
 
 //==================================================================
@@ -61,21 +61,21 @@ bool FileManagerStd::SaveFile(const char* pFileName, const U8 *pInData, size_t d
     DFUNCTION();
     DLOG("Saving file: %s", pFileName);
 
-	FILE	*pFile = fopen( pFileName, "wb" );
-	if NOT( pFile )
-	{
-		return false;
-	}
+    FILE	*pFile = fopen( pFileName, "wb" );
+    if NOT( pFile )
+    {
+        return false;
+    }
 
-	if ( dataSize != fwrite( pInData, 1, dataSize, pFile ) )
-	{
-		fclose( pFile );
-		return false;
-	}
+    if ( dataSize != fwrite( pInData, 1, dataSize, pFile ) )
+    {
+        fclose( pFile );
+        return false;
+    }
 
-	fclose( pFile );
+    fclose( pFile );
 
-	return true;
+    return true;
 }
 
 //==================================================================

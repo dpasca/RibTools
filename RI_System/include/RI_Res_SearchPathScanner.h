@@ -16,22 +16,22 @@ namespace RI
 //==================================================================
 class SearchPathScanner
 {
-	size_t				mIdx;
-	const char			*mpBaseDir;
-	const char			*mpDefaultDir;
-	const DVec<DStr>	*mpSearchPaths;
+    size_t				mIdx;
+    const char			*mpBaseDir;
+    const char			*mpDefaultDir;
+    const DVec<DStr>	*mpSearchPaths;
 
 public:
-	SearchPathScanner(
-				const char *pBaseDir,
-				const char *pDefaultDir,
-				const DVec<DStr> &searchPaths );
+    SearchPathScanner(
+                const char *pBaseDir,
+                const char *pDefaultDir,
+                const DVec<DStr> &searchPaths );
 
-	bool GetNext( DStr &out_path, bool &out_pathIsAbsolute );
+    bool GetNext( DStr &out_path, bool &out_pathIsAbsolute );
 
 private:
-	bool getNextNoSPathList( DStr &out_path, bool &out_pathIsAbsolute );
-	bool getNextWithSPathList( DStr &out_path, bool &out_pathIsAbsolute );
+    bool getNextNoSPathList( DStr &out_path, bool &out_pathIsAbsolute );
+    bool getNextWithSPathList( DStr &out_path, bool &out_pathIsAbsolute );
 };
 
 

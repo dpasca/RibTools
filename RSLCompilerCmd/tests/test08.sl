@@ -8,6 +8,6 @@
 
 surface test8()
 {
-	Ci = diffuse( N );
-	Oi = 1;
+    Ci = diffuse( N );
+    Oi = 1;
 }

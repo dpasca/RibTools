@@ -38,21 +38,21 @@ void ShowAlert( const char *pTitle, const char *pText );
 //==================================================================
 class QuickProf
 {
-	const char *mpMsg;
-	I64			mStart;
+    const char *mpMsg;
+    I64			mStart;
 
 public:
-	QuickProf( const char *pMsg ) :
-		mpMsg(pMsg)
-	{
-		mStart = DUT::GetTimeTicks();
-	}
+    QuickProf( const char *pMsg ) :
+        mpMsg(pMsg)
+    {
+        mStart = DUT::GetTimeTicks();
+    }
 
-	~QuickProf()
-	{
-		I64	elapsed = DUT::GetTimeTicks() - mStart;
-		printf( "%s: %4.2lf ms\n", mpMsg, DUT::TimeTicksToMS( elapsed ) );
-	}
+    ~QuickProf()
+    {
+        I64	elapsed = DUT::GetTimeTicks() - mStart;
+        printf( "%s: %4.2lf ms\n", mpMsg, DUT::TimeTicksToMS( elapsed ) );
+    }
 };
 
 //==================================================================
@@ -60,61 +60,61 @@ public:
 //==================================================================
 class TimeOut
 {
-	I64	mStartTicks;
-	U32	mTimeOutMS;
+    I64	mStartTicks;
+    U32	mTimeOutMS;
 
 public:
-	TimeOut( U32 timeoutMS ) :
-		mStartTicks(GetTimeTicks()),
-		mTimeOutMS(timeoutMS)
-	{
-	}
+    TimeOut( U32 timeoutMS ) :
+        mStartTicks(GetTimeTicks()),
+        mTimeOutMS(timeoutMS)
+    {
+    }
 
-	bool IsExpired() const
-	{
-		I64 delta = GetTimeTicks() - mStartTicks;
+    bool IsExpired() const
+    {
+        I64 delta = GetTimeTicks() - mStartTicks;
 
-		return TimeTicksToMS( delta ) > mTimeOutMS;
-	}
+        return TimeTicksToMS( delta ) > mTimeOutMS;
+    }
 
-	void Reset()
-	{
-		mStartTicks = GetTimeTicks();
-	}
+    void Reset()
+    {
+        mStartTicks = GetTimeTicks();
+    }
 };
 
 //==================================================================
 class CharScreen
 {
 public:
-	typedef void (* UpdateCBackType)( void *pUserData );
+    typedef void (* UpdateCBackType)( void *pUserData );
 
-	int				mPx;
-	int				mPy;
-	int				mAlignX;
-	int				mAlignY;
-	UpdateCBackType	mpCBack;
-	void			*mpCtx;
-	u_int			mNX;
-	DVec<DStr>		mLines;
+    int				mPx;
+    int				mPy;
+    int				mAlignX;
+    int				mAlignY;
+    UpdateCBackType	mpCBack;
+    void			*mpCtx;
+    u_int			mNX;
+    DVec<DStr>		mLines;
 
-	CharScreen() :
-		mPx(0),
-		mPy(0),
-		mAlignX(-1),
-		mAlignY(-1),
-		mpCBack(NULL),
-		mpCtx(NULL),
-		mNX(0)
-		{}
+    CharScreen() :
+        mPx(0),
+        mPy(0),
+        mAlignX(-1),
+        mAlignY(-1),
+        mpCBack(NULL),
+        mpCtx(NULL),
+        mNX(0)
+        {}
 
-	void clear();
+    void clear();
 
-	void AddLine( const char *pFmt, ... );
-	void AddLine();
+    void AddLine( const char *pFmt, ... );
+    void AddLine();
 
-	u_int GetNX() const { return mNX; }
-	u_int GetNY() const { return (u_int)mLines.size(); }
+    u_int GetNX() const { return mNX; }
+    u_int GetNY() const { return (u_int)mLines.size(); }
 };
 
 //==================================================================

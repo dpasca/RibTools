@@ -27,12 +27,12 @@ typedef unsigned int		uint32_t;
 #ifdef _MSC_VER
 inline int strcasecmp( const char *a, const char *b )
 {
-	return _stricmp( a, b );
+    return _stricmp( a, b );
 }
 
 inline int strncasecmp( const char *a, const char *b, size_t len )
 {
-	return _strnicmp( a, b, len );
+    return _strnicmp( a, b, len );
 }
 
 #define strtok_r	strtok_s
@@ -68,59 +68,59 @@ namespace D
 template <class T>
 T Lerp( const T& left, const T& right, float t )
 {
-	return (T)(left * (1-t) + right * t);
+    return (T)(left * (1-t) + right * t);
 }
 
 template <class T>
 T Lerp( const T& left, const T& right, double t )
 {
-	return (T)(left * (1-t) + right * t);
+    return (T)(left * (1-t) + right * t);
 }
 
 //===============================================================
 template <class T>
 T Clamp( const T& val, const T& left, const T& right )
 {
-	if ( val < left )	return left;	else
-	if ( val > right )	return right;	else
-						return val;
+    if ( val < left )	return left;	else
+    if ( val > right )	return right;	else
+                        return val;
 }
 
 //===============================================================
 template <class T>
 T Min( const T& left, const T& right )
 {
-	return DMIN( left, right );
+    return DMIN( left, right );
 }
 
 //===============================================================
 template <class T>
 T Max( const T& left, const T& right )
 {
-	return DMAX( left, right );
+    return DMAX( left, right );
 }
 
 //===============================================================
 template <class T>
 T Abs( const T& val )
 {
-	return val < 0 ? -val : val;
+    return val < 0 ? -val : val;
 }
 
 //===============================================================
 template <class T>
 T Sign( const T& val )
 {
-	return val < 0 ? (T)-1 : (T)1;
+    return val < 0 ? (T)-1 : (T)1;
 }
 
 //===============================================================
 template <class T>
 void Swap( T& left, T& right )
 {
-	T tmp = left;
-	left = right;
-	right = tmp;
+    T tmp = left;
+    left = right;
+    right = tmp;
 }
 
 //===============================================================
@@ -155,13 +155,13 @@ typedef unsigned int	u_int;
 // Assume that only Visual Studio means that we have unaligned
 // memory access.
 #if defined(_MSC_VER)
-	#define D_UNALIGNED_MEM_ACCESS
+    #define D_UNALIGNED_MEM_ACCESS
 #endif
 
 #if defined(_MSC_VER)
-	#define SIZE_T_FMT	"%Id"
+    #define SIZE_T_FMT	"%Id"
 #else
-	#define SIZE_T_FMT	"%zd"
+    #define SIZE_T_FMT	"%zd"
 #endif
 
 #endif

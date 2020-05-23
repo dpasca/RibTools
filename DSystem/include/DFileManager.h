@@ -16,12 +16,12 @@
 class DFileManagerBase
 {
 public:
-	DFileManagerBase(){}
-	virtual ~DFileManagerBase(){}
+    DFileManagerBase(){}
+    virtual ~DFileManagerBase(){}
 
-	virtual bool FileExists(const char* pFileName, const char* pMode) const = 0;
-	virtual bool GrabFile(const char* pFileName, DVec<U8> &out_data, const char* pMode) = 0;
-	virtual bool SaveFile(const char* pFileName, const U8 *pInData, size_t dataSize, const char* pMode) = 0;
+    virtual bool FileExists(const char* pFileName, const char* pMode) const = 0;
+    virtual bool GrabFile(const char* pFileName, DVec<U8> &out_data, const char* pMode) = 0;
+    virtual bool SaveFile(const char* pFileName, const U8 *pInData, size_t dataSize, const char* pMode) = 0;
 };
 
 #endif

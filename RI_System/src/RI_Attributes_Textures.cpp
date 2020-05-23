@@ -19,41 +19,41 @@ namespace RI
 //==================================================================
 Texture *Attributes::GetTexture( const char *pTextureName ) const
 {
-	// try see if we have it loaded already
-	Texture	*pTexture =
-			(Texture *)mpResManager->FindResource( pTextureName,
-													ResourceBase::TYPE_TEXTURE );
+    // try see if we have it loaded already
+    Texture	*pTexture =
+            (Texture *)mpResManager->FindResource( pTextureName,
+                                                    ResourceBase::TYPE_TEXTURE );
 
-	if ( pTexture )
-		return pTexture;
+    if ( pTexture )
+        return pTexture;
 
-	DStr	shaderFullPathName;
+    DStr	shaderFullPathName;
 
-	shaderFullPathName = mpState->FindResFile( pTextureName, Options::SEARCHPATH_TEXTURE );
+    shaderFullPathName = mpState->FindResFile( pTextureName, Options::SEARCHPATH_TEXTURE );
 
-	if ( shaderFullPathName.length() )
-	{
+    if ( shaderFullPathName.length() )
+    {
 /*
-		try {
+        try {
 */
-			// grab the file
-			DUT::MemFile	file;
-			mpState->GetFileManager().GrabFile( shaderFullPathName.c_str(), file );
+            // grab the file
+            DUT::MemFile	file;
+            mpState->GetFileManager().GrabFile( shaderFullPathName.c_str(), file );
 
-			// load the texture based on the file
-			pTexture = DNEW Texture( pTextureName, file );
+            // load the texture based on the file
+            pTexture = DNEW Texture( pTextureName, file );
 /*
-		} catch ( ... )
-		{
-			mpState->EXCEPTPrintf( "Could not load '%s' !", pTextureName );
-			return NULL;
-		}
+        } catch ( ... )
+        {
+            mpState->EXCEPTPrintf( "Could not load '%s' !", pTextureName );
+            return NULL;
+        }
 */
 
-		mpResManager->AddResource( pTexture );
-	}
+        mpResManager->AddResource( pTexture );
+    }
 
-	return pTexture;
+    return pTexture;
 }
 
 //==================================================================

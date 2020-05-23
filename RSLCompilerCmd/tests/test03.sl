@@ -4,13 +4,13 @@
 /*==========================================*/
 float dude( float a=1, bb )
 {
-	float c = a + bb;
-	return c + 1;
+    float c = a + bb;
+    return c + 1;
 }
 
 /*==========================================*/
 surface test3( float b )
 {
-	Ci = dude( 180, P );
-	Oi = Os;
+    Ci = dude( 180, P );
+    Oi = Os;
 }

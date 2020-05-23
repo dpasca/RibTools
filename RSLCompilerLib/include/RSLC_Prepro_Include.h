@@ -21,13 +21,13 @@ namespace PREPRO
 
 //==================================================================
 void HandleInclude(
-				DVec<Fat8>				&text,
-				size_t					i,
-				size_t					lineEnd,
-				size_t					includePoint,
-				DIO::FileManagerBase	&fmanager,
-				FatBase					&fatBase,
-				const char				*pCurShaderDir );
+                DVec<Fat8>				&text,
+                size_t					i,
+                size_t					lineEnd,
+                size_t					includePoint,
+                DIO::FileManagerBase	&fmanager,
+                FatBase					&fatBase,
+                const char				*pCurShaderDir );
 
 //==================================================================
 }

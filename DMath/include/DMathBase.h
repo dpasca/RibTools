@@ -10,121 +10,121 @@
 #define DMATHBASE_H
 
 #if defined(__linux__) || (__APPLE__)
-	#include <inttypes.h>
+    #include <inttypes.h>
 #endif
 
 #define DMATH_USE_M128
 //#define DMATH_USE_M512
 
 #if defined(DMATH_USE_M128)
-	#include <xmmintrin.h>
+    #include <xmmintrin.h>
 
-	#define DMT_SIMD_FLEN	4
-	#define DMT_SIMD_ALIGN_SIZE	16	//	DMT_SIMD_FLEN * 4
+    #define DMT_SIMD_FLEN	4
+    #define DMT_SIMD_ALIGN_SIZE	16	//	DMT_SIMD_FLEN * 4
 
-	// better reciprocal square root found on the Internet 8)
-	inline __m128 _mm_rsqrtnr_ps( __m128 x )
-	{
-	  __m128 t = _mm_rsqrt_ps(x);
-	  return _mm_mul_ps(  _mm_set_ps1( 0.5f ),
-						  _mm_mul_ps(_mm_sub_ps(  _mm_set_ps1( 3.0f ),
-												  _mm_mul_ps(_mm_mul_ps(x,t),t) ),t)  );
-	}
+    // better reciprocal square root found on the Internet 8)
+    inline __m128 _mm_rsqrtnr_ps( __m128 x )
+    {
+      __m128 t = _mm_rsqrt_ps(x);
+      return _mm_mul_ps(  _mm_set_ps1( 0.5f ),
+                          _mm_mul_ps(_mm_sub_ps(  _mm_set_ps1( 3.0f ),
+                                                  _mm_mul_ps(_mm_mul_ps(x,t),t) ),t)  );
+    }
 
-	//==================================================================
-	struct VecNMask
-	{
-		union
-		{
-			unsigned int	m[4];
-			__m128			v;
-		} u;
+    //==================================================================
+    struct VecNMask
+    {
+        union
+        {
+            unsigned int	m[4];
+            __m128			v;
+        } u;
 
-		VecNMask()						{}
+        VecNMask()						{}
 
-		VecNMask( const __m128 &from )	{	u.v = from; }
+        VecNMask( const __m128 &from )	{	u.v = from; }
 
-		VecNMask( unsigned int a, unsigned int b, unsigned int c, unsigned int d )
-		{
-			u.m[0] = a;
-			u.m[1] = b;
-			u.m[2] = c;
-			u.m[3] = d;
-		}
+        VecNMask( unsigned int a, unsigned int b, unsigned int c, unsigned int d )
+        {
+            u.m[0] = a;
+            u.m[1] = b;
+            u.m[2] = c;
+            u.m[3] = d;
+        }
 
-		friend VecNMask CmpMaskEQ( const VecNMask &lval, const VecNMask &rval ) { return _mm_cmpeq_ps( lval.u.v, rval.u.v );  }
-		friend VecNMask CmpMaskNE( const VecNMask &lval, const VecNMask &rval ) { return _mm_cmpneq_ps( lval.u.v, rval.u.v ); }
+        friend VecNMask CmpMaskEQ( const VecNMask &lval, const VecNMask &rval ) { return _mm_cmpeq_ps( lval.u.v, rval.u.v );  }
+        friend VecNMask CmpMaskNE( const VecNMask &lval, const VecNMask &rval ) { return _mm_cmpneq_ps( lval.u.v, rval.u.v ); }
 
-		friend bool operator ==( const VecNMask &lval, const VecNMask &rval )
-		{
-			__m128	tmp = _mm_xor_ps( lval.u.v, rval.u.v );
+        friend bool operator ==( const VecNMask &lval, const VecNMask &rval )
+        {
+            __m128	tmp = _mm_xor_ps( lval.u.v, rval.u.v );
 
-			unsigned int	folded =  ((const unsigned int *)&tmp)[0]
-									| ((const unsigned int *)&tmp)[1]
-									| ((const unsigned int *)&tmp)[2]
-									| ((const unsigned int *)&tmp)[3];
-			return !folded;
-		}
+            unsigned int	folded =  ((const unsigned int *)&tmp)[0]
+                                    | ((const unsigned int *)&tmp)[1]
+                                    | ((const unsigned int *)&tmp)[2]
+                                    | ((const unsigned int *)&tmp)[3];
+            return !folded;
+        }
 
-		friend bool operator !=( const VecNMask &lval, const VecNMask &rval )
-		{
-			return !(lval == rval);
-		}
+        friend bool operator !=( const VecNMask &lval, const VecNMask &rval )
+        {
+            return !(lval == rval);
+        }
 
-		VecNMask operator & ( const VecNMask &rval ) {	return _mm_and_ps( u.v, rval.u.v ); }
-		VecNMask operator | ( const VecNMask &rval ) {	return _mm_or_ps( u.v, rval.u.v ); }
-	};
+        VecNMask operator & ( const VecNMask &rval ) {	return _mm_and_ps( u.v, rval.u.v ); }
+        VecNMask operator | ( const VecNMask &rval ) {	return _mm_or_ps( u.v, rval.u.v ); }
+    };
 
-	static const VecNMask DMT_SIMD_ALLONE( 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF );
-	static const VecNMask DMT_SIMD_ALLZERO( 0, 0, 0, 0 );
+    static const VecNMask DMT_SIMD_ALLONE( 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF );
+    static const VecNMask DMT_SIMD_ALLZERO( 0, 0, 0, 0 );
 
-	static const VecNMask VecNMaskFull = DMT_SIMD_ALLONE.u.v;
-	static const VecNMask VecNMaskEmpty = DMT_SIMD_ALLZERO.u.v;
+    static const VecNMask VecNMaskFull = DMT_SIMD_ALLONE.u.v;
+    static const VecNMask VecNMaskEmpty = DMT_SIMD_ALLZERO.u.v;
 
-	inline void VecNMask_Broadcast0Lane( VecNMask &val )
-	{
-		val.u.v = _mm_shuffle_ps( val.u.v, val.u.v, _MM_SHUFFLE(0,0,0,0) );
-	}
+    inline void VecNMask_Broadcast0Lane( VecNMask &val )
+    {
+        val.u.v = _mm_shuffle_ps( val.u.v, val.u.v, _MM_SHUFFLE(0,0,0,0) );
+    }
 
 #else
 
-	#if defined(DMATH_USE_M512)
+    #if defined(DMATH_USE_M512)
 
-			#define USE_C_PROTOTYPE_PRIMITIVES 0
+            #define USE_C_PROTOTYPE_PRIMITIVES 0
 
-			#include "external/lrb/lrb_prototype_primitives.inl"
+            #include "external/lrb/lrb_prototype_primitives.inl"
 
-			#define DMT_SIMD_FLEN	16
-			#define DMT_SIMD_ALIGN_SIZE	64	//	DMT_SIMD_FLEN * 4
+            #define DMT_SIMD_FLEN	16
+            #define DMT_SIMD_ALIGN_SIZE	64	//	DMT_SIMD_FLEN * 4
 
-			typedef __mmask	VecNMask;	// only need 16 bits
+            typedef __mmask	VecNMask;	// only need 16 bits
 
-			inline void VecNMask_Broadcast0Lane( VecNMask &val )
-			{
-				// expand the least significant bit
-				val = (VecNMask)(((signed short)(val << (DMT_SIMD_FLEN-1))) >> (DMT_SIMD_FLEN-1));
-			}
+            inline void VecNMask_Broadcast0Lane( VecNMask &val )
+            {
+                // expand the least significant bit
+                val = (VecNMask)(((signed short)(val << (DMT_SIMD_FLEN-1))) >> (DMT_SIMD_FLEN-1));
+            }
 
-	#else
+    #else
 
-			#define DMT_SIMD_FLEN		1
-			#define DMT_SIMD_ALIGN_SIZE	4	//	DMT_SIMD_FLEN * 4
+            #define DMT_SIMD_FLEN		1
+            #define DMT_SIMD_ALIGN_SIZE	4	//	DMT_SIMD_FLEN * 4
 
-			typedef unsigned short	VecNMask;	// only need 4 bits (round to 1 byte)
+            typedef unsigned short	VecNMask;	// only need 4 bits (round to 1 byte)
 
-			inline void VecNMask_Broadcast0Lane( VecNMask &val )
-			{
-				// expand the least significant bit
-				val = (VecNMask)(((signed char)(val << (DMT_SIMD_FLEN-1))) >> (DMT_SIMD_FLEN-1));
-			}
+            inline void VecNMask_Broadcast0Lane( VecNMask &val )
+            {
+                // expand the least significant bit
+                val = (VecNMask)(((signed char)(val << (DMT_SIMD_FLEN-1))) >> (DMT_SIMD_FLEN-1));
+            }
 
-	#endif
+    #endif
 
-		static const VecNMask VecNMaskFull = (VecNMask)-1;
-		static const VecNMask VecNMaskEmpty = (VecNMask)0;
+        static const VecNMask VecNMaskFull = (VecNMask)-1;
+        static const VecNMask VecNMaskEmpty = (VecNMask)0;
 
-		inline VecNMask CmpMaskEQ( const VecNMask &lval, const VecNMask &rval ) { return lval == rval; }
-		inline VecNMask CmpMaskNE( const VecNMask &lval, const VecNMask &rval ) { return lval != rval; }
+        inline VecNMask CmpMaskEQ( const VecNMask &lval, const VecNMask &rval ) { return lval == rval; }
+        inline VecNMask CmpMaskNE( const VecNMask &lval, const VecNMask &rval ) { return lval != rval; }
 
 #endif
 
@@ -196,21 +196,21 @@ template <>			inline double	DCeil<double>( const double &a ) { return ceil( a );
 //==================================================================
 template <class T>	inline T		DSign( const T &a )
 {
-	if ( a < 0 )	return T( -1 ); else
-	if ( a > 0 )	return T(  1 ); else
-					return T(  0 );
+    if ( a < 0 )	return T( -1 ); else
+    if ( a > 0 )	return T(  1 ); else
+                    return T(  0 );
 }
 //==================================================================
 template <class T>	inline T		DAbs( const T &a )
 {
-	if ( a < T(0) )	return -a;	else
-					return  a;
+    if ( a < T(0) )	return -a;	else
+                    return  a;
 }
 //==================================================================
 template <class T>	inline T		DMin( const T &a, const T &b )
 {
-	if ( a < b )	return a;	else
-					return b;
+    if ( a < b )	return a;	else
+                    return b;
 }
 //==================================================================
 template <class T>	inline T        DMin3( const T &a, const T &b, const T &c )
@@ -221,8 +221,8 @@ template <class T>	inline T        DMin3( const T &a, const T &b, const T &c )
 //==================================================================
 template <class T>	inline T		DMax( const T &a, const T &b )
 {
-	if ( a > b )	return a;	else
-					return b;
+    if ( a > b )	return a;	else
+                    return b;
 }
 //==================================================================
 template <class T>	inline T        DMax3( const T &a, const T &b, const T &c )
@@ -233,9 +233,9 @@ template <class T>	inline T        DMax3( const T &a, const T &b, const T &c )
 //==================================================================
 template <class T>	inline T		DClamp( const T& a, const T& x0, const T& x1 )
 {
-	if ( a < x0 )	return x0;	else
-	if ( a > x1 )	return x1;	else
-					return a;
+    if ( a < x0 )	return x0;	else
+    if ( a > x1 )	return x1;	else
+                    return a;
 }
 //==================================================================
 template < typename _TA , typename _TB >
@@ -254,7 +254,7 @@ inline _TA DInvLerp( const _TA &left, const _TA &right, const _TB &x )
     if ( x < left  ) return _TA(0); else
     if ( x > right ) return _TA(1);
 
-	return DClamp( (x - left) / (right - left), _TA(0), _TA(1) );
+    return DClamp( (x - left) / (right - left), _TA(0), _TA(1) );
 }
 template <typename _TA , typename _TB>
 inline _TA DSmoothStep( const _TA &a, const _TA &b,  const _TB &t )

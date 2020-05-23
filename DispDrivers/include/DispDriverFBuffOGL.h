@@ -16,22 +16,22 @@
 //==================================================================
 class DispDriverFBuffOGL
 {
-	DIMG::Image	mImage;
-	u_int		mTexId;
-	u_int		mTexWd;
-	u_int		mTexHe;
+    DIMG::Image	mImage;
+    u_int		mTexId;
+    u_int		mTexWd;
+    u_int		mTexHe;
 
 private:
-	bool	mSupportsNonPow2;
+    bool	mSupportsNonPow2;
 
 public:
-	DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::Image &srcImg );	
-	~DispDriverFBuffOGL();
+    DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::Image &srcImg );	
+    ~DispDriverFBuffOGL();
 
-	void Blit() const;
+    void Blit() const;
 
-	u_int GetCurWd() const {	return mImage.mWd; }
-	u_int GetCurHe() const {	return mImage.mHe; }
+    u_int GetCurWd() const {	return mImage.mWd; }
+    u_int GetCurHe() const {	return mImage.mHe; }
 };
 
 #endif

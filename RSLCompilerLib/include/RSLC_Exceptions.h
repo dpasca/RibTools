@@ -24,20 +24,20 @@ class Fat8;
 //==================================================================
 class Exception
 {
-	DStr	mMsg;
+    DStr	mMsg;
 
 public:
-	Exception( const DStr &msg, const Token *pTok=NULL );
-	Exception( const DStr &msg, const TokNode *pTokNode );
-	Exception( const TokNode *pTokNode, const char *pFmt, ... );
+    Exception( const DStr &msg, const Token *pTok=NULL );
+    Exception( const DStr &msg, const TokNode *pTokNode );
+    Exception( const TokNode *pTokNode, const char *pFmt, ... );
 
-	Exception( const FatBase &fatBase, const Fat8 &ch, const char *pFmt, ...  );
+    Exception( const FatBase &fatBase, const Fat8 &ch, const char *pFmt, ...  );
 
-	~Exception()
-	{
-	}
+    ~Exception()
+    {
+    }
 
-	const DStr &GetMessage() const	{	return mMsg;	}
+    const DStr &GetMessage() const	{	return mMsg;	}
 };
 
 //==================================================================

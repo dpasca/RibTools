@@ -24,13 +24,13 @@ class Transform;
 class RenderBucketsBase
 {
 public:
-	virtual ~RenderBucketsBase() {}
+    virtual ~RenderBucketsBase() {}
 
-	virtual void Render( Hider &hider ) = 0;
+    virtual void Render( Hider &hider ) = 0;
 /*
 private:
-	RenderBucketsBase( const RenderBucketsBase &from ) {}
-	void operator =( const RenderBucketsBase &from ) {}
+    RenderBucketsBase( const RenderBucketsBase &from ) {}
+    void operator =( const RenderBucketsBase &from ) {}
 */
 };
 
@@ -40,73 +40,73 @@ private:
 class Framework
 {
 #if defined(DEBUG) || defined(_DEBUG)
-	DVec<DStr>	mDbg_SrcFileNames;
+    DVec<DStr>	mDbg_SrcFileNames;
 #endif
 
 public:
-	class Params
-	{
-	public:
-		bool					mFallBackFileDisplay;
-		bool					mFallBackFBuffDisplay;
-		RenderBucketsBase		*mpRenderBuckets;
-		const Hider::Params		*mpHiderParams;
-		std::string				mInFNameForDefaultOutFName;
+    class Params
+    {
+    public:
+        bool					mFallBackFileDisplay;
+        bool					mFallBackFBuffDisplay;
+        RenderBucketsBase		*mpRenderBuckets;
+        const Hider::Params		*mpHiderParams;
+        std::string				mInFNameForDefaultOutFName;
 
-		Params() :
-			mFallBackFileDisplay(false),
-			mFallBackFBuffDisplay(false),
-			mpRenderBuckets(NULL),
-			mpHiderParams(NULL)
-		{
-		}
-	};
+        Params() :
+            mFallBackFileDisplay(false),
+            mFallBackFBuffDisplay(false),
+            mpRenderBuckets(NULL),
+            mpHiderParams(NULL)
+        {
+        }
+    };
 
-	Params				mParams;
+    Params				mParams;
 
-	const SymbolList	*mpGlobalSyms;
-	Hider				mHider;
-
-private:
-	Options				mOptions;	//temporary, will remove
+    const SymbolList	*mpGlobalSyms;
+    Hider				mHider;
 
 private:
-	DVec<Attributes*>	mpUniqueAttribs;
-	DVec<Transform*>	mpUniqueTransform;
+    Options				mOptions;	//temporary, will remove
 
-	RevisionChecker		mAttrsRev;
-	RevisionChecker		mTransRev;
+private:
+    DVec<Attributes*>	mpUniqueAttribs;
+    DVec<Transform*>	mpUniqueTransform;
+
+    RevisionChecker		mAttrsRev;
+    RevisionChecker		mTransRev;
 
 public:
-	Framework( const Params &params );
+    Framework( const Params &params );
 
-	void SetGlobalSyms( const SymbolList *pGlobalSyms )
-	{
-		mpGlobalSyms = pGlobalSyms;
+    void SetGlobalSyms( const SymbolList *pGlobalSyms )
+    {
+        mpGlobalSyms = pGlobalSyms;
 
-		mHider.mpGlobalSyms = pGlobalSyms;
-	}
+        mHider.mpGlobalSyms = pGlobalSyms;
+    }
 
-	void WorldBegin(
-				const Options &opt,
-				const Matrix44 &mtxWorldCamera );
+    void WorldBegin(
+                const Options &opt,
+                const Matrix44 &mtxWorldCamera );
 
-	void Insert(	PrimitiveBase		*pPrim,
-					const Attributes	&attr,
-					const Transform		&xform );
+    void Insert(	PrimitiveBase		*pPrim,
+                    const Attributes	&attr,
+                    const Transform		&xform );
 
 #if defined(DEBUG) || defined(_DEBUG)
-	void Dbg_MarkLastPrim( const char *pSrcFileName, int srcLine );
+    void Dbg_MarkLastPrim( const char *pSrcFileName, int srcLine );
 #endif
 
-	void WorldEnd();
+    void WorldEnd();
 
-	static void RenderBucket_s( Hider &hider, HiderBucket &bucket );
+    static void RenderBucket_s( Hider &hider, HiderBucket &bucket );
 
 private:
-	void	worldEnd_simplify();
-	void	worldEnd_splitAndAddToBuckets();
-	void	worldEnd_setupDisplays();
+    void	worldEnd_simplify();
+    void	worldEnd_splitAndAddToBuckets();
+    void	worldEnd_setupDisplays();
 };
 
 //==================================================================

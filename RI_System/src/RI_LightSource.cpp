@@ -17,13 +17,13 @@ namespace RI
 
 //==================================================================
 LightSourceT::LightSourceT() :
-	mIsAmbient(false)
+    mIsAmbient(false)
 {
 /*
-	mIntesity	= 1;
-	mColor		= Color( 1 );
-	mLocFromPos	= Point3( 0, 0, 0 );
-	mLocToPos	= Point3( 0, 0, 1 );
+    mIntesity	= 1;
+    mColor		= Color( 1 );
+    mLocFromPos	= Point3( 0, 0, 0 );
+    mLocToPos	= Point3( 0, 0, 1 );
 */
 }
 
@@ -31,26 +31,26 @@ LightSourceT::LightSourceT() :
 //==================================================================
 void LightSourceT::UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam )
 {
-	if ( mType == TYPE_DISTANT )
-	{
+    if ( mType == TYPE_DISTANT )
+    {
 #if 0
-		Vector3	diff =
-					V3__V3W1_Mul_M44( mLocToPos,	xform.GetMatrix() ) -
-					V3__V3W1_Mul_M44( mLocFromPos,	xform.GetMatrix() );
+        Vector3	diff =
+                    V3__V3W1_Mul_M44( mLocToPos,	xform.GetMatrix() ) -
+                    V3__V3W1_Mul_M44( mLocFromPos,	xform.GetMatrix() );
 
-		mRend.mDistant.mDirWS = diff.GetNormalized();
+        mRend.mDistant.mDirWS = diff.GetNormalized();
 #else
 
-		const Matrix44 &mtxLocalWorld = xform.GetMatrix();
+        const Matrix44 &mtxLocalWorld = xform.GetMatrix();
 
-		Vec3f	diffLS = mLocToPos - mLocFromPos;
-		Vec3f	diffWS = V3__V3W1_Mul_M44<float>( diffLS, mtxLocalWorld );
-		Vec3f	diffCS = V3__V3W1_Mul_M44<float>( diffWS, mtxWorldCam );
+        Vec3f	diffLS = mLocToPos - mLocFromPos;
+        Vec3f	diffWS = V3__V3W1_Mul_M44<float>( diffLS, mtxLocalWorld );
+        Vec3f	diffCS = V3__V3W1_Mul_M44<float>( diffWS, mtxWorldCam );
 
-		mRend.mDistant.mDirWS = -diffWS.GetNormalized();
-		mRend.mDistant.mDirCS = -diffCS.GetNormalized();
+        mRend.mDistant.mDirWS = -diffWS.GetNormalized();
+        mRend.mDistant.mDirCS = -diffCS.GetNormalized();
 #endif
-	}
+    }
 }
 */
 

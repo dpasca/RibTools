@@ -6,10 +6,10 @@
 //================================================================*/
 
 light ambientlight(
-			float intensity = 1;
-			color lightcolor = 1;
-		)
+            float intensity = 1;
+            color lightcolor = 1;
+        )
 {
-	Cl = intensity * lightcolor;
-	L = 0;
+    Cl = intensity * lightcolor;
+    L = 0;
 }

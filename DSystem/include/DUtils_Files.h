@@ -46,24 +46,24 @@ bool SaveFile( const char *pFileName, const MemWriterDynamic &mw, bool prefs=fal
 
 inline DStr JoinPath( const DStr &path1, const DStr &path2 )
 {
-	if NOT( path2.size() ) return path1;
-	if NOT( path1.size() ) return path2;
+    if NOT( path2.size() ) return path1;
+    if NOT( path1.size() ) return path2;
 
-	bool slash1 = (path1[path1.size()-1] == '\\' || path1[path1.size()-1] == '/');
-	bool slash2 = (path2[0] == '\\' || path2[0] == '/');
+    bool slash1 = (path1[path1.size()-1] == '\\' || path1[path1.size()-1] == '/');
+    bool slash2 = (path2[0] == '\\' || path2[0] == '/');
 
-	if ( slash1 && slash2 )
-		return path1 + (path2.c_str()+1);
-	else
-	if ( slash1 || slash2 )
-		return path1 + path2;
-	else
-		return path1 + '/' + path2;
+    if ( slash1 && slash2 )
+        return path1 + (path2.c_str()+1);
+    else
+    if ( slash1 || slash2 )
+        return path1 + path2;
+    else
+        return path1 + '/' + path2;
 }
 
 inline DStr JoinPath( const char *pPath1, const char *pPath2 )
 {
-	return JoinPath( DStr( pPath1 ), DStr( pPath2 ) );
+    return JoinPath( DStr( pPath1 ), DStr( pPath2 ) );
 }
 
 //==================================================================

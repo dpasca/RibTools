@@ -31,10 +31,10 @@ static const u_int OPC_FLG_DIRPOSLIGHT		= 64;	// it's dealing with positional an
 //==================================================================
 struct OpCodeDef
 {
-	const char		*pName;
-	u_int			OperCnt;
-	u_int			Flags;
-	Symbol::Type	Types[5];
+    const char		*pName;
+    u_int			OperCnt;
+    u_int			Flags;
+    Symbol::Type	Types[5];
 };
 
 extern OpCodeDef	_gOpCodeDefs[];

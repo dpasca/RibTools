@@ -24,8 +24,8 @@
 # include <sstream>
 
 # define __DSHORT_FILE__ \
-	(strrchr(__FILE__,'/') ? strrchr(__FILE__,'/')+1 : \
-		(strrchr(__FILE__,'\\') ? strrchr(__FILE__,'\\')+1 : __FILE__) )
+    (strrchr(__FILE__,'/') ? strrchr(__FILE__,'/')+1 : \
+        (strrchr(__FILE__,'\\') ? strrchr(__FILE__,'\\')+1 : __FILE__) )
 
 inline std::string DEX_MakeString( const char *pFmt, ... )
 {

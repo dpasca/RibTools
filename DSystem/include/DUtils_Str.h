@@ -22,7 +22,7 @@ namespace DUT
 //==================================================================
 inline bool IsWhite( char ch )
 {
-	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f';
+    return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f';
 }
 
 //==================================================================
@@ -47,7 +47,7 @@ const char *StrSeekToFilename( const char *pStr );
 
 inline bool CharIsWhite( char ch )
 {
-	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f';
+    return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\f';
 }
 
 size_t VecStr_find_by_idx_case( DVec<DStr> &v, const char *pVal );

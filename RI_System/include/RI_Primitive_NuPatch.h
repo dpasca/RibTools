@@ -21,63 +21,63 @@ namespace RI
 //==================================================================
 class NuPatch : public SimplePrimitiveBase
 {
-	class BaseDef : public RCBase
-	{
-	public:
-		DVec<float>		mUKnots;
-		DVec<float>		mVKnots;
-		DVec<Float4>	mCtrlPws;
-		int				mUOrder;
-		int				mVOrder;
-		int				mNu;
-		int				mNv;
+    class BaseDef : public RCBase
+    {
+    public:
+        DVec<float>		mUKnots;
+        DVec<float>		mVKnots;
+        DVec<Float4>	mCtrlPws;
+        int				mUOrder;
+        int				mVOrder;
+        int				mNu;
+        int				mNv;
 
-	public:
-		BaseDef( int uorder, int vorder, int nu, int nv ) :
-			mUOrder(uorder),
-			mVOrder(vorder),
-			mNu(nu),
-			mNv(nv)
-		{
-		}
-	};
+    public:
+        BaseDef( int uorder, int vorder, int nu, int nv ) :
+            mUOrder(uorder),
+            mVOrder(vorder),
+            mNu(nu),
+            mNv(nv)
+        {
+        }
+    };
 
-	RCSha<BaseDef>	moBaseDef;
+    RCSha<BaseDef>	moBaseDef;
 
 public:
-	NuPatch(
-			int			nu		,
-			int			uorder	,
-			const float	*pUknot	,
-			float		umin	,
-			float		umax	,
-			int			nv		,
-			int			vorder	,
-			const float	*pVknot	,
-			float		vmin	,
-			float		vmax	,
-			ParamList	&params
-			);
+    NuPatch(
+            int			nu		,
+            int			uorder	,
+            const float	*pUknot	,
+            float		umin	,
+            float		umax	,
+            int			nv		,
+            int			vorder	,
+            const float	*pVknot	,
+            float		vmin	,
+            float		vmax	,
+            ParamList	&params
+            );
 
-	NuPatch( const NuPatch &from ) :
-		SimplePrimitiveBase(from),
-		moBaseDef(from.moBaseDef)
-	{
-	}
+    NuPatch( const NuPatch &from ) :
+        SimplePrimitiveBase(from),
+        moBaseDef(from.moBaseDef)
+    {
+    }
 
-	void operator = ( const NuPatch &from )	{	moBaseDef = from.moBaseDef;	}
+    void operator = ( const NuPatch &from )	{	moBaseDef = from.moBaseDef;	}
 
-		NuPatch	*Clone() const {	return DNEW NuPatch( *this ); }
+        NuPatch	*Clone() const {	return DNEW NuPatch( *this ); }
 
-		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const;
+        void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const;
 
-		void Eval_dPdu_dPdv(
-						const Float2_ &uv,
-						Float3_ &out_pt,
-						Float3_ *out_dPdu,
-						Float3_ *out_dPdv ) const;
+        void Eval_dPdu_dPdv(
+                        const Float2_ &uv,
+                        Float3_ &out_pt,
+                        Float3_ *out_dPdu,
+                        Float3_ *out_dPdv ) const;
 };
-	
+    
 //==================================================================
 }
 

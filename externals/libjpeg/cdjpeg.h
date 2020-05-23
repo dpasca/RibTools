@@ -25,11 +25,11 @@ typedef struct cjpeg_source_struct * cjpeg_source_ptr;
 
 struct cjpeg_source_struct {
   JMETHOD(void, start_input, (j_compress_ptr cinfo,
-			      cjpeg_source_ptr sinfo));
+                  cjpeg_source_ptr sinfo));
   JMETHOD(JDIMENSION, get_pixel_rows, (j_compress_ptr cinfo,
-				       cjpeg_source_ptr sinfo));
+                       cjpeg_source_ptr sinfo));
   JMETHOD(void, finish_input, (j_compress_ptr cinfo,
-			       cjpeg_source_ptr sinfo));
+                   cjpeg_source_ptr sinfo));
 
   FILE *input_file;
 
@@ -49,14 +49,14 @@ struct djpeg_dest_struct {
    * The color map will be ready at this time, if one is needed.
    */
   JMETHOD(void, start_output, (j_decompress_ptr cinfo,
-			       djpeg_dest_ptr dinfo));
+                   djpeg_dest_ptr dinfo));
   /* Emit the specified number of pixel rows from the buffer. */
   JMETHOD(void, put_pixel_rows, (j_decompress_ptr cinfo,
-				 djpeg_dest_ptr dinfo,
-				 JDIMENSION rows_supplied));
+                 djpeg_dest_ptr dinfo,
+                 JDIMENSION rows_supplied));
   /* Finish up at the end of the image. */
   JMETHOD(void, finish_output, (j_decompress_ptr cinfo,
-				djpeg_dest_ptr dinfo));
+                djpeg_dest_ptr dinfo));
 
   /* Target file spec; filled in by djpeg.c after object is created. */
   FILE * output_file;
@@ -118,7 +118,7 @@ typedef struct cdjpeg_progress_mgr * cd_progress_ptr;
 
 EXTERN(cjpeg_source_ptr) jinit_read_bmp JPP((j_compress_ptr cinfo));
 EXTERN(djpeg_dest_ptr) jinit_write_bmp JPP((j_decompress_ptr cinfo,
-					    boolean is_os2));
+                        boolean is_os2));
 EXTERN(cjpeg_source_ptr) jinit_read_gif JPP((j_compress_ptr cinfo));
 EXTERN(djpeg_dest_ptr) jinit_write_gif JPP((j_decompress_ptr cinfo));
 EXTERN(cjpeg_source_ptr) jinit_read_ppm JPP((j_compress_ptr cinfo));
@@ -131,7 +131,7 @@ EXTERN(djpeg_dest_ptr) jinit_write_targa JPP((j_decompress_ptr cinfo));
 /* cjpeg support routines (in rdswitch.c) */
 
 EXTERN(boolean) read_quant_tables JPP((j_compress_ptr cinfo, char * filename,
-				    int scale_factor, boolean force_baseline));
+                    int scale_factor, boolean force_baseline));
 EXTERN(boolean) read_scan_script JPP((j_compress_ptr cinfo, char * filename));
 EXTERN(boolean) set_quant_slots JPP((j_compress_ptr cinfo, char *arg));
 EXTERN(boolean) set_sample_factors JPP((j_compress_ptr cinfo, char *arg));
@@ -144,7 +144,7 @@ EXTERN(void) read_color_map JPP((j_decompress_ptr cinfo, FILE * infile));
 
 EXTERN(void) enable_signal_catcher JPP((j_common_ptr cinfo));
 EXTERN(void) start_progress_monitor JPP((j_common_ptr cinfo,
-					 cd_progress_ptr progress));
+                     cd_progress_ptr progress));
 EXTERN(void) end_progress_monitor JPP((j_common_ptr cinfo));
 EXTERN(boolean) keymatch JPP((char * arg, const char * keyword, int minchars));
 EXTERN(FILE *) read_stdin JPP((void));

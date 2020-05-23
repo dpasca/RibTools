@@ -22,19 +22,19 @@ class Function;
 
 //==================================================================
 Variable *AddVariable(
-			TokNode *pNode,
-			TokNode *pDTypeNode,
-			TokNode *pDetailNode,
-			TokNode *pSpaceCastTok,
-			TokNode *pNameNode,
-			bool	isArray,
-			bool	isOutput );
+            TokNode *pNode,
+            TokNode *pDTypeNode,
+            TokNode *pDetailNode,
+            TokNode *pSpaceCastTok,
+            TokNode *pNameNode,
+            bool	isArray,
+            bool	isOutput );
 
 void AddSelfVariable(
-			TokNode *pNode,
-			VarType	varType,
-			bool	isVarying,
-			bool	isDetailForced );
+            TokNode *pNode,
+            VarType	varType,
+            bool	isVarying,
+            bool	isDetailForced );
 
 //==================================================================
 VarType VarTypeFromToken( const Token *pTok );

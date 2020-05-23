@@ -19,35 +19,35 @@
 //==================================================================
 class RSLCompiler
 {
-	DVec<RSLC::Token>	mTokens;
-	RSLC::TokNode		*mpRoot;
+    DVec<RSLC::Token>	mTokens;
+    RSLC::TokNode		*mpRoot;
 
-	static const char	*mpsVersionString;
+    static const char	*mpsVersionString;
 
 public:
-	class Params
-	{
-	public:
-		bool					mDbgOutputTree;
-		DIO::FileManagerBase	*mpFileManager;
+    class Params
+    {
+    public:
+        bool					mDbgOutputTree;
+        DIO::FileManagerBase	*mpFileManager;
 
-		Params() :
-			mDbgOutputTree(false),
-			mpFileManager(NULL)
-		{
-		}
-	};
+        Params() :
+            mDbgOutputTree(false),
+            mpFileManager(NULL)
+        {
+        }
+    };
 
-	RSLCompiler(
-		const char *pSLFName,
-		const char *pSource,
-		size_t sourceSize,
-		const char *pBaseInclude,
-		const Params &params );
+    RSLCompiler(
+        const char *pSLFName,
+        const char *pSource,
+        size_t sourceSize,
+        const char *pBaseInclude,
+        const Params &params );
 
-	~RSLCompiler();
+    ~RSLCompiler();
 
-	void SaveASM( const char *pFName, const char *pRefSourceName );
+    void SaveASM( const char *pFName, const char *pRefSourceName );
 };
 
 #endif

@@ -20,46 +20,46 @@ class TokNode;
 //==================================================================
 inline bool IsAsmFunc( const char *pFuncName )
 {
-	return pFuncName == strstr( pFuncName, "_asm_" );
+    return pFuncName == strstr( pFuncName, "_asm_" );
 }
 
 //==================================================================
 class Function
 {
 public:
-	TokNode			*mpParamsNode;
-	TokNode			*mpCodeBlkNode;
-	Token			*mpRetTypeTok;
-	TokNode			*mpNameNode;
-	VarType			mRetVarType;
-	bool			mRetVarIsArray;	
-	DVec<VarType>	mParamsVarTypes;
-	DVec<bool>		mParamsVarIsArray;
+    TokNode			*mpParamsNode;
+    TokNode			*mpCodeBlkNode;
+    Token			*mpRetTypeTok;
+    TokNode			*mpNameNode;
+    VarType			mRetVarType;
+    bool			mRetVarIsArray;	
+    DVec<VarType>	mParamsVarTypes;
+    DVec<bool>		mParamsVarIsArray;
 
-	Function() :
-		mpParamsNode(NULL),
-		mpCodeBlkNode(NULL),
-		mpRetTypeTok(NULL),
-		mpNameNode(NULL),
-		mRetVarType(VT_UNKNOWN),
-		mRetVarIsArray(false)
-	{
-	}
+    Function() :
+        mpParamsNode(NULL),
+        mpCodeBlkNode(NULL),
+        mpRetTypeTok(NULL),
+        mpNameNode(NULL),
+        mRetVarType(VT_UNKNOWN),
+        mRetVarIsArray(false)
+    {
+    }
 
-	~Function()
-	{
-	}
+    ~Function()
+    {
+    }
 
-	bool IsShader() const
-	{
-		return mpRetTypeTok->idType == T_TYPE_SHADERTYPE;
-	}
+    bool IsShader() const
+    {
+        return mpRetTypeTok->idType == T_TYPE_SHADERTYPE;
+    }
 
-	bool IsAsmFunc() const;
+    bool IsAsmFunc() const;
 
-	bool IsFuncOp() const	{	return mpRetTypeTok->id == T_KW___funcop; }
+    bool IsFuncOp() const	{	return mpRetTypeTok->id == T_KW___funcop; }
 
-	bool HasParams() const;
+    bool HasParams() const;
 };
 
 //==================================================================

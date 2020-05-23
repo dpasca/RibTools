@@ -20,9 +20,9 @@ namespace DUT
 CriticalSection::CriticalSection()
 {
 #if defined(WIN32)
-	mCSection = DNEW CRITICAL_SECTION;
-	InitializeCriticalSection( (CRITICAL_SECTION *)mCSection );
-	
+    mCSection = DNEW CRITICAL_SECTION;
+    InitializeCriticalSection( (CRITICAL_SECTION *)mCSection );
+    
 #elif defined(__linux__)
 
 #endif
@@ -32,11 +32,11 @@ CriticalSection::CriticalSection()
 CriticalSection::~CriticalSection()
 {
 #if defined(WIN32)
-	CRITICAL_SECTION *pCSection = (CRITICAL_SECTION *)mCSection;
+    CRITICAL_SECTION *pCSection = (CRITICAL_SECTION *)mCSection;
 
-	DeleteCriticalSection( pCSection );
-	DSAFE_DELETE( pCSection );
-	
+    DeleteCriticalSection( pCSection );
+    DSAFE_DELETE( pCSection );
+    
 #elif defined(__linux__)
 
 #endif
@@ -46,7 +46,7 @@ CriticalSection::~CriticalSection()
 void CriticalSection::Enter()
 {
 #if defined(WIN32)
-	EnterCriticalSection( (CRITICAL_SECTION *)mCSection );
+    EnterCriticalSection( (CRITICAL_SECTION *)mCSection );
 
 #elif defined(__linux__)
 
@@ -57,7 +57,7 @@ void CriticalSection::Enter()
 void CriticalSection::Leave()
 {
 #if defined(WIN32)
-	LeaveCriticalSection( (CRITICAL_SECTION *)mCSection );
+    LeaveCriticalSection( (CRITICAL_SECTION *)mCSection );
 
 #elif defined(__linux__)
 

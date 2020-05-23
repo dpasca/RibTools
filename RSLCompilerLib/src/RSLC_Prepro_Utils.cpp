@@ -20,65 +20,65 @@ namespace PREPRO
 //==================================================================
 bool MatchesAdvance( const DVec<Fat8> &str, size_t &io_i, size_t end, const char *pFindStr )
 {
-	size_t ii = io_i;
+    size_t ii = io_i;
 
-	for (; ii < end && *pFindStr; ++ii)
-		if ( str[ii].Ch != *pFindStr++ )
-			return false;
+    for (; ii < end && *pFindStr; ++ii)
+        if ( str[ii].Ch != *pFindStr++ )
+            return false;
 
-	io_i = ii;
-	return true;
+    io_i = ii;
+    return true;
 }
 
 //==================================================================
 void SkipHWhites( const DVec<Fat8> &text, size_t &i, size_t toEnd )
 {
-	for (; i < toEnd; ++i)
-		if ( text[i].Ch != ' ' && text[i].Ch != '\t' )
-			break;
+    for (; i < toEnd; ++i)
+        if ( text[i].Ch != ' ' && text[i].Ch != '\t' )
+            break;
 }
 
 //==================================================================
 void CutVectorInclusive( DVec<Fat8> &vec, size_t start, size_t end )
 {
-	if ( (end+1) < vec.size() )
-		++end;
+    if ( (end+1) < vec.size() )
+        ++end;
 
-	CutVector( vec, start, end );
+    CutVector( vec, start, end );
 }
 
 //==================================================================
 size_t GetAlphaNumBetweenSpaces(
-				DVec<Fat8>	&text,
-				size_t		i,
-				size_t		lineEnd,
-				FatBase		&fatBase,
-				DStr	&out_symName )
+                DVec<Fat8>	&text,
+                size_t		i,
+                size_t		lineEnd,
+                FatBase		&fatBase,
+                DStr	&out_symName )
 {
-	SkipHWhites( text, i, lineEnd );
+    SkipHWhites( text, i, lineEnd );
 
-	size_t symStart = i;
+    size_t symStart = i;
 
-	for (; i < lineEnd; ++i)
-		if ( text[i].Ch == ' ' || text[i].Ch == '\t' )
-			break;
-	
-	size_t symEnd = i;
+    for (; i < lineEnd; ++i)
+        if ( text[i].Ch == ' ' || text[i].Ch == '\t' )
+            break;
+    
+    size_t symEnd = i;
 
-	out_symName.clear();
+    out_symName.clear();
 
-	DStr	symbolName;
-	for (size_t j=symStart; j < symEnd; ++j)
-		out_symName += text[j].Ch;
+    DStr	symbolName;
+    for (size_t j=symStart; j < symEnd; ++j)
+        out_symName += text[j].Ch;
 
-	if NOT( IsAlphaNumStr( out_symName ) )
-		throw Exception(
-					fatBase,
-					text[i],
-					"Expecting an alphanumeric but found '%s'",
-					out_symName.c_str() );
+    if NOT( IsAlphaNumStr( out_symName ) )
+        throw Exception(
+                    fatBase,
+                    text[i],
+                    "Expecting an alphanumeric but found '%s'",
+                    out_symName.c_str() );
 
-	return symEnd;
+    return symEnd;
 }
 
 //==================================================================

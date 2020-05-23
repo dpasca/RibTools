@@ -14,7 +14,7 @@
 
 // test line splicing and macros that contract in size
 #define CONTR	\
-		1
+        1
 
 // test macros that expand in size
 #define EXPA	123456
@@ -28,29 +28,29 @@
 //==================================================================
 surface test10_1()
 {
-	Ci = test10_2_getColor();
-	
-	Oi = EXPA;		// should become 123456
-	
-	Oi = CONTR;		// should become 1
+    Ci = test10_2_getColor();
+    
+    Oi = EXPA;		// should become 123456
+    
+    Oi = CONTR;		// should become 1
 
-	Oi = SAME;		// should become 1234
-	
+    Oi = SAME;		// should become 1234
+    
 #ifdef PLAIN_SYMBOL1
-	PLAIN_SYMBOL1;	// should become just ;
-	
-	Oi = 7;			// this should appear
-	
-	#ifdef SOMETHING_NOT_DEFINED
-	Oi = 8;			// this should be ignored
-	#endif
-	
+    PLAIN_SYMBOL1;	// should become just ;
+    
+    Oi = 7;			// this should appear
+    
+    #ifdef SOMETHING_NOT_DEFINED
+    Oi = 8;			// this should be ignored
+    #endif
+    
 #endif
 
 #ifndef PLAIN_SYMBOL1
-	Oi = 9;			// this should be ignored
+    Oi = 9;			// this should be ignored
 #else
-	Oi = 10;		// this should appear
+    Oi = 10;		// this should appear
 #endif
 
 }

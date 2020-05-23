@@ -21,34 +21,34 @@ class Variable;
 //==================================================================
 class VarLink
 {
-	TokNode		*mpNode;
-	size_t		mVarIdx;
+    TokNode		*mpNode;
+    size_t		mVarIdx;
 
 public:
-	VarLink();
-	VarLink( const VarLink &from );
-	VarLink &operator=( const VarLink &from );
+    VarLink();
+    VarLink( const VarLink &from );
+    VarLink &operator=( const VarLink &from );
 
-	~VarLink();
+    ~VarLink();
 
-	void Setup( TokNode *pNode, size_t idx );
-	void ReplaceNode( TokNode *pNewNode );
+    void Setup( TokNode *pNode, size_t idx );
+    void ReplaceNode( TokNode *pNewNode );
 
-	bool IsValid() const { return mVarIdx != DNPOS; }
+    bool IsValid() const { return mVarIdx != DNPOS; }
 
-	const TokNode	*GetNode() const	{	return mpNode;	}
-	size_t			GetVarIdx() const	{	return mVarIdx; }
+    const TokNode	*GetNode() const	{	return mpNode;	}
+    size_t			GetVarIdx() const	{	return mVarIdx; }
 
-		  Variable *GetVarPtr();
-	const Variable *GetVarPtr() const;
+          Variable *GetVarPtr();
+    const Variable *GetVarPtr() const;
 
 #ifdef _DEBUG
-	bool IsNodeValid() const;
+    bool IsNodeValid() const;
 #endif
 
 private:
-	void addRef();
-	void subRef();
+    void addRef();
+    void subRef();
 };
 
 //==================================================================

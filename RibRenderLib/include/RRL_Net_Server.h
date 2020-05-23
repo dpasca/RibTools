@@ -27,19 +27,19 @@ class FileServer;
 class Server
 {
 public:
-	DStr				mAddressName;
-	int					mPortToCall;
-	DNET::PacketManager	*mpPakMan;
-	FileManagerNet		*mpFilemanager;
-	FileServer			*mpFileServer;
-	bool				mIsValid;
-	int					mBusyCnt;
+    DStr				mAddressName;
+    int					mPortToCall;
+    DNET::PacketManager	*mpPakMan;
+    FileManagerNet		*mpFilemanager;
+    FileServer			*mpFileServer;
+    bool				mIsValid;
+    int					mBusyCnt;
 
-	Server();
-	~Server();
+    Server();
+    ~Server();
 
-	void Init( DNET::PacketManager *pPakMan );
-	bool IsConnected() const;
+    void Init( DNET::PacketManager *pPakMan );
+    bool IsConnected() const;
 };
 
 //==================================================================

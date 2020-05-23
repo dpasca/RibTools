@@ -21,17 +21,17 @@ namespace NET
 //==================================================================
 class FileServer : DTH::ThreadedBase
 {
-	DNET::PacketManager	*mpPakMan;
+    DNET::PacketManager	*mpPakMan;
 
 public:
-	FileServer( DNET::PacketManager *pPakMan );
-	~FileServer()
-	{
-		DTH::ThreadedBase::KillThread();
-	}
+    FileServer( DNET::PacketManager *pPakMan );
+    ~FileServer()
+    {
+        DTH::ThreadedBase::KillThread();
+    }
 
 private:
-	void threadMain();
+    void threadMain();
 };
 
 //==================================================================

@@ -32,15 +32,15 @@ static const u_int	MP_GRID_MAX_DIM_SIMD_BLKS		= DMT_SIMD_BLOCKS( MP_GRID_MAX_DIM
 //==================================================================
 enum Mode
 {
-	MD_UNDEFINED,
-	MD_BASE,
-	MD_FRAME,
-	MD_WORLD,
-	MD_ATTRIBUTE,
-	MD_TRANSFORM,
-	MD_SOLID,
-	MD_OBJECT,
-	MD_MOTION,
+    MD_UNDEFINED,
+    MD_BASE,
+    MD_FRAME,
+    MD_WORLD,
+    MD_ATTRIBUTE,
+    MD_TRANSFORM,
+    MD_SOLID,
+    MD_OBJECT,
+    MD_MOTION,
 };
 
 //==================================================================
@@ -48,33 +48,33 @@ enum Mode
 //==================================================================
 enum Error
 {
-	E_OK				,
-	E_NESTING			,
-	E_NOTOPTIONS		,
-	E_NOTATTRIBS		,
-	E_NOTPRIMS			,
-	E_NOTSTARTED		,
-	E_ILLSTATE			,
-	E_ARRAYTOOBIG		,
-	E_BADARGUMENT		,
-	E_BADARRAY			,
-	E_BADBASIS			,
-	E_BADCOLOR			,
-	E_BADHANDLE			,
-	E_BADPARAMLIST		,
-	E_BADRIPCODE		,
-	E_BADSTRINGTOKEN	,
-	E_BADTOKEN			,
-	E_BADVERSION		,
-	E_LIMITCHECK		,
-	E_OUTOFMEMORY_X		,
-	E_PROTOCOLBOTCH		,
-	E_STRINGTOOBIG		,
-	E_SYNTAXERROR		,
-	E_UNREGISTERED		,
+    E_OK				,
+    E_NESTING			,
+    E_NOTOPTIONS		,
+    E_NOTATTRIBS		,
+    E_NOTPRIMS			,
+    E_NOTSTARTED		,
+    E_ILLSTATE			,
+    E_ARRAYTOOBIG		,
+    E_BADARGUMENT		,
+    E_BADARRAY			,
+    E_BADBASIS			,
+    E_BADCOLOR			,
+    E_BADHANDLE			,
+    E_BADPARAMLIST		,
+    E_BADRIPCODE		,
+    E_BADSTRINGTOKEN	,
+    E_BADTOKEN			,
+    E_BADVERSION		,
+    E_LIMITCHECK		,
+    E_OUTOFMEMORY_X		,
+    E_PROTOCOLBOTCH		,
+    E_STRINGTOOBIG		,
+    E_SYNTAXERROR		,
+    E_UNREGISTERED		,
 
 };
-	
+    
 //==================================================================
 const char *ErrorToString( Error errCode );
 
@@ -83,45 +83,45 @@ const char *ErrorToString( Error errCode );
 //==================================================================
 class RefCount
 {
-	int		mRefCount;
-	
+    int		mRefCount;
+    
 public:
-	RefCount( const RefCount &from ) : mRefCount(0)
-	{
-	}
-	
-	RefCount &operator=( const RefCount &from )
-	{
-		mRefCount = 0;
+    RefCount( const RefCount &from ) : mRefCount(0)
+    {
+    }
+    
+    RefCount &operator=( const RefCount &from )
+    {
+        mRefCount = 0;
         return *this;
-	}
+    }
 
-	RefCount() :
-		mRefCount(0)
-	{
-	}
-	
-	~RefCount()
-	{
-		DASSERT( mRefCount == 0 );
-	}
+    RefCount() :
+        mRefCount(0)
+    {
+    }
+    
+    ~RefCount()
+    {
+        DASSERT( mRefCount == 0 );
+    }
 
-	void AddRef()
-	{
-		mRefCount += 1;
-	}
+    void AddRef()
+    {
+        mRefCount += 1;
+    }
 
-	int SubRef()
-	{
-		DASSERT( mRefCount >= 1 );
-		mRefCount -= 1;
-		return mRefCount;
-	}
+    int SubRef()
+    {
+        DASSERT( mRefCount >= 1 );
+        mRefCount -= 1;
+        return mRefCount;
+    }
 
-	int GetCount() const
-	{
-		return mRefCount;
-	}
+    int GetCount() const
+    {
+        return mRefCount;
+    }
 };
 
 //==================================================================
@@ -129,100 +129,100 @@ public:
 //==================================================================
 class RCBase
 {
-	int		mCount;
-	
+    int		mCount;
+    
 public:
-	RCBase() :
-		mCount(0)
-	{
-	}
-	
-	virtual ~RCBase()
-	{
-		DASSERT( mCount == 0 );
-	}
+    RCBase() :
+        mCount(0)
+    {
+    }
+    
+    virtual ~RCBase()
+    {
+        DASSERT( mCount == 0 );
+    }
 
-	void AddRef()
-	{
-		mCount += 1;
-	}
+    void AddRef()
+    {
+        mCount += 1;
+    }
 
-	int SubRef()
-	{
-		DASSERT( mCount >= 1 );
-		mCount -= 1;
-		int retVal = mCount;
+    int SubRef()
+    {
+        DASSERT( mCount >= 1 );
+        mCount -= 1;
+        int retVal = mCount;
 
-		if ( retVal == 0 )
-		{
-			DDELETE( this );
-		}
+        if ( retVal == 0 )
+        {
+            DDELETE( this );
+        }
 
-		return retVal;
-	}
+        return retVal;
+    }
 
-	int GetRef() const
-	{
-		return mCount;
-	}
+    int GetRef() const
+    {
+        return mCount;
+    }
 
 private:
-	RCBase( const RCBase &from ) :	mCount(0)
-	{
-	}
-	
-	RCBase &operator=( const RCBase &from )
-	{
-		mCount = 0;
+    RCBase( const RCBase &from ) :	mCount(0)
+    {
+    }
+    
+    RCBase &operator=( const RCBase &from )
+    {
+        mCount = 0;
         return *this;
-	}
+    }
 };
 
 //==================================================================
 class RCBaseNoDel
 {
-	int		mCount;
-	
+    int		mCount;
+    
 public:
-	RCBaseNoDel() :
-		mCount(0)
-	{
-	}
-	
-	virtual ~RCBaseNoDel()
-	{
-		DASSERT( mCount == 0 );
-	}
+    RCBaseNoDel() :
+        mCount(0)
+    {
+    }
+    
+    virtual ~RCBaseNoDel()
+    {
+        DASSERT( mCount == 0 );
+    }
 
-	void AddRef()
-	{
-		mCount += 1;
-	}
+    void AddRef()
+    {
+        mCount += 1;
+    }
 
-	int SubRef()
-	{
-		DASSERT( mCount >= 1 );
-		mCount -= 1;
-		int retVal = mCount;
+    int SubRef()
+    {
+        DASSERT( mCount >= 1 );
+        mCount -= 1;
+        int retVal = mCount;
 
-		return retVal;
-	}
+        return retVal;
+    }
 
-	int GetRef() const
-	{
-		return mCount;
-	}
+    int GetRef() const
+    {
+        return mCount;
+    }
 
 private:
-	RCBaseNoDel( const RCBaseNoDel &from ) :	mCount(0)
-	{
-	}
-	
-	RCBaseNoDel &operator=( const RCBaseNoDel &from )
-	{
-		mCount = 0;
+    RCBaseNoDel( const RCBaseNoDel &from ) :	mCount(0)
+    {
+    }
+    
+    RCBaseNoDel &operator=( const RCBaseNoDel &from )
+    {
+        mCount = 0;
         return *this;
-	}
+    }
 };
 
 //==================================================================
@@ -231,101 +231,101 @@ private:
 template <class T>
 class RCSha
 {
-	T	*mPtr;
+    T	*mPtr;
 
 public:
-	RCSha()						: mPtr(NULL)	{ }
-	RCSha( T *ptr )				: mPtr(NULL)	{ borrow( ptr ); }
-	RCSha( const RCSha &from )	: mPtr(NULL)	{ borrow( from.get() ); }
+    RCSha()						: mPtr(NULL)	{ }
+    RCSha( T *ptr )				: mPtr(NULL)	{ borrow( ptr ); }
+    RCSha( const RCSha &from )	: mPtr(NULL)	{ borrow( from.get() ); }
 
-	virtual ~RCSha()
-	{
-		if ( mPtr )
-			mPtr->SubRef();
-	}
+    virtual ~RCSha()
+    {
+        if ( mPtr )
+            mPtr->SubRef();
+    }
 
-	RCSha &operator=( const RCSha &from )	{	borrow( from.get() );	return *this; }
-	RCSha &operator=( T *ptr )				{	borrow( ptr );			return *this; }
-	RCSha &operator=( const T *ptr )		{	borrow( ptr );			return *this; }
+    RCSha &operator=( const RCSha &from )	{	borrow( from.get() );	return *this; }
+    RCSha &operator=( T *ptr )				{	borrow( ptr );			return *this; }
+    RCSha &operator=( const T *ptr )		{	borrow( ptr );			return *this; }
 
 private:
-	void borrow( T *ptr )
-	{
-		if ( ptr == mPtr )
-			return;
+    void borrow( T *ptr )
+    {
+        if ( ptr == mPtr )
+            return;
 
-		if ( mPtr )
-			mPtr->SubRef();
+        if ( mPtr )
+            mPtr->SubRef();
 
-		if ( (mPtr = ptr) )
-			mPtr->AddRef();
-	}
+        if ( (mPtr = ptr) )
+            mPtr->AddRef();
+    }
 
-	void borrow( const T *ptr )
-	{
-		if ( ptr == mPtr )
-			return;
+    void borrow( const T *ptr )
+    {
+        if ( ptr == mPtr )
+            return;
 
-		if ( mPtr )
-			mPtr->SubRef();
+        if ( mPtr )
+            mPtr->SubRef();
 
-		if ( (mPtr = (T *)ptr) )
-			mPtr->AddRef();
-	}
+        if ( (mPtr = (T *)ptr) )
+            mPtr->AddRef();
+    }
 
 public:
-	const T *get() const
-	{
-		DASSERT( !mPtr || mPtr->GetRef() > 0 );
+    const T *get() const
+    {
+        DASSERT( !mPtr || mPtr->GetRef() > 0 );
 
-		return mPtr;
-	}
+        return mPtr;
+    }
 
-	T *get()
-	{
-		DASSERT( !mPtr || mPtr->GetRef() > 0 );
+    T *get()
+    {
+        DASSERT( !mPtr || mPtr->GetRef() > 0 );
 
-		return mPtr;
-	}
+        return mPtr;
+    }
 
-	const T *operator->() const	{ return mPtr; }
-		  T *operator->()		{ return mPtr; }
+    const T *operator->() const	{ return mPtr; }
+          T *operator->()		{ return mPtr; }
 };
 
 //==================================================================
 class RevisionTracker
 {
 public:
-	int	mRTrackRevisionCount;
-	
-	RevisionTracker() : mRTrackRevisionCount(0) {}
+    int	mRTrackRevisionCount;
+    
+    RevisionTracker() : mRTrackRevisionCount(0) {}
 
-	void BumpRevision()
-	{
-		mRTrackRevisionCount += 1;
-	}
+    void BumpRevision()
+    {
+        mRTrackRevisionCount += 1;
+    }
 };
 
 //==================================================================
 class RevisionChecker
 {
 public:
-	int	mCurRevisionCount;
-	
-	RevisionChecker() : mCurRevisionCount(-1) {}
+    int	mCurRevisionCount;
+    
+    RevisionChecker() : mCurRevisionCount(-1) {}
 
-	bool Sync( const RevisionTracker &tracker )
-	{
-		if ( tracker.mRTrackRevisionCount != mCurRevisionCount )
-		{
-			mCurRevisionCount = tracker.mRTrackRevisionCount;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+    bool Sync( const RevisionTracker &tracker )
+    {
+        if ( tracker.mRTrackRevisionCount != mCurRevisionCount )
+        {
+            mCurRevisionCount = tracker.mRTrackRevisionCount;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 };
 
 //==================================================================
@@ -337,54 +337,54 @@ typedef void		*LightHandle;
 
 struct Bound
 {
-	Float3	mBox[2];
+    Float3	mBox[2];
 
-	Bound()
-	{
-	}
+    Bound()
+    {
+    }
 
-	Bound( float val )
-	{
-		mBox[0].Set( val, val, val );
-		mBox[1].Set( val, val, val );
-	}
-	
-	Bound( float x1, float y1, float z1,
-		   float x2, float y2, float z2 )
-	{
-		mBox[0].Set( x1, y1, z1 );
-		mBox[1].Set( x2, y2, z2 );
-	}
-	
-	void SetMin( const float *p )			{ mBox[0].Set( p[0], p[1], p[2] );	}
-	void SetMax( const float *p )			{ mBox[1].Set( p[0], p[1], p[2] );	}
-	void SetMin( float x, float y, float z ){ mBox[0].Set( x, y, z );	}
-	void SetMax( float x, float y, float z ){ mBox[1].Set( x, y, z );	}
-	
-	void Reset()
-	{
-		mBox[0].Set( FLT_MAX, FLT_MAX, FLT_MAX );
-		mBox[1].Set( -FLT_MAX, -FLT_MAX, -FLT_MAX );
-	}
+    Bound( float val )
+    {
+        mBox[0].Set( val, val, val );
+        mBox[1].Set( val, val, val );
+    }
+    
+    Bound( float x1, float y1, float z1,
+           float x2, float y2, float z2 )
+    {
+        mBox[0].Set( x1, y1, z1 );
+        mBox[1].Set( x2, y2, z2 );
+    }
+    
+    void SetMin( const float *p )			{ mBox[0].Set( p[0], p[1], p[2] );	}
+    void SetMax( const float *p )			{ mBox[1].Set( p[0], p[1], p[2] );	}
+    void SetMin( float x, float y, float z ){ mBox[0].Set( x, y, z );	}
+    void SetMax( float x, float y, float z ){ mBox[1].Set( x, y, z );	}
+    
+    void Reset()
+    {
+        mBox[0].Set( FLT_MAX, FLT_MAX, FLT_MAX );
+        mBox[1].Set( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+    }
 
-	void Expand( const Float3 &p )
-	{
-		mBox[0].x() = DMIN( mBox[0].x(), p.x() );
-		mBox[0].y() = DMIN( mBox[0].y(), p.y() );
-		mBox[0].z() = DMIN( mBox[0].z(), p.z() );
+    void Expand( const Float3 &p )
+    {
+        mBox[0].x() = DMIN( mBox[0].x(), p.x() );
+        mBox[0].y() = DMIN( mBox[0].y(), p.y() );
+        mBox[0].z() = DMIN( mBox[0].z(), p.z() );
 
-		mBox[1].x() = DMAX( mBox[1].x(), p.x() );
-		mBox[1].y() = DMAX( mBox[1].y(), p.y() );
-		mBox[1].z() = DMAX( mBox[1].z(), p.z() );
-	}
-	
-	bool IsValid() const
-	{
-		return
-			mBox[0].x() <= mBox[1].x() &&
-			mBox[0].y() <= mBox[1].y() &&
-			mBox[0].z() <= mBox[1].z();
-	}
+        mBox[1].x() = DMAX( mBox[1].x(), p.x() );
+        mBox[1].y() = DMAX( mBox[1].y(), p.y() );
+        mBox[1].z() = DMAX( mBox[1].z(), p.z() );
+    }
+    
+    bool IsValid() const
+    {
+        return
+            mBox[0].x() <= mBox[1].x() &&
+            mBox[0].y() <= mBox[1].y() &&
+            mBox[0].z() <= mBox[1].z();
+    }
 };
 
 //==================================================================
@@ -398,10 +398,10 @@ static const size_t	NOUTCOLS = 4;	// temporary !!
 /*
 enum VarType
 {
-	VARTYPE_UNKNOWN,
-	VARTYPE_FLOAT,
-	VARTYPE_INT,
-	VARTYPE_BOOLEAN
+    VARTYPE_UNKNOWN,
+    VARTYPE_FLOAT,
+    VARTYPE_INT,
+    VARTYPE_BOOLEAN
 };
 */
 
@@ -453,7 +453,7 @@ extern RtBasis	PowerBasis;
 namespace RI
 {
 
-	static const u_int INVALID_PC = (u_int)-1;
+    static const u_int INVALID_PC = (u_int)-1;
 
 //==================================================================
 }

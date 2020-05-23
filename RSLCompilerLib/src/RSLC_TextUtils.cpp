@@ -16,29 +16,29 @@ namespace RSLC
 //==================================================================
 bool IsAlphaNumStart( char c )
 {
-	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
 //==================================================================
 bool IsAlphaNumBody( char c )
 {
-	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+    return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
 }
 
 //==================================================================
 bool IsAlphaNumStr( const DStr &str )
 {
-	if NOT( str.length() )
-		return false;
+    if NOT( str.length() )
+        return false;
 
-	if NOT( IsAlphaNumStart( str[0] ) )
-		return false;
+    if NOT( IsAlphaNumStart( str[0] ) )
+        return false;
 
-	for (size_t i=1; i < str.length(); ++i)
-		if NOT( IsAlphaNumBody( str[i] ) )
-			return false;
+    for (size_t i=1; i < str.length(); ++i)
+        if NOT( IsAlphaNumBody( str[i] ) )
+            return false;
 
-	return true;
+    return true;
 }
 
 //==================================================================

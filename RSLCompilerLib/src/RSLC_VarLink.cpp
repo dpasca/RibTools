@@ -15,47 +15,47 @@ namespace RSLC
 
 //==================================================================
 VarLink::VarLink() :
-	mpNode(NULL),
-	mVarIdx(DNPOS)
+    mpNode(NULL),
+    mVarIdx(DNPOS)
 {
 }
 
 //==================================================================
 VarLink::VarLink( const VarLink &from )
 {
-	mpNode	= from.mpNode;
-	mVarIdx	= from.mVarIdx;
-	addRef();
+    mpNode	= from.mpNode;
+    mVarIdx	= from.mVarIdx;
+    addRef();
 }
 
 //==================================================================
 VarLink &VarLink::operator=( const VarLink &from )
 {
-	DASSERT( !from.mpNode || from.mpNode->mBlockID != 0xfeeefeee );
+    DASSERT( !from.mpNode || from.mpNode->mBlockID != 0xfeeefeee );
 
-	subRef();
-	mpNode	= from.mpNode;
-	mVarIdx	= from.mVarIdx;
-	addRef();
+    subRef();
+    mpNode	= from.mpNode;
+    mVarIdx	= from.mVarIdx;
+    addRef();
 
-	return *this;
+    return *this;
 }
 
 //==================================================================
 VarLink::~VarLink()
 {
-	subRef();
+    subRef();
 }
 
 //==================================================================
 void VarLink::addRef()
 {
 #ifdef _DEBUG
-	if ( mpNode )
-	{
-		// umm disabling for now...
-		//mpNode->mpReferringVarLinks.find_or_push_back( this );
-	}
+    if ( mpNode )
+    {
+        // umm disabling for now...
+        //mpNode->mpReferringVarLinks.find_or_push_back( this );
+    }
 #endif
 }
 
@@ -63,52 +63,52 @@ void VarLink::addRef()
 void VarLink::subRef()
 {
 #ifdef _DEBUG
-	if ( mpNode )
-	{
-		// umm disabling for now...
-		//DVec<VarLink*>::iterator it = mpNode->mpReferringVarLinks.find( this );
-		//DASSERT( it != mpNode->mpReferringVarLinks.end() );
-		//mpNode->mpReferringVarLinks.erase( it );
-	}
+    if ( mpNode )
+    {
+        // umm disabling for now...
+        //DVec<VarLink*>::iterator it = mpNode->mpReferringVarLinks.find( this );
+        //DASSERT( it != mpNode->mpReferringVarLinks.end() );
+        //mpNode->mpReferringVarLinks.erase( it );
+    }
 #endif
 }
 
 //==================================================================
 void VarLink::Setup( TokNode *pNode, size_t idx )
 {
-	mpNode = pNode;
-	mVarIdx = idx;
+    mpNode = pNode;
+    mVarIdx = idx;
 
-	addRef();
+    addRef();
 }
 
 //==================================================================
 void VarLink::ReplaceNode( TokNode *pNewNode )
 {
-	subRef();
+    subRef();
 
-	mpNode = pNewNode;
+    mpNode = pNewNode;
 
-	addRef();
+    addRef();
 }
 
 //==================================================================
 Variable * VarLink::GetVarPtr()
 {
-	return mVarIdx != DNPOS ? &mpNode->GetVars()[mVarIdx] : NULL;
+    return mVarIdx != DNPOS ? &mpNode->GetVars()[mVarIdx] : NULL;
 }
 
 //==================================================================
 const Variable * VarLink::GetVarPtr() const
 {
-	return mVarIdx != DNPOS ? &mpNode->GetVars()[mVarIdx] : NULL;
+    return mVarIdx != DNPOS ? &mpNode->GetVars()[mVarIdx] : NULL;
 }
 
 //==================================================================
 #ifdef _DEBUG
 bool VarLink::IsNodeValid() const
 {
-	return mpNode == 0 || mpNode->mBlockID != 0xfeeefeee;
+    return mpNode == 0 || mpNode->mBlockID != 0xfeeefeee;
 }
 #endif
 

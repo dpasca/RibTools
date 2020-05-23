@@ -20,32 +20,32 @@ namespace DNET
 //==================================================================
 bool InitializeSocket()
 {
-	static bool	initialized;
+    static bool	initialized;
 
-	if ( initialized )
-		return true;
+    if ( initialized )
+        return true;
 
 #if defined(WIN32)
-	WSAData	data;
+    WSAData	data;
 
-	if ( WSAStartup( MAKEWORD(2,2), &data ) != 0 )
-	{
-		return false;
-	}
+    if ( WSAStartup( MAKEWORD(2,2), &data ) != 0 )
+    {
+        return false;
+    }
 #endif
 
-	initialized = true;
+    initialized = true;
 
-	return true;
+    return true;
 }
 
 //==================================================================
 int LastSockErr()
 {
 #if defined(WIN32)
-	return WSAGetLastError();
+    return WSAGetLastError();
 #else
-	return errno;
+    return errno;
 #endif
 }
 
@@ -53,66 +53,66 @@ int LastSockErr()
 bool SetNonBlocking( SOCKET sock )
 {
 #if defined(WIN32)
-	u_long	blockflg = 1;
-	if ( -1 == ioctlsocket( sock, FIONBIO, &blockflg ) )
-		return false;
+    u_long	blockflg = 1;
+    if ( -1 == ioctlsocket( sock, FIONBIO, &blockflg ) )
+        return false;
 
 #elif defined(__linux__)
-	if ( -1 == fcntl( sock, F_SETFL, O_NONBLOCK ) )
-		return false;
+    if ( -1 == fcntl( sock, F_SETFL, O_NONBLOCK ) )
+        return false;
 
 #endif
 
-	return true;
+    return true;
 }
 
 //==================================================================
 const char *GetSockErrStr( int err )
 {
-	switch ( err )
-	{
-	case EWOULDBLOCK    : return "EWOULDBLOCK";
-	case EINPROGRESS    : return "EINPROGRESS";
-	case EALREADY       : return "EALREADY";
-	case ENOTSOCK       : return "ENOTSOCK";
-	case EDESTADDRREQ   : return "EDESTADDRREQ";
-	case EMSGSIZE       : return "EMSGSIZE";
-	case EPROTOTYPE     : return "EPROTOTYPE";
-	case ENOPROTOOPT    : return "ENOPROTOOPT";
-	case EPROTONOSUPPORT: return "EPROTONOSUPPORT";
-	case ESOCKTNOSUPPORT: return "ESOCKTNOSUPPORT";
-	case EOPNOTSUPP     : return "EOPNOTSUPP";
-	case EPFNOSUPPORT   : return "EPFNOSUPPORT";
-	case EAFNOSUPPORT   : return "EAFNOSUPPORT";
-	case EADDRINUSE     : return "EADDRINUSE";
-	case EADDRNOTAVAIL  : return "EADDRNOTAVAIL";
-	case ENETDOWN       : return "ENETDOWN";
-	case ENETUNREACH    : return "ENETUNREACH";
-	case ENETRESET      : return "ENETRESET";
-	case ECONNABORTED   : return "ECONNABORTED";
-	case ECONNRESET     : return "ECONNRESET";
-	case ENOBUFS        : return "ENOBUFS";
-	case EISCONN        : return "EISCONN";
-	case ENOTCONN       : return "ENOTCONN";
-	case ESHUTDOWN      : return "ESHUTDOWN";
-	case ETOOMANYREFS   : return "ETOOMANYREFS";
-	case ETIMEDOUT      : return "ETIMEDOUT";
-	case ECONNREFUSED   : return "ECONNREFUSED";
-	case ELOOP          : return "ELOOP";
-	case ENAMETOOLONG   : return "ENAMETOOLONG";
-	case EHOSTDOWN      : return "EHOSTDOWN";
-	case EHOSTUNREACH   : return "EHOSTUNREACH";
-	case ENOTEMPTY      : return "ENOTEMPTY";
+    switch ( err )
+    {
+    case EWOULDBLOCK    : return "EWOULDBLOCK";
+    case EINPROGRESS    : return "EINPROGRESS";
+    case EALREADY       : return "EALREADY";
+    case ENOTSOCK       : return "ENOTSOCK";
+    case EDESTADDRREQ   : return "EDESTADDRREQ";
+    case EMSGSIZE       : return "EMSGSIZE";
+    case EPROTOTYPE     : return "EPROTOTYPE";
+    case ENOPROTOOPT    : return "ENOPROTOOPT";
+    case EPROTONOSUPPORT: return "EPROTONOSUPPORT";
+    case ESOCKTNOSUPPORT: return "ESOCKTNOSUPPORT";
+    case EOPNOTSUPP     : return "EOPNOTSUPP";
+    case EPFNOSUPPORT   : return "EPFNOSUPPORT";
+    case EAFNOSUPPORT   : return "EAFNOSUPPORT";
+    case EADDRINUSE     : return "EADDRINUSE";
+    case EADDRNOTAVAIL  : return "EADDRNOTAVAIL";
+    case ENETDOWN       : return "ENETDOWN";
+    case ENETUNREACH    : return "ENETUNREACH";
+    case ENETRESET      : return "ENETRESET";
+    case ECONNABORTED   : return "ECONNABORTED";
+    case ECONNRESET     : return "ECONNRESET";
+    case ENOBUFS        : return "ENOBUFS";
+    case EISCONN        : return "EISCONN";
+    case ENOTCONN       : return "ENOTCONN";
+    case ESHUTDOWN      : return "ESHUTDOWN";
+    case ETOOMANYREFS   : return "ETOOMANYREFS";
+    case ETIMEDOUT      : return "ETIMEDOUT";
+    case ECONNREFUSED   : return "ECONNREFUSED";
+    case ELOOP          : return "ELOOP";
+    case ENAMETOOLONG   : return "ENAMETOOLONG";
+    case EHOSTDOWN      : return "EHOSTDOWN";
+    case EHOSTUNREACH   : return "EHOSTUNREACH";
+    case ENOTEMPTY      : return "ENOTEMPTY";
 // TODO fix at some point
 #if defined(WIN32)
-	case EPROCLIM       : return "EPROCLIM";
+    case EPROCLIM       : return "EPROCLIM";
 #endif
-	case EUSERS         : return "EUSERS";
-	case EDQUOT         : return "EDQUOT";
-	case ESTALE         : return "ESTALE";
-	case EREMOTE        : return "EREMOTE";
-	default				: return "UNKNOWN_ERROR";
-	}
+    case EUSERS         : return "EUSERS";
+    case EDQUOT         : return "EDQUOT";
+    case ESTALE         : return "ESTALE";
+    case EREMOTE        : return "EREMOTE";
+    default				: return "UNKNOWN_ERROR";
+    }
 }
 
 //==================================================================

@@ -21,35 +21,35 @@ namespace RI
 //==================================================================
 class Parser
 {
-	class Tokenizer	*mpTokenizer;
+    class Tokenizer	*mpTokenizer;
 
 public:
 
-	DStr		mNextCommand;
-	int			mNextCommandLine;
-	DStr		mCurCommand;
-	int			mCurCommandLine;
-	ParamList	mCurParams;
+    DStr		mNextCommand;
+    int			mNextCommandLine;
+    DStr		mCurCommand;
+    int			mCurCommandLine;
+    ParamList	mCurParams;
 
 public:
-	Parser();
-	~Parser();
+    Parser();
+    ~Parser();
 
-	void AddChar( char ch );
+    void AddChar( char ch );
 
-	bool HasNewCommand() const
-	{
-		return	( mCurCommand.length() != 0 );
-	}
-	
-	void FlushNewCommand( DStr		*out_pCmdName,
-						  ParamList	*out_pParams,
-						  int		*out_pCmdLine );
-	
-	int GetCurLineNumber() const;
-	
+    bool HasNewCommand() const
+    {
+        return	( mCurCommand.length() != 0 );
+    }
+    
+    void FlushNewCommand( DStr		*out_pCmdName,
+                          ParamList	*out_pParams,
+                          int		*out_pCmdLine );
+    
+    int GetCurLineNumber() const;
+    
 private:
-	bool	mReachedEOF;
+    bool	mReachedEOF;
 };
 
 //==================================================================

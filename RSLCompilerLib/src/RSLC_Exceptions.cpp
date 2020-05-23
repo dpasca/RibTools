@@ -19,111 +19,111 @@ namespace RSLC
 
 //==================================================================
 static void makeMsg(
-				DStr &out_msg,
-				const char *pFile,
-				int line,
-				const char *pSrcMsg )
+                DStr &out_msg,
+                const char *pFile,
+                int line,
+                const char *pSrcMsg )
 {
-	out_msg = DUT::SSPrintFS(
-				"SHADER ERR> MSG : %s\n"
-				"SHADER ERR> AT  : %s : %i\n",
-				pSrcMsg,
-				pFile ? pFile : "<NO FILE>", line
-				);
+    out_msg = DUT::SSPrintFS(
+                "SHADER ERR> MSG : %s\n"
+                "SHADER ERR> AT  : %s : %i\n",
+                pSrcMsg,
+                pFile ? pFile : "<NO FILE>", line
+                );
 }
 
 //==================================================================
 Exception::Exception( const DStr &msg, const Token *pTok/*=NULL */ )
 {
-	if ( pTok )
-	{
-		makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, msg.c_str() );
-	}
-	else
-		mMsg = msg;
+    if ( pTok )
+    {
+        makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, msg.c_str() );
+    }
+    else
+        mMsg = msg;
 }
 
 //==================================================================
 Exception::Exception( const DStr &msg, const TokNode *pTokNode )
 {
-	if ( pTokNode && pTokNode->mpToken )
-	{
-		const Token *pTok = pTokNode->mpToken;
-		makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, msg.c_str() );
-	}
-	else
-		mMsg = msg;
+    if ( pTokNode && pTokNode->mpToken )
+    {
+        const Token *pTok = pTokNode->mpToken;
+        makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, msg.c_str() );
+    }
+    else
+        mMsg = msg;
 }
 
 //==================================================================
 Exception::Exception( const TokNode *pTokNode, const char *pFmt, ... )
 {
-	va_list	vl;
-	va_start( vl, pFmt );
+    va_list	vl;
+    va_start( vl, pFmt );
 
-	char	buff[4096];
+    char	buff[4096];
 
-	vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
-	va_end( vl );
+    vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
+    va_end( vl );
 
 
-	if ( pTokNode && pTokNode->mpToken )
-	{
-		const Token *pTok = pTokNode->mpToken;
-		makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, buff );
-	}
-	else
-	{
-		mMsg = buff;
-	}
+    if ( pTokNode && pTokNode->mpToken )
+    {
+        const Token *pTok = pTokNode->mpToken;
+        makeMsg( mMsg, pTok->pSourceFileName, pTok->sourceLine, buff );
+    }
+    else
+    {
+        mMsg = buff;
+    }
 }
 
 //==================================================================
 Exception::Exception( const FatBase &fatBase, const Fat8 &ch, const char *pFmt, ...  )
 {
-	va_list	vl;
-	va_start( vl, pFmt );
+    va_list	vl;
+    va_start( vl, pFmt );
 
-	char	buff[2048];
+    char	buff[2048];
 
-	vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
-	va_end( vl );
+    vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
+    va_end( vl );
 
-	makeMsg( mMsg, fatBase.mFileNames[ ch.FNameIdx ].c_str(), ch.SrcPos, buff );
+    makeMsg( mMsg, fatBase.mFileNames[ ch.FNameIdx ].c_str(), ch.SrcPos, buff );
 }
 
 //==================================================================
 void Warning( const TokNode *pTokNode, const char *pFmt, ... )
 {
-	va_list	vl;
-	va_start( vl, pFmt );
+    va_list	vl;
+    va_start( vl, pFmt );
 
-	char	buff[4096];
+    char	buff[4096];
 
-	vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
-	va_end( vl );
+    vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
+    va_end( vl );
 
 
-	if ( pTokNode && pTokNode->mpToken )
-	{
-		const Token *pTok = pTokNode->mpToken;
+    if ( pTokNode && pTokNode->mpToken )
+    {
+        const Token *pTok = pTokNode->mpToken;
 
-		printf(
-			"SHADER WARN> MSG : %s\n"
-			"SHADER WARN> AT  : %s : %i\n",
-			buff,
-			pTok->pSourceFileName ? pTok->pSourceFileName : "<NO FILE>",
-			pTok->sourceLine
-			);
+        printf(
+            "SHADER WARN> MSG : %s\n"
+            "SHADER WARN> AT  : %s : %i\n",
+            buff,
+            pTok->pSourceFileName ? pTok->pSourceFileName : "<NO FILE>",
+            pTok->sourceLine
+            );
 
-	}
-	else
-	{
-		printf(
-			"SHADER WARN> MSG : %s\n",
-			buff
-			);
-	}
+    }
+    else
+    {
+        printf(
+            "SHADER WARN> MSG : %s\n",
+            buff
+            );
+    }
 }
 
 //==================================================================

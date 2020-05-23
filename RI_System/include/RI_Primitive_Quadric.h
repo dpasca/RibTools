@@ -22,34 +22,34 @@ namespace RI
 class Cylinder : public SimplePrimitiveBase
 {
 public:
-	float	mRadius;
-	float	mZMin;
-	float	mZMax;
-	float	mThetamaxRad;
+    float	mRadius;
+    float	mZMin;
+    float	mZMax;
+    float	mThetamaxRad;
 
 public:
-	Cylinder( float radius, float zmin, float zmax, float thetamax ) :
-		SimplePrimitiveBase(CYLINDER),
-		mRadius(radius),
-		mZMin(zmin),
-		mZMax(zmax),
-		mThetamaxRad(DEG2RAD(thetamax))
-	{
-	}
+    Cylinder( float radius, float zmin, float zmax, float thetamax ) :
+        SimplePrimitiveBase(CYLINDER),
+        mRadius(radius),
+        mZMin(zmin),
+        mZMax(zmax),
+        mThetamaxRad(DEG2RAD(thetamax))
+    {
+    }
 
-		Cylinder *Clone() const {	return DNEW Cylinder( *this ); }
+        Cylinder *Clone() const {	return DNEW Cylinder( *this ); }
 
-		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
-		{
-			MakeBoundFromUVRangeN<SimplePrimitiveBase,MAKE_BOUND_FROM_UV_RANGE_DIM>( *this, out_bound, out_pPo );
-		}
-		void MakeBound( Bound &out_bound ) const;
+        void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
+        {
+            MakeBoundFromUVRangeN<SimplePrimitiveBase,MAKE_BOUND_FROM_UV_RANGE_DIM>( *this, out_bound, out_pPo );
+        }
+        void MakeBound( Bound &out_bound ) const;
 
-		void Eval_dPdu_dPdv(
-						const Float2_ &uv,
-						Float3_ &out_pt,
-						Float3_ *out_dPdu,
-						Float3_ *out_dPdv ) const;
+        void Eval_dPdu_dPdv(
+                        const Float2_ &uv,
+                        Float3_ &out_pt,
+                        Float3_ *out_dPdu,
+                        Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -58,32 +58,32 @@ public:
 class Cone : public SimplePrimitiveBase
 {
 public:
-	float	mHeight;
-	float	mRadius;
-	float	mThetamaxRad;
+    float	mHeight;
+    float	mRadius;
+    float	mThetamaxRad;
 
 public:
-	Cone( float height, float radius, float thetamax ) :
-		SimplePrimitiveBase(CONE),
-		mHeight(height),
-		mRadius(radius),
-		mThetamaxRad(DEG2RAD(thetamax))
-	{
-	}
+    Cone( float height, float radius, float thetamax ) :
+        SimplePrimitiveBase(CONE),
+        mHeight(height),
+        mRadius(radius),
+        mThetamaxRad(DEG2RAD(thetamax))
+    {
+    }
 
-		Cone *Clone() const {	return DNEW Cone( *this ); }
+        Cone *Clone() const {	return DNEW Cone( *this ); }
 
-		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
-		{
-			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
-		}
-		void MakeBound( Bound &out_bound ) const;
+        void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
+        {
+            MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+        }
+        void MakeBound( Bound &out_bound ) const;
 
-		void Eval_dPdu_dPdv(
-						const Float2_ &uv,
-						Float3_ &out_pt,
-						Float3_ *out_dPdu,
-						Float3_ *out_dPdv ) const;
+        void Eval_dPdu_dPdv(
+                        const Float2_ &uv,
+                        Float3_ &out_pt,
+                        Float3_ *out_dPdu,
+                        Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -92,34 +92,34 @@ public:
 class Sphere : public SimplePrimitiveBase
 {
 public:
-	float	mRadius;
-	float	mZMin;
-	float	mZMax;
-	float	mThetamaxRad;
+    float	mRadius;
+    float	mZMin;
+    float	mZMax;
+    float	mThetamaxRad;
 
 public:
-	Sphere( float radius, float zmin, float zmax, float thetamax ) :
-		SimplePrimitiveBase(SPHERE),
-		mRadius(radius),
-		mZMin(zmin),
-		mZMax(zmax),
-		mThetamaxRad(DEG2RAD(thetamax))
-	{
-	}
+    Sphere( float radius, float zmin, float zmax, float thetamax ) :
+        SimplePrimitiveBase(SPHERE),
+        mRadius(radius),
+        mZMin(zmin),
+        mZMax(zmax),
+        mThetamaxRad(DEG2RAD(thetamax))
+    {
+    }
 
-		Sphere *Clone() const {	return DNEW Sphere( *this ); }
+        Sphere *Clone() const {	return DNEW Sphere( *this ); }
 
-		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
-		{
-			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
-		}
-		void MakeBound( Bound &out_bound ) const;
+        void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
+        {
+            MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+        }
+        void MakeBound( Bound &out_bound ) const;
 
-		void Eval_dPdu_dPdv(
-						const Float2_ &uv,
-						Float3_ &out_pt,
-						Float3_ *out_dPdu,
-						Float3_ *out_dPdv ) const;
+        void Eval_dPdu_dPdv(
+                        const Float2_ &uv,
+                        Float3_ &out_pt,
+                        Float3_ *out_dPdu,
+                        Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -128,32 +128,32 @@ public:
 class Hyperboloid : public SimplePrimitiveBase
 {
 public:
-	Float3	mP1;
-	Float3	mP2;
-	float	mThetamaxRad;
+    Float3	mP1;
+    Float3	mP2;
+    float	mThetamaxRad;
 
 public:
-	Hyperboloid( const Float3 &p1, const Float3 &p2, float thetamax ) :
-		SimplePrimitiveBase(HYPERBOLOID),
-		mP1(p1),
-		mP2(p2),
-		mThetamaxRad(DEG2RAD(thetamax))
-	{
-	}
+    Hyperboloid( const Float3 &p1, const Float3 &p2, float thetamax ) :
+        SimplePrimitiveBase(HYPERBOLOID),
+        mP1(p1),
+        mP2(p2),
+        mThetamaxRad(DEG2RAD(thetamax))
+    {
+    }
 
-		Hyperboloid *Clone() const { return DNEW Hyperboloid( *this ); }
+        Hyperboloid *Clone() const { return DNEW Hyperboloid( *this ); }
 
-		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
-		{
-			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
-		}
-		void MakeBound( Bound &out_bound ) const;
+        void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
+        {
+            MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+        }
+        void MakeBound( Bound &out_bound ) const;
 
-		void Eval_dPdu_dPdv(
-						const Float2_ &uv,
-						Float3_ &out_pt,
-						Float3_ *out_dPdu,
-						Float3_ *out_dPdv ) const;
+        void Eval_dPdu_dPdv(
+                        const Float2_ &uv,
+                        Float3_ &out_pt,
+                        Float3_ *out_dPdu,
+                        Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -162,34 +162,34 @@ public:
 class Paraboloid : public SimplePrimitiveBase
 {
 public:
-	float	mRmax;
-	float	mZmin;
-	float	mZmax;
-	float	mThetamaxRad;
+    float	mRmax;
+    float	mZmin;
+    float	mZmax;
+    float	mThetamaxRad;
 
 public:
-	Paraboloid( float rmax, float zmin, float zmax, float thetamax ) :
-		SimplePrimitiveBase(PARABOLOID),
-		mRmax(rmax),
-		mZmin(zmin),
-		mZmax(zmax),
-		mThetamaxRad(DEG2RAD(thetamax))
-	{
-	}
+    Paraboloid( float rmax, float zmin, float zmax, float thetamax ) :
+        SimplePrimitiveBase(PARABOLOID),
+        mRmax(rmax),
+        mZmin(zmin),
+        mZmax(zmax),
+        mThetamaxRad(DEG2RAD(thetamax))
+    {
+    }
 
-		Paraboloid *Clone() const {	return DNEW Paraboloid( *this ); }
+        Paraboloid *Clone() const {	return DNEW Paraboloid( *this ); }
 
-		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
-		{
-			MakeBoundFromUVRangeN<SimplePrimitiveBase,3>( *this, out_bound, out_pPo );
-		}
-		void MakeBound( Bound &out_bound ) const;
+        void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
+        {
+            MakeBoundFromUVRangeN<SimplePrimitiveBase,3>( *this, out_bound, out_pPo );
+        }
+        void MakeBound( Bound &out_bound ) const;
 
-		void Eval_dPdu_dPdv(
-						const Float2_ &uv,
-						Float3_ &out_pt,
-						Float3_ *out_dPdu,
-						Float3_ *out_dPdv ) const;
+        void Eval_dPdu_dPdv(
+                        const Float2_ &uv,
+                        Float3_ &out_pt,
+                        Float3_ *out_dPdu,
+                        Float3_ *out_dPdv ) const;
 };
 
 //==================================================================
@@ -198,38 +198,38 @@ public:
 class Torus : public SimplePrimitiveBase
 {
 public:
-	float	mMinRadius;
-	float	mMaxRadius;
-	float	mPhiminRad;
-	float	mPhimaxRad;
-	float	mThetamaxRad;
+    float	mMinRadius;
+    float	mMaxRadius;
+    float	mPhiminRad;
+    float	mPhimaxRad;
+    float	mThetamaxRad;
 
 public:
-	Torus( float maxRadius, float minRadius,
-		   float phimin, float phimax,
-		   float thetamax ) :
-		SimplePrimitiveBase(TORUS),
-		mMaxRadius(maxRadius),
-		mMinRadius(minRadius),
-		mPhiminRad(DEG2RAD(phimin)),
-		mPhimaxRad(DEG2RAD(phimax)),
-		mThetamaxRad(DEG2RAD(thetamax))
-	{
-	}
-	
-		Torus *Clone() const {	return DNEW Torus( *this ); }
+    Torus( float maxRadius, float minRadius,
+           float phimin, float phimax,
+           float thetamax ) :
+        SimplePrimitiveBase(TORUS),
+        mMaxRadius(maxRadius),
+        mMinRadius(minRadius),
+        mPhiminRad(DEG2RAD(phimin)),
+        mPhimaxRad(DEG2RAD(phimax)),
+        mThetamaxRad(DEG2RAD(thetamax))
+    {
+    }
+    
+        Torus *Clone() const {	return DNEW Torus( *this ); }
 
-		void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
-		{
-			MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
-		}
-		void MakeBound( Bound &out_bound ) const;
+        void MakeBound( Bound &out_bound, Float3_ *out_pPo ) const
+        {
+            MakeBoundFromUVRangeN<SimplePrimitiveBase,4>( *this, out_bound, out_pPo );
+        }
+        void MakeBound( Bound &out_bound ) const;
 
-		void Eval_dPdu_dPdv(
-						const Float2_ &uv,
-						Float3_ &out_pt,
-						Float3_ *out_dPdu,
-						Float3_ *out_dPdv ) const;
+        void Eval_dPdu_dPdv(
+                        const Float2_ &uv,
+                        Float3_ &out_pt,
+                        Float3_ *out_dPdu,
+                        Float3_ *out_dPdv ) const;
 };
 
 //==================================================================

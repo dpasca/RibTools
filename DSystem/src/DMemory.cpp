@@ -11,13 +11,13 @@
 #include "DExceptions.h"
 
 #ifdef _MSC_VER
-	#include <malloc.h>
+    #include <malloc.h>
 
 #elif defined(__MACH__)
-	//#include <mm_malloc.h>
+    //#include <mm_malloc.h>
 
 #else
-	#include <mm_malloc.h>
+    #include <mm_malloc.h>
 
 #endif
 
@@ -28,8 +28,8 @@ void *operator new( size_t size, const char *pFile, int line )
 {
     void *p = _mm_malloc( size, 64 );
 
-	if NOT( p )
-		DEX_BAD_ALLOC( "new failed !" );
+    if NOT( p )
+        DEX_BAD_ALLOC( "new failed !" );
 
     return p;
 }
@@ -39,8 +39,8 @@ void *operator new [] ( size_t size, const char *pFile, int line )
 {
     void *p = _mm_malloc( size, 64 );
 
-	if NOT( p )
-		DEX_BAD_ALLOC( "new [] failed !" );
+    if NOT( p )
+        DEX_BAD_ALLOC( "new [] failed !" );
 
     return p;
 }
@@ -48,15 +48,15 @@ void *operator new [] ( size_t size, const char *pFile, int line )
 //==================================================================
 void operator delete( void *p, const char *pFile, int line )
 {
-	if ( p )
-		_mm_free( p );
+    if ( p )
+        _mm_free( p );
 }
 
 //==================================================================
 void operator delete [] ( void *p, const char *pFile, int line )
 {
-	if ( p )
-		_mm_free( p );
+    if ( p )
+        _mm_free( p );
 }
 #endif
 
@@ -67,8 +67,8 @@ void *operator new( size_t size )
 {
     void *p = _mm_malloc( size, 64 );
 
-	if NOT( p )
-		DEX_BAD_ALLOC( "new failed !" );
+    if NOT( p )
+        DEX_BAD_ALLOC( "new failed !" );
 
     return p;
 }
@@ -78,8 +78,8 @@ void *operator new [] ( size_t size )
 {
     void *p = _mm_malloc( size, 64 );
 
-	if NOT( p )
-		DEX_BAD_ALLOC( "new [] failed !" );
+    if NOT( p )
+        DEX_BAD_ALLOC( "new [] failed !" );
 
     return p;
 }
@@ -87,15 +87,15 @@ void *operator new [] ( size_t size )
 //==================================================================
 void operator delete( void *p )
 {
-	if ( p )
-		_mm_free( p );
+    if ( p )
+        _mm_free( p );
 }
 
 //==================================================================
 void operator delete [] ( void *p )
 {
-	if ( p )
-		_mm_free( p );
+    if ( p )
+        _mm_free( p );
 }
 
 #endif

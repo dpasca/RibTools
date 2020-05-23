@@ -22,80 +22,80 @@ namespace RSLC
 //==================================================================
 enum BlockType
 {
-	BLKT_UNKNOWN,
-	BLKT_ROOT,
-	BLKT_DECL_PARAMS_SH,
-	BLKT_DECL_PARAMS_FN,
-	BLKT_CALL_PARAMS_FN,
-	BLKT_CALL_OR_DELC_PARAMS_FN,
-	BLKT_CODEBLOCK,
-	BLKT_EXPRESSION,
-	BLKT_N
+    BLKT_UNKNOWN,
+    BLKT_ROOT,
+    BLKT_DECL_PARAMS_SH,
+    BLKT_DECL_PARAMS_FN,
+    BLKT_CALL_PARAMS_FN,
+    BLKT_CALL_OR_DELC_PARAMS_FN,
+    BLKT_CODEBLOCK,
+    BLKT_EXPRESSION,
+    BLKT_N
 };
 
 //==================================================================
 class Token
 {
 public:
-	DStr		str;
-	TokenID		id;
-	TokenIDType	idType;
-	bool		isPrecededByWS;
-	bool		isBadNumber;
-	const char	*pSourceFileName;
-	int			sourceLine;
+    DStr		str;
+    TokenID		id;
+    TokenIDType	idType;
+    bool		isPrecededByWS;
+    bool		isBadNumber;
+    const char	*pSourceFileName;
+    int			sourceLine;
 
-	double		ConstNum;	// valid only if id == T_VL_NUMBER
+    double		ConstNum;	// valid only if id == T_VL_NUMBER
 
-	Token();
+    Token();
 
-	Token(
-			const char	*pStr_,
-			TokenID		id_,
-			TokenIDType	idType_,
-			const Token	*pInheritTokPos_=NULL );
+    Token(
+            const char	*pStr_,
+            TokenID		id_,
+            TokenIDType	idType_,
+            const Token	*pInheritTokPos_=NULL );
 
-	void SetAsStringValue( const char *srcStr );
-	void SetAsStringValue( const DStr &srcStr );
-	void SetAsBoolValue( bool onoff );
-	void SetAsNumValue( double num );
+    void SetAsStringValue( const char *srcStr );
+    void SetAsStringValue( const DStr &srcStr );
+    void SetAsBoolValue( bool onoff );
+    void SetAsNumValue( double num );
 
-	// kind of lame function used during construction..
-	bool IsSet() const
-	{
-		return id != TOKEN_N;
-	}
+    // kind of lame function used during construction..
+    bool IsSet() const
+    {
+        return id != TOKEN_N;
+    }
 
-	const char *GetStrChar() const
-	{
-		return str.c_str();
-	}
+    const char *GetStrChar() const
+    {
+        return str.c_str();
+    }
 
-	bool IsAssignOp() const
-	{
-		return
-			id == T_OP_ASSIGN	||
-			id == T_OP_PLUSASS	||
-			id == T_OP_MINUSASS	||
-			id == T_OP_MULASS	||
-			id == T_OP_DIVASS	;
-	}
+    bool IsAssignOp() const
+    {
+        return
+            id == T_OP_ASSIGN	||
+            id == T_OP_PLUSASS	||
+            id == T_OP_MINUSASS	||
+            id == T_OP_MULASS	||
+            id == T_OP_DIVASS	;
+    }
 
-	bool IsBiOp() const;
+    bool IsBiOp() const;
 
-	bool IsCmpOp() const
-	{
-		return
-			id == T_OP_LSEQ	||
-			id == T_OP_GEEQ	||
-			id == T_OP_LSTH	||
-			id == T_OP_GRTH	||
-			id == T_OP_EQ	||
-			id == T_OP_NEQ	;
-	}
+    bool IsCmpOp() const
+    {
+        return
+            id == T_OP_LSEQ	||
+            id == T_OP_GEEQ	||
+            id == T_OP_LSTH	||
+            id == T_OP_GRTH	||
+            id == T_OP_EQ	||
+            id == T_OP_NEQ	;
+    }
 
-	void UpdateConstNum();
-	void UpdateStrFromValue();
+    void UpdateConstNum();
+    void UpdateStrFromValue();
 };
 
 //==================================================================

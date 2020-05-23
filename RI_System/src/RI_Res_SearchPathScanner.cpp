@@ -15,130 +15,130 @@ namespace RI
 
 //==================================================================
 SearchPathScanner::SearchPathScanner(
-				const char *pBaseDir,
-				const char *pDefaultDir,
-				const DVec<DStr> &searchPaths ) :
-	mIdx(0),
-	mpBaseDir(pBaseDir),
-	mpDefaultDir(pDefaultDir),
-	mpSearchPaths(&searchPaths)
+                const char *pBaseDir,
+                const char *pDefaultDir,
+                const DVec<DStr> &searchPaths ) :
+    mIdx(0),
+    mpBaseDir(pBaseDir),
+    mpDefaultDir(pDefaultDir),
+    mpSearchPaths(&searchPaths)
 {
 }
 
 //==================================================================
 bool SearchPathScanner::GetNext( DStr &out_path, bool &out_pathIsAbsolute )
 {
-	// no search paths ?
-	if NOT( mpSearchPaths->size() )
-	{
-		return getNextNoSPathList( out_path, out_pathIsAbsolute );
-	}
-	else
-	{
-		return getNextWithSPathList( out_path, out_pathIsAbsolute );
-	}
+    // no search paths ?
+    if NOT( mpSearchPaths->size() )
+    {
+        return getNextNoSPathList( out_path, out_pathIsAbsolute );
+    }
+    else
+    {
+        return getNextWithSPathList( out_path, out_pathIsAbsolute );
+    }
 }
 
 //==================================================================
 // remove trailing slash or backslash
 static void strRemoveTrailingDirDiv( DStr &io_str )
 {
-	while ( io_str.length() )
-	{
-		char ch = io_str[ io_str.length() - 1 ];
+    while ( io_str.length() )
+    {
+        char ch = io_str[ io_str.length() - 1 ];
 
-		if ( ch != '/' && ch != '\\' )
-			break;
+        if ( ch != '/' && ch != '\\' )
+            break;
 
-		io_str.resize( io_str.length() - 1 );
-	}
+        io_str.resize( io_str.length() - 1 );
+    }
 }
 
 //==================================================================
 bool SearchPathScanner::getNextNoSPathList( DStr &out_path, bool &out_pathIsAbsolute )
 {
-	out_pathIsAbsolute = true;
+    out_pathIsAbsolute = true;
 
-	// use the base dir first and then the app res dir..
+    // use the base dir first and then the app res dir..
 
-	switch ( mIdx )
-	{
-	case 0:
-		out_path = mpBaseDir;
-		strRemoveTrailingDirDiv( out_path );
-		++mIdx;
-		return true;
+    switch ( mIdx )
+    {
+    case 0:
+        out_path = mpBaseDir;
+        strRemoveTrailingDirDiv( out_path );
+        ++mIdx;
+        return true;
 
-	case 1:
-		if ( mpDefaultDir )
-		{
-			out_path = mpDefaultDir;
-			strRemoveTrailingDirDiv( out_path );
-			++mIdx;
-			return true;
-		}
+    case 1:
+        if ( mpDefaultDir )
+        {
+            out_path = mpDefaultDir;
+            strRemoveTrailingDirDiv( out_path );
+            ++mIdx;
+            return true;
+        }
 
-		return false;
+        return false;
 
-	default:
-		return false;
-	}
+    default:
+        return false;
+    }
 }
 
 //==================================================================
 bool SearchPathScanner::getNextWithSPathList( DStr &out_path, bool &out_pathIsAbsolute )
 {
-	// not given the base dir yet ?
-	if ( mpBaseDir )
-	{
-		// ..give this first
-		out_pathIsAbsolute = true;
-		out_path = mpBaseDir;
-		strRemoveTrailingDirDiv( out_path );
+    // not given the base dir yet ?
+    if ( mpBaseDir )
+    {
+        // ..give this first
+        out_pathIsAbsolute = true;
+        out_path = mpBaseDir;
+        strRemoveTrailingDirDiv( out_path );
 
-		// set it to NULL to flag that we won't give it again
-		mpBaseDir = NULL;
+        // set it to NULL to flag that we won't give it again
+        mpBaseDir = NULL;
 
-		return true;
-	}
+        return true;
+    }
 
-	// have we reached the end ?
-	if ( mIdx >= mpSearchPaths->size() )
-		return false;
+    // have we reached the end ?
+    if ( mIdx >= mpSearchPaths->size() )
+        return false;
 
-	if NOT( mpDefaultDir )
-	{
-		// if we have no default dir, then skip all the @ until
-		// the next actual path
-		for (; mIdx < mpSearchPaths->size(); ++mIdx)
-		{
-			if ( (*mpSearchPaths)[mIdx] != "@" )
-				break;
-		}
+    if NOT( mpDefaultDir )
+    {
+        // if we have no default dir, then skip all the @ until
+        // the next actual path
+        for (; mIdx < mpSearchPaths->size(); ++mIdx)
+        {
+            if ( (*mpSearchPaths)[mIdx] != "@" )
+                break;
+        }
 
-		// have we reached the end ?
-		if ( mIdx >= mpSearchPaths->size() )
-			return false;
-	}
+        // have we reached the end ?
+        if ( mIdx >= mpSearchPaths->size() )
+            return false;
+    }
 
-	// is this the default path ?
-	if ( (*mpSearchPaths)[mIdx] == "@" )
-	{
-		out_pathIsAbsolute = true;
-		out_path = mpDefaultDir;
-		strRemoveTrailingDirDiv( out_path );
-	}
-	else
-	{
-		// ..or just a plain path..
-		out_pathIsAbsolute = false;	// not really 100% sure..
-		out_path = (*mpSearchPaths)[mIdx];
-		strRemoveTrailingDirDiv( out_path );
-	}
+    // is this the default path ?
+    if ( (*mpSearchPaths)[mIdx] == "@" )
+    {
+        out_pathIsAbsolute = true;
+        out_path = mpDefaultDir;
+        strRemoveTrailingDirDiv( out_path );
+    }
+    else
+    {
+        // ..or just a plain path..
+        out_pathIsAbsolute = false;	// not really 100% sure..
+        out_path = (*mpSearchPaths)[mIdx];
+        strRemoveTrailingDirDiv( out_path );
+    }
 
-	++mIdx;
+    ++mIdx;
 
-	return true;
+    return true;
 }
 
 //==================================================================

@@ -50,46 +50,46 @@ namespace DUT
 //===============================================================
 DStr VSSPrintFS( const char *pFmt, va_list vl )
 {
-	char	buff[1024];
-	vsnprintf( buff, sizeof(buff), pFmt, vl );
+    char	buff[1024];
+    vsnprintf( buff, sizeof(buff), pFmt, vl );
 
-	return DStr( buff );
+    return DStr( buff );
 }
 
 //==================================================================
 DStr SSPrintFS( const char *pFmt, ... )
 {
-	va_list	vl;
-	va_start( vl, pFmt );
+    va_list	vl;
+    va_start( vl, pFmt );
 
-	DStr ret = VSSPrintFS( pFmt, vl );
+    DStr ret = VSSPrintFS( pFmt, vl );
 
-	va_end( vl );
+    va_end( vl );
 
-	return ret;
+    return ret;
 }
 
 //===============================================================
 void DAssert( bool ok, const char *pFile, int line, const char *msg )
 {
-	if ( ok )
-		return;
+    if ( ok )
+        return;
 
-	char	buff[1024];
+    char	buff[1024];
 
-	sprintf(buff, "ASSERT: %s:%i '%s'\n", pFile, line, (msg==0)?(""):msg);
+    sprintf(buff, "ASSERT: %s:%i '%s'\n", pFile, line, (msg==0)?(""):msg);
 
-	printf( "%s", buff );
+    printf( "%s", buff );
 
 #if defined(_DEBUG) || defined(DEBUG)
 
 # if defined(_MSC_VER)
 
     OutputDebugString( buff );
-	DebugBreak();
+    DebugBreak();
 
 # elif defined(TARGET_OS_IPHONE)
-	kill( getpid(), SIGINT );
+    kill( getpid(), SIGINT );
 
 # elif defined(ANDROID)
     PlatformAssertRaise(buff);
@@ -113,60 +113,60 @@ void DAssert( bool ok, const char *pFile, int line, const char *msg )
 //===============================================================
 void DAssThrow( bool ok, const char *pFile, int line, const char *pFmt, ... )
 {
-	if ( ok )
-		return;
+    if ( ok )
+        return;
 
-	va_list	vl;
-	va_start( vl, pFmt );
+    va_list	vl;
+    va_start( vl, pFmt );
 
-	DVAssThrow( ok, pFile, line, pFmt, vl );
+    DVAssThrow( ok, pFile, line, pFmt, vl );
 
-	va_end( vl );
+    va_end( vl );
 }
 
 //===============================================================
 void DVAssThrow( bool ok, const char *pFile, int line, const char *pFmt, va_list vl )
 {
-	if ( ok )
-		return;
+    if ( ok )
+        return;
 
-	char	buff[1024];
-	vsnprintf( buff, sizeof(buff), pFmt, vl );
+    char	buff[1024];
+    vsnprintf( buff, sizeof(buff), pFmt, vl );
 
-	DSAssThrow( ok, pFile, line, buff );
+    DSAssThrow( ok, pFile, line, buff );
 }
 
 //===============================================================
 void DSAssThrow( bool ok, const char *pFile, int line, const char *pNewCharMsg )
 {
-	if ( ok )
-		return;
+    if ( ok )
+        return;
 
-	char	buff[1024];
+    char	buff[1024];
 
-	if ( pNewCharMsg )
-	{
-		sprintf( buff, "ASSERT EXCEPT: %s - %s %i\n", pNewCharMsg, pFile, line );
-	}
-	else
-	{
-		sprintf( buff, "ASSERT EXCEPT: %s %i\n", pFile, line );
-	}
+    if ( pNewCharMsg )
+    {
+        sprintf( buff, "ASSERT EXCEPT: %s - %s %i\n", pNewCharMsg, pFile, line );
+    }
+    else
+    {
+        sprintf( buff, "ASSERT EXCEPT: %s %i\n", pFile, line );
+    }
 
-	//puts( buff );
+    //puts( buff );
 
 #if defined(ANDROID)
     PlatformAssertRaise(buff);
 #else
-	throw std::runtime_error( buff );
+    throw std::runtime_error( buff );
 #endif
 }
 
 //==================================================================
 void DVerbose(const char *fmt, ... )
 {
-	va_list	vl;
-	va_start( vl, fmt );
+    va_list	vl;
+    va_start( vl, fmt );
 
     DVVerbose(fmt, vl);
 }
@@ -184,8 +184,8 @@ void DVVerbose(const char *fmt, va_list vl)
 //==================================================================
 void DDebugOut(const char *fmt, ... )
 {
-	va_list	vl;
-	va_start( vl, fmt );
+    va_list	vl;
+    va_start( vl, fmt );
 
     DVDebugOut(fmt, vl);
 }
@@ -196,7 +196,7 @@ void DVDebugOut(const char *fmt, va_list vl)
 
     // like DVVerbose, but with additional debugger output
 #if defined(_MSC_VER)
-	char	buff[2048];
+    char	buff[2048];
     vsnprintf( buff, sizeof(buff), fmt, vl);
     OutputDebugString( buff );
 #endif
@@ -205,49 +205,49 @@ void DVDebugOut(const char *fmt, va_list vl)
 //==================================================================
 I64 GetTimeTicks()
 {
-	I64	val;
+    I64	val;
 
 #if defined(_MSC_VER)
-	QueryPerformanceCounter( (LARGE_INTEGER *)&val );
+    QueryPerformanceCounter( (LARGE_INTEGER *)&val );
 
 #else
-	timeval		timeVal;
+    timeval		timeVal;
 
-	gettimeofday( &timeVal, NULL );
+    gettimeofday( &timeVal, NULL );
 
-	val = (I64)timeVal.tv_sec * (1000*1000) + (I64)timeVal.tv_usec;
+    val = (I64)timeVal.tv_sec * (1000*1000) + (I64)timeVal.tv_usec;
 #endif
 
-	return val;
+    return val;
 }
 
 //==================================================================
 double TimeTicksToMS( I64 ticks )
 {
-	static double	coe;
+    static double	coe;
 
 #if defined(_MSC_VER)
-	static I64  	freq;
+    static I64  	freq;
 
-	if ( freq == 0 )
-	{
-		QueryPerformanceFrequency( (LARGE_INTEGER *)&freq );
-		coe = 1000.0 / freq;
-	}
+    if ( freq == 0 )
+    {
+        QueryPerformanceFrequency( (LARGE_INTEGER *)&freq );
+        coe = 1000.0 / freq;
+    }
 
 #else
-	coe = 1.0 / 1000.0;
+    coe = 1.0 / 1000.0;
 
 #endif
 
-	return ticks * coe;
+    return ticks * coe;
 }
 
 //==================================================================
 void SleepMS( U32 sleepMS )
 {
 #if defined(WIN32)
-	Sleep( sleepMS );
+    Sleep( sleepMS );
 #endif
 }
 
@@ -256,11 +256,11 @@ void OpenURL( const char *pURL )
 {
 #if defined(TARGET_OS_IPHONE)
 
-	IPHUT::OpenURL( pURL );
+    IPHUT::OpenURL( pURL );
 
 #elif defined(WIN32)
 
-	ShellExecute( NULL, "open", pURL, NULL, NULL, SW_SHOWNORMAL );
+    ShellExecute( NULL, "open", pURL, NULL, NULL, SW_SHOWNORMAL );
 
 #elif defined(ANDROID)
 
@@ -268,7 +268,7 @@ void OpenURL( const char *pURL )
 
 #else
 
-	// DAVIDE - DPRINT seems to be undefined (?)
+    // DAVIDE - DPRINT seems to be undefined (?)
     //DPRINT("(unimplemented) OpenURL: %s", pURL);
     printf("(unimplemented) OpenURL: %s\n", pURL);
 
@@ -297,30 +297,30 @@ void ShowAlert( const char *pTitle, const char *pText )
 //==================================================================
 void CharScreen::clear()
 {
-	mLines.clear();
-	mNX = 0;
+    mLines.clear();
+    mNX = 0;
 }
 
 //==================================================================
 void CharScreen::AddLine( const char *pFmt, ... )
 {
-	char	buff[1024];
+    char	buff[1024];
 
-	va_list	vl;
-	va_start( vl, pFmt );
-	vsnprintf( buff, sizeof(buff), pFmt, vl );
-	va_end( vl );
+    va_list	vl;
+    va_start( vl, pFmt );
+    vsnprintf( buff, sizeof(buff), pFmt, vl );
+    va_end( vl );
 
-	mLines.push_back( buff );
+    mLines.push_back( buff );
 
-	if ( (u_int)mLines.back().size() > mNX )
-		mNX = (u_int)mLines.back().size();
+    if ( (u_int)mLines.back().size() > mNX )
+        mNX = (u_int)mLines.back().size();
 }
 
 //==================================================================
 void CharScreen::AddLine()
 {
-	mLines.push_back( DStr() );
+    mLines.push_back( DStr() );
 }
 
 //==================================================================

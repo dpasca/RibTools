@@ -16,100 +16,100 @@ namespace DUT
 //==================================================================
 void StrStripBeginEndWhite( char *pStr )
 {
-	size_t	len = strlen( pStr );
+    size_t	len = strlen( pStr );
 
-	if NOT( len )
-		return;
+    if NOT( len )
+        return;
 
-	int	newLen = len;
-	for (int i=(int)len-1; i >= 0; --i)
-	{
-		char ch = pStr[i];
-		if ( IsWhite( ch ) )
-			pStr[i] = 0;
-		else
-		{
-			newLen = i + 1;
-			break;
-		}
-	}
+    int	newLen = len;
+    for (int i=(int)len-1; i >= 0; --i)
+    {
+        char ch = pStr[i];
+        if ( IsWhite( ch ) )
+            pStr[i] = 0;
+        else
+        {
+            newLen = i + 1;
+            break;
+        }
+    }
 
-	size_t	di = 0;
-	bool	foundNonWhite = false;
-	for (int si=0; si < newLen; ++si)
-	{
-		char ch = pStr[si];
+    size_t	di = 0;
+    bool	foundNonWhite = false;
+    for (int si=0; si < newLen; ++si)
+    {
+        char ch = pStr[si];
 
-		if ( foundNonWhite || !IsWhite( ch ) )
-		{
-			pStr[di++] = pStr[si];
-			foundNonWhite = true;
-		}
-	}
-	pStr[di] = 0;
+        if ( foundNonWhite || !IsWhite( ch ) )
+        {
+            pStr[di++] = pStr[si];
+            foundNonWhite = true;
+        }
+    }
+    pStr[di] = 0;
 }
 
 //==================================================================
 const char *StrStrI( const char *pStr, const char *pSearch )
 {
-	// ANSI strstr behavior: it's a match if search is empty
-	if NOT( pSearch[0] )
-		return pStr;
+    // ANSI strstr behavior: it's a match if search is empty
+    if NOT( pSearch[0] )
+        return pStr;
 
-	for (size_t i=0; pStr[i]; ++i)
-	{
-		if ( tolower(pSearch[0]) == tolower(pStr[i]) )
-		{
-			size_t	j = 0;
-			for (; pSearch[j]; ++j)
-				if ( tolower(pStr[i+j]) != tolower(pSearch[j]) )
-					break;
+    for (size_t i=0; pStr[i]; ++i)
+    {
+        if ( tolower(pSearch[0]) == tolower(pStr[i]) )
+        {
+            size_t	j = 0;
+            for (; pSearch[j]; ++j)
+                if ( tolower(pStr[i+j]) != tolower(pSearch[j]) )
+                    break;
 
-			// reached the end of the search string ?
-			if ( pSearch[j] == 0 )
-				return pStr + i;	// it's a match
-		}
-	}
+            // reached the end of the search string ?
+            if ( pSearch[j] == 0 )
+                return pStr + i;	// it's a match
+        }
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //==================================================================
 bool StrStartsWithI( const char *pStr, const char *pSearch )
 {
-	return pStr == StrStrI( pStr, pSearch );
+    return pStr == StrStrI( pStr, pSearch );
 }
 
 //==================================================================
 bool StrEndsWithI( const char *pStr, const char *pSearch )
 {
-	size_t	strLen = strlen( pStr );
-	size_t	searchLen = strlen( pSearch );
+    size_t	strLen = strlen( pStr );
+    size_t	searchLen = strlen( pSearch );
 
-	if ( searchLen > strLen )
-		return false;
+    if ( searchLen > strLen )
+        return false;
 
-	return 0 == strcasecmp( pStr + strLen - searchLen, pSearch );
+    return 0 == strcasecmp( pStr + strLen - searchLen, pSearch );
 }
 
 //==================================================================
 void StrToUpper( DStr &str )
 {
-	for (size_t i=0; i < str.size(); ++i)
-		str[i] = toupper( str[i] );
+    for (size_t i=0; i < str.size(); ++i)
+        str[i] = toupper( str[i] );
 }
 //==================================================================
 void StrToUpper( char *pStr )
 {
-	for (size_t i=0; pStr[i]; ++i)
-		pStr[i] = toupper( pStr[i] );
+    for (size_t i=0; pStr[i]; ++i)
+        pStr[i] = toupper( pStr[i] );
 }
 
 //==================================================================
 void StrToLower( DStr &str )
 {
-	for (size_t i=0; i < str.size(); ++i)
-		str[i] = tolower( str[i] );
+    for (size_t i=0; i < str.size(); ++i)
+        str[i] = tolower( str[i] );
 }
 //==================================================================
 void StrToLower( char *pStr )
@@ -121,84 +121,84 @@ void StrToLower( char *pStr )
 //==================================================================
 const char *StrFindFirstOf( const char *pStr, char searchCh )
 {
-	for (; ; ++pStr)
-	{
-		if ( *pStr == 0 )
+    for (; ; ++pStr)
+    {
+        if ( *pStr == 0 )
             return NULL;
         else
-		if ( *pStr == searchCh )
-			return pStr;
-	}
+        if ( *pStr == searchCh )
+            return pStr;
+    }
 }
 
 //==================================================================
 const char *StrFindLastOf( const char *pStr, char searchCh )
 {
-	size_t	len = strlen( pStr );
+    size_t	len = strlen( pStr );
 
-	for (size_t i=0; i < len; ++i)
-	{
-		if ( pStr[ len-1 - i ] == searchCh )
-			return &pStr[ len-1 - i];
-	}
+    for (size_t i=0; i < len; ++i)
+    {
+        if ( pStr[ len-1 - i ] == searchCh )
+            return &pStr[ len-1 - i];
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //==================================================================
 const char *StrFindLastOfMulti( const char *pStr, const char *pChars )
 {
-	size_t	len = strlen( pStr );
-	size_t	findN = strlen( pChars );
+    size_t	len = strlen( pStr );
+    size_t	findN = strlen( pChars );
 
-	for (size_t i=0; i < len; ++i)
-	{
-		for (size_t j=0; j < findN; ++j)
-		{
-			if ( pStr[ len-1 - i ] == pChars[j] )
-				return &pStr[ len-1 - i];
-		}
-	}
+    for (size_t i=0; i < len; ++i)
+    {
+        for (size_t j=0; j < findN; ++j)
+        {
+            if ( pStr[ len-1 - i ] == pChars[j] )
+                return &pStr[ len-1 - i];
+        }
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //==================================================================
 static char *find_first_sep( char *pTxt, const char *pSeps )
 {
-	size_t  sepN = strlen( pSeps );
+    size_t  sepN = strlen( pSeps );
 
-	while ( pTxt[0] )
-	{
-		for (size_t i=0; i < sepN; ++i)
-			if ( pTxt[0] == pSeps[i] )
-				return pTxt;
+    while ( pTxt[0] )
+    {
+        for (size_t i=0; i < sepN; ++i)
+            if ( pTxt[0] == pSeps[i] )
+                return pTxt;
 
-		++pTxt;
-	}
+        ++pTxt;
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //==================================================================
 static char *find_first_nonsep( char *pTxt, const char *pSeps )
 {
-	size_t	sepN = strlen( pSeps );
+    size_t	sepN = strlen( pSeps );
 
-	while ( pTxt[0] )
-	{
-		size_t i = 0;
-		for (; i < sepN; ++i)
-			if ( pTxt[0] == pSeps[i] )
-				break;
+    while ( pTxt[0] )
+    {
+        size_t i = 0;
+        for (; i < sepN; ++i)
+            if ( pTxt[0] == pSeps[i] )
+                break;
 
-		if ( i == sepN )
-			return pTxt;
+        if ( i == sepN )
+            return pTxt;
 
-		++pTxt;
-	}
+        ++pTxt;
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //==================================================================
@@ -206,207 +206,207 @@ void StrSplitLine( char *pLine, DVec<char *> &out_pPtrs, const char *pSeps, bool
 {
     out_pPtrs.clear();
 
-	if ( sepMakesEmptyStr )
-	{
-		char *pTok = pLine;
+    if ( sepMakesEmptyStr )
+    {
+        char *pTok = pLine;
 
         while ( true )
         {
-    		out_pPtrs.push_back( pTok );
+            out_pPtrs.push_back( pTok );
 
             pTok = find_first_sep( pTok, pSeps );
-    		if NOT( pTok )
-    			break;
+            if NOT( pTok )
+                break;
 
             *pTok++ = 0;
         }
-	}
+    }
     else
     {
-    	char	*pLine2 = pLine;
+        char	*pLine2 = pLine;
 
-    	while ( pLine2[0] )
-    	{
-    		char *pTok = find_first_nonsep( pLine2, pSeps );
-    		if NOT( pTok )
-    			break;
+        while ( pLine2[0] )
+        {
+            char *pTok = find_first_nonsep( pLine2, pSeps );
+            if NOT( pTok )
+                break;
 
-			out_pPtrs.push_back( pTok );
+            out_pPtrs.push_back( pTok );
 
-    		char *pTokEnd = find_first_sep( pTok, pSeps );
-    		if NOT( pTokEnd )
-    		{
-    			break;
-    		}
-    		else
-    		{
-    			pTokEnd[0] = 0;
-    			pLine2 = pTokEnd;
-    		}
+            char *pTokEnd = find_first_sep( pTok, pSeps );
+            if NOT( pTokEnd )
+            {
+                break;
+            }
+            else
+            {
+                pTokEnd[0] = 0;
+                pLine2 = pTokEnd;
+            }
 
-    		++pLine2;
-    	}
+            ++pLine2;
+        }
     }
 }
 
 //==================================================================
 DStr StrGetDirPath( const char *pStr )
 {
-	const char *pLastSlash = StrFindLastOf( pStr, '/' );
-	const char *pLastBSlash = StrFindLastOf( pStr, '\\' );
-	const char *pLastColon = StrFindLastOf( pStr, ':' );
+    const char *pLastSlash = StrFindLastOf( pStr, '/' );
+    const char *pLastBSlash = StrFindLastOf( pStr, '\\' );
+    const char *pLastColon = StrFindLastOf( pStr, ':' );
 
-	size_t	n = 0;
+    size_t	n = 0;
 
-	if ( pLastBSlash )
-		n = std::max( n, (size_t)(pLastBSlash - pStr + 1) );
+    if ( pLastBSlash )
+        n = std::max( n, (size_t)(pLastBSlash - pStr + 1) );
 
-	if ( pLastSlash )
-		n = std::max( n, (size_t)(pLastSlash - pStr + 1) );
+    if ( pLastSlash )
+        n = std::max( n, (size_t)(pLastSlash - pStr + 1) );
 
-	if ( pLastColon )
-		n = std::max( n, (size_t)(pLastColon - pStr + 1) );
+    if ( pLastColon )
+        n = std::max( n, (size_t)(pLastColon - pStr + 1) );
 
-	if ( n )
-		return DStr( pStr, n );
-	else
-		return DStr();
+    if ( n )
+        return DStr( pStr, n );
+    else
+        return DStr();
 }
 
 //==================================================================
 const char *StrSeekToFilename( const char *pStr )
 {
-	const char *pLastSlash = StrFindLastOf( pStr, '/' );
-	const char *pLastBSlash = StrFindLastOf( pStr, '\\' );
-	const char *pLastColon = StrFindLastOf( pStr, ':' );
+    const char *pLastSlash = StrFindLastOf( pStr, '/' );
+    const char *pLastBSlash = StrFindLastOf( pStr, '\\' );
+    const char *pLastColon = StrFindLastOf( pStr, ':' );
 
-	size_t	n = 0;
+    size_t	n = 0;
 
-	if ( pLastBSlash )
-		n = std::max( n, (size_t)(pLastBSlash - pStr + 1) );
+    if ( pLastBSlash )
+        n = std::max( n, (size_t)(pLastBSlash - pStr + 1) );
 
-	if ( pLastSlash )
-		n = std::max( n, (size_t)(pLastSlash - pStr + 1) );
+    if ( pLastSlash )
+        n = std::max( n, (size_t)(pLastSlash - pStr + 1) );
 
-	if ( pLastColon )
-		n = std::max( n, (size_t)(pLastColon - pStr + 1) );
+    if ( pLastColon )
+        n = std::max( n, (size_t)(pLastColon - pStr + 1) );
 
-	return pStr + n;
+    return pStr + n;
 }
 
 //==================================================================
 const char *StrTok_StrQuot( char *pSrcStr, char **ppContext, bool *pOut_HadQuots )
 {
-	if ( pSrcStr )
-	{
-		*ppContext = pSrcStr;
-	}
+    if ( pSrcStr )
+    {
+        *ppContext = pSrcStr;
+    }
 
-	char *p = *ppContext;
+    char *p = *ppContext;
 
-	if NOT( p )
-		return NULL;
+    if NOT( p )
+        return NULL;
 
-	size_t i = 0;
-	for (; ; ++i)
-	{
-		if NOT( p[i] )
-			return NULL;
+    size_t i = 0;
+    for (; ; ++i)
+    {
+        if NOT( p[i] )
+            return NULL;
 
-		if NOT( CharIsWhite( p[i] ) )
-			break;
-	}
+        if NOT( CharIsWhite( p[i] ) )
+            break;
+    }
 
-	bool isInStr;
+    bool isInStr;
 
-	if ( p[i] == '"' )
-	{
-		isInStr = true;
-		++i;
+    if ( p[i] == '"' )
+    {
+        isInStr = true;
+        ++i;
 
         if ( pOut_HadQuots )
             *pOut_HadQuots = true;
-	}
-	else
+    }
+    else
     {
-		isInStr = false;
+        isInStr = false;
 
         if ( pOut_HadQuots )
             *pOut_HadQuots = false;
     }
 
-	size_t	start = i;
+    size_t	start = i;
 
-	for (; p[i]; ++i)
-	{
-		if ( (isInStr && p[i] == '"') ||
-			 (!isInStr && CharIsWhite( p[i] )) )
-		{
-			p[i] = 0;
-			*ppContext = p + i + 1;
-			return p + start;
-		}
-	}
+    for (; p[i]; ++i)
+    {
+        if ( (isInStr && p[i] == '"') ||
+             (!isInStr && CharIsWhite( p[i] )) )
+        {
+            p[i] = 0;
+            *ppContext = p + i + 1;
+            return p + start;
+        }
+    }
 
-	*ppContext = NULL;
-	return p + start;
+    *ppContext = NULL;
+    return p + start;
 }
 
 //==================================================================
 void StrConvertCEscape( char *pStr )
 {
-	if NOT( pStr[0] )
-		return;
+    if NOT( pStr[0] )
+        return;
 
-	size_t len = strlen( pStr );
+    size_t len = strlen( pStr );
 
-	bool isEsc = false;
-	size_t j = 0;
-	for (size_t i=0; i < len; ++i)
-	{
-		if ( pStr[i] == '\\' )
-		{
-			if ( isEsc )
-				isEsc = false;
-			else
-			{
-				isEsc = true;
-				continue;
-			}
-		}
+    bool isEsc = false;
+    size_t j = 0;
+    for (size_t i=0; i < len; ++i)
+    {
+        if ( pStr[i] == '\\' )
+        {
+            if ( isEsc )
+                isEsc = false;
+            else
+            {
+                isEsc = true;
+                continue;
+            }
+        }
 
-		if ( isEsc )
-		{
-			isEsc = false;
+        if ( isEsc )
+        {
+            isEsc = false;
 
-			if ( pStr[i] == 'n' )
-				pStr[j++] = '\n';
-		}
-		else
-		{
-			pStr[j++] = pStr[i];
-		}
-	}
-	pStr[j] = 0;
+            if ( pStr[i] == 'n' )
+                pStr[j++] = '\n';
+        }
+        else
+        {
+            pStr[j++] = pStr[i];
+        }
+    }
+    pStr[j] = 0;
 }
 
 //==================================================================
 size_t VecStr_find_by_idx_case( DVec<DStr> &v, const char *pVal )
 {
-	for (size_t i=0; i < v.size(); ++i)
-		if ( 0 == strcasecmp( v[i].c_str(), pVal ) )
-			return i;
+    for (size_t i=0; i < v.size(); ++i)
+        if ( 0 == strcasecmp( v[i].c_str(), pVal ) )
+            return i;
 
-	return DNPOS;
+    return DNPOS;
 }
 
 //==================================================================
 void VecStr_push_back_unique_case( DVec<DStr> &v, const char *pVal )
 {
-	if ( DNPOS != VecStr_find_by_idx_case( v, pVal ) )
-		return;
+    if ( DNPOS != VecStr_find_by_idx_case( v, pVal ) )
+        return;
 
-	v.push_back( pVal );
+    v.push_back( pVal );
 }
 
 //==================================================================

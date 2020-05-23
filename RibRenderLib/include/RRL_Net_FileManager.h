@@ -24,17 +24,17 @@ namespace NET
 //==================================================================
 class FileManagerNet : public DIO::FileManagerBase
 {
-	friend class Server;
+    friend class Server;
 
-	DUT::LongCriticalSection	mLongCS;
+    DUT::LongCriticalSection	mLongCS;
 
-	DNET::PacketManager			*mpPakMan;
+    DNET::PacketManager			*mpPakMan;
 
 public:
-	FileManagerNet( DNET::PacketManager &packManager );
+    FileManagerNet( DNET::PacketManager &packManager );
 
-		void GrabFile( const char *pFileName, DVec<U8> &out_vec );
-		bool FileExists( const char *pFileName );
+        void GrabFile( const char *pFileName, DVec<U8> &out_vec );
+        bool FileExists( const char *pFileName );
 };
 
 //==================================================================

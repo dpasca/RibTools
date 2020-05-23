@@ -6,6 +6,6 @@
 
 surface constant()
 {
-	Oi = Os;
-	Ci = Os * Cs;
+    Oi = Os;
+    Ci = Os * Cs;
 }

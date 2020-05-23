@@ -8,14 +8,14 @@
 
 surface test9( string texturename )
 {
-	if ( texturename != "" )
-	{
-		Ci = color( 0, 0, 1 );
-	}
-	else
-	{
-		Ci = color( 1, 0, 0 );
-	}
+    if ( texturename != "" )
+    {
+        Ci = color( 0, 0, 1 );
+    }
+    else
+    {
+        Ci = color( 1, 0, 0 );
+    }
 
-	Oi = 1;
+    Oi = 1;
 }

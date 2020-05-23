@@ -22,55 +22,55 @@ class Context;
 template<bool INCLUDES_AXIS_ANGLE>
 void Inst_Illuminance( Context &ctx, u_int blocksN_unused )
 {
-	// only from surface shaders !!
-	DASSERT( ctx.GetShader()->mType == Shader::TYPE_SURFACE );
+    // only from surface shaders !!
+    DASSERT( ctx.GetShader()->mType == Shader::TYPE_SURFACE );
 
-	DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
+    DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
 
-	u_short funcOpEndAddr = ctx.GetOp(0)->mOpCode.mFuncopEndAddr;
+    u_short funcOpEndAddr = ctx.GetOp(0)->mOpCode.mFuncopEndAddr;
 
-	// any lights ?
-	if NOT( ctx.mpAttribs->mActiveLights.size() )
-	{
-		// no ? Skip the whole thing
-		ctx.GotoInstruction( funcOpEndAddr );
-		ctx.NextInstruction();
-		return;
-	}
+    // any lights ?
+    if NOT( ctx.mpAttribs->mActiveLights.size() )
+    {
+        // no ? Skip the whole thing
+        ctx.GotoInstruction( funcOpEndAddr );
+        ctx.NextInstruction();
+        return;
+    }
 
-	const Float3_*	pPos	= (Float3_ *)ctx.GetRO( 1 );
-	const Float3_*	pAxis	;
-	const Float_*	pAngle	;
+    const Float3_*	pPos	= (Float3_ *)ctx.GetRO( 1 );
+    const Float3_*	pAxis	;
+    const Float_*	pAngle	;
 
-	if ( INCLUDES_AXIS_ANGLE )
-	{
-		pAxis	= (		Float3_ *)ctx.GetRO( 2 );
-		pAngle	= (const Float_ *)ctx.GetRO( 3 );
-	}
-	else
-	{
-		pAxis	= NULL;
-		pAngle	= NULL;
-	}
+    if ( INCLUDES_AXIS_ANGLE )
+    {
+        pAxis	= (		Float3_ *)ctx.GetRO( 2 );
+        pAngle	= (const Float_ *)ctx.GetRO( 3 );
+    }
+    else
+    {
+        pAxis	= NULL;
+        pAngle	= NULL;
+    }
 
-	SymbolI	*pLSym = ctx.mpGridSymIList->FindSymbolI( "L" );
-	Float3_	*pL	= (Float3_ *)pLSym->GetRWData();
+    SymbolI	*pLSym = ctx.mpGridSymIList->FindSymbolI( "L" );
+    Float3_	*pL	= (Float3_ *)pLSym->GetRWData();
 
-	ctx.NextInstruction();
-	u_int bodyStartAddr = ctx.GetCurPC();
+    ctx.NextInstruction();
+    u_int bodyStartAddr = ctx.GetCurPC();
 
-	ctx.mIlluminanceCtx.Init(
-			bodyStartAddr,
-			pAxis,
-			pAngle,
-			pL,
-			ctx.mpAttribs->mActiveLights.size()
-			);
+    ctx.mIlluminanceCtx.Init(
+            bodyStartAddr,
+            pAxis,
+            pAngle,
+            pL,
+            ctx.mpAttribs->mActiveLights.size()
+            );
 
-	// start looping by the funcop end
-	ctx.GotoInstruction( funcOpEndAddr );
+    // start looping by the funcop end
+    ctx.GotoInstruction( funcOpEndAddr );
 
-	ctx.mFopStack.push( SRC_FuncopStack::FLG_ILLUMINANCE );
+    ctx.mFopStack.push( SRC_FuncopStack::FLG_ILLUMINANCE );
 }
 
 //==================================================================
@@ -78,46 +78,46 @@ void Inst_Illuminance( Context &ctx, u_int blocksN_unused )
 template<bool INCLUDES_AXIS_ANGLE>
 void Inst_Solar( Context &ctx, u_int blocksN_unused )
 {
-	// only from light shaders !!
-	DASSERT( ctx.GetShader()->mType == Shader::TYPE_LIGHT );
+    // only from light shaders !!
+    DASSERT( ctx.GetShader()->mType == Shader::TYPE_LIGHT );
 
-	DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
+    DASSTHROW( !ctx.IsInFuncop(), ("Nested funcop ?!") );
 
-	// don't really need the following...
-	// u_short funcOpEndAddr = ctx.GetOp(0)->mOpCode.mFuncopEndAddr;
+    // don't really need the following...
+    // u_short funcOpEndAddr = ctx.GetOp(0)->mOpCode.mFuncopEndAddr;
 
-	SymbolI	*pLSym = ctx.mpGridSymIList->FindSymbolI( "L" );
-	Float3_	*pL	= (Float3_ *)pLSym->GetRWData();
-	u_int blocksN = pLSym->IsVarying() ? ctx.mBlocksN : 1;
+    SymbolI	*pLSym = ctx.mpGridSymIList->FindSymbolI( "L" );
+    Float3_	*pL	= (Float3_ *)pLSym->GetRWData();
+    u_int blocksN = pLSym->IsVarying() ? ctx.mBlocksN : 1;
 
-	if ( INCLUDES_AXIS_ANGLE )
-	{
-		const Float3_*	pAxis	= (		Float3_ *)ctx.GetRO( 1 );
-		const Float_ *	pAngle	= (const Float_ *)ctx.GetRO( 2 );
+    if ( INCLUDES_AXIS_ANGLE )
+    {
+        const Float3_*	pAxis	= (		Float3_ *)ctx.GetRO( 1 );
+        const Float_ *	pAngle	= (const Float_ *)ctx.GetRO( 2 );
 
-		// set to the value of the axis..
-		// NOTE: ignoring the angle for now !
+        // set to the value of the axis..
+        // NOTE: ignoring the angle for now !
 
-		for (u_int i=0; i < blocksN; ++i)
-		{
-			// not checking for active processor ?
-			pL[i] = -pAxis->GetNormalized();	// why '-' ?! ..just because ?
-		}		
-	}
-	else
-	{
-		// set light direction as 0,0,0
-		for (u_int i=0; i < blocksN; ++i)
-		{
-			// not checking for active processor ?
-			pL[i] = Float3_( 0.f );
-		}
-	}
+        for (u_int i=0; i < blocksN; ++i)
+        {
+            // not checking for active processor ?
+            pL[i] = -pAxis->GetNormalized();	// why '-' ?! ..just because ?
+        }		
+    }
+    else
+    {
+        // set light direction as 0,0,0
+        for (u_int i=0; i < blocksN; ++i)
+        {
+            // not checking for active processor ?
+            pL[i] = Float3_( 0.f );
+        }
+    }
 
-	// yes.. we are in a solar() block 8)
-	ctx.mFopStack.push( SRC_FuncopStack::FLG_SOLAR );
+    // yes.. we are in a solar() block 8)
+    ctx.mFopStack.push( SRC_FuncopStack::FLG_SOLAR );
 
-	ctx.NextInstruction();
+    ctx.NextInstruction();
 }
 
 //==================================================================

@@ -42,42 +42,42 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 template <class _T>
 class uptr
 {
-	_T	*mPtr;
+    _T	*mPtr;
 
 public:
-	uptr( _T *ptr=0 )
-	{
-		mPtr = ptr;
-	}
+    uptr( _T *ptr=0 )
+    {
+        mPtr = ptr;
+    }
 
-	uptr &operator=( _T *ptr )
-	{
-		if ( mPtr && mPtr != ptr )
-			DSAFE_DELETE( mPtr );
+    uptr &operator=( _T *ptr )
+    {
+        if ( mPtr && mPtr != ptr )
+            DSAFE_DELETE( mPtr );
 
-		mPtr = ptr;
+        mPtr = ptr;
 
-		return *this;
-	}
+        return *this;
+    }
 
-	~uptr()
-	{
-		if ( mPtr )
-			delete mPtr;
-	}
+    ~uptr()
+    {
+        if ( mPtr )
+            delete mPtr;
+    }
 
-	bool	is_null() const			{ return mPtr == NULL;	}
+    bool	is_null() const			{ return mPtr == NULL;	}
 
-	const _T *operator->() const	{ return mPtr; }
-		  _T *operator->()			{ return mPtr; }
+    const _T *operator->() const	{ return mPtr; }
+          _T *operator->()			{ return mPtr; }
 
-	const _T &operator*() const		{ return *mPtr; }
-		  _T &operator*()			{ return *mPtr; }
+    const _T &operator*() const		{ return *mPtr; }
+          _T &operator*()			{ return *mPtr; }
 
-	const _T *get() const			{ return mPtr;	}
-		  _T *get()					{ return mPtr;	}
+    const _T *get() const			{ return mPtr;	}
+          _T *get()					{ return mPtr;	}
 
-		  _T *release()				{ _T *pRet = mPtr; mPtr = NULL; return pRet; }
+          _T *release()				{ _T *pRet = mPtr; mPtr = NULL; return pRet; }
 };
 #endif
 
@@ -85,70 +85,70 @@ public:
 template <class _T>
 class VecOwn
 {
-	DVec<_T>	mVec;
+    DVec<_T>	mVec;
 
 public:
-	~VecOwn()
-	{
-		clear_free();
-	}
+    ~VecOwn()
+    {
+        clear_free();
+    }
 
-	size_t size() const { return mVec.size(); }
+    size_t size() const { return mVec.size(); }
 
-	void resize( size_t newSize )
-	{
-		mVec.resize( newSize );
-	}
+    void resize( size_t newSize )
+    {
+        mVec.resize( newSize );
+    }
 
-	void reserve( size_t reserveSize )
-	{
-		mVec.reserve( reserveSize );
-	}
-	
-	void clear()
-	{
-		for (size_t i=0; i < size(); ++i)
-		{
-			DSAFE_DELETE( (*this)[i] );
-		}
+    void reserve( size_t reserveSize )
+    {
+        mVec.reserve( reserveSize );
+    }
+    
+    void clear()
+    {
+        for (size_t i=0; i < size(); ++i)
+        {
+            DSAFE_DELETE( (*this)[i] );
+        }
 
-		mVec.clear();
-	}
+        mVec.clear();
+    }
 
-	void clear_free()
-	{
-		for (size_t i=0; i < size(); ++i)
-		{
-			DSAFE_DELETE( (*this)[i] );
-		}
+    void clear_free()
+    {
+        for (size_t i=0; i < size(); ++i)
+        {
+            DSAFE_DELETE( (*this)[i] );
+        }
 
-		mVec = DVec<_T>();
-	}
+        mVec = DVec<_T>();
+    }
 
-	void erase( size_t idx )
-	{
-		DSAFE_DELETE( (*this)[idx] );
+    void erase( size_t idx )
+    {
+        DSAFE_DELETE( (*this)[idx] );
 
-		mVec.erase( mVec.begin() + idx );
-	}
+        mVec.erase( mVec.begin() + idx );
+    }
 
-	void push_back( const _T &val )
-	{
-		mVec.push_back( val );
-	}
+    void push_back( const _T &val )
+    {
+        mVec.push_back( val );
+    }
 
     void pop_back()
     {
-		DSAFE_DELETE( (*this)[mVec.size()-1] );
+        DSAFE_DELETE( (*this)[mVec.size()-1] );
 
-		mVec.erase( mVec.begin() + (mVec.size()-1) );
+        mVec.erase( mVec.begin() + (mVec.size()-1) );
     }
 
-	const	_T &back() const	{ return mVec.back(); }
-			_T &back()			{ return mVec.back(); }
+    const	_T &back() const	{ return mVec.back(); }
+            _T &back()			{ return mVec.back(); }
 
-	const _T &operator[]( size_t idx ) const { return mVec[ idx ]; }
-		  _T &operator[]( size_t idx )		 { return mVec[ idx ]; }
+    const _T &operator[]( size_t idx ) const { return mVec[ idx ]; }
+          _T &operator[]( size_t idx )		 { return mVec[ idx ]; }
 };
 
 //==================================================================
@@ -161,90 +161,90 @@ void Dclear_free( VecOwn<_T> &v ) {
 template <class _T>
 class VecOwnNamed
 {
-	VecOwn<_T>	mVec;
-	DVec<DStr>	mNames;
+    VecOwn<_T>	mVec;
+    DVec<DStr>	mNames;
 
 public:
-	size_t size() const									{ return mVec.size(); }
-	void resize( size_t newSize )						{ mVec.resize( newSize ); mNames.resize( newSize ); }
-	void reserve( size_t reserveSize )                  { mVec.reserve( reserveSize ); mNames.reserve( reserveSize ); }
-	void clear()										{ mVec.clear(); mNames.clear();  }
-	void clear_free()									{ mVec.clear_free(); Dclear_free( mNames ); }
-	void erase( size_t idx )							{ mVec.erase( idx ); mNames.erase( mNames.begin() + idx ); }
-	void push_back( const _T &val, const char *pName )	{ mVec.push_back( val ); mNames.push_back( pName ); }
+    size_t size() const									{ return mVec.size(); }
+    void resize( size_t newSize )						{ mVec.resize( newSize ); mNames.resize( newSize ); }
+    void reserve( size_t reserveSize )                  { mVec.reserve( reserveSize ); mNames.reserve( reserveSize ); }
+    void clear()										{ mVec.clear(); mNames.clear();  }
+    void clear_free()									{ mVec.clear_free(); Dclear_free( mNames ); }
+    void erase( size_t idx )							{ mVec.erase( idx ); mNames.erase( mNames.begin() + idx ); }
+    void push_back( const _T &val, const char *pName )	{ mVec.push_back( val ); mNames.push_back( pName ); }
 
-	const	_T &back() const	{ return mVec.back(); }
-			_T &back()			{ return mVec.back(); }
+    const	_T &back() const	{ return mVec.back(); }
+            _T &back()			{ return mVec.back(); }
 
-	const _T &operator[]( const char *pSrcName ) const	{ return mVec[ FindByName( pSrcName ) ]; }
-		  _T &operator[]( const char *pSrcName )		{ return mVec[ FindByName( pSrcName ) ]; }
+    const _T &operator[]( const char *pSrcName ) const	{ return mVec[ FindByName( pSrcName ) ]; }
+          _T &operator[]( const char *pSrcName )		{ return mVec[ FindByName( pSrcName ) ]; }
 
-	const _T &operator[]( size_t idx ) const { return mVec[ idx ]; }
-		  _T &operator[]( size_t idx )		 { return mVec[ idx ]; }
+    const _T &operator[]( size_t idx ) const { return mVec[ idx ]; }
+          _T &operator[]( size_t idx )		 { return mVec[ idx ]; }
 
-	size_t FindByName( const char *pSrcName ) const
-	{
-		for (size_t i=0; i < mNames.size(); ++i)
-			if ( 0 == strcmp( mNames[i].c_str(), pSrcName ) )
-				return i;
+    size_t FindByName( const char *pSrcName ) const
+    {
+        for (size_t i=0; i < mNames.size(); ++i)
+            if ( 0 == strcmp( mNames[i].c_str(), pSrcName ) )
+                return i;
 
-		return DNPOS;
-	}
+        return DNPOS;
+    }
 };
 
 //==================================================================
 class RCBaseNoDel
 {
-	int		mCount;
-	
+    int		mCount;
+    
 public:
-	RCBaseNoDel() :
-		mCount(0)
-	{
-	}
-	
-	virtual ~RCBaseNoDel()
-	{
-		DASSERT( mCount == 0 );
-	}
+    RCBaseNoDel() :
+        mCount(0)
+    {
+    }
+    
+    virtual ~RCBaseNoDel()
+    {
+        DASSERT( mCount == 0 );
+    }
 
-	void AddRef()
-	{
-		mCount += 1;
-	}
+    void AddRef()
+    {
+        mCount += 1;
+    }
 
-	int SubRef()
-	{
-		DASSERT( mCount >= 1 );
-		mCount -= 1;
-		int retVal = mCount;
+    int SubRef()
+    {
+        DASSERT( mCount >= 1 );
+        mCount -= 1;
+        int retVal = mCount;
 
-		if ( retVal == 0 )
-			OnZeroCount();
+        if ( retVal == 0 )
+            OnZeroCount();
 
-		return retVal;
+        return retVal;
 
-	}
+    }
 
-	virtual void OnZeroCount()
-	{
-	}
+    virtual void OnZeroCount()
+    {
+    }
 
-	int GetRef() const
-	{
-		return mCount;
-	}
+    int GetRef() const
+    {
+        return mCount;
+    }
 
 private:
-	RCBaseNoDel( const RCBaseNoDel &from ) :	mCount(0)
-	{
-	}
-	
-	RCBaseNoDel &operator=( const RCBaseNoDel &from )
-	{
-		mCount = 0;
-		return *(RCBaseNoDel *)0;
-	}
+    RCBaseNoDel( const RCBaseNoDel &from ) :	mCount(0)
+    {
+    }
+    
+    RCBaseNoDel &operator=( const RCBaseNoDel &from )
+    {
+        mCount = 0;
+        return *(RCBaseNoDel *)0;
+    }
 };
 
 //==================================================================
@@ -253,72 +253,72 @@ private:
 template <class _T>
 class RCSha
 {
-	_T	*mPtr;
+    _T	*mPtr;
 
 public:
-	RCSha()						: mPtr(NULL)	{ }
-	RCSha( _T *ptr )			: mPtr(NULL)	{ borrow( ptr ); }
-	RCSha( const RCSha &from )	: mPtr(NULL)	{ borrow( from.get() ); }
+    RCSha()						: mPtr(NULL)	{ }
+    RCSha( _T *ptr )			: mPtr(NULL)	{ borrow( ptr ); }
+    RCSha( const RCSha &from )	: mPtr(NULL)	{ borrow( from.get() ); }
 
-	virtual ~RCSha()
-	{
-		if ( mPtr )
-			mPtr->SubRef();
-	}
+    virtual ~RCSha()
+    {
+        if ( mPtr )
+            mPtr->SubRef();
+    }
 
-	RCSha &operator=( const RCSha &from )	{	borrow( from.get() );	return *this; }
-	RCSha &operator=( _T *ptr )				{	borrow( ptr );			return *this; }
-	RCSha &operator=( const _T *ptr )		{	borrow( ptr );			return *this; }
+    RCSha &operator=( const RCSha &from )	{	borrow( from.get() );	return *this; }
+    RCSha &operator=( _T *ptr )				{	borrow( ptr );			return *this; }
+    RCSha &operator=( const _T *ptr )		{	borrow( ptr );			return *this; }
 
 private:
-	void borrow( _T *ptr )
-	{
-		if ( ptr == mPtr )
-			return;
+    void borrow( _T *ptr )
+    {
+        if ( ptr == mPtr )
+            return;
 
-		if ( ptr )
-			ptr->AddRef();
+        if ( ptr )
+            ptr->AddRef();
 
-		if ( mPtr )
-			mPtr->SubRef();
+        if ( mPtr )
+            mPtr->SubRef();
 
-		mPtr = ptr;
-	}
+        mPtr = ptr;
+    }
 
-	void borrow( const _T *ptr )
-	{
-		if ( ptr == mPtr )
-			return;
+    void borrow( const _T *ptr )
+    {
+        if ( ptr == mPtr )
+            return;
 
-		if ( ptr )
-			((_T *)ptr)->AddRef();
+        if ( ptr )
+            ((_T *)ptr)->AddRef();
 
-		if ( mPtr )
-			mPtr->SubRef();
+        if ( mPtr )
+            mPtr->SubRef();
 
-		mPtr = (_T *)ptr;
-	}
+        mPtr = (_T *)ptr;
+    }
 
 public:
-	const _T *get() const
-	{
-		DASSERT( !mPtr || mPtr->GetRef() > 0 );
+    const _T *get() const
+    {
+        DASSERT( !mPtr || mPtr->GetRef() > 0 );
 
-		return mPtr;
-	}
+        return mPtr;
+    }
 
-	_T *get()
-	{
-		DASSERT( !mPtr || mPtr->GetRef() > 0 );
+    _T *get()
+    {
+        DASSERT( !mPtr || mPtr->GetRef() > 0 );
 
-		return mPtr;
-	}
+        return mPtr;
+    }
 
-	const _T *operator->() const	{ return mPtr; }
-		  _T *operator->()			{ return mPtr; }
+    const _T *operator->() const	{ return mPtr; }
+          _T *operator->()			{ return mPtr; }
 
-	const _T &operator*() const		{ return *mPtr; }
-		  _T &operator*()			{ return *mPtr; }
+    const _T &operator*() const		{ return *mPtr; }
+          _T &operator*()			{ return *mPtr; }
 
 };
 

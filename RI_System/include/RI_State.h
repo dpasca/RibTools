@@ -27,7 +27,7 @@ namespace RI
 Options
 *	WorldBegin/End
 *	FrameBegin/End
-	
+    
 Attributes
 *	AttributeBegin/End
 *	WorldBegin/End
@@ -47,7 +47,7 @@ Transform
 //==================================================================
 template <class T> class CopyStack
 {
-	DVec<T>	mVec;
+    DVec<T>	mVec;
 public:
     CopyStack()          { mVec.resize(1); }
     void push()          { mVec.push_back( top() ); }
@@ -63,203 +63,203 @@ public:
 class State
 {
 public:
-	struct Params
-	{
-		Framework				*mpFramework		;
-		DIO::FileManagerBase	*mpFileManager		;
-		DStr					mBaseDir			;
-		DStr					mDefaultShadersDir	;
-		DStr					mForcedSurfaceShader;
+    struct Params
+    {
+        Framework				*mpFramework		;
+        DIO::FileManagerBase	*mpFileManager		;
+        DStr					mBaseDir			;
+        DStr					mDefaultShadersDir	;
+        DStr					mForcedSurfaceShader;
 
-		Params() :
-			mpFramework			(NULL),
-			mpFileManager		(NULL)
-		{
-		}
-	};
+        Params() :
+            mpFramework			(NULL),
+            mpFileManager		(NULL)
+        {
+        }
+    };
 
 private:
-	SymbolList				mGlobalSyms;
+    SymbolList				mGlobalSyms;
     DVec<Mode>	            mModeStack;
-	CopyStack<Options	>	mOptionsStack;
-	CopyStack<Attributes>	mAttributesStack;
-	CopyStack<Transform	>	mTransformOpenStack;
-	CopyStack<Transform	>	mTransformCloseStack;
-	
-	RevisionTracker			mOptionsRevTrack;
-	RevisionTracker			mAttribsRevTrack;
-	RevisionTracker			mTransOpenRevTrack;
-	RevisionTracker			mTransCloseRevTrack;
+    CopyStack<Options	>	mOptionsStack;
+    CopyStack<Attributes>	mAttributesStack;
+    CopyStack<Transform	>	mTransformOpenStack;
+    CopyStack<Transform	>	mTransformCloseStack;
+    
+    RevisionTracker			mOptionsRevTrack;
+    RevisionTracker			mAttribsRevTrack;
+    RevisionTracker			mTransOpenRevTrack;
+    RevisionTracker			mTransCloseRevTrack;
 
-	DVec<LightSourceT *>	mpLightSources;
+    DVec<LightSourceT *>	mpLightSources;
 
-	Matrix44				mMtxWorldCamera;
-
-public:
-	Params					mParams;
-private:
-	ResourceManager			mResManager;
-
-	enum OpType
-	{
-		OPTYPE_OPTS,
-		OPTYPE_ATRB,
-		OPTYPE_PRIM,
-		OPTYPE_STD_XFORM,	// excludes CoordinateSystem and TransformPoints
-	};
+    Matrix44				mMtxWorldCamera;
 
 public:
-	State( const Params &params );
-	~State();
+    Params					mParams;
+private:
+    ResourceManager			mResManager;
 
-	DIO::FileManagerBase &GetFileManager()	{	return *mParams.mpFileManager;				}
-	const char *GetBaseDir()		const	{	return mParams.mBaseDir.c_str();			}
-	const char *GetDefShadersDir() const	{	return mParams.mDefaultShadersDir.c_str();	}
+    enum OpType
+    {
+        OPTYPE_OPTS,
+        OPTYPE_ATRB,
+        OPTYPE_PRIM,
+        OPTYPE_STD_XFORM,	// excludes CoordinateSystem and TransformPoints
+    };
 
-	DStr		FindResFile( const char *pFileName, Options::SearchPathh spathType );
+public:
+    State( const Params &params );
+    ~State();
 
-	Options			&GetCurOptions()			{	return mOptionsStack.top();	}
-	const Options	&GetCurOptions() const		{	return mOptionsStack.top();	}
+    DIO::FileManagerBase &GetFileManager()	{	return *mParams.mpFileManager;				}
+    const char *GetBaseDir()		const	{	return mParams.mBaseDir.c_str();			}
+    const char *GetDefShadersDir() const	{	return mParams.mDefaultShadersDir.c_str();	}
 
-	void	Begin( RtToken name );
-	void	End();
+    DStr		FindResFile( const char *pFileName, Options::SearchPathh spathType );
 
-	void	FrameBegin( int frame );
-	void	FrameEnd();
-	void	WorldBegin();
-	void	WorldEnd();
-	void	AttributeBegin();
-	void	AttributeEnd();
-	void	TransformBegin();
-	void	TransformEnd();
-	void	SolidBegin( RtToken operation );
-	void	SolidEnd();
-	ObjectHandle ObjectBegin();
-	void	ObjectEnd();
-	void	MotionBegin( int n, const float times[] );
-	void	MotionEnd();
+    Options			&GetCurOptions()			{	return mOptionsStack.top();	}
+    const Options	&GetCurOptions() const		{	return mOptionsStack.top();	}
 
-	// attributes
-	void DoBound( const Bound &bound );
+    void	Begin( RtToken name );
+    void	End();
 
-	void Detail( const Bound &detail );
+    void	FrameBegin( int frame );
+    void	FrameEnd();
+    void	WorldBegin();
+    void	WorldEnd();
+    void	AttributeBegin();
+    void	AttributeEnd();
+    void	TransformBegin();
+    void	TransformEnd();
+    void	SolidBegin( RtToken operation );
+    void	SolidEnd();
+    ObjectHandle ObjectBegin();
+    void	ObjectEnd();
+    void	MotionBegin( int n, const float times[] );
+    void	MotionEnd();
 
-	void DetailRange(float	minVisible,
-					 float	lowerTransition,
-					 float	upperTransition,
-					 float	maxVisible );
-					 
-	void GeometricApproximation(RtToken typeApproximation,
-								   float valueApproximation );
+    // attributes
+    void DoBound( const Bound &bound );
 
-	void Orientation( RtToken orientation );
-	void Sides( int sides );
-	void Basis( RtToken ubasis, const float *pCustomUBasis, int ustep,
-				RtToken vbasis, const float *pCustomVBasis, int vstep );
-				
-	void ColorSet( const Color &col );
-	void Opacity( const Color &col );
-	void AreaLightSource( ParamList &params );
-	void LightSource( ParamList &params );
-	void Declare( ParamList &params );
-	void Surface( ParamList &params );
-	void Displacement( ParamList &params );
+    void Detail( const Bound &detail );
 
-	// options
-	void Format( int xRes, int yRes, float pixelRatio );
-	void FrameAspectRatio( float ratio );
-	void ScreenWindow( float left, float right, float bottom, float top );
-	void CropWindow( float xMin, float xMax, float yMin, float yMax );
-	void Projection( ParamList &params );
-	void Clipping( float nearr, float farr );
-	void DepthOfField( float fStop, float focalLength, float focalDistance );
-	void Shutter( float openShutter, float closeShutter );
-	// options.display
-	void Display( const char *pName, const char *pType, const char *pMode, ParamList &params );
-	void PixelSamples( int samplesX, int samplesY );
+    void DetailRange(float	minVisible,
+                     float	lowerTransition,
+                     float	upperTransition,
+                     float	maxVisible );
+                     
+    void GeometricApproximation(RtToken typeApproximation,
+                                   float valueApproximation );
 
-	// transforms
-	void Identity();
-	void ConcatTransform( const Matrix44 &mtxLeft );
-	void TransformCmd( const float *pMtx );
-	void Scale( float sx, float sy, float sz );
-	void Rotate( float angDeg, float ax, float ay, float az );
-	void Translate( float tx, float ty, float tz );
+    void Orientation( RtToken orientation );
+    void Sides( int sides );
+    void Basis( RtToken ubasis, const float *pCustomUBasis, int ustep,
+                RtToken vbasis, const float *pCustomVBasis, int vstep );
+                
+    void ColorSet( const Color &col );
+    void Opacity( const Color &col );
+    void AreaLightSource( ParamList &params );
+    void LightSource( ParamList &params );
+    void Declare( ParamList &params );
+    void Surface( ParamList &params );
+    void Displacement( ParamList &params );
 
-	// primitives
-	void Cylinder( float radius, float zmin, float zmax, float thetamax );
-	void Cone( float height, float radius, float thetamax );
-	void Sphere( float radius, float zmin, float zmax, float thetamax );
-	void Hyperboloid( const Float3 &p1, const Float3 &p2, float thetamax );
-	void Paraboloid( float rmax, float zmin, float zmax, float thetamax );
-	void Torus( float maxRadius, float minRadius,
-			   float phimin, float phimax,
-			   float thetamax );
+    // options
+    void Format( int xRes, int yRes, float pixelRatio );
+    void FrameAspectRatio( float ratio );
+    void ScreenWindow( float left, float right, float bottom, float top );
+    void CropWindow( float xMin, float xMax, float yMin, float yMax );
+    void Projection( ParamList &params );
+    void Clipping( float nearr, float farr );
+    void DepthOfField( float fStop, float focalLength, float focalDistance );
+    void Shutter( float openShutter, float closeShutter );
+    // options.display
+    void Display( const char *pName, const char *pType, const char *pMode, ParamList &params );
+    void PixelSamples( int samplesX, int samplesY );
 
-	void Patch( RtToken type, ParamList &params );
-	void PatchMesh( RtToken type, ParamList &params );
-	void NuPatch(
-			int		nu		,
-			int		uorder	,
-			const float	*pUknot	,
-			float	umin	,
-			float	umax	,
-			int		nv		,
-			int		vorder	,
-			const float	*pVknot	,
-			float	vmin	,
-			float	vmax	,
-			ParamList &params
-		);
+    // transforms
+    void Identity();
+    void ConcatTransform( const Matrix44 &mtxLeft );
+    void TransformCmd( const float *pMtx );
+    void Scale( float sx, float sy, float sz );
+    void Rotate( float angDeg, float ax, float ay, float az );
+    void Translate( float tx, float ty, float tz );
 
-	void Polygon( ParamList &params );
-	void PointsPolygons( ParamList &params );
-	void PointsGeneralPolygons( ParamList &params );
+    // primitives
+    void Cylinder( float radius, float zmin, float zmax, float thetamax );
+    void Cone( float height, float radius, float thetamax );
+    void Sphere( float radius, float zmin, float zmax, float thetamax );
+    void Hyperboloid( const Float3 &p1, const Float3 &p2, float thetamax );
+    void Paraboloid( float rmax, float zmin, float zmax, float thetamax );
+    void Torus( float maxRadius, float minRadius,
+               float phimin, float phimax,
+               float thetamax );
 
-	// --- Non RI commands
+    void Patch( RtToken type, ParamList &params );
+    void PatchMesh( RtToken type, ParamList &params );
+    void NuPatch(
+            int		nu		,
+            int		uorder	,
+            const float	*pUknot	,
+            float	umin	,
+            float	umax	,
+            int		nv		,
+            int		vorder	,
+            const float	*pVknot	,
+            float	vmin	,
+            float	vmax	,
+            ParamList &params
+        );
 
-	void ErrHandler( Error errCode );
-	void ErrHandler( Error errCode, const char *pFmt, ... );
+    void Polygon( ParamList &params );
+    void PointsPolygons( ParamList &params );
+    void PointsGeneralPolygons( ParamList &params );
 
-	size_t AddLightSource( LightSourceT *pLSource );
-	const DVec<LightSourceT *>	&GetLightSources()	{	return mpLightSources;	}
+    // --- Non RI commands
 
-	const Matrix44 &GetCurTransformOpenMtx() const	{	return mTransformOpenStack.top().GetMatrix();	}
-	const Matrix44 &GetCurTransformCloseMtx() const	{	return mTransformCloseStack.top().GetMatrix();	}
+    void ErrHandler( Error errCode );
+    void ErrHandler( Error errCode, const char *pFmt, ... );
 
-	const Matrix44 &GetWorldCameraMtx() const		{	return mMtxWorldCamera;	}
+    size_t AddLightSource( LightSourceT *pLSource );
+    const DVec<LightSourceT *>	&GetLightSources()	{	return mpLightSources;	}
 
-	SVM::Shader *GetShader( const char *pShaderName, const char *pAlternateName );
+    const Matrix44 &GetCurTransformOpenMtx() const	{	return mTransformOpenStack.top().GetMatrix();	}
+    const Matrix44 &GetCurTransformCloseMtx() const	{	return mTransformCloseStack.top().GetMatrix();	}
+
+    const Matrix44 &GetWorldCameraMtx() const		{	return mMtxWorldCamera;	}
+
+    SVM::Shader *GetShader( const char *pShaderName, const char *pAlternateName );
 
 private:
-	bool checkPopMode( Mode expectedMode );
-	bool verifyOpType( OpType optype );
-	bool verifyBasis( RtToken basis, int steps );
+    bool checkPopMode( Mode expectedMode );
+    bool verifyOpType( OpType optype );
+    bool verifyBasis( RtToken basis, int steps );
 
-	void pushMode( Mode mode )
-	{
-		mModeStack.push_back( mode );
-	}
+    void pushMode( Mode mode )
+    {
+        mModeStack.push_back( mode );
+    }
 
-	void popMode( Mode expectedMode )
-	{
-		checkPopMode( expectedMode );
-	}
+    void popMode( Mode expectedMode )
+    {
+        checkPopMode( expectedMode );
+    }
 
-	enum StackFlag
-	{
-		SF_OPTS = 1,
-		SF_ATRB = 2,
-		SF_TRAN = 4
-	};
+    enum StackFlag
+    {
+        SF_OPTS = 1,
+        SF_ATRB = 2,
+        SF_TRAN = 4
+    };
 
-	inline void pushStacks( const u_int flags );
-	inline void popStacks( const u_int flags );
-	
-	inline void insertPrimitive( PrimitiveBase *pPrim );
-	
-	void makeDefaultShaders( const char *pBasePath );
-	void addDefShader( const char *pBasePath, const char *pSName );
+    inline void pushStacks( const u_int flags );
+    inline void popStacks( const u_int flags );
+    
+    inline void insertPrimitive( PrimitiveBase *pPrim );
+    
+    void makeDefaultShaders( const char *pBasePath );
+    void addDefShader( const char *pBasePath, const char *pSName );
 };
 
 }

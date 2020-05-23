@@ -10,13 +10,13 @@
 /*==================================================================*/
 surface matte( float Ka = 1; float Kd = 1;)
 {
-	normal Nf = faceforward(normalize(N), I);
-	Oi = Os;
-	/* replicated expressions to test that register allocation
-	   is efficient. */
-	Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
-	Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
-	Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
-	Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
-	Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
+    normal Nf = faceforward(normalize(N), I);
+    Oi = Os;
+    /* replicated expressions to test that register allocation
+       is efficient. */
+    Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
+    Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
+    Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
+    Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
+    Ci = Os * Cs * (Ka*ambient() + Kd*diffuse(Nf));
 }

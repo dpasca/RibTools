@@ -21,16 +21,16 @@ namespace RI
 class MicroPolygon
 {
 public:
-	int			mXMin;
-	int			mYMin;
-	int			mXMax;
-	int			mYMax;
-	float		mZMin;
-	float		mZMax;
-	u_int		mVertIdx0;
-	u_int		mVertIdx1;
-	u_int		mVertIdx2;
-	u_int		mVertIdx3;
+    int			mXMin;
+    int			mYMin;
+    int			mXMax;
+    int			mYMax;
+    float		mZMin;
+    float		mZMax;
+    u_int		mVertIdx0;
+    u_int		mVertIdx1;
+    u_int		mVertIdx2;
+    u_int		mVertIdx3;
 };
 
 //==================================================================

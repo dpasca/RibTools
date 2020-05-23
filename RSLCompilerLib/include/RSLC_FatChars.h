@@ -21,16 +21,16 @@ namespace RSLC
 class Fat8
 {
 public:
-	U8			Ch;
-	size_t		SrcPos;
-	size_t		FNameIdx;
+    U8			Ch;
+    size_t		SrcPos;
+    size_t		FNameIdx;
 
-	Fat8() :
-		Ch(0),
-		SrcPos(DNPOS),
-		FNameIdx(DNPOS)
-	{
-	}
+    Fat8() :
+        Ch(0),
+        SrcPos(DNPOS),
+        FNameIdx(DNPOS)
+    {
+    }
 };
 
 //==================================================================
@@ -40,17 +40,17 @@ typedef DVec<Fat8> Fat8Vec;
 class FatBase
 {
 public:
-	DVec<DStr>	mFileNames;
+    DVec<DStr>	mFileNames;
 
-	size_t InsertNewFile( DVec<Fat8> &desData, size_t inserStart, size_t insertEnd, const char *pSrcFName, const U8 *pSrcData, size_t srcSize );
+    size_t InsertNewFile( DVec<Fat8> &desData, size_t inserStart, size_t insertEnd, const char *pSrcFName, const U8 *pSrcData, size_t srcSize );
 
-	void AppendNewFile( DVec<Fat8> &desData, const char *pSrcFName, const DVec<U8> &srcData );
-	void AppendNewFile( DVec<Fat8> &desData, const char *pSrcFName, const U8 *pSrcData, size_t srcSize );
+    void AppendNewFile( DVec<Fat8> &desData, const char *pSrcFName, const DVec<U8> &srcData );
+    void AppendNewFile( DVec<Fat8> &desData, const char *pSrcFName, const U8 *pSrcData, size_t srcSize );
 
-	void Append( DVec<Fat8> &desData, const DVec<Fat8> &srcData )
-	{
+    void Append( DVec<Fat8> &desData, const DVec<Fat8> &srcData )
+    {
         desData.insert( desData.end(), srcData.begin(), srcData.end() );
-	}
+    }
 };
 
 //==================================================================

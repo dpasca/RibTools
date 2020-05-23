@@ -24,17 +24,17 @@ namespace NET
 //===============================================================
 enum MsgID
 {
-	MSGID_FILEREQ		 = 333,
-	MSGID_FILEREQANS_DATA,
-	MSGID_FILEREQANS_FAIL,
-	MSGID_FILEEXISTREQ,
-	MSGID_FILEEXISTANSYES,
-	MSGID_FILEEXISTANSNO,
-	MSGID_RENDJOB,
-	MSGID_RENDBUCKETS,
-	MSGID_RENDDONE,
-	MSGID_BUCKETDATA,
-	MSGID_N
+    MSGID_FILEREQ		 = 333,
+    MSGID_FILEREQANS_DATA,
+    MSGID_FILEREQANS_FAIL,
+    MSGID_FILEEXISTREQ,
+    MSGID_FILEEXISTANSYES,
+    MSGID_FILEEXISTANSNO,
+    MSGID_RENDJOB,
+    MSGID_RENDBUCKETS,
+    MSGID_RENDDONE,
+    MSGID_BUCKETDATA,
+    MSGID_N
 };
 
 //===============================================================
@@ -42,63 +42,63 @@ enum MsgID
 //==================================================================
 struct MsgRendJob
 {
-	U32		MsgID;
-	char	FileName[512];
-	char	BaseDir[512];
-	char	DefaultResourcesDir[512];
-	I32		ForcedLongDim;
-	I32		ForcedWd;
-	I32		ForcedHe;
+    U32		MsgID;
+    char	FileName[512];
+    char	BaseDir[512];
+    char	DefaultResourcesDir[512];
+    I32		ForcedLongDim;
+    I32		ForcedWd;
+    I32		ForcedHe;
 
-	MsgRendJob()
-	{
-		memset( this, 0, sizeof(*this) );
-		MsgID = MSGID_RENDJOB;
-	}
+    MsgRendJob()
+    {
+        memset( this, 0, sizeof(*this) );
+        MsgID = MSGID_RENDJOB;
+    }
 };
 
 //===============================================================
 struct MsgRendBuckes
 {
-	U32		MsgID;
-	U32		BucketStart;
-	U32		BucketEnd;
+    U32		MsgID;
+    U32		BucketStart;
+    U32		BucketEnd;
 
-	MsgRendBuckes()
-	{
-		memset( this, 0, sizeof(*this) );
-		MsgID = MSGID_RENDBUCKETS;
-	}
+    MsgRendBuckes()
+    {
+        memset( this, 0, sizeof(*this) );
+        MsgID = MSGID_RENDBUCKETS;
+    }
 };
 
 //===============================================================
 struct MsgRendDone
 {
-	U32		MsgID;
+    U32		MsgID;
 
-	MsgRendDone()
-	{
-		MsgID = MSGID_RENDDONE;
-	}
+    MsgRendDone()
+    {
+        MsgID = MSGID_RENDDONE;
+    }
 };
 
 //===============================================================
 struct MsgBucketData
 {
-	U32		MsgID;
-	U32		BucketIdx;
+    U32		MsgID;
+    U32		BucketIdx;
 
-	MsgBucketData()
-	{
-		memset( this, 0, sizeof(*this) );
-		MsgID = MSGID_BUCKETDATA;
-	}
+    MsgBucketData()
+    {
+        memset( this, 0, sizeof(*this) );
+        MsgID = MSGID_BUCKETDATA;
+    }
 };
 
 //==================================================================
 inline MsgID GetMsgID( const DNET::Packet *pPacket )
 {
-	return (MsgID)*((const U32 *)&pPacket->mDataBuff[0]);
+    return (MsgID)*((const U32 *)&pPacket->mDataBuff[0]);
 }
 
 //==================================================================

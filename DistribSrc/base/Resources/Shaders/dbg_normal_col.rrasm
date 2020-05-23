@@ -1,17 +1,17 @@
 
 .data
-	Ci		global varying color
-	Oi		global varying color
-	N		global varying normal
-	
-	onev3	temporary constant vector 1.0 1.0 1.0
+    Ci		global varying color
+    Oi		global varying color
+    N		global varying normal
+    
+    onev3	temporary constant vector 1.0 1.0 1.0
 
 .code
 
 surface
 
 __main:
-	mov.vv	Ci	N
-	mov.vv	Oi	onev3
+    mov.vv	Ci	N
+    mov.vv	Oi	onev3
 
-	ret
+    ret

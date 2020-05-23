@@ -20,90 +20,90 @@ namespace NET
 /// RenderBucketsServer
 //==================================================================
 RenderBucketsServer::RenderBucketsServer( DNET::PacketManager &pakMan ) :
-	mpPakMan(&pakMan)
+    mpPakMan(&pakMan)
 {
 }
 
 //==================================================================
 void RenderBucketsServer::Render( RI::Hider &hider )
 {
-	while ( true )
-	{
-		U32 ids[] = { MSGID_RENDBUCKETS, MSGID_RENDDONE };
-		DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatchID32( true, ids, _countof(ids), 10 );
+    while ( true )
+    {
+        U32 ids[] = { MSGID_RENDBUCKETS, MSGID_RENDDONE };
+        DNET::Packet *pPacket = mpPakMan->WaitNextPacketMatchID32( true, ids, _countof(ids), 10 );
 
-		if NOT( pPacket )
-		{
-			if ( mpPakMan->IsConnected() )
-				continue;
-			else
-			{
-				printf( "Error: Connection interrupted, but no DONE rendering message received\n" );
-				break;
-			}
-		}
+        if NOT( pPacket )
+        {
+            if ( mpPakMan->IsConnected() )
+                continue;
+            else
+            {
+                printf( "Error: Connection interrupted, but no DONE rendering message received\n" );
+                break;
+            }
+        }
 
-		MsgID	msgID = GetMsgID( pPacket );
+        MsgID	msgID = GetMsgID( pPacket );
 
-		if ( msgID == MSGID_RENDBUCKETS )
-		{
-			printf( "NETLOG RECV MSGID_RENDBUCKETS\n" );
+        if ( msgID == MSGID_RENDBUCKETS )
+        {
+            printf( "NETLOG RECV MSGID_RENDBUCKETS\n" );
 
-			const MsgRendBuckes	&msg = *((const MsgRendBuckes *)&pPacket->mDataBuff[0]);
+            const MsgRendBuckes	&msg = *((const MsgRendBuckes *)&pPacket->mDataBuff[0]);
 
-			rendBucketsRange( hider, msg.BucketStart, msg.BucketEnd );
+            rendBucketsRange( hider, msg.BucketStart, msg.BucketEnd );
 
-			sendBucketsData( hider, msg.BucketStart, msg.BucketEnd );
-		}
-		else
-		if ( msgID == MSGID_RENDDONE )
-		{
-			printf( "RECV MSGID_RENDDONE\n" );
-			break;
-		}
+            sendBucketsData( hider, msg.BucketStart, msg.BucketEnd );
+        }
+        else
+        if ( msgID == MSGID_RENDDONE )
+        {
+            printf( "RECV MSGID_RENDDONE\n" );
+            break;
+        }
 
-		mpPakMan->DeletePacket( pPacket );
-	}
+        mpPakMan->DeletePacket( pPacket );
+    }
 }
 
 //==================================================================
 void RenderBucketsServer::rendBucketsRange( RI::Hider &hider, int buckRangeX1, int buckRangeX2 )
 {
-	const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
+    const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
 
-	DASSERT(
-		buckRangeX1 >= 0 &&
-		buckRangeX1 < buckRangeX2 &&
-		buckRangeX2 <= (int)buckets.size() );
+    DASSERT(
+        buckRangeX1 >= 0 &&
+        buckRangeX1 < buckRangeX2 &&
+        buckRangeX2 <= (int)buckets.size() );
 
-	#pragma omp parallel for
-	for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
-		RI::Framework::RenderBucket_s( hider, *buckets[ bi ] );
+    #pragma omp parallel for
+    for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
+        RI::Framework::RenderBucket_s( hider, *buckets[ bi ] );
 }
 
 //==================================================================
 void RenderBucketsServer::sendBucketsData( RI::Hider &hider, int buckRangeX1, int buckRangeX2 )
 {
-	const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
+    const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
 
-	for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
-	{
-		size_t	buckMemSize = hider.GetOutputBucketMemSize( (size_t)bi );
+    for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
+    {
+        size_t	buckMemSize = hider.GetOutputBucketMemSize( (size_t)bi );
 
-		DNET::Packet *pPacket;
-		pPacket = mpPakMan->SendBegin( sizeof(MsgBucketData) + buckMemSize );
+        DNET::Packet *pPacket;
+        pPacket = mpPakMan->SendBegin( sizeof(MsgBucketData) + buckMemSize );
 
-			U8 *pSendData = pPacket->GetDataPtrSend();
+            U8 *pSendData = pPacket->GetDataPtrSend();
 
-			MsgBucketData	&msg = *(new ( pSendData ) MsgBucketData());
-			pSendData += sizeof(MsgBucketData);
-			msg.BucketIdx = bi;
+            MsgBucketData	&msg = *(new ( pSendData ) MsgBucketData());
+            pSendData += sizeof(MsgBucketData);
+            msg.BucketIdx = bi;
 
-			hider.CopyOutputBucket( (size_t)bi, (float *)pSendData, buckMemSize );
+            hider.CopyOutputBucket( (size_t)bi, (float *)pSendData, buckMemSize );
 
-		printf( "NETLOG SEND MSGID_BUCKETDATA\n" );
-		mpPakMan->SendEnd( pPacket );
-	}
+        printf( "NETLOG SEND MSGID_BUCKETDATA\n" );
+        mpPakMan->SendEnd( pPacket );
+    }
 }
 
 //==================================================================

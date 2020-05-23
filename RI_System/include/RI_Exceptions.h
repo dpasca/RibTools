@@ -18,19 +18,19 @@ namespace RI
 //==================================================================
 class Exception
 {
-	DStr	mMsg;
+    DStr	mMsg;
 
 public:
-	Exception( const char *pFmt, ... );
+    Exception( const char *pFmt, ... );
 
-	~Exception()
-	{
-	}
+    ~Exception()
+    {
+    }
 
-	const DStr &GetMessage_() const
-	{
-		return mMsg;
-	}
+    const DStr &GetMessage_() const
+    {
+        return mMsg;
+    }
 };
 
 

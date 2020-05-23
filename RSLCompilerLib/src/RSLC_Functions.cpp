@@ -19,17 +19,17 @@ namespace RSLC
 //==================================================================
 bool Function::IsAsmFunc() const
 {
-	return RSLC::IsAsmFunc( mpNameNode->GetTokStr() );
+    return RSLC::IsAsmFunc( mpNameNode->GetTokStr() );
 }
 
 //==================================================================
 bool Function::HasParams() const
 {
-	// has parameters if the first child is not a code block (body of the function)
-	return
-		mpParamsNode
-		&&	mpParamsNode->mpChilds.size()
-		&&	mpParamsNode->mpChilds[0]->GetBlockType() != BLKT_CODEBLOCK;
+    // has parameters if the first child is not a code block (body of the function)
+    return
+        mpParamsNode
+        &&	mpParamsNode->mpChilds.size()
+        &&	mpParamsNode->mpChilds[0]->GetBlockType() != BLKT_CODEBLOCK;
 }
 
 //==================================================================

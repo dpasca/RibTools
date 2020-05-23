@@ -16,84 +16,84 @@ namespace RSLC
 //==================================================================
 void Variable::AssignRegister( int regIdx )
 {
-	DASSERT( !mBuild_Register.IsValid() );
+    DASSERT( !mBuild_Register.IsValid() );
 
-	mBuild_Register.SetType( mVarType, mIsVarying, mIsForcedDetail );
-	mBuild_Register.SetRegIdx( regIdx );
+    mBuild_Register.SetType( mVarType, mIsVarying, mIsForcedDetail );
+    mBuild_Register.SetRegIdx( regIdx );
 }
 
 //==================================================================
 bool Variable::IsRegisterAssigned() const
 {
-	return mBuild_Register.IsAssigned();
+    return mBuild_Register.IsAssigned();
 }
 
 //==================================================================
 RSLC::VarType Variable::GetVarType() const
 {
-	DASSERT( !mBuild_Register.IsValid() || mBuild_Register.GetVarType() == mVarType );
+    DASSERT( !mBuild_Register.IsValid() || mBuild_Register.GetVarType() == mVarType );
 
-	return mVarType;
+    return mVarType;
 }
 
 //==================================================================
 bool Variable::IsVarying() const
 {
-	DASSERT( !mBuild_Register.IsValid() || mBuild_Register.IsVarying() == mIsVarying );
+    DASSERT( !mBuild_Register.IsValid() || mBuild_Register.IsVarying() == mIsVarying );
 
-	return mIsVarying;
+    return mIsVarying;
 }
 
 //==================================================================
 bool Variable::IsForcedDetail() const
 {
-	//DASSERT( mBuild_Register.IsForcedDetail() == mIsForcedDetail );
+    //DASSERT( mBuild_Register.IsForcedDetail() == mIsForcedDetail );
 
-	return mIsForcedDetail;
+    return mIsForcedDetail;
 }
 
 //==================================================================
 void Variable::SetForcedDetail( bool onoff )
 {
-	DASSERT( mIsForcedDetail == false );
+    DASSERT( mIsForcedDetail == false );
 
-	mIsForcedDetail = onoff;
+    mIsForcedDetail = onoff;
 }
 
 //==================================================================
 void Variable::SetVarying( bool varying )
 {
-	DASSERT( mIsForcedDetail == false );
+    DASSERT( mIsForcedDetail == false );
 
-	mIsVarying = varying;
+    mIsVarying = varying;
 
-	if ( mBuild_Register.IsValid() )
-	{
-		mBuild_Register.SetVarying( varying );
-	}
+    if ( mBuild_Register.IsValid() )
+    {
+        mBuild_Register.SetVarying( varying );
+    }
 }
 
 //==================================================================
 DStr Variable::GetUseName() const
 {
-	if ( mIsGlobal || mIsSHParam )
-		return mpDefNameNode->GetTokStr();
-	else
-	if ( mBuild_Register.IsValid() )
-	{
-		return mBuild_Register.GetName();
-	}
-	else
-		return mInternalName;
+    if ( mIsGlobal || mIsSHParam )
+        return mpDefNameNode->GetTokStr();
+    else
+    if ( mBuild_Register.IsValid() )
+    {
+        return mBuild_Register.GetName();
+    }
+    else
+        return mInternalName;
 }
 
 //==================================================================
 const char * Variable::GetDefName() const
 {
-	if ( mpDefNameNode )
-		return mpDefNameNode->GetTokStr();
-	else
-		return NULL;
+    if ( mpDefNameNode )
+        return mpDefNameNode->GetTokStr();
+    else
+        return NULL;
 }
 
 //==================================================================

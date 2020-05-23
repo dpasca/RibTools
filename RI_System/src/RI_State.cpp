@@ -18,708 +18,708 @@ namespace RI
 /// State
 //==================================================================
 State::State( const Params &params ) :
-	mParams(params)
+    mParams(params)
 {
-	// normalize the directories in input...
-	// to simplify the usage later on, the current directory
-	// needs to be explicitly "."
-	if ( mParams.mBaseDir == "" )
-		mParams.mBaseDir = ".";
+    // normalize the directories in input...
+    // to simplify the usage later on, the current directory
+    // needs to be explicitly "."
+    if ( mParams.mBaseDir == "" )
+        mParams.mBaseDir = ".";
 
-	if ( mParams.mDefaultShadersDir == "" )
-		mParams.mDefaultShadersDir = ".";
+    if ( mParams.mDefaultShadersDir == "" )
+        mParams.mDefaultShadersDir = ".";
 
-	mModeStack.push_back( MD_UNDEFINED );
+    mModeStack.push_back( MD_UNDEFINED );
 
-	mMtxWorldCamera.Identity();
+    mMtxWorldCamera.Identity();
 
-	mGlobalSyms.AddGVoid(	RI_FRAMEBUFFER		);
-	mGlobalSyms.AddGVoid( 	RI_FILE				);
-	mGlobalSyms.AddGVoid( 	RI_RGB				);
-	mGlobalSyms.AddGVoid( 	RI_RGBA				);
-	mGlobalSyms.AddGVoid( 	RI_RGBZ				);
-	mGlobalSyms.AddGVoid( 	RI_RGBAZ			);
-	mGlobalSyms.AddGVoid( 	RI_A				);
-	mGlobalSyms.AddGVoid( 	RI_Z				);
-	mGlobalSyms.AddGVoid( 	RI_AZ				);
-	mGlobalSyms.AddGVoid( 	RI_PERSPECTIVE		);
-	mGlobalSyms.AddGVoid( 	RI_ORTHOGRAPHIC		);
-	mGlobalSyms.AddGVoid( 	RI_HIDDEN			);
-	mGlobalSyms.AddGVoid( 	RI_PAINT			);
-	mGlobalSyms.AddGVoid( 	RI_CONSTANT			);
-	mGlobalSyms.AddGVoid( 	RI_SMOOTH			);
-	mGlobalSyms.AddGVoid( 	RI_FLATNESS			);
-	mGlobalSyms.AddGVoid( 	RI_FOV				);
-	mGlobalSyms.AddGVoid( 	RI_AMBIENTLIGHT		);
-	mGlobalSyms.AddGVoid( 	RI_POINTLIGHT		);
-	mGlobalSyms.AddGVoid( 	RI_DISTANTLIGHT		);
-	mGlobalSyms.AddGVoid( 	RI_SPOTLIGHT 		);
-	mGlobalSyms.AddGlob( 	"uniform float ", RI_INTENSITY		 );
-	mGlobalSyms.AddGlob( 	"uniform color ", RI_LIGHTCOLOR		 );
-	mGlobalSyms.AddGlob( 	"uniform point ", RI_FROM			 );
-	mGlobalSyms.AddGlob( 	"uniform point ", RI_TO				 );
-	mGlobalSyms.AddGlob( 	"uniform float ", RI_CONEANGLE		 );
-	mGlobalSyms.AddGlob( 	"uniform float ", RI_CONEDELTAANGLE	 );
-	mGlobalSyms.AddGlob( 	"uniform float ", RI_BEAMDISTRIBUTION );
-	mGlobalSyms.AddGVoid( 	RI_MATTE			);
-	mGlobalSyms.AddGVoid( 	RI_METAL			);
-	mGlobalSyms.AddGVoid( 	RI_SHINYMETAL		);
-	mGlobalSyms.AddGVoid( 	RI_PLASTIC			);
-	mGlobalSyms.AddGVoid( 	RI_PAINTEDPLASTIC	);
-	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KA			);
-	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KD			);
-	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KS			);
-	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_ROUGHNESS		);
-	mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KR			);
-	mGlobalSyms.AddGlob( 	"uniform string ",  RI_TEXTURENAME	);
-	mGlobalSyms.AddGlob( 	"uniform color  ",  RI_SPECULARCOLOR	);
-	mGlobalSyms.AddGVoid( 	RI_DEPTHCUE			);
-	mGlobalSyms.AddGVoid( 	RI_FOG				);
-	mGlobalSyms.AddGVoid( 	RI_BUMPY			);
-	mGlobalSyms.AddGlob( 	"uniform float ", RI_MINDISTANCE );
-	mGlobalSyms.AddGlob( 	"uniform float ", RI_MAXDISTANCE );
-	mGlobalSyms.AddGlob( 	"uniform color ", RI_BACKGROUND  );
-	mGlobalSyms.AddGlob( 	"uniform float ", RI_DISTANCE	);
-	mGlobalSyms.AddGlob( 	"uniform float ", RI_AMPLITUDE   );
-	mGlobalSyms.AddGVoid( 	RI_RASTER			);
-	mGlobalSyms.AddGVoid( 	RI_SCREEN			);
-	mGlobalSyms.AddGVoid( 	RI_CAMERA			);
-	mGlobalSyms.AddGVoid( 	RI_WORLD			);
-	mGlobalSyms.AddGVoid( 	RI_OBJECT			);
-	mGlobalSyms.AddGVoid( 	RI_INSIDE			);
-	mGlobalSyms.AddGVoid( 	RI_OUTSIDE			);
-	mGlobalSyms.AddGVoid( 	RI_LH				);
-	mGlobalSyms.AddGVoid( 	RI_RH				);
-	mGlobalSyms.AddGlob( 	"vertex point     ", RI_P	);		// verified
-	mGlobalSyms.AddGlob( 	"vertex float     ", RI_PZ	);		// verified
-	mGlobalSyms.AddGlob( 	"vertex hpoint    ", RI_PW	);		// verified
-	mGlobalSyms.AddGlob( 	"varying normal   ", RI_N	);		// verified
-	mGlobalSyms.AddGlob( 	"uniform point    ", RI_NP	);
-	mGlobalSyms.AddGlob( 	"varying color    ", RI_CS	);		// verified
-	mGlobalSyms.AddGlob( 	"varying color    ", RI_OS	);		// verified
-	mGlobalSyms.AddGlob( 	"varying float    ", RI_S	);		// verified
-	mGlobalSyms.AddGlob( 	"varying float    ", RI_T    );		// verified
-	//mGlobalSyms.AddGlob( 	"varying float[2] ", RI_ST	);		// verified
-	mGlobalSyms.AddGVoid( 	RI_BILINEAR			);
-	mGlobalSyms.AddGVoid( 	RI_BICUBIC			);
-	mGlobalSyms.AddGVoid( 	RI_PRIMITIVE		);
-	mGlobalSyms.AddGVoid( 	RI_INTERSECTION		);
-	mGlobalSyms.AddGVoid( 	RI_UNION			);
-	mGlobalSyms.AddGVoid( 	RI_DIFFERENCE		);
-	mGlobalSyms.AddGVoid( 	RI_PERIODIC			);
-	mGlobalSyms.AddGVoid( 	RI_NONPERIODIC		);
-	mGlobalSyms.AddGVoid( 	RI_CLAMP			);
-	mGlobalSyms.AddGVoid( 	RI_BLACK			);
-	mGlobalSyms.AddGVoid( 	RI_IGNORE			);
-	mGlobalSyms.AddGVoid( 	RI_PRINT			);
-	mGlobalSyms.AddGVoid( 	RI_ABORT			);
-	mGlobalSyms.AddGVoid( 	RI_HANDLER			);
-	mGlobalSyms.AddGVoid( 	RI_EMPTY_TOKEN		);
+    mGlobalSyms.AddGVoid(	RI_FRAMEBUFFER		);
+    mGlobalSyms.AddGVoid( 	RI_FILE				);
+    mGlobalSyms.AddGVoid( 	RI_RGB				);
+    mGlobalSyms.AddGVoid( 	RI_RGBA				);
+    mGlobalSyms.AddGVoid( 	RI_RGBZ				);
+    mGlobalSyms.AddGVoid( 	RI_RGBAZ			);
+    mGlobalSyms.AddGVoid( 	RI_A				);
+    mGlobalSyms.AddGVoid( 	RI_Z				);
+    mGlobalSyms.AddGVoid( 	RI_AZ				);
+    mGlobalSyms.AddGVoid( 	RI_PERSPECTIVE		);
+    mGlobalSyms.AddGVoid( 	RI_ORTHOGRAPHIC		);
+    mGlobalSyms.AddGVoid( 	RI_HIDDEN			);
+    mGlobalSyms.AddGVoid( 	RI_PAINT			);
+    mGlobalSyms.AddGVoid( 	RI_CONSTANT			);
+    mGlobalSyms.AddGVoid( 	RI_SMOOTH			);
+    mGlobalSyms.AddGVoid( 	RI_FLATNESS			);
+    mGlobalSyms.AddGVoid( 	RI_FOV				);
+    mGlobalSyms.AddGVoid( 	RI_AMBIENTLIGHT		);
+    mGlobalSyms.AddGVoid( 	RI_POINTLIGHT		);
+    mGlobalSyms.AddGVoid( 	RI_DISTANTLIGHT		);
+    mGlobalSyms.AddGVoid( 	RI_SPOTLIGHT 		);
+    mGlobalSyms.AddGlob( 	"uniform float ", RI_INTENSITY		 );
+    mGlobalSyms.AddGlob( 	"uniform color ", RI_LIGHTCOLOR		 );
+    mGlobalSyms.AddGlob( 	"uniform point ", RI_FROM			 );
+    mGlobalSyms.AddGlob( 	"uniform point ", RI_TO				 );
+    mGlobalSyms.AddGlob( 	"uniform float ", RI_CONEANGLE		 );
+    mGlobalSyms.AddGlob( 	"uniform float ", RI_CONEDELTAANGLE	 );
+    mGlobalSyms.AddGlob( 	"uniform float ", RI_BEAMDISTRIBUTION );
+    mGlobalSyms.AddGVoid( 	RI_MATTE			);
+    mGlobalSyms.AddGVoid( 	RI_METAL			);
+    mGlobalSyms.AddGVoid( 	RI_SHINYMETAL		);
+    mGlobalSyms.AddGVoid( 	RI_PLASTIC			);
+    mGlobalSyms.AddGVoid( 	RI_PAINTEDPLASTIC	);
+    mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KA			);
+    mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KD			);
+    mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KS			);
+    mGlobalSyms.AddGlob( 	"uniform float  ",  RI_ROUGHNESS		);
+    mGlobalSyms.AddGlob( 	"uniform float  ",  RI_KR			);
+    mGlobalSyms.AddGlob( 	"uniform string ",  RI_TEXTURENAME	);
+    mGlobalSyms.AddGlob( 	"uniform color  ",  RI_SPECULARCOLOR	);
+    mGlobalSyms.AddGVoid( 	RI_DEPTHCUE			);
+    mGlobalSyms.AddGVoid( 	RI_FOG				);
+    mGlobalSyms.AddGVoid( 	RI_BUMPY			);
+    mGlobalSyms.AddGlob( 	"uniform float ", RI_MINDISTANCE );
+    mGlobalSyms.AddGlob( 	"uniform float ", RI_MAXDISTANCE );
+    mGlobalSyms.AddGlob( 	"uniform color ", RI_BACKGROUND  );
+    mGlobalSyms.AddGlob( 	"uniform float ", RI_DISTANCE	);
+    mGlobalSyms.AddGlob( 	"uniform float ", RI_AMPLITUDE   );
+    mGlobalSyms.AddGVoid( 	RI_RASTER			);
+    mGlobalSyms.AddGVoid( 	RI_SCREEN			);
+    mGlobalSyms.AddGVoid( 	RI_CAMERA			);
+    mGlobalSyms.AddGVoid( 	RI_WORLD			);
+    mGlobalSyms.AddGVoid( 	RI_OBJECT			);
+    mGlobalSyms.AddGVoid( 	RI_INSIDE			);
+    mGlobalSyms.AddGVoid( 	RI_OUTSIDE			);
+    mGlobalSyms.AddGVoid( 	RI_LH				);
+    mGlobalSyms.AddGVoid( 	RI_RH				);
+    mGlobalSyms.AddGlob( 	"vertex point     ", RI_P	);		// verified
+    mGlobalSyms.AddGlob( 	"vertex float     ", RI_PZ	);		// verified
+    mGlobalSyms.AddGlob( 	"vertex hpoint    ", RI_PW	);		// verified
+    mGlobalSyms.AddGlob( 	"varying normal   ", RI_N	);		// verified
+    mGlobalSyms.AddGlob( 	"uniform point    ", RI_NP	);
+    mGlobalSyms.AddGlob( 	"varying color    ", RI_CS	);		// verified
+    mGlobalSyms.AddGlob( 	"varying color    ", RI_OS	);		// verified
+    mGlobalSyms.AddGlob( 	"varying float    ", RI_S	);		// verified
+    mGlobalSyms.AddGlob( 	"varying float    ", RI_T    );		// verified
+    //mGlobalSyms.AddGlob( 	"varying float[2] ", RI_ST	);		// verified
+    mGlobalSyms.AddGVoid( 	RI_BILINEAR			);
+    mGlobalSyms.AddGVoid( 	RI_BICUBIC			);
+    mGlobalSyms.AddGVoid( 	RI_PRIMITIVE		);
+    mGlobalSyms.AddGVoid( 	RI_INTERSECTION		);
+    mGlobalSyms.AddGVoid( 	RI_UNION			);
+    mGlobalSyms.AddGVoid( 	RI_DIFFERENCE		);
+    mGlobalSyms.AddGVoid( 	RI_PERIODIC			);
+    mGlobalSyms.AddGVoid( 	RI_NONPERIODIC		);
+    mGlobalSyms.AddGVoid( 	RI_CLAMP			);
+    mGlobalSyms.AddGVoid( 	RI_BLACK			);
+    mGlobalSyms.AddGVoid( 	RI_IGNORE			);
+    mGlobalSyms.AddGVoid( 	RI_PRINT			);
+    mGlobalSyms.AddGVoid( 	RI_ABORT			);
+    mGlobalSyms.AddGVoid( 	RI_HANDLER			);
+    mGlobalSyms.AddGVoid( 	RI_EMPTY_TOKEN		);
 
-	mGlobalSyms.AddGlob( "constant matrix ", RI_BEZIERBASIS		, (const void *)&BezierBasis	);
-	mGlobalSyms.AddGlob( "constant matrix ", RI_BSPLINEBASIS	, (const void *)&BSplineBasis	);
-	mGlobalSyms.AddGlob( "constant matrix ", RI_CATMULLROMBASIS	, (const void *)&CatmullRomBasis);
-	mGlobalSyms.AddGlob( "constant matrix ", RI_HERMITEBASIS	, (const void *)&HermiteBasis	);
-	mGlobalSyms.AddGlob( "constant matrix ", RI_POWERBASIS		, (const void *)&PowerBasis		);
-	
-	// add shader-specific globals that for some reasons are not listed in ri.h
-	mGlobalSyms.AddGlob( "varying point  dPdu"	);
-	mGlobalSyms.AddGlob( "varying point  dPdv"	);
-	mGlobalSyms.AddGlob( "varying float  _oodu"	);
-	mGlobalSyms.AddGlob( "varying float  _oodv"	);
-	mGlobalSyms.AddGlob( "varying normal Ng"	);
-	mGlobalSyms.AddGlob( "varying float  u"		);
-	mGlobalSyms.AddGlob( "varying float  v"		);
-	mGlobalSyms.AddGlob( "varying float  du"	);
-	mGlobalSyms.AddGlob( "varying float  dv"	);
-	mGlobalSyms.AddGlob( "varying vector L"		);
-	mGlobalSyms.AddGlob( "varying color  Cl"	);
-	mGlobalSyms.AddGlob( "varying vector I"		);
-	mGlobalSyms.AddGlob( "varying color  Ci"	);
-	mGlobalSyms.AddGlob( "varying color  Oi"	);
-	mGlobalSyms.AddGlob( "uniform point  E"		);
+    mGlobalSyms.AddGlob( "constant matrix ", RI_BEZIERBASIS		, (const void *)&BezierBasis	);
+    mGlobalSyms.AddGlob( "constant matrix ", RI_BSPLINEBASIS	, (const void *)&BSplineBasis	);
+    mGlobalSyms.AddGlob( "constant matrix ", RI_CATMULLROMBASIS	, (const void *)&CatmullRomBasis);
+    mGlobalSyms.AddGlob( "constant matrix ", RI_HERMITEBASIS	, (const void *)&HermiteBasis	);
+    mGlobalSyms.AddGlob( "constant matrix ", RI_POWERBASIS		, (const void *)&PowerBasis		);
+    
+    // add shader-specific globals that for some reasons are not listed in ri.h
+    mGlobalSyms.AddGlob( "varying point  dPdu"	);
+    mGlobalSyms.AddGlob( "varying point  dPdv"	);
+    mGlobalSyms.AddGlob( "varying float  _oodu"	);
+    mGlobalSyms.AddGlob( "varying float  _oodv"	);
+    mGlobalSyms.AddGlob( "varying normal Ng"	);
+    mGlobalSyms.AddGlob( "varying float  u"		);
+    mGlobalSyms.AddGlob( "varying float  v"		);
+    mGlobalSyms.AddGlob( "varying float  du"	);
+    mGlobalSyms.AddGlob( "varying float  dv"	);
+    mGlobalSyms.AddGlob( "varying vector L"		);
+    mGlobalSyms.AddGlob( "varying color  Cl"	);
+    mGlobalSyms.AddGlob( "varying vector I"		);
+    mGlobalSyms.AddGlob( "varying color  Ci"	);
+    mGlobalSyms.AddGlob( "varying color  Oi"	);
+    mGlobalSyms.AddGlob( "uniform point  E"		);
 
-	makeDefaultShaders( mParams.mDefaultShadersDir.c_str() );
+    makeDefaultShaders( mParams.mDefaultShadersDir.c_str() );
 
-	mOptionsStack.top().Init( &mGlobalSyms, &mOptionsRevTrack );
-	mAttributesStack.top().Init( this, &mGlobalSyms, &mResManager, &mAttribsRevTrack );
-	mTransformOpenStack.top().Init( &mTransOpenRevTrack );
-	mTransformCloseStack.top().Init( &mTransCloseRevTrack );
-	
-	mParams.mpFramework->SetGlobalSyms( &mGlobalSyms );
+    mOptionsStack.top().Init( &mGlobalSyms, &mOptionsRevTrack );
+    mAttributesStack.top().Init( this, &mGlobalSyms, &mResManager, &mAttribsRevTrack );
+    mTransformOpenStack.top().Init( &mTransOpenRevTrack );
+    mTransformCloseStack.top().Init( &mTransCloseRevTrack );
+    
+    mParams.mpFramework->SetGlobalSyms( &mGlobalSyms );
 }
 
 //==================================================================
 SVM::Shader *State::GetShader( const char *pShaderName, const char *pAlternateName )
 {
-	// try see if we have it loaded already
-	SVM::Shader	*pShader =
-			(SVM::Shader *)mResManager.FindResource( pShaderName,
-													ResourceBase::TYPE_SHADER );
+    // try see if we have it loaded already
+    SVM::Shader	*pShader =
+            (SVM::Shader *)mResManager.FindResource( pShaderName,
+                                                    ResourceBase::TYPE_SHADER );
 
-	if ( pShader )
-		return pShader;
+    if ( pShader )
+        return pShader;
 
-	DStr	tmpFName;
-	DStr	shaderFullPathName;
+    DStr	tmpFName;
+    DStr	shaderFullPathName;
 
-	// try .sl
-	tmpFName = DStr( pShaderName ) + ".sl";
-	shaderFullPathName = FindResFile( tmpFName.c_str(), Options::SEARCHPATH_SHADER );
+    // try .sl
+    tmpFName = DStr( pShaderName ) + ".sl";
+    shaderFullPathName = FindResFile( tmpFName.c_str(), Options::SEARCHPATH_SHADER );
 
-	if NOT( shaderFullPathName.length() )
-	{
-		// try .rrasm
-		tmpFName = DStr( pShaderName ) + ".rrasm";
-		shaderFullPathName = FindResFile( tmpFName.c_str(), Options::SEARCHPATH_SHADER );
-	}
+    if NOT( shaderFullPathName.length() )
+    {
+        // try .rrasm
+        tmpFName = DStr( pShaderName ) + ".rrasm";
+        shaderFullPathName = FindResFile( tmpFName.c_str(), Options::SEARCHPATH_SHADER );
+    }
 
-	if ( shaderFullPathName.length() )
-	{
-		SVM::Shader::CtorParams	params;
-		params.pName			= pShaderName;
-		params.pBaseIncDir		= GetDefShadersDir();
-		params.pSourceFileName	= shaderFullPathName.c_str();
+    if ( shaderFullPathName.length() )
+    {
+        SVM::Shader::CtorParams	params;
+        params.pName			= pShaderName;
+        params.pBaseIncDir		= GetDefShadersDir();
+        params.pSourceFileName	= shaderFullPathName.c_str();
 
-		try {
-			pShader = DNEW SVM::Shader( params, GetFileManager() );
-		} catch ( ... )
-		{
-			//ERRPrintf( "Could not compile '%s' !", params.pSourceFileName );
-			return NULL;
-		}
+        try {
+            pShader = DNEW SVM::Shader( params, GetFileManager() );
+        } catch ( ... )
+        {
+            //ERRPrintf( "Could not compile '%s' !", params.pSourceFileName );
+            return NULL;
+        }
 
-		mResManager.AddResource( pShader );
+        mResManager.AddResource( pShader );
 
-		return pShader;
-	}
-	else
-	{
-		return NULL;
-	}
-		
-	if ( pAlternateName )
-	{
-		pShader =
+        return pShader;
+    }
+    else
+    {
+        return NULL;
+    }
+        
+    if ( pAlternateName )
+    {
+        pShader =
             (SVM::Shader *)mResManager.FindResource(
                     pAlternateName,
                     ResourceBase::TYPE_SHADER );
 
-		if ( pShader )
-			return pShader;
-	}
+        if ( pShader )
+            return pShader;
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //==================================================================
 void State::makeDefaultShaders( const char *pBasePath )
 {
-	const char *pDefShaders[] =
-	{
-		"constant",
-		"matte",
-		"dbg_normal_col",
-		NULL
-	};
+    const char *pDefShaders[] =
+    {
+        "constant",
+        "matte",
+        "dbg_normal_col",
+        NULL
+    };
 
-	// load the default shaders.. these must be found
-	for (size_t i=0; pDefShaders[i]; ++i)
-	{
-		SVM::Shader *pShader = GetShader( pDefShaders[i], NULL );
+    // load the default shaders.. these must be found
+    for (size_t i=0; pDefShaders[i]; ++i)
+    {
+        SVM::Shader *pShader = GetShader( pDefShaders[i], NULL );
 
         if NOT( pShader )
             DEX_RUNTIME_ERROR(
                     "Could not find the shader '%s'",
                     pDefShaders[i] );
-	}
+    }
 }
 
 //==================================================================
 State::~State()
 {
-	mModeStack.clear();
-	mOptionsStack.clear();
-	mAttributesStack.clear();
-	mTransformOpenStack.clear();
-	mTransformCloseStack.clear();
+    mModeStack.clear();
+    mOptionsStack.clear();
+    mAttributesStack.clear();
+    mTransformOpenStack.clear();
+    mTransformCloseStack.clear();
 }
 
 //==================================================================
 void State::pushStacks( const u_int flags )
 {
-	if ( flags & SF_OPTS )	mOptionsStack.push();
-	if ( flags & SF_ATRB )	mAttributesStack.push();
-	if ( flags & SF_TRAN )	mTransformOpenStack.push(), mTransformCloseStack.push();
+    if ( flags & SF_OPTS )	mOptionsStack.push();
+    if ( flags & SF_ATRB )	mAttributesStack.push();
+    if ( flags & SF_TRAN )	mTransformOpenStack.push(), mTransformCloseStack.push();
 }
 
 //==================================================================
 void State::popStacks( const u_int flags )
 {
-	if ( flags & SF_OPTS )	mOptionsStack.pop();
-	if ( flags & SF_ATRB )	mAttributesStack.pop();
-	if ( flags & SF_TRAN )	mTransformOpenStack.pop(), mTransformCloseStack.pop();
+    if ( flags & SF_OPTS )	mOptionsStack.pop();
+    if ( flags & SF_ATRB )	mAttributesStack.pop();
+    if ( flags & SF_TRAN )	mTransformOpenStack.pop(), mTransformCloseStack.pop();
 }
 
 //==================================================================
 void State::Begin( RtToken name )
 {
-	pushMode( MD_BASE );
+    pushMode( MD_BASE );
 }
 //==================================================================
 void State::End()
 {
-	popMode( MD_BASE );
+    popMode( MD_BASE );
 }
 //==================================================================
 void State::FrameBegin( int frame )
 {
-	pushMode( MD_FRAME );
-	pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
+    pushMode( MD_FRAME );
+    pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 }
 //==================================================================
 void State::FrameEnd()
 {
-	popStacks( SF_OPTS | SF_ATRB | SF_TRAN );
-	popMode( MD_FRAME );
+    popStacks( SF_OPTS | SF_ATRB | SF_TRAN );
+    popMode( MD_FRAME );
 }
 //==================================================================
 void State::WorldBegin()
 {
-	// tell the options what drivers we have available
-	mOptionsStack.top().Finalize(
-					mParams.mpFramework->mParams.mFallBackFileDisplay,
-					mParams.mpFramework->mParams.mFallBackFBuffDisplay );
+    // tell the options what drivers we have available
+    mOptionsStack.top().Finalize(
+                    mParams.mpFramework->mParams.mFallBackFileDisplay,
+                    mParams.mpFramework->mParams.mFallBackFBuffDisplay );
 
-	pushMode( MD_WORLD );
+    pushMode( MD_WORLD );
 
-	// store the current (camera) transformation
-	mMtxWorldCamera = mTransformOpenStack.top().GetMatrix();
+    // store the current (camera) transformation
+    mMtxWorldCamera = mTransformOpenStack.top().GetMatrix();
 
-	pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
+    pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 
-	// initialize the world transformation
-	mTransformOpenStack.top().SetIdentity();
-	mTransformCloseStack.top().SetIdentity();
+    // initialize the world transformation
+    mTransformOpenStack.top().SetIdentity();
+    mTransformCloseStack.top().SetIdentity();
 
-	mParams.mpFramework->WorldBegin( mOptionsStack.top(), mMtxWorldCamera );
+    mParams.mpFramework->WorldBegin( mOptionsStack.top(), mMtxWorldCamera );
 }
 //==================================================================
 void State::WorldEnd()
 {
-	mParams.mpFramework->WorldEnd();
+    mParams.mpFramework->WorldEnd();
 
-	popStacks( SF_OPTS | SF_ATRB | SF_TRAN );
-	popMode( MD_WORLD );
+    popStacks( SF_OPTS | SF_ATRB | SF_TRAN );
+    popMode( MD_WORLD );
 }
 //==================================================================
 void State::AttributeBegin()
 {
-	pushMode( MD_ATTRIBUTE );
-	pushStacks( SF_ATRB | SF_TRAN );
+    pushMode( MD_ATTRIBUTE );
+    pushStacks( SF_ATRB | SF_TRAN );
 }
 //==================================================================
 void State::AttributeEnd()
 {
-	popStacks( SF_ATRB | SF_TRAN );
-	popMode( MD_ATTRIBUTE );
+    popStacks( SF_ATRB | SF_TRAN );
+    popMode( MD_ATTRIBUTE );
 }
 //==================================================================
 void State::TransformBegin()
 {
-	//printf( ">> " );
-	//mTransformOpenStack.top().mMatrix.PrintOut();
+    //printf( ">> " );
+    //mTransformOpenStack.top().mMatrix.PrintOut();
 
-	pushMode( MD_TRANSFORM );
-	pushStacks( SF_TRAN );
+    pushMode( MD_TRANSFORM );
+    pushStacks( SF_TRAN );
 }
 //==================================================================
 void State::TransformEnd()
 {
-	popStacks( SF_TRAN );
-	popMode( MD_TRANSFORM );
+    popStacks( SF_TRAN );
+    popMode( MD_TRANSFORM );
 
-	//printf( "<< " );
-	//mTransformOpenStack.top().mMatrix.PrintOut();
+    //printf( "<< " );
+    //mTransformOpenStack.top().mMatrix.PrintOut();
 }
 //==================================================================
 void State::SolidBegin( RtToken operation )
 {
-	pushMode( MD_SOLID );
-	pushStacks( SF_ATRB | SF_TRAN );
+    pushMode( MD_SOLID );
+    pushStacks( SF_ATRB | SF_TRAN );
 }
 //==================================================================
 void State::SolidEnd()
 {
-	popStacks( SF_ATRB | SF_TRAN );
-	popMode( MD_SOLID );
+    popStacks( SF_ATRB | SF_TRAN );
+    popMode( MD_SOLID );
 }
 //==================================================================
 ObjectHandle State::ObjectBegin()
 {
-	pushMode( MD_OBJECT );
-	pushStacks( SF_ATRB | SF_TRAN );
+    pushMode( MD_OBJECT );
+    pushStacks( SF_ATRB | SF_TRAN );
 
-	return NULL;
+    return NULL;
 }
 //==================================================================
 void State::ObjectEnd()
 {
-	popStacks( SF_ATRB | SF_TRAN );
-	popMode( MD_OBJECT );
+    popStacks( SF_ATRB | SF_TRAN );
+    popMode( MD_OBJECT );
 }
 //==================================================================
 void State::MotionBegin( int n, const float times[] )
 {
-	pushMode( MD_MOTION );
+    pushMode( MD_MOTION );
 }
 //==================================================================
 void State::MotionEnd()
 {
-	popMode( MD_MOTION );
+    popMode( MD_MOTION );
 }
 
 // setting attributes
 //==================================================================
 void State::DoBound( const Bound &bound )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdBound( bound );
+    mAttributesStack.top().cmdBound( bound );
 }
 //==================================================================
 void State::Detail( const Bound &detail )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdDetail( detail );
+    mAttributesStack.top().cmdDetail( detail );
 }
 //==================================================================
 void State::DetailRange(float	minVisible,
-				 float	lowerTransition,
-				 float	upperTransition,
-				 float	maxVisible )
+                 float	lowerTransition,
+                 float	upperTransition,
+                 float	maxVisible )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdDetailRange(
-					minVisible,
-					lowerTransition,
-					upperTransition,
-					maxVisible );
+    mAttributesStack.top().cmdDetailRange(
+                    minVisible,
+                    lowerTransition,
+                    upperTransition,
+                    maxVisible );
 }
 //==================================================================
 void State::GeometricApproximation(RtToken typeApproximation,
-							   float valueApproximation )
+                               float valueApproximation )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdGeometricApproximation(
-							typeApproximation,
-							valueApproximation );
+    mAttributesStack.top().cmdGeometricApproximation(
+                            typeApproximation,
+                            valueApproximation );
 }
 //==================================================================
 void State::Orientation( RtToken orientation )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdOrientation( orientation );
+    mAttributesStack.top().cmdOrientation( orientation );
 }
 //==================================================================
 void State::Sides( int sides )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
-			
-	mAttributesStack.top().cmdSides( sides );
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
+            
+    mAttributesStack.top().cmdSides( sides );
 }
 
 //==================================================================
 void State::Basis( RtToken ubasis, const float *pCustomUBasis, int ustep,
-				   RtToken vbasis, const float *pCustomVBasis, int vstep )
+                   RtToken vbasis, const float *pCustomVBasis, int vstep )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	DASSERT( (ubasis || pCustomUBasis) && (vbasis || pCustomVBasis) );
+    DASSERT( (ubasis || pCustomUBasis) && (vbasis || pCustomVBasis) );
 
-	if ( (ubasis && !verifyBasis( ubasis, ustep )) ||
-		 (vbasis && !verifyBasis( vbasis, vstep )) )
-		return;
+    if ( (ubasis && !verifyBasis( ubasis, ustep )) ||
+         (vbasis && !verifyBasis( vbasis, vstep )) )
+        return;
 
-	mAttributesStack.top().cmdBasis(
-						ubasis, pCustomUBasis, ustep,
-						vbasis, pCustomVBasis, vstep );
+    mAttributesStack.top().cmdBasis(
+                        ubasis, pCustomUBasis, ustep,
+                        vbasis, pCustomVBasis, vstep );
 }
 
 //==================================================================
 void State::ColorSet( const Color &col )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdColor( col );
+    mAttributesStack.top().cmdColor( col );
 }
 
 //==================================================================
 void State::Opacity( const Color &col )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdOpacity( col );
+    mAttributesStack.top().cmdOpacity( col );
 }
 
 //==================================================================
 void State::AreaLightSource( ParamList &params )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdLightSource( params );
+    mAttributesStack.top().cmdLightSource( params );
 }
 
 //==================================================================
 void State::LightSource( ParamList &params )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdLightSource( params );
+    mAttributesStack.top().cmdLightSource( params );
 }
 
 //==================================================================
 void State::Declare( ParamList &params )
 {
-	if ( params.size() != 2 )
-	{
-		DASSTHROW( 0, ("Broken declare ?") );
-	}
+    if ( params.size() != 2 )
+    {
+        DASSTHROW( 0, ("Broken declare ?") );
+    }
 
-	const char *pSymName = params[0].PChar();
-	const char *pSymType = params[1].PChar();
+    const char *pSymName = params[0].PChar();
+    const char *pSymType = params[1].PChar();
 
-	mGlobalSyms.AddGlob( pSymType, pSymName, NULL, Symbol::CLASS_MSK_UNIFORM );
+    mGlobalSyms.AddGlob( pSymType, pSymName, NULL, Symbol::CLASS_MSK_UNIFORM );
 
-	//mGlobalSyms.Add( );
-	//mAttributesStack.top().cmdSurface( params );
+    //mGlobalSyms.Add( );
+    //mAttributesStack.top().cmdSurface( params );
 }
 
 //==================================================================
 void State::Surface( ParamList &params )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdSurface( params );
+    mAttributesStack.top().cmdSurface( params );
 }
 
 //==================================================================
 void State::Displacement( ParamList &params )
 {
-	if NOT( verifyOpType( OPTYPE_ATRB ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_ATRB ) )
+        return;
 
-	mAttributesStack.top().cmdDisplacement( params );
+    mAttributesStack.top().cmdDisplacement( params );
 }
 
 // options
 //==================================================================
 void State::Format( int xRes, int yRes, float pixelRatio )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdFormat( xRes, yRes, pixelRatio );
+    mOptionsStack.top().cmdFormat( xRes, yRes, pixelRatio );
 }
 //==================================================================
 void State::FrameAspectRatio( float ratio )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdFrameAspectRatio( ratio );
+    mOptionsStack.top().cmdFrameAspectRatio( ratio );
 }
 //==================================================================
 void State::ScreenWindow( float left, float right, float bottom, float top )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdScreenWindow( left, right, bottom, top );
+    mOptionsStack.top().cmdScreenWindow( left, right, bottom, top );
 }
 //==================================================================
 void State::CropWindow( float xMin, float xMax, float yMin, float yMax )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdCropWindow( xMin, xMax, yMin, yMax );
+    mOptionsStack.top().cmdCropWindow( xMin, xMax, yMin, yMax );
 }
 //==================================================================
 void State::Projection( ParamList &params )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdProjection( params );
+    mOptionsStack.top().cmdProjection( params );
 }
 //==================================================================
 void State::Clipping( float nearr, float farr )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdClipping( nearr, farr );
+    mOptionsStack.top().cmdClipping( nearr, farr );
 }
 //==================================================================
 void State::DepthOfField( float fStop, float focalLength, float focalDistance )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdDepthOfField( fStop, focalLength, focalDistance );
+    mOptionsStack.top().cmdDepthOfField( fStop, focalLength, focalDistance );
 }
 //==================================================================
 void State::Shutter( float openShutter, float closeShutter )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdShutter( openShutter, closeShutter );
+    mOptionsStack.top().cmdShutter( openShutter, closeShutter );
 }
 
 //==================================================================
 void State::Display( const char *pName, const char *pType, const char *pMode, ParamList &params )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdDisplay( pName, pType, pMode, params );
+    mOptionsStack.top().cmdDisplay( pName, pType, pMode, params );
 }
 
 //==================================================================
 void State::PixelSamples( int samplesX, int samplesY )
 {
-	if NOT( verifyOpType( OPTYPE_OPTS ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_OPTS ) )
+        return;
 
-	mOptionsStack.top().cmdPixelSamples( samplesX, samplesY );
+    mOptionsStack.top().cmdPixelSamples( samplesX, samplesY );
 }
 
 //==================================================================
 void State::Identity()
 {
-	mTransformOpenStack.top().SetIdentity();
+    mTransformOpenStack.top().SetIdentity();
 }
 
 //==================================================================
 void State::ConcatTransform( const Matrix44 &mtxLeft )
 {
-	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
+        return;
 
-	mTransformOpenStack.top().ConcatTransform( mtxLeft );
+    mTransformOpenStack.top().ConcatTransform( mtxLeft );
 }
 
 //==================================================================
 void State::TransformCmd( const float *pMtx )
 {
-	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
+        return;
 
-	mTransformOpenStack.top().CopyRowMajor( pMtx );
+    mTransformOpenStack.top().CopyRowMajor( pMtx );
 }
 
 //==================================================================
 void State::Scale( float sx, float sy, float sz )
 {
-	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
+        return;
 
-	mTransformOpenStack.top().ConcatTransform( Matrix44::Scale( sx, sy, sz ) );
+    mTransformOpenStack.top().ConcatTransform( Matrix44::Scale( sx, sy, sz ) );
 }
 
 //==================================================================
 void State::Rotate( float angDeg, float ax, float ay, float az )
 {
-	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
+        return;
 
-	mTransformOpenStack.top().ConcatTransform( Matrix44::Rot( DEG2RAD(angDeg), ax, ay, az ) );
+    mTransformOpenStack.top().ConcatTransform( Matrix44::Rot( DEG2RAD(angDeg), ax, ay, az ) );
 }
 
 //==================================================================
 void State::Translate( float tx, float ty, float tz )
 {
-	if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
-		return;
+    if NOT( verifyOpType( OPTYPE_STD_XFORM ) )
+        return;
 
-	mTransformOpenStack.top().ConcatTransform( Matrix44::Translate( tx, ty, tz ) );
+    mTransformOpenStack.top().ConcatTransform( Matrix44::Translate( tx, ty, tz ) );
 }
 
 //==================================================================
 size_t State::AddLightSource( LightSourceT *pLSource )
 {
-	for (size_t i=0; i < mpLightSources.size(); ++i)
-	{
-		if ( pLSource->mID == mpLightSources[i]->mID )
-		{
-			mpLightSources[i] = pLSource;
-			return i;
-		}
-	}
+    for (size_t i=0; i < mpLightSources.size(); ++i)
+    {
+        if ( pLSource->mID == mpLightSources[i]->mID )
+        {
+            mpLightSources[i] = pLSource;
+            return i;
+        }
+    }
 
-	// add if didn't replace any existing light
-	mpLightSources.push_back( pLSource );
-	return mpLightSources.size() - 1;
+    // add if didn't replace any existing light
+    mpLightSources.push_back( pLSource );
+    return mpLightSources.size() - 1;
 }
 
 //==================================================================
 DStr State::FindResFile( const char *pFindFileName, Options::SearchPathh spathType )
 {
-	const DVec<DStr>	&spaths = GetCurOptions().mSearchPaths[ spathType ];
+    const DVec<DStr>	&spaths = GetCurOptions().mSearchPaths[ spathType ];
 
-	const char *pBaseIncDir = NULL;
+    const char *pBaseIncDir = NULL;
 
-	// special case for shaders
-	if ( spathType == Options::SEARCHPATH_SHADER )
-		pBaseIncDir = GetDefShadersDir();
+    // special case for shaders
+    if ( spathType == Options::SEARCHPATH_SHADER )
+        pBaseIncDir = GetDefShadersDir();
 
-	SearchPathScanner	pathScanner( GetBaseDir(), pBaseIncDir, spaths );
+    SearchPathScanner	pathScanner( GetBaseDir(), pBaseIncDir, spaths );
 
-	DStr	usePath;
-	bool	usePathIsAbsolute;
+    DStr	usePath;
+    bool	usePathIsAbsolute;
 
-	while ( pathScanner.GetNext( usePath, usePathIsAbsolute ) )
-	{
-		DStr fullPathName = DUT::SSPrintFS( "%s/%s", usePath.c_str(), pFindFileName );
+    while ( pathScanner.GetNext( usePath, usePathIsAbsolute ) )
+    {
+        DStr fullPathName = DUT::SSPrintFS( "%s/%s", usePath.c_str(), pFindFileName );
 
-		if ( GetFileManager().FileExists( fullPathName.c_str() ) )
-		{
-			return fullPathName;
-		}
-		else
-		{
-			if ( !usePathIsAbsolute )
-			{
-				// WARNING: tricky path discovery.. we also try ribfilepath/searchpath
-				fullPathName = DUT::SSPrintFS( "%s/%s", GetBaseDir(), fullPathName.c_str() );
+        if ( GetFileManager().FileExists( fullPathName.c_str() ) )
+        {
+            return fullPathName;
+        }
+        else
+        {
+            if ( !usePathIsAbsolute )
+            {
+                // WARNING: tricky path discovery.. we also try ribfilepath/searchpath
+                fullPathName = DUT::SSPrintFS( "%s/%s", GetBaseDir(), fullPathName.c_str() );
 
-				if ( GetFileManager().FileExists( fullPathName.c_str() ) )
-				{
-					return fullPathName;
-				}
-			}
-		}
-	}
+                if ( GetFileManager().FileExists( fullPathName.c_str() ) )
+                {
+                    return fullPathName;
+                }
+            }
+        }
+    }
 
-	return "";
+    return "";
 }
 
 //==================================================================

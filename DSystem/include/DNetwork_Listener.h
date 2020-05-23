@@ -18,26 +18,26 @@ namespace DNET
 //==================================================================
 class Listener
 {
-	U32		mPort;
-	SOCKET	mListenSock;
+    U32		mPort;
+    SOCKET	mListenSock;
 
 public:
-	enum IdleRetType
-	{
-		IRT_NOTHING,
-		IRT_CONNECTED,
-		IRT_ERROR,
-		IRT_N
-	};
+    enum IdleRetType
+    {
+        IRT_NOTHING,
+        IRT_CONNECTED,
+        IRT_ERROR,
+        IRT_N
+    };
 
 public:
-	Listener( u_short port=0 );
-	~Listener();
+    Listener( u_short port=0 );
+    ~Listener();
 
-	bool		Start( u_short port=0 );
-	void		Stop();
-	bool		IsListening() const;
-	IdleRetType Idle( SOCKET &out_acceptedSock, U32 waitMSec );
+    bool		Start( u_short port=0 );
+    void		Stop();
+    bool		IsListening() const;
+    IdleRetType Idle( SOCKET &out_acceptedSock, U32 waitMSec );
 };
 
 //==================================================================

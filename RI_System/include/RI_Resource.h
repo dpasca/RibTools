@@ -20,28 +20,28 @@ namespace RI
 class ResourceBase : public RCBaseNoDel
 {
 public:
-	enum Type
-	{
-		TYPE_SHADER,
-		TYPE_TEXTURE,
-	};
+    enum Type
+    {
+        TYPE_SHADER,
+        TYPE_TEXTURE,
+    };
 
 private:
-	std::string	mName;
-	Type		mType;
-	
-	friend class ResourceManager;
+    std::string	mName;
+    Type		mType;
+    
+    friend class ResourceManager;
 
 public:
-	ResourceBase( const char *pName, Type type ) :
-		mName(pName),
-		mType(type)
-	{
-	}
-	
-	virtual ~ResourceBase()
-	{
-	}
+    ResourceBase( const char *pName, Type type ) :
+        mName(pName),
+        mType(type)
+    {
+    }
+    
+    virtual ~ResourceBase()
+    {
+    }
 };
 
 //==================================================================
@@ -49,23 +49,23 @@ public:
 //==================================================================
 class ResourceManager
 {
-	DUT::CriticalSection	mCSection;
-	DVec<ResourceBase *>	mpList;
+    DUT::CriticalSection	mCSection;
+    DVec<ResourceBase *>	mpList;
 public:
-	ResourceManager()
-	{
-	}
-	
-	~ResourceManager()
-	{
-		Collect();
-	}
-	
-	ResourceBase *AddResource( ResourceBase *pRes );
+    ResourceManager()
+    {
+    }
+    
+    ~ResourceManager()
+    {
+        Collect();
+    }
+    
+    ResourceBase *AddResource( ResourceBase *pRes );
 
-	ResourceBase *FindResource( const char *pName, ResourceBase::Type type );
+    ResourceBase *FindResource( const char *pName, ResourceBase::Type type );
 
-	void Collect();
+    void Collect();
 };
 
 

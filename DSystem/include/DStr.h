@@ -23,26 +23,26 @@ typedef std::string DStr;
 // Horrid and probably leaks, but (hopefully) only used for setup
 class DStr
 {
-	DVec<char>	mData;
+    DVec<char>	mData;
 
 public:
     DStr(const char *str)
     {
-		if NOT( str )
-			mData.push_back( 0 );
-		else
-	        mData.append_array( str, strlen(str)+1 );
+        if NOT( str )
+            mData.push_back( 0 );
+        else
+            mData.append_array( str, strlen(str)+1 );
     }
 
     DStr(const char c)
     {
-		mData.push_back( c );
-		mData.push_back( 0 );
+        mData.push_back( c );
+        mData.push_back( 0 );
     }
     
     DStr()
     {
-		mData.push_back( 0 );
+        mData.push_back( 0 );
     }
 /*
     DStr(const DStr &other)
@@ -68,7 +68,7 @@ public:
     void clear()
     {
         mData.resize( 1 );
-		mData[0] = 0;
+        mData[0] = 0;
     }
 
     const char *c_str() const { return &mData[0]; }
@@ -83,8 +83,8 @@ public:
 
     void operator +=(const DStr &other)
     {
-		mData.resize( mData.size() - 1 );
-		mData.append_array( &other.mData[0], other.mData.size() );
+        mData.resize( mData.size() - 1 );
+        mData.append_array( &other.mData[0], other.mData.size() );
     }
 
     DStr operator + (const DStr &other) const
@@ -96,8 +96,8 @@ public:
 
     void operator +=( char ch )
     {
-		mData[ mData.size() - 1 ] = ch;
-		mData.push_back( 0 );
+        mData[ mData.size() - 1 ] = ch;
+        mData.push_back( 0 );
     }
 
     DStr operator + ( char ch ) const
@@ -111,18 +111,18 @@ public:
     {
         if (newsize < size())
         {
-			mData.resize( newsize + 1 );
-			mData[newsize] = 0;
+            mData.resize( newsize + 1 );
+            mData[newsize] = 0;
             return;
         }
 
-		// fill with null character.. but we want to keep it as a c-string..
-		// so, nothing is done
-		DASSERT( newsize == size() );
+        // fill with null character.. but we want to keep it as a c-string..
+        // so, nothing is done
+        DASSERT( newsize == size() );
     }
 
-	const char &operator[]( size_t idx ) const	{ return mData[ idx ]; }
-		  char &operator[]( size_t idx )		{ return mData[ idx ]; }
+    const char &operator[]( size_t idx ) const	{ return mData[ idx ]; }
+          char &operator[]( size_t idx )		{ return mData[ idx ]; }
 };
 #endif
 

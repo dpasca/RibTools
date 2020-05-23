@@ -79,24 +79,24 @@ class ThreadedBase
 {
 protected:
 #if defined(WIN32)
-	void				*mThreadHandle;
+    void				*mThreadHandle;
 #endif
-	bool				mQuitRequest;
-	bool				mQuitAck;
+    bool				mQuitRequest;
+    bool				mQuitAck;
 
 public:
-	ThreadedBase();
-	virtual ~ThreadedBase();
+    ThreadedBase();
+    virtual ~ThreadedBase();
 
 private:
-	static void threadMain_s( void *pThis )
-	{
-		((ThreadedBase *)pThis)->threadMain();
-	}
+    static void threadMain_s( void *pThis )
+    {
+        ((ThreadedBase *)pThis)->threadMain();
+    }
 
 protected:
-	void KillThread();
-	virtual void threadMain() = 0;
+    void KillThread();
+    virtual void threadMain() = 0;
 };
 
 //==================================================================

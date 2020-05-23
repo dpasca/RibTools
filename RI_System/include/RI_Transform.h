@@ -23,45 +23,45 @@ namespace RI
 class Transform
 {
 public:
-	Transform() : mMatrix(true)	{ }
+    Transform() : mMatrix(true)	{ }
 
-	// avoid initialization of default values and just copy..
-	Transform( const Transform &fromObj ) {	*this = fromObj; }
-	~Transform() {}
+    // avoid initialization of default values and just copy..
+    Transform( const Transform &fromObj ) {	*this = fromObj; }
+    ~Transform() {}
 
-	//==================================================================
-	void Init( RevisionTracker *pRevision )
-	{
-		mpRevision = pRevision;
-	}
+    //==================================================================
+    void Init( RevisionTracker *pRevision )
+    {
+        mpRevision = pRevision;
+    }
 
-	const Matrix44 &GetMatrix() const	{	return mMatrix;		}
+    const Matrix44 &GetMatrix() const	{	return mMatrix;		}
 
-	void SetIdentity()
-	{
-		mpRevision->BumpRevision();
-		mMatrix.Identity();
-	}
+    void SetIdentity()
+    {
+        mpRevision->BumpRevision();
+        mMatrix.Identity();
+    }
 
-	void ConcatTransform( const Matrix44 &m )
-	{
-		mpRevision->BumpRevision();
+    void ConcatTransform( const Matrix44 &m )
+    {
+        mpRevision->BumpRevision();
 
-		// check if not identity ?
-		mMatrix = m * mMatrix;
-	}
+        // check if not identity ?
+        mMatrix = m * mMatrix;
+    }
 
-	void CopyRowMajor( const float *pSrcMtx )
-	{
-		mpRevision->BumpRevision();
-		mMatrix.CopyRowMajor( pSrcMtx );
-	}
+    void CopyRowMajor( const float *pSrcMtx )
+    {
+        mpRevision->BumpRevision();
+        mMatrix.CopyRowMajor( pSrcMtx );
+    }
 
 public:
-	RevisionTracker	*mpRevision;
+    RevisionTracker	*mpRevision;
 
 private:
-	Matrix44	mMatrix;
+    Matrix44	mMatrix;
 };
 
 //==================================================================

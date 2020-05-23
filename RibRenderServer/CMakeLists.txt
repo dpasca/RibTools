@@ -9,16 +9,16 @@ source_group( Sources FILES ${SRCS} ${INCS} )
 add_executable( ${PROJECT_NAME} ${SRCS} ${INCS} )
 
 target_link_libraries(
-	${PROJECT_NAME}
-	DSystem
-	DMath
-	DImage
-	RI_System
-	RibRenderLib
-	RibToolsBase
-	RSLCompilerLib
-	freeglut
-	libtiff
-	libjpeg
-	)
+    ${PROJECT_NAME}
+    DSystem
+    DMath
+    DImage
+    RI_System
+    RibRenderLib
+    RibToolsBase
+    RSLCompilerLib
+    freeglut
+    libtiff
+    libjpeg
+    )
 

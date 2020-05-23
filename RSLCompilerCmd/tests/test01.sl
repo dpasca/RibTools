@@ -3,14 +3,14 @@
 
 surface
 test1(
-	float Ka = 1; )
+    float Ka = 1; )
 {
-	Ci = Ka * ambient();
+    Ci = Ka * ambient();
 
-	ambient();
+    ambient();
 
-	
-	Ci = ambient();
+    
+    Ci = ambient();
 
-	Oi = Os;
+    Oi = Os;
 }

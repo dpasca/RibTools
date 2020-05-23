@@ -14,32 +14,32 @@ for RibRender */
 ///==============================================================*/
 __funcop solar( vector axis; float angle )
 {
-	_asm_solarbegin_vs( axis, angle );
+    _asm_solarbegin_vs( axis, angle );
 }
 /*===============================================================*/
 __funcop solar()
 {
-	_asm_solarbegin();
+    _asm_solarbegin();
 }
 /*===============================================================*/
 __funcop illuminance( point pos; vector axis; float angle )
 {
-	_asm_illuminance_vvs( pos, axis, angle );
+    _asm_illuminance_vvs( pos, axis, angle );
 }
 /*===============================================================*/
 __funcop illuminance( point pos )
 {
-	_asm_illuminance_v( pos );
+    _asm_illuminance_v( pos );
 }
 /*===============================================================*/
 __funcop if( bool val )
 {
-	_asm_iftrue_b( val );
+    _asm_iftrue_b( val );
 }
 /*===============================================================*/
 __funcop else()
 {
-	_asm_orelse();
+    _asm_orelse();
 }
 
 /*================================================================
@@ -76,12 +76,12 @@ uniform float PI = 3.14159265;	/* Should implement "const" for this 8) */
 /*================================================================*/
 float	radians( float deg )
 {
-	return deg * 0.0174532925;
+    return deg * 0.0174532925;
 }
 /*================================================================*/
 float	degrees( float rad )
 {
-	return rad * 57.29577957855;
+    return rad * 57.29577957855;
 }
 
 float	sin( float a )			{}
@@ -211,11 +211,11 @@ vector	cellnoise( point pt, float t ){}
 float xcomp( point	P ){ float tmp; _asm_xcomp_sv( tmp, P ); return tmp; }
 float xcomp( vector	P ){ float tmp; _asm_xcomp_sv( tmp, P ); return tmp; }
 float xcomp( normal	P ){ float tmp; _asm_xcomp_sv( tmp, P ); return tmp; }
-	   
+       
 float ycomp( point	P ){ float tmp; _asm_ycomp_sv( tmp, P ); return tmp; }
 float ycomp( vector	P ){ float tmp; _asm_ycomp_sv( tmp, P ); return tmp; }
 float ycomp( normal	P ){ float tmp; _asm_ycomp_sv( tmp, P ); return tmp; }
-									  
+                                      
 float zcomp( point	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
 float zcomp( vector	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
 float zcomp( normal	P ){ float tmp; _asm_zcomp_sv( tmp, P ); return tmp; }
@@ -227,7 +227,7 @@ void	setxcomp( output normal	 P; float x ){ _asm_setxcomp_vs( P, x ); }
 void	setycomp( output point	 P; float y ){ _asm_setycomp_vs( P, y ); }
 void	setycomp( output vector	 P; float y ){ _asm_setycomp_vs( P, y ); }
 void	setycomp( output normal	 P; float y ){ _asm_setycomp_vs( P, y ); }
-										                          
+                                                                  
 void	setzcomp( output point	 P; float z ){ _asm_setzcomp_vs( P, z ); }
 void	setzcomp( output vector	 P; float z ){ _asm_setzcomp_vs( P, z ); }
 void	setzcomp( output normal	 P; float z ){ _asm_setzcomp_vs( P, z ); }
@@ -273,95 +273,95 @@ color	ambient()			{	color tmp; _asm_ambient( tmp );		return tmp;	}
 /*================================================================*/
 color	diffuse( normal nor )
 {	
-	color 	C = 0;
+    color 	C = 0;
 
-	normal	nn = normalize( nor );
+    normal	nn = normalize( nor );
 
-	illuminance ( P, nn, PI/2 )
-	{
-		C += Cl * (normalize(L) . nn);
-	}
+    illuminance ( P, nn, PI/2 )
+    {
+        C += Cl * (normalize(L) . nn);
+    }
 
-	return C;
+    return C;
 }
 
 /*================================================================*/
 color specularbrdf( vector L, N, V; float roughness )
 {
-	vector H = normalize( L + V );
+    vector H = normalize( L + V );
 
-	/* DAVIDE - RMan Standard - float power = 1 / roughness; */
-	/* DAVIDE - Following is more like PRMan/BMRT/Aqsis */
-	float power = 8 / roughness;
+    /* DAVIDE - RMan Standard - float power = 1 / roughness; */
+    /* DAVIDE - Following is more like PRMan/BMRT/Aqsis */
+    float power = 8 / roughness;
 
-	return pow( max( 0, N . H ), power );
+    return pow( max( 0, N . H ), power );
 }
 
 /*================================================================*/
 color specular( normal N; vector V; float roughness )
 {
-	color C = 0;
+    color C = 0;
 
-	illuminance( P, N, PI/2 )
-	{
-		C = C + Cl * specularbrdf( normalize(L), N, V, roughness );
-	}
+    illuminance( P, N, PI/2 )
+    {
+        C = C + Cl * specularbrdf( normalize(L), N, V, roughness );
+    }
 
-	return C;
+    return C;
 }
 
 /*================================================================*/
 color phong( normal N; vector V; float size )
 {
-	color C = 0;
-	
-	vector R = reflect( vector(0) - normalize(V), normalize(N) );
-	
-	illuminance( P, N, PI/2 )
-	{
-		vector Ln = normalize(L);
+    color C = 0;
+    
+    vector R = reflect( vector(0) - normalize(V), normalize(N) );
+    
+    illuminance( P, N, PI/2 )
+    {
+        vector Ln = normalize(L);
 
-		C = C + Cl * pow(max(0.0,R.Ln), size);
-	}
+        C = C + Cl * pow(max(0.0,R.Ln), size);
+    }
 
-	return C;
+    return C;
 }
 
 /*================================================================*/
 color trace( point P, point R )
 {
-	return color( 0 );
+    return color( 0 );
 }
 
 /*================================================================*/
 color texture( string texname ){
-	color	val; _asm_texture_vx( val, texname );
-	return val;
+    color	val; _asm_texture_vx( val, texname );
+    return val;
 }
 /*================================================================*/
 color texture( string texname; float s0, t0 ){
-	color	val; _asm_texture_vxss( val, texname, s0, t0 );
-	return val;
+    color	val; _asm_texture_vxss( val, texname, s0, t0 );
+    return val;
 }
 /*================================================================*/
 color texture( string texname; float s0, t0, s1, t1, s2, t2, s3, t3 ){
-	color	val; _asm_texture_vxssssssss( val, texname, s0, t0, s1, t1, s2, t2, s3, t3 );
-	return val;
+    color	val; _asm_texture_vxssssssss( val, texname, s0, t0, s1, t1, s2, t2, s3, t3 );
+    return val;
 }
 /*================================================================*/
 float texture( string texname ){
-	float	val; _asm_texture_sxss( val, texname, s, t );
-	return val;
+    float	val; _asm_texture_sxss( val, texname, s, t );
+    return val;
 }
 /*================================================================*/
 float texture( string texname; float s0, t0 ){
-	float	val; _asm_texture_sxss( val, texname, s0, t0 );
-	return val;
+    float	val; _asm_texture_sxss( val, texname, s0, t0 );
+    return val;
 }
 /*================================================================*/
 float texture( string texname; float s0, t0, s1, t1, s2, t2, s3, t3 ){
-	float	val; _asm_texture_sxssssssss( val, texname, s0, t0, s1, t1, s2, t2, s3, t3 );
-	return val;
+    float	val; _asm_texture_sxssssssss( val, texname, s0, t0, s1, t1, s2, t2, s3, t3 );
+    return val;
 }
 
 /*

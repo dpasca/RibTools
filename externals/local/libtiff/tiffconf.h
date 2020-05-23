@@ -24,31 +24,31 @@
 
 #if defined(_MSC_VER)
 
-	/* Signed 64-bit type formatter */
-	#define TIFF_INT64_FORMAT "%I64d"
+    /* Signed 64-bit type formatter */
+    #define TIFF_INT64_FORMAT "%I64d"
 
-	/* Signed 64-bit type */
-	#define TIFF_INT64_T signed __int64
+    /* Signed 64-bit type */
+    #define TIFF_INT64_T signed __int64
 
-	/* Unsigned 64-bit type formatter */
-	#define TIFF_UINT64_FORMAT "%I64u"
+    /* Unsigned 64-bit type formatter */
+    #define TIFF_UINT64_FORMAT "%I64u"
 
-	/* Unsigned 64-bit type */
-	#define TIFF_UINT64_T unsigned __int64
+    /* Unsigned 64-bit type */
+    #define TIFF_UINT64_T unsigned __int64
 
 #else
 
-	/* Signed 64-bit type formatter */
-	#define TIFF_INT64_FORMAT "%lld"
+    /* Signed 64-bit type formatter */
+    #define TIFF_INT64_FORMAT "%lld"
 
-	/* Signed 64-bit type */
-	#define TIFF_INT64_T signed long long
+    /* Signed 64-bit type */
+    #define TIFF_INT64_T signed long long
 
-	/* Unsigned 64-bit type formatter */
-	#define TIFF_UINT64_FORMAT "%llu"
+    /* Unsigned 64-bit type formatter */
+    #define TIFF_UINT64_FORMAT "%llu"
 
-	/* Unsigned 64-bit type */
-	#define TIFF_UINT64_T unsigned long long
+    /* Unsigned 64-bit type */
+    #define TIFF_UINT64_T unsigned long long
 
 #endif
 

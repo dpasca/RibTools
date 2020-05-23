@@ -25,13 +25,13 @@ namespace PREPRO
 class Prepro
 {
 public:
-	Prepro(
-		DIO::FileManagerBase	&fmanager,
-		FatBase					&fatBase,
-		const DVec<Fat8>		&inText,
-		const char				*pBaseInclude,
-		const char				*pCurShaderDir,
-		DVec<Fat8>				&out_text );
+    Prepro(
+        DIO::FileManagerBase	&fmanager,
+        FatBase					&fatBase,
+        const DVec<Fat8>		&inText,
+        const char				*pBaseInclude,
+        const char				*pCurShaderDir,
+        DVec<Fat8>				&out_text );
 };
 
 //==================================================================

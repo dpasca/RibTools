@@ -18,7 +18,7 @@ public:
     UTF8Parser(const uint8_t *utf8);
     uint32_t GetNextCharacter();
 
-	const uint8_t *GetCurrent() const;
+    const uint8_t *GetCurrent() const;
 
 protected:
     const uint8_t *m_current;
@@ -73,14 +73,14 @@ UTF8Parser::GetNextCharacter()
 
     DASSERT(false);
 
-	// DAVIDE: forcing a return for all control paths
-	return 0;
+    // DAVIDE: forcing a return for all control paths
+    return 0;
 }
 
 inline const uint8_t
 *UTF8Parser::GetCurrent() const
 {
-	return m_current;
+    return m_current;
 }
 
 #endif

@@ -9,12 +9,12 @@
 /*==================================================================*/
 surface SpacesTestWorldSha()
 {
-	Oi = color( 1, 1, 1 );
+    Oi = color( 1, 1, 1 );
 
-	normal nn = normal "world" ( 0, 0, 1 );
+    normal nn = normal "world" ( 0, 0, 1 );
 
-	Ci = color(
-			xcomp( nn ),
-			ycomp( nn ),
-			zcomp( nn ) );
+    Ci = color(
+            xcomp( nn ),
+            ycomp( nn ),
+            zcomp( nn ) );
 }

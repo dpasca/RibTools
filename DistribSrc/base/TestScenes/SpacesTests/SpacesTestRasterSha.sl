@@ -9,12 +9,12 @@
 /*==================================================================*/
 surface SpacesTestRasterSha()
 {
-	Oi = color( 1, 1, 1 );
+    Oi = color( 1, 1, 1 );
 
-	normal nn = normal "raster" ( 0, 0, 1 );
+    normal nn = normal "raster" ( 0, 0, 1 );
 
-	Ci = color(
-			xcomp( nn ),
-			ycomp( nn ),
-			zcomp( nn ) );
+    Ci = color(
+            xcomp( nn ),
+            ycomp( nn ),
+            zcomp( nn ) );
 }

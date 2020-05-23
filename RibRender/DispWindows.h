@@ -18,43 +18,43 @@
 //==================================================================
 class DispWindows
 {
-	struct Window
-	{
-		DispDriverFBuffOGL	*mpDispDriver;
-		int					mWinId;
-	};
+    struct Window
+    {
+        DispDriverFBuffOGL	*mpDispDriver;
+        int					mWinId;
+    };
 
-	static DVec<Window>	msWindows;
+    static DVec<Window>	msWindows;
 
-	int					mArgc;
-	char				**mppArgv;
-	DStr				mWindowBaseName;
+    int					mArgc;
+    char				**mppArgv;
+    DStr				mWindowBaseName;
 
 public:
-	DispWindows();
-	~DispWindows();
+    DispWindows();
+    ~DispWindows();
 
-	void Init( int argc, char **argv, const char *pWindowBaseName )
-	{
-		mArgc = argc;
-		mppArgv = argv;
+    void Init( int argc, char **argv, const char *pWindowBaseName )
+    {
+        mArgc = argc;
+        mppArgv = argv;
 
-		mWindowBaseName = pWindowBaseName;
-	}
+        mWindowBaseName = pWindowBaseName;
+    }
 
-	//===============================================================
-	void AddWindow( const RI::Options::Display &disp );
-	
-	bool HasWindows() const { return !!msWindows.size(); }
+    //===============================================================
+    void AddWindow( const RI::Options::Display &disp );
+    
+    bool HasWindows() const { return !!msWindows.size(); }
 
-	void MainLoop();
+    void MainLoop();
 
 private:
-	//===============================================================
-	static void sDisplayFunc();
+    //===============================================================
+    static void sDisplayFunc();
 
-	//===============================================================
-	static void sReshapeFunc( int width, int height );
+    //===============================================================
+    static void sReshapeFunc( int width, int height );
 
 };
 

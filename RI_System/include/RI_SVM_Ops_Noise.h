@@ -20,46 +20,46 @@ namespace SVM
 template <class TB>
 inline void Inst_Noise1( Context &ctx, u_int blocksN )
 {
-		  Float_*	lhs	= (		 Float_*)ctx.GetRW( 1 );
-	const TB	*	op1	= (const TB	   *)ctx.GetRO( 2 );
+          Float_*	lhs	= (		 Float_*)ctx.GetRW( 1 );
+    const TB	*	op1	= (const TB	   *)ctx.GetRO( 2 );
 
-	int		op1_step = ctx.GetSymbolVaryingStep( 2 );
-	int		op1_idx = 0;
+    int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+    int		op1_idx = 0;
 
-	for (u_int i=0; i < blocksN; ++i)
-	{
-		SLRUNCTX_BLKWRITECHECK( i );
-		{
-			lhs[i] = Noise::unoise1( op1[op1_idx] );
-		}
+    for (u_int i=0; i < blocksN; ++i)
+    {
+        SLRUNCTX_BLKWRITECHECK( i );
+        {
+            lhs[i] = Noise::unoise1( op1[op1_idx] );
+        }
 
-		op1_idx += op1_step;
-	}
+        op1_idx += op1_step;
+    }
 
-	ctx.NextInstruction();
+    ctx.NextInstruction();
 }
 
 //==================================================================
 template <class TB>
 inline void Inst_Noise3( Context &ctx, u_int blocksN )
 {
-		  Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
-	const TB	 *	op1	= (const TB		*)ctx.GetRO( 2 );
+          Float3_*	lhs	= (		 Float3_*)ctx.GetRW( 1 );
+    const TB	 *	op1	= (const TB		*)ctx.GetRO( 2 );
 
-	int		op1_step = ctx.GetSymbolVaryingStep( 2 );
-	int		op1_idx = 0;
+    int		op1_step = ctx.GetSymbolVaryingStep( 2 );
+    int		op1_idx = 0;
 
-	for (u_int i=0; i < blocksN; ++i)
-	{
-		SLRUNCTX_BLKWRITECHECK( i );
-		{
-			lhs[i] = Noise::unoise3( op1[op1_idx] );
-		}
+    for (u_int i=0; i < blocksN; ++i)
+    {
+        SLRUNCTX_BLKWRITECHECK( i );
+        {
+            lhs[i] = Noise::unoise3( op1[op1_idx] );
+        }
 
-		op1_idx += op1_step;
-	}
+        op1_idx += op1_step;
+    }
 
-	ctx.NextInstruction();
+    ctx.NextInstruction();
 }
 
 //==================================================================

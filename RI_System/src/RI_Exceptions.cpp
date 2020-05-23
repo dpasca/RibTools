@@ -18,15 +18,15 @@ namespace RI
 //==================================================================
 Exception::Exception( const char *pFmt, ... )
 {
-	va_list	vl;
-	va_start( vl, pFmt );
+    va_list	vl;
+    va_start( vl, pFmt );
 
-	char	buff[4096];
+    char	buff[4096];
 
-	vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
-	va_end( vl );
+    vsnprintf_s( buff, sizeof(buff), _countof(buff)-1, pFmt, vl );
+    va_end( vl );
 
-	mMsg = buff;
+    mMsg = buff;
 }
 
 //==================================================================

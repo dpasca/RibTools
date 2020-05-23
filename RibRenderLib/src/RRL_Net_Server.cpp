@@ -20,12 +20,12 @@ namespace NET
 
 //==================================================================
 Server::Server() :
-	mPortToCall(32323),
-	mpPakMan(NULL),
-	mpFilemanager(NULL),
-	mpFileServer(NULL),
-	mIsValid(true),
-	mBusyCnt(0)
+    mPortToCall(32323),
+    mpPakMan(NULL),
+    mpFilemanager(NULL),
+    mpFileServer(NULL),
+    mIsValid(true),
+    mBusyCnt(0)
 {
 
 }
@@ -33,24 +33,24 @@ Server::Server() :
 //==================================================================
 Server::~Server()
 {
-	DSAFE_DELETE( mpFilemanager );
-	DSAFE_DELETE( mpFileServer );
-	DSAFE_DELETE( mpPakMan );
+    DSAFE_DELETE( mpFilemanager );
+    DSAFE_DELETE( mpFileServer );
+    DSAFE_DELETE( mpPakMan );
 }
 
 //==================================================================
 void Server::Init( DNET::PacketManager *pPakMan )
 {
-	mpPakMan = pPakMan;
+    mpPakMan = pPakMan;
 
-	mpFilemanager = DNEW FileManagerNet( *mpPakMan );
-	mpFileServer = DNEW FileServer( mpPakMan );
+    mpFilemanager = DNEW FileManagerNet( *mpPakMan );
+    mpFileServer = DNEW FileServer( mpPakMan );
 }
 
 //==================================================================
 bool Server::IsConnected() const
 {
-	return mpFilemanager && mpFilemanager->mpPakMan->IsConnected();
+    return mpFilemanager && mpFilemanager->mpPakMan->IsConnected();
 }
 
 //==================================================================

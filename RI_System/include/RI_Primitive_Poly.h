@@ -23,12 +23,12 @@ class Hider;
 class Polygon : public ComplexPrimitiveBase
 {
 public:
-	ParamList		mParams;
+    ParamList		mParams;
 
 public:
-	Polygon( ParamList &params, const SymbolList &globalSymbols );
+    Polygon( ParamList &params, const SymbolList &globalSymbols );
 
-		void Simplify( Hider &hider );
+        void Simplify( Hider &hider );
 };
 
 //==================================================================
@@ -37,12 +37,12 @@ public:
 class PointsPolygons : public ComplexPrimitiveBase
 {
 public:
-	ParamList		mParams;
+    ParamList		mParams;
 
 public:
-	PointsPolygons( ParamList &params, const SymbolList &globalSymbols );
+    PointsPolygons( ParamList &params, const SymbolList &globalSymbols );
 
-		void Simplify( Hider &hider );
+        void Simplify( Hider &hider );
 };
 
 //==================================================================
@@ -51,12 +51,12 @@ public:
 class PointsGeneralPolygons : public ComplexPrimitiveBase
 {
 public:
-	ParamList		mParams;
+    ParamList		mParams;
 
 public:
-	PointsGeneralPolygons( ParamList &params, const SymbolList &globalSymbols );
+    PointsGeneralPolygons( ParamList &params, const SymbolList &globalSymbols );
 
-		void Simplify( Hider &hider );
+        void Simplify( Hider &hider );
 };
 
 //==================================================================

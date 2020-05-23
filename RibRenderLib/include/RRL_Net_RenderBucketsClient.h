@@ -29,22 +29,22 @@ namespace NET
 //==================================================================
 class RenderBucketsClient : public RI::RenderBucketsBase
 {
-	DVec<Server>	*mpServList;
+    DVec<Server>	*mpServList;
 
 public:
-	RenderBucketsClient( DVec<Server> &servList );
-	void Render( RI::Hider &hider );
+    RenderBucketsClient( DVec<Server> &servList );
+    void Render( RI::Hider &hider );
 
 private:
-	Server *findFreeServer();
-	bool dispatchToServer( int buckRangeX1, int buckRangeX2 );
+    Server *findFreeServer();
+    bool dispatchToServer( int buckRangeX1, int buckRangeX2 );
 
-	bool checkServersData(
-					RI::Hider &hider,
-					bool replyDoneIfNotbusy );
+    bool checkServersData(
+                    RI::Hider &hider,
+                    bool replyDoneIfNotbusy );
 
-	bool isAnyServerAvailable() const;
-	void sendRendDoneToNotBusy();
+    bool isAnyServerAvailable() const;
+    void sendRendDoneToNotBusy();
 };
 
 //==================================================================

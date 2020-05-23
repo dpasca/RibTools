@@ -19,12 +19,12 @@
 
 /* Define to 1 if you have the <io.h> header file. */
 #if defined(_MSC_VER)
-	#define HAVE_IO_H 1
+    #define HAVE_IO_H 1
 #endif
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #if !defined(_MSC_VER)
-	#define HAVE_UNISTD_H 1
+    #define HAVE_UNISTD_H 1
 #endif
 
 /* Define to 1 if you have the <search.h> header file. */
@@ -40,18 +40,18 @@
 #define SIZEOF_LONG 4
 
 #if defined(_MSC_VER)
-	/* Signed 64-bit type */
-	#define TIFF_INT64_T signed __int64
+    /* Signed 64-bit type */
+    #define TIFF_INT64_T signed __int64
 
-	/* Unsigned 64-bit type */
-	#define TIFF_UINT64_T unsigned __int64
+    /* Unsigned 64-bit type */
+    #define TIFF_UINT64_T unsigned __int64
 
 #else
-	/* Signed 64-bit type */
-	#define TIFF_INT64_T signed long long
+    /* Signed 64-bit type */
+    #define TIFF_INT64_T signed long long
 
-	/* Unsigned 64-bit type */
-	#define TIFF_UINT64_T unsigned long long
+    /* Unsigned 64-bit type */
+    #define TIFF_UINT64_T unsigned long long
 
 #endif
 

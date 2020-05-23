@@ -32,132 +32,132 @@ const char	*RSLCompiler::mpsVersionString = "0.4a";
 
 //==================================================================
 RSLCompiler::RSLCompiler(
-		const char *pSLFName,
-		const char *pSource,
-		size_t sourceSize,
-		const char *pBaseInclude,
-		const Params &params )
+        const char *pSLFName,
+        const char *pSource,
+        size_t sourceSize,
+        const char *pBaseInclude,
+        const Params &params )
 {
-	FatBase		fatBase;
-	DVec<Fat8>	source;
-	fatBase.AppendNewFile( source, pSLFName, (const U8 *)pSource, sourceSize );
-	DVec<Fat8>	processedSource;
+    FatBase		fatBase;
+    DVec<Fat8>	source;
+    fatBase.AppendNewFile( source, pSLFName, (const U8 *)pSource, sourceSize );
+    DVec<Fat8>	processedSource;
 
-	DStr	curShaderDir = DUT::GetDirNameFromFPathName( pSLFName );
+    DStr	curShaderDir = DUT::GetDirNameFromFPathName( pSLFName );
 
-	PREPRO::Prepro
-				prepro(
-					*params.mpFileManager,
-					fatBase,
-					source,
-					pBaseInclude,
-					curShaderDir.c_str(),
-					processedSource );
+    PREPRO::Prepro
+                prepro(
+                    *params.mpFileManager,
+                    fatBase,
+                    source,
+                    pBaseInclude,
+                    curShaderDir.c_str(),
+                    processedSource );
 
-	Tokenizer( mTokens, fatBase, processedSource );
+    Tokenizer( mTokens, fatBase, processedSource );
 
 #if 0	// useful to debug the tokenizer
-	for (size_t i=0; i < mTokens.size(); ++i)
-	{
-		printf( "%3i) %i - %-12s - %s\n",
-				i,
-				mTokens[i].isPrecededByWS,
-				GetTokenTypeStr( mTokens[i].idType ),
-				mTokens[i].str.c_str() );
-	}
+    for (size_t i=0; i < mTokens.size(); ++i)
+    {
+        printf( "%3i) %i - %-12s - %s\n",
+                i,
+                mTokens[i].isPrecededByWS,
+                GetTokenTypeStr( mTokens[i].idType ),
+                mTokens[i].str.c_str() );
+    }
 #endif
 
-	mpRoot = DNEW TokNode( (Token *)NULL );
+    mpRoot = DNEW TokNode( (Token *)NULL );
 
-	// make the basic tree with nested blocks based on brackets
-	u_int	blockCnt = 0;
-	MakeTree( mpRoot, mTokens, blockCnt );
+    // make the basic tree with nested blocks based on brackets
+    u_int	blockCnt = 0;
+    MakeTree( mpRoot, mTokens, blockCnt );
 
-	// discover variables declarations
-	DiscoverVariablesDeclarations( mpRoot );
+    // discover variables declarations
+    DiscoverVariablesDeclarations( mpRoot );
 
-	// discover functions declarations and usage
-	DiscoverFunctions( mpRoot, blockCnt );
+    // discover functions declarations and usage
+    DiscoverFunctions( mpRoot, blockCnt );
 
-	// remove semicolons as they serve no additional purpose
-	RemoveSemicolons( mpRoot );
+    // remove semicolons as they serve no additional purpose
+    RemoveSemicolons( mpRoot );
 
-	// develop the tree based on operators with the proper precedence
-	ReparentOperators( mpRoot );
+    // develop the tree based on operators with the proper precedence
+    ReparentOperators( mpRoot );
 
-	RemoveOpeningExprBrackets( mpRoot );
+    RemoveOpeningExprBrackets( mpRoot );
 
-	// simplify assign-with-arithmetic operators
-	// example: a += b  ..becomes..  a = a + b
-	ExpandAssingOperators( mpRoot );
+    // simplify assign-with-arithmetic operators
+    // example: a += b  ..becomes..  a = a + b
+    ExpandAssingOperators( mpRoot );
 
-	OptimizeConstantExpressions( mpRoot );
+    OptimizeConstantExpressions( mpRoot );
 
-	RealizeArraysSizes( mpRoot );
+    RealizeArraysSizes( mpRoot );
 
-	GenerateArrayAssignOperators( mpRoot );
+    GenerateArrayAssignOperators( mpRoot );
 
-	// discover variables usage
-	DiscoverVariablesUsage( mpRoot );
+    // discover variables usage
+    DiscoverVariablesUsage( mpRoot );
 
-	RealizeConstants( mpRoot );
+    RealizeConstants( mpRoot );
 
-	SolveExpressions( mpRoot, false );
+    SolveExpressions( mpRoot, false );
 
-	ResolveFunctionCalls( mpRoot );
+    ResolveFunctionCalls( mpRoot );
 
-	MarkUsedVariables( mpRoot );
+    MarkUsedVariables( mpRoot );
 
-	SolveGlobalConstants( mpRoot );
+    SolveGlobalConstants( mpRoot );
 
-	SolveVariablesDetail( mpRoot );
+    SolveVariablesDetail( mpRoot );
 
-	AssignRegisters( mpRoot, 0 );
+    AssignRegisters( mpRoot, 0 );
 
-	CloseFuncOps( mpRoot );
+    CloseFuncOps( mpRoot );
 
-	// produce some debug info in the output file
-	if ( params.mDbgOutputTree )
-		TraverseTree( mpRoot, 0 );
+    // produce some debug info in the output file
+    if ( params.mDbgOutputTree )
+        TraverseTree( mpRoot, 0 );
 }
 
 //==================================================================
 RSLCompiler::~RSLCompiler()
 {
-	DSAFE_DELETE( mpRoot );
+    DSAFE_DELETE( mpRoot );
 }
 
 //==================================================================
 void RSLCompiler::SaveASM( const char *pFName, const char *pRefSourceName )
 {
-	// return;
+    // return;
 
-	FILE	*pFile;
+    FILE	*pFile;
 
-	if ( fopen_s( &pFile, pFName, "wb" ) )
-	{
-		DASSTHROW( 0, ("Failed to save %s", pFName) );
-	}
+    if ( fopen_s( &pFile, pFName, "wb" ) )
+    {
+        DASSTHROW( 0, ("Failed to save %s", pFName) );
+    }
 
-	char dateStr[256];
-	char timeStr[256];
-	numstrdate( dateStr);
-	_strtime_s( timeStr );
+    char dateStr[256];
+    char timeStr[256];
+    numstrdate( dateStr);
+    _strtime_s( timeStr );
 
-	fprintf_s( pFile, ";==========================================================\n" );
-	fprintf_s( pFile, ";= %s\n", pFName );
-	fprintf_s( pFile, ";= Source file %s\n", pRefSourceName );
-	fprintf_s( pFile, ";= Creation date %s - %s\n", dateStr, timeStr );
-	fprintf_s( pFile, ";= File automatically generated by RSLCompilerCmd %s\n", mpsVersionString );
-	fprintf_s( pFile, ";=========================================================\n\n" );
+    fprintf_s( pFile, ";==========================================================\n" );
+    fprintf_s( pFile, ";= %s\n", pFName );
+    fprintf_s( pFile, ";= Source file %s\n", pRefSourceName );
+    fprintf_s( pFile, ";= Creation date %s - %s\n", dateStr, timeStr );
+    fprintf_s( pFile, ";= File automatically generated by RSLCompilerCmd %s\n", mpsVersionString );
+    fprintf_s( pFile, ";=========================================================\n\n" );
 
-	fprintf_s( pFile, "\n.data\n" );
+    fprintf_s( pFile, "\n.data\n" );
 
-	RRASMOut::WriteVariables( pFile, mpRoot );
+    RRASMOut::WriteVariables( pFile, mpRoot );
 
-	fprintf_s( pFile, "\n.code\n" );
+    fprintf_s( pFile, "\n.code\n" );
 
-	RRASMOut::WriteFunctions( pFile, mpRoot );
+    RRASMOut::WriteFunctions( pFile, mpRoot );
 
-	fclose( pFile );
+    fclose( pFile );
 }

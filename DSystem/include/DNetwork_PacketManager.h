@@ -25,46 +25,46 @@ namespace DNET
 class Packet
 {
 public:
-	DVec<U8>	mDataBuff;
+    DVec<U8>	mDataBuff;
 
-	Packet()
-	{
-	}
+    Packet()
+    {
+    }
 
-	Packet( const DVec<U8> &dataBuff ) :
-		mDataBuff(dataBuff)
-	{
-	}
+    Packet( const DVec<U8> &dataBuff ) :
+        mDataBuff(dataBuff)
+    {
+    }
 
 /*
-	virtual ~Packet()
-	{
-	}
+    virtual ~Packet()
+    {
+    }
 */
-	const U8 *GetDataPtrRecv() const
-	{
-		if ( mDataBuff.size() )
-			return &mDataBuff[0];
-		else
-			return NULL;
-	}
+    const U8 *GetDataPtrRecv() const
+    {
+        if ( mDataBuff.size() )
+            return &mDataBuff[0];
+        else
+            return NULL;
+    }
 
-	U8 *GetDataPtrSend()
-	{
-		if ( mDataBuff.size() >= sizeof(U32) )
-			return &mDataBuff[sizeof(U32)];
-		else
-			return NULL;
-	}
+    U8 *GetDataPtrSend()
+    {
+        if ( mDataBuff.size() >= sizeof(U32) )
+            return &mDataBuff[sizeof(U32)];
+        else
+            return NULL;
+    }
 
-	size_t GetDataSize() const
-	{
-		return mDataBuff.size();
-	}
+    size_t GetDataSize() const
+    {
+        return mDataBuff.size();
+    }
 
 private:
-	Packet( const Packet &from ) {}
-	void operator =( const Packet &from ) {}
+    Packet( const Packet &from ) {}
+    void operator =( const Packet &from ) {}
 };
 
 //===============================================================
@@ -72,85 +72,85 @@ private:
 //===============================================================
 class PacketManager : public DTH::ThreadedBase
 {
-	class Queue
-	{
-	public:
-		DVec<Packet *>			mInQueue;
-		DUT::CriticalSection	mInQueueCS;
-		DVec<Packet *>			mQueue;
+    class Queue
+    {
+    public:
+        DVec<Packet *>			mInQueue;
+        DUT::CriticalSection	mInQueueCS;
+        DVec<Packet *>			mQueue;
 
-		//==================================================================
-		void FlushInQueue()
-		{
-			if NOT( mInQueue.size() )
-				return;
+        //==================================================================
+        void FlushInQueue()
+        {
+            if NOT( mInQueue.size() )
+                return;
 
-			DUT::CriticalSection::Block	lock( mInQueueCS );
+            DUT::CriticalSection::Block	lock( mInQueueCS );
 
-			for (size_t i=0; i < mInQueue.size(); ++i)
-				mQueue.push_back( mInQueue[i] );
+            for (size_t i=0; i < mInQueue.size(); ++i)
+                mQueue.push_back( mInQueue[i] );
 
-			mInQueue.clear();
-		}
-	};
+            mInQueue.clear();
+        }
+    };
 
-	SOCKET					mSocket;
-	Queue					mSendList;
+    SOCKET					mSocket;
+    Queue					mSendList;
 
-	DUT::CriticalSection	mRecvOutQueueCS;
-	DVec<Packet *>			mRecvOutQueue;
+    DUT::CriticalSection	mRecvOutQueueCS;
+    DVec<Packet *>			mRecvOutQueue;
 
-	bool					mFatalError;
+    bool					mFatalError;
 
 public:
-	//===============================================================
-	PacketManager( SOCKET socket );
-	~PacketManager();
+    //===============================================================
+    PacketManager( SOCKET socket );
+    ~PacketManager();
 
-	bool IsConnected() const;
+    bool IsConnected() const;
 
-	void Send( const void *pData, size_t dataSize );
+    void Send( const void *pData, size_t dataSize );
 
-	template<class T>
-	void SendValue( const T &val )
-	{
-		Send( &val, sizeof(val) );
-	}
+    template<class T>
+    void SendValue( const T &val )
+    {
+        Send( &val, sizeof(val) );
+    }
 
-	Packet *SendBegin( size_t dataSize );
-	void SendEnd( Packet *pPacket );
+    Packet *SendBegin( size_t dataSize );
+    void SendEnd( Packet *pPacket );
 
-	Packet *GetNextPacket( bool doRemove );
-	Packet *WaitNextPacket( bool doRemove, U32 timeoutMS=0 );
+    Packet *GetNextPacket( bool doRemove );
+    Packet *WaitNextPacket( bool doRemove, U32 timeoutMS=0 );
 
-	Packet *GetNextPacketMatchID32(
-		bool doRemove,
-		U32 matchArray[],
-		size_t matchArrayN );
+    Packet *GetNextPacketMatchID32(
+        bool doRemove,
+        U32 matchArray[],
+        size_t matchArrayN );
 
-	Packet *GetNextPacketMatchID8(
-		bool doRemove,
-		U8 matchArray[],
-		size_t matchArrayN );
+    Packet *GetNextPacketMatchID8(
+        bool doRemove,
+        U8 matchArray[],
+        size_t matchArrayN );
 
-	Packet *WaitNextPacketMatchID32(
-			bool doRemove,
-			U32 matchArray[],
-			size_t matchArrayN,
-			U32 timeoutMS=0 );
+    Packet *WaitNextPacketMatchID32(
+            bool doRemove,
+            U32 matchArray[],
+            size_t matchArrayN,
+            U32 timeoutMS=0 );
 
-	void RemovePacket( Packet *pPacket );
-	void RemoveAndDeletePacket( Packet *pPacket );
+    void RemovePacket( Packet *pPacket );
+    void RemoveAndDeletePacket( Packet *pPacket );
 
-	void DeletePacket( Packet * &pPacket )
-	{
-		DSAFE_DELETE( pPacket )
-	}
+    void DeletePacket( Packet * &pPacket )
+    {
+        DSAFE_DELETE( pPacket )
+    }
 
 private:
-		void threadMain();
-	
-	void threadOnSockError( Packet &entry );
+        void threadMain();
+    
+    void threadOnSockError( Packet &entry );
 };
 
 //==================================================================

@@ -14,9 +14,9 @@ add_library( ${PROJECT_NAME} STATIC ${SRCS} ${INCS} )
 
 if ( WIN32 )
 target_link_libraries(
-	${PROJECT_NAME}
-	opengl32
-	winmm
-	)
+    ${PROJECT_NAME}
+    opengl32
+    winmm
+    )
 endif ( WIN32 )
 

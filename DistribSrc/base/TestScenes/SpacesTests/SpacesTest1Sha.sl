@@ -8,10 +8,10 @@
 
 surface SpacesTestDisp()
 {
-	Oi = color( 1, 1, 1 );
+    Oi = color( 1, 1, 1 );
 
-	Ci = color(
-			xcomp( N ),
-			ycomp( N ),
-			zcomp( N ) );
+    Ci = color(
+            xcomp( N ),
+            ycomp( N ),
+            zcomp( N ) );
 }

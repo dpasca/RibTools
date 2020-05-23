@@ -21,7 +21,7 @@ namespace RI
 //==================================================================
 namespace RRASM
 {
-	struct OpCodeDef;
+    struct OpCodeDef;
 }
 
 //==================================================================
@@ -31,121 +31,121 @@ namespace SVM
 //==================================================================
 enum OpBaseTypeID
 {
-	OBT_MOV	,
-	OBT_ABS	,
-	OBT_SIGN,
-	OBT_ADD	,
-	OBT_SUB	,
-	OBT_MUL	,
-	OBT_DIV	,
+    OBT_MOV	,
+    OBT_ABS	,
+    OBT_SIGN,
+    OBT_ADD	,
+    OBT_SUB	,
+    OBT_MUL	,
+    OBT_DIV	,
 
-	OBT_SETLE	,
-	OBT_SETGE	,
-	OBT_SETLT	,
-	OBT_SETGT	,
-	OBT_SETEQ	,
-	OBT_SETNEQ	,
+    OBT_SETLE	,
+    OBT_SETGE	,
+    OBT_SETLT	,
+    OBT_SETGT	,
+    OBT_SETEQ	,
+    OBT_SETNEQ	,
 
-	OBT_MIN	,
-	OBT_MAX	,
+    OBT_MIN	,
+    OBT_MAX	,
 
-	OBT_N
+    OBT_N
 };
 
 //==================================================================
 enum OpCodeID
 {
-	OP_RET
+    OP_RET
 };
 
 //==================================================================
 class Value
 {
 public:
-	struct
-	{
-	   unsigned mOwnData	: 1;
-	   unsigned mCanChange	: 1;
-	} Flags;
+    struct
+    {
+       unsigned mOwnData	: 1;
+       unsigned mCanChange	: 1;
+    } Flags;
 
-	union
-	{
-		void		*pVoidValue;
-		const void	*pConstVoidValue;
-	} Data;
+    union
+    {
+        void		*pVoidValue;
+        const void	*pConstVoidValue;
+    } Data;
 
-	const Symbol	*mpSrcSymbol;
+    const Symbol	*mpSrcSymbol;
 
-	Value()
-	{
-		Flags.mOwnData = 0;
-		Flags.mCanChange = 0;
-		Data.pVoidValue = NULL;
-		mpSrcSymbol = NULL;
-	}
+    Value()
+    {
+        Flags.mOwnData = 0;
+        Flags.mCanChange = 0;
+        Data.pVoidValue = NULL;
+        mpSrcSymbol = NULL;
+    }
 
-	void SetDataR( const void *pData, const Symbol *pSrcSymbol )
-	{
-		Flags.mCanChange		= 0;
-		Data.pConstVoidValue	= pData;
-		mpSrcSymbol				= pSrcSymbol;
-	}
+    void SetDataR( const void *pData, const Symbol *pSrcSymbol )
+    {
+        Flags.mCanChange		= 0;
+        Data.pConstVoidValue	= pData;
+        mpSrcSymbol				= pSrcSymbol;
+    }
 
-	void AllocFillConstData( const Symbol *pSrcSymbol, size_t samplesN, const void *pSrcConstData )
-	{
-		void *pVaryingData = pSrcSymbol->AllocClone( samplesN );
+    void AllocFillConstData( const Symbol *pSrcSymbol, size_t samplesN, const void *pSrcConstData )
+    {
+        void *pVaryingData = pSrcSymbol->AllocClone( samplesN );
 
-		Flags.mOwnData = 1;
-		SetDataR( pVaryingData, pSrcSymbol );
-		pSrcSymbol->FillDataFromSIMD( pVaryingData, samplesN, pSrcConstData );
-	}
+        Flags.mOwnData = 1;
+        SetDataR( pVaryingData, pSrcSymbol );
+        pSrcSymbol->FillDataFromSIMD( pVaryingData, samplesN, pSrcConstData );
+    }
 
-	void SetDataRW( void *pData, const Symbol *pSrcSymbol )
-	{
-		Flags.mCanChange	= 1;
-		Data.pVoidValue		= pData;
-		mpSrcSymbol			= pSrcSymbol;
-	}
+    void SetDataRW( void *pData, const Symbol *pSrcSymbol )
+    {
+        Flags.mCanChange	= 1;
+        Data.pVoidValue		= pData;
+        mpSrcSymbol			= pSrcSymbol;
+    }
 };
 
 //==================================================================
 struct OpCode
 {
-	static const u_short	INVALID_ADDR = 0xffff;
+    static const u_short	INVALID_ADDR = 0xffff;
 
-	u_int	mTableOffset;	// Instruction index in the instruction table
-	u_short	mOperandCount;	// How many operands ?
-	u_short	mFuncopEndAddr;	// end of if/else, solar, etc, address
-	u_int	mDbgLineNum;	// what line in the RRASM code ?
+    u_int	mTableOffset;	// Instruction index in the instruction table
+    u_short	mOperandCount;	// How many operands ?
+    u_short	mFuncopEndAddr;	// end of if/else, solar, etc, address
+    u_int	mDbgLineNum;	// what line in the RRASM code ?
 };
 
 //==================================================================
 struct SymbolWord
 {
-	u_int	mTableOffset;
-	bool	mIsVarying;
-	Symbol	*mpOrigSymbol;
+    u_int	mTableOffset;
+    bool	mIsVarying;
+    Symbol	*mpOrigSymbol;
 };
 
 //==================================================================
 struct Address
 {
-	u_int	mOffset;
+    u_int	mOffset;
 };
 
 //==================================================================
 struct ImmFloat
 {
-	float	mValue;
+    float	mValue;
 };
 
 //==================================================================
 union CPUWord
 {
-	OpCode		mOpCode;
-	SymbolWord	mSymbol;
-	Address		mAddress;
-	ImmFloat	mImmFloat;
+    OpCode		mOpCode;
+    SymbolWord	mSymbol;
+    Address		mAddress;
+    ImmFloat	mImmFloat;
 };
 
 //==================================================================
@@ -154,43 +154,43 @@ union CPUWord
 class Shader : public ResourceBase
 {
 public:
-	enum Type
-	{
-		TYPE_UNKNOWN,
-		TYPE_LIGHT,
-		TYPE_SURFACE,
-		TYPE_VOLUME,
-		TYPE_DISPLACEMENT,
-		TYPE_TRANSFORMATION,
-		TYPE_IMAGER,
-		TYPE_N
-	};
+    enum Type
+    {
+        TYPE_UNKNOWN,
+        TYPE_LIGHT,
+        TYPE_SURFACE,
+        TYPE_VOLUME,
+        TYPE_DISPLACEMENT,
+        TYPE_TRANSFORMATION,
+        TYPE_IMAGER,
+        TYPE_N
+    };
 public:
-	Type				mType;
-	DStr				mShaderName;
-	DVec<Symbol	*>		mpShaSyms;
-	DVec<u_int>			mpShaSymsStartPCs;
-	u_int				mStartPC;
-	DVec<CPUWord>		mCode;
-	bool				mHasDirPosInstructions;
+    Type				mType;
+    DStr				mShaderName;
+    DVec<Symbol	*>		mpShaSyms;
+    DVec<u_int>			mpShaSymsStartPCs;
+    u_int				mStartPC;
+    DVec<CPUWord>		mCode;
+    bool				mHasDirPosInstructions;
 
-	struct CtorParams
-	{
-		const char	*pName;
-		const char	*pSource;
-		const char	*pSourceFileName;
-		const char	*pBaseIncDir;
+    struct CtorParams
+    {
+        const char	*pName;
+        const char	*pSource;
+        const char	*pSourceFileName;
+        const char	*pBaseIncDir;
 
-		CtorParams() :
-			pName(NULL),
-			pSource(NULL),
-			pSourceFileName(NULL),
-			pBaseIncDir(NULL)
-		{
-		}
-	};
+        CtorParams() :
+            pName(NULL),
+            pSource(NULL),
+            pSourceFileName(NULL),
+            pBaseIncDir(NULL)
+        {
+        }
+    };
 
-	Shader( const CtorParams &params, DIO::FileManagerBase &fileManager );
+    Shader( const CtorParams &params, DIO::FileManagerBase &fileManager );
 };
 
 //==================================================================
@@ -198,45 +198,45 @@ public:
 //==================================================================
 class ShaderInst : public RCBase
 {
-	friend class Context;
+    friend class Context;
 
-	RCSha<Shader>		moShader;
-	size_t				mMaxPointsN;
-
-public:
-	SymbolList			mCallSymList;
-	SymbolIList			mCallSymIList;
+    RCSha<Shader>		moShader;
+    size_t				mMaxPointsN;
 
 public:
-	ShaderInst( Shader *pShader, size_t maxPointsN=MP_GRID_MAX_SIZE );
-	~ShaderInst();
+    SymbolList			mCallSymList;
+    SymbolIList			mCallSymIList;
 
-	ShaderInst( const ShaderInst &right )
-	{
-		DASSERT( right.moShader.get() != NULL );
-		moShader = right.moShader;
-		//mCallSymIList	= right.mCallSymIList;
-	}
+public:
+    ShaderInst( Shader *pShader, size_t maxPointsN=MP_GRID_MAX_SIZE );
+    ~ShaderInst();
 
-	void operator = ( const ShaderInst &right )
-	{
-		DASSERT( right.moShader.get() != NULL );
-		moShader = right.moShader;
-		//mCallSymIList	= right.mCallSymIList;
-	}
+    ShaderInst( const ShaderInst &right )
+    {
+        DASSERT( right.moShader.get() != NULL );
+        moShader = right.moShader;
+        //mCallSymIList	= right.mCallSymIList;
+    }
 
-	Value	*Bind(
-			const SymbolList	&globalSyms,
-			SymbolIList			&gridSymIList,
-			DVec<u_int>			&out_defParamValsStartPCs ) const;
+    void operator = ( const ShaderInst &right )
+    {
+        DASSERT( right.moShader.get() != NULL );
+        moShader = right.moShader;
+        //mCallSymIList	= right.mCallSymIList;
+    }
 
-	void Unbind( Value * &pDataSegment ) const;
+    Value	*Bind(
+            const SymbolList	&globalSyms,
+            SymbolIList			&gridSymIList,
+            DVec<u_int>			&out_defParamValsStartPCs ) const;
 
-	void Run( class Context &ctx ) const;
+    void Unbind( Value * &pDataSegment ) const;
+
+    void Run( class Context &ctx ) const;
 
 private:
-	bool verifyOpParams( Context &ctx, const RRASM::OpCodeDef &opCodeDef ) const;
-	void runFrom( class Context &ctx, u_int startPC ) const;
+    bool verifyOpParams( Context &ctx, const RRASM::OpCodeDef &opCodeDef ) const;
+    void runFrom( class Context &ctx, u_int startPC ) const;
 };
 
 //==================================================================

@@ -26,46 +26,46 @@ class Transform;
 class LightSourceT
 {
 public:
-	RCSha<SVM::ShaderInst>	moShaderInst;
+    RCSha<SVM::ShaderInst>	moShaderInst;
 
 public:
-	enum Type
-	{
-		TYPE_DISTANT,
-		TYPE_AMBIENT,
-	};
+    enum Type
+    {
+        TYPE_DISTANT,
+        TYPE_AMBIENT,
+    };
 public:
 
-	u_int	mID;
-	bool	mIsAmbient;
+    u_int	mID;
+    bool	mIsAmbient;
 /*
-	Type	mType;
-	float	mIntesity;
-	Color	mColor;
-	Point3	mLocFromPos;
-	Point3	mLocToPos;
+    Type	mType;
+    float	mIntesity;
+    Color	mColor;
+    Point3	mLocFromPos;
+    Point3	mLocToPos;
 
-	struct  // union would be nice
-	{
-		struct 
-		{
-			Vec3f	mDirWS;
-			Vec3f	mDirCS;
-		} mDistant;
+    struct  // union would be nice
+    {
+        struct 
+        {
+            Vec3f	mDirWS;
+            Vec3f	mDirCS;
+        } mDistant;
 
-		struct  
-		{
-			Point3	mFromPos;
-			Point3	mToPos;
-		} mCone;
+        struct  
+        {
+            Point3	mFromPos;
+            Point3	mToPos;
+        } mCone;
 
-	} mRend;
+    } mRend;
 */
 
-	LightSourceT();
-	~LightSourceT()
-	{
-	}
+    LightSourceT();
+    ~LightSourceT()
+    {
+    }
 
 //	void UpdateRend( const Transform &xform, const Matrix44 &mtxWorldCam );
 };

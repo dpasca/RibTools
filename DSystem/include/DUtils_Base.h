@@ -19,9 +19,9 @@ namespace DUT
 #if defined(_DEBUG) || defined(DEBUG)
 # define DASSERT(_X_)                                       \
     {                                                       \
-		bool ok=(_X_);                                      \
-		if ( !ok )                                          \
-			DUT::DAssert( ok, __FILE__, __LINE__, #_X_ );   \
+        bool ok=(_X_);                                      \
+        if ( !ok )                                          \
+            DUT::DAssert( ok, __FILE__, __LINE__, #_X_ );   \
     }
 #else
 # define DASSERT(_X_) ((void)0)

@@ -20,21 +20,21 @@ namespace RSLC
 //==================================================================
 enum TokenIDType
 {
-	T_TYPE_NONTERM		,
+    T_TYPE_NONTERM		,
 
-	T_TYPE_TEMPDEST		,
+    T_TYPE_TEMPDEST		,
 
-	T_TYPE_VALUE		,
+    T_TYPE_VALUE		,
 
-	T_TYPE_OPERATOR		,
-	T_TYPE_DATATYPE		,
-	T_TYPE_SHADERTYPE	,
-	T_TYPE_DETAIL		,
-	T_TYPE_KEYWORD		,
+    T_TYPE_OPERATOR		,
+    T_TYPE_DATATYPE		,
+    T_TYPE_SHADERTYPE	,
+    T_TYPE_DETAIL		,
+    T_TYPE_KEYWORD		,
 
-	T_TYPE_FUNCOP		,
+    T_TYPE_FUNCOP		,
 
-	T_TYPE_N
+    T_TYPE_N
 };
 
 //==================================================================
@@ -49,87 +49,87 @@ enum TokenIDType
 //==================================================================
 enum TokenID
 {
-	T_NONTERM		,
+    T_NONTERM		,
 
-	T_TD_TEMPDEST	,
+    T_TD_TEMPDEST	,
 
-	T_VL_NUMBER,
-	T_VL_STRING,
+    T_VL_NUMBER,
+    T_VL_STRING,
 
-	T_VL_BOOL_TRUE,
-	T_VL_BOOL_FALSE,
+    T_VL_BOOL_TRUE,
+    T_VL_BOOL_FALSE,
 
-	T_OP_ASSIGN_ARR_ITEM,					// operator used internally
+    T_OP_ASSIGN_ARR_ITEM,					// operator used internally
 
-	OP_DEF(	"="		,	ASSIGN		)	,	// assign ops
-	OP_DEF(	"+="	,	PLUSASS		)	,
-	OP_DEF(	"-="	,	MINUSASS	)	,
-	OP_DEF(	"*="	,	MULASS		)	,
-	OP_DEF(	"/="	,	DIVASS		)	,
+    OP_DEF(	"="		,	ASSIGN		)	,	// assign ops
+    OP_DEF(	"+="	,	PLUSASS		)	,
+    OP_DEF(	"-="	,	MINUSASS	)	,
+    OP_DEF(	"*="	,	MULASS		)	,
+    OP_DEF(	"/="	,	DIVASS		)	,
 
-	OP_DEF(	"<="	,	LSEQ		)	,	// cmp ops
-	OP_DEF(	">="	,	GEEQ		)	,
-	OP_DEF(	"<"		,	LSTH		)	,
-	OP_DEF(	">"		,	GRTH		)	,
-	OP_DEF(	"=="	,	EQ			)	,
-	OP_DEF(	"!="	,	NEQ			)	,
+    OP_DEF(	"<="	,	LSEQ		)	,	// cmp ops
+    OP_DEF(	">="	,	GEEQ		)	,
+    OP_DEF(	"<"		,	LSTH		)	,
+    OP_DEF(	">"		,	GRTH		)	,
+    OP_DEF(	"=="	,	EQ			)	,
+    OP_DEF(	"!="	,	NEQ			)	,
 
-	OP_DEF(	"&&"	,	LOGIC_AND	)	,	// general bi-ops
-	OP_DEF(	"||"	,	LOGIC_OR	)	,
-	OP_DEF(	"+"		,	PLUS		)	,
-	OP_DEF(	"-"		,	MINUS		)	,
-	OP_DEF(	"*"		,	MUL			)	,
-	OP_DEF(	"/"		,	DIV			)	,
-	OP_DEF(	"^"		,	POW			)	,
-	OP_DEF(	"."		,	DOT			)	,
+    OP_DEF(	"&&"	,	LOGIC_AND	)	,	// general bi-ops
+    OP_DEF(	"||"	,	LOGIC_OR	)	,
+    OP_DEF(	"+"		,	PLUS		)	,
+    OP_DEF(	"-"		,	MINUS		)	,
+    OP_DEF(	"*"		,	MUL			)	,
+    OP_DEF(	"/"		,	DIV			)	,
+    OP_DEF(	"^"		,	POW			)	,
+    OP_DEF(	"."		,	DOT			)	,
 
-	OP_DEF(	":"		,	COLON		)	,
-	OP_DEF(	","		,	COMMA		)	,
-	OP_DEF(	";"		,	SEMICOL		)	,
-	OP_DEF(	"("		,	LFT_BRACKET			)	,
-	OP_DEF(	")"		,	RGT_BRACKET			)	,
-	OP_DEF(	"["		,	LFT_SQ_BRACKET		)	,
-	OP_DEF(	"]"		,	RGT_SQ_BRACKET		)	,
-	OP_DEF(	"{"		,	LFT_CRL_BRACKET		)	,
-	OP_DEF(	"}"		,	RGT_CRL_BRACKET		)	,
-	OP_DEF(	"#"		,	HASH		)	,
+    OP_DEF(	":"		,	COLON		)	,
+    OP_DEF(	","		,	COMMA		)	,
+    OP_DEF(	";"		,	SEMICOL		)	,
+    OP_DEF(	"("		,	LFT_BRACKET			)	,
+    OP_DEF(	")"		,	RGT_BRACKET			)	,
+    OP_DEF(	"["		,	LFT_SQ_BRACKET		)	,
+    OP_DEF(	"]"		,	RGT_SQ_BRACKET		)	,
+    OP_DEF(	"{"		,	LFT_CRL_BRACKET		)	,
+    OP_DEF(	"}"		,	RGT_CRL_BRACKET		)	,
+    OP_DEF(	"#"		,	HASH		)	,
 
-	DT_DEF( float			)	,
-	DT_DEF( vector			)	,
-	DT_DEF( point			)	,
-	DT_DEF( normal			)	,
-	DT_DEF( color			)	,
-	DT_DEF( matrix			)	,
-	DT_DEF( string			)	,
-	DT_DEF( bool			)	,
-	DT_DEF( void			)	,
+    DT_DEF( float			)	,
+    DT_DEF( vector			)	,
+    DT_DEF( point			)	,
+    DT_DEF( normal			)	,
+    DT_DEF( color			)	,
+    DT_DEF( matrix			)	,
+    DT_DEF( string			)	,
+    DT_DEF( bool			)	,
+    DT_DEF( void			)	,
 
-	DE_DEF( varying			)	,
-	DE_DEF( uniform			)	,
+    DE_DEF( varying			)	,
+    DE_DEF( uniform			)	,
 
-	//FO_DEF( if				)	,
-	FO_DEF( for				)	,
-	FO_DEF( while			)	,
+    //FO_DEF( if				)	,
+    FO_DEF( for				)	,
+    FO_DEF( while			)	,
 
-	KW_DEF( break			)	,
-	KW_DEF( continue		)	,
-	KW_DEF( return			)	,
-	KW_DEF( output			)	,
-	KW_DEF( __funcop		)	,
+    KW_DEF( break			)	,
+    KW_DEF( continue		)	,
+    KW_DEF( return			)	,
+    KW_DEF( output			)	,
+    KW_DEF( __funcop		)	,
 
-	//KW_DEF( texture			)	,	// texture_type
-	//KW_DEF( environment		)	,
-	KW_DEF( bump			)	,
-	//KW_DEF( shadow			)	,
+    //KW_DEF( texture			)	,	// texture_type
+    //KW_DEF( environment		)	,
+    KW_DEF( bump			)	,
+    //KW_DEF( shadow			)	,
 
-	ST_DEF( light			)	,	// shader types
-	ST_DEF( surface			)	,
-	ST_DEF( volume			)	,
-	ST_DEF( displacement	)	,
-	ST_DEF( transformation	)	,
-	ST_DEF( imager			)	,
+    ST_DEF( light			)	,	// shader types
+    ST_DEF( surface			)	,
+    ST_DEF( volume			)	,
+    ST_DEF( displacement	)	,
+    ST_DEF( transformation	)	,
+    ST_DEF( imager			)	,
 
-	TOKEN_N
+    TOKEN_N
 };
 
 //==================================================================
@@ -144,9 +144,9 @@ enum TokenID
 //==================================================================
 struct TokenDef
 {
-	const char	*pStr;
-	TokenIDType	idType;
-	TokenID		id;
+    const char	*pStr;
+    TokenIDType	idType;
+    TokenID		id;
 };
 
 //==================================================================

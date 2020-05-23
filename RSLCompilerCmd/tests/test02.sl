@@ -4,6 +4,6 @@
 /*==========================================*/
 surface test2()
 {
-	Ci = radians( 180 );
-	Oi = Os;
+    Ci = radians( 180 );
+    Oi = Os;
 }

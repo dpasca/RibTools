@@ -17,9 +17,9 @@ namespace RSLC
 
 //==================================================================
 Token *TokenCalcBiOp(
-				TokenID			operTokID,
-				const Token		&val1,
-				const Token		&val2 );
+                TokenID			operTokID,
+                const Token		&val1,
+                const Token		&val2 );
 
 //==================================================================
 }

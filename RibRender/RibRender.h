@@ -30,19 +30,19 @@
 //==================================================================
 struct CmdParams
 {
-	const char				*pInFileName;
-	int						forcedlongdim;
-	DVec<RRL::NET::Server>	servList;
-	bool					doColorGrids;
+    const char				*pInFileName;
+    int						forcedlongdim;
+    DVec<RRL::NET::Server>	servList;
+    bool					doColorGrids;
 
-	DStr					baseDir;
+    DStr					baseDir;
 
-	CmdParams() :
-		pInFileName		(NULL),
-		forcedlongdim	(-1),
-		doColorGrids	(false)
-	{
-	}
+    CmdParams() :
+        pInFileName		(NULL),
+        forcedlongdim	(-1),
+        doColorGrids	(false)
+    {
+    }
 };
 
 //==================================================================

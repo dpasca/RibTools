@@ -30,12 +30,12 @@ void SkipHWhites( const DVec<Fat8> &text, size_t &i, size_t toEnd );
 template <class _T>
 void CutVector( DVec<_T> &vec, size_t start, size_t end )
 {
-	DASSERT( start <= end );
+    DASSERT( start <= end );
 
-	for (size_t i=end; i < vec.size(); ++i)
-		vec[start+i-end] = vec[i];
+    for (size_t i=end; i < vec.size(); ++i)
+        vec[start+i-end] = vec[i];
 
-	vec.resize( vec.size() - (end - start) );
+    vec.resize( vec.size() - (end - start) );
 }
 
 //==================================================================
@@ -45,49 +45,49 @@ void CutVectorInclusive( DVec<Fat8> &vec, size_t start, size_t end );
 template <class _T>
 void ReplaceSubVector( DVec<_T> &vec, size_t start, size_t end, const DVec<_T> &newSpan )
 {
-	// VEC  : -----------|start------------|end-----------|vec.size()
-	// EXPA :            |newSpan-------------|newSpan.size()
-	// CONTR:            |newSpan--------|newSpan.size()
+    // VEC  : -----------|start------------|end-----------|vec.size()
+    // EXPA :            |newSpan-------------|newSpan.size()
+    // CONTR:            |newSpan--------|newSpan.size()
 
-	DASSERT( start <= end );
+    DASSERT( start <= end );
 
-	size_t		oldSpanLen = end - start;
+    size_t		oldSpanLen = end - start;
 
-	ptrdiff_t	oldToNewSizeDiff = (ptrdiff_t)newSpan.size() - (ptrdiff_t)oldSpanLen;
+    ptrdiff_t	oldToNewSizeDiff = (ptrdiff_t)newSpan.size() - (ptrdiff_t)oldSpanLen;
 
-	if ( oldToNewSizeDiff > 0 )
-	{
-		// expand
-		size_t	oldVecSize = vec.size();
+    if ( oldToNewSizeDiff > 0 )
+    {
+        // expand
+        size_t	oldVecSize = vec.size();
 
-		vec.resize( oldVecSize + oldToNewSizeDiff );	// enlarge the vec
+        vec.resize( oldVecSize + oldToNewSizeDiff );	// enlarge the vec
 
-		// move the elements down to make space
-		for (size_t i=oldVecSize; i > end; --i)
-			vec[i-1+oldToNewSizeDiff] = vec[i-1];
-	}
-	else
-	if ( oldToNewSizeDiff < 0 )
-	{
-		// contract
-		for (size_t i=end; i < vec.size(); ++i)
-			vec[i+oldToNewSizeDiff] = vec[i];
+        // move the elements down to make space
+        for (size_t i=oldVecSize; i > end; --i)
+            vec[i-1+oldToNewSizeDiff] = vec[i-1];
+    }
+    else
+    if ( oldToNewSizeDiff < 0 )
+    {
+        // contract
+        for (size_t i=end; i < vec.size(); ++i)
+            vec[i+oldToNewSizeDiff] = vec[i];
 
-		vec.resize( vec.size() + oldToNewSizeDiff );
-	}
+        vec.resize( vec.size() + oldToNewSizeDiff );
+    }
 
-	// finally copy the new span
-	for (size_t i=0; i < newSpan.size(); ++i)
-		vec[start+i] = newSpan[i];
+    // finally copy the new span
+    for (size_t i=0; i < newSpan.size(); ++i)
+        vec[start+i] = newSpan[i];
 }
 
 //==================================================================
 size_t GetAlphaNumBetweenSpaces(
-				DVec<Fat8>	&text,
-				size_t		i,
-				size_t		lineEnd,
-				FatBase		&fatBase,
-				DStr	&out_symName );
+                DVec<Fat8>	&text,
+                size_t		i,
+                size_t		lineEnd,
+                FatBase		&fatBase,
+                DStr	&out_symName );
 
 //==================================================================
 }

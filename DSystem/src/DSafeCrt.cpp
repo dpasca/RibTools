@@ -16,91 +16,91 @@
 //==================================================================
 errno_t fopen_s( FILE **out_ppFile, const char *pFName, const char *pMode )
 {
-	if ( (*out_ppFile = fopen( pFName, pMode )) )
-		return 0;
-	else
-		return -1;
+    if ( (*out_ppFile = fopen( pFName, pMode )) )
+        return 0;
+    else
+        return -1;
 }
 
 //==================================================================
 void strtime( char *pDest, size_t maxLen )
 {
-	//struct tm	tmm;
-	time_t		t;
+    //struct tm	tmm;
+    time_t		t;
 
-	t = time( NULL );
+    t = time( NULL );
 
-	strcpy_s( pDest, ctime( &t ) );
+    strcpy_s( pDest, ctime( &t ) );
 }
 
 //==================================================================
 int vsnprintf_s( char *str, size_t strMaxLen, size_t size, const char *format, va_list ap )
 {
-	int len = vsnprintf( str, size, format, ap );
+    int len = vsnprintf( str, size, format, ap );
 
-	// verify only later.. better than nothing !
-	DASSERT( (size_t )(len+1) <= strMaxLen );
+    // verify only later.. better than nothing !
+    DASSERT( (size_t )(len+1) <= strMaxLen );
 
-	return len;
+    return len;
 }
 
 //==================================================================
 char *strcpy_s( char *pDest, size_t destSize, const char *pSrc )
 {
-	size_t	srcLen = strlen( pSrc );
-	DASSTHROW( (srcLen+1) <= destSize, ("Out of bounds !") );
-	return strcpy( pDest, pSrc );
+    size_t	srcLen = strlen( pSrc );
+    DASSTHROW( (srcLen+1) <= destSize, ("Out of bounds !") );
+    return strcpy( pDest, pSrc );
 }
 
 //==================================================================
 char *strcat_s( char *pDest, size_t destSize, const char *pSrc )
 {
-	size_t	srcLen = strlen( pSrc );
-	size_t	curDestLen = strlen( pDest );
-	DASSTHROW( (curDestLen+srcLen+1) <= destSize, ("Out of bounds !") );
-	return strcat( pDest, pSrc );
+    size_t	srcLen = strlen( pSrc );
+    size_t	curDestLen = strlen( pDest );
+    DASSTHROW( (curDestLen+srcLen+1) <= destSize, ("Out of bounds !") );
+    return strcat( pDest, pSrc );
 }
 
 //==================================================================
 int vsprintf_s( char *str, const char *pFmt, va_list vl )
 {
-	return vsprintf( str, pFmt, vl );
+    return vsprintf( str, pFmt, vl );
 }
 
 //==================================================================
 int vsprintf_s( char *str, size_t destMaxSize, const char *pFmt, va_list vl )
 {
-	return vsprintf( str, pFmt, vl );
+    return vsprintf( str, pFmt, vl );
 }
 
 //==================================================================
 int sprintf_s( char *str, const char *format, ...)
 {
-	int	ret;
+    int	ret;
 
-	va_list	vl;
-	va_start( vl, format );
+    va_list	vl;
+    va_start( vl, format );
 
-	ret = vsprintf_s( str, format, vl );
+    ret = vsprintf_s( str, format, vl );
 
-	va_end( vl );
+    va_end( vl );
 
-	return ret;
+    return ret;
 }
 
 //==================================================================
 int sprintf_s( char *str, size_t destMaxSize, const char *format, ...)
 {
-	int	ret;
+    int	ret;
 
-	va_list	vl;
-	va_start( vl, format );
+    va_list	vl;
+    va_start( vl, format );
 
-	ret = vsprintf_s( str, format, vl );
+    ret = vsprintf_s( str, format, vl );
 
-	va_end( vl );
+    va_end( vl );
 
-	return ret;
+    return ret;
 }
 
 #endif
@@ -108,14 +108,14 @@ int sprintf_s( char *str, size_t destMaxSize, const char *format, ...)
 //==================================================================
 void numstrdate( char *pDest, size_t maxLen )
 {
-	time_t 		t;
-	struct tm	*tm;
+    time_t 		t;
+    struct tm	*tm;
 
-	t 	= time( NULL );
-	tm	= localtime( &t );
+    t 	= time( NULL );
+    tm	= localtime( &t );
 
-	sprintf( pDest, "%i/%02i/%02i",
-		tm->tm_year+1900,
-		tm->tm_mon+1,
-		tm->tm_mday );
+    sprintf( pDest, "%i/%02i/%02i",
+        tm->tm_year+1900,
+        tm->tm_mon+1,
+        tm->tm_mday );
 }

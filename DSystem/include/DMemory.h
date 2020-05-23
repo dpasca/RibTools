@@ -19,29 +19,29 @@
 //==================================================================
 #if defined(D_FILE_LINE_NEW_DEL) && defined(D_OVERRIDE_NEW_DEL)
 
-	#define DNEW				new			(__FILE__, __LINE__)
-	#define DDELETE(_X_)		delete		(__FILE__, __LINE__, (_X_))
-	#define DDELETE_ARRAY(_X_)	delete []	(__FILE__, __LINE__, (_X_))
+    #define DNEW				new			(__FILE__, __LINE__)
+    #define DDELETE(_X_)		delete		(__FILE__, __LINE__, (_X_))
+    #define DDELETE_ARRAY(_X_)	delete []	(__FILE__, __LINE__, (_X_))
 
-	void *operator new( size_t size, const char *pFile, int line );
-	void *operator new [] ( size_t size, const char *pFile, int line );
-	void operator delete( void *p, const char *pFile, int line );
-	void operator delete [] ( void *p, const char *pFile, int line );
+    void *operator new( size_t size, const char *pFile, int line );
+    void *operator new [] ( size_t size, const char *pFile, int line );
+    void operator delete( void *p, const char *pFile, int line );
+    void operator delete [] ( void *p, const char *pFile, int line );
 
 #else
 
-	#define DNEW				new
-	#define DDELETE(_X_)		delete		(_X_)
-	#define DDELETE_ARRAY(_X_)	delete []	(_X_)
+    #define DNEW				new
+    #define DDELETE(_X_)		delete		(_X_)
+    #define DDELETE_ARRAY(_X_)	delete []	(_X_)
 
 #endif
 
 #if defined(D_OVERRIDE_NEW_DEL)
 
-	void *operator new( size_t size );
-	void *operator new [] ( size_t size );
-	void operator delete( void *p );
-	void operator delete [] ( void *p );
+    void *operator new( size_t size );
+    void *operator new [] ( size_t size );
+    void operator delete( void *p );
+    void operator delete [] ( void *p );
 
 #endif
 

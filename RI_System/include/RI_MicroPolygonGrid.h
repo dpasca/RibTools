@@ -25,46 +25,46 @@ class Attributes;
 //==================================================================
 class WorkGrid
 {
-	SlColor			*mpDataCi;
-	SlColor			*mpDataOi;
-	SlColor			*mpDataCs;
-	SlColor			*mpDataOs;
-	SVM::Context	mSurfRunCtx;
-	SVM::Context	mDispRunCtx;
+    SlColor			*mpDataCi;
+    SlColor			*mpDataOi;
+    SlColor			*mpDataCs;
+    SlColor			*mpDataOs;
+    SVM::Context	mSurfRunCtx;
+    SVM::Context	mDispRunCtx;
 
 public:
-	u_int			mXDim;
-	u_int			mXBlocks;
-	u_int			mYDim;
-	u_int			mPointsN;
-	Float3_			*mpPointsCS;
-	float			mURange[2];
-	float			mVRange[2];
-	SymbolIList		mSymbolIs;
+    u_int			mXDim;
+    u_int			mXBlocks;
+    u_int			mYDim;
+    u_int			mPointsN;
+    Float3_			*mpPointsCS;
+    float			mURange[2];
+    float			mVRange[2];
+    SymbolIList		mSymbolIs;
 
-	Matrix44		mMtxLocalWorld;
-	Matrix44		mMtxWorldCamera;
-	Matrix44		mMtxLocalCamera;
-	Matrix44		mMtxLocalCameraNorm;
-	Matrix44		mMtxCameraLocal;
+    Matrix44		mMtxLocalWorld;
+    Matrix44		mMtxWorldCamera;
+    Matrix44		mMtxLocalCamera;
+    Matrix44		mMtxLocalCameraNorm;
+    Matrix44		mMtxCameraLocal;
 
-	WorkGrid( const SymbolList &globalSymbols );
-	~WorkGrid();
+    WorkGrid( const SymbolList &globalSymbols );
+    ~WorkGrid();
 
-	void Setup(u_int xdim,
-			   u_int ydim,
-			   const float uRange[2],
-			   const float vRange[2],
-			   const Matrix44 &mtxLocalWorld,
-			   const Matrix44 &mtxWorldCamera );
-			   
-	u_int GetPointsN() const { return mPointsN; }
-	
-	void Displace( const Attributes &attribs );
-	void Shade( const Attributes &attribs );
+    void Setup(u_int xdim,
+               u_int ydim,
+               const float uRange[2],
+               const float vRange[2],
+               const Matrix44 &mtxLocalWorld,
+               const Matrix44 &mtxWorldCamera );
+               
+    u_int GetPointsN() const { return mPointsN; }
+    
+    void Displace( const Attributes &attribs );
+    void Shade( const Attributes &attribs );
 
 private:
-	void *addSymI( const SymbolList &globalSyms, const char *pName );
+    void *addSymI( const SymbolList &globalSyms, const char *pName );
 };
 
 //==================================================================
@@ -73,20 +73,20 @@ private:
 class ShadedGrid
 {
 public:
-	u_int			mXDim;
-	u_int			mXBlocks;
-	u_int			mYDim;
-	u_int			mPointsN;
-	Float3_			*mpPointsCS;
-	Float3_			*mpPointsCloseCS;
-	Float2_			*mpPosWin;
-	SlColor			*mpCi;
-	SlColor			*mpOi;
+    u_int			mXDim;
+    u_int			mXBlocks;
+    u_int			mYDim;
+    u_int			mPointsN;
+    Float3_			*mpPointsCS;
+    Float3_			*mpPointsCloseCS;
+    Float2_			*mpPosWin;
+    SlColor			*mpCi;
+    SlColor			*mpOi;
 
-	ShadedGrid();
-	~ShadedGrid();
+    ShadedGrid();
+    ~ShadedGrid();
 
-	void Init( u_int pointsN );
+    void Init( u_int pointsN );
 };
 
 //==================================================================

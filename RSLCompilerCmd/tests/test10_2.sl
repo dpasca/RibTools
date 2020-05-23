@@ -8,5 +8,5 @@
 
 color test10_2_getColor()
 {
-	return color( 1, 0, 0 );
+    return color( 1, 0, 0 );
 }

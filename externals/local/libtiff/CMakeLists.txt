@@ -45,15 +45,15 @@ set( SRCS
 
 if (MSVC)
 
-	set( SRCS_PLATFORM
-	../../tiff/libtiff/tif_win32.c
-	)
-	
+    set( SRCS_PLATFORM
+    ../../tiff/libtiff/tif_win32.c
+    )
+    
 else (MSVC)
 
-	set( SRCS_PLATFORM
-	../../tiff/libtiff/tif_unix.c
-	)
+    set( SRCS_PLATFORM
+    ../../tiff/libtiff/tif_unix.c
+    )
 
 endif (MSVC)
 

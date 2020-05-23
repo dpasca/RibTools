@@ -21,9 +21,9 @@ namespace RI
 class HiderSampleData
 {
 public:
-	float			mDepth;
-	float			mCi[3];
-	float			mOi[3];
+    float			mDepth;
+    float			mCi[3];
+    float			mOi[3];
 };
 
 //==================================================================
@@ -32,17 +32,17 @@ public:
 class HiderSampleCoords
 {
 public:
-	float		mX, mY;
-	float		mTime;
-	float		mLensX;
-	float		mLensY;
+    float		mX, mY;
+    float		mTime;
+    float		mLensX;
+    float		mLensY;
 };
 
 //==================================================================
 class HiderBaseSampleCoords
 {
 public:
-	float			mTime;
+    float			mTime;
 };
 
 //==================================================================
@@ -51,9 +51,9 @@ public:
 class HiderPixel
 {
 public:
-	int						mX, mY;
-	const HiderSampleCoords	*mpSampCoords;	// one per sub-sample
-	DVec<HiderSampleData>	*mpSampDataLists;	// one per sub-sample
+    int						mX, mY;
+    const HiderSampleCoords	*mpSampCoords;	// one per sub-sample
+    DVec<HiderSampleData>	*mpSampDataLists;	// one per sub-sample
 };
 
 //==================================================================
@@ -62,40 +62,40 @@ public:
 class HiderSampleCoordsBuffer
 {
 public:
-	u_int					mWd;
-	u_int					mHe;
-	u_int					mSubPixelDimLog2;
-	HiderSampleCoords		*mpSampCoords;
-	HiderBaseSampleCoords	*mpBaseSampCoords;
+    u_int					mWd;
+    u_int					mHe;
+    u_int					mSubPixelDimLog2;
+    HiderSampleCoords		*mpSampCoords;
+    HiderBaseSampleCoords	*mpBaseSampCoords;
 
-	HiderSampleCoordsBuffer();
+    HiderSampleCoordsBuffer();
 
-	~HiderSampleCoordsBuffer();
+    ~HiderSampleCoordsBuffer();
 
-	void Init( u_int wd, u_int he, u_int subPixelDimLog2 );
+    void Init( u_int wd, u_int he, u_int subPixelDimLog2 );
 
-	void Setup( float openTime, float closeTime );
+    void Setup( float openTime, float closeTime );
 
-	bool IsInitialized() const		{ return mpSampCoords != NULL; }
+    bool IsInitialized() const		{ return mpSampCoords != NULL; }
 
-	u_int GetWd() const				{ return mWd; }
-	u_int GetHe() const				{ return mHe; }
+    u_int GetWd() const				{ return mWd; }
+    u_int GetHe() const				{ return mHe; }
 
-	u_int GetSampsPerDim() const	{ return 1 << mSubPixelDimLog2;			}
-	u_int GetSampsPerPixel() const	{ return 1 << (mSubPixelDimLog2 << 1);	}
+    u_int GetSampsPerDim() const	{ return 1 << mSubPixelDimLog2;			}
+    u_int GetSampsPerPixel() const	{ return 1 << (mSubPixelDimLog2 << 1);	}
 
 private:
-	void initPixel(
-				HiderSampleCoords		*pSampCoods,
-				HiderBaseSampleCoords	*pBaseSampleCoords,
-				u_int					subPixelDimLog2,
-				DUT::RandMT				&randGen );
+    void initPixel(
+                HiderSampleCoords		*pSampCoods,
+                HiderBaseSampleCoords	*pBaseSampleCoords,
+                u_int					subPixelDimLog2,
+                DUT::RandMT				&randGen );
 
-	void setupPixel(
-				HiderSampleCoords		*pSampCoods,
-				HiderBaseSampleCoords	*pBaseSampleCoords,
-				float					openTime,
-				float					dtime );
+    void setupPixel(
+                HiderSampleCoords		*pSampCoods,
+                HiderBaseSampleCoords	*pBaseSampleCoords,
+                float					openTime,
+                float					dtime );
 };
 
 //==================================================================

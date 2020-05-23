@@ -22,50 +22,50 @@ namespace RSLC
 //==================================================================
 class Register
 {
-	VarType			mVarType;
-	bool			mIsVarying;
-	bool			mIsForcedDetail;
-	int				mRegIdx;
+    VarType			mVarType;
+    bool			mIsVarying;
+    bool			mIsForcedDetail;
+    int				mRegIdx;
 
 public:
-	Register() :
-		mVarType(VT_UNKNOWN),
-		mIsVarying(false),
-		mIsForcedDetail(false),
-		mRegIdx(-1)
-	{
-	}
+    Register() :
+        mVarType(VT_UNKNOWN),
+        mIsVarying(false),
+        mIsForcedDetail(false),
+        mRegIdx(-1)
+    {
+    }
 
-	void SetType( VarType vtype, bool isVarying, bool isForcedDetail )
-	{
-		DASSERT( mVarType == VT_UNKNOWN && mIsVarying == false );
-		mVarType		= vtype;
-		mIsVarying		= isVarying;
-		mIsForcedDetail	= isForcedDetail;
-	}
+    void SetType( VarType vtype, bool isVarying, bool isForcedDetail )
+    {
+        DASSERT( mVarType == VT_UNKNOWN && mIsVarying == false );
+        mVarType		= vtype;
+        mIsVarying		= isVarying;
+        mIsForcedDetail	= isForcedDetail;
+    }
 
-	void SetRegIdx( int regIdx )
-	{
-		DASSERT( mRegIdx == -1 );
-		mRegIdx		= regIdx;
-	}
+    void SetRegIdx( int regIdx )
+    {
+        DASSERT( mRegIdx == -1 );
+        mRegIdx		= regIdx;
+    }
 
-	void SetVarying( bool varying )
-	{
-		DASSERT( mIsForcedDetail == false );
-		mIsVarying = varying;
-	}
+    void SetVarying( bool varying )
+    {
+        DASSERT( mIsForcedDetail == false );
+        mIsVarying = varying;
+    }
 
-	VarType	GetVarType() const		{ return mVarType; }
-	bool	IsVarying() const		{ return mIsVarying; }
-	bool	IsForcedDetail() const	{ return mIsForcedDetail; }
-	int		GetRegIdx() const		{ return mRegIdx; }
+    VarType	GetVarType() const		{ return mVarType; }
+    bool	IsVarying() const		{ return mIsVarying; }
+    bool	IsForcedDetail() const	{ return mIsForcedDetail; }
+    int		GetRegIdx() const		{ return mRegIdx; }
 
-	bool IsValid() const			{ return mRegIdx != -1; }
-	bool IsAssigned() const			{ return mRegIdx != -1; }
+    bool IsValid() const			{ return mRegIdx != -1; }
+    bool IsAssigned() const			{ return mRegIdx != -1; }
 
-	//==================================================================
-	DStr GetName() const;
+    //==================================================================
+    DStr GetName() const;
 };
 
 //==================================================================

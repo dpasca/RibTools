@@ -23,18 +23,18 @@ namespace RSLC
 class Tokenize
 {
 public:
-	const Fat8Vec	&mStr;
-	DVec<Token>		&mTokens;
-	FatBase			&mFatBase;
+    const Fat8Vec	&mStr;
+    DVec<Token>		&mTokens;
+    FatBase			&mFatBase;
 
-	//==================================================================
-	Tokenize( const Fat8Vec &str, DVec<Token> &tokens, FatBase &fatBase );
+    //==================================================================
+    Tokenize( const Fat8Vec &str, DVec<Token> &tokens, FatBase &fatBase );
 
-	void newToken( const Fat8 &fatCh );
-	bool matchTokenDef( size_t &i, bool wasPrecededByWS );
-	bool handleAlphanum( size_t &i );
-	bool handleNumber( size_t &i );
-	bool handleString( size_t &i );
+    void newToken( const Fat8 &fatCh );
+    bool matchTokenDef( size_t &i, bool wasPrecededByWS );
+    bool handleAlphanum( size_t &i );
+    bool handleNumber( size_t &i );
+    bool handleString( size_t &i );
 
 //==================================================================
 };

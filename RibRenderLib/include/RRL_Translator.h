@@ -23,68 +23,68 @@ namespace RRL
 class Translator
 {
 public:
-	struct Params
-	{
-		RI::State::Params	mState;
-		int					mForcedLongDim		;
-		int					mForcedWd			;
-		int					mForcedHe			;
+    struct Params
+    {
+        RI::State::Params	mState;
+        int					mForcedLongDim		;
+        int					mForcedWd			;
+        int					mForcedHe			;
 
-		Params() :
-			mForcedLongDim		(-1),
-			mForcedWd			(-1),
-			mForcedHe			(-1)
-		{
-		}
-	};
+        Params() :
+            mForcedLongDim		(-1),
+            mForcedWd			(-1),
+            mForcedHe			(-1)
+        {
+        }
+    };
 
 private:
-	RI::State	mState;
-	Params		mParams;
-	DStr		mReadArchivePathFName;
+    RI::State	mState;
+    Params		mParams;
+    DStr		mReadArchivePathFName;
 
 public:
-	Translator( const Params &params );
+    Translator( const Params &params );
 
-	enum RetCmd
-	{
-		CMD_GENERIC = 0,
-		CMD_READARCHIVE,
-		CMD_WORLDEND
-	};
+    enum RetCmd
+    {
+        CMD_GENERIC = 0,
+        CMD_READARCHIVE,
+        CMD_WORLDEND
+    };
 
-	RetCmd AddCommand(
-				const DStr		&cmdName,
-				RI::ParamList	&cmdParams,
-				const char		*pFileName,
-				int				cmdLine );
+    RetCmd AddCommand(
+                const DStr		&cmdName,
+                RI::ParamList	&cmdParams,
+                const char		*pFileName,
+                int				cmdLine );
 
-	void ErrHandler( RI::Error errCode )
-	{
-		printf( "Error %s !!\n", ErrorToString( errCode ) );
-	}
+    void ErrHandler( RI::Error errCode )
+    {
+        printf( "Error %s !!\n", ErrorToString( errCode ) );
+    }
 
-	RI::State &GetState()	{	return mState;	}
+    RI::State &GetState()	{	return mState;	}
 
-	const char *GetReadArchivePathFName() const { return mReadArchivePathFName.c_str(); }
+    const char *GetReadArchivePathFName() const { return mReadArchivePathFName.c_str(); }
 
 private:
-	void unknownCommand( const char *pCmdName );
-	void exN( size_t n, const RI::ParamList &cmdParams );
-	void geN( size_t n, const RI::ParamList &cmdParams );
+    void unknownCommand( const char *pCmdName );
+    void exN( size_t n, const RI::ParamList &cmdParams );
+    void geN( size_t n, const RI::ParamList &cmdParams );
 
-	void addFormatCmd( RI::ParamList &p );
+    void addFormatCmd( RI::ParamList &p );
 
-	bool addCommand_prims(
-		const DStr		&nm,
-		RI::ParamList	&p,
-		const char		*pFileName,
-		int				cmdLine );
+    bool addCommand_prims(
+        const DStr		&nm,
+        RI::ParamList	&p,
+        const char		*pFileName,
+        int				cmdLine );
 
-	bool addCommand_options( const DStr &nm, RI::ParamList &p );
-	bool addCommand_transforms( const DStr &nm, RI::ParamList &p );
+    bool addCommand_options( const DStr &nm, RI::ParamList &p );
+    bool addCommand_transforms( const DStr &nm, RI::ParamList &p );
 
-	static RtToken matchToken( const char *pStr, RtToken pAllowedTokens[] );
+    static RtToken matchToken( const char *pStr, RtToken pAllowedTokens[] );
 };
 
 //==================================================================

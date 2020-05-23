@@ -30,7 +30,7 @@ typedef unsigned char uint8_t;
 #if defined(ANDROID)
 static bool isPrefsMode( const char *pMode )
 {
-	return (pMode != NULL && (strchr( pMode, 'p' ) || strchr( pMode, 'P' )));
+    return (pMode != NULL && (strchr( pMode, 'p' ) || strchr( pMode, 'P' )));
 }
 #endif
 
@@ -39,7 +39,7 @@ bool
 FileManagerAndroid::FileExists(const char* pFileName, const char* pMode) const
 {
 #if defined(ANDROID)
-	const bool prefs = isPrefsMode( pMode );
+    const bool prefs = isPrefsMode( pMode );
 
     if (prefs)
     {
@@ -57,7 +57,7 @@ FileManagerAndroid::FileExists(const char* pFileName, const char* pMode) const
 
 #else
 
-	return false;
+    return false;
 
 #endif
 }
@@ -69,7 +69,7 @@ bool FileManagerAndroid::GrabFile(const char* pFileName, DVec<U8> &out_data, con
     DLOG("File: %s", pFileName);
 
 #if defined(ANDROID)
-	bool prefs = isPrefsMode( pMode );
+    bool prefs = isPrefsMode( pMode );
 
     if (prefs)
     {
@@ -125,7 +125,7 @@ bool FileManagerAndroid::GrabFile(const char* pFileName, DVec<U8> &out_data, con
     DVERBOSE("GrabFile: released");
 #endif
 
-	return true;
+    return true;
 }
 
 //==================================================================
@@ -135,7 +135,7 @@ bool FileManagerAndroid::SaveFile(const char* pFileName, const U8 *pInData, size
     DLOG("Saving file: %s", pFileName);
 
 #if defined(ANDROID)
-	bool prefs = isPrefsMode( pMode );
+    bool prefs = isPrefsMode( pMode );
 
     bool result = false;
 
@@ -162,7 +162,7 @@ bool FileManagerAndroid::SaveFile(const char* pFileName, const U8 *pInData, size
     return result;
 #endif
 
-	return true;
+    return true;
 }
 
 //==================================================================

@@ -9,34 +9,34 @@
 //==================================================================
 void arrChange( float nonArr, output float rgb[3] )
 {
-	rgb[0] = rgb[1] = nonArr;
+    rgb[0] = rgb[1] = nonArr;
 }
 
 //==================================================================
 void arrUse( float rgb[3] )
 {
-	float a = rgb[0];
-	Oi = a;
-	float localArr[3];
+    float a = rgb[0];
+    Oi = a;
+    float localArr[3];
 }
 
 //==================================================================
 surface test11( float rgbcol[(1+1+1)] ) //{.5,.5,.5} 
 {
-	float	a, b, c;
+    float	a, b, c;
 
-	a = b = c = 1;
+    a = b = c = 1;
 
-	float localArr[4];
-	localArr[0] = 1;
-	localArr[1] = b;
+    float localArr[4];
+    localArr[0] = 1;
+    localArr[1] = b;
 
-	Oi = localArr[1];
+    Oi = localArr[1];
 
-	arrChange( 2, rgbcol );
+    arrChange( 2, rgbcol );
 
-	Ci = color( rgbcol[0]+(3), rgbcol[0+1], rgbcol[2] );
-	//Ci = color( rgbcol+(3), rgbcol+1*2, rgbcol );
+    Ci = color( rgbcol[0]+(3), rgbcol[0+1], rgbcol[2] );
+    //Ci = color( rgbcol+(3), rgbcol+1*2, rgbcol );
 
-	arrUse( rgbcol );
+    arrUse( rgbcol );
 }
