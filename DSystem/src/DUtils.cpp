@@ -94,7 +94,7 @@ void DAssert( bool ok, const char *pFile, int line, const char *msg )
 # elif defined(ANDROID)
     PlatformAssertRaise(buff);
 
-# elif defined(MACOSX)
+# elif defined(__linux__) || defined(MACOSX)
     //
     abort();
 
