@@ -1,3 +1,3 @@
 pushd _distrib
-cmake --build ../_build --config Release
+cmake --build ../_build --config ${1:-Release}
 popd
