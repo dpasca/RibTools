@@ -14,3 +14,5 @@ source_group( Sources FILES ${SRCS} ${INCS} )
 
 add_library( ${PROJECT_NAME} STATIC ${SRCS} ${INCS} )
 
+target_link_libraries( ${PROJECT_NAME} DSystem libtiff )
+

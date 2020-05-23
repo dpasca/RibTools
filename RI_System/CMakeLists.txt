@@ -16,3 +16,4 @@ source_group( "Precompiled Headers" FILES stdafx.cpp stdafx.h )
 
 add_library( ${PROJECT_NAME} STATIC ${SRCS} ${INCS} )
 
+target_link_libraries( ${PROJECT_NAME} DSystem DMath DImage )

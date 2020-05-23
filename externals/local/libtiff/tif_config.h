@@ -70,4 +70,6 @@
 # endif
 #endif
 
-#define lfind _lfind
+#ifdef _MSC_VER // DAVIDE -
+# define lfind _lfind
+#endif
