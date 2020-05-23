@@ -13,7 +13,7 @@
     #pragma comment (lib, "opengl32.lib")
 #endif
 
-#include <GL/GL.h>
+#include <GL/gl.h>
 
 #include "DSystem/include/DTypes.h"
 #include "RI_System/include/RI_State.h"

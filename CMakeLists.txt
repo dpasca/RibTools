@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 3.7)
 
 #=============================================
 MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
@@ -152,7 +152,7 @@ add_subdirectory( RSLCompilerLib )
 # external libs
 add_subdirectory( externals/local/libtiff )
 add_subdirectory( externals/local/libjpeg )
-add_subdirectory( externals/local/freeglut )
+add_subdirectory( externals/FreeGLUT/freeglut/freeglut )
 
 # executables
 add_subdirectory( RibRender )

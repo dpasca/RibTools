@@ -1,0 +1,3 @@
+[submodule "FreeGLUT"]
+	path = externals/FreeGLUT
+	url = git@github.com:dcnieho/FreeGLUT.git

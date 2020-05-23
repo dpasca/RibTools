@@ -324,7 +324,7 @@ void RibRendToy::sReshapeFunc( int width, int height )
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    gluOrtho2D(0, width, height, 0);
+    gluOrtho2D( 0, width, height, 0, -1, 1 );
 
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
