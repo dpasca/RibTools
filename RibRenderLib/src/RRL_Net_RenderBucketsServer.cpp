@@ -67,18 +67,25 @@ void RenderBucketsServer::Render( RI::Hider &hider )
 }
 
 //==================================================================
-void RenderBucketsServer::rendBucketsRange( RI::Hider &hider, int buckRangeX1, int buckRangeX2 )
+void RenderBucketsServer::rendBucketsRange(
+        RI::Hider &hider, int buckRangeX1, int buckRangeX2 )
 {
-    const DVec<RI::HiderBucket *> &buckets = hider.GetBuckets();
+    const auto &buckets = hider.GetBuckets();
 
     DASSERT(
         buckRangeX1 >= 0 &&
         buckRangeX1 < buckRangeX2 &&
         buckRangeX2 <= (int)buckets.size() );
 
-    #pragma omp parallel for
+    DTH::ParallelTasks tasks;
+
     for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
-        RI::Framework::RenderBucket_s( hider, *buckets[ bi ] );
+    {
+        tasks.AddTask( [&hider, pBucket=buckets[ bi ]]()
+        {
+            RI::Framework::RenderBucket_s( hider, *pBucket );
+        });
+    }
 }
 
 //==================================================================

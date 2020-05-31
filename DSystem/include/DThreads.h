@@ -11,9 +11,39 @@
 
 #include "incpthreads.h"
 
+#include <future>
+#include <thread>
+#include <functional>
+
 //==================================================================
 namespace DTH
 {
+
+//==================================================================
+class ParallelTasks
+{
+    DVec<std::future<void>> mFutures;
+
+    const size_t  mMaxN;
+
+public:
+    ParallelTasks( size_t maxN=std::thread::hardware_concurrency() )
+        : mMaxN(maxN)
+    {
+        mFutures.reserve( mMaxN );
+    }
+
+    void AddTask( const std::function<void ()> &fn )
+    {
+        mFutures.push_back( std::async( std::launch::async, fn ) );
+
+        while ( mFutures.size() >= mMaxN )
+        {
+            mFutures[0].get();
+            mFutures.erase( mFutures.begin() );
+        }
+    }
+};
 
 #if !defined(_MSC_VER)
 

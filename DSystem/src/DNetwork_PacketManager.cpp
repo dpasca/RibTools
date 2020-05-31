@@ -22,9 +22,8 @@ namespace DNET
 //==================================================================
 /// PacketManager
 //==================================================================
-PacketManager::PacketManager( SOCKET socket ) :
-    mSocket(socket),
-    mFatalError(false)
+PacketManager::PacketManager( SOCKET socket )
+    : mSocket(socket)
 {
 }
 
@@ -44,7 +43,7 @@ bool PacketManager::IsConnected() const
 void PacketManager::Send( const void *pData, size_t dataSize )
 {
     {
-    DUT::CriticalSection::Block	lock( mSendList.mInQueueCS );
+        std::lock_guard<std::mutex> lock( mSendList.mInQueueCS );
 
         Packet	*pPacket = DNEW Packet();
 
@@ -68,7 +67,7 @@ void PacketManager::Send( const void *pData, size_t dataSize )
 //==================================================================
 Packet *PacketManager::SendBegin( size_t dataSize )
 {
-    //DUT::CriticalSection::Block	lock( mSendList.mInQueueCS );
+    //std::lock_guard<std::mutex> lock( mSendList.mInQueueCS );
 
     Packet	*pPacket = DNEW Packet();
 
@@ -85,7 +84,7 @@ Packet *PacketManager::SendBegin( size_t dataSize )
 void PacketManager::SendEnd( Packet *pPacket )
 {
     {
-    DUT::CriticalSection::Block	lock( mSendList.mInQueueCS );
+        std::lock_guard<std::mutex> lock( mSendList.mInQueueCS );
 
         mSendList.mInQueue.push_back( pPacket );
     }
@@ -101,7 +100,7 @@ Packet *PacketManager::GetNextPacket( bool doRemove )
     if NOT( mRecvOutQueue.size() )
         return NULL;
 
-    DUT::CriticalSection::Block	lock( mRecvOutQueueCS );
+    std::lock_guard<std::mutex> lock( mRecvOutQueueCS );
 
     if NOT( mRecvOutQueue.size() )
         return NULL;
@@ -123,7 +122,7 @@ Packet *PacketManager::GetNextPacketMatchID32(
     if NOT( mRecvOutQueue.size() )
         return NULL;
 
-    DUT::CriticalSection::Block	lock( mRecvOutQueueCS );
+    std::lock_guard<std::mutex> lock( mRecvOutQueueCS );
 
     if NOT( mRecvOutQueue.size() )
         return NULL;
@@ -158,7 +157,7 @@ Packet *PacketManager::GetNextPacketMatchID8(
     if NOT( mRecvOutQueue.size() )
         return NULL;
 
-    DUT::CriticalSection::Block	lock( mRecvOutQueueCS );
+    std::lock_guard<std::mutex> lock( mRecvOutQueueCS );
 
     if NOT( mRecvOutQueue.size() )
         return NULL;
@@ -189,7 +188,7 @@ void PacketManager::RemovePacket( Packet *pPacket )
 {
     DASSERT( mRecvOutQueue.size() != 0 );
 
-    DUT::CriticalSection::Block	lock( mRecvOutQueueCS );
+    std::lock_guard<std::mutex> lock( mRecvOutQueueCS );
 
     DASSERT( mRecvOutQueue.size() != 0 );
 
@@ -473,7 +472,7 @@ void PacketManager::threadMain()
 
             case 2:		// done with this 
                 {
-                DUT::CriticalSection::Block	lock( mRecvOutQueueCS );
+                    std::lock_guard<std::mutex> lock( mRecvOutQueueCS );
 
                     mRecvOutQueue.push_back( DNEW Packet( recvBuff ) );
                 }

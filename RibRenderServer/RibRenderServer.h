@@ -22,7 +22,6 @@
 #include "DSystem/include/DUtils.h"
 #include "DSystem/include/DUtils_Files.h"
 #include "DSystem/include/DNetwork.h"
-#include "DSystem/include/DCriticalSection.h"
 
 #define APPNAME		"RibRenderServer"
 #define APPVERSION	"0.10"

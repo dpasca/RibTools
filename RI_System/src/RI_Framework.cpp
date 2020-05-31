@@ -7,6 +7,7 @@
 //==================================================================
 
 #include "stdafx.h"
+#include "DThreads.h"
 #include "RI_Base.h"
 #include "RI_State.h"
 #include "RI_Framework.h"
@@ -260,13 +261,16 @@ public:
 
         const auto &buckets = hider.GetBuckets();
     
-        int	bucketsN = (int)buckets.size();
 
         // --- dice primitives accumulated in the buckets
-        #pragma omp parallel for
-        for (int bi=0; bi < bucketsN; ++bi)
+        DTH::ParallelTasks tasks;
+
+        for (size_t bi=0; bi < buckets.size(); ++bi)
         {
-            Framework::RenderBucket_s( hider, *buckets[ bi ] );
+            tasks.AddTask( [&hider, pBucket=buckets[ bi ]]()
+        {
+                RI::Framework::RenderBucket_s( hider, *pBucket );
+            });
         }
     }
 };

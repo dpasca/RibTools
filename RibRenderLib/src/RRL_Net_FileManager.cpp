@@ -38,7 +38,8 @@ void FileManagerNet::GrabFile( const char *pFileName, DVec<U8> &out_vec )
     writer.WriteValue( nameLen );
     writer.WriteArray( pFileName, nameLen );
 
-    DUT::LongCriticalSection::Block	lock( mLongCS );
+    //
+    std::lock_guard<std::mutex> lock( mMutex );
 
     mpPakMan->Send( buff, writer.GetCurSize() );
 
@@ -96,7 +97,8 @@ bool FileManagerNet::FileExists( const char *pFileName )
     writer.WriteValue( nameLen );
     writer.WriteArray( pFileName, nameLen );
 
-    DUT::LongCriticalSection::Block	lock( mLongCS );
+    //
+    std::lock_guard<std::mutex> lock( mMutex );
 
     mpPakMan->Send( buff, writer.GetCurSize() );
 

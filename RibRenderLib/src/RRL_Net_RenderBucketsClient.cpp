@@ -76,9 +76,15 @@ void RenderBucketsClient::Render( RI::Hider &hider )
         if NOT( dispatchToServer( buckRangeX1, buckRangeX2 ) )
         {
             // otherwise render locally..
-            #pragma omp parallel for
+            DTH::ParallelTasks tasks;
+
             for (int bi=buckRangeX1; bi < buckRangeX2; ++bi)
-                RI::Framework::RenderBucket_s( hider, *buckets[ bi ] );
+            {
+                tasks.AddTask( [&hider, pBucket=buckets[ bi ]]()
+                {
+                    RI::Framework::RenderBucket_s( hider, *pBucket );
+                });
+            }
         }
     #endif
 

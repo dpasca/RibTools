@@ -19,7 +19,7 @@ namespace RI
 void ResourceManager::Collect()
 {
     // TODO: should not block during delete
-    DUT::CriticalSection::Block	lock( mCSection );
+    std::lock_guard<std::mutex> lock( mMutex );
 
     size_t	wi = 0;
     for (size_t ri=0; ri < mpList.size(); ++ri)
@@ -27,7 +27,7 @@ void ResourceManager::Collect()
         if ( mpList[ri]->GetRef() == 0 )
         {
             DDELETE( mpList[ri] );
-            mpList[ri] = NULL;
+            mpList[ri] = nullptr;
         }
         else
         {
@@ -41,9 +41,9 @@ void ResourceManager::Collect()
 //==================================================================
 ResourceBase * ResourceManager::AddResource( ResourceBase *pRes )
 {
-    DUT::CriticalSection::Block	lock( mCSection );
+    std::lock_guard<std::mutex> lock( mMutex );
 
-    DASSERT( pRes != NULL );
+    DASSERT( pRes != nullptr );
     mpList.push_back( pRes );
     return pRes;
 }
@@ -53,7 +53,7 @@ ResourceBase *ResourceManager::FindResource(
                                 const char *pName,
                                 ResourceBase::Type type )
 {
-    DUT::CriticalSection::Block	lock( mCSection );
+    std::lock_guard<std::mutex> lock( mMutex );
 
     for (size_t i=0; i < mpList.size(); ++i)
     {
@@ -62,7 +62,7 @@ ResourceBase *ResourceManager::FindResource(
                 return mpList[i];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 //==================================================================

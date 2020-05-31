@@ -9,6 +9,7 @@
 #ifndef RRL_NET_FILEMANAGER_H
 #define RRL_NET_FILEMANAGER_H
 
+#include <mutex>
 #include "DSystem/include/DIO_FileManager.h"
 #include "DSystem/include/DNetwork_PacketManager.h"
 
@@ -26,7 +27,7 @@ class FileManagerNet : public DIO::FileManagerBase
 {
     friend class Server;
 
-    DUT::LongCriticalSection	mLongCS;
+    std::mutex                  mMutex;
 
     DNET::PacketManager			*mpPakMan;
 

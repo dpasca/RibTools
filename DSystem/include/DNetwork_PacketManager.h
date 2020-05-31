@@ -9,10 +9,10 @@
 #ifndef DNETWORK_PACKETMANAGER_H
 #define DNETWORK_PACKETMANAGER_H
 
+#include <mutex>
 #include <memory.h>
 #include "DNetwork_Base.h"
 #include "DContainers.h"
-#include "DCriticalSection.h"
 #include "DThreads.h"
 
 //==================================================================
@@ -76,7 +76,7 @@ class PacketManager : public DTH::ThreadedBase
     {
     public:
         DVec<Packet *>			mInQueue;
-        DUT::CriticalSection	mInQueueCS;
+        std::mutex              mInQueueCS;
         DVec<Packet *>			mQueue;
 
         //==================================================================
@@ -85,7 +85,7 @@ class PacketManager : public DTH::ThreadedBase
             if NOT( mInQueue.size() )
                 return;
 
-            DUT::CriticalSection::Block	lock( mInQueueCS );
+            std::lock_guard<std::mutex> lock( mInQueueCS );
 
             for (size_t i=0; i < mInQueue.size(); ++i)
                 mQueue.push_back( mInQueue[i] );
@@ -97,10 +97,10 @@ class PacketManager : public DTH::ThreadedBase
     SOCKET					mSocket;
     Queue					mSendList;
 
-    DUT::CriticalSection	mRecvOutQueueCS;
+    std::mutex              mRecvOutQueueCS;
     DVec<Packet *>			mRecvOutQueue;
 
-    bool					mFatalError;
+    bool                    mFatalError = false;
 
 public:
     //===============================================================
