@@ -264,7 +264,7 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
     catch ( const std::exception &ex )
     {
         printf( "Exception: %s\n", ex.what() );
-        return -1;
+        return false;
     }
     catch ( ... )
     {
