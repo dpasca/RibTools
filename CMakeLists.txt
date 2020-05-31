@@ -152,6 +152,10 @@ add_subdirectory( RSLCompilerLib )
 # external libs
 add_subdirectory( externals/local/libtiff )
 add_subdirectory( externals/local/libjpeg )
+
+set(FREEGLUT_BUILD_SHARED_LIBS OFF CACHE BOOL "Disable FreeGLUT shared libs")
+#set(FREEGLUT_BUILD_STATIC_LIBS OFF CACHE BOOL "Disable FreeGLUT static libs")
+set(FREEGLUT_BUILD_DEMOS OFF CACHE BOOL "Disable FreeGLUT demos")
 add_subdirectory( externals/FreeGLUT/freeglut/freeglut )
 
 # executables

@@ -93,7 +93,7 @@ void RibRendToy::addDirToMenu( const DStr &dirName, const DStr &matchExt )
 
     auto strFromFSPath = []( const fs::path &s )
     {
-        const DStr u8s = s.u8string();
+        const DStr u8s = s.string();
         return DStr( u8s.begin(), u8s.end() );
     };
 
