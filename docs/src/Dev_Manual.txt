@@ -61,7 +61,7 @@ As obtained from the repository:
 *CMakeLists.txt*           Root CMake file to create the build files
 *license.txt*              License file
 *make_build.bat*           Script that creates the ``_build`` directory and its contents (Windows)
-*make_build.sh*            Script that creates the ``_build`` directory and its contents (Linux/OSX)
+*build.sh*                 Script that configures, stages, and builds the project (Linux/macOS)
 *make_distrib.bat*         Script that creates the ``_distrib`` directory and its contents (Windows)
 *make_distrib.sh*          Script that creates the ``_distrib`` directory and its contents (Linux/OSX)
 *make_install.bat*         Script that builds a .zip file for binary distribution (assumes EXEs have been manually compiled with VS)

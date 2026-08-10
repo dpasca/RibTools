@@ -57,12 +57,10 @@ git submodule update --init --recursive
 
 ### Quick start on macOS and Linux
 
-The compatibility scripts create `_build`, stage runtime resources in `_distrib`, build the project, and run the test
-suite:
+The compatibility script creates `_build`, stages runtime resources in `_distrib`, and builds the project:
 
 ```sh
-./make_build.sh Release
-./do_build.sh Release
+./build.sh Release
 ctest --test-dir _build --output-on-failure
 
 cd _distrib
