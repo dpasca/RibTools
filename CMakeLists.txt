@@ -162,37 +162,8 @@ add_subdirectory( RibToolsBase )
 add_subdirectory( RSLCompilerLib )
 
 find_package(OpenGL REQUIRED)
-
-if (NOT TARGET OpenGL::GLU)
-    message(FATAL_ERROR "OpenGL Utility Library (GLU) development files are required")
-endif()
-
-if (APPLE)
-    find_package(GLUT REQUIRED)
-    set(RIBTOOLS_GLUT_TARGET GLUT::GLUT)
-else()
-    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/externals/FreeGLUT/freeglut/freeglut/CMakeLists.txt")
-        message(FATAL_ERROR
-            "The FreeGLUT submodule is missing. Run: git submodule update --init --recursive")
-    endif()
-
-    set(FREEGLUT_BUILD_SHARED_LIBS OFF CACHE BOOL "Disable FreeGLUT shared libs")
-    set(FREEGLUT_BUILD_DEMOS OFF CACHE BOOL "Disable FreeGLUT demos")
-
-    # FreeGLUT's pinned CMake file predates CMake 4's policy floor.
-    if (CMAKE_VERSION VERSION_GREATER_EQUAL 4.0)
-        set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
-    endif()
-
-    add_subdirectory( externals/FreeGLUT/freeglut/freeglut )
-    target_include_directories(freeglut_static PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/externals/FreeGLUT/freeglut/freeglut/include>"
-        "$<INSTALL_INTERFACE:include>")
-    if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-        target_compile_options(freeglut_static PRIVATE -Wno-unused-const-variable)
-    endif()
-    set(RIBTOOLS_GLUT_TARGET freeglut_static)
-endif()
+include(cmake/RibToolsUI.cmake)
+add_subdirectory(RibToolsUI)
 
 # executables
 add_subdirectory( RibRender )
@@ -201,6 +172,9 @@ add_subdirectory( RibRenderToy )
 add_subdirectory( RSLCompilerCmd )
 
 if (BUILD_TESTING)
+    add_test(NAME RibRender.Help COMMAND RibRender --help)
+    add_test(NAME RibRenderToy.Help COMMAND RibRenderToy --help)
+
     add_test(NAME RSLCompilerCmd.Help COMMAND RSLCompilerCmd --help)
 
     add_test(
@@ -222,4 +196,19 @@ if (BUILD_TESTING)
         PROPERTIES
             ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base"
             WILL_FAIL TRUE)
+
+    if (UNIX AND NOT APPLE)
+        find_program(RIBTOOLS_XVFB_RUN xvfb-run)
+        if (RIBTOOLS_XVFB_RUN)
+            add_test(
+                NAME RibRenderToy.UiSmoke
+                COMMAND "${RIBTOOLS_XVFB_RUN}" -a
+                    "$<TARGET_FILE:RibRenderToy>" --smoke-test)
+            set_tests_properties(
+                RibRenderToy.UiSmoke
+                PROPERTIES
+                    ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base"
+                    TIMEOUT 30)
+        endif()
+    endif()
 endif()

@@ -14,8 +14,6 @@ add_executable( ${PROJECT_NAME} ${SRCS} ${INCS} ${SRCSDD} ${INCSDD} )
 
 if (APPLE)
     target_compile_definitions(${PROJECT_NAME} PRIVATE GL_SILENCE_DEPRECATION)
-else()
-    target_compile_definitions(${PROJECT_NAME} PRIVATE FREEGLUT_LIB_PRAGMAS=0)
 endif()
 
 target_link_libraries(
@@ -26,8 +24,7 @@ target_link_libraries(
     RI_System
     RibRenderLib
     RibToolsBase
+    RibToolsUI
     RSLCompilerLib
-    ${RIBTOOLS_GLUT_TARGET}
     OpenGL::GL
-    OpenGL::GLU
     )

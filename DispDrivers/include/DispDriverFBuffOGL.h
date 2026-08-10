@@ -16,13 +16,13 @@
 //==================================================================
 class DispDriverFBuffOGL
 {
-    DIMG::Image	mImage;
-    u_int		mTexId;
-    u_int		mTexWd;
-    u_int		mTexHe;
+    DIMG::Image mImage;
+    unsigned int mTexId {};
+    unsigned int mTexWd {};
+    unsigned int mTexHe {};
 
 private:
-    bool	mSupportsNonPow2;
+    bool mSupportsNonPow2 {};
 
 public:
     DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::Image &srcImg );	
@@ -30,8 +30,11 @@ public:
 
     void Blit() const;
 
-    u_int GetCurWd() const {	return mImage.mWd; }
-    u_int GetCurHe() const {	return mImage.mHe; }
+    unsigned int GetCurWd() const { return mImage.mWd; }
+    unsigned int GetCurHe() const { return mImage.mHe; }
+    unsigned int GetTextureId() const { return mTexId; }
+    float GetTextureUMax() const;
+    float GetTextureVMax() const;
 };
 
 #endif

@@ -2,425 +2,692 @@
 /// RibRenderToy.cpp
 ///
 /// Created by Davide Pasca - 2009/4/25
+/// Dear ImGui front end added in 2026.
 /// See the file "license.txt" that comes with this project for
 /// copyright info.
 //==================================================================
 
-#include <stdio.h>
-#include <stdexcept>
-#include <filesystem>
-#include <iostream>
-#include "RibToolsBase/include/RibToolsBase.h"
-#include "RibRenderLib/include/RibRenderLib.h"
-#include "DSystem/include/DUtils.h"
-#include "DSystem/include/DUtils_Files.h"
 #include "RibRenderToy.h"
 
-#ifdef _MSC_VER
-# include <GL/glut.h>
-# include <direct.h>
-# include <io.h>
+#include <algorithm>
+#include <chrono>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <exception>
+#include <system_error>
 
-#elif defined(__linux__)
-# include <GL/glut.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <dirent.h>
+#include <GLFW/glfw3.h>
 
-#else
-# include <GLUT/glut.h>
+#include "DSystem/include/DUtils.h"
+#include "DSystem/include/DUtils_Files.h"
+#include "RibToolsBase/include/RibToolsBase.h"
+#include "imgui_internal.h"
+#include "imgui_stdlib.h"
 
-#endif
+namespace fs = std::filesystem;
 
-//==================================================================
-RibRendToy	*RibRendToy::mspThis;
-
-//==================================================================
-RibRendToy::RibRendToy( const char *pExePath ) :
-    mpDispDriverFBuff(NULL),
-    mLastUsedWd(0),
-    mLastUsedHe(0),
-    mMainMenuID(-1)
+namespace
 {
-    DASSERT( mspThis == NULL );
 
-    mspThis = this;
+constexpr const char* APP_NAME = "RibRenderToy";
+constexpr const char* APP_VERSION = "0.11";
 
-    mFileToRender[0] = 0;
-
-    strcpy_s( mExePath, pExePath );
-
-    const int resourcePathLen = snprintf( mExeResPath, sizeof(mExeResPath), "%s/Resources", mExePath );
-    DASSTHROW(
-        resourcePathLen >= 0 && static_cast<size_t>(resourcePathLen) < sizeof(mExeResPath),
-        "Executable resource path is too long" );
-
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize( 640, 480 );
-
-    glutCreateWindow( APPNAME " v" APPVERSION );
-
-    glutDisplayFunc( sDisplayFunc );
-    glutReshapeFunc( sReshapeFunc );
-    glutMouseFunc( sMouseFunc );
-    glutPassiveMotionFunc( sPassiveMotion );
-    glutIdleFunc( sIdleFunc );
-
-    RebuildMenu();
+//==================================================================
+bool isHelpArgument(const char* pArgument)
+{
+    return std::strcmp(pArgument, "-h") == 0 || std::strcmp(pArgument, "--help") == 0 ||
+           std::strcmp(pArgument, "-help") == 0;
 }
 
 //==================================================================
-RibRendToy::~RibRendToy()
+bool isSmokeTestArgument(const char* pArgument)
 {
-    DSAFE_DELETE( mpDispDriverFBuff );
+    return std::strcmp(pArgument, "--smoke-test") == 0;
 }
 
 //==================================================================
-void RibRendToy::SetFileToRender( const char *pFName )
+bool isDetachRenderArgument(const char* pArgument)
 {
-    strcpy( mFileToRender, pFName );
-}
-
-//===============================================================
-static void addBoolMenuItem( const char *pName, bool onoff, int id )
-{
-    char	buff[1024];
-    sprintf_s( buff, "[%c] %s", onoff ? '*' : ' ', pName );
-    glutAddMenuEntry( buff, id );
+    return std::strcmp(pArgument, "--detach-render") == 0;
 }
 
 //==================================================================
-void RibRendToy::addDirToMenu( const DStr &dirName, const DStr &matchExt )
+void printUsage(const char* pExecutable)
 {
-    namespace fs = std::filesystem;
+    std::printf("%s v%s\n\n", APP_NAME, APP_VERSION);
+    std::printf("%s [--detach-render] [scene.rib]\n", pExecutable);
+    std::printf("%s --smoke-test [scene.rib]\n", pExecutable);
+    std::printf("\nDrop a RIB file into the window or select an included scene in the Scenes panel.\n");
+}
 
-    auto strFromFSPath = []( const fs::path &s )
+}
+
+//==================================================================
+RibRenderToyApp::RibRenderToyApp(const fs::path &executablePath)
+    : mHost(RTUI::ImGuiHost::Params{std::string(APP_NAME) + " v" + APP_VERSION, 1200, 760, "rib-render-toy.ini"}),
+      mExecutablePath(executablePath), mResourcesPath(executablePath / "Resources"),
+      mStatus("Choose an included scene or drop a RIB file into the window.")
+{
+    glfwSetWindowUserPointer(mHost.GetWindow(), this);
+    glfwSetDropCallback(mHost.GetWindow(), dropCallback);
+    scanScenes();
+}
+
+//==================================================================
+int RibRenderToyApp::Run(int frameLimit)
+{
+    auto renderedFrameCount = 0;
+
+    while (!mHost.ShouldClose())
     {
-        const DStr u8s = s.string();
-        return DStr( u8s.begin(), u8s.end() );
-    };
-
-    const auto matchExtFSP = fs::path( matchExt );
-
-    for (const auto &entry : fs::directory_iterator( dirName ))
-    {
-        if ( entry.path().has_extension() && entry.path().extension() == matchExtFSP  )
+        if (!mHost.BeginFrame())
         {
-            mTestRibFilesPaths.push_back( strFromFSPath( entry.path().parent_path() ) );
-            mTestRibFiles.push_back(      strFromFSPath( entry.path().filename() ) );
+            continue;
+        }
 
-            glutAddMenuEntry(
-                strFromFSPath( entry.path() ).c_str(),
-                MENUID_FILES + (int)mTestRibFiles.size()-1 );
+        processPendingRender();
+        drawWorkspace();
+        mHost.EndFrame();
+
+        ++renderedFrameCount;
+        if (frameLimit > 0 && renderedFrameCount >= frameLimit)
+        {
+            mHost.RequestClose();
         }
     }
-}
 
-//==================================================================
-void RibRendToy::RebuildMenu()
-{
-    if ( mMainMenuID != -1 )
-        glutDestroyMenu( mMainMenuID );
-
-    mMainMenuID = glutCreateMenu( sMenuFunc );
-    glutAttachMenu(GLUT_RIGHT_BUTTON);
-
-    glutAddMenuEntry( "-- Debug --", -1 );
-    addBoolMenuItem( "Pick Bucket Mode", mHiderParams.mDbgShowBuckets, MENUID_DBG_PICK_BUCKET );
-    addBoolMenuItem( "Color Coded Grids", mHiderParams.mDbgColorCodedGrids, MENUID_DBG_COLOR_CODE_GRIDS );
-    addBoolMenuItem( "Rasterize Vertices", mHiderParams.mDbgRasterizeVerts, MENUID_DBG_RASTERIZE_VERTS );
-    glutAddMenuEntry( "", -1 );
-
-    glutAddMenuEntry( "-- Test Files --", -1 );
-
-    mTestRibFiles.clear();
-    mTestRibFilesPaths.clear();
-
-    addDirToMenu( "TestScenes",                 ".rib" );
-    addDirToMenu( "TestScenes/KillerooNURBS",   ".rib" );
-    addDirToMenu( "TestScenes/Sponza",          ".rib" );
-    addDirToMenu( "TestScenes/LightsTests",     ".rib" );
-    addDirToMenu( "TestScenes/MiscTests",       ".rib" );
-    addDirToMenu( "TestScenes/ValuesTests",     ".rib" );
-}
-
-//==================================================================
-void RibRendToy::MenuFunc( int id )
-{
-    switch ( id )
+    if (frameLimit > 0 && (mStatusIsError || !moDisplay))
     {
-    case MENUID_DBG_PICK_BUCKET:
-        mHiderParams.mDbgShowBuckets = !mHiderParams.mDbgShowBuckets;
-        RenderFile( true );
-        RebuildMenu();
-        glutPostRedisplay();
-        return;
-
-    case MENUID_DBG_COLOR_CODE_GRIDS:
-        mHiderParams.mDbgColorCodedGrids = !mHiderParams.mDbgColorCodedGrids;
-        RenderFile( true );
-        RebuildMenu();
-        glutPostRedisplay();
-        return;
-
-    case MENUID_DBG_RASTERIZE_VERTS:
-        mHiderParams.mDbgRasterizeVerts = !mHiderParams.mDbgRasterizeVerts;
-        RenderFile( true );
-        RebuildMenu();
-        glutPostRedisplay();
-        return;
+        return EXIT_FAILURE;
     }
 
-    if ( id >= MENUID_FILES )
-    {
-        strcpy_s( mFileToRender, mExePath );
-        strcat_s( mFileToRender, "/" );
-        strcat_s( mFileToRender, mTestRibFilesPaths[id - MENUID_FILES].c_str() );
-        strcat_s( mFileToRender, "/" );
-        strcat_s( mFileToRender, mTestRibFiles[id - MENUID_FILES].c_str() );
-
-        printf( "Render File: %s\n", mFileToRender );
-    }
+    return EXIT_SUCCESS;
 }
 
 //==================================================================
-bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int forcedHe/*=-1 */ )
+void RibRenderToyApp::SetFileToRender(const fs::path &filePath)
 {
-    const char *pFileName;
-
-    if ( renderLastUsed )
+    std::error_code error;
+    auto absolutePath = filePath;
+    if (filePath.is_relative())
     {
-        if ( mLastFileName.length() )
+        absolutePath = fs::absolute(filePath, error);
+        if (error)
         {
-            pFileName = mLastFileName.c_str();
-            if ( forcedWd == mLastUsedWd &&
-                forcedHe == mLastUsedHe )
-            {
-                return false;
-            }
-
-            if ( forcedWd == -1 )
-            {
-                forcedWd = mLastUsedWd;
-                forcedHe = mLastUsedHe;
-            }
+            absolutePath = filePath;
         }
-        else
-            return false;
     }
-    else
+
+    mPendingFile = absolutePath.lexically_normal();
+    mPathInput = mPendingFile.string();
+    mRenderRequested = true;
+    mStatus = "Render queued...";
+    mStatusIsError = false;
+}
+
+//==================================================================
+void RibRenderToyApp::DetachRenderWindow()
+{
+    mDetachRenderRequested = true;
+}
+
+//==================================================================
+void RibRenderToyApp::scanScenes()
+{
+    mScenes.clear();
+
+    const auto scenesRoot = mExecutablePath / "TestScenes";
+    std::error_code error;
+    if (!fs::is_directory(scenesRoot, error))
     {
-        // remember the last used file name
-        mLastFileName = mFileToRender;
-        pFileName = mFileToRender;
+        mStatus = "The bundled TestScenes directory could not be found.";
+        mStatusIsError = true;
+        return;
     }
 
-    if NOT( pFileName[0] )
-        return false;
+    const auto options = fs::directory_options::skip_permission_denied;
+    for (fs::recursive_directory_iterator it(scenesRoot, options, error), end; it != end; it.increment(error))
+    {
+        if (error)
+        {
+            error.clear();
+            continue;
+        }
 
-    DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
+        if (!it->is_regular_file(error) || it->path().extension() != ".rib")
+        {
+            continue;
+        }
 
-    char	defaultShadersDir[4096];
-    const int shaderPathLen =
-        snprintf( defaultShadersDir, sizeof(defaultShadersDir), "%s/Shaders", mExeResPath );
-    DASSTHROW(
-        shaderPathLen >= 0 && static_cast<size_t>(shaderPathLen) < sizeof(defaultShadersDir),
-        "Default shader path is too long" );
-    printf( "Base Dir: %s\n", baseDir.c_str() );
-    printf( "Default Shaders Dir: %s\n", defaultShadersDir );
+        auto relativePath = fs::relative(it->path(), scenesRoot, error);
+        if (error)
+        {
+            error.clear();
+            relativePath = it->path().filename();
+        }
 
-    RI::Framework::Params	fwParams;
-    fwParams.mFallBackFBuffDisplay		= true;
-    fwParams.mpHiderParams				= &mHiderParams;
-    RI::Framework	framework( fwParams );
+        mScenes.push_back(SceneEntry{it->path().lexically_normal(), relativePath.generic_string()});
+    }
 
-    DIO::FileManagerDisk	fileManager;
+    std::sort(mScenes.begin(), mScenes.end(),
+              [](const SceneEntry &lhs, const SceneEntry &rhs)
+              {
+                  return lhs.mLabel < rhs.mLabel;
+              });
+}
 
-    RRL::Render::Params	params;
-    
-    params.mTrans.mState.mpFramework			= &framework;
-    params.mTrans.mState.mpFileManager			= &fileManager;
-    params.mTrans.mState.mBaseDir				= baseDir;
-    params.mTrans.mState.mDefaultShadersDir		= defaultShadersDir;
+//==================================================================
+void RibRenderToyApp::processPendingRender()
+{
+    if (!mRenderRequested)
+    {
+        return;
+    }
 
-    if ( mHiderParams.mDbgColorCodedGrids )
+    mRenderRequested = false;
+
+    if (!mPendingFile.empty())
+    {
+        mLastFile = mPendingFile;
+        mPendingFile.clear();
+    }
+
+    if (mLastFile.empty())
+    {
+        return;
+    }
+
+    std::error_code error;
+    if (!fs::is_regular_file(mLastFile, error))
+    {
+        mStatus = "RIB file not found: " + mLastFile.string();
+        mStatusIsError = true;
+        return;
+    }
+
+    const auto forcedWidth = mUseSceneResolution ? -1 : std::clamp(mRequestedWidth, 1, 16384);
+    const auto forcedHeight = mUseSceneResolution ? -1 : std::clamp(mRequestedHeight, 1, 16384);
+
+    mHiderParams.mDbgOnlyBucketAtX = mPendingBucketX;
+    mHiderParams.mDbgOnlyBucketAtY = mPendingBucketY;
+    renderFile(mLastFile, forcedWidth, forcedHeight);
+    mHiderParams.mDbgOnlyBucketAtX = -1;
+    mHiderParams.mDbgOnlyBucketAtY = -1;
+    mPendingBucketX = -1;
+    mPendingBucketY = -1;
+}
+
+//==================================================================
+bool RibRenderToyApp::renderFile(const fs::path &filePath, int forcedWidth, int forcedHeight)
+{
+    const auto startTime = std::chrono::steady_clock::now();
+
+    RI::Framework::Params frameworkParams;
+    frameworkParams.mFallBackFBuffDisplay = true;
+    frameworkParams.mpHiderParams = &mHiderParams;
+    RI::Framework framework(frameworkParams);
+
+    DIO::FileManagerDisk fileManager;
+
+    RRL::Render::Params params;
+    params.mTrans.mState.mpFramework = &framework;
+    params.mTrans.mState.mpFileManager = &fileManager;
+    const auto baseDirectory = filePath.parent_path().string();
+    params.mTrans.mState.mBaseDir = baseDirectory.c_str();
+
+    const auto shadersPath = mResourcesPath / "Shaders";
+    const auto shadersDirectory = shadersPath.string();
+    params.mTrans.mState.mDefaultShadersDir = shadersDirectory.c_str();
+
+    if (mHiderParams.mDbgColorCodedGrids)
+    {
         params.mTrans.mState.mForcedSurfaceShader = "constant";
+    }
 
-    params.mTrans.mForcedWd		= forcedWd;
-    params.mTrans.mForcedHe		= forcedHe;
+    params.mTrans.mForcedWd = forcedWidth;
+    params.mTrans.mForcedHe = forcedHeight;
 
-    params.mpFileName			= pFileName;
-
-    params.mpOnFrameEndCB		= renderFile_HandleDisplays_s;
-    params.mpOnFrameEndCBData	= this;
+    const auto filePathString = filePath.string();
+    params.mpFileName = filePathString.c_str();
+    params.mpOnFrameEndCB = handleDisplaysCallback;
+    params.mpOnFrameEndCBData = this;
 
     try
     {
-        RRL::Render	render( params );
+        RRL::Render render(params);
     }
-    catch ( std::bad_alloc )
+    catch (const std::bad_alloc &)
     {
-        printf( "Out of Memory !!!\n" );
+        mStatus = "The render ran out of memory.";
+        mStatusIsError = true;
         return false;
     }
-    catch ( RI::Exception &e )
+    catch (const RI::Exception &exception)
     {
-        printf( "%s\nAborting.\n", e.GetMessage_().c_str() );
+        mStatus = exception.GetMessage_().c_str();
+        mStatusIsError = true;
         return false;
     }
-    catch ( const std::exception &ex )
+    catch (const std::exception &exception)
     {
-        printf( "Exception: %s\n", ex.what() );
+        mStatus = exception.what();
+        mStatusIsError = true;
         return false;
     }
-    catch ( ... )
+    catch (...)
     {
-        printf( "Unknown exception. Aborting.\n" );
+        mStatus = "An unknown exception interrupted the render.";
+        mStatusIsError = true;
         return false;
     }
 
+    const auto endTime = std::chrono::steady_clock::now();
+    mLastRenderMilliseconds = std::chrono::duration<double, std::milli>(endTime - startTime).count();
+    mStatus = "Rendered " + filePath.filename().string();
+    mStatusIsError = false;
     return true;
 }
 
 //==================================================================
-void RibRendToy::renderFile_HandleDisplays( const RRL::DisplayList &pDisplays )
+void RibRenderToyApp::handleDisplays(const RRL::DisplayList &displays)
 {
-    // be happy with the first display found
-    for (size_t i=0; i < pDisplays.size(); ++i)
+    if (displays.empty())
     {
-        DSAFE_DELETE( mpDispDriverFBuff );
-
-        mpDispDriverFBuff =
-            DNEW DispDriverFBuffOGL( "Default Disp Driver", pDisplays[i]->mImage );
-
-        mLastUsedWd = (int)pDisplays[i]->mImage.mWd;
-        mLastUsedHe = (int)pDisplays[i]->mImage.mHe;
-
-        // actually resize the window !
-        glutReshapeWindow( mLastUsedWd, mLastUsedHe );
-        break;
+        return;
     }
-}
 
-//===============================================================
-void RibRendToy::sDisplayFunc()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    const auto* pDisplay = displays.front();
+    auto display = std::make_unique<DispDriverFBuffOGL>(pDisplay->mName.c_str(), pDisplay->mImage);
 
-    if ( mspThis->mpDispDriverFBuff )
-        mspThis->mpDispDriverFBuff->Blit();
-
-    glutSwapBuffers();
-}
-
-//===============================================================
-void RibRendToy::sReshapeFunc( int width, int height )
-{
-    glViewport(0, 0, width, height);
-
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    glOrtho( 0, width, height, 0, -1, 1 );
-
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
-    //glTranslatef( -0.375f, -0.375f, 0 );
-
-    //mspThis->SetSize( width, height );
-
-    glEnable( GL_DEPTH_TEST );
-
-    // render the last loaded file
-    mspThis->RenderFile( true, width, height );
-}
-
-//===============================================================
-void RibRendToy::sMouseFunc( int button, int butState, int mx, int my )
-{
-    mspThis->MouseFunc( button, butState, mx, my );
+    mLastUsedWidth = static_cast<int>(pDisplay->mImage.mWd);
+    mLastUsedHeight = static_cast<int>(pDisplay->mImage.mHe);
+    moDisplay = std::move(display);
 }
 
 //==================================================================
-void RibRendToy::MouseFunc( int button, int butState, int mx, int my )
+void RibRenderToyApp::drawWorkspace()
 {
-    if ( button == 0 )
+    drawMainMenu();
+
+    const auto dockspaceId = ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode);
+    buildInitialLayout(dockspaceId);
+
+    drawSceneBrowser();
+    drawRenderSettings();
+    drawRenderView();
+}
+
+//==================================================================
+void RibRenderToyApp::drawMainMenu()
+{
+    if (!ImGui::BeginMainMenuBar())
     {
-        if ( butState == GLUT_DOWN )
+        return;
+    }
+
+    if (ImGui::BeginMenu("File"))
+    {
+        const auto canRender = !mLastFile.empty() || !mPendingFile.empty();
+        if (ImGui::MenuItem("Render Again", nullptr, false, canRender))
         {
-            if ( mHiderParams.mDbgShowBuckets )
+            requestRender();
+        }
+
+        ImGui::Separator();
+        if (ImGui::MenuItem("Quit"))
+        {
+            mHost.RequestClose();
+        }
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("View"))
+    {
+        ImGui::MenuItem("Fit Image", nullptr, &mFitImage);
+        if (ImGui::MenuItem("Detach Render Window"))
+        {
+            mDetachRenderRequested = true;
+        }
+        if (ImGui::MenuItem("Reset Docking Layout"))
+        {
+            mResetLayoutRequested = true;
+        }
+        ImGui::Separator();
+        ImGui::TextDisabled("Render panels can be dragged outside the main window.");
+        ImGui::EndMenu();
+    }
+
+    ImGui::EndMainMenuBar();
+}
+
+//==================================================================
+void RibRenderToyApp::drawSceneBrowser()
+{
+    ImGui::Begin("Scenes");
+    ImGui::TextWrapped("Select a bundled scene, enter a path, or drop a .rib file onto the app.");
+
+    ImGui::SetNextItemWidth(-70.0f);
+    const auto openFromKeyboard =
+        ImGui::InputTextWithHint("##rib-path", "Path to a RIB file", &mPathInput, ImGuiInputTextFlags_EnterReturnsTrue);
+    ImGui::SameLine();
+    const auto openFromButton = ImGui::Button("Open");
+
+    if ((openFromKeyboard || openFromButton) && !mPathInput.empty())
+    {
+        auto path = fs::path(mPathInput);
+        std::error_code error;
+        if (path.is_relative() && !fs::exists(path, error))
+        {
+            path = mExecutablePath / path;
+        }
+        SetFileToRender(path);
+    }
+
+    ImGui::TextUnformatted("Filter");
+    mSceneFilter.Draw("##scene-filter", -1.0f);
+    ImGui::Separator();
+
+    if (ImGui::BeginChild("SceneList"))
+    {
+        for (size_t sceneIndex = 0; sceneIndex < mScenes.size(); ++sceneIndex)
+        {
+            const auto &scene = mScenes[sceneIndex];
+            if (!mSceneFilter.PassFilter(scene.mLabel.c_str()))
             {
-                mHiderParams.mDbgOnlyBucketAtX = mx;
-                mHiderParams.mDbgOnlyBucketAtY = my;
-                RenderFile( true );
-                glutPostRedisplay();
-                mHiderParams.mDbgOnlyBucketAtX = -1;
-                mHiderParams.mDbgOnlyBucketAtY = -1;
+                continue;
+            }
+
+            const auto selected = mSelectedScene == static_cast<int>(sceneIndex);
+            if (ImGui::Selectable(scene.mLabel.c_str(), selected))
+            {
+                mSelectedScene = static_cast<int>(sceneIndex);
+                SetFileToRender(scene.mPath);
+            }
+
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+            {
+                ImGui::SetTooltip("%s", scene.mPath.string().c_str());
             }
         }
     }
+    ImGui::EndChild();
+    ImGui::End();
 }
 
-//===============================================================
-void RibRendToy::sPassiveMotion( int x, int y )
+//==================================================================
+void RibRenderToyApp::drawRenderSettings()
 {
-    //mspThis->SetCursorPos( x, y );
-    //glutPostRedisplay();
-}
+    ImGui::Begin("Render Settings");
 
-//===============================================================
-void RibRendToy::sIdleFunc()
-{
-    if ( mspThis->mFileToRender[0] )
+    if (mLastFile.empty())
     {
-        mspThis->RenderFile( false );
-
-        // it has been rendered...
-        mspThis->mFileToRender[0] = 0;
-
-        glutPostRedisplay();
+        ImGui::TextDisabled("No scene selected");
     }
     else
     {
-        // Sleep because freeglut goes nuts with mainloop
-#ifdef _MSC_VER
-        Sleep( 1 );
-#endif
+        ImGui::TextWrapped("%s", mLastFile.filename().string().c_str());
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+        {
+            ImGui::SetTooltip("%s", mLastFile.string().c_str());
+        }
     }
-    //glutPostRedisplay();
+
+    const auto canRender = !mLastFile.empty() || !mPendingFile.empty();
+    ImGui::BeginDisabled(!canRender);
+    if (ImGui::Button("Render", ImVec2(-1.0f, 0.0f)))
+    {
+        requestRender();
+    }
+    ImGui::EndDisabled();
+
+    ImGui::SeparatorText("Resolution");
+    ImGui::Checkbox("Use scene resolution", &mUseSceneResolution);
+
+    ImGui::BeginDisabled(mUseSceneResolution);
+    ImGui::TextUnformatted("Width");
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::InputInt("##render-width", &mRequestedWidth);
+    ImGui::TextUnformatted("Height");
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::InputInt("##render-height", &mRequestedHeight);
+    mRequestedWidth = std::clamp(mRequestedWidth, 1, 16384);
+    mRequestedHeight = std::clamp(mRequestedHeight, 1, 16384);
+    ImGui::EndDisabled();
+
+    ImGui::Checkbox("Fit image to panel", &mFitImage);
+
+    ImGui::SeparatorText("Debug");
+    auto debugChanged = false;
+    debugChanged |= ImGui::Checkbox("Pick bucket", &mHiderParams.mDbgShowBuckets);
+    debugChanged |= ImGui::Checkbox("Color-coded grids", &mHiderParams.mDbgColorCodedGrids);
+    debugChanged |= ImGui::Checkbox("Rasterize vertices", &mHiderParams.mDbgRasterizeVerts);
+
+    if (debugChanged && !mLastFile.empty())
+    {
+        requestRender();
+    }
+
+    ImGui::SeparatorText("Status");
+    if (mStatusIsError)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.42f, 0.42f, 1.0f));
+    }
+    ImGui::TextWrapped("%s", mStatus.c_str());
+    if (mStatusIsError)
+    {
+        ImGui::PopStyleColor();
+    }
+
+    if (moDisplay)
+    {
+        ImGui::Text("%d x %d, %.2f ms", mLastUsedWidth, mLastUsedHeight, mLastRenderMilliseconds);
+    }
+
+    ImGui::Spacing();
+    ImGui::TextDisabled("Drag the Render tab out, or use View > Detach Render Window.");
+    ImGui::End();
 }
 
 //==================================================================
-void RibRendToy::sMenuFunc( int id )
+void RibRenderToyApp::drawRenderView()
 {
-    mspThis->MenuFunc( id );
+    if (mDetachRenderRequested)
+    {
+        if (auto* pRenderWindow = ImGui::FindWindowByName("Render"))
+        {
+            ImGui::DockContextProcessUndockWindow(ImGui::GetCurrentContext(), pRenderWindow);
+        }
+
+        const auto* pMainViewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowDockID(0, ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(pMainViewport->Pos.x + 80.0f, pMainViewport->Pos.y + 80.0f), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(760.0f, 620.0f), ImGuiCond_Always);
+        mDetachRenderRequested = false;
+    }
+
+    ImGui::Begin("Render");
+
+    if (!moDisplay)
+    {
+        const auto available = ImGui::GetContentRegionAvail();
+        const auto messageSize = ImGui::CalcTextSize("Choose a scene to render");
+        ImGui::SetCursorPos(ImVec2(std::max(0.0f, (available.x - messageSize.x) * 0.5f),
+                                   std::max(0.0f, (available.y - messageSize.y) * 0.5f)));
+        ImGui::TextDisabled("Choose a scene to render");
+        ImGui::End();
+        return;
+    }
+
+    const auto imageWidth = static_cast<float>(moDisplay->GetCurWd());
+    const auto imageHeight = static_cast<float>(moDisplay->GetCurHe());
+    const auto available = ImGui::GetContentRegionAvail();
+
+    auto scale = 1.0f;
+    if (mFitImage && imageWidth > 0.0f && imageHeight > 0.0f)
+    {
+        scale = std::min(available.x / imageWidth, available.y / imageHeight);
+        scale = std::max(scale, 0.01f);
+    }
+
+    const ImVec2 displaySize(imageWidth * scale, imageHeight * scale);
+    if (mFitImage)
+    {
+        const auto cursor = ImGui::GetCursorPos();
+        ImGui::SetCursorPos(ImVec2(cursor.x + std::max(0.0f, (available.x - displaySize.x) * 0.5f),
+                                   cursor.y + std::max(0.0f, (available.y - displaySize.y) * 0.5f)));
+    }
+
+    const auto texture = ImTextureRef(static_cast<ImTextureID>(moDisplay->GetTextureId()));
+    ImGui::Image(texture, displaySize, ImVec2(0.0f, 0.0f),
+                 ImVec2(moDisplay->GetTextureUMax(), moDisplay->GetTextureVMax()));
+
+    if (mHiderParams.mDbgShowBuckets && ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    {
+        const auto mouse = ImGui::GetMousePos();
+        const auto imageMin = ImGui::GetItemRectMin();
+        const auto x =
+            std::clamp(static_cast<int>((mouse.x - imageMin.x) * imageWidth / displaySize.x), 0, mLastUsedWidth - 1);
+        const auto y =
+            std::clamp(static_cast<int>((mouse.y - imageMin.y) * imageHeight / displaySize.y), 0, mLastUsedHeight - 1);
+        requestBucketRender(x, y);
+    }
+
+    if (ImGui::BeginPopupContextItem("RenderContextMenu"))
+    {
+        if (ImGui::MenuItem("Render Again"))
+        {
+            requestRender();
+        }
+        ImGui::MenuItem("Fit Image", nullptr, &mFitImage);
+        ImGui::EndPopup();
+    }
+
+    ImGui::End();
 }
 
 //==================================================================
-/// main
+void RibRenderToyApp::buildInitialLayout(ImGuiID dockspaceId)
+{
+    if (!mFirstLayout && !mResetLayoutRequested)
+    {
+        return;
+    }
+    mFirstLayout = false;
+
+    const auto* pExistingNode = ImGui::DockBuilderGetNode(dockspaceId);
+    if (!mResetLayoutRequested && pExistingNode && pExistingNode->IsSplitNode())
+    {
+        return;
+    }
+    mResetLayoutRequested = false;
+
+    ImGui::DockBuilderRemoveNode(dockspaceId);
+    ImGui::DockBuilderAddNode(dockspaceId, ImGuiDockNodeFlags_DockSpace);
+    ImGui::DockBuilderSetNodeSize(dockspaceId, ImGui::GetMainViewport()->WorkSize);
+
+    ImGuiID leftDockId = 0;
+    auto renderDockId = dockspaceId;
+    ImGui::DockBuilderSplitNode(dockspaceId, ImGuiDir_Left, 0.27f, &leftDockId, &renderDockId);
+
+    ImGuiID settingsDockId = 0;
+    ImGuiID scenesDockId = 0;
+    ImGui::DockBuilderSplitNode(leftDockId, ImGuiDir_Down, 0.45f, &settingsDockId, &scenesDockId);
+
+    ImGui::DockBuilderDockWindow("Scenes", scenesDockId);
+    ImGui::DockBuilderDockWindow("Render Settings", settingsDockId);
+    ImGui::DockBuilderDockWindow("Render", renderDockId);
+    ImGui::DockBuilderFinish(dockspaceId);
+}
+
+//==================================================================
+void RibRenderToyApp::requestRender()
+{
+    if (!mLastFile.empty() || !mPendingFile.empty())
+    {
+        mRenderRequested = true;
+    }
+}
+
+//==================================================================
+void RibRenderToyApp::requestBucketRender(int x, int y)
+{
+    mPendingBucketX = x;
+    mPendingBucketY = y;
+    requestRender();
+}
+
+//==================================================================
+void RibRenderToyApp::handleDisplaysCallback(void* pUserData, const RRL::DisplayList &displays)
+{
+    static_cast<RibRenderToyApp*>(pUserData)->handleDisplays(displays);
+}
+
+//==================================================================
+void RibRenderToyApp::dropCallback(GLFWwindow* pWindow, int pathCount, const char** ppPaths)
+{
+    auto* pApp = static_cast<RibRenderToyApp*>(glfwGetWindowUserPointer(pWindow));
+    if (!pApp || pathCount < 1 || !ppPaths || !ppPaths[0])
+    {
+        return;
+    }
+
+    pApp->SetFileToRender(ppPaths[0]);
+}
+
 //==================================================================
 int main(int argc, char** argv)
 {
-
-#if 0
-    _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF |
-                    _CRTDBG_DELAY_FREE_MEM_DF |
-                    _CRTDBG_CHECK_ALWAYS_DF |
-                    _CRTDBG_LEAK_CHECK_DF );
-#endif
+    if (argc >= 2 && isHelpArgument(argv[1]))
+    {
+        printUsage(argv[0]);
+        return EXIT_SUCCESS;
+    }
 
     DUT::InstallFileManagerStd();
 
-    glutInit( &argc, argv );
+    try
+    {
+        const DStr executablePath = RTB::FindRibToolsDir(argv);
+        RibRenderToyApp app(executablePath.c_str());
 
-    DStr	exePath = RTB::FindRibToolsDir( argv );
+        if (argc >= 2 && isSmokeTestArgument(argv[1]))
+        {
+            const auto smokeScene = argc >= 3
+                                        ? fs::path(argv[2])
+                                        : fs::path(executablePath.c_str()) / "TestScenes/LightsTests/SphereAmbient.rib";
+            app.SetFileToRender(smokeScene);
+            return app.Run(3);
+        }
 
-    RibRendToy	toy( exePath.c_str() );
+        fs::path scenePath;
+        for (auto argumentIndex = 1; argumentIndex < argc; ++argumentIndex)
+        {
+            if (isDetachRenderArgument(argv[argumentIndex]))
+            {
+                app.DetachRenderWindow();
+                continue;
+            }
 
-    // set optional initial file name
-    if ( argc >= 2 )
-        toy.SetFileToRender( argv[1] );
+            if (!scenePath.empty())
+            {
+                std::fprintf(stderr, "Unexpected argument: %s\n", argv[argumentIndex]);
+                printUsage(argv[0]);
+                return EXIT_FAILURE;
+            }
+            scenePath = argv[argumentIndex];
+        }
 
-    glutMainLoop();
+        if (!scenePath.empty())
+        {
+            app.SetFileToRender(scenePath);
+        }
 
-    return EXIT_SUCCESS;
+        return app.Run();
+    }
+    catch (const std::exception &exception)
+    {
+        std::fprintf(stderr, "%s\n", exception.what());
+        return EXIT_FAILURE;
+    }
 }

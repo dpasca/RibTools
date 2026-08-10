@@ -24,18 +24,18 @@
 #include "DispDrivers/include/DispDriverFBuffOGL.h"
 
 //==================================================================
-static u_int getNextPow2( u_int val )
+static unsigned int getNextPow2(unsigned int val)
 {
-    if ( val == 0 )
+    if (val == 0)
         return 0;
 
-    for (u_int i=1; i < 32; ++i)
+    for (unsigned int i = 1; i < 32; ++i)
     {
-        u_int	l = 1 << (i-1);
-        u_int	r = 1 << i;
-        if ( val >= l && val <= r )
+        const auto left = 1u << (i - 1);
+        const auto right = 1u << i;
+        if (val >= left && val <= right)
         {
-            return r;
+            return right;
         }
     }
 
@@ -46,12 +46,14 @@ static u_int getNextPow2( u_int val )
 //==================================================================
 // DispDriverFramebuffOGL
 //==================================================================
-DispDriverFBuffOGL::DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::Image &srcImg ) :
-    mTexId(0), mTexWd(0), mTexHe(0)
+DispDriverFBuffOGL::DispDriverFBuffOGL(const char* pFBuffOGLName, const DIMG::Image& srcImg)
 {
-    const char *pExtensionsStr = (const char *)glGetString( GL_EXTENSIONS );
+    static_cast<void>(pFBuffOGLName);
 
-    DASSTHROW( pExtensionsStr != NULL, ("OpenGL not initialized ?") );
+    const auto* pExtensionsStr =
+        reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+
+    DASSTHROW(pExtensionsStr != nullptr, "OpenGL is not initialized");
 
     if (
         0 == strstr( pExtensionsStr, "GL_ARB_texture_non_power_of_two" ) &&
@@ -81,6 +83,8 @@ DispDriverFBuffOGL::DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::I
     glBindTexture( GL_TEXTURE_2D, mTexId );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 
     if ( mSupportsNonPow2 )
     {
@@ -125,6 +129,18 @@ DispDriverFBuffOGL::DispDriverFBuffOGL( const char *pFBuffOGLName, const DIMG::I
             GL_UNSIGNED_BYTE,
             mImage.GetPixelPtrR(0,0) );
     }
+}
+
+//==================================================================
+float DispDriverFBuffOGL::GetTextureUMax() const
+{
+    return mTexWd ? static_cast<float>(mImage.mWd) / mTexWd : 0.0f;
+}
+
+//==================================================================
+float DispDriverFBuffOGL::GetTextureVMax() const
+{
+    return mTexHe ? static_cast<float>(mImage.mHe) / mTexHe : 0.0f;
 }
 
 //==================================================================

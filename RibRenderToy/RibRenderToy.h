@@ -1,86 +1,83 @@
 //==================================================================
 /// RibRenderToy.h
 ///
-/// Created by Davide Pasca - 2009/4/27
-/// See the file "license.txt" that comes with this project for
-/// copyright info.
+/// Interactive Dear ImGui front end for the RibTools renderer.
 //==================================================================
 
 #ifndef RIBRENDERTOY_H
 #define RIBRENDERTOY_H
 
-#include "RI_System/include/RI_HiderST.h"
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <vector>
 
-#define APPNAME		"RibRenderToy"
-#define APPVERSION	"0.10"
+#include "DispDrivers/include/DispDriverFBuffOGL.h"
+#include "RI_System/include/RI_HiderST.h"
+#include "RibRenderLib/include/RibRenderLib.h"
+#include "RibToolsUI/ImGuiHost.h"
 
 //==================================================================
-class RibRendToy
+class RibRenderToyApp
 {
-    static RibRendToy	*mspThis;
-    int					mMainMenuID;
-
 public:
-    char				mFileToRender[2048];
-    char				mExePath[2048];
-    char				mExeResPath[2048];
-    DVec<DStr>			mTestRibFiles;
-    DVec<DStr>			mTestRibFilesPaths;
+    explicit RibRenderToyApp(const std::filesystem::path &executablePath);
 
-    RI::Hider::Params	mHiderParams;
+    int Run(int frameLimit = 0);
+    void SetFileToRender(const std::filesystem::path &filePath);
+    void DetachRenderWindow();
 
-    std::string			mLastFileName;
-    int					mLastUsedWd;
-    int					mLastUsedHe;
-
-    DispDriverFBuffOGL	*mpDispDriverFBuff;
-
-    // used for tricky menu/invalidated zone problem
-    int					mPostRedisplayCnt;
-
-    enum
+private:
+    struct SceneEntry
     {
-        MENUID_DBG_PICK_BUCKET,
-        MENUID_DBG_COLOR_CODE_GRIDS,
-        MENUID_DBG_RASTERIZE_VERTS,
-        MENUID_FILES = 200
+        std::filesystem::path mPath;
+        std::string mLabel;
     };
 
-    //===============================================================
-    RibRendToy( const char *p );
-    ~RibRendToy();
+    RTUI::ImGuiHost mHost;
+    std::filesystem::path mExecutablePath;
+    std::filesystem::path mResourcesPath;
+    std::vector<SceneEntry> mScenes;
+    ImGuiTextFilter mSceneFilter;
+    RI::Hider::Params mHiderParams;
+    std::unique_ptr<DispDriverFBuffOGL> moDisplay;
+    std::filesystem::path mPendingFile;
+    std::filesystem::path mLastFile;
+    std::string mPathInput;
+    std::string mStatus;
+    double mLastRenderMilliseconds{};
+    int mLastUsedWidth{};
+    int mLastUsedHeight{};
+    int mRequestedWidth{512};
+    int mRequestedHeight{512};
+    int mPendingBucketX{-1};
+    int mPendingBucketY{-1};
+    int mSelectedScene{-1};
+    bool mUseSceneResolution{true};
+    bool mFitImage{true};
+    bool mRenderRequested{};
+    bool mStatusIsError{};
+    bool mFirstLayout{true};
+    bool mResetLayoutRequested{};
+    bool mDetachRenderRequested{};
 
-    void SetFileToRender( const char *pFName );
+    void scanScenes();
+    void processPendingRender();
+    bool renderFile(const std::filesystem::path &filePath, int forcedWidth, int forcedHeight);
+    void handleDisplays(const RRL::DisplayList &displays);
 
-    void RebuildMenu();
+    void drawWorkspace();
+    void drawMainMenu();
+    void drawSceneBrowser();
+    void drawRenderSettings();
+    void drawRenderView();
+    void buildInitialLayout(ImGuiID dockspaceId);
 
-    void MenuFunc( int id );
+    void requestRender();
+    void requestBucketRender(int x, int y);
 
-    void MouseFunc( int button, int butState, int mx, int my );
-
-    bool RenderFile(
-                    bool renderLastUsed,
-                    int forcedWd=-1,
-                    int forcedHe=-1 );
-
-private:
-    static void renderFile_HandleDisplays_s( void *pThis, const RRL::DisplayList &pDisplays )
-    {
-        ((RibRendToy *)pThis)->renderFile_HandleDisplays( pDisplays );
-    }
-    void renderFile_HandleDisplays( const RRL::DisplayList &pDisplays );
-
-private:
-    //===============================================================
-    static void sDisplayFunc();
-    static void sReshapeFunc(int width, int height);
-    static void sMouseFunc( int button, int butState, int mx, int my );
-    static void sPassiveMotion( int x, int y );
-    static void sIdleFunc();
-    static void sMenuFunc( int id );
-
-    void addDirToMenu( const DStr &dirName, const DStr &matchExt );
-
+    static void handleDisplaysCallback(void* pUserData, const RRL::DisplayList &displays);
+    static void dropCallback(GLFWwindow* pWindow, int pathCount, const char** ppPaths);
 };
 
 #endif

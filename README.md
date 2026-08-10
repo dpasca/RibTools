@@ -35,11 +35,11 @@ Building and running
 
 - CMake 3.21 or newer
 - A C++20 compiler
-- The platform OpenGL and GLU development files
-- X11 and XInput development files on Linux
+- The platform OpenGL development files
+- X11 development files on Linux
 
 Initialize the pinned dependencies after cloning. libjpeg-turbo 3.2.0 and libtiff 4.7.2 provide image codecs.
-FreeGLUT is used on Windows and Linux; macOS uses the system GLUT framework.
+Dear ImGui 1.92.9b (docking branch) and GLFW 3.5.1 provide the desktop interface.
 
 ```sh
 git submodule update --init --recursive
@@ -71,8 +71,21 @@ Release configuration.
 
 ### Run the renderer toy
 
-Launch `RibRenderToy` from `_distrib` (`RibRenderToy.exe` on Windows), then right-click in its window to choose one of the
-included test scenes. The OpenGL/GLUT front end is intentionally still the original compatibility implementation.
+Launch `RibRenderToy` from `_distrib` (`RibRenderToy.exe` on Windows). Select a bundled RIB in the **Scenes** panel,
+enter a path, or drop a `.rib` file onto the window. The **Render Settings** panel exposes the resolution and the existing
+bucket/grid/vertex debug modes.
+
+The workspace uses Dear ImGui docking. Drag the **Render** tab outside the main window, choose
+**View > Detach Render Window**, or start detached from the command line:
+
+```sh
+cd _distrib
+./RibRenderToy --detach-render TestScenes/LightsTests/SphereDistantLight.rib
+```
+
+The layout is saved in `_distrib/rib-render-toy.ini`; **View > Reset Docking Layout** restores the default. Native external
+viewports work on macOS and Windows. On Linux they require X11 and remain window-manager dependent; Wayland is disabled
+because Dear ImGui's multi-viewport backend does not currently support it.
 
 About
 -----
@@ -85,7 +98,8 @@ The following software libraries are utilized in the project:
 
 * libjpeg-turbo: https://github.com/libjpeg-turbo/libjpeg-turbo
 * LibTIFF: https://libtiff.gitlab.io/libtiff/
-* FreeGLUT: https://github.com/dcnieho/FreeGLUT
+* Dear ImGui: https://github.com/ocornut/imgui
+* GLFW: https://github.com/glfw/glfw
 
 Other acknowledgements:
 

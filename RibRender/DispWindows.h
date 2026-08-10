@@ -1,61 +1,52 @@
 //==================================================================
 /// DispWindows.h
 ///
-/// Created by Davide Pasca - 2010/1/28
-/// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// Dear ImGui display host for framebuffer outputs.
 //==================================================================
 
 #ifndef DISPWINDOWS_H
 #define DISPWINDOWS_H
 
-#include "DSystem/include/DContainers.h"
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "DispDrivers/include/DispDriverFBuffOGL.h"
 #include "RI_System/include/RI_Options.h"
+#include "RibToolsUI/ImGuiHost.h"
 
-//==================================================================
-/// DispWindows
 //==================================================================
 class DispWindows
 {
-    struct Window
-    {
-        DispDriverFBuffOGL	*mpDispDriver;
-        int					mWinId;
-    };
-
-    static DVec<Window>	msWindows;
-
-    int					mArgc;
-    char				**mppArgv;
-    DStr				mWindowBaseName;
-
 public:
-    DispWindows();
+    DispWindows() = default;
     ~DispWindows();
 
-    void Init( int argc, char **argv, const char *pWindowBaseName )
+    void Init(int argc, char** ppArgv, const char* pWindowBaseName);
+    void AddWindow(const RI::Options::Display &display);
+
+    bool HasWindows() const
     {
-        mArgc = argc;
-        mppArgv = argv;
-
-        mWindowBaseName = pWindowBaseName;
+        return !mWindows.empty();
     }
-
-    //===============================================================
-    void AddWindow( const RI::Options::Display &disp );
-    
-    bool HasWindows() const { return !!msWindows.size(); }
 
     void MainLoop();
 
 private:
-    //===============================================================
-    static void sDisplayFunc();
+    struct Window
+    {
+        std::string mTitle;
+        std::unique_ptr<DispDriverFBuffOGL> moDisplay;
+        bool mOpen{true};
+    };
 
-    //===============================================================
-    static void sReshapeFunc( int width, int height );
+    std::string mWindowBaseName{"RibRender"};
+    std::unique_ptr<RTUI::ImGuiHost> moHost;
+    std::vector<Window> mWindows;
 
+    void ensureHost(const RI::Options::Display &display);
+    void drawMainMenu();
+    void drawWindows(ImGuiID dockspaceId);
 };
 
 #endif

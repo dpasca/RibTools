@@ -3,7 +3,7 @@ RibTools Developer Manual
 ===========================
 
 :Authors: Davide Pasca
-:Version: 2020/5/19
+:Version: 2026/8/11
 
 .. contents::
 
@@ -23,11 +23,16 @@ See the `User Manual`_ for instructions on how to execute *RibTools* binaries.
 Requirements
 ============
 
-*RibTools* currently only compiles for Windows, although the code is written with portability in mind and Windows-specific code is kept to a minimum.
+*RibTools* builds on Windows, macOS, and Linux.
 
-On Windows the required tools are:
+The required tools are:
 
- * CMake_ 2.8 or better
+ * CMake_ 3.21 or newer
+ * A C++20 compiler
+ * OpenGL development files
+ * X11 development files on Linux
+
+Initialize the pinned dependencies after cloning with ``git submodule update --init --recursive``.
 
 .. _CMake: http://www.cmake.org
 
@@ -52,6 +57,7 @@ As obtained from the repository:
 **RibRenderToy/**          RibRenderToy application project and sources
 **RSLCompilerCmd/**        RSLCompilerCmd application project and sources
 **RSLCompilerLib/**        RSL compiler library
+**RibToolsUI/**            Shared Dear ImGui and GLFW application shell
 *CMakeLists.txt*           Root CMake file to create the build files
 *license.txt*              License file
 *make_build.bat*           Script that creates the ``_build`` directory and its contents (Windows)
@@ -96,7 +102,7 @@ A little test
 -------------
 
     * From the ``_distrib`` directory, launch ``RibRenderToy.exe``
-    * Right-click inside the RibRenderToy window and select a test scene from the pop-up menu (*Airplane.rib* is a safe bet)
+    * Select a test scene from the *Scenes* panel (*Airplane.rib* is a safe bet)
     * After a little while the scene should appear in all it's beauty (!)
 
 Running from Visual Studio
@@ -171,9 +177,11 @@ This is an application that waits for incoming TCP/IP network connections from a
 RibRenderToy
 ------------
 
-This is an interactive application based on the *freeglut* library for interface and OpenGL for display.
+This is an interactive application based on *Dear ImGui* and *GLFW*, with OpenGL used for display.
 
-*RibRenderToy* is meant to be used with a mouse for quick visual testing.
+*RibRenderToy* is meant to be used for quick visual testing. Its scene browser accepts bundled scenes, paths, and
+drag-and-drop input. The interface supports docked panels and native external viewports; drag the *Render* tab outside
+the main window or use *View > Detach Render Window*.
 
 
 RibRenderLib
@@ -195,4 +203,3 @@ RSLCompilerLib
 This library is utilized directly by the rendering applications such as *RibRender* to compile the RenderMan-like shading language into ``rrasm``.
 
 It is also obviously used by *RSLCompilerCmd*.
-
