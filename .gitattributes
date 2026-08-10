@@ -1,9 +1,9 @@
-# normalize text files to LF
-* text=lf
-*.cpp   filter=spabs
-*.h     filter=spabs
-*.sl    filter=spabs
-*.ini   filter=spabs
-*.rrasm filter=spabs
-*.txt   filter=spabs
-*.rib   filter=spabs
+# Normalize text files to LF without requiring a machine-local Git filter.
+* text=auto eol=lf
+
+# Keep binary assets out of text normalization.
+*.gif  binary
+*.jpeg binary
+*.jpg  binary
+*.pdf  binary
+*.png  binary

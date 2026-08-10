@@ -1,0 +1,31 @@
+# Forward-looking only: format new code and touched blocks, not the whole tree.
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++20
+
+UseTab: Never
+IndentWidth: 4
+TabWidth: 4
+ContinuationIndentWidth: 4
+AccessModifierOffset: -4
+NamespaceIndentation: None
+
+BreakBeforeBraces: Allman
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: false
+
+PointerAlignment: Left
+ReferenceAlignment: Right
+DerivePointerAlignment: false
+SpaceBeforeParens: ControlStatements
+
+ColumnLimit: 120
+SortIncludes: Never
+IncludeBlocks: Preserve
+ReflowComments: false
+FixNamespaceComments: false

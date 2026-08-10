@@ -1,0 +1,6 @@
+# Vendored, generated, archival, and distribution content.
+DistribSrc/**
+RI_System/old/**
+docs/**
+external/**
+externals/**
