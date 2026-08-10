@@ -143,15 +143,15 @@ include_directories( DSystem/include )
 # Various libs
 add_subdirectory( DSystem )
 add_subdirectory( DMath )
+
+# Image codecs are pinned submodules. See cmake/RibToolsDependencies.cmake.
+include(cmake/RibToolsDependencies.cmake)
+
 add_subdirectory( DImage )
 add_subdirectory( RI_System )
 add_subdirectory( RibRenderLib )
 add_subdirectory( RibToolsBase )
 add_subdirectory( RSLCompilerLib )
-
-# external libs
-add_subdirectory( externals/local/libtiff )
-add_subdirectory( externals/local/libjpeg )
 
 find_package(OpenGL REQUIRED)
 
@@ -180,6 +180,9 @@ else()
     target_include_directories(freeglut_static PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/externals/FreeGLUT/freeglut/freeglut/include>"
         "$<INSTALL_INTERFACE:include>")
+    if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(freeglut_static PRIVATE -Wno-unused-const-variable)
+    endif()
     set(RIBTOOLS_GLUT_TARGET freeglut_static)
 endif()
 

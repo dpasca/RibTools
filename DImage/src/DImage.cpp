@@ -101,7 +101,8 @@ void Image::Init(
     mSampPerPix	= sampPerPix;
     mSampType	= sampType;
 
-    size_t	len = strlen( pSampNames );
+    DASSTHROW( pSampNames != nullptr, "Missing samples definition" );
+    const size_t len = strlen( pSampNames );
 
     DASSTHROW(
         wd > 0 && wd <= MAX_DIM_SIZE &&
@@ -109,8 +110,9 @@ void Image::Init(
             "Unholy image dimensions ! (%ui, %ui)", wd, he );
 
     DASSTHROW(
+        mSampPerPix > 0 &&
         len == (size_t)mSampPerPix &&
-        mSampPerPix <= MAX_DIM_SIZE,
+        mSampPerPix <= MAX_SAMP_PER_PIX,
             ("Bad samples definition !") );
 
     for (size_t i=0; i < len; ++i)
@@ -122,13 +124,24 @@ void Image::Init(
 
     if ( bytesPerRow <= 0 )
     {
-        mBytesPerRow = mBytesPerPix * mWd;
-        mBytesPerRow = (mBytesPerRow + 63) & ~63;
+        const size_t tightBytesPerRow = static_cast<size_t>(mBytesPerPix) * mWd;
+        const size_t alignedBytesPerRow = (tightBytesPerRow + 63) & ~size_t(63);
+        DASSTHROW(
+            alignedBytesPerRow <= std::numeric_limits<U32>::max(),
+            "Image row size is too large" );
+        mBytesPerRow = static_cast<U32>(alignedBytesPerRow);
     }
     else
     {
+        DASSTHROW(
+            static_cast<size_t>(bytesPerRow) >= static_cast<size_t>(mBytesPerPix) * mWd,
+            "Image row stride is too small" );
         mBytesPerRow = (U32)bytesPerRow;
     }
+
+    DASSTHROW(
+        static_cast<size_t>(mHe) <= std::numeric_limits<size_t>::max() / mBytesPerRow,
+        "Image allocation size is too large" );
 
     if ( pSrcDataBorrow )
     {
@@ -138,14 +151,20 @@ void Image::Init(
     else
     {
         mOwnData = true;
-        mpData = DNEW U8 [ mBytesPerRow * mHe ];
+        mpData = DNEW U8 [ static_cast<size_t>(mBytesPerRow) * mHe ];
     }
 }
 
 //==================================================================
 bool Image::IsSamplesNames( const char *pMatchSampNames ) const
 {
-    size_t	len = strlen( pMatchSampNames );
+    if ( pMatchSampNames == nullptr )
+        return false;
+
+    const size_t len = strlen( pMatchSampNames );
+    if ( len != mSampPerPix || len > MAX_SAMP_PER_PIX )
+        return false;
+
     for (size_t i=0; i < len; ++i)
     {
         if ( mSampNames[i] != pMatchSampNames[i] )

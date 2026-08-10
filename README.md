@@ -38,8 +38,8 @@ Building and running
 - The platform OpenGL and GLU development files
 - X11 and XInput development files on Linux
 
-Initialize the bundled FreeGLUT dependency after cloning. It is used on Windows and Linux; macOS uses the system GLUT
-framework.
+Initialize the pinned dependencies after cloning. libjpeg-turbo 3.2.0 and libtiff 4.7.2 provide image codecs.
+FreeGLUT is used on Windows and Linux; macOS uses the system GLUT framework.
 
 ```sh
 git submodule update --init --recursive
@@ -81,10 +81,11 @@ About
 
 This software is released under the [New BSD license](http://www.opensource.org/licenses/bsd-license.php) .
 
-This following software libraries are utilized in the project:
+The following software libraries are utilized in the project:
 
-* JPEG library: http://www.ijg.org
-* freeglut: http://freeglut.sourceforge.net
+* libjpeg-turbo: https://github.com/libjpeg-turbo/libjpeg-turbo
+* LibTIFF: https://libtiff.gitlab.io/libtiff/
+* FreeGLUT: https://github.com/dcnieho/FreeGLUT
 
 Other acknowledgements:
 

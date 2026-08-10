@@ -1,3 +1,9 @@
 [submodule "FreeGLUT"]
 	path = externals/FreeGLUT
 	url = https://github.com/dcnieho/FreeGLUT.git
+[submodule "externals/libjpeg-turbo"]
+	path = externals/libjpeg-turbo
+	url = https://github.com/libjpeg-turbo/libjpeg-turbo.git
+[submodule "externals/libtiff"]
+	path = externals/libtiff
+	url = https://gitlab.com/libtiff/libtiff.git

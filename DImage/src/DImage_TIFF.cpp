@@ -3,274 +3,321 @@
 ///
 /// Created by Davide Pasca - 2010/1/20
 /// See the file "license.txt" that comes with this project for
-/// copyright info. 
+/// copyright info.
 //==================================================================
 
-extern "C"
-{
-    #include "externals/local/libtiff/tif_config.h"
-    #include "externals/local/libtiff/tiffconf.h"
-    #include "tiff.h"
-    #include "tiffio.h"
-    #include "tiffiop.h"
-}
+#include <algorithm>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <vector>
+
+#include <tiffio.h>
 
 #include "DImage_TIFF.h"
 
-//==================================================================
-static toff_t seekProc( thandle_t pFile, toff_t offset, int whence )
+namespace
 {
-    try 
-    {
-        if ( whence == SEEK_SET )	((DUT::MemFile *)pFile)->SeekSet( offset );	else
-        if ( whence == SEEK_CUR )	((DUT::MemFile *)pFile)->SeekFromCur( offset );	else
-        if ( whence == SEEK_END )	((DUT::MemFile *)pFile)->SeekFromEnd( offset );
-        else
-            return -1;
 
-    } catch ( ... )
+constexpr toff_t InvalidTiffOffset = static_cast<toff_t>(-1);
+
+DUT::MemFile &fileFromHandle( thandle_t handle )
+{
+    return *static_cast<DUT::MemFile *>(handle);
+}
+
+bool toSignedOffset( toff_t offset, ptrdiff_t &outOffset )
+{
+    const auto maxPositive = static_cast<toff_t>(std::numeric_limits<ptrdiff_t>::max());
+    if ( offset <= maxPositive )
+    {
+        outOffset = static_cast<ptrdiff_t>(offset);
+        return true;
+    }
+
+    const toff_t magnitude = ~offset + 1;
+    if ( magnitude > maxPositive + 1 )
+        return false;
+
+    if ( magnitude == maxPositive + 1 )
+        outOffset = std::numeric_limits<ptrdiff_t>::min();
+    else
+        outOffset = -static_cast<ptrdiff_t>(magnitude);
+
+    return true;
+}
+
+toff_t seekProc( thandle_t handle, toff_t offset, int whence )
+{
+    try
+    {
+        auto &file = fileFromHandle( handle );
+
+        if ( whence == SEEK_SET )
+        {
+            if ( offset > std::numeric_limits<size_t>::max() )
+                return InvalidTiffOffset;
+
+            file.SeekSet( static_cast<size_t>(offset) );
+        }
+        else
+        {
+            ptrdiff_t signedOffset = 0;
+            if ( !toSignedOffset( offset, signedOffset ) )
+                return InvalidTiffOffset;
+
+            if ( whence == SEEK_CUR )
+                file.SeekFromCur( signedOffset );
+            else if ( whence == SEEK_END )
+                file.SeekFromEnd( signedOffset );
+            else
+                return InvalidTiffOffset;
+        }
+
+        return static_cast<toff_t>(file.GetCurPos());
+    }
+    catch ( ... )
+    {
+        return InvalidTiffOffset;
+    }
+}
+
+tmsize_t readProc( thandle_t handle, void *pData, tmsize_t size )
+{
+    if ( size < 0 )
+        return -1;
+
+    try
+    {
+        auto &file = fileFromHandle( handle );
+        const size_t remaining = file.GetDataSize() - file.GetCurPos();
+        const size_t requested = static_cast<size_t>(size);
+        const size_t readSize = std::min( requested, remaining );
+
+        if ( readSize > 0 )
+            file.ReadData( pData, readSize );
+
+        return static_cast<tmsize_t>(readSize);
+    }
+    catch ( ... )
     {
         return -1;
     }
-
-    return (toff_t)((DUT::MemFile *)pFile)->GetCurPos();
-}   
-
-//==================================================================
-static tsize_t readProc( thandle_t pFile, tdata_t pData, tsize_t size )
-{
-    try 
-    {
-        ((DUT::MemFile *)pFile)->ReadData( pData, size );
-    } catch ( ... )
-    {
-        return (tsize_t)-1;	// $$$ ummm ??!!
-    }
-
-    return size;
 }
 
-//==================================================================
-static tsize_t writeProc( thandle_t pFile, tdata_t pData, tsize_t size )
-{
-    DASSERT( 0 );
-    return 0;
-}
-
-//==================================================================
-static toff_t sizeProc( thandle_t pFile )
-{
-    return (toff_t)((DUT::MemFile *)pFile)->GetDataSize();
-}
-
-//==================================================================
-static int closeProc( thandle_t pFile )
+tmsize_t writeProc( thandle_t, void *, tmsize_t )
 {
     return 0;
 }
 
-//==================================================================
-static int mapProc( thandle_t pFile, tdata_t *ppData, toff_t *pOff )
+toff_t sizeProc( thandle_t handle )
 {
-    DASSERT( 0 );
+    return static_cast<toff_t>(fileFromHandle( handle ).GetDataSize());
+}
+
+int closeProc( thandle_t )
+{
     return 0;
 }
 
-//==================================================================
-static void unmapProc( thandle_t pFile, tdata_t pData, toff_t off )
+int mapProc( thandle_t, void **, toff_t * )
 {
-    DASSERT( 0 );
+    return 0;
 }
 
-//==================================================================
+void unmapProc( thandle_t, void *, toff_t )
+{
+}
+
+using TiffHandle = std::unique_ptr<TIFF, decltype(&TIFFClose)>;
+
+} // namespace
+
 namespace DIMG
 {
 
 //==================================================================
 void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
 {
-    TIFF *pTiff = TIFFClientOpen(
-                            pFName,
-                            "rm",
-                            &readFile,
-                            readProc,
-                            writeProc,
-                            seekProc,
-                            closeProc,
-                            sizeProc,
-                            mapProc,
-                            unmapProc );
+    TiffHandle tiff(
+        TIFFClientOpen(
+            pFName,
+            "rm",
+            &readFile,
+            readProc,
+            writeProc,
+            seekProc,
+            closeProc,
+            sizeProc,
+            mapProc,
+            unmapProc ),
+        &TIFFClose );
 
-    if NOT( pTiff )
+    DASSTHROW( tiff != nullptr, "Could not open %s for read", pFName );
+
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint16_t samplesPerPixel = 0;
+
+    DASSTHROW(
+        TIFFGetField( tiff.get(), TIFFTAG_IMAGEWIDTH, &width ) == 1 &&
+        TIFFGetField( tiff.get(), TIFFTAG_IMAGELENGTH, &height ) == 1,
+        "Missing image dimensions in %s",
+        pFName );
+    TIFFGetFieldDefaulted( tiff.get(), TIFFTAG_SAMPLESPERPIXEL, &samplesPerPixel );
+
+    DASSTHROW(
+        width > 0 && width <= Image::MAX_DIM_SIZE &&
+        height > 0 && height <= Image::MAX_DIM_SIZE,
+        "Unsupported image dimensions (%u, %u) in %s",
+        width,
+        height,
+        pFName );
+    DASSTHROW(
+        static_cast<size_t>(width) <=
+            std::numeric_limits<size_t>::max() / static_cast<size_t>(height),
+        "Image dimensions overflow in %s",
+        pFName );
+
+    const size_t pixelCount = static_cast<size_t>(width) * height;
+    std::vector<uint32_t> raster( pixelCount );
+
+    DASSTHROW(
+        TIFFReadRGBAImageOriented(
+            tiff.get(),
+            width,
+            height,
+            raster.data(),
+            ORIENTATION_TOPLEFT,
+            0 ) == 1,
+        "Could not read %s",
+        pFName );
+
+    const char *pChannelNames = nullptr;
+    switch ( samplesPerPixel )
     {
-        DASSTHROW( 0, "Could not open %s for read", pFName );
-    }
+    case 1:
+        pChannelNames = "y";
+        break;
 
-    U32	w, h;
-    TIFFGetField( pTiff, TIFFTAG_IMAGEWIDTH, &w );
-    TIFFGetField( pTiff, TIFFTAG_IMAGELENGTH, &h );
+    case 3:
+        pChannelNames = "rgb";
+        break;
 
-    U16	photometric;
-    TIFFGetField( pTiff, TIFFTAG_PHOTOMETRIC, &photometric );
+    case 4:
+        pChannelNames = "rgba";
+        break;
 
-    U16	bps, spp;
-    TIFFGetField( pTiff, TIFFTAG_BITSPERSAMPLE, &bps );
-    TIFFGetField( pTiff, TIFFTAG_SAMPLESPERPIXEL, &spp );
-
-    Image::SampType	imgSampType = Image::ST_UNKNOWN;
-
-    U32 *pTmpBuff = (U32 *)_TIFFCheckMalloc( pTiff, w * h, sizeof(U32), "raster buffer" );
-
-    if NOT( pTmpBuff )
-    {
-        TIFFClose( pTiff );
-        throw std::bad_alloc();
-    }
-
-    // Read the image in one chunk into an RGBA array
-    if NOT( TIFFReadRGBAImageOriented( pTiff, w, h, pTmpBuff, ORIENTATION_TOPLEFT, 0 ) )
-    {
-        TIFFClose( pTiff );
-        _TIFFfree( pTmpBuff );
-        DASSTHROW( 0, "Could not open %s", pFName );
-    }
-
-    const char *pChansStr = 0;
-    switch ( spp )
-    {
-    case 1:	pChansStr = "y"; break;
-    case 3:	pChansStr = "rgb"; break;
-    case 4:	pChansStr = "rgba"; break;
     default:
-        DASSTHROW( 0, "Unsupported # of samples per pixels (%i) in image %s", spp, pFName );
+        DASSTHROW(
+            0,
+            "Unsupported # of samples per pixel (%u) in image %s",
+            samplesPerPixel,
+            pFName );
         return;
     }
 
-    img.Init( w, h, spp, Image::ST_U8, -1, pChansStr );
+    img.Init( width, height, samplesPerPixel, Image::ST_U8, -1, pChannelNames );
 
-    size_t	srcIdx = 0;
-    for (U32 y=0; y < h; ++y)
+    size_t sourceIndex = 0;
+    for (U32 y = 0; y < height; ++y)
     {
         U8 *pDest = img.GetPixelPtrRW( 0, y );
 
-        switch ( spp )
+        for (U32 x = 0; x < width; ++x, ++sourceIndex)
         {
-        case 1:
-            for (U32 x=0; x < w; ++x, ++srcIdx)
-            {
-                pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
-                pDest += 1;
-            }
-            break;
+            const uint32_t pixel = raster[sourceIndex];
+            pDest[0] = static_cast<U8>(TIFFGetR( pixel ));
 
-        case 3:
-            for (U32 x=0; x < w; ++x, ++srcIdx)
+            if ( samplesPerPixel >= 3 )
             {
-                pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
-                pDest[1] = TIFFGetG( pTmpBuff[srcIdx] );
-                pDest[2] = TIFFGetB( pTmpBuff[srcIdx] );
-                pDest += 3;
+                pDest[1] = static_cast<U8>(TIFFGetG( pixel ));
+                pDest[2] = static_cast<U8>(TIFFGetB( pixel ));
             }
-            break;
 
-        case 4:
-            for (U32 x=0; x < w; ++x, ++srcIdx)
-            {
-                pDest[0] = TIFFGetR( pTmpBuff[srcIdx] );
-                pDest[1] = TIFFGetG( pTmpBuff[srcIdx] );
-                pDest[2] = TIFFGetB( pTmpBuff[srcIdx] );
-                pDest[3] = TIFFGetA( pTmpBuff[srcIdx] );
-                pDest += 4;
-            }
-            break;
+            if ( samplesPerPixel == 4 )
+                pDest[3] = static_cast<U8>(TIFFGetA( pixel ));
+
+            pDest += samplesPerPixel;
         }
     }
-
-    // XXX: raster array has 4-byte unsigned integer type, that is why
-    // we should rearrange it here.
-#if HOST_BIGENDIAN
-    TIFFSwabArrayOfLong( pTmpBuff, w * h );
-#endif
-
-    TIFFClose( pTiff );
-
-    // the following is for debugging, to dump out the just read TIF
-#if 0
-    char	fixname[2048];
-    char	ppmName[2048];
-
-    for (size_t i=0; ; ++i)
-    {
-        fixname[i] = pFName[i];
-
-        if ( fixname[i] == '/' || fixname[i] == '\\' )
-            fixname[i] = '_';
-
-        if NOT( pFName[i] )
-            break;
-    }
-
-    sprintf_s( ppmName, "C:\\Users\\xxxxxx\\tmp\\%s.ppm", fixname );
-
-    SavePPM( img, ppmName );
-#endif
-
 }
 
 //==================================================================
 void SaveTIFF( const Image &img, const char *pFName )
 {
-    TIFF *pTiff = TIFFOpen( pFName, "w" );
+    const bool supportedSampleType =
+        img.mSampType == Image::ST_U8 ||
+        img.mSampType == Image::ST_U16 ||
+        img.mSampType == Image::ST_U32 ||
+        img.mSampType == Image::ST_F32;
+    DASSTHROW( supportedSampleType, "Unsupported pixel format when writing %s", pFName );
 
-    if NOT( pTiff )
+    const bool isGray = img.mSampPerPix == 1;
+    const bool isRGB = img.mSampPerPix == 3 && img.IsSamplesNames( "rgb" );
+    const bool isRGBA = img.mSampPerPix == 4 && img.IsSamplesNames( "rgba" );
+    DASSTHROW(
+        isGray || isRGB || isRGBA,
+        "Cannot write %s. Unsupported image format.",
+        pFName );
+
+    TiffHandle tiff( TIFFOpen( pFName, "w" ), &TIFFClose );
+    DASSTHROW( tiff != nullptr, "Could not open %s for write", pFName );
+
+    DASSTHROW(
+        TIFFSetField( tiff.get(), TIFFTAG_IMAGEWIDTH, img.mWd ) == 1 &&
+        TIFFSetField( tiff.get(), TIFFTAG_IMAGELENGTH, img.mHe ) == 1 &&
+        TIFFSetField( tiff.get(), TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG ) == 1 &&
+        TIFFSetField( tiff.get(), TIFFTAG_COMPRESSION, COMPRESSION_NONE ) == 1 &&
+        TIFFSetField( tiff.get(), TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT ) == 1 &&
+        TIFFSetField(
+            tiff.get(),
+            TIFFTAG_BITSPERSAMPLE,
+            static_cast<uint16_t>(img.mBytesPerSamp * 8) ) == 1 &&
+        TIFFSetField(
+            tiff.get(),
+            TIFFTAG_SAMPLEFORMAT,
+            img.mSampType == Image::ST_F32 ? SAMPLEFORMAT_IEEEFP : SAMPLEFORMAT_UINT ) == 1 &&
+        TIFFSetField(
+            tiff.get(),
+            TIFFTAG_SAMPLESPERPIXEL,
+            static_cast<uint16_t>(img.mSampPerPix) ) == 1,
+        "Could not configure TIFF output %s",
+        pFName );
+
+    if ( isGray )
     {
-        DASSTHROW( 0, "Could not open %s for write", pFName );
-    }
-
-    // Write the tiff tags to the file
-    TIFFSetField( pTiff, TIFFTAG_IMAGEWIDTH, img.mWd );
-    TIFFSetField( pTiff, TIFFTAG_IMAGELENGTH, img.mHe );
-    TIFFSetField( pTiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG );
-    //TIFFSetField( pTiff, TIFFTAG_COMPRESSION, COMPRESSION_LZW );
-    TIFFSetField( pTiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT );
-
-    DASSTHROW( img.mSampType != Image::ST_F16, "Unsupported pixel format when writing %s", pFName );
-
-    if ( img.mSampType == Image::ST_F32 )
-        TIFFSetField( pTiff, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP );
-
-    TIFFSetField( pTiff, TIFFTAG_BITSPERSAMPLE, img.mBytesPerSamp * 8 );
-
-    if ( img.mSampPerPix == 1 )
-    {
-        TIFFSetField( pTiff, TIFFTAG_SAMPLESPERPIXEL, 1 );
+        DASSTHROW(
+            TIFFSetField( tiff.get(), TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK ) == 1,
+            "Could not configure TIFF output %s",
+            pFName );
     }
     else
-    if ( img.mSampPerPix == 3 && img.IsSamplesNames( "rgb" ) )
     {
-        TIFFSetField( pTiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB );
-        TIFFSetField( pTiff, TIFFTAG_SAMPLESPERPIXEL, 3 );
-    }
-    else
-    if ( img.mSampPerPix == 4 && img.IsSamplesNames( "rgba" ) )
-    {
-        TIFFSetField( pTiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB );
-        TIFFSetField( pTiff, TIFFTAG_SAMPLESPERPIXEL, 4 );
-        TIFFSetField( pTiff, TIFFTAG_MATTEING, 1 );
-    }
-    else
-    {
-        DASSTHROW( 0, "Cannot write %s. Unsupported image format.", pFName );
+        DASSTHROW(
+            TIFFSetField( tiff.get(), TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB ) == 1,
+            "Could not configure TIFF output %s",
+            pFName );
     }
 
-    //TIFFWriteEncodedStrip( pTiff, 0, (tdata_t)img.GetPixelPtrR(0,0) );
-
-    for (U32 i=0; i < img.mHe; ++i)
+    uint16_t alphaType = EXTRASAMPLE_ASSOCALPHA;
+    if ( isRGBA )
     {
-        TIFFWriteScanline( pTiff, (tdata_t)img.GetPixelPtrR(0,i), i );
+        DASSTHROW(
+            TIFFSetField( tiff.get(), TIFFTAG_EXTRASAMPLES, 1, &alphaType ) == 1,
+            "Could not configure TIFF alpha output %s",
+            pFName );
     }
 
-    TIFFClose( pTiff );
+    for (U32 y = 0; y < img.mHe; ++y)
+    {
+        auto *pRow = const_cast<U8 *>(img.GetPixelPtrR( 0, y ));
+        DASSTHROW(
+            TIFFWriteScanline( tiff.get(), pRow, y, 0 ) >= 0,
+            "Could not write row %u to %s",
+            y,
+            pFName );
+    }
 }
 
 //==================================================================

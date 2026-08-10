@@ -28,8 +28,6 @@ target_link_libraries(
     RibToolsBase
     RSLCompilerLib
     ${RIBTOOLS_GLUT_TARGET}
-    libtiff
-    libjpeg
     OpenGL::GL
     OpenGL::GLU
     )

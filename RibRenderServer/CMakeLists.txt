@@ -17,6 +17,4 @@ target_link_libraries(
     RibRenderLib
     RibToolsBase
     RSLCompilerLib
-    libtiff
-    libjpeg
     )
