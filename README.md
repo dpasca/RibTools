@@ -17,11 +17,6 @@ easier to build, test, and explore while preserving the original renderer archit
 RibTools remains an experimental project rather than a production RenderMan implementation. It is tested against the
 bundled scenes and intentionally supports only part of the RenderMan interface.
 
-New and substantially edited C++ and Objective-C++ code uses four spaces rather than tabs and follows
-[Davide Pasca's current C++ style guide](https://gist.githubusercontent.com/dpasca/5243278/raw/c92097874494f1735e033e1937506701f747dc4d/CodeStyle.cpp).
-This policy is forward-looking, so legacy files are not being mass-formatted. See [CONTRIBUTING.md](CONTRIBUTING.md) for
-the practical rules.
-
 ## Highlights
 
 - RIB scene parsing and a REYES-style micropolygon renderer.
