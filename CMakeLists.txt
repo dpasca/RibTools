@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.21)
 
+if (POLICY CMP0156)
+    cmake_policy(SET CMP0156 NEW)
+endif()
+
+if (POLICY CMP0179)
+    cmake_policy(SET CMP0179 NEW)
+endif()
+
 project(RibTools LANGUAGES C CXX)
 
 include(CTest)
