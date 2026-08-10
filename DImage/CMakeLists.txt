@@ -16,3 +16,8 @@ add_library( ${PROJECT_NAME} STATIC ${SRCS} ${INCS} )
 
 target_link_libraries( ${PROJECT_NAME} DSystem libtiff )
 
+if (BUILD_TESTING)
+    add_executable(DImageTests tests/DImageTests.cpp)
+    target_link_libraries(DImageTests PRIVATE DImage)
+    add_test(NAME DImage.Core COMMAND DImageTests)
+endif()

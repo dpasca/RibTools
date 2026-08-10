@@ -19,7 +19,7 @@ Token *TokenCalcBiOp(
                 const Token		&val1,
                 const Token		&val2 )
 {
-    if ( val1.id != val1.id &&
+    if ( val1.id != val2.id &&
          ((val1.id != T_VL_BOOL_TRUE && val1.id != T_VL_BOOL_FALSE) ||
           (val2.id != T_VL_BOOL_TRUE && val2.id != T_VL_BOOL_FALSE)) )
         return NULL;
@@ -39,7 +39,7 @@ Token *TokenCalcBiOp(
         case T_OP_GEEQ:		pOut_Tok->SetAsBoolValue( val1.ConstNum >= val2.ConstNum ); break;
         case T_OP_LSTH:		pOut_Tok->SetAsBoolValue( val1.ConstNum <  val2.ConstNum ); break;
         case T_OP_GRTH:		pOut_Tok->SetAsBoolValue( val1.ConstNum >  val2.ConstNum ); break;
-        case T_OP_EQ:		pOut_Tok->SetAsBoolValue( val2.ConstNum == val2.ConstNum ); break;
+        case T_OP_EQ:		pOut_Tok->SetAsBoolValue( val1.ConstNum == val2.ConstNum ); break;
         case T_OP_NEQ:		pOut_Tok->SetAsBoolValue( val1.ConstNum != val2.ConstNum ); break;
 
         default:

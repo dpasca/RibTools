@@ -1,0 +1,4 @@
+surface invalid_shader()
+{
+    @
+}

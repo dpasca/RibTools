@@ -22,11 +22,10 @@ namespace SVM
 /// Context
 //==================================================================
 Context::Context( SymbolIList &symsIList, size_t maxPointsN ) :
-    mMaxPointsN(maxPointsN)
+    mMaxPointsN(maxPointsN),
+    mBlocksXN(0),
+    mPointsYN(0)
 {
-    mBlocksXN;
-    mPointsYN;
-
     mProgramCounterIdx = 0;
     mPointsN		= 0;
     mBlocksN		= 0;

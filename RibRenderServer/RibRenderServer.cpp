@@ -11,7 +11,7 @@
 //==================================================================
 static int serverTask( SOCKET clientSock )
 {
-    printf( "Rendering for %zi... yeah, right !!\n", clientSock );
+    printf( "Rendering for %llu... yeah, right !!\n", static_cast<unsigned long long>(clientSock) );
 
     DNET::PacketManager			packetManager( clientSock );
 
@@ -111,7 +111,7 @@ static int serverMain( int argc, char **argv )
             }
 
             port = atoi( argv[i+1] );
-            if ( port <= 0 && port >= 65536 )
+            if ( port <= 0 || port >= 65536 )
             {
                 printf( "Invalid port range.\n" );
                 return -1;
@@ -140,7 +140,7 @@ static int serverMain( int argc, char **argv )
         case DNET::Listener::IRT_CONNECTED:
             listener.Stop();
 
-            printf( "Accepted socket %zi\n", acceptedSock );
+            printf( "Accepted socket %llu\n", static_cast<unsigned long long>(acceptedSock) );
             serverTask( acceptedSock );
 
             closesocket( acceptedSock );
@@ -155,6 +155,13 @@ static int serverMain( int argc, char **argv )
 
         case DNET::Listener::IRT_ERROR:
             printf( "Error while listening !\n" );
+            break;
+
+        case DNET::Listener::IRT_NOTHING:
+            break;
+
+        case DNET::Listener::IRT_N:
+            DASSERT( 0 );
             break;
         }
     }

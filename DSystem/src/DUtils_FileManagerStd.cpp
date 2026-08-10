@@ -43,12 +43,27 @@ bool FileManagerStd::GrabFile(const char* pFileName, DVec<U8> &out_data, const c
         return false;
     }
 
-    fseek( pFile, 0, SEEK_END );
-    out_data.resize( ftell( pFile ) );
-    fseek( pFile, 0, SEEK_SET );
+    if ( fseek( pFile, 0, SEEK_END ) != 0 )
+    {
+        fclose( pFile );
+        return false;
+    }
 
-    if ( out_data.size() )
-        fread( &out_data[0], 1, out_data.size(), pFile );
+    const long fileSize = ftell( pFile );
+    if ( fileSize < 0 || fseek( pFile, 0, SEEK_SET ) != 0 )
+    {
+        fclose( pFile );
+        return false;
+    }
+
+    out_data.resize( static_cast<size_t>(fileSize) );
+
+    if ( !out_data.empty() && fread( &out_data[0], 1, out_data.size(), pFile ) != out_data.size() )
+    {
+        out_data.clear();
+        fclose( pFile );
+        return false;
+    }
 
     fclose( pFile );
 

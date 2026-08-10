@@ -200,6 +200,7 @@ int main( int argc, char *argv[] )
     catch ( RSLC::Exception &e )
     {
         printf( "%s\n", e.GetMessage().c_str() );
+        return -1;
     }
     catch ( ... )
     {
@@ -207,7 +208,7 @@ int main( int argc, char *argv[] )
         return -1;
     }
 
-    printf( "Done !\n", pRRFName );
+    printf( "Done !\n" );
 
     return 0;
 }

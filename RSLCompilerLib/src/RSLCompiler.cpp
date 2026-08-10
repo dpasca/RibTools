@@ -136,7 +136,7 @@ void RSLCompiler::SaveASM( const char *pFName, const char *pRefSourceName )
 
     if ( fopen_s( &pFile, pFName, "wb" ) )
     {
-        DASSTHROW( 0, ("Failed to save %s", pFName) );
+        DASSTHROW( 0, "Failed to save %s", pFName );
     }
 
     char dateStr[256];

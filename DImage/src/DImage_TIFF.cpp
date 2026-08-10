@@ -103,7 +103,7 @@ void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
 
     if NOT( pTiff )
     {
-        DASSTHROW( 0, ("Could not open %s for read", pFName) );
+        DASSTHROW( 0, "Could not open %s for read", pFName );
     }
 
     U32	w, h;
@@ -132,7 +132,7 @@ void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
     {
         TIFFClose( pTiff );
         _TIFFfree( pTmpBuff );
-        DASSTHROW( 0, ("Could not open %s", pFName) );
+        DASSTHROW( 0, "Could not open %s", pFName );
     }
 
     const char *pChansStr = 0;
@@ -142,7 +142,7 @@ void LoadTIFF( Image &img, DUT::MemFile &readFile, const char *pFName )
     case 3:	pChansStr = "rgb"; break;
     case 4:	pChansStr = "rgba"; break;
     default:
-        DASSTHROW( 0, ("Unsupported # of samples per pixels (%i) in image %s", spp, pFName) );
+        DASSTHROW( 0, "Unsupported # of samples per pixels (%i) in image %s", spp, pFName );
         return;
     }
 
@@ -224,7 +224,7 @@ void SaveTIFF( const Image &img, const char *pFName )
 
     if NOT( pTiff )
     {
-        DASSTHROW( 0, ("Could not open %s for write", pFName) );
+        DASSTHROW( 0, "Could not open %s for write", pFName );
     }
 
     // Write the tiff tags to the file
@@ -234,7 +234,7 @@ void SaveTIFF( const Image &img, const char *pFName )
     //TIFFSetField( pTiff, TIFFTAG_COMPRESSION, COMPRESSION_LZW );
     TIFFSetField( pTiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT );
 
-    DASSTHROW( img.mSampType != Image::ST_F16, ("Unsupported pixel format when writing %s", pFName) );
+    DASSTHROW( img.mSampType != Image::ST_F16, "Unsupported pixel format when writing %s", pFName );
 
     if ( img.mSampType == Image::ST_F32 )
         TIFFSetField( pTiff, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP );
@@ -260,7 +260,7 @@ void SaveTIFF( const Image &img, const char *pFName )
     }
     else
     {
-        DASSTHROW( 0, ("Cannot write %s. Unsupported image format.", pFName) );
+        DASSTHROW( 0, "Cannot write %s. Unsupported image format.", pFName );
     }
 
     //TIFFWriteEncodedStrip( pTiff, 0, (tdata_t)img.GetPixelPtrR(0,0) );

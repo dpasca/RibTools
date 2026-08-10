@@ -191,4 +191,24 @@ add_subdirectory( RSLCompilerCmd )
 
 if (BUILD_TESTING)
     add_test(NAME RSLCompilerCmd.Help COMMAND RSLCompilerCmd --help)
+
+    add_test(
+        NAME RSLCompilerCmd.ShaderSmoke
+        COMMAND RSLCompilerCmd
+            "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/matte.sl"
+            "${CMAKE_CURRENT_BINARY_DIR}/matte.rrasm")
+    set_tests_properties(
+        RSLCompilerCmd.ShaderSmoke
+        PROPERTIES ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base")
+
+    add_test(
+        NAME RSLCompilerCmd.RejectsInvalidShader
+        COMMAND RSLCompilerCmd
+            "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/invalid.sl"
+            "${CMAKE_CURRENT_BINARY_DIR}/invalid.rrasm")
+    set_tests_properties(
+        RSLCompilerCmd.RejectsInvalidShader
+        PROPERTIES
+            ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base"
+            WILL_FAIL TRUE)
 endif()

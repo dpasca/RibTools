@@ -108,10 +108,16 @@ Listener::IdleRetType Listener::Idle( SOCKET &out_acceptedSock, U32 waitMSec )
     FD_ZERO( &rdset );
     FD_SET( mListenSock, &rdset );
 
-    tv.tv_sec = 0;
-    tv.tv_usec = waitMSec * 1000;
+    tv.tv_sec = waitMSec / 1000;
+    tv.tv_usec = (waitMSec % 1000) * 1000;
 
-    if ( select( 1, &rdset, NULL, 0, &tv ) == -1 )
+#if defined(WIN32)
+    const int descriptorCount = 0;
+#else
+    const int descriptorCount = mListenSock + 1;
+#endif
+
+    if ( select( descriptorCount, &rdset, NULL, 0, &tv ) == -1 )
     {
         Stop();
         return IRT_ERROR;
@@ -124,7 +130,7 @@ Listener::IdleRetType Listener::Idle( SOCKET &out_acceptedSock, U32 waitMSec )
         if ( out_acceptedSock != INVALID_SOCKET )
         {
             // make non-blocking
-            if NOT( SetNonBlocking( mListenSock ) )
+            if NOT( SetNonBlocking( out_acceptedSock ) )
             {
                 closesocket( out_acceptedSock );
                 out_acceptedSock = INVALID_SOCKET;

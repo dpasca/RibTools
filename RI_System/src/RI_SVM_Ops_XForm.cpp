@@ -43,7 +43,7 @@ static void getMtxToCurrent(
     }
     else
     {
-        DASSTHROW( 0, ("Currently unsupported space cast '%s' !", pFrSpaceName) );
+        DASSTHROW( 0, "Currently unsupported space cast '%s' !", pFrSpaceName );
     }
 }
 

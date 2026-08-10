@@ -31,11 +31,11 @@ bool GetServersList( int argc, char **argv, DVec<RRL::NET::Server> &list )
             if ( pToken )
             {
                 servEntry.mAddressName = pToken;
-                if ( pToken = strtok_r( NULL, ":", &pContext ) )
+                if ( (pToken = strtok_r( NULL, ":", &pContext )) )
                 {
                     servEntry.mPortToCall = atoi( pToken );
 
-                    if ( servEntry.mPortToCall <= 0 && servEntry.mPortToCall >= 65536 )
+                    if ( servEntry.mPortToCall <= 0 || servEntry.mPortToCall >= 65536 )
                     {
                         printf( "Invalid port range.\n" );
                         return false;
@@ -84,4 +84,3 @@ void InitServers( CmdParams &cmdPars, const char *defaultShadersDir )
         }
     }
 }
-

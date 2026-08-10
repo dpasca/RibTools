@@ -25,12 +25,13 @@ errno_t fopen_s( FILE **out_ppFile, const char *pFName, const char *pMode )
 //==================================================================
 void strtime( char *pDest, size_t maxLen )
 {
-    //struct tm	tmm;
-    time_t		t;
+    DASSTHROW( pDest != NULL && maxLen > 0, "Invalid destination buffer" );
 
-    t = time( NULL );
+    const time_t t = time( NULL );
+    const char *pTime = ctime( &t );
+    DASSTHROW( pTime != NULL, "Could not format the current time" );
 
-    strcpy_s( pDest, ctime( &t ) );
+    snprintf( pDest, maxLen, "%s", pTime );
 }
 
 //==================================================================
@@ -47,59 +48,46 @@ int vsnprintf_s( char *str, size_t strMaxLen, size_t size, const char *format, v
 //==================================================================
 char *strcpy_s( char *pDest, size_t destSize, const char *pSrc )
 {
-    size_t	srcLen = strlen( pSrc );
-    DASSTHROW( (srcLen+1) <= destSize, ("Out of bounds !") );
+    DASSTHROW( pDest != NULL && destSize > 0 && pSrc != NULL, "Invalid string buffer" );
+    const size_t srcLen = strlen( pSrc );
+    DASSTHROW( (srcLen + 1) <= destSize, "Out of bounds !" );
     return strcpy( pDest, pSrc );
 }
 
 //==================================================================
 char *strcat_s( char *pDest, size_t destSize, const char *pSrc )
 {
-    size_t	srcLen = strlen( pSrc );
-    size_t	curDestLen = strlen( pDest );
-    DASSTHROW( (curDestLen+srcLen+1) <= destSize, ("Out of bounds !") );
+    DASSTHROW( pDest != NULL && destSize > 0 && pSrc != NULL, "Invalid string buffer" );
+    const size_t srcLen = strlen( pSrc );
+    const size_t curDestLen = strnlen( pDest, destSize );
+    DASSTHROW( curDestLen < destSize, "Destination string is not terminated" );
+    DASSTHROW( (curDestLen + srcLen + 1) <= destSize, "Out of bounds !" );
     return strcat( pDest, pSrc );
-}
-
-//==================================================================
-int vsprintf_s( char *str, const char *pFmt, va_list vl )
-{
-    return vsprintf( str, pFmt, vl );
 }
 
 //==================================================================
 int vsprintf_s( char *str, size_t destMaxSize, const char *pFmt, va_list vl )
 {
-    return vsprintf( str, pFmt, vl );
-}
+    if ( str == NULL || destMaxSize == 0 || pFmt == NULL )
+        return -1;
 
-//==================================================================
-int sprintf_s( char *str, const char *format, ...)
-{
-    int	ret;
-
-    va_list	vl;
-    va_start( vl, format );
-
-    ret = vsprintf_s( str, format, vl );
-
-    va_end( vl );
+    const int ret = vsnprintf( str, destMaxSize, pFmt, vl );
+    if ( ret < 0 || static_cast<size_t>(ret) >= destMaxSize )
+    {
+        str[destMaxSize - 1] = 0;
+        return -1;
+    }
 
     return ret;
 }
 
 //==================================================================
-int sprintf_s( char *str, size_t destMaxSize, const char *format, ...)
+int sprintf_s( char *str, size_t destMaxSize, const char *format, ... )
 {
-    int	ret;
-
-    va_list	vl;
+    va_list vl;
     va_start( vl, format );
-
-    ret = vsprintf_s( str, format, vl );
-
+    const int ret = vsprintf_s( str, destMaxSize, format, vl );
     va_end( vl );
-
     return ret;
 }
 
@@ -108,14 +96,17 @@ int sprintf_s( char *str, size_t destMaxSize, const char *format, ...)
 //==================================================================
 void numstrdate( char *pDest, size_t maxLen )
 {
-    time_t 		t;
-    struct tm	*tm;
+    DASSTHROW( pDest != NULL && maxLen > 0, "Invalid destination buffer" );
 
-    t 	= time( NULL );
-    tm	= localtime( &t );
+    const time_t t = time( NULL );
+    const struct tm *pTime = localtime( &t );
+    DASSTHROW( pTime != NULL, "Could not read the current date" );
 
-    sprintf( pDest, "%i/%02i/%02i",
-        tm->tm_year+1900,
-        tm->tm_mon+1,
-        tm->tm_mday );
+    snprintf(
+        pDest,
+        maxLen,
+        "%i/%02i/%02i",
+        pTime->tm_year + 1900,
+        pTime->tm_mon + 1,
+        pTime->tm_mday );
 }

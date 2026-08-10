@@ -78,8 +78,9 @@ inline void bilinearFill( float out_x[], float out_y[], float x1, float y1, floa
 
     for (; idx < paddedN; ++idx)
     {
-        out_x[idx] = out_x[idx-1];
-        out_y[idx] = out_y[idx-1];
+        const size_t sourceIdx = idx > 0 ? idx - 1 : 0;
+        out_x[idx] = idx > 0 ? out_x[sourceIdx] : 0.0f;
+        out_y[idx] = idx > 0 ? out_y[sourceIdx] : 0.0f;
     }
 }
 

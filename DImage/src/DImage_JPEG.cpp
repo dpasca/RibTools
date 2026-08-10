@@ -41,7 +41,7 @@ static void write_JPEG_file(
 
     if ( 0 != fopen_s( &outfile, filename, "wb" ) )
     {
-        DASSTHROW( 0, ("can't open %s\n", filename) );
+        DASSTHROW( 0, "can't open %s\n", filename );
     }
     jpeg_stdio_dest(&cinfo, outfile);
 

@@ -9,3 +9,8 @@ source_group( Sources FILES ${SRCS} ${INCS} )
 
 add_library( ${PROJECT_NAME} STATIC ${SRCS} ${INCS} )
 
+if (BUILD_TESTING)
+    add_executable(DSystemSafeCrtTests tests/DSafeCrtTests.cpp)
+    target_link_libraries(DSystemSafeCrtTests PRIVATE DSystem)
+    add_test(NAME DSystem.SafeCrt COMMAND DSystemSafeCrtTests)
+endif()

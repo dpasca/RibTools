@@ -100,7 +100,7 @@ public:
         DASSERT( mWd >= 1 && mHe >= 1 );
 
         int	x1 = x % mWd; x1 += mWd & (x1 >> (sizeof(int)*8-1));
-        int	y1 = y % mHe; x1 += mHe & (y1 >> (sizeof(int)*8-1));
+        int	y1 = y % mHe; y1 += mHe & (y1 >> (sizeof(int)*8-1));
 
         int x2 = x1 + 1; if ( x2 >= (int)mWd ) x2 -= mWd;
         int y2 = y1 + 1; if ( y2 >= (int)mHe ) y2 -= mHe;

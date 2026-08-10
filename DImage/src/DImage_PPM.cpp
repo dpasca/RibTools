@@ -19,12 +19,12 @@ void SavePPM( const Image &img, const char *pFName )
     FILE *pFile;
 
     int err = fopen_s( &pFile, pFName, "wb" );
-    DASSTHROW( err == 0, ("Could not write %s", pFName) );
+    DASSTHROW( err == 0, "Could not write %s", pFName );
 
     DASSTHROW(
         img.mSampPerPix <= 3 &&
         img.mBytesPerSamp == 1,
-            ("Unsupported image format. Cannot write %s", pFName) );
+            "Unsupported image format. Cannot write %s", pFName );
 
     fprintf_s( pFile,
         "P6\n"

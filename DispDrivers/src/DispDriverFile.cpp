@@ -32,7 +32,7 @@ DispDriverFile::DispDriverFile( const char *pFileName, const DIMG::Image &srcImg
     }
     else
     {
-        DASSTHROW( 0, ("Unsupported file type '%s'", pExt) );
+        DASSTHROW( 0, "Unsupported file type '%s'", pExt );
     }
 }
 

@@ -75,9 +75,9 @@ void DAssert( bool ok, const char *pFile, int line, const char *msg )
     if ( ok )
         return;
 
-    char	buff[1024];
+    char buff[1024] {};
 
-    sprintf(buff, "ASSERT: %s:%i '%s'\n", pFile, line, (msg==0)?(""):msg);
+    snprintf( buff, sizeof(buff), "ASSERT: %s:%i '%s'\n", pFile, line, msg ? msg : "" );
 
     printf( "%s", buff );
 
@@ -130,7 +130,7 @@ void DVAssThrow( bool ok, const char *pFile, int line, const char *pFmt, va_list
     if ( ok )
         return;
 
-    char	buff[1024];
+    char buff[1024] {};
     vsnprintf( buff, sizeof(buff), pFmt, vl );
 
     DSAssThrow( ok, pFile, line, buff );
@@ -142,15 +142,15 @@ void DSAssThrow( bool ok, const char *pFile, int line, const char *pNewCharMsg )
     if ( ok )
         return;
 
-    char	buff[1024];
+    char buff[1024] {};
 
     if ( pNewCharMsg )
     {
-        sprintf( buff, "ASSERT EXCEPT: %s - %s %i\n", pNewCharMsg, pFile, line );
+        snprintf( buff, sizeof(buff), "ASSERT EXCEPT: %s - %s %i\n", pNewCharMsg, pFile, line );
     }
     else
     {
-        sprintf( buff, "ASSERT EXCEPT: %s %i\n", pFile, line );
+        snprintf( buff, sizeof(buff), "ASSERT EXCEPT: %s %i\n", pFile, line );
     }
 
     //puts( buff );
@@ -169,6 +169,8 @@ void DVerbose(const char *fmt, ... )
     va_start( vl, fmt );
 
     DVVerbose(fmt, vl);
+
+    va_end( vl );
 }
 
 //==================================================================
@@ -188,16 +190,24 @@ void DDebugOut(const char *fmt, ... )
     va_start( vl, fmt );
 
     DVDebugOut(fmt, vl);
+
+    va_end( vl );
 }
 //==================================================================
 void DVDebugOut(const char *fmt, va_list vl)
 {
-    DVVerbose( fmt, vl );
-
     // like DVVerbose, but with additional debugger output
 #if defined(_MSC_VER)
+    va_list debuggerArgs;
+    va_copy( debuggerArgs, vl );
+#endif
+
+    DVVerbose( fmt, vl );
+
+#if defined(_MSC_VER)
     char	buff[2048];
-    vsnprintf( buff, sizeof(buff), fmt, vl);
+    vsnprintf( buff, sizeof(buff), fmt, debuggerArgs );
+    va_end( debuggerArgs );
     OutputDebugString( buff );
 #endif
 }

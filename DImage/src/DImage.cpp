@@ -7,6 +7,7 @@
 //==================================================================
 
 #include <string.h>
+#include <limits>
 #include "DSystem/include/DMemory.h"
 #include "DSystem/include/DUtils.h"
 #include "DImage.h"
@@ -158,12 +159,21 @@ bool Image::IsSamplesNames( const char *pMatchSampNames ) const
 void Image::GetPixelAsFloat( U32 x, U32 y, float out_samps[MAX_SAMP_PER_PIX] ) const
 {
     const void *pPixData = GetPixelPtrR( x, y );
+    const double maxU32 = static_cast<double>(std::numeric_limits<U32>::max());
 
     switch ( mSampType )
     {
     case Image::ST_U8	:	for (size_t i=0; i < mSampPerPix; ++i) out_samps[i] = (1.0f/255) * ((const U8 *)pPixData)[i]; break;
     case Image::ST_U16	:	for (size_t i=0; i < mSampPerPix; ++i) out_samps[i] = (1.0f/65535) * ((const U16 *)pPixData)[i]; break;
-    case Image::ST_U32	:	for (size_t i=0; i < mSampPerPix; ++i) out_samps[i] = (1.0f/0xffffffff) * ((const U32 *)pPixData)[i]; break;
+    case Image::ST_U32:
+    {
+        const auto *pSamples = static_cast<const U32 *>(pPixData);
+        for (size_t i = 0; i < mSampPerPix; ++i)
+        {
+            out_samps[i] = static_cast<float>(pSamples[i] / maxU32);
+        }
+        break;
+    }
         //case Image::ST_F16	:	for (size_t i=0; i < mSampPerPix; ++i) out_samps[i] = ((const U16 *)pPixData)[i]; break;
     case Image::ST_F32	:	for (size_t i=0; i < mSampPerPix; ++i) out_samps[i] = ((const float *)pPixData)[i]; break;
 
@@ -177,12 +187,22 @@ void Image::GetPixelAsFloat( U32 x, U32 y, float out_samps[MAX_SAMP_PER_PIX] ) c
 void Image::SetPixelFromFloat( U32 x, U32 y, const float in_samps[MAX_SAMP_PER_PIX] )
 {
     void *pPixData = GetPixelPtrRW( x, y );
+    const double maxU32 = static_cast<double>(std::numeric_limits<U32>::max());
 
     switch ( mSampType )
     {
     case Image::ST_U8	:	for (size_t i=0; i < mSampPerPix; ++i) ((U8 *)pPixData)[i] = (U8)D::Clamp( 255 * in_samps[i], 0.f, 255.f ); break;
     case Image::ST_U16	:	for (size_t i=0; i < mSampPerPix; ++i) ((U16 *)pPixData)[i] = (U16)D::Clamp( 65535 * in_samps[i], 0.f, 65535.f ); break;
-    case Image::ST_U32	:	for (size_t i=0; i < mSampPerPix; ++i) ((U32 *)pPixData)[i] = (U32)D::Clamp( 0xffffffff * in_samps[i], 0.f, (float)0xffffffff ); break;
+    case Image::ST_U32:
+    {
+        auto *pSamples = static_cast<U32 *>(pPixData);
+        for (size_t i = 0; i < mSampPerPix; ++i)
+        {
+            pSamples[i] = static_cast<U32>(
+                D::Clamp( static_cast<double>(in_samps[i]), 0.0, 1.0 ) * maxU32 );
+        }
+        break;
+    }
         //case Image::ST_F16	:	for (size_t i=0; i < mSampPerPix; ++i) ((U16 *)pPixData)[i] = in_samps[i]; break;
     case Image::ST_F32	:	for (size_t i=0; i < mSampPerPix; ++i) ((float *)pPixData)[i] = in_samps[i]; break;
 

@@ -50,7 +50,10 @@ RibRendToy::RibRendToy( const char *pExePath ) :
 
     strcpy_s( mExePath, pExePath );
 
-    sprintf( mExeResPath, "%s/Resources", mExePath );
+    const int resourcePathLen = snprintf( mExeResPath, sizeof(mExeResPath), "%s/Resources", mExePath );
+    DASSTHROW(
+        resourcePathLen >= 0 && static_cast<size_t>(resourcePathLen) < sizeof(mExeResPath),
+        "Executable resource path is too long" );
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize( 640, 480 );
@@ -218,7 +221,11 @@ bool RibRendToy::RenderFile( bool renderLastUsed, int forcedWd/*=-1*/, int force
     DStr	baseDir = DUT::GetDirNameFromFPathName( pFileName );
 
     char	defaultShadersDir[4096];
-    sprintf( defaultShadersDir, "%s/Shaders", mExeResPath );
+    const int shaderPathLen =
+        snprintf( defaultShadersDir, sizeof(defaultShadersDir), "%s/Shaders", mExeResPath );
+    DASSTHROW(
+        shaderPathLen >= 0 && static_cast<size_t>(shaderPathLen) < sizeof(defaultShadersDir),
+        "Default shader path is too long" );
     printf( "Base Dir: %s\n", baseDir.c_str() );
     printf( "Default Shaders Dir: %s\n", defaultShadersDir );
 

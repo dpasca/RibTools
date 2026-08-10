@@ -23,21 +23,21 @@ static void matchSymbols( const Symbol &dst, const Symbol &src, bool &out_needCo
 
     // this shouldn't really happen at this stage
     DASSTHROW( dst.IsName( src.GetNameChr() ),
-        ("Names not matching ! %s != %s", dst.GetNameChr(), src.GetNameChr()) );
+        "Names not matching ! %s != %s", dst.GetNameChr(), src.GetNameChr() );
 
     DASSTHROW( dst.mType == src.mType,
-                ("Type is %i but expecting %i for '%s'",
+                "Type is %i but expecting %i for '%s'",
                     dst.mType,
                     src.mType,
-                    dst.GetNameChr()) );
+                    dst.GetNameChr() );
 
     if ( src.IsVarying() )
     {
         if NOT( dst.IsVarying() )
         {
             DASSTHROW( 0,
-                ("Cannot assign a varying value to a non varying one for '%s'",
-                    dst.GetNameChr()) );
+                "Cannot assign a varying value to a non varying one for '%s'",
+                    dst.GetNameChr() );
         }
     }
     else
@@ -53,8 +53,8 @@ static void matchSymbols( const Symbol &dst, const Symbol &src, bool &out_needCo
         if NOT( src.IsConstant() )
         {
             DASSTHROW( 0,
-                ("Cannot assign a non-constant value to a constant one '%s'",
-                    dst.GetNameChr()) );
+                "Cannot assign a non-constant value to a constant one '%s'",
+                    dst.GetNameChr() );
         }
     }
 }
@@ -82,7 +82,7 @@ static void bindGlobalStorageSymbol(
 
         const Symbol	*pGlobalSym = globalSyms.FindSymbol( shaSym.GetNameChr() );
 
-        DASSTHROW( pGlobalSym != NULL, ("Could not find the global symbol %s !\n", shaSym.GetNameChr()) );
+        DASSTHROW( pGlobalSym != NULL, "Could not find the global symbol %s !\n", shaSym.GetNameChr() );
 
         bool needConvertToVarying;
         matchSymbols( shaSym, *pGlobalSym, needConvertToVarying );
@@ -100,7 +100,7 @@ static void bindGlobalStorageSymbol(
 
         SymbolI	*pGridGlobalSymI = gridSymIList.FindSymbolI( shaSym.GetNameChr() );
 
-        DASSTHROW( pGridGlobalSymI != NULL, ("Could not find the global symbol %s !\n", shaSym.GetNameChr()) );
+        DASSTHROW( pGridGlobalSymI != NULL, "Could not find the global symbol %s !\n", shaSym.GetNameChr() );
 
         bool needConvertToVarying;
         matchSymbols( shaSym, *pGridGlobalSymI->GetSrcSymbol(), needConvertToVarying );
