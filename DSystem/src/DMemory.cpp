@@ -10,15 +10,12 @@
 #include "DMemory.h"
 #include "DExceptions.h"
 
-#ifdef _MSC_VER
-    #include <malloc.h>
-
-#elif defined(__MACH__)
-    //#include <mm_malloc.h>
-
-#else
-    #include <mm_malloc.h>
-
+#if defined(D_OVERRIDE_NEW_DEL)
+    #if defined(_MSC_VER)
+        #include <malloc.h>
+    #else
+        #include <mm_malloc.h>
+    #endif
 #endif
 
 #if defined(D_FILE_LINE_NEW_DEL) && defined(D_OVERRIDE_NEW_DEL)

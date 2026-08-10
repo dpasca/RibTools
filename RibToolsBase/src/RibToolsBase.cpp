@@ -33,23 +33,21 @@ static void tragicEnd()
 // we place this here for now
 DStr FindRibToolsDir( char *argv[] )
 {
-    char buff[1024];
+    char buff[1024] {};
 
 #if defined(WIN32)
     if NOT( GetEnvironmentVariableA( "RIBTOOLS_DIR", buff, sizeof(buff)-1 ) )
         buff[0] = 0;
 
-#elif defined(__linux__)
-    char *pEnvVar = getenv( "RIBTOOLS_DIR" );
+#else
+    const auto* pEnvVar = getenv( "RIBTOOLS_DIR" );
 
     if ( pEnvVar )
         strcpy_s( buff, pEnvVar );
-    else
-        buff[0] = 0;
 
 #endif
 
-    char buff2[1024];
+    char buff2[1024] {};
 
     if ( buff[0] )
     {
@@ -59,13 +57,13 @@ DStr FindRibToolsDir( char *argv[] )
     }
     else
     {
-        DStr exePath = DUT::GetDirNameFromFPathName( argv[0] );
+        const auto exePath = DUT::GetDirNameFromFPathName( argv[0] );
 
         if ( exePath.length() )
         {
             sprintf_s( buff2, "%s/ribtools.ini", exePath.c_str() );
             if ( DUT::FileExists( buff2 ) )
-                return exePath.c_str() ;
+                return exePath.c_str();
         }
     }
 

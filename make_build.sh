@@ -1,9 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-mkdir -p _build
-pushd _build
-cmake .. -DCMAKE_BUILD_TYPE=${1:-Release}
-popd
+set -euo pipefail
 
-./make_distrib.sh
+build_type=${1:-Release}
 
+cmake -S . -B _build -DCMAKE_BUILD_TYPE="${build_type}"
+bash ./make_distrib.sh

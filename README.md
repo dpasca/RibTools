@@ -3,10 +3,17 @@ RibTools
 
 **RibTools** is an experiment in writing an off-line renderer based on Pixar's [RenderMan interface] and the [REYES] rendering architecture.
 
-> **NOTICE:** Major development was **suspended** in 2010. Only occasional maintenance and refactoring updates are applied.
+> **2026 maintenance:** New and substantially edited C++ uses four spaces rather than tabs and follows
+> [Davide Pasca's current C++ style guide]. This is a forward-looking policy; legacy files are not being mass-formatted.
+> See [CONTRIBUTING.md] for the practical rules.
+
+> **Historical notice:** Major development was suspended in 2010. The project received occasional maintenance through
+> 2020, followed by a basic build and tooling refresh in 2026.
 
 [RenderMan interface]: http://en.wikipedia.org/wiki/RenderMan_Interface_Specification
 [REYES]: http://en.wikipedia.org/wiki/Reyes_rendering
+[Davide Pasca's current C++ style guide]: https://gist.githubusercontent.com/dpasca/5243278/raw/c92097874494f1735e033e1937506701f747dc4d/CodeStyle.cpp
+[CONTRIBUTING.md]: CONTRIBUTING.md
 
 At the core of **RibTools** there is **RibRender**, the rendering engine, built with speed and scalability in mind.
 
@@ -21,21 +28,51 @@ Parallelism is implemented at all levels:
 ![Elephant additive](docs/progress/2009-12-15_elephant_funky_translucency.png)
 ![Elephant buckets](docs/progress/RibRender-elephant-color-coded-grids-bucketed.png)
 
-Building & running
-------------------
+Building and running
+--------------------
 
-Instructions for Windows and Visual Studio.
+### Requirements
 
-1. Launch `make_build.bat`
-2. Launch `do_build.bat`
-3. Go inside the directory `_distrib` and launch `RibRenderToy.exe` `*`
-4. Run
-5. Right click in the window to load a test object
+- CMake 3.21 or newer
+- A C++20 compiler
+- The platform OpenGL and GLU development files
+- X11 and XInput development files on Linux
 
-That's all !
+Initialize the bundled FreeGLUT dependency after cloning. It is used on Windows and Linux; macOS uses the system GLUT
+framework.
 
-`*` In case of Windows, it's possible to open the Visual Studio solution located inside `_build\RibTools.sln`.
-Make sure to select the *Release* build.
+```sh
+git submodule update --init --recursive
+```
+
+### macOS and Linux
+
+The compatibility scripts keep build products in `_build` and stage runnable files in `_distrib`:
+
+```sh
+./make_build.sh Release
+./do_build.sh Release
+ctest --test-dir _build --output-on-failure
+```
+
+The equivalent preset workflow is:
+
+```sh
+cmake --preset release
+bash ./make_distrib.sh
+cmake --build --preset release
+ctest --preset release
+```
+
+### Windows
+
+Run `make_build.bat`, followed by `do_build.bat`. Visual Studio users can also open `_build\RibTools.sln` and select the
+Release configuration.
+
+### Run the renderer toy
+
+Launch `RibRenderToy` from `_distrib` (`RibRenderToy.exe` on Windows), then right-click in its window to choose one of the
+included test scenes. The OpenGL/GLUT front end is intentionally still the original compatibility implementation.
 
 About
 -----
@@ -68,4 +105,3 @@ For any issues regarding attribution, please contact me at `davide@newtypekk.com
 
 The *RenderMan&reg; Interface Procedures* and RIB Protocol are: Copyright 1988, 1989,
 Pixar. All rights reserved. *RenderMan&reg;* is a registered trademark of Pixar.
-

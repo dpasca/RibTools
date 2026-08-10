@@ -13,7 +13,9 @@
     #include <inttypes.h>
 #endif
 
-#define DMATH_USE_M128
+#if defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__)
+    #define DMATH_USE_M128
+#endif
 //#define DMATH_USE_M512
 
 #if defined(DMATH_USE_M128)
@@ -288,4 +290,3 @@ typedef unsigned __int64	DU64;
 #endif
 
 #endif
-

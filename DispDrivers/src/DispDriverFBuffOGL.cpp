@@ -13,7 +13,11 @@
     #pragma comment (lib, "opengl32.lib")
 #endif
 
-#include <GL/gl.h>
+#if defined(__APPLE__)
+    #include <OpenGL/gl.h>
+#else
+    #include <GL/gl.h>
+#endif
 
 #include "DSystem/include/DTypes.h"
 #include "RI_System/include/RI_State.h"

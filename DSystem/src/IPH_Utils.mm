@@ -6,7 +6,7 @@
 /// copyright info. 
 //==================================================================
 
-#if defined(TARGET_OS_IPHONE)
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
 
 #include <Foundation/Foundation.h>
 #include <UIKit/UIKit.h>
@@ -60,4 +60,3 @@ void ShowAlert( const char *pTitle, const char *pText )
 }
 
 #endif
-

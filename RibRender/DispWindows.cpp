@@ -7,7 +7,11 @@
 //==================================================================
 
 #include "DispWindows.h"
-#include <GL/glut.h>
+#if defined(__APPLE__)
+    #include <GLUT/glut.h>
+#else
+    #include <GL/glut.h>
+#endif
 
 //==================================================================
 DVec<DispWindows::Window>	DispWindows::msWindows;

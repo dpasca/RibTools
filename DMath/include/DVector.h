@@ -134,7 +134,7 @@ public:
 
     void SetZero()
     {
-        v3[0] = v3[1] = v3[2] = (_TS)0;
+        v3[0] = v3[1] = v3[2] = _TS{};
     }
 
     bool IsZero() const { for (const auto &x : v3) if (x) return false; return true; }

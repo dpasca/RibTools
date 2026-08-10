@@ -6,7 +6,7 @@
 /// copyright info. 
 //==================================================================
 
-#if !defined(TARGET_OS_IPHONE)
+#if !defined(TARGET_OS_IPHONE) || !TARGET_OS_IPHONE
     #error This is for iPhone only !
 #endif
 

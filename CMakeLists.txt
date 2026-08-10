@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.21)
+
+project(RibTools LANGUAGES C CXX)
+
+include(CTest)
 
 #=============================================
 MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
@@ -60,9 +64,6 @@ endif()
 # sepcify which are the "debug" configs (for the linker)
 set_property(GLOBAL PROPERTY DEBUG_CONFIGURATIONS "Debug;DebugOpt")
 
-#=============================================
-project (RibTools)
-
 # create vcproj.user file for Visual Studio to set debug working directory
 function(app_create_vcxproj_userfile extraPath)
     if (MSVC)
@@ -78,17 +79,16 @@ endfunction()
 # Specify the destination directly into the _distrib directory
 # ..also avoid the /Release and /Debug additional subdirs created by
 # Visual Studio
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../_distrib )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/../_distrib )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/../_distrib )
+set(RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY
+    "${CMAKE_SOURCE_DIR}/_distrib"
+    CACHE PATH "Directory for RibTools executables")
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}" )
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-if (CMAKE_COMPILER_IS_GNUCXX)
-    set(CPPFS_LIBRARIES "stdc++fs")
-endif()
 
 #
 if (MSVC)
@@ -153,10 +153,35 @@ add_subdirectory( RSLCompilerLib )
 add_subdirectory( externals/local/libtiff )
 add_subdirectory( externals/local/libjpeg )
 
-set(FREEGLUT_BUILD_SHARED_LIBS OFF CACHE BOOL "Disable FreeGLUT shared libs")
-#set(FREEGLUT_BUILD_STATIC_LIBS OFF CACHE BOOL "Disable FreeGLUT static libs")
-set(FREEGLUT_BUILD_DEMOS OFF CACHE BOOL "Disable FreeGLUT demos")
-add_subdirectory( externals/FreeGLUT/freeglut/freeglut )
+find_package(OpenGL REQUIRED)
+
+if (NOT TARGET OpenGL::GLU)
+    message(FATAL_ERROR "OpenGL Utility Library (GLU) development files are required")
+endif()
+
+if (APPLE)
+    find_package(GLUT REQUIRED)
+    set(RIBTOOLS_GLUT_TARGET GLUT::GLUT)
+else()
+    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/externals/FreeGLUT/freeglut/freeglut/CMakeLists.txt")
+        message(FATAL_ERROR
+            "The FreeGLUT submodule is missing. Run: git submodule update --init --recursive")
+    endif()
+
+    set(FREEGLUT_BUILD_SHARED_LIBS OFF CACHE BOOL "Disable FreeGLUT shared libs")
+    set(FREEGLUT_BUILD_DEMOS OFF CACHE BOOL "Disable FreeGLUT demos")
+
+    # FreeGLUT's pinned CMake file predates CMake 4's policy floor.
+    if (CMAKE_VERSION VERSION_GREATER_EQUAL 4.0)
+        set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+    endif()
+
+    add_subdirectory( externals/FreeGLUT/freeglut/freeglut )
+    target_include_directories(freeglut_static PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/externals/FreeGLUT/freeglut/freeglut/include>"
+        "$<INSTALL_INTERFACE:include>")
+    set(RIBTOOLS_GLUT_TARGET freeglut_static)
+endif()
 
 # executables
 add_subdirectory( RibRender )
@@ -164,3 +189,6 @@ add_subdirectory( RibRenderServer )
 add_subdirectory( RibRenderToy )
 add_subdirectory( RSLCompilerCmd )
 
+if (BUILD_TESTING)
+    add_test(NAME RSLCompilerCmd.Help COMMAND RSLCompilerCmd --help)
+endif()

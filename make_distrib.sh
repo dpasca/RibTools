@@ -1,9 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 mkdir -p _distrib
-cp -r DistribSrc/base/* _distrib
+cp -R DistribSrc/base/. _distrib/
 
-rm _distrib/rendermn.ini
+rm -f _distrib/rendermn.ini
 
-cp -r DistribSrc/linux/* _distrib
-
+cp -R DistribSrc/linux/. _distrib/

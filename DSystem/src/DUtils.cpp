@@ -27,7 +27,7 @@
 # endif
 #endif
 
-#if defined(TARGET_OS_IPHONE)
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
 # include "IPH_Utils.h"
 #endif
 
@@ -88,13 +88,13 @@ void DAssert( bool ok, const char *pFile, int line, const char *msg )
     OutputDebugString( buff );
     DebugBreak();
 
-# elif defined(TARGET_OS_IPHONE)
+# elif defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
     kill( getpid(), SIGINT );
 
 # elif defined(ANDROID)
     PlatformAssertRaise(buff);
 
-# elif defined(__linux__) || defined(MACOSX)
+# elif defined(__linux__) || defined(__APPLE__)
     //
     abort();
 
@@ -254,7 +254,7 @@ void SleepMS( U32 sleepMS )
 //==================================================================
 void OpenURL( const char *pURL )
 {
-#if defined(TARGET_OS_IPHONE)
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
 
     IPHUT::OpenURL( pURL );
 
@@ -278,7 +278,7 @@ void OpenURL( const char *pURL )
 //==================================================================
 void ShowAlert( const char *pTitle, const char *pText )
 {
-#if defined(TARGET_OS_IPHONE)
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
 
     IPHUT::ShowAlert( pTitle, pText );
 
