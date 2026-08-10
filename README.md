@@ -1,122 +1,193 @@
-RibTools
-========
+# RibTools
 
-**RibTools** is an experiment in writing an off-line renderer based on Pixar's [RenderMan interface] and the [REYES] rendering architecture.
+RibTools is an experimental offline renderer based on Pixar's
+[RenderMan interface](https://en.wikipedia.org/wiki/RenderMan_Interface_Specification)
+and the [REYES](https://en.wikipedia.org/wiki/Reyes_rendering) rendering architecture.
 
-> **2026 maintenance:** New and substantially edited C++ uses four spaces rather than tabs and follows
-> [Davide Pasca's current C++ style guide]. This is a forward-looking policy; legacy files are not being mass-formatted.
-> See [CONTRIBUTING.md] for the practical rules.
+![RibRenderToy rendering the displaced Killeroo scene](docs/images/rib-render-toy-killeroo.png)
 
-> **Historical notice:** Major development was suspended in 2010. The project received occasional maintenance through
-> 2020, followed by a basic build and tooling refresh in 2026.
+*RibRenderToy rendering the displaced Killeroo NURBS model in its default docked workspace.*
 
-[RenderMan interface]: http://en.wikipedia.org/wiki/RenderMan_Interface_Specification
-[REYES]: http://en.wikipedia.org/wiki/Reyes_rendering
-[Davide Pasca's current C++ style guide]: https://gist.githubusercontent.com/dpasca/5243278/raw/c92097874494f1735e033e1937506701f747dc4d/CodeStyle.cpp
-[CONTRIBUTING.md]: CONTRIBUTING.md
+## Project status
 
-At the core of **RibTools** there is **RibRender**, the rendering engine, built with speed and scalability in mind.
+The renderer core was developed mainly during 2009 and 2010. It received occasional maintenance through 2020, followed
+by a build, dependency, testing, and desktop interface refresh in 2026. The current work aims to make the historical code
+easier to build, test, and explore while preserving the original renderer architecture.
 
-Parallelism is implemented at all levels:
-* Instruction level (adaptive N-way SIMD)
-* Many-core hardware (multi-threading)
-* Network-distributed rendering (custom protocol over TCP/IP)
+RibTools remains an experimental project rather than a production RenderMan implementation. It is tested against the
+bundled scenes and intentionally supports only part of the RenderMan interface.
 
-**RibTools** is a rather crude experiment and it's only tested against a small selection of simple scenes included in the project.
+New and substantially edited C++ and Objective-C++ code uses four spaces rather than tabs and follows
+[Davide Pasca's current C++ style guide](https://gist.githubusercontent.com/dpasca/5243278/raw/c92097874494f1735e033e1937506701f747dc4d/CodeStyle.cpp).
+This policy is forward-looking, so legacy files are not being mass-formatted. See [CONTRIBUTING.md](CONTRIBUTING.md) for
+the practical rules.
 
-![Killeroo displaced](docs/progress/2010-01-26_killeroo_properly_displaced.png)
-![Elephant additive](docs/progress/2009-12-15_elephant_funky_translucency.png)
-![Elephant buckets](docs/progress/RibRender-elephant-color-coded-grids-bucketed.png)
+## Highlights
 
-Building and running
---------------------
+- RIB scene parsing and a REYES-style micropolygon renderer.
+- NURBS geometry, surface shaders, texture-driven displacement, lighting, and image output.
+- Multithreaded rendering, adaptive SIMD code, and an experimental TCP/IP distributed rendering path.
+- A RenderMan-like Shading Language compiler that produces the custom `.rrasm` format used by the shader virtual machine.
+- Interactive scene selection, file dropping, render controls, and debug views for buckets, grids, and vertices.
+- A Dear ImGui workspace that starts with the rendered image docked inside the main window and can optionally use native
+  external viewports.
+
+## Applications
+
+| Application | Purpose |
+| --- | --- |
+| `RibRenderToy` | The primary interactive viewer for bundled or user-supplied RIB scenes. |
+| `RibRender` | The command-line render driver, including optional network render servers and framebuffer windows. |
+| `RSLCompilerCmd` | A standalone testing frontend that compiles RenderMan-like `.sl` source to `.rrasm`. |
+| `RibRenderServer` | Runs an experimental render worker that accepts connections from `RibRender`. |
+
+## Building
 
 ### Requirements
 
-- CMake 3.21 or newer
-- A C++20 compiler
-- The platform OpenGL development files
-- X11 development files on Linux
+- Git, including submodule support.
+- CMake 3.21 or newer.
+- A C++20 compiler.
+- OpenGL development files.
+- X11 development files when building on Linux.
 
-Initialize the pinned dependencies after cloning. libjpeg-turbo 3.2.0 and libtiff 4.7.2 provide image codecs.
-Dear ImGui 1.92.9b (docking branch) and GLFW 3.5.1 provide the desktop interface.
+All third-party dependencies are pinned as Git submodules. They include libjpeg-turbo, LibTIFF, Dear ImGui's docking
+branch, and GLFW.
+
+If the repository was cloned without submodules, initialize them first:
 
 ```sh
 git submodule update --init --recursive
 ```
 
-### macOS and Linux
+### Quick start on macOS and Linux
 
-The compatibility scripts keep build products in `_build` and stage runnable files in `_distrib`:
+The compatibility scripts create `_build`, stage runtime resources in `_distrib`, build the project, and run the test
+suite:
 
 ```sh
 ./make_build.sh Release
 ./do_build.sh Release
 ctest --test-dir _build --output-on-failure
+
+cd _distrib
+./RibRenderToy TestScenes/KillerooNURBS/killeroo.rib
 ```
 
-The equivalent preset workflow is:
+The equivalent CMake preset workflow is:
 
 ```sh
 cmake --preset release
 bash ./make_distrib.sh
-cmake --build --preset release
+cmake --build --preset release --parallel
 ctest --preset release
+```
+
+On Ubuntu, the packages used by CI are:
+
+```sh
+sudo apt-get install \
+    libgl1-mesa-dev \
+    libx11-dev \
+    libxcursor-dev \
+    libxext-dev \
+    libxi-dev \
+    libxinerama-dev \
+    libxrandr-dev \
+    xauth \
+    xvfb
 ```
 
 ### Windows
 
-Run `make_build.bat`, followed by `do_build.bat`. Visual Studio users can also open `_build\RibTools.sln` and select the
-Release configuration.
+Run `make_build.bat`, followed by `do_build.bat`. Visual Studio users can also open `_build\RibTools.sln`, select the
+Release configuration, and launch the executables from `_distrib`. The Windows build path is retained, but it has not yet
+received fresh validation as part of the 2026 refresh.
 
-### Run the renderer toy
+## Using RibRenderToy
 
-Launch `RibRenderToy` from `_distrib` (`RibRenderToy.exe` on Windows). Select a bundled RIB in the **Scenes** panel,
-enter a path, or drop a `.rib` file onto the window. The **Render Settings** panel exposes the resolution and the existing
-bucket/grid/vertex debug modes.
-
-The workspace uses Dear ImGui docking. Drag the **Render** tab outside the main window, choose
-**View > Detach Render Window**, or start detached from the command line:
+Start without arguments to browse the bundled scenes:
 
 ```sh
 cd _distrib
-./RibRenderToy --detach-render TestScenes/LightsTests/SphereDistantLight.rib
+./RibRenderToy
 ```
 
-The layout is saved in `_distrib/rib-render-toy.ini`; **View > Reset Docking Layout** restores the default. Native external
-viewports work on macOS and Windows. On Linux they require X11 and remain window-manager dependent; Wayland is disabled
-because Dear ImGui's multi-viewport backend does not currently support it.
+You can select a scene in the **Scenes** panel, enter a path, or drop a `.rib` file onto the application. The **Render
+Settings** panel controls resolution and the existing bucket, grid, and vertex debug modes.
 
-About
------
+The default layout keeps the **Render** panel docked inside the main window. To use a separate native window, drag the
+**Render** tab outside the main window, choose **View > Detach Render Window**, or launch with:
 
-**RibTools** was developed by Davide Pasca in 2009-2010. Development is currently suspended.
+```sh
+./RibRenderToy --detach-render TestScenes/KillerooNURBS/killeroo.rib
+```
 
-This software is released under the [New BSD license](http://www.opensource.org/licenses/bsd-license.php) .
+The layout is saved in `_distrib/rib-render-toy.ini`. Choose **View > Reset Docking Layout** to restore the default.
+External viewports work on macOS and Windows. On Linux they require X11 and remain window-manager dependent. They are
+disabled on Wayland because Dear ImGui's GLFW backend does not currently support multi-viewports there.
 
-The following software libraries are utilized in the project:
+## Command-line rendering
 
-* libjpeg-turbo: https://github.com/libjpeg-turbo/libjpeg-turbo
-* LibTIFF: https://libtiff.gitlab.io/libtiff/
-* Dear ImGui: https://github.com/ocornut/imgui
-* GLFW: https://github.com/glfw/glfw
+Render a RIB file directly:
 
-Other acknowledgements:
+```sh
+cd _distrib
+./RibRender TestScenes/Airplane.rib
+```
 
-* The *Killeroo* model is Copyright of Headus, used with
-permission: http://www.headus.com.au
+Use `--help` with any executable to see its available options. `RibRender` can also constrain the longest image dimension,
+show grids in false colors, or connect to one or more `RibRenderServer` instances.
 
-* The *Sponza Atrium*  model is originally from Marko Dabrovic: http://hdri.cgtechniques.com/~sponza/files/ \
-The RIB version was taken from the *Lucille* renderer
- distribution and modified as needed: http://lucille.sourceforge.net/
+## Platform status
 
-* Most of the included RIB files are old samples that I found included in the *RenSH*
- project: http://www.dctsystems.co.uk/RenderMan/rensh.html
+| Platform | Current status |
+| --- | --- |
+| macOS 15 on Apple Silicon | Built and tested locally and in CI. |
+| Ubuntu 24.04 | Built and tested in CI, including a UI smoke test under Xvfb. |
+| Windows | CMake and Visual Studio support retained. Fresh validation is still pending. |
 
-* Other sample scene files were found on the Internet and are assumed to be freely
-redistributable.
+The test suite covers core utility and image behavior, shader compilation, invalid shader rejection, executable startup,
+and the Linux UI smoke path. Rendered-image regression coverage is a priority for the next maintenance stage.
 
-For any issues regarding attribution, please contact me at `davide@newtypekk.com`.
+## Current limitations
 
-The *RenderMan&reg; Interface Procedures* and RIB Protocol are: Copyright 1988, 1989,
-Pixar. All rights reserved. *RenderMan&reg;* is a registered trademark of Pixar.
+- The RenderMan interface and RIB command set are incomplete.
+- Rendering behavior is validated primarily with the scenes bundled in the repository.
+- The desktop renderer retains a compatibility OpenGL path to support the original fixed-function display code.
+- Distributed rendering is experimental and is not covered by the current CI suite.
+- There are no packaged binary releases for the refreshed version yet.
+
+## Near-term direction
+
+1. Add representative rendered-image regression tests, beginning with lighting, displacement, and Killeroo.
+2. Polish the desktop interface and improve scene and shader error reporting.
+3. Revalidate and repair the Windows build.
+4. Modernize renderer internals incrementally, with focused changes and regression coverage.
+5. Prepare a first maintenance release once the refreshed branch is stable on all supported platforms.
+
+## History and acknowledgements
+
+RibTools was created by Davide Pasca. The Killeroo model is copyright Headus and is used with permission from
+[Headus](http://www.headus.com.au).
+
+The Sponza Atrium model is originally by Marko Dabrovic. The RIB version came from the
+[Lucille renderer](http://lucille.sourceforge.net/) and was modified as needed.
+
+Most included RIB files are historical samples found in the
+[RenSH project](http://www.dctsystems.co.uk/RenderMan/rensh.html). Other sample scene files were found on the Internet and
+are assumed to be freely redistributable. For attribution concerns, contact `davide@newtypekk.com`.
+
+The RenderMan Interface Procedures and RIB Protocol are copyright 1988 and 1989 Pixar. RenderMan is a registered trademark
+of Pixar.
+
+## Dependencies
+
+- [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo)
+- [LibTIFF](https://libtiff.gitlab.io/libtiff/)
+- [Dear ImGui](https://github.com/ocornut/imgui)
+- [GLFW](https://github.com/glfw/glfw)
+
+## License
+
+RibTools is released under the [3-Clause BSD License](license.txt).
