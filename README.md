@@ -103,7 +103,7 @@ sudo apt-get install \
 
 Run the preset commands from a Visual Studio developer terminal or another terminal with CMake and a compiler available.
 Visual Studio users can also open `_build\release\RibTools.sln`, select the Release configuration, and launch the
-executables from `_distrib`. Windows support has not yet received fresh validation as part of the 2026 refresh.
+executables from `_distrib`. Windows Server 2025 with MSVC is built and tested in CI as part of the 2026 refresh.
 
 ### Creating a distribution archive
 
@@ -162,7 +162,7 @@ show grids in false colors, or connect to one or more `RibRenderServer` instance
 | --- | --- |
 | macOS 15 on Apple Silicon | Built and tested locally and in CI. |
 | Ubuntu 24.04 | Built and tested in CI, including a UI smoke test under Xvfb. |
-| Windows | CMake and Visual Studio support retained. Fresh validation is still pending. |
+| Windows | Windows Server 2025 with MSVC; the Release build and tests run in CI. |
 
 The test suite covers core utility and image behavior, shader compilation, invalid shader rejection, executable startup,
 the Linux UI smoke path, the array-language render fixture, and a low-resolution displaced Killeroo render. CI retains
