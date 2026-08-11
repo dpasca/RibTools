@@ -107,7 +107,10 @@ cd _distrib
 ```
 
 You can select a scene in the **Scenes** panel, enter a path, or drop a `.rib` file onto the application. The **Render
-Settings** panel controls resolution and the existing bucket, grid, and vertex debug modes.
+Settings** panel controls resolution, camera overrides, and the existing bucket, grid, and vertex debug modes. Drag the
+rendered image to turn the camera, Shift-drag to pan, and use the mouse wheel to dolly. Camera edits render a smaller
+preview first; choose **Render full resolution** when the view is ready. Numeric yaw, pitch, translation, movement-scale,
+and optional field-of-view controls are available for precise adjustments.
 
 The default layout keeps the **Render** panel docked inside the main window. To use a separate native window, drag the
 **Render** tab outside the main window, choose **View > Detach Render Window**, or launch with:

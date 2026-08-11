@@ -11,37 +11,9 @@
 #include "DImage/include/DImage_TIFF.h"
 #include "RI_Texture.h"
 
-#define GAUSS_HDIM	2
-#define GAUSS_DIM	(GAUSS_HDIM*2 + 1)
-
 //==================================================================
 namespace RI
 {
-
-//==================================================================
-static float _gGaussKernel[GAUSS_DIM][GAUSS_DIM];
-
-//==================================================================
-static void makeGaussKernel()
-{
-    static const float sigma = 1.f;
-
-    for (int i=-GAUSS_HDIM; i <= GAUSS_HDIM; ++i)
-    {
-        for (int j=-GAUSS_HDIM; j <= GAUSS_HDIM; ++j)
-        {
-            float x = (float)j;
-            float y = (float)i;
-
-            float	sigmaSqr = sigma * sigma;
-
-            _gGaussKernel[j][i] =
-                float(
-                    (1 / (2 * (float)M_PI * sigmaSqr)) * exp( -(x*x + y*y) / (2 * sigmaSqr) )
-                );
-        }
-    }
-}
 
 //==================================================================
 static const char *StrFindLastChar( const char *pStr, char ch )
@@ -83,12 +55,6 @@ Texture::Texture( const char *pName, DUT::MemFile &file ) :
     mS_to_X = Float_( (float)mImage.mWd-1 );
     mT_to_Y = Float_( (float)mImage.mHe-1 );
 
-    static bool kernelDone;
-    if NOT( kernelDone )
-    {
-        makeGaussKernel();
-        kernelDone = true;
-    }
 }
 
 //==================================================================

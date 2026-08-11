@@ -15,6 +15,7 @@
 #include <cstdio>
 #include <cstring>
 #include <exception>
+#include <numbers>
 #include <system_error>
 
 #include <GLFW/glfw3.h>
@@ -32,6 +33,24 @@ namespace
 
 constexpr const char* APP_NAME = "RibRenderToy";
 constexpr const char* APP_VERSION = "0.11";
+constexpr float CAMERA_ROTATION_SPEED = 0.25f;
+constexpr float CAMERA_TRANSLATION_SPEED = 0.01f;
+constexpr float CAMERA_DOLLY_SPEED = 0.25f;
+
+//==================================================================
+Matrix44 makeCameraAdjustment(
+    float yawDegrees,
+    float pitchDegrees,
+    float truck,
+    float pedestal,
+    float dolly)
+{
+    constexpr auto degreesToRadians = std::numbers::pi_v<float> / 180.0f;
+    const auto translation = Matrix44::Translate(-truck, -pedestal, -dolly);
+    const auto yaw = Matrix44::Rot(-yawDegrees * degreesToRadians, 0.0f, 1.0f, 0.0f);
+    const auto pitch = Matrix44::Rot(-pitchDegrees * degreesToRadians, 1.0f, 0.0f, 0.0f);
+    return translation * yaw * pitch;
+}
 
 //==================================================================
 bool isHelpArgument(const char* pArgument)
@@ -119,6 +138,8 @@ void RibRenderToyApp::SetFileToRender(const fs::path &filePath)
         }
     }
 
+    resetCamera();
+    mPreviewRenderRequested = false;
     mPendingFile = absolutePath.lexically_normal();
     mPathInput = mPendingFile.string();
     mRenderRequested = true;
@@ -208,10 +229,13 @@ void RibRenderToyApp::processPendingRender()
 
     const auto forcedWidth = mUseSceneResolution ? -1 : std::clamp(mRequestedWidth, 1, 16384);
     const auto forcedHeight = mUseSceneResolution ? -1 : std::clamp(mRequestedHeight, 1, 16384);
+    const auto isPreview = mPreviewRenderRequested;
+    const auto forcedLongDimension = isPreview ? std::clamp(mPreviewLongDimension, 32, 4096) : -1;
+    mPreviewRenderRequested = false;
 
     mHiderParams.mDbgOnlyBucketAtX = mPendingBucketX;
     mHiderParams.mDbgOnlyBucketAtY = mPendingBucketY;
-    renderFile(mLastFile, forcedWidth, forcedHeight);
+    renderFile(mLastFile, forcedWidth, forcedHeight, forcedLongDimension, isPreview);
     mHiderParams.mDbgOnlyBucketAtX = -1;
     mHiderParams.mDbgOnlyBucketAtY = -1;
     mPendingBucketX = -1;
@@ -219,7 +243,12 @@ void RibRenderToyApp::processPendingRender()
 }
 
 //==================================================================
-bool RibRenderToyApp::renderFile(const fs::path &filePath, int forcedWidth, int forcedHeight)
+bool RibRenderToyApp::renderFile(
+    const fs::path &filePath,
+    int forcedWidth,
+    int forcedHeight,
+    int forcedLongDimension,
+    bool isPreview)
 {
     const auto startTime = std::chrono::steady_clock::now();
 
@@ -239,6 +268,17 @@ bool RibRenderToyApp::renderFile(const fs::path &filePath, int forcedWidth, int 
     const auto shadersPath = mResourcesPath / "Shaders";
     const auto shadersDirectory = shadersPath.string();
     params.mTrans.mState.mDefaultShadersDir = shadersDirectory.c_str();
+    params.mTrans.mState.mCameraAdjustment = makeCameraAdjustment(
+        mCameraYawDegrees,
+        mCameraPitchDegrees,
+        mCameraTruck,
+        mCameraPedestal,
+        mCameraDolly);
+
+    if (mOverrideCameraFov)
+    {
+        params.mTrans.mForcedFov = mCameraFovDegrees;
+    }
 
     if (mHiderParams.mDbgColorCodedGrids)
     {
@@ -247,6 +287,7 @@ bool RibRenderToyApp::renderFile(const fs::path &filePath, int forcedWidth, int 
 
     params.mTrans.mForcedWd = forcedWidth;
     params.mTrans.mForcedHe = forcedHeight;
+    params.mTrans.mForcedLongDim = forcedLongDimension;
 
     const auto filePathString = filePath.string();
     params.mpFileName = filePathString.c_str();
@@ -284,7 +325,9 @@ bool RibRenderToyApp::renderFile(const fs::path &filePath, int forcedWidth, int 
 
     const auto endTime = std::chrono::steady_clock::now();
     mLastRenderMilliseconds = std::chrono::duration<double, std::milli>(endTime - startTime).count();
-    mStatus = "Rendered " + filePath.filename().string();
+    mLastRenderWasPreview = isPreview;
+    mStatus = isPreview ? "Rendered camera preview of " : "Rendered ";
+    mStatus += filePath.filename().string();
     mStatusIsError = false;
     return true;
 }
@@ -435,7 +478,7 @@ void RibRenderToyApp::drawRenderSettings()
 
     const auto canRender = !mLastFile.empty() || !mPendingFile.empty();
     ImGui::BeginDisabled(!canRender);
-    if (ImGui::Button("Render", ImVec2(-1.0f, 0.0f)))
+    if (ImGui::Button("Render full resolution", ImVec2(-1.0f, 0.0f)))
     {
         requestRender();
     }
@@ -455,7 +498,70 @@ void RibRenderToyApp::drawRenderSettings()
     mRequestedHeight = std::clamp(mRequestedHeight, 1, 16384);
     ImGui::EndDisabled();
 
+    ImGui::TextUnformatted("Camera preview long side");
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::InputInt("##preview-long-side", &mPreviewLongDimension);
+    mPreviewLongDimension = std::clamp(mPreviewLongDimension, 32, 4096);
+
     ImGui::Checkbox("Fit image to panel", &mFitImage);
+
+    ImGui::SeparatorText("Camera");
+    ImGui::TextWrapped("Drag the image to turn. Shift-drag to pan; use the mouse wheel to dolly.");
+
+    ImGui::BeginDisabled(!canRender);
+    auto cameraEditFinished = false;
+
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::DragFloat("Yaw##camera", &mCameraYawDegrees, 0.25f, -360.0f, 360.0f, "%.2f deg");
+    cameraEditFinished |= ImGui::IsItemDeactivatedAfterEdit();
+
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::DragFloat("Pitch##camera", &mCameraPitchDegrees, 0.25f, -89.0f, 89.0f, "%.2f deg");
+    cameraEditFinished |= ImGui::IsItemDeactivatedAfterEdit();
+    mCameraPitchDegrees = std::clamp(mCameraPitchDegrees, -89.0f, 89.0f);
+
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::DragFloat("Truck##camera", &mCameraTruck, 0.05f, 0.0f, 0.0f, "%.3f");
+    cameraEditFinished |= ImGui::IsItemDeactivatedAfterEdit();
+
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::DragFloat("Pedestal##camera", &mCameraPedestal, 0.05f, 0.0f, 0.0f, "%.3f");
+    cameraEditFinished |= ImGui::IsItemDeactivatedAfterEdit();
+
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::DragFloat("Dolly##camera", &mCameraDolly, 0.05f, 0.0f, 0.0f, "%.3f");
+    cameraEditFinished |= ImGui::IsItemDeactivatedAfterEdit();
+
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::DragFloat("Mouse movement scale", &mCameraMovementScale, 0.05f, 0.001f, 10000.0f, "%.3f");
+    mCameraMovementScale = std::clamp(mCameraMovementScale, 0.001f, 10000.0f);
+
+    if (ImGui::Checkbox("Override field of view", &mOverrideCameraFov))
+    {
+        requestPreviewRender();
+    }
+
+    ImGui::BeginDisabled(!mOverrideCameraFov);
+    ImGui::SetNextItemWidth(-1.0f);
+    ImGui::SliderFloat("Field of view", &mCameraFovDegrees, 5.0f, 150.0f, "%.1f deg");
+    cameraEditFinished |= ImGui::IsItemDeactivatedAfterEdit();
+    ImGui::EndDisabled();
+
+    if (cameraEditFinished)
+    {
+        requestPreviewRender();
+    }
+
+    if (ImGui::Button("Reset camera", ImVec2(-1.0f, 0.0f)))
+    {
+        resetCamera();
+        requestPreviewRender();
+    }
+    if (ImGui::Button("Render camera preview", ImVec2(-1.0f, 0.0f)))
+    {
+        requestPreviewRender();
+    }
+    ImGui::EndDisabled();
 
     ImGui::SeparatorText("Debug");
     auto debugChanged = false;
@@ -481,7 +587,12 @@ void RibRenderToyApp::drawRenderSettings()
 
     if (moDisplay)
     {
-        ImGui::Text("%d x %d, %.2f ms", mLastUsedWidth, mLastUsedHeight, mLastRenderMilliseconds);
+        ImGui::Text(
+            "%d x %d, %.2f ms%s",
+            mLastUsedWidth,
+            mLastUsedHeight,
+            mLastRenderMilliseconds,
+            mLastRenderWasPreview ? " (camera preview)" : "");
     }
 
     ImGui::Spacing();
@@ -541,8 +652,9 @@ void RibRenderToyApp::drawRenderView()
     const auto texture = ImTextureRef(static_cast<ImTextureID>(moDisplay->GetTextureId()));
     ImGui::Image(texture, displaySize, ImVec2(0.0f, 0.0f),
                  ImVec2(moDisplay->GetTextureUMax(), moDisplay->GetTextureVMax()));
+    const auto imageHovered = ImGui::IsItemHovered();
 
-    if (mHiderParams.mDbgShowBuckets && ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    if (mHiderParams.mDbgShowBuckets && imageHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
     {
         const auto mouse = ImGui::GetMousePos();
         const auto imageMin = ImGui::GetItemRectMin();
@@ -553,11 +665,52 @@ void RibRenderToyApp::drawRenderView()
         requestBucketRender(x, y);
     }
 
+    if (!mHiderParams.mDbgShowBuckets && imageHovered)
+    {
+        const auto &io = ImGui::GetIO();
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+        {
+            if (io.KeyShift)
+            {
+                mCameraTruck -= io.MouseDelta.x * CAMERA_TRANSLATION_SPEED * mCameraMovementScale;
+                mCameraPedestal += io.MouseDelta.y * CAMERA_TRANSLATION_SPEED * mCameraMovementScale;
+            }
+            else
+            {
+                mCameraYawDegrees += io.MouseDelta.x * CAMERA_ROTATION_SPEED;
+                mCameraPitchDegrees += io.MouseDelta.y * CAMERA_ROTATION_SPEED;
+                mCameraPitchDegrees = std::clamp(mCameraPitchDegrees, -89.0f, 89.0f);
+            }
+            mCameraDragActive = true;
+        }
+
+        if (io.MouseWheel != 0.0f)
+        {
+            mCameraDolly += io.MouseWheel * CAMERA_DOLLY_SPEED * mCameraMovementScale;
+            requestPreviewRender();
+        }
+    }
+
+    if (mCameraDragActive && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+    {
+        mCameraDragActive = false;
+        requestPreviewRender();
+    }
+
     if (ImGui::BeginPopupContextItem("RenderContextMenu"))
     {
         if (ImGui::MenuItem("Render Again"))
         {
             requestRender();
+        }
+        if (ImGui::MenuItem("Render Camera Preview"))
+        {
+            requestPreviewRender();
+        }
+        if (ImGui::MenuItem("Reset Camera"))
+        {
+            resetCamera();
+            requestPreviewRender();
         }
         ImGui::MenuItem("Fit Image", nullptr, &mFitImage);
         ImGui::EndPopup();
@@ -605,6 +758,17 @@ void RibRenderToyApp::requestRender()
 {
     if (!mLastFile.empty() || !mPendingFile.empty())
     {
+        mPreviewRenderRequested = false;
+        mRenderRequested = true;
+    }
+}
+
+//==================================================================
+void RibRenderToyApp::requestPreviewRender()
+{
+    if (!mLastFile.empty() || !mPendingFile.empty())
+    {
+        mPreviewRenderRequested = true;
         mRenderRequested = true;
     }
 }
@@ -615,6 +779,20 @@ void RibRenderToyApp::requestBucketRender(int x, int y)
     mPendingBucketX = x;
     mPendingBucketY = y;
     requestRender();
+}
+
+//==================================================================
+void RibRenderToyApp::resetCamera()
+{
+    mCameraYawDegrees = 0.0f;
+    mCameraPitchDegrees = 0.0f;
+    mCameraTruck = 0.0f;
+    mCameraPedestal = 0.0f;
+    mCameraDolly = 0.0f;
+    mCameraMovementScale = 1.0f;
+    mCameraFovDegrees = 45.0f;
+    mOverrideCameraFov = false;
+    mCameraDragActive = false;
 }
 
 //==================================================================

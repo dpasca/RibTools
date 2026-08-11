@@ -295,6 +295,8 @@ void State::WorldBegin()
 
     // store the current (camera) transformation
     mMtxWorldCamera = mTransformOpenStack.top().GetMatrix();
+    if ( mParams.mCameraAdjustment )
+        mMtxWorldCamera = mMtxWorldCamera * *mParams.mCameraAdjustment;
 
     pushStacks( SF_OPTS | SF_ATRB | SF_TRAN );
 

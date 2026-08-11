@@ -98,6 +98,27 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(
+    RIBTOOLS_ENABLE_SANITIZERS
+    "Enable AddressSanitizer and UndefinedBehaviorSanitizer instrumentation"
+    OFF)
+
+if (RIBTOOLS_ENABLE_SANITIZERS)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+        add_compile_options(
+            -fsanitize=address,undefined
+            -fno-omit-frame-pointer
+            -fno-sanitize-recover=all)
+        add_link_options(
+            -fsanitize=address,undefined
+            -fno-sanitize-recover=all)
+    else()
+        message(
+            FATAL_ERROR
+            "RIBTOOLS_ENABLE_SANITIZERS requires a Clang- or GCC-compatible compiler")
+    endif()
+endif()
+
 #
 if (MSVC)
     set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}       /DDEBUG /D_DEBUG")
@@ -186,6 +207,36 @@ if (BUILD_TESTING)
         RIArrayVisualTests
         PRIVATE DImage DSystem)
 
+    add_executable(
+        RITextureTests
+        RI_System/tests/TextureTests.cpp)
+    target_link_libraries(
+        RITextureTests
+        PRIVATE RI_System)
+
+    add_executable(
+        RICameraOverrideTests
+        RI_System/tests/CameraOverrideTests.cpp)
+    target_link_libraries(
+        RICameraOverrideTests
+        PRIVATE RibRenderLib RSLCompilerLib)
+
+    set(
+        RIBTOOLS_CAMERA_TEST_SHADER_DIRECTORY
+        "${CMAKE_CURRENT_BINARY_DIR}/camera-override-shaders")
+    foreach(
+        SHADER_FILE
+        IN ITEMS
+            RSLC_Builtins.sl
+            constant.sl
+            dbg_normal_col.rrasm
+            matte.sl)
+        configure_file(
+            "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/${SHADER_FILE}"
+            "${RIBTOOLS_CAMERA_TEST_SHADER_DIRECTORY}/${SHADER_FILE}"
+            COPYONLY)
+    endforeach()
+
     set(RIBTOOLS_SHADER_CONTRACT_SOURCES
         "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/matte_fat.sl"
         "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/matte.sl"
@@ -232,6 +283,15 @@ if (BUILD_TESTING)
 
     add_test(NAME RibRender.Help COMMAND RibRender --help)
     add_test(NAME RibRenderToy.Help COMMAND RibRenderToy --help)
+
+    add_test(
+        NAME RI_System.TextureSampling
+        COMMAND RITextureTests
+            "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/KillerooNURBS/Maps-new/pat006_0.4.mip")
+    add_test(
+        NAME RI_System.CameraOverride
+        COMMAND RICameraOverrideTests
+            "${RIBTOOLS_CAMERA_TEST_SHADER_DIRECTORY}")
 
     add_test(NAME RSLCompilerCmd.Help COMMAND RSLCompilerCmd --help)
 

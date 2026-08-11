@@ -27,6 +27,18 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
+        },
+        {
+            "name": "sanitize",
+            "displayName": "ASan + UBSan",
+            "description": "Debug build instrumented with AddressSanitizer and UndefinedBehaviorSanitizer",
+            "inherits": "base",
+            "binaryDir": "${sourceDir}/_build/sanitize",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "RIBTOOLS_ENABLE_SANITIZERS": "ON",
+                "RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/_build/sanitize/bin"
+            }
         }
     ],
     "buildPresets": [
@@ -38,6 +50,11 @@
         {
             "name": "debug",
             "configurePreset": "debug",
+            "configuration": "Debug"
+        },
+        {
+            "name": "sanitize",
+            "configurePreset": "sanitize",
             "configuration": "Debug"
         }
     ],
@@ -54,6 +71,18 @@
             "name": "debug",
             "configurePreset": "debug",
             "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "sanitize",
+            "configurePreset": "sanitize",
+            "configuration": "Debug",
+            "environment": {
+                "ASAN_OPTIONS": "halt_on_error=1",
+                "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+            },
             "output": {
                 "outputOnFailure": true
             }

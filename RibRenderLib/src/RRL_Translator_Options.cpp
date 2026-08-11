@@ -14,6 +14,37 @@ namespace RRL
 {
 
 //==================================================================
+static void forcePerspectiveFov( RI::ParamList &params, float fov )
+{
+    DASSTHROW( fov > 0.0f && fov < 180.0f, ("Forced field of view must be between 0 and 180 degrees") );
+
+    if ( params.empty() || 0 != strcmp( params[0].PChar(), RI_PERSPECTIVE ) )
+        return;
+
+    for (size_t paramIndex=1; paramIndex < params.size(); ++paramIndex)
+    {
+        if ( params[paramIndex].type != RI::Param::STR ||
+             0 != strcmp( params[paramIndex].PChar(), RI_FOV ) )
+        {
+            continue;
+        }
+
+        if ( paramIndex + 1 == params.size() )
+            params.Add( fov );
+        else
+        {
+            RI::Param &fovParam = params[paramIndex + 1];
+            fovParam.type = RI::Param::FLT;
+            fovParam.u.floatVal = fov;
+        }
+        return;
+    }
+
+    params.Add( RI_FOV );
+    params.Add( fov );
+}
+
+//==================================================================
 static void splitSearchPath( const char *pSrc, DVec<DStr> &out_strings )
 {
     char	buff[4096];
@@ -144,7 +175,12 @@ bool Translator::addCommand_options(
     if ( nm == "FrameAspectRatio" )	{ exN( 1, p ); mState.FrameAspectRatio( p[0] );	}	else
     if ( nm == "ScreenWindow" )		{ exN( 4, p ); mState.ScreenWindow(		p[0], p[1], p[2], p[3] );	}	else
     if ( nm == "CropWindow" )		{ exN( 4, p ); mState.CropWindow(		p[0], p[1], p[2], p[3] );	}	else
-    if ( nm == "Projection" )		{ geN( 1, p ); mState.Projection(	p );	}	else
+    if ( nm == "Projection" )		{
+                                            geN( 1, p );
+                                            if ( mParams.mForcedFov )
+                                                forcePerspectiveFov( p, *mParams.mForcedFov );
+                                            mState.Projection( p );
+                                        }	else
     if ( nm == "Clipping" )			{ exN( 2, p ); mState.Clipping(		p[0], p[1] );	}	else
     if ( nm == "DepthOfField" )		{ exN( 3, p ); mState.DepthOfField(	p[0], p[1], p[2] );	}	else
     if ( nm == "Shutter" )			{ exN( 2, p ); mState.Shutter(		p[0], p[1] );	}	else

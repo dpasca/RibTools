@@ -9,6 +9,8 @@
 #ifndef RRL_TRANSLATOR_H
 #define RRL_TRANSLATOR_H
 
+#include <optional>
+
 #include "DSystem/include/DContainers.h"
 #include "RI_System/include/RI_Base.h"
 #include "RI_System/include/RI_State.h"
@@ -29,6 +31,7 @@ public:
         int					mForcedLongDim		;
         int					mForcedWd			;
         int					mForcedHe			;
+        std::optional<float> mForcedFov;
 
         Params() :
             mForcedLongDim		(-1),

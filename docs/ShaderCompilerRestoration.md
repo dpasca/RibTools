@@ -61,10 +61,16 @@ removed or converted into permanent documentation once the work is complete.
 - [x] Fix the scalar SIMD full-mask definition that made uniform `if` conditions always false on Apple Silicon.
 - [x] Add a direct VM semantic test for both uniform `if` branches.
 
+### Diagnostic build
+
+- [x] Add an isolated opt-in ASan/UBSan preset for Clang and GCC builds.
+- [x] Run the compiler, VM, texture, camera, and visual regression ladder with sanitizer failures made fatal.
+- [x] Remove an unused Gaussian-kernel initializer whose negative array indices were exposed by a displaced Killeroo render.
+- [x] Add direct texture loading and sampling coverage using a real Killeroo displacement map.
+
 ## Next step
 
-- [ ] Add an opt-in ASan/UBSan build and run the compiler, VM, and visual regression ladder under it.
-- [ ] Decide whether to extend arrays to additional element types or first implement varying `if`/`else` lane masks.
+- [ ] Implement varying `if`/`else` lane masks before extending arrays to additional element types.
 - [ ] Add logical unary `!` once boolean and varying-mask semantics are covered.
 
 ## Correctness backlog
@@ -73,7 +79,7 @@ removed or converted into permanent documentation once the work is complete.
 - [x] Validate opcode metadata, callback coverage, and compiler output exercised by the positive shader corpus.
 - [x] Cover opcode metadata and callback alignment by generating both tables from one shared registry.
 - [x] Make the known unsupported `environment()` built-in and `alpha` global compile-time errors.
-- [ ] Add an opt-in ASan/UBSan test build.
+- [x] Add an opt-in ASan/UBSan test build.
 - [ ] Implement logical unary `!` after verifying boolean VM semantics.
 - [x] Implement fixed one-dimensional float arrays end to end.
 - [ ] Implement varying `if`/`else` lane masks, followed by loop control flow.

@@ -46,16 +46,28 @@ private:
     std::string mPathInput;
     std::string mStatus;
     double mLastRenderMilliseconds{};
+    float mCameraYawDegrees{};
+    float mCameraPitchDegrees{};
+    float mCameraTruck{};
+    float mCameraPedestal{};
+    float mCameraDolly{};
+    float mCameraMovementScale{1.0f};
+    float mCameraFovDegrees{45.0f};
     int mLastUsedWidth{};
     int mLastUsedHeight{};
     int mRequestedWidth{512};
     int mRequestedHeight{512};
+    int mPreviewLongDimension{192};
     int mPendingBucketX{-1};
     int mPendingBucketY{-1};
     int mSelectedScene{-1};
     bool mUseSceneResolution{true};
     bool mFitImage{true};
+    bool mOverrideCameraFov{};
     bool mRenderRequested{};
+    bool mPreviewRenderRequested{};
+    bool mLastRenderWasPreview{};
+    bool mCameraDragActive{};
     bool mStatusIsError{};
     bool mFirstLayout{true};
     bool mResetLayoutRequested{};
@@ -63,7 +75,12 @@ private:
 
     void scanScenes();
     void processPendingRender();
-    bool renderFile(const std::filesystem::path &filePath, int forcedWidth, int forcedHeight);
+    bool renderFile(
+        const std::filesystem::path &filePath,
+        int forcedWidth,
+        int forcedHeight,
+        int forcedLongDimension,
+        bool isPreview);
     void handleDisplays(const RRL::DisplayList &displays);
 
     void drawWorkspace();
@@ -74,7 +91,9 @@ private:
     void buildInitialLayout(ImGuiID dockspaceId);
 
     void requestRender();
+    void requestPreviewRender();
     void requestBucketRender(int x, int y);
+    void resetCamera();
 
     static void handleDisplaysCallback(void* pUserData, const RRL::DisplayList &displays);
     static void dropCallback(GLFWwindow* pWindow, int pathCount, const char** ppPaths);

@@ -9,6 +9,8 @@
 #ifndef RI_STATE_H
 #define RI_STATE_H
 
+#include <optional>
+
 #include "RI_Base.h"
 #include "DSystem/include/DContainers.h"
 #include "DSystem/include/DIO_FileManager.h"
@@ -70,6 +72,7 @@ public:
         DStr					mBaseDir			;
         DStr					mDefaultShadersDir	;
         DStr					mForcedSurfaceShader;
+        std::optional<Matrix44> mCameraAdjustment;
 
         Params() :
             mpFramework			(NULL),
