@@ -11,6 +11,13 @@
 #include <cstdio>
 #include <stdexcept>
 
+#if defined(_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 #if defined(__APPLE__)
 #include <OpenGL/gl.h>
 #else
