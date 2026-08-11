@@ -12,4 +12,8 @@ if (BUILD_TESTING)
     add_executable(RSLCompilerTokenCalcTests tests/TokenCalcTests.cpp)
     target_link_libraries(RSLCompilerTokenCalcTests PRIVATE RSLCompilerLib DSystem)
     add_test(NAME RSLCompiler.TokenCalc COMMAND RSLCompilerTokenCalcTests)
+
+    add_executable(RSLCompilerPreproTests tests/PreproTests.cpp)
+    target_link_libraries(RSLCompilerPreproTests PRIVATE RSLCompilerLib DSystem)
+    add_test(NAME RSLCompiler.Preprocessor COMMAND RSLCompilerPreproTests)
 endif()

@@ -6,6 +6,8 @@
 /// copyright info. 
 //==================================================================
 
+#include <algorithm>
+
 #include "RSLC_TextUtils.h"
 #include "RSLC_Exceptions.h"
 #include "RSLC_Prepro_Base.h"
@@ -48,7 +50,7 @@ static void handleDefine(
     for (size_t j=valueStartIdx; j < valueEndIdx; ++j)
         valueStr += text[j].Ch;
 
-    symbols[symName.c_str()] = valueStr;
+    symbols.insert_or_assign( symName, valueStr );
 
     CutVectorInclusive( text, startPoint, lineEnd );
 }
@@ -87,8 +89,10 @@ static size_t applySymbols(
         else
         if ( c == '"' )
         {
+            scrcpad.push_back( text[i] );
+
             // skip to the end of the string
-            for (; i < lineEnd; ++i)
+            for (++i; i < lineEnd; ++i)
             {
                 c = text[i].Ch;
                 scrcpad.push_back( text[i] );
@@ -118,7 +122,7 @@ static size_t applySymbols(
                 tmp += text[j].Ch;
             }
 
-            SymbolsMap::const_iterator foundIt = symbols.find( tmp.c_str() );
+            SymbolsMap::const_iterator foundIt = symbols.find( tmp );
             if ( foundIt != symbols.end() )
             {
                 replacementHappened = true;
@@ -192,7 +196,10 @@ static void processFile(
             }
         }
 
-        bool	isBlockActive = (actStack.size() == 0 || actStack.back() == true);
+        const bool isBlockActive = std::all_of(
+            actStack.begin(),
+            actStack.end(),
+            []( bool isActive ) { return isActive; } );
 
         if ( text[i].Ch == '#' )
         {

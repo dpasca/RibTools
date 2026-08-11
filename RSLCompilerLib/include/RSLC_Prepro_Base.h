@@ -20,7 +20,7 @@ namespace PREPRO
 {
 
 //==================================================================
-typedef std::unordered_map<const char *,DStr>	SymbolsMap;
+using SymbolsMap = std::unordered_map<DStr, DStr>;
 
 //==================================================================
 }

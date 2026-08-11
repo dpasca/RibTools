@@ -187,6 +187,15 @@ if (BUILD_TESTING)
         PROPERTIES ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base")
 
     add_test(
+        NAME RSLCompilerCmd.PreprocessorShader
+        COMMAND RSLCompilerCmd
+            "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test10_1.sl"
+            "${CMAKE_CURRENT_BINARY_DIR}/test10_1.rrasm")
+    set_tests_properties(
+        RSLCompilerCmd.PreprocessorShader
+        PROPERTIES ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base")
+
+    add_test(
         NAME RSLCompilerCmd.RejectsInvalidShader
         COMMAND RSLCompilerCmd
             "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/invalid.sl"
