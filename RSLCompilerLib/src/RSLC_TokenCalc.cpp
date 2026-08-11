@@ -14,6 +14,34 @@ namespace RSLC
 {
 
 //==================================================================
+std::unique_ptr<Token> TokenCalcUnaryOp(
+                TokenID operTokID,
+                const Token &value )
+{
+    if ( value.id != T_VL_NUMBER )
+        return {};
+
+    auto result = std::make_unique<Token>( value );
+
+    switch ( operTokID )
+    {
+    case T_OP_UNARY_PLUS:
+        result->SetAsNumValue( value.ConstNum );
+        break;
+
+    case T_OP_UNARY_MINUS:
+        result->SetAsNumValue( -value.ConstNum );
+        break;
+
+    default:
+        DASSERT( 0 );
+        return {};
+    }
+
+    return result;
+}
+
+//==================================================================
 Token *TokenCalcBiOp(
                 TokenID			operTokID,
                 const Token		&val1,

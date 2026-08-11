@@ -360,6 +360,9 @@ void Parser::parseDataLine( char lineBuff[], int lineCnt )
             onError( "Array size awfully large... perhaps this is not a job for a shader..." );
 
         params.mArraySize = arraySize;
+
+        if NOT( pTok = strtok_r(NULL, " \t", &pTokCtx) )
+            onError( "Expecting array element type" );
     }
 
     if ( 0 == strcmp( pTok, "float"  ) ) params.mType = Symbol::TYP_FLOAT ; else
@@ -669,6 +672,11 @@ void Parser::parseCodeLine( char lineBuff[], int lineCnt )
     if NOT( pOpDef )
     {
         onError( "Unknown opcode '%s' !\n", pTok );
+    }
+
+    if ( pOpDef->Flags & OPC_FLG_UNIMPLEMENTED )
+    {
+        onError( "Opcode '%s' is recognized but not implemented", pTok );
     }
 
     size_t	instrIdx = mpShader->mCode.size();

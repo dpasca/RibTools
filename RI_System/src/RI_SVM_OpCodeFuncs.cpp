@@ -48,6 +48,9 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
     Inst_Mov<X,X>,
     Inst_Mov<B,B>,
 
+    Inst_Neg<S>,
+    Inst_Neg<V>,
+
     Inst_Abs<S,S>,
     Inst_Abs<V,S>,
     Inst_Abs<V,V>,
@@ -153,6 +156,12 @@ SlOpCodeFunc	_gSlOpCodeFuncs[] =
     Inst_Texture<S,1>	,
     Inst_Texture<V,1>	,
 };
+
+//==================================================================
+size_t GetSlOpCodeFuncCount()
+{
+    return sizeof(_gSlOpCodeFuncs) / sizeof(_gSlOpCodeFuncs[0]);
+}
 
 #undef S
 #undef V

@@ -24,6 +24,11 @@ void SolveBiOpType( const TokNode *pOperator,
                     VarType	vt2,
                     VarType &out_varType );
 
+void SolveUnaryOpType(
+                    const TokNode *pOperator,
+                    VarType operandType,
+                    VarType &out_varType );
+
 void ExpandAssingOperators( TokNode *pNode );
 
 //==================================================================

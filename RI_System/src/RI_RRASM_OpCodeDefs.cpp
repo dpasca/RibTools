@@ -28,12 +28,12 @@ namespace RRASM
 #define ADR Symbol::TYP_ADDR
 
 //==================================================================
-// NOTE: this table must match the order of callbacks in sInstructionTable in RI_SVM_Shader.cpp
+// NOTE: this table must match the order of callbacks in _gSlOpCodeFuncs.
 // NOTE: make sure that the allowed types satisfy the rules in
 //       RSLC_Operators_SolveBiOpType_RulesTable.h
 OpCodeDef	_gOpCodeDefs[] =
 {
-    "ret"			,	0,			0,	NA,	NA, NA, NA, NA,
+    "ret"			,	0,			OPC_FLG_VM_HANDLED,	NA,	NA, NA, NA, NA,
 
     "mov.ss"		,	2,			OPC_FLG_1STISDEST,	F1,	F1,	NA,	NA,	NA,
     "mov.vs"		,	2,			OPC_FLG_1STISDEST,	F3,	F1,	NA,	NA,	NA,
@@ -41,6 +41,9 @@ OpCodeDef	_gOpCodeDefs[] =
                                                                                        
     "mov.xx"		,	2,			OPC_FLG_1STISDEST,	STR,STR,NA,	NA,	NA,
     "mov.bb"		,	2,			OPC_FLG_1STISDEST,	BL,	BL,	NA,	NA,	NA,
+
+    "neg.ss"		,	2,			OPC_FLG_1STISDEST,	F1,	F1,	NA,	NA,	NA,
+    "neg.vv"		,	2,			OPC_FLG_1STISDEST,	F3,	F3,	NA,	NA,	NA,
                                                                                        
     "abs.ss"		,	2,			OPC_FLG_1STISDEST,	F1,	F1,	NA,	NA,	NA,
     "abs.vs"		,	2,			OPC_FLG_1STISDEST,	F3,	F1,	NA,	NA,	NA,
@@ -95,14 +98,14 @@ OpCodeDef	_gOpCodeDefs[] =
     "seteq.bss"		,	3,			OPC_FLG_1STISDEST,	BL,	F1	, F1	,	NA,	NA,
     "seteq.bvv"		,	3,			OPC_FLG_1STISDEST,	BL,	F3	, F3	,	NA,	NA,
     "seteq.bhh"		,	3,			OPC_FLG_1STISDEST,	BL,	F4	, F4	,	NA,	NA,
-    "seteq.bmm"		,	3,			OPC_FLG_1STISDEST,	BL,	M44	, M44	,	NA,	NA,
+    "seteq.bmm"		,	3,			OPC_FLG_1STISDEST | OPC_FLG_UNIMPLEMENTED,	BL,	M44	, M44	,	NA,	NA,
     "seteq.bxx"		,	3,			OPC_FLG_1STISDEST,	BL,	STR	, STR	,	NA,	NA,
     "seteq.bbb"		,	3,			OPC_FLG_1STISDEST,	BL,	BL	, BL	,	NA,	NA,
 
     "setne.bss"		,	3,			OPC_FLG_1STISDEST,	BL,	F1	, F1	,	NA,	NA,
     "setne.bvv"		,	3,			OPC_FLG_1STISDEST,	BL,	F3	, F3	,	NA,	NA,
     "setne.bhh"		,	3,			OPC_FLG_1STISDEST,	BL,	F4	, F4	,	NA,	NA,
-    "setne.bmm"		,	3,			OPC_FLG_1STISDEST,	BL,	M44	, M44	,	NA,	NA,
+    "setne.bmm"		,	3,			OPC_FLG_1STISDEST | OPC_FLG_UNIMPLEMENTED,	BL,	M44	, M44	,	NA,	NA,
     "setne.bxx"		,	3,			OPC_FLG_1STISDEST,	BL,	STR	, STR	,	NA,	NA,
     "setne.bbb"		,	3,			OPC_FLG_1STISDEST,	BL,	BL	, BL	,	NA,	NA,
 
@@ -140,13 +143,19 @@ OpCodeDef	_gOpCodeDefs[] =
     "iftrue.b"		,	1,			OPC_FLG_FUNCOP_BEGIN, BL, NA, NA,	NA,	NA,
     "orelse"		,	0,			OPC_FLG_FUNCOP_MIDDLE,NA, NA, NA,	NA,	NA,
 
-    "texture.sx"	,	2,			OPC_FLG_1STISDEST,	F1,	STR, F1, F1, NA,
-    "texture.vx"	,	2,			OPC_FLG_1STISDEST,	F3,	STR, F1, F1, NA,
+    "texture.sx"	,	2,			OPC_FLG_1STISDEST,	F1,	STR, NA, NA, NA,
+    "texture.vx"	,	2,			OPC_FLG_1STISDEST,	F3,	STR, NA, NA, NA,
     "texture.sxss"	,	4,			OPC_FLG_1STISDEST,	F1,	STR, F1, F1, NA,
     "texture.vxss"	,	4,			OPC_FLG_1STISDEST,	F3,	STR, F1, F1, NA,
 
     NULL			,	0,			0,	NA, NA, NA, NA, NA
 };
+
+//==================================================================
+size_t GetOpCodeDefCount()
+{
+    return sizeof(_gOpCodeDefs) / sizeof(_gOpCodeDefs[0]) - 1;
+}
 
 
 //==================================================================

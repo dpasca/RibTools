@@ -15,6 +15,72 @@ namespace RSLC
 {
 
 //==================================================================
+static bool canEndExpression( const TokNode *pNode )
+{
+    if ( pNode == nullptr || pNode->mpToken == nullptr )
+        return false;
+
+    if ( pNode->mNodeType == TokNode::TYPE_FUNCCALL || pNode->IsExpressionBlock() )
+        return true;
+
+    const auto tokenType = pNode->GetTokIDType();
+    return tokenType == T_TYPE_VALUE ||
+           tokenType == T_TYPE_NONTERM ||
+           tokenType == T_TYPE_TEMPDEST;
+}
+
+//==================================================================
+static void classifyUnaryOperators( TokNode *pNode )
+{
+    for (size_t i=0; i < pNode->mpChilds.size(); ++i)
+    {
+        TokNode *pChild = pNode->mpChilds[i];
+        const auto tokenID = pChild->GetTokID();
+
+        if ( tokenID == T_OP_PLUS || tokenID == T_OP_MINUS )
+        {
+            const TokNode *pLeft = i > 0 ? pNode->mpChilds[i-1] : nullptr;
+            if ( !canEndExpression( pLeft ) )
+            {
+                pChild->SetTokID(
+                    tokenID == T_OP_PLUS ? T_OP_UNARY_PLUS : T_OP_UNARY_MINUS );
+            }
+        }
+
+        classifyUnaryOperators( pChild );
+    }
+}
+
+//==================================================================
+static void doReparentUnary( TokNode *pOper )
+{
+    TokNode *pOperand = pOper->GetRight();
+    if ( pOperand == nullptr )
+    {
+        throw Exception(
+            pOper,
+            "Missing operand for unary operator '%s'",
+            pOper->GetTokStr() );
+    }
+
+    pOperand->Reparent( pOper );
+    pOper->mpChilds.push_back( pOperand );
+}
+
+//==================================================================
+static void reparentUnaryOperators( TokNode *pNode )
+{
+    for (size_t i=pNode->mpChilds.size(); i > 0; --i)
+    {
+        TokNode *pChild = pNode->mpChilds[i-1];
+        reparentUnaryOperators( pChild );
+
+        if ( pChild->mpToken && pChild->mpToken->IsUnaryOp() )
+            doReparentUnary( pChild );
+    }
+}
+
+//==================================================================
 static void doReparent( TokNode *pOper, size_t &out_parentIdx, bool swapOrder )
 {
     // get leaves on the left and right of the operand
@@ -227,9 +293,18 @@ void ReparentOperators( TokNode *pNode )
 
     size_t	idx;
 
+    // '+' and '-' share their source token with the binary forms. Classify
+    // prefix uses before any reparenting changes their sibling context.
+    classifyUnaryOperators( pNode );
+
     reparentBiOperators( pNode, priority0, _countof(priority0), idx, true );
 
     reparentBiOperators( pNode, priority1, _countof(priority1),	idx );
+
+    // Unary operators bind below primary expressions but above every binary
+    // operator, and scanning right-to-left handles chains such as '- -value'.
+    reparentUnaryOperators( pNode );
+
     reparentBiOperators( pNode, priority2, _countof(priority2),	idx );
     reparentBiOperators( pNode, priority3, _countof(priority3),	idx );
     reparentBiOperators( pNode, priority4, _countof(priority4),	idx );

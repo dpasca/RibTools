@@ -215,6 +215,51 @@ static bool buildExpression_biOp_handleArrSet(
 }
 
 //==================================================================
+static void buildExpression_unaryOp( FILE *pFile, TokNode *pNode )
+{
+    const TokNode *pOperand = pNode->GetChildTry( 0 );
+    if ( pOperand == nullptr )
+        return;
+
+    VarType operandType;
+    const DStr operandName = getOperand( pOperand, operandType );
+
+    const Register resultRegister = pNode->GetRegister();
+    const DStr resultName = resultRegister.GetName();
+    const char resultTypeID = VarTypeToLetter( resultRegister.GetVarType() );
+    const char operandTypeID = VarTypeToLetter( operandType );
+
+    char instruction[256];
+
+    switch ( pNode->GetTokID() )
+    {
+    case T_OP_UNARY_PLUS:
+        sprintf_s( instruction, "mov.%c%c", resultTypeID, operandTypeID );
+        fprintf_s(
+            pFile,
+            "\t%-14s %-6s\t%-6s\n",
+            instruction,
+            resultName.c_str(),
+            operandName.c_str() );
+        break;
+
+    case T_OP_UNARY_MINUS:
+        sprintf_s( instruction, "neg.%c%c", resultTypeID, operandTypeID );
+        fprintf_s(
+            pFile,
+            "\t%-14s %-6s\t%-6s\n",
+            instruction,
+            resultName.c_str(),
+            operandName.c_str() );
+        break;
+
+    default:
+        DASSERT( 0 );
+        break;
+    }
+}
+
+//==================================================================
 static void buildExpression_biOp( FILE *pFile, TokNode *pNode )
 {
     const TokNode *pOperand1 = pNode->GetChildTry( 0 );
@@ -364,6 +409,11 @@ static void buildExpression( FILE *pFile, TokNode *pNode )
         }
         else
             fprintf_s( pFile, "\n" );
+    }
+    else
+    if ( pNode->mpToken->IsUnaryOp() )
+    {
+        buildExpression_unaryOp( pFile, pNode );
     }
     else
     if ( pNode->mpToken->IsBiOp() )

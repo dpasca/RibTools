@@ -9,6 +9,8 @@
 #ifndef RI_SVM_OPCODEFUNCS_H
 #define RI_SVM_OPCODEFUNCS_H
 
+#include <cstddef>
+
 //==================================================================
 namespace RI
 {
@@ -19,6 +21,8 @@ namespace SVM
 typedef void (*SlOpCodeFunc)( Context &ctx, u_int blocksN );
 
 extern SlOpCodeFunc	_gSlOpCodeFuncs[];
+
+size_t GetSlOpCodeFuncCount();
 
 //==================================================================
 }

@@ -75,4 +75,34 @@ void SolveBiOpType(	const TokNode *pOperator,
 }
 
 //==================================================================
+void SolveUnaryOpType(
+                    const TokNode *pOperator,
+                    VarType operandType,
+                    VarType &out_varType )
+{
+    DASSERT( pOperator->mpToken->IsUnaryOp() );
+    DASSERT( operandType != VT_UNKNOWN );
+
+    switch ( operandType )
+    {
+    case VT_FLOAT:
+    case VT_VECTOR:
+    case VT_POINT:
+    case VT_NORMAL:
+    case VT_COLOR:
+        out_varType = operandType;
+        return;
+
+    default:
+        out_varType = VT_UNKNOWN;
+        throw Exception(
+            DUT::SSPrintFS(
+                "Incompatible unary operation [ '%s' '%s' ]",
+                pOperator->GetTokStr(),
+                VarTypeToString( operandType ) ),
+            pOperator );
+    }
+}
+
+//==================================================================
 }

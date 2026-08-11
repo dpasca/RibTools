@@ -83,6 +83,11 @@ public:
 
     bool IsBiOp() const;
 
+    bool IsUnaryOp() const
+    {
+        return id == T_OP_UNARY_PLUS || id == T_OP_UNARY_MINUS;
+    }
+
     bool IsCmpOp() const
     {
         return

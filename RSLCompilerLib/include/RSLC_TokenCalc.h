@@ -9,11 +9,18 @@
 #ifndef RSLC_TOKENCALC_H
 #define RSLC_TOKENCALC_H
 
+#include <memory>
+
 #include "RSLC_Token.h"
 
 //==================================================================
 namespace RSLC
 {
+
+//==================================================================
+std::unique_ptr<Token> TokenCalcUnaryOp(
+                TokenID operTokID,
+                const Token &value );
 
 //==================================================================
 Token *TokenCalcBiOp(

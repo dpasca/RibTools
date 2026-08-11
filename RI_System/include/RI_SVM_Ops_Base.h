@@ -111,6 +111,29 @@ void Inst_Mov( Context &ctx, u_int blocksN )
 }
 
 //==================================================================
+template <class T>
+void Inst_Neg( Context &ctx, u_int blocksN )
+{
+    auto *pDestination = static_cast<T *>(ctx.GetRW( 1 ));
+    const auto *pOperand = static_cast<const T *>(ctx.GetRO( 2 ));
+
+    size_t operandIndex = 0;
+    const auto operandStep = static_cast<size_t>(ctx.GetSymbolVaryingStep( 2 ));
+
+    for (size_t blockIndex = 0; blockIndex < blocksN; ++blockIndex)
+    {
+        SLRUNCTX_BLKWRITECHECK( blockIndex );
+        {
+            pDestination[blockIndex] = -pOperand[operandIndex];
+        }
+
+        operandIndex += operandStep;
+    }
+
+    ctx.NextInstruction();
+}
+
+//==================================================================
 template <class TA, class TB>
 void Inst_Abs( Context &ctx, u_int blocksN )
 {

@@ -48,6 +48,48 @@ static void getTwoOperands(
 }
 
 //==================================================================
+static VarType getUnaryOperandType( TokNode *pNode )
+{
+    for (TokNode *pOperand = pNode->GetChildTry( 0 );
+         pOperand != nullptr;
+         pOperand = pOperand->GetChildTry( 0 ))
+    {
+        const auto operandType = pOperand->GetVarType();
+        if ( operandType != VT_UNKNOWN )
+            return operandType;
+    }
+
+    throw Exception( pNode, "Unknown operand '%s'", pNode->GetTokStr() );
+}
+
+//==================================================================
+static bool solveConstExpressions_UnaryOp( TokNode *pNode )
+{
+    TokNode *pOperand = pNode->GetChildTry( 0 );
+    if ( pOperand == nullptr )
+        return false;
+
+    const auto operandType = pOperand->GetVarType();
+    if ( operandType == VT_UNKNOWN )
+        return false;
+
+    VarType resultType;
+    SolveUnaryOpType( pNode, operandType, resultType );
+
+    if ( pOperand->GetTokIDType() != T_TYPE_VALUE )
+        return false;
+
+    auto newValueToken = TokenCalcUnaryOp( pNode->GetTokID(), *pOperand->mpToken );
+    if ( newValueToken == nullptr )
+        return false;
+
+    pNode->DeleteReplaceToken( newValueToken.release() );
+    pOperand->UnlinkFromParent();
+    DSAFE_DELETE( pOperand );
+    return true;
+}
+
+//==================================================================
 static bool solveConstExpressions_BiOp( TokNode *pNode )
 {
     if ( pNode->mpToken->IsAssignOp() )
@@ -111,11 +153,26 @@ void OptimizeConstantExpressions( TokNode *pNode )
 
     if ( pNode->mpToken )
     {
+        if ( pNode->mpToken->IsUnaryOp() )
+        {
+            solveConstExpressions_UnaryOp( pNode );
+        }
+        else
         if ( pNode->mpToken->IsBiOp() && !pNode->mpToken->IsAssignOp() )
         {
             solveConstExpressions_BiOp( pNode );
         }
     }
+}
+
+//==================================================================
+static void solveExpressions_sub_UnaryOp( TokNode *pNode )
+{
+    const auto operandType = getUnaryOperandType( pNode );
+
+    VarType resultType;
+    SolveUnaryOpType( pNode, operandType, resultType );
+    AddSelfVariable( pNode, resultType, false, false );
 }
 
 //==================================================================
@@ -157,6 +214,11 @@ static void solveExpressions_sub( TokNode *pNode, const DVec<Function> &funcs )
         {
             pNode->mFuncCall.mpFunc = pFunc;
         }
+    }
+    else
+    if ( pNode->mpToken->IsUnaryOp() )
+    {
+        solveExpressions_sub_UnaryOp( pNode );
     }
     else
     if ( pNode->mpToken->IsBiOp() )
@@ -215,6 +277,15 @@ static void solveVariablesDetail_sub( TokNode *pNode )
     for (size_t i=0; i < pNode->mpChilds.size(); ++i)
         solveVariablesDetail_sub( pNode->mpChilds[i] );
 
+    if ( pNode->mpToken->IsUnaryOp() )
+    {
+        TokNode *pOperand = pNode->GetChildTry( 0 );
+        const bool operandIsVarying = isBranchVarying( pOperand );
+        const bool setSuccess =
+            pNode->TrySetVarying_AndForceIfTrue( operandIsVarying );
+        DASSERT( setSuccess );
+    }
+    else
     if ( pNode->mpToken->IsBiOp() )
     {
         TokNode	*pLNode	= pNode->GetChildTry( 0 );

@@ -36,6 +36,8 @@ TokenDef _TokenDefs[TOKEN_N] =
     "false"	,	T_TYPE_VALUE	,	T_VL_BOOL_FALSE	,
 
     NULL	,	T_TYPE_OPERATOR,	T_OP_ASSIGN_ARR_ITEM,	// operator used internally
+    NULL	,	T_TYPE_OPERATOR,	T_OP_UNARY_PLUS,		// operators used internally
+    NULL	,	T_TYPE_OPERATOR,	T_OP_UNARY_MINUS,
 
     OP_DEF(	"="		,	ASSIGN		)	,	// assign ops
     OP_DEF(	"+="	,	PLUSASS		)	,

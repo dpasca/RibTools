@@ -172,6 +172,55 @@ add_subdirectory( RibRenderToy )
 add_subdirectory( RSLCompilerCmd )
 
 if (BUILD_TESTING)
+    add_executable(
+        RISystemShaderCompilerTests
+        RI_System/tests/ShaderCompilerTests.cpp)
+    target_link_libraries(
+        RISystemShaderCompilerTests
+        PRIVATE RI_System RSLCompilerLib)
+
+    set(RIBTOOLS_SHADER_CONTRACT_SOURCES
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/matte_fat.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/matte.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test01.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test02.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test04.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test05.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test06.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test07.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test08.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test09.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test10_1.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/unary_operators.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/ambientlight.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/arealight.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/constant.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/distantlight.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/matte.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/metal.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/plastic.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/pointlight.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/KillerooNURBS/Shaders/disp_textured.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/KillerooNURBS/Shaders/shoulderlight.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/MiscTests/T01_TestIfElse.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/SpacesTests/SpacesTest1Sha.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/SpacesTests/SpacesTestCameraSha.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/SpacesTests/SpacesTestObjectSha.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/SpacesTests/SpacesTestRasterSha.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/SpacesTests/SpacesTestScreenSha.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/SpacesTests/SpacesTestWorldSha.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ValuesTests/dbg_show_I.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ValuesTests/dbg_show_N.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ValuesTests/dbg_show_negI.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ValuesTests/dbg_show_Nf.sl")
+
+    add_test(
+        NAME RI_System.ShaderCompilerContract
+        COMMAND RISystemShaderCompilerTests
+            "${CMAKE_CURRENT_BINARY_DIR}/RI_System/shader-contract"
+            "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/RSLC_Builtins.sl"
+            ${RIBTOOLS_SHADER_CONTRACT_SOURCES})
+
     add_test(NAME RibRender.Help COMMAND RibRender --help)
     add_test(NAME RibRenderToy.Help COMMAND RibRenderToy --help)
 
@@ -193,6 +242,27 @@ if (BUILD_TESTING)
             "${CMAKE_CURRENT_BINARY_DIR}/test10_1.rrasm")
     set_tests_properties(
         RSLCompilerCmd.PreprocessorShader
+        PROPERTIES ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base")
+
+    add_test(
+        NAME RSLCompilerCmd.UnaryOperators
+        COMMAND RSLCompilerCmd
+            "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/unary_operators.sl"
+            "${CMAKE_CURRENT_BINARY_DIR}/unary_operators.rrasm")
+    add_test(
+        NAME RSLCompilerCmd.UnaryShoulderLight
+        COMMAND RSLCompilerCmd
+            "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/KillerooNURBS/Shaders/shoulderlight.sl"
+            "${CMAKE_CURRENT_BINARY_DIR}/shoulderlight.rrasm")
+    add_test(
+        NAME RSLCompilerCmd.ArrayFrontEnd
+        COMMAND RSLCompilerCmd
+            "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test11.sl"
+            "${CMAKE_CURRENT_BINARY_DIR}/test11.rrasm")
+    set_tests_properties(
+        RSLCompilerCmd.UnaryOperators
+        RSLCompilerCmd.UnaryShoulderLight
+        RSLCompilerCmd.ArrayFrontEnd
         PROPERTIES ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base")
 
     add_test(

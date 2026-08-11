@@ -9,6 +9,8 @@
 #ifndef RI_RRASM_OPCODEDEFS_H
 #define RI_RRASM_OPCODEDEFS_H
 
+#include <cstddef>
+
 #include "RI_SVM_Shader.h"
 #include "RI_Symbol.h"
 
@@ -27,6 +29,8 @@ static const u_int OPC_FLG_FUNCOP_BEGIN		= 8	;	// it's a funcop begin instructio
 static const u_int OPC_FLG_FUNCOP_MIDDLE	= 16;	// it's a funcop middle instruction
 static const u_int OPC_FLG_FUNCOP_END		= 32;	// it's a funcop end instruction
 static const u_int OPC_FLG_DIRPOSLIGHT		= 64;	// it's dealing with positional and directional light
+static const u_int OPC_FLG_VM_HANDLED		= 128;	// handled directly by the VM dispatch loop
+static const u_int OPC_FLG_UNIMPLEMENTED	= 256;	// recognized, but rejected by the RRASM parser
 
 //==================================================================
 struct OpCodeDef
@@ -38,6 +42,8 @@ struct OpCodeDef
 };
 
 extern OpCodeDef	_gOpCodeDefs[];
+
+size_t GetOpCodeDefCount();
 
 //==================================================================
 }

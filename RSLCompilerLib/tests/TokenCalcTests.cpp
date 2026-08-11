@@ -59,5 +59,24 @@ int main()
     if ( !isBoolean( booleanResult.get(), true ) )
         return 5;
 
+    auto negativeResult =
+        RSLC::TokenCalcUnaryOp( RSLC::T_OP_UNARY_MINUS, three );
+    if ( negativeResult == nullptr ||
+         negativeResult->id != RSLC::T_VL_NUMBER ||
+         negativeResult->ConstNum != -3.0 )
+        return 6;
+
+    auto positiveResult =
+        RSLC::TokenCalcUnaryOp( RSLC::T_OP_UNARY_PLUS, three );
+    if ( positiveResult == nullptr ||
+         positiveResult->id != RSLC::T_VL_NUMBER ||
+         positiveResult->ConstNum != 3.0 )
+        return 7;
+
+    auto invalidUnaryResult =
+        RSLC::TokenCalcUnaryOp( RSLC::T_OP_UNARY_MINUS, stringValue );
+    if ( invalidUnaryResult != nullptr )
+        return 8;
+
     return 0;
 }
