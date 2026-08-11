@@ -8,7 +8,7 @@ if (POLICY CMP0179)
     cmake_policy(SET CMP0179 NEW)
 endif()
 
-project(RibTools LANGUAGES C CXX)
+project(RibTools VERSION 0.11.0 LANGUAGES C CXX)
 
 include(CTest)
 
@@ -84,9 +84,8 @@ function(app_create_vcxproj_userfile extraPath)
     endif()
 endfunction()
 
-# Specify the destination directly into the _distrib directory
-# ..also avoid the /Release and /Debug additional subdirs created by
-# Visual Studio
+# Keep the applications and their runtime assets together. This also avoids
+# the per-configuration subdirectories normally added by Visual Studio.
 set(RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY
     "${CMAKE_SOURCE_DIR}/_distrib"
     CACHE PATH "Directory for RibTools executables")
@@ -191,6 +190,85 @@ add_subdirectory( RibRender )
 add_subdirectory( RibRenderServer )
 add_subdirectory( RibRenderToy )
 add_subdirectory( RSLCompilerCmd )
+
+# Stage the data needed to run RibTools as part of every normal build. This is
+# the cross-platform replacement for the old make_distrib shell and batch
+# scripts; generated shader caches remain in place between builds.
+set(RIBTOOLS_RUNTIME_SOURCE_DIRECTORY "${CMAKE_SOURCE_DIR}/DistribSrc/base")
+add_custom_target(
+    RibToolsRuntimeAssets ALL
+    COMMAND
+        "${CMAKE_COMMAND}" -E make_directory
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}"
+    COMMAND
+        "${CMAKE_COMMAND}" -E copy_directory
+        "${RIBTOOLS_RUNTIME_SOURCE_DIRECTORY}"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}"
+    COMMAND
+        "${CMAKE_COMMAND}" -E rm -f
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/rendermn.ini"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/readme.html"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/readme.txt"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/make_tests.bat"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/make_tests.sh"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/del_compiled_shaders.bat"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/del_compiled_shaders.sh"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/TestScenes/MiscTests/render.bat"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/TestScenes/MiscTests/render.sh"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/TestScenes/ValuesTests/render.bat"
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/TestScenes/ValuesTests/render_aqsis.bat"
+    COMMAND
+        "${CMAKE_COMMAND}" -E remove_directory
+        "${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}/Extras"
+    COMMENT "Staging RibTools runtime assets")
+
+foreach(APP_TARGET RibRender RibRenderServer RibRenderToy RSLCompilerCmd)
+    add_dependencies(${APP_TARGET} RibToolsRuntimeAssets)
+endforeach()
+
+add_custom_target(
+    RibToolsCleanShaderCache
+    COMMAND
+        "${CMAKE_COMMAND}"
+        "-DRIBTOOLS_RUNTIME_DIRECTORY=${RIBTOOLS_RUNTIME_OUTPUT_DIRECTORY}"
+        -P "${CMAKE_SOURCE_DIR}/cmake/CleanRuntimeShaderCache.cmake"
+    COMMENT "Removing generated runtime shader caches")
+
+# CPack installs into a fresh temporary tree, so release archives cannot pick
+# up stale render outputs, settings, or generated shader caches from _distrib.
+install(
+    TARGETS RibRender RibRenderServer RibRenderToy RSLCompilerCmd
+    RUNTIME DESTINATION .)
+install(
+    DIRECTORY
+        "${RIBTOOLS_RUNTIME_SOURCE_DIRECTORY}/Resources"
+        "${RIBTOOLS_RUNTIME_SOURCE_DIRECTORY}/TestScenes"
+    DESTINATION .
+    PATTERN "Unused" EXCLUDE
+    PATTERN "*.autogen.rrasm" EXCLUDE
+    PATTERN "*.slx" EXCLUDE)
+install(
+    FILES
+        "${RIBTOOLS_RUNTIME_SOURCE_DIRECTORY}/ribtools.ini"
+        "${CMAKE_SOURCE_DIR}/README.md"
+        "${CMAKE_SOURCE_DIR}/license.txt"
+    DESTINATION .)
+install(
+    FILES "${CMAKE_SOURCE_DIR}/docs/images/rib-render-toy-killeroo.png"
+    DESTINATION docs/images)
+
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_PACKAGE_NAME "RibTools")
+set(CPACK_PACKAGE_VENDOR "Davide Pasca")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Experimental RenderMan-style REYES renderer")
+set(CPACK_PACKAGE_DIRECTORY "${CMAKE_BINARY_DIR}/packages")
+set(
+    CPACK_PACKAGE_FILE_NAME
+    "RibTools-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+set(CPACK_PACKAGE_CHECKSUM "SHA256")
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY ON)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/license.txt")
+include(CPack)
 
 if (BUILD_TESTING)
     add_executable(

@@ -2,11 +2,27 @@
 
 set -euo pipefail
 
-build_type=${1:-Release}
+preset=${1:-release}
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 
 cd "${script_dir}"
 
-cmake -S . -B _build -DCMAKE_BUILD_TYPE="${build_type}"
-bash ./make_distrib.sh
-cmake --build _build --config "${build_type}"
+case "${preset}" in
+    Release|release)
+        preset=release
+        ;;
+    Debug|debug)
+        preset=debug
+        ;;
+    Sanitize|sanitize)
+        preset=sanitize
+        ;;
+    *)
+        echo "Unknown build preset: ${preset}" >&2
+        echo "Expected release, debug, or sanitize." >&2
+        exit 2
+        ;;
+esac
+
+cmake --preset "${preset}"
+cmake --build --preset "${preset}" --parallel

@@ -24,3 +24,38 @@ agreed in advance. Vendored and archival directories are excluded through `.clan
 
 Keep commits focused and preserve existing public interfaces unless a change explicitly requires an API break. Generated,
 vendored, shader, and third-party code should retain its native style.
+
+## Diagnostic builds
+
+Clang and GCC builds can opt into AddressSanitizer and UndefinedBehaviorSanitizer through the dedicated preset:
+
+```sh
+cmake --preset sanitize
+cmake --build --preset sanitize
+ctest --preset sanitize
+```
+
+The instrumented executables are written to `_build/sanitize/bin` so they do not replace the normal binaries in
+`_distrib`. Runtime assets are staged there automatically. Sanitizer findings stop the failing test immediately.
+
+## Runtime staging and packaging
+
+CMake stages `DistribSrc/base` into the selected runtime output directory whenever the applications are built. Do not add
+platform-specific copy scripts; Windows, macOS, and Linux use the same CMake target.
+
+Generated `*.autogen.rrasm` shader caches deliberately survive ordinary builds. Remove them with:
+
+```sh
+cmake --build --preset release --target RibToolsCleanShaderCache
+```
+
+To validate the distributable layout, build the Release preset and use its CPack target:
+
+```sh
+cmake --preset release
+cmake --build --preset release --parallel
+cmake --build --preset release --target package
+```
+
+The resulting ZIP and SHA-256 checksum are placed in `_build/release/packages`. Packaging uses CMake's clean temporary
+install tree rather than copying `_distrib`.

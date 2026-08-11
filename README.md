@@ -36,6 +36,12 @@ bundled scenes and intentionally supports only part of the RenderMan interface.
 | `RSLCompilerCmd` | A standalone testing frontend that compiles RenderMan-like `.sl` source to `.rrasm`. |
 | `RibRenderServer` | Runs an experimental render worker that accepts connections from `RibRender`. |
 
+## Documentation
+
+- [Development guide](DEVELOPMENT.md)
+- [Architecture overview](docs/Architecture.md)
+- [Documentation index and historical material](docs/README.md)
+
 ## Building
 
 ### Requirements
@@ -55,25 +61,27 @@ If the repository was cloned without submodules, initialize them first:
 git submodule update --init --recursive
 ```
 
-### Quick start on macOS and Linux
+### Quick start
 
-The compatibility script creates `_build`, stages runtime resources in `_distrib`, and builds the project:
+The same CMake preset workflow is used on macOS, Linux, and Windows. Building also stages the runtime resources in
+`_distrib`:
 
 ```sh
-./build.sh Release
-ctest --test-dir _build --output-on-failure
+cmake --preset release
+cmake --build --preset release --parallel
+ctest --preset release
 
 cd _distrib
 ./RibRenderToy TestScenes/KillerooNURBS/killeroo.rib
 ```
 
-The equivalent CMake preset workflow is:
+On macOS and Linux, `./build.sh Release` remains as a convenience wrapper around the first two commands. It also accepts
+`Debug` and `Sanitize`.
+
+To remove shaders compiled into the runtime cache without deleting the rest of `_distrib`:
 
 ```sh
-cmake --preset release
-bash ./make_distrib.sh
-cmake --build --preset release --parallel
-ctest --preset release
+cmake --build --preset release --target RibToolsCleanShaderCache
 ```
 
 On Ubuntu, the packages used by CI are:
@@ -93,9 +101,22 @@ sudo apt-get install \
 
 ### Windows
 
-Run `make_build.bat`, followed by `do_build.bat`. Visual Studio users can also open `_build\RibTools.sln`, select the
-Release configuration, and launch the executables from `_distrib`. The Windows build path is retained, but it has not yet
-received fresh validation as part of the 2026 refresh.
+Run the preset commands from a Visual Studio developer terminal or another terminal with CMake and a compiler available.
+Visual Studio users can also open `_build\release\RibTools.sln`, select the Release configuration, and launch the
+executables from `_distrib`. Windows support has not yet received fresh validation as part of the 2026 refresh.
+
+### Creating a distribution archive
+
+Release archives are produced through CPack, without external archiving tools or a pre-existing `_distrib` directory:
+
+```sh
+cmake --preset release
+cmake --build --preset release --parallel
+cmake --build --preset release --target package
+```
+
+The ZIP archive and its SHA-256 checksum are written to `_build/release/packages`. CPack uses a fresh staging tree, so
+local settings, rendered images, and generated `.autogen.rrasm` shader caches are not included.
 
 ## Using RibRenderToy
 
@@ -152,7 +173,7 @@ and the Linux UI smoke path. Rendered-image regression coverage is a priority fo
 - Rendering behavior is validated primarily with the scenes bundled in the repository.
 - The desktop renderer retains a compatibility OpenGL path to support the original fixed-function display code.
 - Distributed rendering is experimental and is not covered by the current CI suite.
-- There are no packaged binary releases for the refreshed version yet.
+- No refreshed binary packages have been published yet; the repository can produce local ZIP packages with CPack.
 
 ## Near-term direction
 
@@ -160,7 +181,7 @@ and the Linux UI smoke path. Rendered-image regression coverage is a priority fo
 2. Polish the desktop interface and improve scene and shader error reporting.
 3. Revalidate and repair the Windows build.
 4. Modernize renderer internals incrementally, with focused changes and regression coverage.
-5. Prepare a first maintenance release once the refreshed branch is stable on all supported platforms.
+5. Publish a first maintenance release once the refreshed branch is stable on all supported platforms.
 
 ## History and acknowledgements
 
