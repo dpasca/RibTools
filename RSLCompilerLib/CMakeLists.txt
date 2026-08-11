@@ -7,6 +7,7 @@ include_directories( include )
 source_group( Sources FILES ${SRCS} ${INCS} )
 
 add_library( ${PROJECT_NAME} STATIC ${SRCS} ${INCS} )
+target_link_libraries( ${PROJECT_NAME} PUBLIC DSystem )
 
 if (BUILD_TESTING)
     add_executable(RSLCompilerTokenCalcTests tests/TokenCalcTests.cpp)

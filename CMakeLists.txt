@@ -176,10 +176,10 @@ add_subdirectory( DMath )
 include(cmake/RibToolsDependencies.cmake)
 
 add_subdirectory( DImage )
+add_subdirectory( RSLCompilerLib )
 add_subdirectory( RI_System )
 add_subdirectory( RibRenderLib )
 add_subdirectory( RibToolsBase )
-add_subdirectory( RSLCompilerLib )
 
 find_package(OpenGL REQUIRED)
 include(cmake/RibToolsUI.cmake)
@@ -297,7 +297,7 @@ if (BUILD_TESTING)
         RI_System/tests/CameraOverrideTests.cpp)
     target_link_libraries(
         RICameraOverrideTests
-        PRIVATE RibRenderLib RSLCompilerLib)
+        PRIVATE RibRenderLib)
 
     set(
         RIBTOOLS_CAMERA_TEST_SHADER_DIRECTORY
