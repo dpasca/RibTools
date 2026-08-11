@@ -8,7 +8,8 @@ Option "searchpath" "shader" ["@:./Shaders"]
 FrameBegin 1
 Display "killeroo.0001.tif" "file" "rgba"
 PixelSamples 2 2
-Imager "background" "background" [ 1.0 1.0 1.0 ]
+# Imager shaders are not implemented; retain the renderer's black background.
+# Imager "background" "background" [ 1.0 1.0 1.0 ]
 Format 796 515 1
 Projection "perspective" "fov" [ 29.1143 ]
 Transform [ 1 0 0 0 0 0 1 0 0 1 0 0 0 0 0 1 ]

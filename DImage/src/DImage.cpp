@@ -6,8 +6,9 @@
 /// copyright info. 
 //==================================================================
 
-#include <string.h>
+#include <cmath>
 #include <limits>
+#include <string.h>
 #include "DSystem/include/DMemory.h"
 #include "DSystem/include/DUtils.h"
 #include "DImage.h"
@@ -15,6 +16,17 @@
 //==================================================================
 namespace DIMG
 {
+
+//==================================================================
+static double clampUnitSample( float sample )
+{
+    // Integer images cannot represent NaN. Use black/transparent for NaN and
+    // saturate infinities just like other out-of-range floating-point values.
+    if ( std::isnan( sample ) )
+        return 0.0;
+
+    return D::Clamp( static_cast<double>(sample), 0.0, 1.0 );
+}
 
 //==================================================================
 void Image::initBase()
@@ -210,15 +222,26 @@ void Image::SetPixelFromFloat( U32 x, U32 y, const float in_samps[MAX_SAMP_PER_P
 
     switch ( mSampType )
     {
-    case Image::ST_U8	:	for (size_t i=0; i < mSampPerPix; ++i) ((U8 *)pPixData)[i] = (U8)D::Clamp( 255 * in_samps[i], 0.f, 255.f ); break;
-    case Image::ST_U16	:	for (size_t i=0; i < mSampPerPix; ++i) ((U16 *)pPixData)[i] = (U16)D::Clamp( 65535 * in_samps[i], 0.f, 65535.f ); break;
+    case Image::ST_U8:
+    {
+        auto *pSamples = static_cast<U8 *>(pPixData);
+        for (size_t i = 0; i < mSampPerPix; ++i)
+            pSamples[i] = static_cast<U8>(clampUnitSample( in_samps[i] ) * 255.0);
+        break;
+    }
+    case Image::ST_U16:
+    {
+        auto *pSamples = static_cast<U16 *>(pPixData);
+        for (size_t i = 0; i < mSampPerPix; ++i)
+            pSamples[i] = static_cast<U16>(clampUnitSample( in_samps[i] ) * 65535.0);
+        break;
+    }
     case Image::ST_U32:
     {
         auto *pSamples = static_cast<U32 *>(pPixData);
         for (size_t i = 0; i < mSampPerPix; ++i)
         {
-            pSamples[i] = static_cast<U32>(
-                D::Clamp( static_cast<double>(in_samps[i]), 0.0, 1.0 ) * maxU32 );
+            pSamples[i] = static_cast<U32>(clampUnitSample( in_samps[i] ) * maxU32);
         }
         break;
     }

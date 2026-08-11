@@ -70,6 +70,43 @@ bool testU32Conversion()
     return std::fabs( output[0] - 1.0f ) < 0.000001f;
 }
 
+bool testNonFiniteIntegerConversion()
+{
+    const float input[DIMG::Image::MAX_SAMP_PER_PIX] {
+        std::numeric_limits<float>::quiet_NaN(),
+        std::numeric_limits<float>::infinity(),
+        -std::numeric_limits<float>::infinity(),
+        0.5f
+    };
+
+    DIMG::Image imageU8( 1, 1, 4, DIMG::Image::ST_U8, -1, "rgba" );
+    imageU8.SetPixelFromFloat( 0, 0, input );
+    const auto *pU8 = reinterpret_cast<const U8 *>(imageU8.GetPixelPtrR( 0, 0 ));
+    if ( pU8[0] != 0 || pU8[1] != 255 || pU8[2] != 0 || pU8[3] != 127 )
+        return false;
+
+    DIMG::Image imageU16( 1, 1, 4, DIMG::Image::ST_U16, -1, "rgba" );
+    imageU16.SetPixelFromFloat( 0, 0, input );
+    const auto *pU16 = reinterpret_cast<const U16 *>(imageU16.GetPixelPtrR( 0, 0 ));
+    if (
+        pU16[0] != 0 ||
+        pU16[1] != std::numeric_limits<U16>::max() ||
+        pU16[2] != 0 ||
+        pU16[3] != 32767 )
+    {
+        return false;
+    }
+
+    DIMG::Image imageU32( 1, 1, 4, DIMG::Image::ST_U32, -1, "rgba" );
+    imageU32.SetPixelFromFloat( 0, 0, input );
+    const auto *pU32 = reinterpret_cast<const U32 *>(imageU32.GetPixelPtrR( 0, 0 ));
+    return
+        pU32[0] == 0 &&
+        pU32[1] == std::numeric_limits<U32>::max() &&
+        pU32[2] == 0 &&
+        pU32[3] == 2147483647U;
+}
+
 bool testSampleNames()
 {
     DIMG::Image image( 1, 1, 4, DIMG::Image::ST_U8, -1, "rgba" );
@@ -228,15 +265,18 @@ int main( int argc, char **argv )
     if ( !testU32Conversion() )
         return 3;
 
-    if ( !testSampleNames() )
+    if ( !testNonFiniteIntegerConversion() )
         return 4;
+
+    if ( !testSampleNames() )
+        return 5;
 
     const std::filesystem::path outputDirectory( argv[1] );
     if ( !testTIFFRoundTrip( outputDirectory ) )
-        return 5;
+        return 6;
 
     if ( !testJPEGConversionAndStride( outputDirectory ) )
-        return 6;
+        return 7;
 
     return 0;
 }

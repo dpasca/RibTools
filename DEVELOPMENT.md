@@ -38,6 +38,20 @@ ctest --preset sanitize
 The instrumented executables are written to `_build/sanitize/bin` so they do not replace the normal binaries in
 `_distrib`. Runtime assets are staged there automatically. Sanitizer findings stop the failing test immediately.
 
+## Visual regression tests
+
+The test suite renders its image fixtures from isolated runtime copies, so compiling their shaders does not modify the
+source tree. The Killeroo check forces the bundled scene to 160 pixels on its longest edge and compares a coarse
+luminance-and-alpha signature. This tolerates small platform differences while still catching missing geometry, changed
+framing, and substantial shading or displacement regressions.
+
+CI retains each platform's `killeroo.0001.tif` as a downloadable artifact. After an intentional visual change, inspect
+the TIFF first, then use the checker to print reviewed replacement values:
+
+```sh
+_distrib/RIKillerooVisualTests _build/release/killeroo.0001.tif --print-reference
+```
+
 ## Runtime staging and packaging
 
 CMake stages `DistribSrc/base` into the selected runtime output directory whenever the applications are built. Do not add

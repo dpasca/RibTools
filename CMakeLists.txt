@@ -286,6 +286,13 @@ if (BUILD_TESTING)
         PRIVATE DImage DSystem)
 
     add_executable(
+        RIKillerooVisualTests
+        RI_System/tests/KillerooVisualTests.cpp)
+    target_link_libraries(
+        RIKillerooVisualTests
+        PRIVATE DImage DSystem)
+
+    add_executable(
         RITextureTests
         RI_System/tests/TextureTests.cpp)
     target_link_libraries(
@@ -428,9 +435,9 @@ if (BUILD_TESTING)
         COMMAND "${CMAKE_COMMAND}"
             "-DRENDERER=$<TARGET_FILE:RibRender>"
             "-DSCENE=${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ArrayTests/array_red_green.rib"
-            "-DSHADER=${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ArrayTests/array_red_green.sl"
             "-DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/array_red_green.tiff"
             "-DRIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base"
+            "-DTEST_NAME=array-visual"
             -P "${CMAKE_SOURCE_DIR}/RI_System/tests/RunVisualRenderTest.cmake")
     set_tests_properties(
         RI_System.ArrayVisualRender
@@ -447,6 +454,33 @@ if (BUILD_TESTING)
         PROPERTIES
             DEPENDS RI_System.ArrayVisualRender
             FIXTURES_REQUIRED RIArrayVisual
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+
+    add_test(
+        NAME RI_System.KillerooVisualRender
+        COMMAND "${CMAKE_COMMAND}"
+            "-DRENDERER=$<TARGET_FILE:RibRender>"
+            "-DSCENE=${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/KillerooNURBS/killeroo.rib"
+            "-DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/killeroo.0001.tif"
+            "-DRIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base"
+            "-DTEST_NAME=killeroo-visual"
+            "-DFORCED_LONG_DIM=160"
+            -P "${CMAKE_SOURCE_DIR}/RI_System/tests/RunVisualRenderTest.cmake")
+    set_tests_properties(
+        RI_System.KillerooVisualRender
+        PROPERTIES
+            FIXTURES_SETUP RIKillerooVisual
+            TIMEOUT 60)
+
+    add_test(
+        NAME RI_System.KillerooVisualCheck
+        COMMAND RIKillerooVisualTests
+            "${CMAKE_CURRENT_BINARY_DIR}/killeroo.0001.tif")
+    set_tests_properties(
+        RI_System.KillerooVisualCheck
+        PROPERTIES
+            DEPENDS RI_System.KillerooVisualRender
+            FIXTURES_REQUIRED RIKillerooVisual
             WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
     if (UNIX AND NOT APPLE)

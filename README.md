@@ -165,7 +165,8 @@ show grids in false colors, or connect to one or more `RibRenderServer` instance
 | Windows | CMake and Visual Studio support retained. Fresh validation is still pending. |
 
 The test suite covers core utility and image behavior, shader compilation, invalid shader rejection, executable startup,
-and the Linux UI smoke path. Rendered-image regression coverage is a priority for the next maintenance stage.
+the Linux UI smoke path, the array-language render fixture, and a low-resolution displaced Killeroo render. CI retains
+the Killeroo TIFF from each platform for visual inspection.
 
 ## Current limitations
 
@@ -177,7 +178,7 @@ and the Linux UI smoke path. Rendered-image regression coverage is a priority fo
 
 ## Near-term direction
 
-1. Add representative rendered-image regression tests, beginning with lighting, displacement, and Killeroo.
+1. Expand rendered-image regression beyond the current array and Killeroo checks, beginning with focused lighting cases.
 2. Polish the desktop interface and improve scene and shader error reporting.
 3. Revalidate and repair the Windows build.
 4. Modernize renderer internals incrementally, with focused changes and regression coverage.
