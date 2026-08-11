@@ -31,6 +31,15 @@ static void matchSymbols( const Symbol &dst, const Symbol &src, bool &out_needCo
                     src.mType,
                     dst.GetNameChr() );
 
+    DASSTHROW(
+        dst.IsArray() == src.IsArray(),
+        "Array shape does not match for '%s'",
+        dst.GetNameChr() );
+    DASSTHROW(
+        !dst.IsArray() || dst.GetArraySize() == src.GetArraySize(),
+        "Array size does not match for '%s'",
+        dst.GetNameChr() );
+
     if ( src.IsVarying() )
     {
         if NOT( dst.IsVarying() )

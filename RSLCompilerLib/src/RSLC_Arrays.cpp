@@ -6,7 +6,7 @@
 /// copyright info. 
 //==================================================================
 
-#include <math.h>
+#include <cmath>
 
 #include "RSLC_Tree.h"
 #include "RSLC_Exceptions.h"
@@ -25,6 +25,13 @@ void RealizeArraysSizes( TokNode *pNode )
     {
         if NOT( vars[i].mIsArray )
             continue;
+
+        if ( vars[i].GetVarType() != VT_FLOAT )
+        {
+            throw Exception(
+                vars[i].mpDefNameNode,
+                "Only float arrays are currently implemented" );
+        }
 
         /* At this point, we are dealing with the following structure
          (because of the reparenting by operators..
@@ -45,23 +52,93 @@ void RealizeArraysSizes( TokNode *pNode )
         TokNode	*pArrSizeNode = pSqBracket->GetChildTry( 1 );
         DASSERT( pArrSizeNode != NULL );
 
-        double	arrSize = pArrSizeNode->mpToken->ConstNum;
-        U64		arrSizeInt = (U64)ceil( arrSize );
+        if ( pArrSizeNode->GetTokID() != T_VL_NUMBER )
+        {
+            throw Exception(
+                pArrSizeNode,
+                "Array size must be a compile-time constant" );
+        }
 
-        // if it's negative or if it's not an integral value
-        if ( arrSize < 0 || arrSizeInt != arrSize )
+        const double arrSize = pArrSizeNode->mpToken->ConstNum;
+
+        if (
+            !std::isfinite( arrSize ) ||
+            arrSize <= 0 ||
+            std::trunc( arrSize ) != arrSize )
+        {
             throw Exception( pSqBracket, "Array size must be positive integral value" );
+        }
 
         // enforce a "large enough" maximum size
-        if ( arrSize > (double)(1 << 24) )
-            throw Exception( pSqBracket, "Array size is currently limited to %i !", 1 << 24 );
+        if ( arrSize >= static_cast<double>(1 << 20) )
+        {
+            throw Exception(
+                pSqBracket,
+                "Array size must be less than %i",
+                1 << 20 );
+        }
 
         // finally set the array size
-        vars[i].mArraySize = (U32)arrSizeInt;
+        vars[i].mArraySize = static_cast<U32>(arrSize);
     }
 
     for (size_t i=0; i < pNode->mpChilds.size(); ++i)
         RealizeArraysSizes( pNode->mpChilds[i] );
+}
+
+//==================================================================
+void ValidateArrayAccesses( TokNode *pNode )
+{
+    if ( pNode->IsTokenID( T_OP_LFT_SQ_BRACKET ) )
+    {
+        TokNode *pArrayNode = pNode->GetChildTry( 0 );
+        TokNode *pIndexNode = pNode->GetChildTry( 1 );
+        if ( pArrayNode == nullptr || pIndexNode == nullptr )
+            throw Exception( pNode, "Incomplete array access" );
+
+        const Variable *pVariable = pArrayNode->mVarLink.GetVarPtr();
+        if ( pVariable == nullptr )
+            throw Exception( pArrayNode, "Unknown array '%s'", pArrayNode->GetTokStr() );
+
+        // The declaration itself has the same square-bracket shape as an access.
+        if ( pVariable->mpDefNameNode != pArrayNode )
+        {
+            if ( !pVariable->IsArray() )
+            {
+                throw Exception(
+                    pArrayNode,
+                    "Variable '%s' is not an array",
+                    pArrayNode->GetTokStr() );
+            }
+
+            if ( pIndexNode->GetTokID() == T_VL_NUMBER )
+            {
+                const double index = pIndexNode->mpToken->ConstNum;
+                if (
+                    !std::isfinite( index ) ||
+                    index < 0 ||
+                    std::trunc( index ) != index )
+                {
+                    throw Exception(
+                        pIndexNode,
+                        "Array index must be a non-negative integral value" );
+                }
+
+                if ( index >= static_cast<double>(pVariable->mArraySize) )
+                {
+                    throw Exception(
+                        pIndexNode,
+                        "Array index %.0f is outside '%s[%u]'",
+                        index,
+                        pArrayNode->GetTokStr(),
+                        pVariable->mArraySize );
+                }
+            }
+        }
+    }
+
+    for (TokNode *pChild : pNode->mpChilds)
+        ValidateArrayAccesses( pChild );
 }
 
 //==================================================================

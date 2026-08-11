@@ -356,6 +356,9 @@ void Parser::parseDataLine( char lineBuff[], int lineCnt )
         if ( 1 != sscanf_s( pTok, "%u", &arraySize ) )
             onError( "Could not read the array size" );
 
+        if ( arraySize == 0 )
+            onError( "Array size must be positive" );
+
         if ( arraySize >= (1024*1024) )
             onError( "Array size awfully large... perhaps this is not a job for a shader..." );
 
@@ -622,6 +625,17 @@ void Parser::parseCode_handleOperSymbol( const char *pTok, const OpCodeDef *pOpD
 
         if NOT( matches )
             onError( "Invalid operand type at position %i (%s)", operIdx+1, pTok );
+
+        const bool expectsArray =
+            (pOpDef->Flags & OPC_FLG_2NDISARRAY) && operIdx == 1;
+        if ( mpShader->mpShaSyms[symbolIdx]->IsArray() != expectsArray )
+        {
+            onError(
+                "Operand %i for '%s' must be %s",
+                operIdx + 1,
+                pOpDef->pName,
+                expectsArray ? "an array" : "a scalar value" );
+        }
     }
 
     mpShader->mCode.push_back( word );

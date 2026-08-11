@@ -1,0 +1,44 @@
+foreach(REQUIRED_VARIABLE RENDERER SCENE SHADER OUTPUT_FILE RIBTOOLS_DIR)
+    if (NOT DEFINED ${REQUIRED_VARIABLE})
+        message(FATAL_ERROR "Missing required variable: ${REQUIRED_VARIABLE}")
+    endif()
+endforeach()
+
+get_filename_component(OUTPUT_DIRECTORY "${OUTPUT_FILE}" DIRECTORY)
+get_filename_component(SCENE_NAME "${SCENE}" NAME)
+set(STAGING_ROOT "${OUTPUT_DIRECTORY}/array-visual-runtime")
+set(STAGED_SCENE_DIRECTORY "${STAGING_ROOT}/TestScenes/ArrayTests")
+set(STAGED_SCENE "${STAGED_SCENE_DIRECTORY}/${SCENE_NAME}")
+
+file(REMOVE "${OUTPUT_FILE}")
+file(REMOVE_RECURSE "${STAGING_ROOT}")
+file(MAKE_DIRECTORY "${STAGED_SCENE_DIRECTORY}")
+file(COPY "${RIBTOOLS_DIR}/ribtools.ini" DESTINATION "${STAGING_ROOT}")
+file(COPY "${RIBTOOLS_DIR}/Resources" DESTINATION "${STAGING_ROOT}")
+file(COPY "${SCENE}" "${SHADER}" DESTINATION "${STAGED_SCENE_DIRECTORY}")
+
+execute_process(
+    COMMAND
+        "${CMAKE_COMMAND}" -E env
+        "RIBTOOLS_DIR=${STAGING_ROOT}"
+        "${RENDERER}" "${STAGED_SCENE}"
+    WORKING_DIRECTORY "${OUTPUT_DIRECTORY}"
+    RESULT_VARIABLE RENDER_RESULT
+    OUTPUT_VARIABLE RENDER_STDOUT
+    ERROR_VARIABLE RENDER_STDERR)
+
+string(CONCAT RENDER_LOG "${RENDER_STDOUT}" "${RENDER_STDERR}")
+
+if (NOT RENDER_RESULT EQUAL 0)
+    message(FATAL_ERROR "Renderer exited with ${RENDER_RESULT}:\n${RENDER_LOG}")
+endif()
+
+if (RENDER_LOG MATCHES "SCENE ERR>|SHADER ERROR:")
+    message(FATAL_ERROR "Renderer reported an error:\n${RENDER_LOG}")
+endif()
+
+if (NOT EXISTS "${OUTPUT_FILE}")
+    message(FATAL_ERROR "Renderer did not create ${OUTPUT_FILE}:\n${RENDER_LOG}")
+endif()
+
+message(STATUS "Visual regression render completed:\n${RENDER_LOG}")

@@ -122,11 +122,20 @@
 
     #endif
 
-        static const VecNMask VecNMaskFull = (VecNMask)-1;
+        // Portable backends store one mask bit per SIMD lane.
+        static const VecNMask VecNMaskFull =
+            static_cast<VecNMask>((1u << DMT_SIMD_FLEN) - 1u);
         static const VecNMask VecNMaskEmpty = (VecNMask)0;
 
-        inline VecNMask CmpMaskEQ( const VecNMask &lval, const VecNMask &rval ) { return lval == rval; }
-        inline VecNMask CmpMaskNE( const VecNMask &lval, const VecNMask &rval ) { return lval != rval; }
+        inline VecNMask CmpMaskEQ( const VecNMask &lval, const VecNMask &rval )
+        {
+            return static_cast<VecNMask>(~(lval ^ rval)) & VecNMaskFull;
+        }
+
+        inline VecNMask CmpMaskNE( const VecNMask &lval, const VecNMask &rval )
+        {
+            return (lval ^ rval) & VecNMaskFull;
+        }
 
 #endif
 

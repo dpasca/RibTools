@@ -32,6 +32,15 @@ static const DStr getOperand(
     //DASSERT( pOperand->mpParent && pOperand->mpParent->mpChilds.size() >= 1 );
     while ( pOperand )
     {
+        if ( pOperand->mpToken && pOperand->mpToken->IsAssignOp() )
+        {
+            // An assignment expression evaluates to the value that was assigned.
+            // This is especially important for an array element destination: its
+            // load register is not populated by the store instruction.
+            pOperand = pOperand->GetChildTry( 1 );
+            continue;
+        }
+
         const Variable	*pVar = pOperand->GetVarPtr();
 
         if ( pVar )

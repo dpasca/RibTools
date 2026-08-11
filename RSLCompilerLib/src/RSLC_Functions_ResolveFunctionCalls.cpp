@@ -243,6 +243,42 @@ static TokNode *insertAssignToVar(
 }
 
 //==================================================================
+static const TokNode *findArrayArgument( const TokNode *pNode )
+{
+    const Variable *pVariable = pNode->mVarLink.GetVarPtr();
+    if ( pVariable != nullptr && pVariable->IsArray() )
+        return pNode;
+
+    // Function-argument wrappers may add one structural node, but an indexed
+    // access or any other expression is a scalar value rather than an array.
+    if (
+        pNode->mpChilds.size() == 1 &&
+        (pNode->mpToken == nullptr || !pNode->mpToken->IsBiOp()) )
+        return findArrayArgument( pNode->mpChilds[0] );
+
+    return nullptr;
+}
+
+//==================================================================
+static void remapVariableLinks(
+                    TokNode *pNode,
+                    const Variable &from,
+                    const VarLink &to )
+{
+    const Variable *pLinkedVariable = pNode->mVarLink.GetVarPtr();
+    if (
+        pLinkedVariable != nullptr &&
+        (pLinkedVariable == &from ||
+         pLinkedVariable->mInternalName == from.mInternalName) )
+    {
+        pNode->mVarLink = to;
+    }
+
+    for (TokNode *pChild : pNode->mpChilds)
+        remapVariableLinks( pChild, from, to );
+}
+
+//==================================================================
 static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassParams )
 {
     for (int i=0,j=0; i < (int)pParamsHooks->mpChilds.size(); ++i)
@@ -260,7 +296,30 @@ static void assignPassingParams( TokNode *pParamsHooks, const TokNode *pPassPara
 
         if ( desTokID == T_OP_LFT_SQ_BRACKET )
         {
-            // special case for arrays
+            TokNode *pParameterName = pDestNode->GetChildTry( 0 );
+            const TokNode *pArrayArgument = findArrayArgument( pPassParam );
+            if ( pParameterName == nullptr || pArrayArgument == nullptr )
+                throw Exception( pPassParam, "Array argument must name an array variable" );
+
+            Variable *pParameterVariable = pParameterName->mVarLink.GetVarPtr();
+            const Variable *pArgumentVariable = pArrayArgument->mVarLink.GetVarPtr();
+            DASSERT( pParameterVariable != nullptr && pArgumentVariable != nullptr );
+
+            if ( pParameterVariable->mArraySize != pArgumentVariable->mArraySize )
+            {
+                throw Exception(
+                    pPassParam,
+                    "Array argument '%s[%u]' does not match parameter size %u",
+                    pArrayArgument->GetTokStr(),
+                    pArgumentVariable->mArraySize,
+                    pParameterVariable->mArraySize );
+            }
+
+            remapVariableLinks(
+                pParamsHooks,
+                *pParameterVariable,
+                pArrayArgument->mVarLink );
+
             pDestNode->UnlinkFromParent();
             DSAFE_DELETE( pDestNode );
             i -= 1;

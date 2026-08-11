@@ -8,6 +8,7 @@
 
 #include "stdafx.h"
 #include <exception>
+#include <limits>
 #include "RI_Base.h"
 #include "RI_Symbol.h"
 
@@ -36,22 +37,28 @@ void *Symbol::AllocClone( size_t size ) const
 
     void	*pOutData = NULL;
 
-    size_t	blocksN = DMT_SIMD_BLOCKS( size );
+    const size_t blocksN = DMT_SIMD_BLOCKS( size );
+    const size_t arraySize = IsArray() ? GetArraySize() : 1;
+    DASSTHROW( arraySize > 0, "Cannot allocate an empty array" );
+    DASSTHROW(
+        blocksN <= std::numeric_limits<size_t>::max() / arraySize,
+        "Array allocation is too large" );
+    const size_t valuesN = blocksN * arraySize;
 
     // for now, matrix and string can only be uniform (dunno someday about matrices ?)
     DASSERT( !(mType == Symbol::TYP_MATRIX || mType == Symbol::TYP_STRING) || size == 1 );
 
     switch ( mType )
     {
-    case Symbol::TYP_FLOAT:	pOutData = allocStream( sizeof(Float_)*blocksN );	break;
+    case Symbol::TYP_FLOAT:	pOutData = allocStream( sizeof(Float_)*valuesN );	break;
     case Symbol::TYP_POINT:
     case Symbol::TYP_VECTOR:
-    case Symbol::TYP_NORMAL:pOutData = allocStream( sizeof(Float3_)*blocksN );	break;
-    case Symbol::TYP_HPOINT:pOutData = allocStream( sizeof(Float4_)*blocksN );	break;
-    case Symbol::TYP_COLOR:	pOutData = allocStream( sizeof(SlColor)*blocksN );	break;
-    case Symbol::TYP_MATRIX:pOutData = allocStream( sizeof(Matrix44)*size );	break;
-    case Symbol::TYP_STRING:pOutData = allocStream( sizeof(SlStr)*size );		break;
-    case Symbol::TYP_BOOL:	pOutData = allocStream( sizeof(VecNMask)*size );	break;
+    case Symbol::TYP_NORMAL:pOutData = allocStream( sizeof(Float3_)*valuesN );	break;
+    case Symbol::TYP_HPOINT:pOutData = allocStream( sizeof(Float4_)*valuesN );	break;
+    case Symbol::TYP_COLOR:	pOutData = allocStream( sizeof(SlColor)*valuesN );	break;
+    case Symbol::TYP_MATRIX:pOutData = allocStream( sizeof(Matrix44)*valuesN );	break;
+    case Symbol::TYP_STRING:pOutData = allocStream( sizeof(SlStr)*valuesN );	break;
+    case Symbol::TYP_BOOL:	pOutData = allocStream( sizeof(VecNMask)*valuesN );	break;
 
     default:
         DASSERT( 0 );
@@ -72,6 +79,7 @@ void Symbol::FreeClone( void *pData ) const
 void Symbol::CopyConstValue( void *pDestData ) const
 {
     DASSERT( IsConstant() );
+    DASSERT( !IsArray() );
 
     switch ( mType )
     {
@@ -95,6 +103,7 @@ void Symbol::CopyConstValue( void *pDestData ) const
 void Symbol::InitConstValue( const void *pSrcData )
 {
     DASSERT( mpConstVal == NULL );
+    DASSERT( !IsArray() );
 
     mpConstVal = AllocClone( 1 );
 
@@ -281,6 +290,8 @@ Symbol *SymbolList::AddByParams( const Symbol::CtorParams &params )
     pSym->mType			= params.mType;
     pSym->mStorage		= params.mStorage;
     pSym->mClass		= params.mClass;
+    pSym->mIsArray		= params.mIsArray;
+    pSym->mArraySize	= params.mArraySize;
 
     if ( params.mpSrcData )
         pSym->InitConstValue( params.mpSrcData );

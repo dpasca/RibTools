@@ -31,6 +31,7 @@ static const u_int OPC_FLG_FUNCOP_END		= 32;	// it's a funcop end instruction
 static const u_int OPC_FLG_DIRPOSLIGHT		= 64;	// it's dealing with positional and directional light
 static const u_int OPC_FLG_VM_HANDLED		= 128;	// handled directly by the VM dispatch loop
 static const u_int OPC_FLG_UNIMPLEMENTED	= 256;	// recognized, but rejected by the RRASM parser
+static const u_int OPC_FLG_2NDISARRAY		= 512;	// second operand must be an array; all others must be scalar
 
 //==================================================================
 struct OpCodeDef

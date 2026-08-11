@@ -35,24 +35,47 @@ removed or converted into permanent documentation once the work is complete.
 - [x] Verify identical table lengths and require callbacks at every executable opcode index.
 - [x] Require unique case-insensitive names, valid operand counts and types, known flags, and callbacks for executable opcodes.
 - [x] Mark VM-handled and deliberately unimplemented instructions explicitly; reject unimplemented instructions while loading.
-- [x] Compile and load 35 known-positive shaders through the real RRASM parser.
+- [x] Generate RRASM metadata and VM callbacks from one shared opcode registry.
+- [x] Compile and load 39 known-positive shaders through the real RRASM parser.
 - [x] Fix RRASM array declarations so `array <size> <type>` consumes the element type correctly.
+
+### Unsupported-feature diagnostics
+
+- [x] Reject `environment()` with a source-located, explicit not-implemented diagnostic.
+- [x] Reject the missing `alpha` imager global with a source-located, explicit not-implemented diagnostic.
+- [x] Diagnose invalid array sizes, element types, scalar indexing, constant out-of-range indices, and non-array function arguments.
+
+### Fixed-size float arrays
+
+- [x] Preserve array shape in RRASM symbols and allocate storage for every SIMD block and element.
+- [x] Implement scalar-float `arrld.sss` and `arrst.sss` for uniform and varying arrays and indices.
+- [x] Alias inlined array function parameters to their caller arrays and validate matching lengths.
+- [x] Fix chained element assignment so `a[0] = a[1] = value` reuses the assigned value.
+- [x] Execute a multi-block, partial-final-block array round trip in the VM regression suite.
+- [x] Compile and load the historical `test11.sl` array case through the compiler and RRASM loader.
+
+### Visual and control-flow regression
+
+- [x] Render two array-shaded objects selected through `if`/`else`, then assert red-left and green-right pixels.
+- [x] Stage render assets in the build tree, reject renderer error output, and prevent stale images or generated source-tree files.
+- [x] Fix the scalar SIMD full-mask definition that made uniform `if` conditions always false on Apple Silicon.
+- [x] Add a direct VM semantic test for both uniform `if` branches.
 
 ## Next step
 
-- [ ] Replace the parallel opcode arrays with one shared registry when making the next structural VM change.
-- [ ] Improve diagnostics for unsupported globals and built-ins before starting fixed-size array work.
-- [ ] Implement and test the missing `arrld` and `arrst` VM instructions.
+- [ ] Add an opt-in ASan/UBSan build and run the compiler, VM, and visual regression ladder under it.
+- [ ] Decide whether to extend arrays to additional element types or first implement varying `if`/`else` lane masks.
+- [ ] Add logical unary `!` once boolean and varying-mask semantics are covered.
 
 ## Correctness backlog
 
 - [ ] Make compiler output deterministic; the first compiler-to-loader regression is now in place.
 - [x] Validate opcode metadata, callback coverage, and compiler output exercised by the positive shader corpus.
-- [ ] Cover unexercised opcode-emission paths by generating the tables from one shared registry.
-- [ ] Make unsupported built-ins compile-time errors instead of emitting unusable code.
+- [x] Cover opcode metadata and callback alignment by generating both tables from one shared registry.
+- [x] Make the known unsupported `environment()` built-in and `alpha` global compile-time errors.
 - [ ] Add an opt-in ASan/UBSan test build.
 - [ ] Implement logical unary `!` after verifying boolean VM semantics.
-- [ ] Implement fixed one-dimensional arrays end to end.
+- [x] Implement fixed one-dimensional float arrays end to end.
 - [ ] Implement varying `if`/`else` lane masks, followed by loop control flow.
 
 ## Modernization backlog
@@ -68,14 +91,15 @@ removed or converted into permanent documentation once the work is complete.
 1. Unit tests for compiler stages such as preprocessing and expression handling.
 2. Compile-and-load tests that pass every emitted shader through the RRASM parser.
 3. Semantic tests that execute shaders over small, controlled sample grids.
-4. Small deterministic renders with reference, result, and difference images.
+4. Small deterministic renders with reference-image comparisons or focused pixel assertions.
 
 ## Known corpus gaps
 
-- `shinimetal_test.sl` now compiles past `-I`, then fails while resolving its unsupported `environment()` expression.
-- `background.sl` uses an `alpha` imager global that is not declared by the compiler built-ins or runtime.
+- `shinimetal_test.sl` now fails with an explicit diagnostic because `environment()` remains unimplemented.
+- `background.sl` now fails with an explicit diagnostic because the `alpha` imager global remains unimplemented.
 - `test03.sl` deliberately calls a float function with a point argument and remains a negative type-checking case.
-- `test11.sl` compiles array operations and its declarations now load correctly, but the VM lacks `arrld` and `arrst`.
+- Arrays currently support only `float` elements; array-valued shader/RIB parameters and other element types remain future work.
+- Varying `if`/`else` lane masks remain unimplemented; the new control-flow regression covers uniform conditions.
 - Matrix equality opcodes are declared but have no implementation, so the RRASM parser now rejects them instead of allowing a null callback.
 
 ## Diagnostic builds

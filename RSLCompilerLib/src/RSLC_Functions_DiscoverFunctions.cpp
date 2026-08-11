@@ -6,6 +6,8 @@
 /// copyright info. 
 //==================================================================
 
+#include <cstring>
+
 #include "RSLC_Tree.h"
 #include "RSLC_Functions.h"
 #include "RSLC_Exceptions.h"
@@ -321,7 +323,16 @@ static void discoverFuncsCalls_sub(
                         funcs );
 
         if NOT( pFunc )
+        {
+            if ( std::strcmp( pFuncCallNode->GetTokStr(), "environment" ) == 0 )
+            {
+                throw Exception(
+                    pFuncCallNode,
+                    "Built-in function 'environment' is not implemented" );
+            }
+
             return;
+        }
 
         // see if it's a funcop
         if ( pFunc->mpRetTypeTok->id == T_KW___funcop )

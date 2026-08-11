@@ -16,6 +16,7 @@ namespace RSLC
 class TokNode;
 
 void RealizeArraysSizes( TokNode *pNode );
+void ValidateArrayAccesses( TokNode *pNode );
 
 void GenerateArrayAssignOperators( TokNode *pNode );
 

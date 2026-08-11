@@ -100,6 +100,8 @@ RSLCompiler::RSLCompiler(
     // discover variables usage
     DiscoverVariablesUsage( mpRoot );
 
+    ValidateArrayAccesses( mpRoot );
+
     RealizeConstants( mpRoot );
 
     SolveExpressions( mpRoot, false );

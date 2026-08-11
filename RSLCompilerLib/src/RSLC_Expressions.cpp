@@ -6,6 +6,8 @@
 /// copyright info. 
 //==================================================================
 
+#include <cstring>
+
 #include "RSLC_Tree.h"
 #include "RSLC_Exceptions.h"
 #include "RSLC_Operators.h"
@@ -15,6 +17,17 @@
 //==================================================================
 namespace RSLC
 {
+
+//==================================================================
+static void throwUnknownVariable( const TokNode *pNode )
+{
+    if ( std::strcmp( pNode->GetTokStr(), "alpha" ) == 0 )
+    {
+        throw Exception( pNode, "Global variable 'alpha' is not implemented" );
+    }
+
+    throw Exception( pNode, "Unknown variable '%s'", pNode->GetTokStr() );
+}
 
 //==================================================================
 static void getTwoOperands(
@@ -41,6 +54,13 @@ static void getTwoOperands(
             {
                 out_vtypes[opIdx] = vtype;
                 break;
+            }
+
+            if (
+                out_pOperands[opIdx]->IsNonTerminal() &&
+                out_pOperands[opIdx]->mpChilds.empty() )
+            {
+                throwUnknownVariable( out_pOperands[opIdx] );
             }
         }
     }
@@ -213,6 +233,21 @@ static void solveExpressions_sub( TokNode *pNode, const DVec<Function> &funcs )
         if ( pFunc )
         {
             pNode->mFuncCall.mpFunc = pFunc;
+        }
+        else
+        if ( !IsAsmFunc( pNode->GetTokStr() ) )
+        {
+            if ( std::strcmp( pNode->GetTokStr(), "environment" ) == 0 )
+            {
+                throw Exception(
+                    pNode,
+                    "Built-in function 'environment' is not implemented" );
+            }
+
+            throw Exception(
+                pNode,
+                "Could not find a matching function '%s'",
+                pNode->GetTokStr() );
         }
     }
     else

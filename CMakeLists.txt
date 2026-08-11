@@ -179,6 +179,13 @@ if (BUILD_TESTING)
         RISystemShaderCompilerTests
         PRIVATE RI_System RSLCompilerLib)
 
+    add_executable(
+        RIArrayVisualTests
+        RI_System/tests/ArrayVisualTests.cpp)
+    target_link_libraries(
+        RIArrayVisualTests
+        PRIVATE DImage DSystem)
+
     set(RIBTOOLS_SHADER_CONTRACT_SOURCES
         "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/matte_fat.sl"
         "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/matte.sl"
@@ -191,6 +198,7 @@ if (BUILD_TESTING)
         "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test08.sl"
         "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test09.sl"
         "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test10_1.sl"
+        "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/test11.sl"
         "${CMAKE_SOURCE_DIR}/RSLCompilerCmd/tests/unary_operators.sl"
         "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/ambientlight.sl"
         "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/arealight.sl"
@@ -202,6 +210,7 @@ if (BUILD_TESTING)
         "${CMAKE_SOURCE_DIR}/DistribSrc/base/Resources/Shaders/pointlight.sl"
         "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/KillerooNURBS/Shaders/disp_textured.sl"
         "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/KillerooNURBS/Shaders/shoulderlight.sl"
+        "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ArrayTests/array_red_green.sl"
         "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/MiscTests/T01_TestIfElse.sl"
         "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/SpacesTests/SpacesTest1Sha.sl"
         "${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/SpacesTests/SpacesTestCameraSha.sl"
@@ -275,6 +284,32 @@ if (BUILD_TESTING)
         PROPERTIES
             ENVIRONMENT "RIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base"
             WILL_FAIL TRUE)
+
+    add_test(
+        NAME RI_System.ArrayVisualRender
+        COMMAND "${CMAKE_COMMAND}"
+            "-DRENDERER=$<TARGET_FILE:RibRender>"
+            "-DSCENE=${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ArrayTests/array_red_green.rib"
+            "-DSHADER=${CMAKE_SOURCE_DIR}/DistribSrc/base/TestScenes/ArrayTests/array_red_green.sl"
+            "-DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/array_red_green.tiff"
+            "-DRIBTOOLS_DIR=${CMAKE_SOURCE_DIR}/DistribSrc/base"
+            -P "${CMAKE_SOURCE_DIR}/RI_System/tests/RunVisualRenderTest.cmake")
+    set_tests_properties(
+        RI_System.ArrayVisualRender
+        PROPERTIES
+            FIXTURES_SETUP RIArrayVisual
+            TIMEOUT 30)
+
+    add_test(
+        NAME RI_System.ArrayVisualCheck
+        COMMAND RIArrayVisualTests
+            "${CMAKE_CURRENT_BINARY_DIR}/array_red_green.tiff")
+    set_tests_properties(
+        RI_System.ArrayVisualCheck
+        PROPERTIES
+            DEPENDS RI_System.ArrayVisualRender
+            FIXTURES_REQUIRED RIArrayVisual
+            WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
     if (UNIX AND NOT APPLE)
         find_program(RIBTOOLS_XVFB_RUN xvfb-run)

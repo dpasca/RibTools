@@ -100,6 +100,8 @@ public:
     Type	mType;
     Storage	mStorage;
     u_int	mClass;
+    bool	mIsArray;
+    size_t	mArraySize;
     void	*mpConstVal;
 
 public:
@@ -133,6 +135,8 @@ public:
         mType		= params.mType;
         mStorage	= params.mStorage;
         mClass		= params.mClass;
+        mIsArray	= params.mIsArray;
+        mArraySize	= params.mArraySize;
         mpConstVal = NULL;
     }
 
@@ -141,6 +145,8 @@ public:
         mType = TYP_UNKNOWN;
         mStorage = STOR_TEMPORARY;
         mClass = 0;
+        mIsArray = false;
+        mArraySize = 0;
         mpConstVal = NULL;
     }
 
@@ -156,6 +162,9 @@ public:
     bool IsUniform() const		{	return !(mClass & CLASS_MSK_VARYING);	}
 
     bool IsConstant() const		{	return !!(mClass & CLASS_MSK_CONSTANT);	}
+
+    bool IsArray() const			{ return mIsArray; }
+    size_t GetArraySize() const	{ return mArraySize; }
 
     bool IsName( const char *pSrc ) const
     {
@@ -230,13 +239,11 @@ class SymbolI
 {
     const Symbol	*mpSrcSymbol;
 public:
-    size_t			mArraySize;
     void			*mpValArray;
     //u_int			mDefaultValStartPC;
 
     SymbolI( const Symbol &symbol, size_t varyingAllocN ) :
         mpSrcSymbol(&symbol),
-        mArraySize(0),
         mpValArray(NULL)
         //, mDefaultValStartPC(INVALID_PC)
     {

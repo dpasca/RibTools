@@ -1,0 +1,19 @@
+##RenderMan RIB-Structure 1.0
+Display "array_red_green.tiff" "file" "rgb"
+Format 160 80 1
+PixelSamples 1 1
+Projection "perspective" "fov" 35
+
+Translate 0 0 8
+
+WorldBegin
+
+    Translate -1.1 0 0
+    Surface "array_red_green" "uniform float selectedIndex" [0]
+    Sphere 1 -1 1 360
+
+    Translate 2.2 0 0
+    Surface "array_red_green" "uniform float selectedIndex" [1]
+    Sphere 1 -1 1 360
+
+WorldEnd
