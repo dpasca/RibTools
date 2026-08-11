@@ -23,6 +23,13 @@
 #include "RI_System/include/RI_State.h"
 #include "DispDrivers/include/DispDriverFBuffOGL.h"
 
+#if defined(GL_CLAMP_TO_EDGE)
+static constexpr GLint kClampToEdge = GL_CLAMP_TO_EDGE;
+#else
+// The Windows OpenGL 1.1 header omits this core OpenGL 1.2 token.
+static constexpr GLint kClampToEdge = 0x812F;
+#endif
+
 //==================================================================
 static unsigned int getNextPow2(unsigned int val)
 {
@@ -83,8 +90,8 @@ DispDriverFBuffOGL::DispDriverFBuffOGL(const char* pFBuffOGLName, const DIMG::Im
     glBindTexture( GL_TEXTURE_2D, mTexId );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, kClampToEdge );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, kClampToEdge );
 
     if ( mSupportsNonPow2 )
     {
